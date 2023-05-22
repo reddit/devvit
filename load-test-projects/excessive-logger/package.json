@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "excessive-logger",
+  "description": "logs way too much",
+  "version": "0.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@devvit/public-api": "*",
+    "@devvit/tsconfig": "*",
+    "typescript": "*"
+  }
+}

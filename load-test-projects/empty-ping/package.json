@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "name": "empty-ping",
+  "description": "trivial ping app",
+  "version": "0.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@devvit/public-api": "*",
+    "@devvit/tsconfig": "*",
+    "typescript": "*"
+  }
+}
