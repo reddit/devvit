@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "remind-me-app-template",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "dependencies": {
+    "@devvit/protos": "*",
+    "@devvit/public-api": "*",
+    "chrono-node": "2.3.9"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "*",
+    "typescript": "4.9.3"
+  }
+}

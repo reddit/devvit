@@ -1,0 +1,60 @@
+{
+  "name": "@devvit/example-projects",
+  "version": "0.9.6",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./bundles/*": "./dist/bundles/*",
+    "./projects": "./dist/projects/index.js",
+    "./projects/*": "./dist/projects/*",
+    "./internal-projects": "./dist/internal-projects/index.js",
+    "./internal-projects/*": "./dist/internal-projects/*",
+    "./load-test-projects": "./dist/load-test-projects/index.js",
+    "./load-test-projects/*": "./dist/load-test-projects/*",
+    "./project-templates": "./dist/project-templates/index.js",
+    "./project-templates/*": "./dist/project-templates/*",
+    "./actor-templates": "./dist/actor-templates",
+    "./actor-templates/*": "./dist/actor-templates/*"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "clean": "rm -rf .turbo dist coverage .devvitLocalStorage",
+    "clobber": "yarn clean && rm -rf node_modules && rm -rf projects/*/node_modules || :",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepublishOnly": "rm -rf dist/bundles && publish-package-json",
+    "test": "yarn test:unit && yarn test:types && yarn lint",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@devvit/build-pack": "0.9.6",
+    "@devvit/builders": "0.9.6",
+    "@devvit/linkers": "0.9.6",
+    "@devvit/plugins": "0.9.6",
+    "@devvit/protos": "0.9.6",
+    "@devvit/public-api": "0.9.6",
+    "@devvit/runtimes": "0.9.6",
+    "rxjs": "7.5.7"
+  },
+  "devDependencies": {
+    "@devvit/eslint-config": "0.9.6",
+    "@devvit/repo-tools": "0.9.6",
+    "@devvit/shared-types": "0.9.6",
+    "@devvit/tsconfig": "0.9.6",
+    "eslint": "8.9.0",
+    "typescript": "4.9.3",
+    "vitest": "0.31.0"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  }
+}

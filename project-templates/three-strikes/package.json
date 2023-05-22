@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "three-strikes-app-template",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "dependencies": {
+    "@devvit/protos": "*",
+    "@devvit/public-api": "*"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "*",
+    "typescript": "4.9.3"
+  }
+}

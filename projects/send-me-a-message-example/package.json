@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "send-me-a-message-example",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "main": "index.js"
+}
