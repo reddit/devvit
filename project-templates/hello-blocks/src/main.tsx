@@ -6,28 +6,21 @@ Devvit.configure({
 
 Devvit.addCustomPostType({
   name: 'Hello Blocks',
-  initialState: async ({ reddit }) => {
-    const currentUser = await reddit.getCurrentUser();
+  render: ({ reddit, useState }) => {
+    const [currentUsername] = useState(async () => {
+      const currentUser = await reddit.getCurrentUser();
+      return currentUser.username;
+    });
 
-    return {
-      username: currentUser.username,
-      counter: 0,
-    };
-  },
-  render: ({ state }) => {
+    const [counter, setCounter] = useState(0);
+
     return (
       <vstack padding="medium" gap="medium" backgroundColor="#FFBEA6" cornerRadius="medium">
         <text style="heading" size="xxlarge">
-          Hello, {state.username ?? 'stranger'}! 👋
+          Hello, {currentUsername ?? 'stranger'}! 👋
         </text>
-        <text size="large">{`Click counter: ${state.counter}`}</text>
-        <button
-          onPress={() => {
-            state.counter += 1;
-          }}
-        >
-          Click me!
-        </button>
+        <text size="large">{`Click counter: ${counter}`}</text>
+        <button onPress={() => setCounter(counter + 1)}>Click me!</button>
       </vstack>
     );
   },
