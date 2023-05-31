@@ -4,11 +4,16 @@
   "version": "0.0.0",
   "license": "BSD-3-Clause",
   "type": "module",
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "vitest --run"
+  },
   "dependencies": {
     "@devvit/public-api-next": "*"
   },
   "devDependencies": {
     "@devvit/tsconfig": "*",
-    "typescript": "4.9.3"
+    "typescript": "4.9.3",
+    "vitest": "0.31.1"
   }
 }
