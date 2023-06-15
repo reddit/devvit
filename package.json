@@ -27,7 +27,7 @@
     "build": "./scripts/build.sh",
     "clean": "rm -rf .turbo dist coverage .devvitLocalStorage",
     "clobber": "yarn clean && rm -rf node_modules && rm -rf projects/*/node_modules || :",
-    "lint": "redlint . && ./scripts/lint-internal.sh",
+    "lint": "NODE_OPTIONS=\"--max-old-space-size=32000\" redlint . && ./scripts/lint-internal.sh",
     "lint:fix": "yarn lint --fix",
     "prepublishOnly": "rm -rf dist/bundles && publish-package-json && scripts/clean-internals.sh",
     "test": "yarn test:unit && yarn test:types && yarn lint",
@@ -42,6 +42,7 @@
     "@devvit/plugins": "0.9.9",
     "@devvit/protos": "0.9.9",
     "@devvit/public-api": "0.9.9",
+    "@devvit/public-api-next": "0.9.9",
     "@devvit/runtimes": "0.9.9",
     "rxjs": "7.5.7"
   },
@@ -50,7 +51,7 @@
     "@devvit/repo-tools": "0.9.9",
     "@devvit/shared-types": "0.9.9",
     "@devvit/tsconfig": "0.9.9",
-    "eslint": "8.9.0",
+    "eslint": "8.42.0",
     "typescript": "4.9.3",
     "vitest": "0.31.0"
   },
