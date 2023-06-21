@@ -1,16 +1,20 @@
 import { Devvit } from '@devvit/public-api-next';
 
 Devvit.addTrigger({
-  event: 'PostSubmit',
+  events: ['PostSubmit', 'PostCreate'],
   onEvent(event, _context) {
-    console.log(`Received OnPostSubmit event`);
+    if (event.type === 'PostSubmit') {
+      console.log('Received OnPostSubmit event');
+    } else if (event.type === 'PostCreate') {
+      console.log('Received OnPostCreate event');
+    }
   },
 });
 
 Devvit.addTrigger({
   events: ['PostUpdate', 'PostReport'],
   onEvent(event, _context) {
-    if (event.type == 'PostUpdate') {
+    if (event.type === 'PostUpdate') {
       console.log('Received OnPostUpdate event');
     } else if (event.type === 'PostReport') {
       console.log('Received OnPostReport event');
@@ -26,11 +30,15 @@ Devvit.addTrigger({
 });
 
 Devvit.addTrigger({
-  event: 'CommentSubmit',
+  events: ['CommentSubmit', 'CommentCreate'],
   onEvent(event, context) {
-    console.log('Received OnCommentSubmit event');
-    if (event.author?.id === context.appAccountId) {
-      console.log('hey! I created this comment; not going to respond');
+    if (event.type === 'CommentSubmit') {
+      console.log('Received OnCommentSubmit event');
+      if (event.author?.id === context.appAccountId) {
+        console.log('hey! I created this comment; not going to respond');
+      }
+    } else if (event.type === 'CommentCreate') {
+      console.log('Received OnCommentCreate event');
     }
   },
 });
