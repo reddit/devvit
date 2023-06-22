@@ -24,7 +24,7 @@ Devvit.addTrigger({
 
 Devvit.addTrigger({
   event: 'PostDelete',
-  onEvent(event, _context) {
+  onEvent(_event, _context) {
     console.log('Received OnPostDelete event');
   },
 });
@@ -45,42 +45,42 @@ Devvit.addTrigger({
 
 Devvit.addTrigger({
   event: 'CommentUpdate',
-  onEvent(event, _context) {
+  onEvent(_event, _context) {
     console.log('Received OnCommentUpdate event');
   },
 });
 
 Devvit.addTrigger({
   event: 'CommentReport',
-  onEvent(event, _context) {
+  onEvent(_event, _context) {
     console.log('Received OnCommentReport event');
   },
 });
 
 Devvit.addTrigger({
   event: 'CommentDelete',
-  onEvent(event, _context) {
+  onEvent(_event, _context) {
     console.log('Received OnCommentDelete event');
   },
 });
 
 Devvit.addTrigger({
   event: 'SubredditSubscribe',
-  onEvent(event, _context) {
+  onEvent(_event, _context) {
     console.log('Received OnSubredditSubscribe event');
   },
 });
 
 Devvit.addTrigger({
   event: 'AppInstall',
-  onEvent(event, _context) {
+  onEvent(_event, _context) {
     console.log('Received OnAppInstall event');
   },
 });
 
 Devvit.addTrigger({
   event: 'AppUpgrade',
-  onEvent(event, _context) {
+  onEvent(_event, _context) {
     console.log('Received OnAppUpgrade event');
   },
 });
