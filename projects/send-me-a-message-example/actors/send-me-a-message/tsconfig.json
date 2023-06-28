@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "."
-  },
-  "exclude": ["node_modules"],
-  "extends": "@devvit/tsconfig/base.json",
-  "include": ["./main.ts"]
-}

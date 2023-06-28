@@ -4,5 +4,12 @@
   "version": "0.0.0",
   "license": "BSD-3-Clause",
   "type": "module",
-  "main": "index.js"
+  "dependencies": {
+    "@devvit/public-api": "*",
+    "@devvit/shared-types": "*"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "*",
+    "typescript": "*"
+  }
 }
