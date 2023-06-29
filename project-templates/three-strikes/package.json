@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@devvit/protos": "*",
-    "@devvit/public-api": "*"
+    "@devvit/public-api-next": "*"
   },
   "devDependencies": {
     "@devvit/tsconfig": "*",

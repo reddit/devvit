@@ -1,110 +1,71 @@
-import {
-  Context,
-  ContextActionEvent,
-  Devvit,
-  KeyValueStorage,
-  RedditAPIClient,
-  UserContext,
-} from '@devvit/public-api';
-import { Metadata } from '@devvit/protos';
+import { Devvit, MenuItemOnPressEvent, User } from '@devvit/public-api-next';
 
-/**
- * Three-strikes mod tool
- *
- * Adds an action to Posts and Comments to remove the content and strike
- * the author with increasingly severe penalties.
- *
- * Strike 1: Send a private message warning the user of the action taken
- *           for the content
- * Strike 2: Ban for 1 day, warn again and add that an additional strike
- *           will result in banning for 1 year
- * Strike 3+: Ban the user for 1 year
- */
+Devvit.configure({
+  kvStore: true, // Enable access to kvStore
+  redditAPI: true,
+});
 
-/**
- * Provides access to the Key Value storage
- */
-const kv = new KeyValueStorage();
+Devvit.addMenuItem({
+  label: 'Remove and Strike',
+  location: ['post', 'comment'],
+  forUserType: 'moderator',
+  onPress: strike,
+});
 
-/**
- * The Reddit API client lets us make calls to the Reddit API.
- * To use it, we must instantiate it at the top of our main.ts file.
- */
-const reddit = new RedditAPIClient();
+Devvit.addMenuItem({
+  label: `Check User's Strikes`,
+  location: ['post', 'comment'],
+  forUserType: 'moderator',
+  onPress: checkStrikes,
+});
 
-/**
- * Declare our custom mod-only actions and add it to Posts and Comments
- */
-Devvit.addActions([
-  {
-    name: 'Remove and Strike',
-    description: 'Remove this and add a strike to the author',
-    context: [Context.POST, Context.COMMENT],
-    userContext: UserContext.MODERATOR,
-    handler: strike,
-  },
-  {
-    name: `Check User's Strikes`,
-    description: 'Tells you how many strikes the author has',
-    context: [Context.POST, Context.COMMENT],
-    userContext: UserContext.MODERATOR,
-    handler: checkStrikes,
-  },
-  {
-    name: 'Remove Strike from Author',
-    description: 'Remove a strike from the author of this content',
-    context: [Context.POST, Context.COMMENT],
-    userContext: UserContext.MODERATOR,
-    handler: removeStrike,
-  },
-  {
-    name: 'Remove All Strikes from Author',
-    description: `Reset the author's strike count to zero`,
-    context: [Context.POST, Context.COMMENT],
-    userContext: UserContext.MODERATOR,
-    handler: clearStrikes,
-  },
-]);
+Devvit.addMenuItem({
+  label: 'Remove Strike from Author',
+  location: ['post', 'comment'],
+  forUserType: 'moderator',
+  onPress: removeStrike,
+});
+
+Devvit.addMenuItem({
+  label: 'Remove All Strikes from Author',
+  location: ['post', 'comment'],
+  forUserType: 'moderator',
+  onPress: clearStrikes,
+});
+
+async function getThing(event: MenuItemOnPressEvent, context: Devvit.Context) {
+  const { location, targetId } = event;
+  const { reddit } = context;
+  if (location === 'post') {
+    return await reddit.getPostById(targetId);
+  } else if (location === 'comment') {
+    return await reddit.getCommentById(targetId);
+  }
+  throw 'Cannot find a post or comment with that ID';
+}
+
+async function getAuthor(event: MenuItemOnPressEvent, context: Devvit.Context) {
+  const { reddit } = context;
+  const thing = await getThing(event, context);
+  return await reddit.getUserById(thing.authorId!);
+}
 
 /**
  * Handles the 'strike' action
  */
-async function strike(event: ContextActionEvent, metadata?: Metadata) {
+async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   // Use the correct term in our message based on what was acted upon
-  const contextType = event.context === Context.POST ? 'post' : 'comment';
+  const { location } = event;
+  const { reddit, ui } = context;
+  const thing = await getThing(event, context);
+  const author = await getAuthor(event, context);
 
-  // Get some relevant data from the post or comment
-  let id: string | undefined, author: string | undefined, permalink: string | undefined;
-
-  if (event.context === Context.POST) {
-    id = `t3_${event.post.id}`;
-    author = event.post.author;
-    permalink = event.post.permalink;
-  } else if (event.context === Context.COMMENT) {
-    id = `t1_${event.comment.id}`;
-    author = event.comment.author;
-    permalink = event.comment.permalink;
-  }
-
-  if (!id || !author || !permalink) {
-    return {
-      success: false,
-      message: `Metadata is missing for ${contextType}!`,
-    };
-  }
-
-  /**
-   * Remove the content
-   * See: https://www.reddit.com/dev/api#POST_api_remove
-   *
-   * NOTE: Apps are executed as the moderator that installed this app and
-   *       must have permission to remove content for this to work!
-   */
-  await reddit.remove(id, false, metadata);
+  // Remove the content
+  await thing!.remove();
 
   // Add a strike to the user and persist it to the KVStore
-  let strikes = await getAuthorStrikes(author!, metadata);
-  await setAuthorStrikes(author, ++strikes, metadata);
+  let strikes = await getAuthorStrikes(author, context);
+  await setAuthorStrikes(author, ++strikes, context);
 
   // What we'll send the user in a private message
   let pmMessage = '';
@@ -116,180 +77,124 @@ async function strike(event: ContextActionEvent, metadata?: Metadata) {
   let days = 0;
 
   // Get the current subreddit from the metadata
-  const subreddit = await reddit.getCurrentSubreddit(metadata);
-
+  const subreddit = await reddit.getCurrentSubreddit();
+  const { permalink } = thing;
   switch (strikes) {
     case 1:
       // first strike, send a warning
-      pmMessage = `You have received a strike and your ${contextType} has been removed from ${subreddit.name} for breaking the rules. Another strike will result in a 1-day ban.\n\n${permalink}`;
+      pmMessage = `You have received a strike and your ${location} has been removed from ${subreddit.name} for breaking the rules. Another strike will result in a 1-day ban.\n\n${permalink}`;
       punishment = `sent a warning`;
       ban = false;
       break;
     case 2:
       // second strike, temp ban, warn again
       days = 1;
-      pmMessage = `You have received your second strike and your ${contextType} has been removed from ${subreddit.name} and you have been banned for 1 day for breaking the rules.\n\nONE MORE STRIKE WILL RESULT IN A 1-YEAR BAN FROM THIS SUBREDDIT.\n\n${permalink}`;
+      pmMessage = `You have received your second strike and your ${location} has been removed from ${subreddit.name} and you have been banned for 1 day for breaking the rules.\n\nONE MORE STRIKE WILL RESULT IN A 1-YEAR BAN FROM THIS SUBREDDIT.\n\n${permalink}`;
       punishment = `banned for 1 day`;
       break;
     case 3:
     default:
       // third (and any subsequent strikes), ban for 1 year from now
       days = 365;
-      pmMessage = `You have been banned from ${subreddit.name} for one year for receiving ${strikes} strikes for your ${contextType}.\n\n${permalink}`;
+      pmMessage = `You have been banned from ${subreddit.name} for one year for receiving ${strikes} strikes for your ${location}.\n\n${permalink}`;
       punishment = `banned for 1 year`;
       break;
   }
 
-  /**
-   * Send a private message to the user
-   * See: https://www.reddit.com/dev/api#POST_api_compose
-   *
-   * NOTE: Apps are executed as the moderator that installed this app into a
-   *       subreddit and will be used as the user that sends this message!
-   */
-  await reddit.sendPrivateMessage(
-    {
-      to: author,
-      subject: `Received a strike on ${subreddit.name}`,
-      text: pmMessage,
-    },
-    metadata
-  );
+  // Send a private message to the user
+  await reddit.sendPrivateMessage({
+    to: author.username,
+    subject: `Received a strike on ${subreddit.name}`,
+    text: pmMessage,
+  });
 
-  const result = `u/${author} has ${strikes} strike${
-    strikes !== 1 ? 's' : ''
-  } and has been ${punishment}.`;
+  const result = `u/${author.username} strikes: ${strikes} and has been ${punishment}.`;
 
   if (ban) {
-    // Get the current user from the metadata
-    const currentUser = await reddit.getCurrentUser(metadata);
-
-    /**
-     * We ban a user by creating a "banned" relationship between the user
-     * and the subreddit.
-     * See: https://www.reddit.com/dev/api#POST_api_friend
-     *
-     * NOTE: Apps are executed as the moderator that installed this app and
-     *       must have permission to ban users for this to work!
-     */
-
-    await reddit.banUser(
-      {
-        subredditName: subreddit.name,
-        username: author,
-        duration: days,
-        context: id,
-        reason: `Received ${strikes} strike${
-          strikes !== 1 ? 's' : ''
-        } for breaking subreddit rules`,
-        note: `Strike added by ${currentUser.username}`,
-      },
-      metadata
-    );
+    const currentUser = await reddit.getCurrentUser();
+    await reddit.banUser({
+      subredditName: subreddit.name,
+      username: author.username,
+      duration: days,
+      context: thing!.id,
+      reason: `Received ${strikes} strike${strikes !== 1 ? 's' : ''} for breaking subreddit rules`,
+      note: `Strike added by ${currentUser.username}`,
+    });
   }
 
-  return {
-    success: true,
-    message: result,
-  };
+  ui.showToast(result);
 }
 
-/**
- * Handles the 'checkstrikes' action
- */
-async function checkStrikes(event: ContextActionEvent, metadata?: Metadata) {
-  // Get some relevant data from the post or comment
-  let author: string | undefined;
-  if (event.context === Context.POST) {
-    author = event.post.author;
-  } else if (event.context === Context.COMMENT) {
-    author = event.comment.author;
-  }
-
-  const strikes = await getAuthorStrikes(author!, metadata);
-
-  return {
-    success: true,
-    message: `Author u/${author} has ${strikes} strike${strikes !== 1 ? 's' : ''}.`,
-  };
+async function checkStrikes(event: MenuItemOnPressEvent, context: Devvit.Context) {
+  const author = await getAuthor(event, context);
+  console.log('checking for ', author.username);
+  const { ui } = context;
+  const strikes = await getAuthorStrikes(author, context);
+  console.log('strikes are ', strikes);
+  ui.showToast(`Author u/${author.username} has ${strikes} strike${strikes !== 1 ? 's' : ''}.`);
 }
 
 /**
  * Handles the 'removestrike' action
  */
-async function removeStrike(event: ContextActionEvent, metadata?: Metadata) {
+async function removeStrike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   // Get some relevant data from the post or comment
-  let author: string | undefined;
-  if (event.context === Context.POST) {
-    author = event.post.author;
-  } else if (event.context === Context.COMMENT) {
-    author = event.comment.author;
-  }
+  const author = await getAuthor(event, context);
+  const { ui } = context;
+  let strikes = await getAuthorStrikes(author, context);
 
-  let strikes = await getAuthorStrikes(author!, metadata);
   if (strikes > 0) {
-    await setAuthorStrikes(author!, --strikes, metadata);
-    return {
-      success: true,
-      message: `Removed a strike from u/${author}. Remaining strikes: ${strikes}.`,
-    };
+    await setAuthorStrikes(author, --strikes, context);
+    ui.showToast(`Removed a strike from u/${author.username}. Remaining strikes: ${strikes}.`);
+    return;
   }
 
-  return {
-    success: false,
-    message: `u/${author} does not have any strikes!`,
-  };
+  ui.showToast(`u/${author.username} does not have any strikes!`);
 }
 
 /**
  * Handles the 'clearstrikes' action
  */
-async function clearStrikes(event: ContextActionEvent, metadata?: Metadata) {
+async function clearStrikes(event: MenuItemOnPressEvent, context: Devvit.Context) {
   // Get some relevant data from the post or comment
-  let author: string | undefined;
-  if (event.context === Context.POST) {
-    author = event.post.author;
-  } else if (event.context === Context.COMMENT) {
-    author = event.comment.author;
-  }
+  const author = await getAuthor(event, context);
+  const hadStrikes = await getAuthorStrikes(author, context);
+  const { ui } = context;
 
-  const hadStrikes = await getAuthorStrikes(author!, metadata);
   if (hadStrikes > 0) {
-    await setAuthorStrikes(author!, 0, metadata);
-
-    return {
-      success: true,
-      message: `Cleared ${hadStrikes} strike${hadStrikes !== 1 ? 's' : ''} from u/${author}!`,
-    };
+    await setAuthorStrikes(author!, 0, context);
+    ui.showToast(
+      `Cleared ${hadStrikes} strike${hadStrikes !== 1 ? 's' : ''} from u/${author.username}!`
+    );
+    return;
   }
 
-  return {
-    success: false,
-    message: `u/${author} does not have any strikes!`,
-  };
+  ui.showToast(`u/${author.username} does not have any strikes!`);
 }
 
 /**
  * Creates a KVStore key for the author
  */
-function getKeyForAuthor(author: string): string {
-  return `u_${author}_strikes`;
+function getKeyForAuthor(author: User) {
+  return `${author.id}_strikes`;
 }
 
 /**
  * Fetch the current strike count for the author
  */
-async function getAuthorStrikes(author: string, metadata?: Metadata): Promise<number> {
+async function getAuthorStrikes(author: User, context: Devvit.Context) {
+  const { kvStore } = context;
   const key = getKeyForAuthor(author);
-  return (await kv.get(key, metadata, 0)) as number;
+  return ((await kvStore.get(key)) as number) || 0;
 }
 
 /**
  * Updates the strike counter in the KVStore
  */
-async function setAuthorStrikes(author: string, strikes: number, metadata?: Metadata) {
+async function setAuthorStrikes(author: User, strikes: number, context: Devvit.Context) {
+  const { kvStore } = context;
   const key = getKeyForAuthor(author);
-  await kv.put(key, strikes, metadata);
+  await kvStore.put(key, strikes);
 }
 
 export default Devvit;

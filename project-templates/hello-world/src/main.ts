@@ -1,68 +1,50 @@
-import { Context, Devvit, UserContext } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api-next';
 
 /**
  * Declare the custom actions we'd like to add to the subreddit
  */
-Devvit.addAction({
-  context: Context.POST,
-  name: 'Custom Post Action', // text to display in the menu (keep it short!)
-  description: 'Do something with this post', // short blurb describing what we're going to do
-  handler: async (event) => {
-    const message = `Post action! Post ID: ${event.post?.id}`;
+Devvit.addMenuItem({
+  location: 'post', // location where the menu item appears
+  label: 'Custom Post Action', // text to display in the menu (keep it short!)
+  onPress: async (event, context) => {
+    const message = `Post action! Post ID: ${event.targetId}`;
     console.log(message);
-    /**
-     * We need to return two things from this call:
-     *  - success: whether the Action succeeded
-     *  - message: A bit of text to show the user as
-     *             feedback (confirmation, warning, error, etc.)
-     */
-    return { success: true, message };
+    const { ui } = context;
+    ui.showToast(message);
   },
 });
 
-Devvit.addAction({
-  context: Context.COMMENT,
-  name: 'Custom Comment Action', // text to display in the menu (keep it short!)
-  description: 'Do something with this comment', // short blurb describing what we're going to do
-  handler: async (event) => {
-    const message = `Comment action! Comment ID: ${event.comment?.id}`;
+Devvit.addMenuItem({
+  location: 'post',
+  forUserType: 'moderator', // limit the action to moderators
+  label: 'Custom Post Action, only for mods!',
+  onPress: async (event, context) => {
+    const message = `Post action for mods! Post ID: ${event.targetId}`;
     console.log(message);
-    return { success: true, message };
+    const { ui } = context;
+    ui.showToast(message);
   },
 });
 
-Devvit.addAction({
-  context: Context.SUBREDDIT,
-  name: 'Custom Subreddit Action', // text to display in the menu (keep it short!)
-  description: 'Do something with this subreddit', // short blurb describing what we're going to do
-  handler: async (event) => {
-    const message = `Subreddit action! Subreddit ID: ${event.subreddit?.id}`;
+Devvit.addMenuItem({
+  location: 'comment',
+  label: 'Custom Comment Action',
+  onPress: async (event, context) => {
+    const message = `Comment action! Comment ID: ${event.targetId}`;
     console.log(message);
-    return { success: true, message };
+    const { ui } = context;
+    ui.showToast(message);
   },
 });
 
-Devvit.addAction({
-  context: Context.POST,
-  userContext: UserContext.MODERATOR,
-  name: 'Custom Post Action, only for mods!', // text to display in the menu (keep it short!)
-  description: 'Do something with this post', // short blurb describing what we're going to do
-  handler: async (event) => {
-    const message = `Post action for mods! Post ID: ${event.post?.id}`;
+Devvit.addMenuItem({
+  location: 'subreddit',
+  label: 'Custom Subreddit Action',
+  onPress: async (event, context) => {
+    const message = `Subreddit action! Subreddit ID: ${event.targetId}`;
     console.log(message);
-    return { success: true, message };
-  },
-});
-
-Devvit.addAction({
-  context: Context.POST,
-  userContext: UserContext.MEMBER,
-  name: 'Custom Post Action, only for members!', // text to display in the menu (keep it short!)
-  description: 'Do something with this post', // short blurb describing what we're going to do
-  handler: async (event) => {
-    const message = `Post action for members! Post ID: ${event.post?.id}`;
-    console.log(message);
-    return { success: true, message };
+    const { ui } = context;
+    ui.showToast(message);
   },
 });
 

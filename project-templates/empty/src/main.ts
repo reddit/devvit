@@ -1,3 +1,14 @@
-import { Devvit } from '@devvit/public-api';
-// Visit developers.reddit.com/docs to view documentation for the Devvit api
+// Visit developers.reddit.com/docs to learn Devvit!
+
+import { Devvit } from '@devvit/public-api-next';
+
+Devvit.addMenuItem({
+  location: 'post',
+  label: 'Hello World',
+  onPress: (event, context) => {
+    console.log(`Pressed ${event.targetId}`);
+    context.ui.showToast('Hello world!');
+  },
+});
+
 export default Devvit;
