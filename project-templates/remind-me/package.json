@@ -9,12 +9,12 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/protos": "*",
-    "@devvit/public-api": "*",
+    "@devvit/protos": "0.10.0",
+    "@devvit/public-api": "0.10.0",
     "chrono-node": "2.3.9"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "*",
+    "@devvit/tsconfig": "0.10.0",
     "typescript": "4.9.3",
     "vitest": "0.31.1"
   }

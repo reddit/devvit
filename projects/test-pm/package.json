@@ -5,10 +5,10 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/protos": "*",
-    "@devvit/public-api-old": "*"
+    "@devvit/protos": "0.10.0",
+    "@devvit/public-api-old": "0.10.0"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "*"
+    "@devvit/tsconfig": "0.10.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@devvit/example-projects",
-  "version": "0.9.9",
+  "version": "0.10.0",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -36,21 +36,21 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/build-pack": "0.9.9",
-    "@devvit/builders": "0.9.9",
-    "@devvit/linkers": "0.9.9",
-    "@devvit/plugins": "0.9.9",
-    "@devvit/protos": "0.9.9",
-    "@devvit/public-api": "0.9.9",
-    "@devvit/public-api-old": "0.9.9",
-    "@devvit/runtimes": "0.9.9",
+    "@devvit/build-pack": "0.10.0",
+    "@devvit/builders": "0.10.0",
+    "@devvit/linkers": "0.10.0",
+    "@devvit/plugins": "0.10.0",
+    "@devvit/protos": "0.10.0",
+    "@devvit/public-api": "0.10.0",
+    "@devvit/public-api-old": "0.10.0",
+    "@devvit/runtimes": "0.10.0",
     "rxjs": "7.5.7"
   },
   "devDependencies": {
-    "@devvit/eslint-config": "0.9.9",
-    "@devvit/repo-tools": "0.9.9",
-    "@devvit/shared-types": "0.9.9",
-    "@devvit/tsconfig": "0.9.9",
+    "@devvit/eslint-config": "0.10.0",
+    "@devvit/repo-tools": "0.10.0",
+    "@devvit/shared-types": "0.10.0",
+    "@devvit/tsconfig": "0.10.0",
     "eslint": "8.42.0",
     "typescript": "4.9.3",
     "vitest": "0.31.0"
