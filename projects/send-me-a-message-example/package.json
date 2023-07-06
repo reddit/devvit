@@ -5,7 +5,7 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "*",
+    "@devvit/public-api-old": "*",
     "@devvit/shared-types": "*"
   },
   "devDependencies": {

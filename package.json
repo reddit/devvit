@@ -42,7 +42,7 @@
     "@devvit/plugins": "0.9.9",
     "@devvit/protos": "0.9.9",
     "@devvit/public-api": "0.9.9",
-    "@devvit/public-api-next": "0.9.9",
+    "@devvit/public-api-old": "0.9.9",
     "@devvit/runtimes": "0.9.9",
     "rxjs": "7.5.7"
   },

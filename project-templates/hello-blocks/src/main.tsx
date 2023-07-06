@@ -1,4 +1,4 @@
-import { Devvit } from '@devvit/public-api-next';
+import { Devvit } from '@devvit/public-api';
 
 Devvit.configure({
   redditAPI: true,

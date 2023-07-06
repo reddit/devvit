@@ -5,7 +5,7 @@
   "description": "an example of adding event listeners",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api-next": "*"
+    "@devvit/public-api": "*"
   },
   "devDependencies": {
     "@devvit/tsconfig": "*",

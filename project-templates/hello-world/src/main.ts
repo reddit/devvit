@@ -1,4 +1,4 @@
-import { Devvit } from '@devvit/public-api-next';
+import { Devvit } from '@devvit/public-api';
 
 /**
  * Declare the custom actions we'd like to add to the subreddit

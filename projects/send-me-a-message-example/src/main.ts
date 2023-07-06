@@ -1,4 +1,4 @@
-import { Context, Devvit, getFromMetadata, Header, NameLookup } from '@devvit/public-api';
+import { Context, Devvit, getFromMetadata, Header, NameLookup } from '@devvit/public-api-old';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 const PrivateMessages = Devvit.use(Devvit.Types.RedditAPI.PrivateMessages);

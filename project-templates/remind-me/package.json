@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@devvit/protos": "*",
-    "@devvit/public-api-next": "*",
+    "@devvit/public-api": "*",
     "chrono-node": "2.3.9"
   },
   "devDependencies": {

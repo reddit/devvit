@@ -1,6 +1,6 @@
 // Visit developers.reddit.com/docs to learn Devvit!
 
-import { Devvit } from '@devvit/public-api-next';
+import { Devvit } from '@devvit/public-api';
 
 Devvit.addMenuItem({
   location: 'post',

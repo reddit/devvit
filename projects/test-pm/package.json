@@ -6,7 +6,7 @@
   "type": "module",
   "dependencies": {
     "@devvit/protos": "*",
-    "@devvit/public-api": "*"
+    "@devvit/public-api-old": "*"
   },
   "devDependencies": {
     "@devvit/tsconfig": "*"

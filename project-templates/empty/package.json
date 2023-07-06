@@ -9,7 +9,7 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/public-api-next": "*"
+    "@devvit/public-api": "*"
   },
   "devDependencies": {
     "@devvit/tsconfig": "*",

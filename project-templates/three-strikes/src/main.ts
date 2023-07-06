@@ -1,4 +1,4 @@
-import { Devvit, MenuItemOnPressEvent, User } from '@devvit/public-api-next';
+import { Devvit, MenuItemOnPressEvent, User } from '@devvit/public-api';
 
 Devvit.configure({
   kvStore: true, // Enable access to kvStore

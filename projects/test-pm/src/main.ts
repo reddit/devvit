@@ -1,4 +1,4 @@
-import { Context, Devvit, RedditAPIClient, UserContext } from '@devvit/public-api';
+import { Context, Devvit, RedditAPIClient, UserContext } from '@devvit/public-api-old';
 const reddit = new RedditAPIClient();
 
 Devvit.addAction({

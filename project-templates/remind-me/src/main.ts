@@ -1,4 +1,4 @@
-import { Devvit, FormOnSubmitEvent } from '@devvit/public-api-next';
+import { Devvit, FormOnSubmitEvent } from '@devvit/public-api';
 import * as chrono from 'chrono-node';
 
 const REMIND_ME_JOB = 'remindmejob';
