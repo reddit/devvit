@@ -10,6 +10,7 @@ const numbro = numbroImport as unknown as any;
 
 Devvit.configure({
   redis: true,
+  redditAPI: true,
 });
 
 export enum PageType {
@@ -156,9 +157,10 @@ const addPoll = Devvit.createForm({
     type: 'string',
   }]
 }, async (event, { reddit, subredditId, ui, redis }) => {
+  const sub = await reddit.getSubredditById(subredditId)
   const answers = event.values.answers.split(',').map((answer: string, i: number) => ({ member: answer.trim(), score: i }));
   const options = {
-    subredditName: subredditId,
+    subredditName: sub.name,
     title: event.values.question,
     preview: (<hstack><text>loading...</text></hstack>)
   }
