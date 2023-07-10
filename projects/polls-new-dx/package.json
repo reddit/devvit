@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "name": "polls-new-dx",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "dependencies": {
+    "@devvit/protos": "0.10.0",
+    "@devvit/public-api": "0.10.0",
+    "@devvit/shared-types": "0.10.0",
+    "moment": "2.29.4",
+    "moment-duration-format": "2.3.2",
+    "numbro": "2.3.6"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "0.10.0",
+    "@types/numbro": "1.9.3",
+    "typescript": "4.9.3"
+  }
+}

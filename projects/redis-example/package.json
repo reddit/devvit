@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "name": "redis-example",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "dependencies": {
+    "@devvit/public-api": "*"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "*",
+    "typescript": "4.9.3"
+  }
+}
