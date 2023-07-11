@@ -3,20 +3,19 @@
 
 import { Devvit } from '@devvit/public-api';
 import { PageType, PollProps, formatCount } from '../main.js';
-import moment from "moment";
-
+import moment from 'moment';
 
 // const props = { option, index, selectedOption, setSelectedOption }
 export const PollOption = ({
   option,
   index,
   selectedOption,
-  setSelectedOption
+  setSelectedOption,
 }: {
-  option: string,
-  index: number,
-  selectedOption: number,
-  setSelectedOption: (n: number) => void
+  option: string;
+  index: number;
+  selectedOption: number;
+  setSelectedOption: (n: number) => void;
 }) => {
   const selectOption = () => setSelectedOption(index);
   const selected = index === selectedOption;
@@ -30,7 +29,7 @@ export const PollOption = ({
       data-selection={index}
     >
       <vstack cornerRadius={'full'} border={'thin'} borderColor={'black'} backgroundColor={bgColor}>
-        <spacer size={'medium'} shape='square' />
+        <spacer size={'medium'} shape="square" />
       </vstack>
 
       <text>{option}</text>
@@ -38,51 +37,53 @@ export const PollOption = ({
   );
 };
 
-export const VotePage: Devvit.AsyncBlockComponent<PollProps> = async ({ options, votes, setVotes, total, navigate, remainingMillis }, { redis, useState, userId, postId }) => {
+export const VotePage: Devvit.AsyncBlockComponent<PollProps> = async (
+  { options, votes, setVotes, total, navigate, remainingMillis },
+  { redis, useState, userId, postId }
+) => {
   const remaining = moment.duration(remainingMillis).humanize();
 
-  const [selectedOption, setSelectedOption] = useState(-1)
+  const [selectedOption, setSelectedOption] = useState(-1);
 
   const submitVote: Devvit.Blocks.OnPressEventHandler = async () => {
-    const userKey = `polls:${postId}:${userId}`
-    const tx = await redis.watch(userKey)
-    const already = await redis.get(userKey)
-    await tx.multi()
-    await tx.zAdd(`polls:${postId}:voted`, { member: userKey, score: 0 })
+    const userKey = `polls:${postId}:${userId}`;
+    const tx = await redis.watch(userKey);
+    const already = await redis.get(userKey);
+    await tx.multi();
+    await tx.zAdd(`polls:${postId}:voted`, { member: userKey, score: 0 });
     if (already) {
-      await tx.exec()
-      navigate(PageType.RESULTS)
-      return
+      await tx.exec();
+      navigate(PageType.RESULTS);
+      return;
     }
-    console.log(`polls:${postId}:${selectedOption}`)
-    await tx.set(userKey, selectedOption + "")
-    await redis.incrBy(`polls:${postId}:${selectedOption}`, 1)
-    await tx.exec()
-    setVotes(votes.map((v, i) => i == selectedOption ? v + 1 : v))
-    navigate(PageType.RESULTS)
-  }
+    console.log(`polls:${postId}:${selectedOption}`);
+    await tx.set(userKey, selectedOption + '');
+    await redis.incrBy(`polls:${postId}:${selectedOption}`, 1);
+    await tx.exec();
+    setVotes(votes.map((v, i) => (i == selectedOption ? v + 1 : v)));
+    navigate(PageType.RESULTS);
+  };
   return (
-    <vstack gap='medium' padding='small'>
+    <vstack gap="medium" padding="small">
       <hstack>
-        <text style='heading'>Open</text>
+        <text style="heading">Open</text>
         <text>&nbsp;· {formatCount(total)} votes</text>
       </hstack>
-      <hstack border='thin'></hstack>
+      <hstack border="thin"></hstack>
 
-      {
-        options.map((option, index) => {
-          const props = { option, index, selectedOption, setSelectedOption }
-          return <PollOption {...props} />
-        })
-      }
+      {options.map((option, index) => {
+        const props = { option, index, selectedOption, setSelectedOption };
+        return <PollOption {...props} />;
+      })}
 
       <hstack>
         <button onPress={submitVote} disabled={selectedOption == -1}>
           Vote!
         </button>
         <vstack alignment="middle">
-          <text>&nbsp;{remaining} left</text></vstack>
+          <text>&nbsp;{remaining} left</text>
+        </vstack>
       </hstack>
-    </vstack >
+    </vstack>
   );
 };
