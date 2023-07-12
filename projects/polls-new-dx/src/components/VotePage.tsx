@@ -37,10 +37,7 @@ export const PollOption = ({
   );
 };
 
-export const VotePage: Devvit.AsyncBlockComponent<PollProps> = async (
-  { options, votes, setVotes, total, navigate, remainingMillis },
-  { redis, useState, userId, postId }
-) => {
+export const VotePage: Devvit.BlockComponent<PollProps> = async ({ options, votes, setVotes, total, navigate, remainingMillis }, { redis, useState, userId, postId }) => {
   const remaining = moment.duration(remainingMillis).humanize();
 
   const [selectedOption, setSelectedOption] = useState(-1);
