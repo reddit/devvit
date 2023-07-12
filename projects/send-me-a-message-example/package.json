@@ -5,8 +5,8 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api-old": "0.10.0",
-    "@devvit/shared-types": "0.10.0"
+    "@devvit/public-api": "*",
+    "@devvit/shared-types": "*"
   },
   "devDependencies": {
     "@devvit/tsconfig": "0.10.0",
