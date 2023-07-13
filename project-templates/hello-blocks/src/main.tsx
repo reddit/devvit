@@ -4,6 +4,25 @@ Devvit.configure({
   redditAPI: true,
 });
 
+Devvit.addMenuItem({
+  location: 'subreddit',
+  label: 'Submit custom post',
+  onPress: async (_, context) => {
+    const { reddit, ui } = context;
+    const currentSubreddit = await reddit.getCurrentSubreddit();
+    await reddit.submitPost({
+      title: 'My custom post',
+      subredditName: currentSubreddit.name,
+      preview: (
+        <vstack>
+          <text>Loading...</text>
+        </vstack>
+      ),
+    });
+    ui.showToast(`Submitted custom post to ${currentSubreddit.name}`);
+  },
+});
+
 Devvit.addCustomPostType({
   name: 'Hello Blocks',
   render: ({ reddit, useState }) => {
