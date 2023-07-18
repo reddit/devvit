@@ -5,10 +5,10 @@
   "description": "an example of adding event listeners",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.0"
+    "@devvit/public-api": "0.10.1"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.0",
+    "@devvit/tsconfig": "0.10.1",
     "typescript": "*"
   }
 }

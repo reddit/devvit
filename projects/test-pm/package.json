@@ -9,6 +9,6 @@
     "@devvit/public-api": "*"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.0"
+    "@devvit/tsconfig": "0.10.1"
   }
 }
