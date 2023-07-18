@@ -183,6 +183,7 @@ const addPoll = Devvit.createForm(
     await redis.set(`polls:${post.id}:finish`, timestamp + '');
     await redis.set(`polls:${post.id}:question`, event.values.question);
     await redis.zAdd(`polls:${post.id}:options`, answers);
+
     ui.showToast('Poll created!');
   }
 );
