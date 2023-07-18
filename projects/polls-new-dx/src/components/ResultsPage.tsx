@@ -27,7 +27,9 @@ const PollResult = ({ option, votes, total, winner }: ResultProps) => {
         width={percent}
         alignment={'center middle'}
       >
-        <spacer shape="square" size="small" />
+        <vstack>
+          <spacer shape="square" size="small" />
+        </vstack>
       </hstack>
     );
 
@@ -54,7 +56,10 @@ const PollResult = ({ option, votes, total, winner }: ResultProps) => {
   );
 };
 
-export const ResultsPage: Devvit.BlockComponent<PollProps> = async ({ reset, finish, setFinish, options, votes, total, remainingMillis, navigate }, { postId }) => {
+export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
+  { reset, finish, setFinish, options, votes, total, remainingMillis, navigate },
+  { postId }
+) => {
   const remaining = moment.duration(remainingMillis).humanize();
   const max = Math.max(...votes);
   const zipped = options.map((option, index) => ({

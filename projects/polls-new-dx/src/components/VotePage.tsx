@@ -2,7 +2,7 @@
 /** @jsxFrag Devvit.Fragment */
 
 import { Devvit } from '@devvit/public-api';
-import { PageType, PollProps, formatCount } from '../main.js';
+import { formatCount, PageType, PollProps } from '../main.js';
 import moment from 'moment';
 
 // const props = { option, index, selectedOption, setSelectedOption }
@@ -28,16 +28,21 @@ export const PollOption = ({
       padding={'small'}
       data-selection={index}
     >
-      <vstack cornerRadius={'full'} border={'thin'} borderColor={'black'} backgroundColor={bgColor}>
-        <spacer size={'medium'} shape="square" />
-      </vstack>
-
+      <hstack cornerRadius={'full'} border={'thin'} borderColor={'black'} backgroundColor={bgColor}>
+        <spacer size={'medium'} />
+        <vstack>
+          <spacer size={'medium'} />
+        </vstack>
+      </hstack>
       <text>{option}</text>
     </hstack>
   );
 };
 
-export const VotePage: Devvit.BlockComponent<PollProps> = async ({ options, votes, setVotes, total, navigate, remainingMillis }, { redis, useState, userId, postId }) => {
+export const VotePage: Devvit.BlockComponent<PollProps> = async (
+  { options, votes, setVotes, total, navigate, remainingMillis },
+  { redis, useState, userId, postId }
+) => {
   const remaining = moment.duration(remainingMillis).humanize();
 
   const [selectedOption, setSelectedOption] = useState(-1);
@@ -50,14 +55,12 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async ({ options, vote
     await tx.zAdd(`polls:${postId}:voted`, { member: userKey, score: 0 });
     if (already) {
       await tx.exec();
-      navigate(PageType.RESULTS);
-      return;
+    } else {
+      await tx.set(userKey, selectedOption + '');
+      await redis.incrBy(`polls:${postId}:${selectedOption}`, 1);
+      await tx.exec();
+      setVotes(votes.map((v, i) => (i == selectedOption ? v + 1 : v)));
     }
-    console.log(`polls:${postId}:${selectedOption}`);
-    await tx.set(userKey, selectedOption + '');
-    await redis.incrBy(`polls:${postId}:${selectedOption}`, 1);
-    await tx.exec();
-    setVotes(votes.map((v, i) => (i == selectedOption ? v + 1 : v)));
     navigate(PageType.RESULTS);
   };
   return (
@@ -69,7 +72,12 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async ({ options, vote
       <hstack border="thin"></hstack>
 
       {options.map((option, index) => {
-        const props = { option, index, selectedOption, setSelectedOption };
+        const props = {
+          option,
+          index,
+          selectedOption,
+          setSelectedOption,
+        };
         return <PollOption {...props} />;
       })}
 
