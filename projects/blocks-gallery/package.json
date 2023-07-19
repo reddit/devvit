@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "blocks-gallery",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "dependencies": {
+    "@devvit/protos": "0.10.1",
+    "@devvit/public-api": "0.10.1",
+    "@devvit/shared-types": "0.10.1"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "0.10.1",
+    "typescript": "4.9.3"
+  }
+}

@@ -50,7 +50,12 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
   const submitVote: Devvit.Blocks.OnPressEventHandler = async () => {
     const userKey = `polls:${postId}:${userId}`;
     const tx = await redis.watch(userKey);
-    const already = await redis.get(userKey);
+    let already = false;
+    try {
+      already = !!(await redis.get(userKey));
+    } catch {
+      // ignored
+    }
     await tx.multi();
     await tx.zAdd(`polls:${postId}:voted`, { member: userKey, score: 0 });
     if (already) {

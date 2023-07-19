@@ -87,6 +87,8 @@ const App: Devvit.CustomPostComponent = async ({ redis, useState, postId, userId
     }
   });
 
+  const [currentUserId] = useState(userId);
+
   const [options] = useState(async () => {
     const options = await redis.zRange(`polls:${postId}:options`, 0, -1);
     return options.map((option) => option.member);
@@ -109,10 +111,8 @@ const App: Devvit.CustomPostComponent = async ({ redis, useState, postId, userId
   const finishKey = `polls:${postId}:finish`;
   const [finish, setFinish] = useState(async () => {
     const finish = await redis.get(finishKey);
-    console.log('reading state', finishKey, finish);
     return parseInt(finish || '0');
   });
-  console.log(finish, 'finish', await redis.get(finishKey));
   const remainingMillis = finish - now;
 
   const props: PollProps = {
@@ -127,8 +127,12 @@ const App: Devvit.CustomPostComponent = async ({ redis, useState, postId, userId
     reset,
   };
 
-  if (!userId) {
-    return <hstack grow>Not logged in</hstack>;
+  if (!currentUserId) {
+    return (
+      <hstack grow alignment={'center middle'}>
+        <text>Not logged in</text>
+      </hstack>
+    );
   } else if (page === PageType.VOTE && remainingMillis > 0) {
     return <VotePage {...props} />;
   } else {
@@ -172,8 +176,8 @@ const addPoll = Devvit.createForm(
       subredditName: sub.name,
       title: event.values.question,
       preview: (
-        <hstack>
-          <text>loading...</text>
+        <hstack alignment={'center middle'}>
+          <text>Loading...</text>
         </hstack>
       ),
     };
@@ -188,21 +192,6 @@ const addPoll = Devvit.createForm(
     await redis.set(finishKey, timestamp + '');
     await redis.set(questionKey, event.values.question);
     await redis.zAdd(answersKey, ...answers);
-
-    const finishValue = await redis.get(finishKey);
-    const questionValue = await redis.get(questionKey);
-    const finishExpireTime = await redis.expireTime(finishKey);
-    const questionExpireTime = await redis.expireTime(questionKey);
-
-    console.log(finishKey, '=', finishValue, `(${finishExpireTime})`);
-    console.log(questionKey, '=', questionValue, `(${questionExpireTime})`);
-
-    console.log(
-      answersKey,
-      '=',
-      ...(await redis.zRange(answersKey, 0, -1)),
-      `(${await redis.expireTime(answersKey)})`
-    );
 
     ui.showToast('Poll created!');
   }
