@@ -20,7 +20,7 @@ export class GalleryState {
 
   constructor(renderContext: ContextAPIClients) {
     const { useState } = renderContext;
-    const goHome = () => {
+    const goHome = (): void => {
       this.currentPage = Page.HOME;
     };
     const statefulProps: StatefulProps = { useState, goHome };

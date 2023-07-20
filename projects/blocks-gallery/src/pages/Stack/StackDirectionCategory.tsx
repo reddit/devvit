@@ -6,7 +6,7 @@ import { Box } from '../../components/Box.js';
 const boxesPerLine: number = 3;
 const boxes: JSX.Element[] = new Array(boxesPerLine).fill(<Box color="rgba(0, 69, 172, 0.5)" />);
 
-export const StackDirectionCategory = () => (
+export const StackDirectionCategory = (): JSX.Element => (
   <vstack gap="small">
     <Tile label="HStack">
       <hstack gap="small">{boxes}</hstack>

@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Tile } from '../../components/Tile.js';
 import { Columns } from '../../components/Columns.js';
 
-export const TextWeightCategory = () => {
+export const TextWeightCategory = (): JSX.Element => {
   const options: [string, Devvit.Blocks.TextWeight][] = [
     ['Regular *', 'regular'],
     ['Semibold', 'bold'],

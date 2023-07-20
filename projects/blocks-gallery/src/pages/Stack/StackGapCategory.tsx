@@ -4,7 +4,7 @@ import { Tile } from '../../components/Tile.js';
 import { Columns } from '../../components/Columns.js';
 import { Box } from '../../components/Box.js';
 
-export const StackGapCategory = () => {
+export const StackGapCategory = (): JSX.Element => {
   const options: [string, Devvit.Blocks.ContainerGap][] = [
     ['None *', 'none'],
     ['Small (8 dp)', 'small'],

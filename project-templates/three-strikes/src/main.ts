@@ -1,4 +1,4 @@
-import { Devvit, MenuItemOnPressEvent, User } from '@devvit/public-api';
+import { Comment, Devvit, MenuItemOnPressEvent, Post, User } from '@devvit/public-api';
 
 Devvit.configure({
   kvStore: true, // Enable access to kvStore
@@ -33,7 +33,10 @@ Devvit.addMenuItem({
   onPress: clearStrikes,
 });
 
-async function getThing(event: MenuItemOnPressEvent, context: Devvit.Context) {
+async function getThing(
+  event: MenuItemOnPressEvent,
+  context: Devvit.Context
+): Promise<Post | Comment> {
   const { location, targetId } = event;
   const { reddit } = context;
   if (location === 'post') {
@@ -44,7 +47,7 @@ async function getThing(event: MenuItemOnPressEvent, context: Devvit.Context) {
   throw 'Cannot find a post or comment with that ID';
 }
 
-async function getAuthor(event: MenuItemOnPressEvent, context: Devvit.Context) {
+async function getAuthor(event: MenuItemOnPressEvent, context: Devvit.Context): Promise<User> {
   const { reddit } = context;
   const thing = await getThing(event, context);
   return await reddit.getUserById(thing.authorId!);
@@ -53,7 +56,7 @@ async function getAuthor(event: MenuItemOnPressEvent, context: Devvit.Context) {
 /**
  * Handles the 'strike' action
  */
-async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
+async function strike(event: MenuItemOnPressEvent, context: Devvit.Context): Promise<void> {
   // Use the correct term in our message based on what was acted upon
   const { location } = event;
   const { reddit, ui } = context;
@@ -125,7 +128,7 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   ui.showToast(result);
 }
 
-async function checkStrikes(event: MenuItemOnPressEvent, context: Devvit.Context) {
+async function checkStrikes(event: MenuItemOnPressEvent, context: Devvit.Context): Promise<void> {
   const author = await getAuthor(event, context);
   console.log('checking for ', author.username);
   const { ui } = context;
@@ -137,7 +140,7 @@ async function checkStrikes(event: MenuItemOnPressEvent, context: Devvit.Context
 /**
  * Handles the 'removestrike' action
  */
-async function removeStrike(event: MenuItemOnPressEvent, context: Devvit.Context) {
+async function removeStrike(event: MenuItemOnPressEvent, context: Devvit.Context): Promise<void> {
   // Get some relevant data from the post or comment
   const author = await getAuthor(event, context);
   const { ui } = context;
@@ -155,7 +158,7 @@ async function removeStrike(event: MenuItemOnPressEvent, context: Devvit.Context
 /**
  * Handles the 'clearstrikes' action
  */
-async function clearStrikes(event: MenuItemOnPressEvent, context: Devvit.Context) {
+async function clearStrikes(event: MenuItemOnPressEvent, context: Devvit.Context): Promise<void> {
   // Get some relevant data from the post or comment
   const author = await getAuthor(event, context);
   const hadStrikes = await getAuthorStrikes(author, context);
@@ -175,14 +178,14 @@ async function clearStrikes(event: MenuItemOnPressEvent, context: Devvit.Context
 /**
  * Creates a KVStore key for the author
  */
-function getKeyForAuthor(author: User) {
+function getKeyForAuthor(author: User): string {
   return `${author.id}_strikes`;
 }
 
 /**
  * Fetch the current strike count for the author
  */
-async function getAuthorStrikes(author: User, context: Devvit.Context) {
+async function getAuthorStrikes(author: User, context: Devvit.Context): Promise<number> {
   const { kvStore } = context;
   const key = getKeyForAuthor(author);
   return ((await kvStore.get(key)) as number) || 0;
@@ -191,7 +194,11 @@ async function getAuthorStrikes(author: User, context: Devvit.Context) {
 /**
  * Updates the strike counter in the KVStore
  */
-async function setAuthorStrikes(author: User, strikes: number, context: Devvit.Context) {
+async function setAuthorStrikes(
+  author: User,
+  strikes: number,
+  context: Devvit.Context
+): Promise<void> {
   const { kvStore } = context;
   const key = getKeyForAuthor(author);
   await kvStore.put(key, strikes);

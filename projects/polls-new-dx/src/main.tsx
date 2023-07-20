@@ -1,12 +1,9 @@
 import { Context, Devvit, ZMember } from '@devvit/public-api';
 import { VotePage } from './components/VotePage.js';
-
 import { ResultsPage } from './components/ResultsPage.js';
 
 import numbroImport from 'numbro';
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const numbro = numbroImport as unknown as any;
+const numbro = numbroImport as unknown as typeof numbroImport.default;
 
 Devvit.configure({
   redis: true,
@@ -30,7 +27,7 @@ export interface PollProps {
   reset: () => Promise<void>;
 }
 
-export const formatCount = (count: number) => {
+export const formatCount = (count: number): string => {
   return numbro(count).format({
     average: true,
     mantissa: 1,
@@ -47,7 +44,7 @@ const App: Devvit.CustomPostComponent = async ({ redis, useState, postId, userId
    * this only happens in the development environment, where postId is undefined.  This is a hack
    * to reset the state of the poll.  Also, the debug panel would be available.
    */
-  const resetRedis = async () => {
+  const resetRedis = async (): Promise<void> => {
     await redis.mset({
       'polls:undefined:question': 'What is your favorite color?',
       'polls:undefined:finish': new Date().getTime() + 5 * 60 * 1000 + '',
@@ -99,7 +96,7 @@ const App: Devvit.CustomPostComponent = async ({ redis, useState, postId, userId
     return rsp.map((count) => parseInt(count || '0'));
   });
 
-  const reset = async () => {
+  const reset = async (): Promise<void> => {
     await resetRedis();
     setVotes([0, 0, 0]);
     setFinish(new Date().getTime() + 5 * 60 * 1000);

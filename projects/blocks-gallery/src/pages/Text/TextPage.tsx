@@ -9,7 +9,7 @@ import { TextStyleCategory } from './TextStyleCategory.js';
 import { Page } from '../page.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
-export const TextPage = ({ state }: SharedCategoryPageProps) => {
+export const TextPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
   const categories: CategoryProps[] = [
     {
       label: 'Sizes',

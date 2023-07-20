@@ -16,7 +16,7 @@ export interface BlockGalleryProps {
   state: GalleryState;
 }
 
-export const BlockGallery = ({ state }: BlockGalleryProps) => {
+export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
   const page = state.currentPage;
   const pageState = state.pageState(page);
   return (

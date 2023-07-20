@@ -7,7 +7,12 @@ export interface BoxProps {
   rounded?: boolean;
 }
 
-export const Box = ({ spacerSize = 'large', size = 1, color, rounded = false }: BoxProps) => (
+export const Box = ({
+  spacerSize = 'large',
+  size = 1,
+  color,
+  rounded = false,
+}: BoxProps): JSX.Element => (
   <zstack>
     <hstack>
       <vstack>

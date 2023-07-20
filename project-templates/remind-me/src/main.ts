@@ -55,7 +55,7 @@ const remindMeForm = Devvit.createForm(
   remindMeHandler
 );
 
-async function remindMeHandler(event: FormOnSubmitEvent, context: Devvit.Context) {
+async function remindMeHandler(event: FormOnSubmitEvent, context: Devvit.Context): Promise<void> {
   const whenStr = (event.values.when as string) || '';
   if (!whenStr) {
     context.ui.showToast("I don't know when to remind you!");

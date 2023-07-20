@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { StackAlignmentPreview } from './StackAlignmentPreview.js';
 import { CategoryPage, CategoryPageState } from '../../components/CategoryPage.js';
 
-export const StackAlignmentCategory = ({ state }: { state: CategoryPageState }) => {
+export const StackAlignmentCategory = ({ state }: { state: CategoryPageState }): JSX.Element => {
   const subCategories = [
     ['Horizontal', 'horizontal'],
     ['Vertical', 'vertical'],

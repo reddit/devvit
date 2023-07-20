@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Columns } from '../../components/Columns.js';
 import { Tile } from '../../components/Tile.js';
 
-export const ButtonDisabledCategory = () => {
+export const ButtonDisabledCategory = (): JSX.Element => {
   const options: [string, Devvit.Blocks.ButtonAppearance][] = [
     ['Primary', 'primary'],
     ['Secondary *', 'secondary'],

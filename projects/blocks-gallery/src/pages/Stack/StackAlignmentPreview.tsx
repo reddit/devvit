@@ -8,8 +8,8 @@ import Alignment = Devvit.Blocks.Alignment;
 const horizontalAlignment: Devvit.Blocks.Alignment[] = ['start', 'center', 'end'];
 const verticalAlignment: Devvit.Blocks.Alignment[] = ['top', 'middle', 'bottom'];
 
-export const StackAlignmentPreview = ({ mode }: { mode: string }) => {
-  const options = [];
+export const StackAlignmentPreview = ({ mode }: { mode: string }): JSX.Element => {
+  const options: [string, string][] = [];
 
   if (mode.includes('vertical')) {
     for (const vert of verticalAlignment) {

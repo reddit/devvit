@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Tile } from '../../components/Tile.js';
 import { Columns } from '../../components/Columns.js';
 
-export const ImageResizeModeCategory = () => {
+export const ImageResizeModeCategory = (): JSX.Element => {
   const options: [string, Devvit.Blocks.ImageResizeMode][] = [
     ['None', 'none'],
     ['Fit *', 'fit'],

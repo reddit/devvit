@@ -24,7 +24,7 @@ export class CategoryPageState {
     this.subcategory = '';
   }
 
-  setCategory = (value: string) => {
+  setCategory = (value: string): void => {
     this.category = value;
   };
 
@@ -36,11 +36,11 @@ export class CategoryPageState {
     this._subcategory[1](value);
   }
 
-  setSubCategory = (value: string) => {
+  setSubCategory = (value: string): void => {
     this.subcategory = value;
   };
 
-  goHome = () => this._goHome();
+  goHome = (): void => this._goHome();
 }
 
 export interface SharedCategoryPageProps {
@@ -61,7 +61,7 @@ export interface CategoryProps {
   content: JSX.Element | JSX.Element[];
 }
 
-export const CategoryPage = (props: CategoryPageProps) => {
+export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
   const activeCategory = props.activeCategory || props.categories[0].category;
   return (
     <vstack gap="small" grow>

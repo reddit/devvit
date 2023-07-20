@@ -4,7 +4,7 @@ import { Columns } from '../../components/Columns.js';
 import { Tile } from '../../components/Tile.js';
 import { CategoryPage, SharedCategoryPageProps } from '../../components/CategoryPage.js';
 
-function getIcons(type: string = '') {
+function getIcons(type: string = ''): JSX.Element[] {
   const iconNames = ['bot', 'topic-programming', 'original', 'karma'];
   const iconColors = ['black', 'blue', 'green', 'red'];
 
@@ -25,7 +25,7 @@ const iconCategories = [
   { label: 'Fill', category: 'fill', content: <Columns count={2}>{fillIcons}</Columns> },
 ];
 
-export const IconsCategory = ({ state }: SharedCategoryPageProps) => {
+export const IconsCategory = ({ state }: SharedCategoryPageProps): JSX.Element => {
   return (
     <CategoryPage
       state={state}

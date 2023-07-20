@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Columns } from '../../components/Columns.js';
 import { BlockGalleryProps } from '../../components/BlockGallery.js';
 
-export const HomePage = ({ state }: BlockGalleryProps) => {
+export const HomePage = ({ state }: BlockGalleryProps): JSX.Element => {
   const pages: string[][] = [
     ['Button', 'buttons'],
     ['Image', 'images'],

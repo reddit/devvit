@@ -11,7 +11,7 @@ import { Page } from '../page.js';
 import { ButtonIconCategory } from './ButtonIconCategory.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
-export const ButtonPage = ({ state }: SharedCategoryPageProps) => {
+export const ButtonPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
   const categories: CategoryProps[] = [
     {
       label: 'Appearances',

@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Tile } from '../../components/Tile.js';
 import { Columns } from '../../components/Columns.js';
 
-export const StackReverseCategory = () => {
+export const StackReverseCategory = (): JSX.Element => {
   const options: [string, boolean][] = [
     ['False *', false],
     ['True', true],

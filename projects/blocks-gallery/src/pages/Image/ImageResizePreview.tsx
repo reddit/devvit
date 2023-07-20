@@ -2,7 +2,11 @@ import { Devvit } from '@devvit/public-api';
 
 import { Tile } from '../../components/Tile.js';
 
-export const ImageResizePreview = ({ mode }: { mode: Devvit.Blocks.ImageResizeMode }) => {
+export const ImageResizePreview = ({
+  mode,
+}: {
+  mode: Devvit.Blocks.ImageResizeMode;
+}): JSX.Element => {
   return (
     <Tile>
       <hstack backgroundColor="#EAEDEF">

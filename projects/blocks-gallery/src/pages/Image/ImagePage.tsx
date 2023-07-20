@@ -8,7 +8,7 @@ import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 type ImageMode = [string, Devvit.Blocks.ImageResizeMode];
 
-export const ImagePage = ({ state }: SharedCategoryPageProps) => {
+export const ImagePage = ({ state }: SharedCategoryPageProps): JSX.Element => {
   const imageModes: ImageMode[] = [
     ['None', 'none'],
     ['Fit *', 'fit'],

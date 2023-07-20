@@ -16,8 +16,8 @@ export const PollOption = ({
   index: number;
   selectedOption: number;
   setSelectedOption: (n: number) => void;
-}) => {
-  const selectOption = () => setSelectedOption(index);
+}): JSX.Element => {
+  const selectOption = (): void => setSelectedOption(index);
   const selected = index === selectedOption;
   const bgColor = selected ? 'orangered' : 'white';
   return (

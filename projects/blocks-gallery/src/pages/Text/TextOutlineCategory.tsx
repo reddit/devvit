@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Tile } from '../../components/Tile.js';
 import { Columns } from '../../components/Columns.js';
 
-export const TextOutlineCategory = () => {
+export const TextOutlineCategory = (): JSX.Element => {
   const options: [string, Devvit.Blocks.Thickness, string][] = [
     ['None *', 'none', 'bright'],
     ['Thin', 'thin', 'bright'],

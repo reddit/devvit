@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Columns } from '../../components/Columns.js';
 import { Tile } from '../../components/Tile.js';
 
-export const ButtonContentCategory = () => {
+export const ButtonContentCategory = (): JSX.Element => {
   return (
     <vstack>
       <Columns count={3}>

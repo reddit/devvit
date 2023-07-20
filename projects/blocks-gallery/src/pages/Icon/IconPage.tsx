@@ -6,7 +6,7 @@ import { Page } from '../page.js';
 import { IconsCategory } from './IconsCategory.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
-export const IconPage = ({ state }: SharedCategoryPageProps) => {
+export const IconPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
   const categories: CategoryProps[] = [
     {
       label: 'Examples',

@@ -14,12 +14,12 @@ type ResultProps = {
   winner: boolean;
 };
 
-const PollResult = ({ option, votes, total, winner }: ResultProps) => {
+const PollResult = ({ option, votes, total, winner }: ResultProps): JSX.Element => {
   const percent = (votes / total) * 100;
 
   const nice = formatCount(votes);
 
-  const PercentBar = () =>
+  const PercentBar = (): JSX.Element | false =>
     percent > 0 && (
       <hstack
         cornerRadius="small"

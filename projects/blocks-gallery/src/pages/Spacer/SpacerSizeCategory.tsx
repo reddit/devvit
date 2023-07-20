@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Tile } from '../../components/Tile.js';
 import { Columns } from '../../components/Columns.js';
 
-export const SpacerSizeCategory = () => {
+export const SpacerSizeCategory = (): JSX.Element => {
   const options: [string, Devvit.Blocks.SpacerSize][] = [
     ['XSmall (4 dp)', 'xsmall'],
     ['Small (8 dp)', 'small'],

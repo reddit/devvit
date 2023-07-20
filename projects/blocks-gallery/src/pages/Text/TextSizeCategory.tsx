@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 import { Tile } from '../../components/Tile.js';
 import { Columns } from '../../components/Columns.js';
 
-export const TextSizeCategory = () => {
+export const TextSizeCategory = (): JSX.Element => {
   const options: [string, Devvit.Blocks.TextSize][] = [
     ['XSmall', 'xsmall'],
     ['Small', 'small'],

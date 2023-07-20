@@ -6,7 +6,7 @@ import { SpacerSizeCategory } from './SpacerSizeCategory.js';
 import { Page } from '../page.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
-export const SpacerPage = ({ state }: SharedCategoryPageProps) => {
+export const SpacerPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
   const categories: CategoryProps[] = [
     {
       label: 'Size',

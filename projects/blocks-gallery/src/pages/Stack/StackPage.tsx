@@ -12,7 +12,7 @@ import { StackReverseCategory } from './StackReverseCategory.js';
 import { Page } from '../page.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
-export const StacksPage = ({ state }: SharedCategoryPageProps) => {
+export const StacksPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
   const categories: CategoryProps[] = [
     {
       label: 'Direction',

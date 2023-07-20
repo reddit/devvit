@@ -6,7 +6,7 @@ export interface TileProps {
   children: JSX.Element | JSX.Element[];
 }
 
-export const Tile = (props: TileProps) => {
+export const Tile = (props: TileProps): JSX.Element => {
   const { label, children } = props;
   return (
     <vstack
