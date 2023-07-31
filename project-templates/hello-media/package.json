@@ -9,7 +9,7 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.1"
+    "@devvit/public-api": "0.10.2"
   },
   "devDependencies": {
     "typescript": "4.9.3",
