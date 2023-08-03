@@ -65,13 +65,6 @@ Devvit.addTrigger({
 });
 
 Devvit.addTrigger({
-  event: 'SubredditSubscribe',
-  onEvent(_event, _context) {
-    console.log('Received OnSubredditSubscribe event');
-  },
-});
-
-Devvit.addTrigger({
   event: 'AppInstall',
   onEvent(_event, _context) {
     console.log('Received OnAppInstall event');
