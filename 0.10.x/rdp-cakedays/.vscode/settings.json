@@ -1,0 +1,19 @@
+{
+  // Keep the explorer listing and search results relevant
+  "files.exclude": {
+    ".husky/_/": true,
+    "**/.eslintcache": true,
+    "**/.yarn": true,
+    "**/*.lock": true,
+    "**/*.turbo/": true,
+    "**/dist/": true,
+    "**/LICENSE": true,
+    "**/node_modules/": true
+  },
+
+  // Add Devvit schemas to vscode-proto3 extension
+  "protoc": { "options": ["--proto_path=packages/protos/schema"] },
+
+  // Use the workspace version of TypeScript, not the IDE version
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
