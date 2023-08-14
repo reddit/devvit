@@ -19,6 +19,17 @@ export const ButtonSizeCategory = (): JSX.Element => {
       </Tile>
     );
   });
+  content.push(
+    ...options.map(([label, size]) => {
+      return (
+        <Tile label={label}>
+          <button appearance="secondary" size={size} icon="admin">
+            Label
+          </button>
+        </Tile>
+      );
+    })
+  );
 
   return (
     <vstack>
