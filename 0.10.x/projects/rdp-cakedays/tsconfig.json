@@ -1,7 +1,0 @@
-{
-  "extends": "@devvit/tsconfig/base.json",
-  "compilerOptions": {
-    "jsxFactory": "Devvit.createElement",
-    "jsxFragmentFactory": "Devvit.Fragment"
-  }
-}
