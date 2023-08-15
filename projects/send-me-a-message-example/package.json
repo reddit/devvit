@@ -1,15 +1,15 @@
 {
   "private": true,
   "name": "send-me-a-message-example",
-  "version": "0.0.0",
+  "version": "0.10.3",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "*",
-    "@devvit/shared-types": "*"
+    "@devvit/public-api": "0.10.3",
+    "@devvit/shared-types": "0.10.3"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.2",
+    "@devvit/tsconfig": "0.10.3",
     "typescript": "*"
   }
 }

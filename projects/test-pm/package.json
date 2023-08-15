@@ -1,14 +1,14 @@
 {
   "private": true,
   "name": "test-pm",
-  "version": "0.0.0",
+  "version": "0.10.3",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/protos": "*",
-    "@devvit/public-api": "*"
+    "@devvit/protos": "0.10.3",
+    "@devvit/public-api": "0.10.3"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.2"
+    "@devvit/tsconfig": "0.10.3"
   }
 }
