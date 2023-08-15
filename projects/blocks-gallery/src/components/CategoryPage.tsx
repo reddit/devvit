@@ -1,6 +1,5 @@
-import { Devvit } from '@devvit/public-api';
-
 import type { UseStateResult } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import type { StatefulProps } from '../state/state.js';
 import { Tabs } from './Tabs.js';
 
@@ -9,8 +8,8 @@ export class CategoryPageState {
   readonly _subcategory: UseStateResult<string>;
   readonly _goHome: () => void;
 
-  constructor({ useState, goHome }: StatefulProps) {
-    this._category = useState<string>('');
+  constructor({ useState, goHome }: StatefulProps, defaultCategory: string = '') {
+    this._category = useState<string>(defaultCategory);
     this._subcategory = useState<string>('');
     this._goHome = goHome;
   }
@@ -73,7 +72,7 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
           <button onPress={props.state?.goHome} appearance="secondary" size="small">
             {' ← '}
           </button>
-          <text selectable={false} size="xlarge" weight="bold" color="#0F1A1C">
+          <text selectable={false} size="xlarge" weight="bold" color="neutral-content">
             {props.title}
           </text>
         </hstack>

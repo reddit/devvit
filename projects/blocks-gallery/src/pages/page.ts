@@ -6,4 +6,5 @@ export enum Page {
   STACKS = 'stacks',
   TEXT = 'text',
   ICON = 'icon',
+  COLOR = 'color'
 }

@@ -7,6 +7,7 @@ import { SpacerPageState } from './spacerPageState.js';
 import { TextPageState } from './textPageState.js';
 import { IconPageState } from './iconPageState.js';
 import { ContextAPIClients, UseStateResult } from '@devvit/public-api';
+import { ColorPageState } from "./colorPageState.js";
 
 export interface StatefulProps {
   useState: ContextAPIClients['useState'];
@@ -33,6 +34,7 @@ export class GalleryState {
       [Page.SPACERS]: new SpacerPageState(statefulProps),
       [Page.TEXT]: new TextPageState(statefulProps),
       [Page.ICON]: new IconPageState(statefulProps),
+      [Page.COLOR]: new ColorPageState(statefulProps),
     };
     this.showToast = (message: string) => renderContext.ui.showToast(message);
   }

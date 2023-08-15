@@ -13,14 +13,10 @@ export const Box = ({
   color,
   rounded = false,
 }: BoxProps): JSX.Element => (
-  <zstack>
-    <hstack>
-      <vstack>
-        <zstack backgroundColor={color} cornerRadius={rounded ? 'full' : 'none'}>
-          <hstack>{new Array(size).fill(<spacer size={spacerSize} />)}</hstack>
-          <vstack>{new Array(size).fill(<spacer size={spacerSize} />)}</vstack>
-        </zstack>
-      </vstack>
-    </hstack>
+  <zstack alignment={'start top'}>
+    <zstack backgroundColor={color} cornerRadius={rounded ? 'full' : 'none'}>
+      <hstack>{new Array(size).fill(<spacer size={spacerSize} />)}</hstack>
+      <vstack>{new Array(size).fill(<spacer size={spacerSize} />)}</vstack>
+    </zstack>
   </zstack>
 );

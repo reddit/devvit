@@ -12,7 +12,7 @@ export const Tile = (props: TileProps): JSX.Element => {
     <vstack
       padding={props.padding ?? 'medium'}
       border="thick"
-      borderColor="#0002"
+      borderColor="neutral-border-weak"
       cornerRadius="small"
       gap="small"
       grow
@@ -21,7 +21,7 @@ export const Tile = (props: TileProps): JSX.Element => {
         {children}
       </hstack>
       {label ? (
-        <text selectable={false} color="#576F76">
+        <text selectable={false} color="neutral-content-weak">
           {label}
         </text>
       ) : (

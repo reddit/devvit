@@ -13,7 +13,7 @@ export const StackBorderCategory = (): JSX.Element => {
 
   const content = options.map(([label, option]) => (
     <Tile label={label}>
-      <hstack backgroundColor="#EAEDEF" border={option}>
+      <hstack backgroundColor="secondary-background" border={option}>
         <Box />
       </hstack>
     </Tile>

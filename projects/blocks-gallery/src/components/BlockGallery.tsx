@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
 import {
-  ButtonPage,
+  ButtonPage, ColorPage,
   HomePage,
   IconPage,
   ImagePage,
@@ -29,6 +29,7 @@ export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
         {page === Page.STACKS && <StacksPage state={pageState} />}
         {page === Page.TEXT && <TextPage state={pageState} />}
         {page === Page.ICON && <IconPage state={pageState} />}
+        {page === Page.COLOR && <ColorPage state={pageState} />}
       </vstack>
     </blocks>
   );

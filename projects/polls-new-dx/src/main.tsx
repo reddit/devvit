@@ -38,7 +38,15 @@ export const formatCount = (count: number): string => {
 };
 
 const App: Devvit.CustomPostComponent = async ({ redis, useState, postId, userId }: Context) => {
-  const [page, navigate] = useState(PageType.VOTE);
+  const [page, navigate] = useState(async () => {
+    let hasVoted = false;
+    try {
+      hasVoted = !!(await redis.get(`polls:${postId}:${userId}`));
+    } catch {
+      //
+    }
+    return hasVoted ? PageType.RESULTS : PageType.VOTE
+  });
 
   /**
    * this only happens in the development environment, where postId is undefined.  This is a hack

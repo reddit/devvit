@@ -11,6 +11,7 @@ export const HomePage = ({ state }: BlockGalleryProps): JSX.Element => {
     ['Spacer', 'spacers'],
     ['Text', 'text'],
     ['Icon', 'icon'],
+    ['Color', 'color'],
   ];
 
   const pageButtons = pages.map(([label, id]) => (
@@ -31,14 +32,14 @@ export const HomePage = ({ state }: BlockGalleryProps): JSX.Element => {
           selectable={false}
           size="xlarge"
           weight="bold"
-          color="#0F1A1C"
+          color="neutral-content"
           onPress={() => {
             state.showToast('Hello, world!');
           }}
         >
           Block Gallery
         </text>
-        <text selectable={false} size="medium" color="#576F76">
+        <text selectable={false} size="medium" color="neutral-content-weak">
           Version 2.0
         </text>
       </vstack>
