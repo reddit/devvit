@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
 
 import {
-  ButtonPage, ColorPage,
+  ButtonPage,
+  ColorPage,
   HomePage,
   IconPage,
   ImagePage,
