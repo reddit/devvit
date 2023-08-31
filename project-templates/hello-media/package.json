@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "hello-media-template",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.3"
+    "@devvit/public-api": "0.10.4"
   },
   "devDependencies": {
     "typescript": "4.9.3",

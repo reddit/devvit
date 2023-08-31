@@ -1,14 +1,14 @@
 {
   "private": true,
   "name": "event-handler-example",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "description": "an example of adding event listeners",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.3"
+    "@devvit/public-api": "0.10.4"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.3",
+    "@devvit/tsconfig": "0.10.4",
     "typescript": "*"
   }
 }
