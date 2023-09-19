@@ -14,7 +14,11 @@ Devvit.addMenuItem({
     await reddit.submitPost({
       title: 'Blocks Gallery',
       subredditName: currentSubreddit.name,
-      preview: <text>Loading blocks gallery</text>,
+      preview: (
+        <blocks height={'tall'}>
+          <text>Loading blocks gallery</text>
+        </blocks>
+      ),
     });
 
     ui.showToast('Posted a blocks gallery!');
