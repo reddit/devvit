@@ -70,7 +70,6 @@ Devvit.addCustomPostType({
         ],
       },
       (values) => {
-        console.log('pressed');
         setContent(indentXML(values.content));
       }
     );
