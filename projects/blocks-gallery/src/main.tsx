@@ -2,6 +2,8 @@ import { ContextAPIClients, Devvit } from '@devvit/public-api';
 import { BlockGallery } from './components/BlockGallery.js';
 import { GalleryState } from './state/state.js';
 
+Devvit.debug.emitSnapshots = true;
+
 Devvit.configure({
   redditAPI: true,
 });
