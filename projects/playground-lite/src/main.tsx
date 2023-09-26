@@ -10,11 +10,9 @@ Devvit.configure({
 });
 
 const base = (
-  <blocks height="regular">
-    <vstack grow alignment="middle center">
-      loading...
-    </vstack>
-  </blocks>
+  <vstack grow alignment="middle center">
+    loading...
+  </vstack>
 );
 
 /*
@@ -56,6 +54,7 @@ const defaultContent = indentXML(
 
 Devvit.addCustomPostType({
   name: 'Playground',
+  height: 'tall',
   render: ({ useState, useForm, ui }) => {
     const [content, setContent] = useState(defaultContent);
     const form = useForm(

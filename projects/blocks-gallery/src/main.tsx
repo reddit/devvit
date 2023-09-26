@@ -16,11 +16,7 @@ Devvit.addMenuItem({
     await reddit.submitPost({
       title: 'Blocks Gallery',
       subredditName: currentSubreddit.name,
-      preview: (
-        <blocks height={'tall'}>
-          <text>Loading blocks gallery</text>
-        </blocks>
-      ),
+      preview: <text>Loading blocks gallery</text>,
     });
 
     ui.showToast('Posted a blocks gallery!');
@@ -30,6 +26,7 @@ Devvit.addMenuItem({
 Devvit.addCustomPostType({
   name: 'Blocks Gallery',
   description: 'Demonstrates the blocks elements',
+  height: 'tall',
   render: (renderContext: ContextAPIClients) => {
     const state = new GalleryState(renderContext);
     return <BlockGallery state={state} />;

@@ -48,6 +48,10 @@ Devvit.addMenuItem({
 
 Devvit.addCustomPostType({
   name: 'Hello Blocks',
+  /**
+   * You can optionally set the height of your post between 'regular' (320px) and 'tall' (512px)
+   */
+  height: 'regular',
   /*
    * The render function defines the custom post layout during rendering.
    * It is called on load and after every user interaction (e.g. button click)
@@ -77,21 +81,15 @@ Devvit.addCustomPostType({
 
     // Your custom post layout goes here!
     return (
-      /*
-       * The <blocks> component is optional, but useful if you want
-       * to specify a different vertical size for your custom post.
-       */
-      <blocks height="regular">
-        <vstack padding="medium" cornerRadius="medium" gap="medium" alignment="middle">
-          <text style="heading" size="xxlarge">
-            Hello, {currentUsername ?? 'stranger'}! 👋
-          </text>
-          <text size="large">{`Click counter: ${counter}`}</text>
-          <button appearance="primary" onPress={() => setCounter(counter + 1)}>
-            Click me!
-          </button>
-        </vstack>
-      </blocks>
+      <vstack padding="medium" cornerRadius="medium" gap="medium" alignment="middle">
+        <text style="heading" size="xxlarge">
+          Hello, {currentUsername ?? 'stranger'}! 👋
+        </text>
+        <text size="large">{`Click counter: ${counter}`}</text>
+        <button appearance="primary" onPress={() => setCounter(counter + 1)}>
+          Click me!
+        </button>
+      </vstack>
     );
   },
 });
