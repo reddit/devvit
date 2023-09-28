@@ -6,7 +6,7 @@ import { Page } from '../page.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { ColorSubcategoryPage } from './ColorSubcategoryPage.js';
 import { ColorPrimitivesPage } from './ColorPrimitivesPage.js';
-import { ColorSemanticPage } from "./ColorSemanticPage.js";
+import { ColorSemanticPage } from './ColorSemanticPage.js';
 
 const hexCategories = [
   ['#RRGGBB', 'six'],
@@ -20,10 +20,11 @@ const rgbCategories = [
   ['rgba()', 'a'],
 ];
 
-const hslCategories = [
-  ['hsl()', ''],
-  ['hsla()', 'a'],
-];
+// TODO: Uncomment once HSL is supported in public-api (DXR-440)
+// const hslCategories = [
+//   ['hsl()', ''],
+//   ['hsla()', 'a'],
+// ];
 
 export const ColorPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
   const categories: CategoryProps[] = [
@@ -37,11 +38,12 @@ export const ColorPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
       category: 'rgb',
       content: <ColorSubcategoryPage state={state} subcategories={rgbCategories} />,
     },
-    {
-      label: 'HSL',
-      category: 'hsl',
-      content: <ColorSubcategoryPage state={state} subcategories={hslCategories} />,
-    },
+    // TODO: Uncomment once HSL is supported in public-api (DXR-440)
+    // {
+    //   label: 'HSL',
+    //   category: 'hsl',
+    //   content: <ColorSubcategoryPage state={state} subcategories={hslCategories} />,
+    // },
     {
       label: 'Primitives',
       category: 'primitives',
