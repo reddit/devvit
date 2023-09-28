@@ -48,13 +48,12 @@ export function indentXML(xml: string): string {
   }
   return formatted;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const toJSX = (json: any): JSX.Element => {
   if (json === undefined || json === null) {
     return <></>;
   }
   if (Array.isArray(json)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return <>{json.map((child: any) => toJSX(child))} </>;
   } else {
     const attrs = json[':@'];
