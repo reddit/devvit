@@ -86,7 +86,7 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
 
   return (
     <vstack gap="none" padding="medium" grow>
-      <hstack grow>
+      <hstack grow alignment="middle">
         <vstack alignment="middle">
           <hstack>
             <text style="heading" color="green">

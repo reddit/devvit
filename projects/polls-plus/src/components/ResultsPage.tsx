@@ -21,6 +21,7 @@ const PollResult = ({ option, votes, total, winner }: ResultProps): JSX.Element 
         cornerRadius="small"
         backgroundColor={winner ? 'upvote-background-disabled' : 'secondary-background'}
         width={percent}
+        height={'100%'}
         alignment={'center middle'}
       >
         <vstack>
@@ -41,7 +42,7 @@ const PollResult = ({ option, votes, total, winner }: ResultProps): JSX.Element 
   }
 
   return (
-    <zstack>
+    <zstack width={'100%'}>
       <PercentBar />
       <hstack padding="small">
         <text color="secondary-content" weight="bold">
