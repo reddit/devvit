@@ -34,7 +34,7 @@ export function BaseballScoreBoard(
           event: scoreInfo.event,
         })}
         <zstack grow width={100}>
-          <hstack grow>
+          <hstack width={'100%'} height={'100%'}>
             {TeamBlock({
               isHomeTeam: false,
               name: scoreInfo.event.awayTeam.fullName,

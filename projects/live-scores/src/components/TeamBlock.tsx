@@ -50,7 +50,7 @@ export function TeamBlock({
   }
 
   return (
-    <vstack padding="medium" grow backgroundColor={backgroundColor} alignment={alignment}>
+    <vstack padding="medium" width={'50%'} backgroundColor={backgroundColor} alignment={alignment}>
       <text alignment={alignment} size="small" color="white" height={baseballProps ? 16 : 10}>
         {name.toUpperCase()} {isHomeTeam ? '(HOME)' : '(AWAY)'}
       </text>
