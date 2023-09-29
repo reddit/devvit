@@ -15,19 +15,7 @@ export const IconTile: BlockComponent<IconTileProps> = ({ gallery, icon }) => {
       alignment={'center'}
       gap={'none'}
     >
-      <zstack alignment={'center middle'}>
-        <icon size={'large'} color={'transparent'} name={'admin'} />
-        <vstack>
-          <spacer size={'large'} />
-          <spacer size={'xsmall'} />
-        </vstack>
-        <hstack>
-          <spacer size={'large'} />
-          <spacer size={'large'} />
-          <spacer size={'large'} />
-          <spacer size={'large'} />
-          <spacer size={'large'} />
-        </hstack>
+      <zstack alignment={'center middle'} width={'140px'} height={'35px'}>
         <hstack gap={'medium'}>
           <icon
             name={`${icon}-outline` as IconName}

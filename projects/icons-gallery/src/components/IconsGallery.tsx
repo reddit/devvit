@@ -16,7 +16,7 @@ export const IconsGallery: CustomPostComponent = (context) => {
   return (
     <blocks height={'tall'}>
       <zstack backgroundColor={'puregray-100'} grow>
-        <vstack padding={'medium'} grow>
+        <vstack padding={'medium'} width={'100%'} height={'100%'}>
           <Header gallery={gallery} />
           <spacer size={'small'} />
           <hstack alignment={'center'}>
