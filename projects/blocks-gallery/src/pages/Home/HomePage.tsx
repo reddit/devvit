@@ -19,7 +19,6 @@ export const HomePage = ({ state }: BlockGalleryProps): JSX.Element => {
       onPress={() => {
         state.currentPage = id;
       }}
-      width={50}
     >
       {label}
     </button>
