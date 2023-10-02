@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "name": "ci-slot-machine",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "dependencies": {
+    "@devvit/public-api": "0.10.4"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "0.10.4",
+    "typescript": "4.9.3"
+  }
+}
