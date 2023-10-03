@@ -9,23 +9,25 @@ export function CommentBlock({
 }): JSX.Element {
   if (username == 'none') return;
   return (
-    <vstack reverse padding="medium">
-      <hstack
-        height={10}
-        padding="small"
-        backgroundColor="white"
-        alignment="middle start"
-        border="thick"
-        cornerRadius="full"
-      >
-        <text size="small" color="black" weight="bold">
-          u/{username}:
-        </text>
-        <spacer></spacer>
-        <text size="small" color="black">
-          {commentBody}
-        </text>
-      </hstack>
+    <vstack width="100%" height="100%" alignment="bottom">
+      <vstack reverse padding="medium">
+        <hstack
+          height={10}
+          padding="small"
+          backgroundColor="white"
+          alignment="middle start"
+          border="thick"
+          cornerRadius="full"
+        >
+          <text size="small" color="black" weight="bold">
+            u/{username}:
+          </text>
+          <spacer></spacer>
+          <text size="small" color="black">
+            {commentBody}
+          </text>
+        </hstack>
+      </vstack>
     </vstack>
   );
 }
