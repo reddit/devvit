@@ -1,14 +1,14 @@
 {
   "private": true,
   "name": "gql-plugin-example",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "description": "an example of adding event listeners",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.4"
+    "@devvit/public-api": "0.10.5"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.4",
+    "@devvit/tsconfig": "0.10.5",
     "typescript": "*"
   }
 }
