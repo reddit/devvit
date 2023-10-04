@@ -12,7 +12,6 @@ export function CommentBlock({
     <vstack width="100%" height="100%" alignment="bottom">
       <vstack reverse padding="medium">
         <hstack
-          height={10}
           padding="small"
           backgroundColor="white"
           alignment="middle start"
