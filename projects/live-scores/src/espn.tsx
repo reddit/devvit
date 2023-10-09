@@ -308,6 +308,8 @@ function parseEventState(event: any): EventState {
       return EventState.LIVE;
     case 'STATUS_FINAL':
       return EventState.FINAL;
+    case 'STATUS_FULL_TIME':
+      return EventState.FINAL;
     case 'STATUS_DELAYED':
       return EventState.DELAYED;
     case 'STATUS_RAIN_DELAY':
