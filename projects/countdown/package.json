@@ -4,9 +4,6 @@
   "version": "0.10.6",
   "license": "BSD-3-Clause",
   "type": "module",
-  "scripts": {
-    "test": "npm run test:unit"
-  },
   "dependencies": {
     "@devvit/public-api": "0.10.6",
     "tldts": "^6.0.14"

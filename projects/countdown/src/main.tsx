@@ -4,7 +4,7 @@ import {
   getHourOptions,
   getFormattedTimeLeft,
   getTimezones,
-  formatDateTime,
+  getFormattedDueDate,
 } from './utils.js';
 import { parse } from 'tldts';
 
@@ -38,15 +38,12 @@ async function getRedditImageUrl(imageUrl: string, media: MediaPlugin): Promise<
 }
 
 const TIME_VALUES: DropdownOption[] = getHourOptions(2).map(mapValueToDropdownOption);
-const TIMEZONE_VALUES: DropdownOption[] = getTimezones().map(({ name, tzValue }) => ({
-  value: tzValue,
-  label: name,
-}));
+const TIMEZONE_VALUES: DropdownOption[] = getTimezones().map(mapValueToDropdownOption);
 
 type CountdownFormData = {
   title: string;
   description?: string;
-  date: string; // dd-mm-yyyy
+  date: string; // yyyy-mm-dd
   time: [string]; // hh:mm 24h format
   timezone: [string]; // Intl timezoneName
   link_url?: string;
@@ -58,6 +55,7 @@ type CountdownData = {
   title: string;
   description?: string;
   dateTime: string; // ISO-8601
+  timezone?: string; // as in Intl.supportedValuesOf('timeZone'). e.g. Europe/Amsterdam
   link_url?: string;
   link_title?: string;
   img_url: string | null;
@@ -73,7 +71,7 @@ const CountdownForm = Devvit.createForm(
         type: 'group',
         label: 'End date and time',
         fields: [
-          { name: 'date', label: 'Countdown date (dd-mm-yyyy)', type: 'string', required: true },
+          { name: 'date', label: 'Countdown date (yyyy-mm-dd)', type: 'string', required: true },
           {
             name: 'time',
             label: 'Countdown time',
@@ -84,10 +82,10 @@ const CountdownForm = Devvit.createForm(
           },
           {
             name: 'timezone',
-            label: 'Timezone (default value is your current timezone: ',
+            label: 'Timezone',
             type: 'select',
             required: true,
-            defaultValue: ['-04:00'],
+            defaultValue: ['America/New_York'],
             options: TIMEZONE_VALUES,
           },
         ],
@@ -130,6 +128,7 @@ const CountdownForm = Devvit.createForm(
       title: formData.title || '',
       description: formData.description || '',
       dateTime: createDatetime(formData.date, formData.time[0], formData.timezone[0]),
+      timezone: formData.timezone[0],
       link_url: formData.link_url || '',
       link_title: formData.link_title || '',
       img_url: formData.img_url ? await getRedditImageUrl(formData.img_url, media) : null,
@@ -159,6 +158,7 @@ const CountdownForm = Devvit.createForm(
 
       ui.showToast(`Countdown created!`);
     } catch (e) {
+      console.log(postData);
       ui.showToast('Ooof, bad day, huh?');
     }
   }
@@ -233,7 +233,10 @@ Devvit.addCustomPostType({
 
     const linkForm = context.useForm(makeLinkForm(postAssociatedData), () => {});
 
-    const formattedDueDate = formatDateTime(postAssociatedData.dateTime);
+    const formattedDueDate = getFormattedDueDate(
+      postAssociatedData.dateTime,
+      postAssociatedData.timezone
+    );
     const formattedTimeLeft = getFormattedTimeLeft(timeLeft);
     const hasLink = postAssociatedData.link_url;
     const contentEventHappened = hasLink ? (

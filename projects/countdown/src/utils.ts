@@ -23,55 +23,39 @@ export const getHourOptions = (hourDividedTimes: number = 1): string[] => {
     });
 };
 
-export const getTimezones = (): { name: string; tzValue: string }[] => {
+export const getTimezones = (): string[] => {
   return [...TIMEZONES];
 };
 
 export const createDatetime = (
-  dateString: string,
+  dateString: string, // expected in `yyyy-mm-dd` format
   timeString: string,
-  tzOffset: string
+  timezoneName: string
 ): string => {
-  const [dd, mm, yyyy] = dateString.split('-');
-  return `${yyyy}-${mm}-${dd}T${timeString}:00.000${tzOffset}`;
+  const date = new Date(`${dateString}T${timeString}`);
+  const sameDateInCorrectTimezone = new Date(
+    date.toLocaleString('en-US', { timeZone: timezoneName })
+  );
+  const timeDiff = date.getTime() - sameDateInCorrectTimezone.getTime();
+  const timezonedDate = new Date(date.getTime() + timeDiff);
+  return timezonedDate.toISOString();
 };
 
-// gets offset in format +-hh:mm
-// for whole hours expected output is +-h
-// otherwise +-h:mm
-function getTimezoneString(timezoneOffset: string | undefined): string {
-  if (!timezoneOffset) {
-    return '';
-  }
-  try {
-    const [hours, minutes] = timezoneOffset.replace(/[+-]/, '').split(':');
-    const hoursFormatted = Intl.NumberFormat().format(Number(hours));
-    const minutesFormatted = minutes == '00' ? '' : `:${minutes}`;
-    return `${timezoneOffset[0]}${hoursFormatted}${minutesFormatted}`;
-  } catch (e) {
-    return '';
-  }
-}
-
-export const formatDateTime = (dateString: string): string => {
-  const utc0regex = /Z$/;
-  const timezoneOffsetRegex = /[+-]\d\d:\d\d$/;
-  const dateStringWithoutTimezone = dateString
-    .replace(utc0regex, '')
-    .replace(timezoneOffsetRegex, '');
-  const formattedDate = new Date(dateStringWithoutTimezone).toLocaleString([], {
+/**
+ * Returns a formatted due date string
+ * @param dateTime ISO-8601 string
+ * @param timeZone Timezone name as in Intl.supportedValuesOf('timeZone'). e.g. Europe/Amsterdam
+ */
+export const getFormattedDueDate = (dateTime: string, timeZone?: string): string => {
+  return new Date(dateTime).toLocaleString(['en-US'], {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+    timeZoneName: 'short',
+    timeZone,
   });
-  const timezone = utc0regex.test(dateString)
-    ? '+00:00'
-    : dateString.match(timezoneOffsetRegex)?.[0];
-  const timezoneOffset = getTimezoneString(timezone);
-  const timezoneString = timezoneOffset ? ` (UTC${timezoneOffset})` : '';
-  return `${formattedDate}${timezoneString}`;
 };
 
 type CountdownEntry = {
