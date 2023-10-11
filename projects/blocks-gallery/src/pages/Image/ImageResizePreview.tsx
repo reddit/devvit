@@ -10,7 +10,7 @@ export const ImageResizePreview = ({
   return (
     <Tile>
       <hstack backgroundColor="#EAEDEF">
-        <image url="/assets/Snoo.png" resizeMode={mode} imageHeight={128} imageWidth={512} />
+        <image url="Snoo.png" resizeMode={mode} imageHeight={128} imageWidth={512} />
       </hstack>
     </Tile>
   );
