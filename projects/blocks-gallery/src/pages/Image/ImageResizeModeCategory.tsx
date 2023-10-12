@@ -15,7 +15,7 @@ export const ImageResizeModeCategory = (): JSX.Element => {
   const content = options.map(([label, style]) => (
     <Tile label={label}>
       <hstack backgroundColor="#EAEDEF">
-        <image url="/assets/Snoo.png" resizeMode={style} imageHeight={128} imageWidth={512} />
+        <image url="Snoo.png" resizeMode={style} imageHeight={128} imageWidth={512} />
       </hstack>
     </Tile>
   ));

@@ -12,6 +12,7 @@ export const HomePage = ({ state }: BlockGalleryProps): JSX.Element => {
     ['Text', 'text'],
     ['Icon', 'icon'],
     ['Color', 'color'],
+    ['Size', 'size'],
   ];
 
   const pageButtons = pages.map(([label, id]) => (

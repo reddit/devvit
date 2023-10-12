@@ -69,9 +69,7 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
         <></>
       ) : (
         <hstack alignment="start middle" gap="small">
-          <button onPress={props.state?.goHome} appearance="secondary" size="small">
-            {' ← '}
-          </button>
+          <button onPress={props.state?.goHome} appearance="secondary" size="small" icon="back" />
           <text selectable={false} size="xlarge" weight="bold" color="neutral-content">
             {props.title}
           </text>

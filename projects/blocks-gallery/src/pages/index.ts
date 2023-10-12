@@ -6,6 +6,7 @@ import { SpacerPage } from './Spacer/SpacerPage.js';
 import { TextPage } from './Text/TextPage.js';
 import { IconPage } from './Icon/IconPage.js';
 import { ColorPage } from './Color/ColorPage.js';
+import { SizePage } from './Size/SizePage.js';
 import { Page } from './page.js';
 
 export {
@@ -17,5 +18,6 @@ export {
   TextPage,
   IconPage,
   ColorPage,
+  SizePage,
   Page,
 };

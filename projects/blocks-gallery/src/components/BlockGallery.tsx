@@ -7,6 +7,7 @@ import {
   IconPage,
   ImagePage,
   Page,
+  SizePage,
   SpacerPage,
   StacksPage,
   TextPage,
@@ -21,7 +22,7 @@ export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
   const page = state.currentPage;
   const pageState = state.pageState(page);
   return (
-    <vstack borderColor="gray" border="thick" cornerRadius="small" padding="medium" grow>
+    <vstack padding="medium" grow>
       {page === Page.HOME && <HomePage state={state} />}
       {page === Page.BUTTONS && <ButtonPage state={pageState} />}
       {page === Page.IMAGES && <ImagePage state={pageState} />}
@@ -30,6 +31,7 @@ export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
       {page === Page.TEXT && <TextPage state={pageState} />}
       {page === Page.ICON && <IconPage state={pageState} />}
       {page === Page.COLOR && <ColorPage state={pageState} />}
+      {page === Page.SIZE && <SizePage state={pageState} />}
     </vstack>
   );
 };

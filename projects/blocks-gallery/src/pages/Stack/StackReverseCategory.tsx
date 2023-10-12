@@ -15,19 +15,16 @@ export const StackReverseCategory = (): JSX.Element => {
     <Tile label={label}>
       <hstack reverse={option} gap="small">
         {letters.map((letter) => (
-          <zstack backgroundColor="#0045AC">
-            <hstack>
-              <spacer size="large" />
-            </hstack>
-            <vstack>
-              <spacer size="large" />
-            </vstack>
-            <hstack alignment="center middle">
-              <text selectable={false} weight="bold" color="#ffffff">
-                {letter}
-              </text>
-            </hstack>
-          </zstack>
+          <hstack
+            width={'32px'}
+            height={'32px'}
+            backgroundColor={'#0045ac'}
+            alignment={'middle center'}
+          >
+            <text selectable={false} weight="bold" color="#ffffff">
+              {letter}
+            </text>
+          </hstack>
         ))}
       </hstack>
     </Tile>

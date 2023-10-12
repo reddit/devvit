@@ -8,25 +8,26 @@ export const SpacerSizeCategory = (): JSX.Element => {
     ['XSmall (4 dp)', 'xsmall'],
     ['Small (8 dp)', 'small'],
     ['Medium (16 dp)', 'medium'],
-    ['Large (24 dp)', 'large'],
+    ['Large (32 dp)', 'large'],
   ];
 
   const content = options.map(([label, size]) => (
     <Tile label={label}>
-      <zstack backgroundColor="secondary-background" border={'thin'} padding={'small'}>
-        <hstack alignment="middle">
-          <text>A</text>
-          <hstack alignment={'middle'}>
-            <hstack backgroundColor="alienblue-500">
-              <spacer size={size} shape={'thin'} />
-            </hstack>
+      <hstack
+        border={'thin'}
+        padding={'small'}
+        backgroundColor="secondary-background"
+        height={'48px'}
+        alignment="middle"
+      >
+        <text>A</text>
+        <hstack alignment={'middle'}>
+          <hstack backgroundColor="alienblue-500">
+            <spacer size={size} shape={'thin'} />
           </hstack>
-          <text>B</text>
         </hstack>
-        <vstack>
-          <spacer size="large" />
-        </vstack>
-      </zstack>
+        <text>B</text>
+      </hstack>
     </Tile>
   ));
 

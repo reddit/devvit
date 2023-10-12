@@ -1,4 +1,5 @@
 import { ContextAPIClients, Devvit } from '@devvit/public-api';
+
 import { BlockGallery } from './components/BlockGallery.js';
 import { GalleryState } from './state/state.js';
 
@@ -16,7 +17,11 @@ Devvit.addMenuItem({
     await reddit.submitPost({
       title: 'Blocks Gallery',
       subredditName: currentSubreddit.name,
-      preview: <text>Loading blocks gallery</text>,
+      preview: (
+        <vstack alignment={'middle center'} grow>
+          <text>Loading blocks gallery</text>
+        </vstack>
+      ),
     });
 
     ui.showToast('Posted a blocks gallery!');

@@ -1,18 +1,31 @@
-import { Page } from '../pages/page.js';
-import { ButtonPageState } from './buttonPageState.js';
-import { CategoryPageState } from '../components/CategoryPage.js';
-import { ImagePageState } from './imagePageState.js';
-import { StackPageState } from './stackPageState.js';
-import { SpacerPageState } from './spacerPageState.js';
-import { TextPageState } from './textPageState.js';
-import { IconPageState } from './iconPageState.js';
 import { ContextAPIClients, UseStateResult } from '@devvit/public-api';
-import { ColorPageState } from "./colorPageState.js";
+
+import { Page } from '../pages/page.js';
+import { CategoryPageState } from '../components/CategoryPage.js';
 
 export interface StatefulProps {
   useState: ContextAPIClients['useState'];
   goHome: () => void;
 }
+
+const PAGES = [
+  Page.HOME,
+  Page.BUTTONS,
+  Page.IMAGES,
+  Page.STACKS,
+  Page.SPACERS,
+  Page.TEXT,
+  Page.ICON,
+  Page.COLOR,
+  Page.SIZE,
+];
+
+/**
+ * Override default category for page
+ */
+const DEFAULT_CATEGORY: Record<string, string> = {
+  [Page.COLOR]: 'hex',
+};
 
 export class GalleryState {
   readonly _currentPage: UseStateResult<Page>;
@@ -26,16 +39,15 @@ export class GalleryState {
     };
     const statefulProps: StatefulProps = { useState, goHome };
     this._currentPage = useState<Page>(Page.HOME);
-    this._pageStates = {
-      [Page.HOME]: new CategoryPageState(statefulProps),
-      [Page.BUTTONS]: new ButtonPageState(statefulProps),
-      [Page.IMAGES]: new ImagePageState(statefulProps),
-      [Page.STACKS]: new StackPageState(statefulProps),
-      [Page.SPACERS]: new SpacerPageState(statefulProps),
-      [Page.TEXT]: new TextPageState(statefulProps),
-      [Page.ICON]: new IconPageState(statefulProps),
-      [Page.COLOR]: new ColorPageState(statefulProps),
-    };
+
+    this._pageStates = PAGES.reduce(
+      (out, page) => ({
+        ...out,
+        [page]: new CategoryPageState(statefulProps, DEFAULT_CATEGORY[page] ?? ''),
+      }),
+      {} as typeof this._pageStates
+    );
+
     this.showToast = (message: string) => renderContext.ui.showToast(message);
   }
 

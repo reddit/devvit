@@ -25,7 +25,7 @@ export const ColorPreview = ({
           <Tile label={`${StringUtil.capitalize(colorName)}: ${colorValues[key]}`}>
             <zstack>
               <image
-                url={'/assets/checkerboard.png'}
+                url={'checkerboard.png'}
                 imageWidth={32}
                 imageHeight={32}
                 resizeMode={'none'}
