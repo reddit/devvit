@@ -1,6 +1,7 @@
 import { KVStore } from '@devvit/public-api';
 import { GameSubscription } from './sports.js';
-import { EventState, GameEvent, GeneralGameScoreInfo } from './espn.js';
+import { EventState, GameEvent, GeneralGameScoreInfo, parseGeneralGameScoreInfo } from './espn.js';
+import { mlbDemoForId } from './mock-scores/mlb/mock-mlb.js';
 
 export function makeKeyForSubscription(subscription: GameSubscription): string {
   return `info:${subscription.league}-${subscription.eventId}`;
@@ -22,6 +23,12 @@ export async function fetchCachedGameInfoForPostId(
     return null;
   }
   const gameSubscription: GameSubscription = JSON.parse(gameSubStr);
+
+  if (gameSubscription.eventId.startsWith('demo')) {
+    const demo = mlbDemoForId(gameSubscription.eventId);
+    return parseGeneralGameScoreInfo(demo, `mlb`, `baseball`);
+  }
+
   const gameInfoStr: string | undefined = await kvStore.get(
     makeKeyForSubscription(gameSubscription)
   );

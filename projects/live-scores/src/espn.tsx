@@ -246,7 +246,7 @@ function populateBaseballInfo(
   return baseballInfo;
 }
 
-function parseGeneralGameScoreInfo(
+export function parseGeneralGameScoreInfo(
   event: any,
   league: string,
   gameType: string

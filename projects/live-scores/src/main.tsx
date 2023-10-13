@@ -1,4 +1,4 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, Post } from '@devvit/public-api';
 import { GenericScoreBoard } from './components/Scoreboard.js';
 import { BaseballScoreBoard } from './components/baseball.js';
 import { CommentData, getLastComment } from './components/comments.js';
@@ -7,15 +7,21 @@ import {
   EventState,
   fetchScoreForGame,
   GeneralGameScoreInfo,
+  parseGeneralGameScoreInfo,
 } from './espn.js';
-import { fetchCachedGameInfoForPostId, makeKeyForSubscription } from './helpers.js';
-import { GameSubscription } from './sports.js';
+import {
+  fetchCachedGameInfoForPostId,
+  makeKeyForPostId,
+  makeKeyForSubscription,
+} from './helpers.js';
+import { GameSubscription, getLeagueFromString } from './sports.js';
 import { getSubscriptions, removeSubscription } from './subscriptions.js';
 import { scoreboardCreationForm } from './forms/ScoreboardCreateForm.js';
+import { mlbDemoForId, nextMLBDemoPage } from './mock-scores/mlb/mock-mlb.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
-Devvit.debug.emitSnapshots = true;
+// Devvit.debug.emitSnapshots = true;
 
 Devvit.configure({
   redditAPI: true, // context.reddit will now be available
@@ -68,12 +74,46 @@ Devvit.addMenuItem({
   },
 });
 
+Devvit.addMenuItem({
+  label: 'LiveScores: Demo',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, context) => {
+    const currentSubreddit = await context.reddit.getCurrentSubreddit();
+    const post: Post = await context.reddit.submitPost({
+      preview: (
+        <vstack padding="medium" cornerRadius="medium">
+          <text style="heading" size="medium">
+            Loading scoreboard for game...
+          </text>
+        </vstack>
+      ),
+      title: `Scoreboard: Demo`,
+      subredditName: currentSubreddit.name,
+    });
+    const gameSub: GameSubscription = {
+      league: getLeagueFromString('mlb'),
+      eventId: 'demo-mlb-01',
+    };
+    await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
+    return context.ui.showToast({
+      text: 'Scoreboard Demo Post Created!',
+      appearance: 'success',
+    });
+  },
+});
+
 Devvit.addCustomPostType({
   name: 'Scoreboard',
-  render: async (context) => {
+  render: (context) => {
     const { useState, postId, kvStore } = context;
     const [scoreInfo, setScoreInfo] = useState(async () => {
-      return await fetchCachedGameInfoForPostId(kvStore, postId);
+      const pageId = context.debug.metadata?.['debug-id']?.values?.[0];
+      if (pageId) {
+        return parseGeneralGameScoreInfo(mlbDemoForId(pageId), `mlb`, `baseball`);
+      } else {
+        return await fetchCachedGameInfoForPostId(kvStore, postId);
+      }
     });
 
     const updateInterval = context.useInterval(async () => {
@@ -90,6 +130,14 @@ Devvit.addCustomPostType({
       postId: `none`,
     };
     const [lastComment, setLastComment] = context.useState<CommentData>(async () => {
+      if (context.debug.metadata?.['debug-id']?.values?.[0]) {
+        return {
+          id: '123',
+          username: 'test',
+          text: 'oh hi mark',
+          postId: '123',
+        };
+      }
       const storedLastComment = await getLastComment(context, context.postId);
       if (storedLastComment != undefined) {
         return storedLastComment;
@@ -112,11 +160,25 @@ Devvit.addCustomPostType({
     }, 3000);
     interval.start();
 
+    const demoNext = async () => {
+      const pageId = scoreInfo?.event.id;
+      if (pageId?.startsWith('demo')) {
+        const nextPage = nextMLBDemoPage(pageId);
+        const gameSub: GameSubscription = {
+          league: getLeagueFromString('mlb'),
+          eventId: nextPage,
+        };
+        await context.kvStore.put(makeKeyForPostId(postId), JSON.stringify(gameSub));
+        const update = await fetchCachedGameInfoForPostId(kvStore, postId);
+        setScoreInfo(update);
+      }
+    };
+
     if (scoreInfo) {
       if (scoreInfo.event.gameType == 'baseball') {
         const baseBallScoreInfo = scoreInfo as BaseballGameScoreInfo;
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
-        return BaseballScoreBoard(baseBallScoreInfo, lastComment);
+        return BaseballScoreBoard(baseBallScoreInfo, lastComment, demoNext);
       } else {
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
         return GenericScoreBoard(scoreInfo, lastComment);

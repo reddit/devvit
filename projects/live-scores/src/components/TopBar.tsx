@@ -9,9 +9,16 @@ function msToHMS(ms: number): string {
   // 2- Extract hours:
   const hours = Math.trunc(seconds / 3600); // 3,600 seconds in 1 hour
   seconds = seconds % 3600; // seconds remaining after extracting hours
+
+  if (hours > 24) {
+    const days = Math.trunc(hours / 24);
+    const shortHours = hours % 24;
+    return `${days}d ${shortHours}h`;
+  }
+
   // 3- Extract minutes:
   const minutes = Math.trunc(seconds / 60).toString(); // 60 seconds in 1 minute
-  return `${hours}:${minutes.length === 1 ? '0' + minutes : minutes}`;
+  return `${hours}h ${minutes}m`;
 }
 
 export function Live(): JSX.Element {

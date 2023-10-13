@@ -13,7 +13,8 @@ export type TeamBlockBaseball = {
 
 export function BaseballScoreBoard(
   scoreInfo: BaseballGameScoreInfo,
-  lastComment: CommentData
+  lastComment: CommentData,
+  demoNext: () => void | Promise<void>
 ): JSX.Element {
   return (
     <blocks height="regular">
@@ -94,6 +95,13 @@ export function BaseballScoreBoard(
             username: lastComment.username,
             commentBody: lastComment.text,
           })}
+          {scoreInfo.event.id.startsWith(`demo`) && (
+            <hstack width={'100%'} height={'100%'} alignment="end bottom">
+              <button maxWidth={100} onPress={() => demoNext()}>
+                Next
+              </button>
+            </hstack>
+          )}
         </zstack>
       </vstack>
     </blocks>
