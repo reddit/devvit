@@ -7,18 +7,21 @@ import {
   getFormattedDueDate,
 } from './utils.js';
 import { parse } from 'tldts';
+import { APPROVED_DOMAINS, ONE_MINUTE_IN_MS, POST_DATA_KEY } from './constants.js';
+import {
+  addUserReminder,
+  getExistingReminders,
+  removePostAssociatedData,
+  removeUserReminder,
+  setPostReminder,
+} from './reminders.js';
 
 Devvit.configure({
   redditAPI: true,
   kvStore: true,
   media: true,
+  redis: true,
 });
-
-Devvit.debug.emitSnapshots = true;
-
-const APPROVED_DOMAINS = ['redd.it', 'redditstatic.com', 'redditmedia.com'];
-
-const POST_DATA_KEY = (postId: string): string => `countdown_${postId}`;
 
 type DropdownOption = { label: string; value: string };
 
@@ -113,7 +116,7 @@ const CountdownForm = Devvit.createForm(
     ],
     acceptLabel: 'Next',
   },
-  async (event, { reddit, kvStore, ui, subredditId, media }) => {
+  async (event, { reddit, kvStore, ui, subredditId, media, scheduler }) => {
     const formData = event.values as CountdownFormData;
     if (formData.img_url) {
       // check valid domain
@@ -155,6 +158,8 @@ const CountdownForm = Devvit.createForm(
       });
 
       await kvStore.put(POST_DATA_KEY(post.id), postData);
+
+      await setPostReminder(postData.dateTime, scheduler, post.id, kvStore);
 
       ui.showToast(`Countdown created!`);
     } catch (e) {
@@ -207,13 +212,28 @@ Devvit.addCustomPostType({
   name: 'Community Countdown',
   description: 'Mark the date!',
   render: (context) => {
-    const [postAssociatedData, _] = context.useState(async () => {
+    const postId = context.postId || 'test';
+
+    const [postAssociatedData] = context.useState(async () => {
       return await getPostAssociatedData(context);
     });
 
     if (!postAssociatedData) {
       return <ErrorState />;
     }
+
+    const [currentUserId] = context.useState<string | null>(async () => {
+      const user = await context.reddit.getCurrentUser();
+      return user?.id;
+    });
+
+    const [isReminderActive, setIsReminderActive] = context.useState<boolean>(async () => {
+      if (!currentUserId) {
+        return false;
+      }
+      const reminders = await getExistingReminders(postId, context.kvStore);
+      return reminders.includes(currentUserId);
+    });
 
     const [timeLeft, setTimeLeft] = context.useState(() => {
       const now = Date.now();
@@ -239,20 +259,57 @@ Devvit.addCustomPostType({
     );
     const formattedTimeLeft = getFormattedTimeLeft(timeLeft);
     const hasLink = postAssociatedData.link_url;
-    const contentEventHappened = hasLink ? (
-      <button
-        width={50}
-        onPress={() => {
-          context.ui.showForm(linkForm);
-        }}
-      >
-        {postAssociatedData.link_title || 'Click here!'}
-      </button>
-    ) : (
-      <text style="heading" size="xxlarge">
-        It happened!
-      </text>
-    );
+    const renderEventHappened = () => {
+      if (!hasLink) {
+        return (
+          <text style="heading" size="xxlarge">
+            It happened!
+          </text>
+        );
+      }
+      return (
+        <button
+          width={50}
+          onPress={() => {
+            context.ui.showForm(linkForm);
+          }}
+        >
+          {postAssociatedData.link_title || 'Click here!'}
+        </button>
+      );
+    };
+
+    const renderContentCountdown = () => {
+      if (!formattedTimeLeft) {
+        return undefined;
+      }
+      return formattedTimeLeft.map((remainingTimeEntry) => (
+        <vstack>
+          <text size="large" weight="bold" alignment="center">
+            {remainingTimeEntry.value || '0'}
+          </text>
+          <text size="small" weight="regular" alignment="center">
+            {remainingTimeEntry.label}
+          </text>
+        </vstack>
+      ));
+    };
+
+    const toggleReminder = async () => {
+      // impossible in practice, just a typeguard
+      if (!currentUserId) {
+        return;
+      }
+
+      // the redundancy here is intentional
+      // this way we make sure that we do exactly what user expects us to do
+      await (isReminderActive
+        ? removeUserReminder(currentUserId, postId, context.kvStore)
+        : addUserReminder(currentUserId, postId, context.kvStore));
+      setIsReminderActive(!isReminderActive);
+    };
+
+    const isEnoughTimeForReminder = timeLeft > 2 * ONE_MINUTE_IN_MS;
 
     return (
       <blocks height="regular">
@@ -283,20 +340,29 @@ Devvit.addCustomPostType({
               </vstack>
             </hstack>
           )}
-          <hstack gap="medium" alignment="center">
-            {!formattedTimeLeft
-              ? contentEventHappened
-              : formattedTimeLeft.map((remainingTimeEntry) => (
-                  <vstack>
-                    <text size="large" weight="bold" alignment="center">
-                      {remainingTimeEntry.value || '0'}
-                    </text>
-                    <text size="small" weight="regular" alignment="center">
-                      {remainingTimeEntry.label}
-                    </text>
-                  </vstack>
-                ))}
-          </hstack>
+          {!formattedTimeLeft ? (
+            <hstack gap="medium" alignment="center">
+              {renderEventHappened()}
+            </hstack>
+          ) : (
+            <>
+              <hstack gap="medium" alignment="center">
+                {renderContentCountdown()}
+              </hstack>
+              {currentUserId && isEnoughTimeForReminder && (
+                <>
+                  <spacer size="medium" />
+                  <button
+                    icon={!isReminderActive ? 'notification-outline' : 'notification-frequent-fill'}
+                    appearance="primary"
+                    onPress={toggleReminder}
+                  >
+                    {!isReminderActive ? 'Remind me' : 'Reminder set'}
+                  </button>
+                </>
+              )}
+            </>
+          )}
           <spacer grow={true}></spacer>
         </vstack>
       </blocks>
@@ -310,6 +376,15 @@ Devvit.addMenuItem({
   onPress: async (_event, context) => {
     const { ui } = context;
     ui.showForm(CountdownForm);
+  },
+});
+
+// Clearing up reminder on a PostDelete event
+Devvit.addTrigger({
+  event: 'PostDelete',
+  onEvent: async (event, context) => {
+    const postId = event.postId;
+    await removePostAssociatedData(postId, context.kvStore, context.scheduler);
   },
 });
 

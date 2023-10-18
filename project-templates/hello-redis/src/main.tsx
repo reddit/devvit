@@ -12,14 +12,8 @@ const App: Devvit.CustomPostComponent = ({ useState, redis, postId }) => {
 
   // Store the progress state keyed by post ID
   const [progress, setProgress] = useState(async () => {
-    let state = '0';
-    try {
-      state = (await redis.get(key(postId))) || '0';
-    } catch (e) {
-      // catches initial redis: nil error when key doesn't exist
-      console.log(e);
-    }
-    return parseInt(state);
+    const state = await redis.get(key(postId));
+    return parseInt(state || '0');
   });
 
   return (
