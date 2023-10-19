@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { GeneralGameScoreInfo } from '../espn.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
 import { CommentData, CommentBlock } from './comments.js';
+import { GeneralGameScoreInfo } from '../sports/GameModels.js';
 
 export function GenericScoreBoard(
   scoreInfo: GeneralGameScoreInfo,

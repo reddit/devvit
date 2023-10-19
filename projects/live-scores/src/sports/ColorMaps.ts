@@ -68,7 +68,6 @@ export const NFL_TEAM_COLOR_MAP: Record<string, string> = {
   sea: '#002244',
   tb: '#D50A0A',
   ten: '#002A5C',
-  was: '#773141',
   wsh: '#773141',
 };
 

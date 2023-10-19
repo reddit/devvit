@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { TeamInfo, GameEvent, fetchNextEventForTeam } from '../espn.js';
-import { getDisplayNameFromLeague } from '../sports.js';
+import { getDisplayNameFromLeague } from '../sports/Sports.js';
 import { gameSelectForm } from './GameSelectionForm.js';
+import { GameEvent, TeamInfo } from '../sports/GameModels.js';
+import { fetchNextEventForTeam } from '../sports/espn/espn.js';
 
 export const singleTeamSelectForm = Devvit.createForm(
   (data) => {

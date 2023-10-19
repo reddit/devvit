@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { GENERIC_TEAM_COLOR_MAP } from '../constants.js';
-import { EventState } from '../espn.js';
+import { GENERIC_TEAM_COLOR_MAP } from '../sports/ColorMaps.js';
 import { TeamBlockBaseball, sportSpecificContentBaseball } from './baseball.js';
 import { TeamBlockBasketball, sportSpecificContentBasketball } from './basketball.js';
+import { EventState } from '../sports/GameModels.js';
 
 export function TeamBlock({
   isHomeTeam,
@@ -17,8 +17,8 @@ export function TeamBlock({
   isHomeTeam: boolean;
   name: string;
   logo: string;
-  color: string;
-  score: number;
+  color?: string;
+  score?: number;
   state: EventState;
   baseballProps?: TeamBlockBaseball;
   basketballProps?: TeamBlockBasketball;
@@ -30,7 +30,7 @@ export function TeamBlock({
   );
   const scoreEl = (
     <text color="white" size="xxlarge">
-      {state === EventState.PRE ? '-' : score.toString()}
+      {state === EventState.PRE ? '-' : score?.toString()}
     </text>
   );
 

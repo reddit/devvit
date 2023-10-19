@@ -1,8 +1,9 @@
 import { Devvit } from '@devvit/public-api';
-import { BaseballGameScoreInfo, InningState, EventState } from '../espn.js';
+import { BaseballGameScoreInfo, InningState } from '../sports/espn/espn.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
 import { CommentData, CommentBlock } from './comments.js';
+import { EventState } from '../sports/GameModels.js';
 
 export type TeamBlockBaseball = {
   isPitching: boolean;

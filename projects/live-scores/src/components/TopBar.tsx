@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { EventState, GameEvent, eventPeriodNumber, eventPeriodToString } from '../espn.js';
+import { eventPeriodNumber, eventPeriodToString } from '../sports/espn/espn.js';
 import { TopBarBaseball, topBarBaseballComponent } from './baseball.js';
 import { TopBarBasketball, topBarBasketballComponent } from './basketball.js';
+import { EventState, GameEvent } from '../sports/GameModels.js';
 
 function msToHMS(ms: number): string {
   // 1- Convert to seconds:

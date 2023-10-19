@@ -1,7 +1,13 @@
 export type GameSubscription = {
   league: League;
   eventId: string;
+  service?: APIService;
 };
+
+export enum APIService {
+  ESPN = `espn`,
+  SR = `sr`,
+}
 
 export enum League {
   UNKNOWN = '',

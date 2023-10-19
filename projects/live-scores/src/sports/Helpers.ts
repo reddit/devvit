@@ -1,7 +1,8 @@
 import { KVStore } from '@devvit/public-api';
-import { GameSubscription } from './sports.js';
-import { EventState, GameEvent, GeneralGameScoreInfo, parseGeneralGameScoreInfo } from './espn.js';
-import { mlbDemoForId } from './mock-scores/mlb/mock-mlb.js';
+import { GameSubscription } from './Sports.js';
+import { mlbDemoForId } from '../mock-scores/mlb/mock-mlb.js';
+import { GeneralGameScoreInfo, GameEvent, EventState } from './GameModels.js';
+import { parseGeneralGameScoreInfo } from './espn/espn.js';
 
 export function makeKeyForSubscription(subscription: GameSubscription): string {
   return `info:${subscription.league}-${subscription.eventId}`;

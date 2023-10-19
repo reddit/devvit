@@ -1,42 +1,16 @@
-import { getLeagueFromString, getSportFromLeague, getSportFromLeagueString } from './sports.js';
-
-export type GameEvent = {
-  // events[].id
-  id: string;
-  // events[].name
-  name: string;
-  // events[].date
-  date: string;
-  homeTeam: TeamInfo;
-  awayTeam: TeamInfo;
-  // "Live" or "Final" events[].competitions[].status.type.detail (if this != “Final” its an ongoing game)
-  state: EventState;
-  // the sport name
-  gameType: string;
-  // the league (i.e. `mlb` or `nfl`)
-  league: string;
-  // Timing info (i.e. clock & period/quarter/half)
-  timingInfo: GameEventTimingInfo;
-};
-
-export type GeneralGameScoreInfo = {
-  event: GameEvent;
-  // Events[].competitions[].competitors[].score
-  homeScore: number;
-  // Events[].competitions[].competitors[].score
-  awayScore: number;
-  // For example, "Bot 2" events[].competitions[].status.type.shortDetails
-  extraContent: string;
-};
-
-export type GameEventTimingInfo = {
-  clock: number;
-  // Events[].competitions[].status.clock
-  displayClock: string;
-  // Events[].competitions[].status.clock
-  period: number;
-  // // Events[].competitions[].status.period
-};
+import {
+  EventState,
+  GameEvent,
+  GameEventTimingInfo,
+  GeneralGameScoreInfo,
+  TeamInfo,
+} from '../GameModels.js';
+import {
+  APIService,
+  getLeagueFromString,
+  getSportFromLeague,
+  getSportFromLeagueString,
+} from '../Sports.js';
 
 export interface BaseballGameScoreInfo extends GeneralGameScoreInfo {
   // events[].competitions[].situation.onFirst
@@ -65,31 +39,6 @@ export interface BaseballGameScoreInfo extends GeneralGameScoreInfo {
   pitcherSummery: string;
   // events[].competitions[].situation.batter.athlete.summary
   batterSummary: string;
-}
-
-export type TeamInfo = {
-  // events[].competitions[].competitors[].id
-  id: string;
-  // events[].competitions[].competitors[].team.shortDisplayName
-  name: string;
-  // events[].competitions[].competitors[].team.abbreviation
-  abbreviation: string;
-  // events[].competitions[].competitors[].team.displayName
-  fullName: string;
-  // events[].competitions[].competitors[].team.location
-  location: string;
-  // events[].competitions[].competitors[].team.logo
-  logo: string;
-  // team color
-  color: string;
-};
-
-export enum EventState {
-  UNKNOWN = '',
-  PRE = 'pre',
-  LIVE = 'live',
-  FINAL = 'final',
-  DELAYED = 'delayed',
 }
 
 export enum InningState {
@@ -169,6 +118,7 @@ export async function fetchScoreForGame<T extends GeneralGameScoreInfo>(
   let data;
   const sport = getSportFromLeagueString(league);
   const apiUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard/${id}`;
+  // console.log(apiUrl);
   try {
     const request = new Request(apiUrl, {
       headers: { Accept: 'application/json' },
@@ -269,6 +219,7 @@ export function parseGeneralGameScoreInfo(
     homeScore: homeCompetitor.score,
     awayScore: awayCompetitor.score,
     extraContent: competition.status.type.shortDetail,
+    service: APIService.ESPN,
   };
 
   if (gameType.includes('baseball')) {

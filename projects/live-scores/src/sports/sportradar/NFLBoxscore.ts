@@ -1,0 +1,152 @@
+import { Devvit } from '@devvit/public-api';
+import { NFLGame, NFLSeason, NFLWeek } from './NFLSchedule.js';
+import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameModels.js';
+import { APIService } from '../Sports.js';
+import { NFL_TEAM_COLOR_MAP } from '../ColorMaps.js';
+import { Team, TeamRecord } from './GenericModels.js';
+
+interface NFLBoxscoreSummary {
+  season: NFLSeason;
+  week: NFLWeek;
+  home: NFLGameTeam;
+  away: NFLGameTeam;
+}
+
+interface NFLGameTeam extends Team {
+  market: string;
+  used_timeouts: number;
+  remaining_timeouts: number;
+  points: number;
+  used_challenges: number;
+  remaining_challenges: number;
+  record: TeamRecord;
+}
+
+interface NFLBoxscoreSituation {
+  clock: string;
+  down: number;
+  yfd: number;
+  possession: Team;
+  location: {
+    id: string;
+    name: string;
+    market: string;
+    alias: string;
+    sr_id: string;
+    yardline: number;
+  };
+}
+
+interface LastEvent {
+  type: string;
+  id: string;
+  sequence: number;
+  clock: string;
+  event_type: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+  wall_clock: string;
+}
+
+export interface NFLBoxscore extends NFLGame {
+  clock: string;
+  quarter: number;
+  summary: NFLBoxscoreSummary;
+  situation: NFLBoxscoreSituation;
+  last_event: LastEvent;
+}
+
+export enum NFLBoxscoreStatus {
+  CREATED = `created`,
+  INPROGRESS = `inprogress`,
+  CLOSED = `closed`,
+  COMPLETE = `complete`,
+}
+
+export async function fetchNFLBoxscore(
+  gameId: string,
+  context: Devvit.Context
+): Promise<GeneralGameScoreInfo | null> {
+  let data;
+  const apiKey = await context.settings.get('nfl-api-key');
+  try {
+    const request = new Request(
+      `https://api.sportradar.us/nfl/official/trial/v7/en/games/${gameId}/boxscore.json?api_key=${apiKey}`
+    );
+    // console.log(request.url);
+    const response = await fetch(request);
+    data = await response.json();
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+  return gameScoreInfo(parseNFLBoxscore(data));
+}
+
+function parseNFLBoxscore(jsonData: any): NFLBoxscore {
+  return {
+    id: jsonData.id,
+    status: jsonData.status,
+    scheduled: jsonData.scheduled,
+    attendance: jsonData.attendance,
+    clock: jsonData.clock,
+    quarter: jsonData.quarter,
+    sr_id: jsonData.sr_id,
+    game_type: jsonData.game_type,
+    conference_game: jsonData.conference_game,
+    duration: jsonData.duration,
+    summary: jsonData.summary,
+    situation: jsonData.situation,
+    last_event: jsonData.last_event,
+    scoring: jsonData.scoring,
+  };
+}
+
+function parseTeam(league: string, team: any): TeamInfo {
+  return {
+    id: team.id,
+    name: team.name,
+    abbreviation: team.alias,
+    fullName: `${team.market} ${team.name}`,
+    location: team.market,
+    logo: league + '-' + team.alias.toLowerCase() + '.png',
+    color: NFL_TEAM_COLOR_MAP[team.alias.toLowerCase()],
+  };
+}
+
+export function gameScoreInfo(game: NFLBoxscore): GeneralGameScoreInfo {
+  return {
+    event: {
+      id: game.id,
+      name: `${game.summary.away.name} at ${game.summary.home.name}`,
+      date: game.scheduled,
+      homeTeam: parseTeam(`nfl`, game.summary.home),
+      awayTeam: parseTeam(`nfl`, game.summary.away),
+      state: eventState(game),
+      gameType: 'football',
+      league: 'nfl',
+      timingInfo: {
+        displayClock: game.clock,
+        period: game.quarter,
+      },
+    },
+    homeScore: game.summary.home.points,
+    awayScore: game.summary.away.points,
+    service: APIService.SR,
+  };
+}
+
+function eventState(event: NFLBoxscore): EventState {
+  switch (event.status) {
+    case NFLBoxscoreStatus.CREATED:
+      return EventState.PRE;
+    case NFLBoxscoreStatus.INPROGRESS:
+      return EventState.LIVE;
+    case NFLBoxscoreStatus.CLOSED:
+      return EventState.FINAL;
+    case NFLBoxscoreStatus.COMPLETE:
+      return EventState.FINAL;
+  }
+  return EventState.UNKNOWN;
+}

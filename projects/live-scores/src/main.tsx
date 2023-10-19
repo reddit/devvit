@@ -2,22 +2,22 @@ import { Devvit, Post } from '@devvit/public-api';
 import { GenericScoreBoard } from './components/Scoreboard.js';
 import { BaseballScoreBoard } from './components/baseball.js';
 import { CommentData, getLastComment } from './components/comments.js';
+import { mlbDemoForId, nextMLBDemoPage } from './mock-scores/mlb/mock-mlb.js';
 import {
   BaseballGameScoreInfo,
-  EventState,
   fetchScoreForGame,
-  GeneralGameScoreInfo,
   parseGeneralGameScoreInfo,
-} from './espn.js';
+} from './sports/espn/espn.js';
 import {
   fetchCachedGameInfoForPostId,
   makeKeyForPostId,
   makeKeyForSubscription,
-} from './helpers.js';
-import { GameSubscription, getLeagueFromString } from './sports.js';
+} from './sports/Helpers.js';
+import { APIService, GameSubscription, getLeagueFromString } from './sports/Sports.js';
 import { getSubscriptions, removeSubscription } from './subscriptions.js';
-import { scoreboardCreationForm } from './forms/ScoreboardCreateForm.js';
-import { mlbDemoForId, nextMLBDemoPage } from './mock-scores/mlb/mock-mlb.js';
+import { scoreboardCreationForm, srScoreboardCreationForm } from './forms/ScoreboardCreateForm.js';
+import { fetchNFLBoxscore } from './sports/sportradar/NFLBoxscore.js';
+import { EventState, GeneralGameScoreInfo } from './sports/GameModels.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -29,12 +29,29 @@ Devvit.configure({
   kvStore: true,
 });
 
+Devvit.addSettings([
+  {
+    type: 'string',
+    name: 'nfl-api-key',
+    label: 'Enter your NFL Sportsradar API key',
+  },
+]);
+
 Devvit.addMenuItem({
   label: 'LiveScores: Create a new scoreboard post',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
     return ui.showForm(scoreboardCreationForm);
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'LiveScores: Create a new SR scoreboard post',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srScoreboardCreationForm);
   },
 });
 
@@ -154,8 +171,6 @@ Devvit.addCustomPostType({
       if (lastComment.id != newLastComment.id) {
         console.log({ newLastComment });
         setLastComment(newLastComment);
-      } else {
-        console.log(`ignoring comment, same as last`);
       }
     }, 3000);
     interval.start();
@@ -203,11 +218,19 @@ Devvit.addSchedulerJob({
     const gameSubscriptions: GameSubscription[] = subscriptions.map((sub: string) => ({
       league: JSON.parse(sub)['league'],
       eventId: JSON.parse(sub)['eventId'],
+      service: JSON.parse(sub)['service'],
     }));
+
+    // ESPN
     const eventFetches: Promise<GeneralGameScoreInfo | null>[] = [];
     gameSubscriptions.forEach((gameSub: GameSubscription) => {
-      eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
+      if (gameSub.service === APIService.SR) {
+        eventFetches.push(fetchNFLBoxscore(gameSub.eventId, context));
+      } else {
+        eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
+      }
     });
+
     const results: GeneralGameScoreInfo[] = (await Promise.all(eventFetches)).flatMap((result) =>
       result ? [result] : []
     );

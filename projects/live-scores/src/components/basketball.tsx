@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-import { EventState } from '../espn.js';
 import { Live } from './TopBar.js';
+import { EventState } from '../sports/GameModels.js';
 
 export enum BasketballPossesion {
   HOME = 'HOME',
