@@ -259,6 +259,8 @@ Devvit.addCustomPostType({
     );
     const formattedTimeLeft = getFormattedTimeLeft(timeLeft);
     const hasLink = postAssociatedData.link_url;
+    const imgUrl = postAssociatedData.img_url;
+
     const renderEventHappened = () => {
       if (!hasLink) {
         return (
@@ -269,7 +271,7 @@ Devvit.addCustomPostType({
       }
       return (
         <button
-          width={50}
+          appearance="primary"
           onPress={() => {
             context.ui.showForm(linkForm);
           }}
@@ -284,8 +286,18 @@ Devvit.addCustomPostType({
         return undefined;
       }
       return formattedTimeLeft.map((remainingTimeEntry) => (
-        <vstack>
-          <text size="large" weight="bold" alignment="center">
+        <vstack
+          backgroundColor={imgUrl ? 'transparent' : '#E4EFFF'}
+          padding={imgUrl ? 'small' : 'medium'}
+          cornerRadius="small"
+          width={imgUrl ? '48px' : '68px'}
+        >
+          <text
+            style="heading"
+            size={imgUrl ? 'large' : 'xxlarge'}
+            weight="bold"
+            alignment="center"
+          >
             {remainingTimeEntry.value || '0'}
           </text>
           <text size="small" weight="regular" alignment="center">
@@ -328,31 +340,33 @@ Devvit.addCustomPostType({
           >
             {formattedDueDate}
           </text>
-          {!postAssociatedData.img_url ? undefined : (
-            <hstack alignment="center" padding="medium">
-              <vstack cornerRadius="large">
-                <image
-                  url={postAssociatedData.img_url}
-                  imageWidth={150}
-                  imageHeight={150}
-                  resizeMode="cover"
-                ></image>
-              </vstack>
-            </hstack>
+          {!imgUrl ? (
+            <spacer size="large"></spacer>
+          ) : (
+            <>
+              <spacer size="xsmall"></spacer>
+              <hstack alignment="center" padding="small">
+                <vstack cornerRadius="large">
+                  <image url={imgUrl} imageWidth={120} imageHeight={120} resizeMode="cover"></image>
+                </vstack>
+              </hstack>
+            </>
           )}
           {!formattedTimeLeft ? (
-            <hstack gap="medium" alignment="center">
+            <hstack gap="medium" alignment="center" width="100%">
               {renderEventHappened()}
             </hstack>
           ) : (
             <>
-              <hstack gap="medium" alignment="center">
+              <hstack gap={imgUrl ? 'none' : 'small'} alignment="center">
                 {renderContentCountdown()}
               </hstack>
               {currentUserId && isEnoughTimeForReminder && (
                 <>
-                  <spacer size="medium" />
+                  <spacer size={imgUrl ? 'small' : 'large'} />
                   <button
+                    size={imgUrl ? 'medium' : 'large'}
+                    width="160px"
                     icon={!isReminderActive ? 'notification-outline' : 'notification-frequent-fill'}
                     appearance="primary"
                     onPress={toggleReminder}
