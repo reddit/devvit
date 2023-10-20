@@ -3,7 +3,7 @@ import { BaseballGameScoreInfo, InningState } from '../sports/espn/espn.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
 import { CommentData, CommentBlock } from './comments.js';
-import { EventState } from '../sports/GameModels.js';
+import { EventState } from '../sports/GameEvent.js';
 
 export type TeamBlockBaseball = {
   isPitching: boolean;

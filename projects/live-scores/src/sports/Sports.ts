@@ -1,12 +1,13 @@
 export type GameSubscription = {
   league: League;
   eventId: string;
-  service?: APIService;
+  service: APIService;
 };
 
 export enum APIService {
   ESPN = `espn`,
-  SR = `sr`,
+  SRNFL = `sr_nfl`,
+  SRSoccer = `sr_soccer`,
 }
 
 export enum League {
@@ -19,42 +20,90 @@ export enum League {
   MLS = 'usa.1',
   CFB = 'college-football',
   WNBA = 'wnba',
+  LALIGA = `es_laliga`,
+  SERIEA = `it_serie_a`,
+  SUPERLIG = `tr_super_lig`,
+  EFL = `eng_efl_cup`,
+  BUNDESLIGA = `de_bundesliga`,
 }
 
-export const leaguesSupported: { label: string; value: string }[] = [
-  {
-    label: getDisplayNameFromLeague(League.MLB),
-    value: League.MLB,
-  },
-  {
-    label: getDisplayNameFromLeague(League.NFL),
-    value: League.NFL,
-  },
-  {
-    label: getDisplayNameFromLeague(League.NBA),
-    value: League.NBA,
-  },
-  {
-    label: getDisplayNameFromLeague(League.NHL),
-    value: League.NHL,
-  },
-  {
-    label: getDisplayNameFromLeague(League.EPL),
-    value: League.EPL,
-  },
-  {
-    label: getDisplayNameFromLeague(League.MLS),
-    value: League.MLS,
-  },
-  // {
-  //   label: getDisplayNameFromLeague(League.CFB),
-  //   value: League.CFB,
-  // },
-  {
-    label: getDisplayNameFromLeague(League.WNBA),
-    value: League.WNBA,
-  },
-];
+export function leaguesSupported(service: APIService): { label: string; value: string }[] {
+  if (service === APIService.ESPN) {
+    return [
+      {
+        label: getDisplayNameFromLeague(League.MLB),
+        value: League.MLB,
+      },
+      {
+        label: getDisplayNameFromLeague(League.NFL),
+        value: League.NFL,
+      },
+      {
+        label: getDisplayNameFromLeague(League.NBA),
+        value: League.NBA,
+      },
+      {
+        label: getDisplayNameFromLeague(League.NHL),
+        value: League.NHL,
+      },
+      {
+        label: getDisplayNameFromLeague(League.EPL),
+        value: League.EPL,
+      },
+      {
+        label: getDisplayNameFromLeague(League.MLS),
+        value: League.MLS,
+      },
+      // {
+      //   label: getDisplayNameFromLeague(League.CFB),
+      //   value: League.CFB,
+      // },
+      {
+        label: getDisplayNameFromLeague(League.WNBA),
+        value: League.WNBA,
+      },
+    ];
+  } else if (service === APIService.SRNFL) {
+    return [
+      {
+        label: getDisplayNameFromLeague(League.NFL),
+        value: League.NFL,
+      },
+    ];
+  } else if (service === APIService.SRSoccer) {
+    return [
+      {
+        label: getDisplayNameFromLeague(League.EPL),
+        value: League.EPL,
+      },
+      {
+        label: getDisplayNameFromLeague(League.LALIGA),
+        value: League.LALIGA,
+      },
+      {
+        label: getDisplayNameFromLeague(League.SERIEA),
+        value: League.SERIEA,
+      },
+      {
+        label: getDisplayNameFromLeague(League.BUNDESLIGA),
+        value: League.BUNDESLIGA,
+      },
+      {
+        label: getDisplayNameFromLeague(League.SUPERLIG),
+        value: League.SUPERLIG,
+      },
+      {
+        label: getDisplayNameFromLeague(League.EFL),
+        value: League.EFL,
+      },
+      {
+        label: getDisplayNameFromLeague(League.MLS),
+        value: League.MLS,
+      },
+    ];
+  }
+  return [];
+}
 
 export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() == 'mlb') {
@@ -75,12 +124,28 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() == 'usa.1') {
     return League.MLS;
   }
-  if (str.toLowerCase() == 'college-football') {
+  if (str.toLowerCase() == 'college_football') {
     return League.CFB;
   }
   if (str.toLowerCase() == 'wnba') {
     return League.WNBA;
   }
+  if (str.toLowerCase() == 'es_laliga') {
+    return League.LALIGA;
+  }
+  if (str.toLowerCase() == 'it_serie_a') {
+    return League.SERIEA;
+  }
+  if (str.toLowerCase() == 'tr_super_lig') {
+    return League.SUPERLIG;
+  }
+  if (str.toLowerCase() == 'eng_efl_cup') {
+    return League.EFL;
+  }
+  if (str.toLowerCase() == 'de_bundesliga') {
+    return League.BUNDESLIGA;
+  }
+
   return League.UNKNOWN;
 }
 
@@ -106,6 +171,16 @@ export function getSportFromLeague(league: League): string {
       return 'football';
     case League.WNBA:
       return 'basketball';
+    case League.LALIGA:
+      return 'soccer';
+    case League.SERIEA:
+      return 'soccer';
+    case League.SUPERLIG:
+      return 'soccer';
+    case League.EFL:
+      return 'soccer';
+    case League.BUNDESLIGA:
+      return 'soccer';
     default:
       return '';
   }
@@ -129,6 +204,16 @@ export function getDisplayNameFromLeague(league: League): string {
       return 'College Football';
     case League.WNBA:
       return 'WNBA';
+    case League.LALIGA:
+      return 'La Liga (ES)';
+    case League.SERIEA:
+      return 'Serie A (IT)';
+    case League.SUPERLIG:
+      return 'Süper Lig (TR)';
+    case League.EFL:
+      return 'EFL Cup';
+    case League.BUNDESLIGA:
+      return 'Bundesliga (DE)';
     default:
       return '';
   }

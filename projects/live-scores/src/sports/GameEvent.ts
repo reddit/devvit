@@ -51,3 +51,25 @@ export enum EventState {
   FINAL = 'final',
   DELAYED = 'delayed',
 }
+
+export function compareEvents(event1: GameEvent, event2: GameEvent): number {
+  const eventPriority: EventState[] = [
+    EventState.PRE,
+    EventState.LIVE,
+    EventState.DELAYED,
+    EventState.FINAL,
+    EventState.UNKNOWN,
+  ];
+  const event1Index = eventPriority.indexOf(event1.state);
+  const event2Index = eventPriority.indexOf(event2.state);
+  if (event1Index != event2Index) {
+    return event1Index - event2Index;
+  } else {
+    if (event1.date < event2.date) {
+      return -1;
+    } else if (event1.date > event2.date) {
+      return 1;
+    }
+  }
+  return 0;
+}

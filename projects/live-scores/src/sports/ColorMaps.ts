@@ -137,3 +137,25 @@ export const NBA_TEAM_COLOR_MAP: Record<string, string> = {
   uth: '#002B5C',
   was: '#002B5C',
 };
+
+export const EPL_TEAM_COLOR_MAP: Record<string, string> = {
+  ars: '#EF0107', // Arsenal
+  avl: '#7F0037', // Aston Villa
+  bre: '#FBE311', // Brentford
+  bri: '#0057B8', // Brighton & Hove Albion
+  bur: '#6C1D45', // Burnley
+  che: '#034694', // Chelsea
+  cry: '#1B458F', // Crystal Palace
+  eve: '#003399', // Everton
+  lei: '#003090', // Leicester City
+  liv: '#C8102E', // Liverpool
+  mci: '#6CABDD', // Manchester City
+  mun: '#DA291C', // Manchester United
+  new: '#241F20', // Newcastle United
+  nor: '#00A650', // Norwich City
+  sou: '#D71920', // Southampton
+  tot: '#132257', // Tottenham Hotspur
+  wat: '#FBEE23', // Watford
+  whu: '#7A263A', // West Ham United
+  wol: '#FDB913', // Wolverhampton Wanderers
+};

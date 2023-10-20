@@ -2,7 +2,7 @@ import { Devvit } from '@devvit/public-api';
 import { GENERIC_TEAM_COLOR_MAP } from '../sports/ColorMaps.js';
 import { TeamBlockBaseball, sportSpecificContentBaseball } from './baseball.js';
 import { TeamBlockBasketball, sportSpecificContentBasketball } from './basketball.js';
-import { EventState } from '../sports/GameModels.js';
+import { EventState } from '../sports/GameEvent.js';
 
 export function TeamBlock({
   isHomeTeam,

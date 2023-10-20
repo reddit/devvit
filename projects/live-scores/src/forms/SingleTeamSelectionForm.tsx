@@ -1,10 +1,10 @@
 import { Devvit } from '@devvit/public-api';
 import { getDisplayNameFromLeague } from '../sports/Sports.js';
-import { gameSelectForm } from './GameSelectionForm.js';
-import { GameEvent, TeamInfo } from '../sports/GameModels.js';
+import { espnGameSelectForm } from './GameSelectionForm.js';
+import { GameEvent, TeamInfo } from '../sports/GameEvent.js';
 import { fetchNextEventForTeam } from '../sports/espn/espn.js';
 
-export const singleTeamSelectForm = Devvit.createForm(
+export const espnSingleTeamSelectForm = Devvit.createForm(
   (data) => {
     const teamOptions: { label: string; value: string }[] = data.teams
       .map((team: TeamInfo) => ({
@@ -34,6 +34,10 @@ export const singleTeamSelectForm = Devvit.createForm(
     const teamId: string = values.team[0].split('-')[1];
     const timezone: string = values.team[0].split('-')[2];
     const event: GameEvent = await fetchNextEventForTeam(teamId, league);
-    return ctx.ui.showForm(gameSelectForm, { league: league, events: [event], timezone: timezone });
+    return ctx.ui.showForm(espnGameSelectForm, {
+      league: league,
+      events: [event],
+      timezone: timezone,
+    });
   }
 );

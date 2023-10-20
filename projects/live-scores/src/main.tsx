@@ -1,23 +1,24 @@
 import { Devvit, Post } from '@devvit/public-api';
 import { GenericScoreBoard } from './components/Scoreboard.js';
 import { BaseballScoreBoard } from './components/baseball.js';
-import { CommentData, getLastComment } from './components/comments.js';
-import { mlbDemoForId, nextMLBDemoPage } from './mock-scores/mlb/mock-mlb.js';
-import {
-  BaseballGameScoreInfo,
-  fetchScoreForGame,
-  parseGeneralGameScoreInfo,
-} from './sports/espn/espn.js';
-import {
-  fetchCachedGameInfoForPostId,
-  makeKeyForPostId,
-  makeKeyForSubscription,
-} from './sports/Helpers.js';
+import { CommentData, debugComment, getLastComment } from './components/comments.js';
+import { nextMLBDemoPage } from './mock-scores/mlb/mock-mlb.js';
+import { BaseballGameScoreInfo } from './sports/espn/espn.js';
 import { APIService, GameSubscription, getLeagueFromString } from './sports/Sports.js';
 import { getSubscriptions, removeSubscription } from './subscriptions.js';
-import { scoreboardCreationForm, srScoreboardCreationForm } from './forms/ScoreboardCreateForm.js';
-import { fetchNFLBoxscore } from './sports/sportradar/NFLBoxscore.js';
-import { EventState, GeneralGameScoreInfo } from './sports/GameModels.js';
+import {
+  espnScoreboardCreationForm,
+  srManualSoccerScoreboardCreateForm,
+  srNflScoreboardCreationForm,
+  srSoccerScoreboardCreationForm,
+} from './forms/ScoreboardCreateForm.js';
+import { EventState } from './sports/GameEvent.js';
+import {
+  fetchDebugGameInfo,
+  fetchCachedGameInfo,
+  makeKeyForPostId,
+  fetchSubscriptions,
+} from './sports/GameFetch.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -35,23 +36,46 @@ Devvit.addSettings([
     name: 'nfl-api-key',
     label: 'Enter your NFL Sportsradar API key',
   },
+  {
+    type: 'string',
+    name: 'soccer-api-key',
+    label: 'Enter your Soccer Sportsradar API key',
+  },
 ]);
 
 Devvit.addMenuItem({
-  label: 'LiveScores: Create a new scoreboard post',
+  label: 'LiveScores: Create ESPN scoreboard',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
-    return ui.showForm(scoreboardCreationForm);
+    return ui.showForm(espnScoreboardCreationForm);
   },
 });
 
 Devvit.addMenuItem({
-  label: 'LiveScores: Create a new SR scoreboard post',
+  label: 'LiveScores: Create NFL scoreboard',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
-    return ui.showForm(srScoreboardCreationForm);
+    return ui.showForm(srNflScoreboardCreationForm);
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'LiveScores: Create manual football scoreboard',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srManualSoccerScoreboardCreateForm);
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'LiveScores: Create football scoreboard',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srSoccerScoreboardCreationForm);
   },
 });
 
@@ -92,7 +116,7 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'LiveScores: Demo',
+  label: 'LiveScores: Create MLB Demo',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, context) => {
@@ -111,6 +135,7 @@ Devvit.addMenuItem({
     const gameSub: GameSubscription = {
       league: getLeagueFromString('mlb'),
       eventId: 'demo-mlb-01',
+      service: APIService.ESPN,
     };
     await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
     return context.ui.showToast({
@@ -125,55 +150,41 @@ Devvit.addCustomPostType({
   render: (context) => {
     const { useState, postId, kvStore } = context;
     const [scoreInfo, setScoreInfo] = useState(async () => {
-      const pageId = context.debug.metadata?.['debug-id']?.values?.[0];
-      if (pageId) {
-        return parseGeneralGameScoreInfo(mlbDemoForId(pageId), `mlb`, `baseball`);
+      const debugId = context.debug.metadata?.['debug-id']?.values?.[0];
+      if (debugId) {
+        return fetchDebugGameInfo(debugId);
       } else {
-        return await fetchCachedGameInfoForPostId(kvStore, postId);
+        return await fetchCachedGameInfo(kvStore, postId);
       }
     });
 
     const updateInterval = context.useInterval(async () => {
-      const data = await fetchCachedGameInfoForPostId(kvStore, postId);
+      const data = await fetchCachedGameInfo(kvStore, postId);
       data && setScoreInfo(data);
     }, 10000);
 
     updateInterval.start();
 
-    const loading: CommentData = {
-      id: `none`,
-      username: `none`,
-      text: `nope`,
-      postId: `none`,
-    };
-    const [lastComment, setLastComment] = context.useState<CommentData>(async () => {
+    const [lastComment, _setLastComment] = context.useState<CommentData>(async () => {
       if (context.debug.metadata?.['debug-id']?.values?.[0]) {
-        return {
-          id: '123',
-          username: 'test',
-          text: 'oh hi mark',
-          postId: '123',
-        };
+        return debugComment;
       }
-      const storedLastComment = await getLastComment(context, context.postId);
-      if (storedLastComment != undefined) {
-        return storedLastComment;
-      } else {
-        return loading;
-      }
+      return await getLastComment(context, context.postId);
     });
 
-    const interval = context.useInterval(async () => {
-      const newLastComment: any = await getLastComment(context, context.postId);
-      if (newLastComment == undefined) {
-        return;
-      }
-      if (lastComment.id != newLastComment.id) {
-        console.log({ newLastComment });
-        setLastComment(newLastComment);
-      }
-    }, 3000);
-    interval.start();
+    // Disable comments for now, revisit in near future (2023-10-19)
+
+    // const interval = context.useInterval(async () => {
+    //   const newLastComment: any = await getLastComment(context, context.postId);
+    //   if (newLastComment == undefined) {
+    //     return;
+    //   }
+    //   if (lastComment.id != newLastComment.id) {
+    //     console.log({ newLastComment });
+    //     setLastComment(newLastComment);
+    //   }
+    // }, 3000);
+    // interval.start();
 
     const demoNext = async () => {
       const pageId = scoreInfo?.event.id;
@@ -182,9 +193,10 @@ Devvit.addCustomPostType({
         const gameSub: GameSubscription = {
           league: getLeagueFromString('mlb'),
           eventId: nextPage,
+          service: APIService.ESPN,
         };
         await context.kvStore.put(makeKeyForPostId(postId), JSON.stringify(gameSub));
-        const update = await fetchCachedGameInfoForPostId(kvStore, postId);
+        const update = await fetchCachedGameInfo(kvStore, postId);
         setScoreInfo(update);
       }
     };
@@ -212,39 +224,7 @@ Devvit.addCustomPostType({
 Devvit.addSchedulerJob({
   name: 'game_subscription_thread',
   onRun: async (_, context) => {
-    console.log('Running game_subscription_thread...');
-    const subscriptions: string[] = await getSubscriptions(context);
-    console.log('Found ' + subscriptions.length + ' active subscription(s)');
-    const gameSubscriptions: GameSubscription[] = subscriptions.map((sub: string) => ({
-      league: JSON.parse(sub)['league'],
-      eventId: JSON.parse(sub)['eventId'],
-      service: JSON.parse(sub)['service'],
-    }));
-
-    // ESPN
-    const eventFetches: Promise<GeneralGameScoreInfo | null>[] = [];
-    gameSubscriptions.forEach((gameSub: GameSubscription) => {
-      if (gameSub.service === APIService.SR) {
-        eventFetches.push(fetchNFLBoxscore(gameSub.eventId, context));
-      } else {
-        eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
-      }
-    });
-
-    const results: GeneralGameScoreInfo[] = (await Promise.all(eventFetches)).flatMap((result) =>
-      result ? [result] : []
-    );
-    for (let i = 0; i < gameSubscriptions.length; i++) {
-      await context.kvStore.put(
-        makeKeyForSubscription(gameSubscriptions[i]),
-        JSON.stringify(results[i])
-      );
-      if (results[i].event.state == EventState.FINAL) {
-        console.log(`Game ID ${results[i].event.id} (${results[i].event.awayTeam.abbreviation} @ \
-${results[i].event.homeTeam.abbreviation}) has ended. Cancelling subscription ${subscriptions[i]}.`);
-        await removeSubscription(context, subscriptions[i]);
-      }
-    }
+    await fetchSubscriptions(context);
   },
 });
 

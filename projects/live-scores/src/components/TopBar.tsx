@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { eventPeriodNumber, eventPeriodToString } from '../sports/espn/espn.js';
+import { eventPeriodString } from '../sports/espn/espn.js';
 import { TopBarBaseball, topBarBaseballComponent } from './baseball.js';
 import { TopBarBasketball, topBarBasketballComponent } from './basketball.js';
-import { EventState, GameEvent } from '../sports/GameModels.js';
+import { EventState, GameEvent } from '../sports/GameEvent.js';
 
 function msToHMS(ms: number): string {
   // 1- Convert to seconds:
@@ -79,7 +79,7 @@ export function TopBar({
               {displayClock}
             </text>
             <text color="white" style="body">
-              {eventPeriodNumber(period)} {eventPeriodToString(event.gameType)}
+              {eventPeriodString(period, event.gameType)}
             </text>
           </vstack>
         </hstack>

@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { NFLGame, NFLSeason, NFLWeek } from './NFLSchedule.js';
-import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameModels.js';
+import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
 import { NFL_TEAM_COLOR_MAP } from '../ColorMaps.js';
 import { Team, TeamRecord } from './GenericModels.js';
@@ -81,7 +81,7 @@ export async function fetchNFLBoxscore(
     console.error(e);
     return null;
   }
-  return gameScoreInfo(parseNFLBoxscore(data));
+  return nflGameScoreInfo(parseNFLBoxscore(data));
 }
 
 function parseNFLBoxscore(jsonData: any): NFLBoxscore {
@@ -115,7 +115,7 @@ function parseTeam(league: string, team: any): TeamInfo {
   };
 }
 
-export function gameScoreInfo(game: NFLBoxscore): GeneralGameScoreInfo {
+export function nflGameScoreInfo(game: NFLBoxscore): GeneralGameScoreInfo {
   return {
     event: {
       id: game.id,
@@ -133,7 +133,7 @@ export function gameScoreInfo(game: NFLBoxscore): GeneralGameScoreInfo {
     },
     homeScore: game.summary.home.points,
     awayScore: game.summary.away.points,
-    service: APIService.SR,
+    service: APIService.SRNFL,
   };
 }
 

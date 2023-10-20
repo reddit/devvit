@@ -1,45 +1,3 @@
-import { KVStore } from '@devvit/public-api';
-import { GameSubscription } from './Sports.js';
-import { mlbDemoForId } from '../mock-scores/mlb/mock-mlb.js';
-import { GeneralGameScoreInfo, GameEvent, EventState } from './GameModels.js';
-import { parseGeneralGameScoreInfo } from './espn/espn.js';
-
-export function makeKeyForSubscription(subscription: GameSubscription): string {
-  return `info:${subscription.league}-${subscription.eventId}`;
-}
-
-export function makeKeyForPostId(postId: string | undefined): string {
-  if (postId === undefined) {
-    throw new Error('Undefined postId in makeKeyForPostId');
-  }
-  return `post:${postId}`;
-}
-
-export async function fetchCachedGameInfoForPostId(
-  kvStore: KVStore,
-  postId: string | undefined
-): Promise<GeneralGameScoreInfo | null> {
-  const gameSubStr: string | undefined = await kvStore.get(makeKeyForPostId(postId));
-  if (gameSubStr === undefined) {
-    return null;
-  }
-  const gameSubscription: GameSubscription = JSON.parse(gameSubStr);
-
-  if (gameSubscription.eventId.startsWith('demo')) {
-    const demo = mlbDemoForId(gameSubscription.eventId);
-    return parseGeneralGameScoreInfo(demo, `mlb`, `baseball`);
-  }
-
-  const gameInfoStr: string | undefined = await kvStore.get(
-    makeKeyForSubscription(gameSubscription)
-  );
-  if (gameInfoStr === undefined) {
-    return null;
-  }
-  const gameInfo: GeneralGameScoreInfo = JSON.parse(gameInfoStr);
-  return gameInfo;
-}
-
 // Timezone stuff
 
 const tzList: string[] = `Africa/Abidjan
@@ -673,30 +631,6 @@ function compareTimezones(zone1: string, zone2: string): number {
     if (zone1 < zone2) {
       return -1;
     } else if (zone1 > zone2) {
-      return 1;
-    }
-  }
-  return 0;
-}
-
-// Event Stuff
-
-export function compareEvents(event1: GameEvent, event2: GameEvent): number {
-  const eventPriority: EventState[] = [
-    EventState.PRE,
-    EventState.LIVE,
-    EventState.DELAYED,
-    EventState.FINAL,
-    EventState.UNKNOWN,
-  ];
-  const event1Index = eventPriority.indexOf(event1.state);
-  const event2Index = eventPriority.indexOf(event2.state);
-  if (event1Index != event2Index) {
-    return event1Index - event2Index;
-  } else {
-    if (event1.date < event2.date) {
-      return -1;
-    } else if (event1.date > event2.date) {
       return 1;
     }
   }

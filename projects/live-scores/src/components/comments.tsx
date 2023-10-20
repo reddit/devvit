@@ -34,9 +34,9 @@ export function CommentBlock({
 export async function getLastComment(
   context: Devvit.Context,
   postId: string | undefined
-): Promise<CommentData | undefined> {
-  const last = await context.kvStore.get(keyForPostId(postId));
-  return last === undefined ? last : (last as unknown as CommentData);
+): Promise<CommentData> {
+  const last = (await context.kvStore.get(keyForPostId(postId))) as CommentData;
+  return last !== undefined ? last : commentLoading;
 }
 
 export type CommentData = {
@@ -44,6 +44,20 @@ export type CommentData = {
   username: string;
   text: string;
   postId: string;
+};
+
+export const commentLoading: CommentData = {
+  id: `none`,
+  username: `none`,
+  text: `nope`,
+  postId: `none`,
+};
+
+export const debugComment: CommentData = {
+  id: '123',
+  username: 'test',
+  text: 'oh hi mark',
+  postId: '123',
 };
 
 export function basicDisplayStringForComment(comment: CommentData): string {
@@ -60,6 +74,8 @@ function keyForPostId(postId: string | undefined): string {
 async function storeLastComment(context: TriggerContext, commentData: CommentData): Promise<void> {
   await context.kvStore.put(keyForPostId(commentData.postId), commentData);
 }
+
+// Disable comments for now, revisit in near future (2023-10-19)
 
 Devvit.addTrigger({
   event: 'CommentCreate',

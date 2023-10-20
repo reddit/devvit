@@ -4,7 +4,7 @@ import {
   GameEventTimingInfo,
   GeneralGameScoreInfo,
   TeamInfo,
-} from '../GameModels.js';
+} from '../GameEvent.js';
 import {
   APIService,
   getLeagueFromString,
@@ -284,7 +284,7 @@ export function eventStateToString(state: EventState): string {
   }
 }
 
-export function eventPeriodToString(sport: string): string {
+function eventPeriodToString(sport: string): string {
   switch (sport) {
     case 'football':
       return 'Quarter';
@@ -299,18 +299,20 @@ export function eventPeriodToString(sport: string): string {
   }
 }
 
-export function eventPeriodNumber(period: number): string {
+export function eventPeriodString(period: number, sport: string): string {
   switch (period) {
+    case 0.5:
+      return `Halftime`;
     case 1:
-      return '1st';
+      return `1st ${eventPeriodToString(sport)}`;
     case 2:
-      return '2nd';
+      return `2nd ${eventPeriodToString(sport)}`;
     case 3:
-      return '3rd';
+      return `3rd ${eventPeriodToString(sport)}`;
     case 4:
-      return '4th';
+      return `4th ${eventPeriodToString(sport)}`;
     default:
-      return `${period}`;
+      return `${period} ${eventPeriodToString(sport)}`;
     // todo -> special case needed for overtime
   }
 }

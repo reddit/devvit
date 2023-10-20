@@ -1,8 +1,8 @@
 import { Comment, Devvit, MenuItemOnPressEvent, Post, User } from '@devvit/public-api';
 
 Devvit.configure({
-  kvStore: true, // Enable access to kvStore
-  redditAPI: true,
+  redis: true, // Enable access to Redis
+  redditAPI: true, // Enable access to Reddit API
 });
 
 Devvit.addMenuItem({
@@ -66,7 +66,7 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context): Pro
   // Remove the content
   await thing!.remove();
 
-  // Add a strike to the user and persist it to the KVStore
+  // Add a strike to the user and persist it to Redis
   let strikes = await getAuthorStrikes(author, context);
   await setAuthorStrikes(author, ++strikes, context);
 
@@ -176,7 +176,7 @@ async function clearStrikes(event: MenuItemOnPressEvent, context: Devvit.Context
 }
 
 /**
- * Creates a KVStore key for the author
+ * Creates a Redis key for the author
  */
 function getKeyForAuthor(author: User): string {
   return `${author.id}_strikes`;
@@ -186,22 +186,22 @@ function getKeyForAuthor(author: User): string {
  * Fetch the current strike count for the author
  */
 async function getAuthorStrikes(author: User, context: Devvit.Context): Promise<number> {
-  const { kvStore } = context;
+  const { redis } = context;
   const key = getKeyForAuthor(author);
-  return ((await kvStore.get(key)) as number) || 0;
+  return ((await redis.get(key)) || 0) as number;
 }
 
 /**
- * Updates the strike counter in the KVStore
+ * Updates the strike counter in Redis
  */
 async function setAuthorStrikes(
   author: User,
   strikes: number,
   context: Devvit.Context
 ): Promise<void> {
-  const { kvStore } = context;
+  const { redis } = context;
   const key = getKeyForAuthor(author);
-  await kvStore.put(key, strikes);
+  await redis.set(key, strikes.toString());
 }
 
 export default Devvit;
