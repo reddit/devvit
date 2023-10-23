@@ -12,7 +12,7 @@ export const ChessSquare: Devvit.BlockComponent<ChessSquareProps> = (
   context: Devvit.Context
 ) => {
   const [isSelected, setIsSelected] = context.useState(false);
-  const squareColor = (row + column) % 2 == 0 ? BoardColors.light : BoardColors.dark;
+  const squareColor = (row + column) % 2 === 0 ? BoardColors.light : BoardColors.dark;
   return (
     <zstack
       alignment="center middle"

@@ -65,7 +65,7 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
       await tx.set(user, selectedOption + '');
       await redis.incrBy(`polls:${postId}:${selectedOption}`, 1);
       await tx.exec();
-      setVotes(votes.map((v, i) => (i == selectedOption ? v + 1 : v)));
+      setVotes(votes.map((v, i) => (i === selectedOption ? v + 1 : v)));
     }
     navigate(PageType.RESULTS);
   };
@@ -132,7 +132,7 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
               size="small"
               icon="back-outline"
               onPress={prevPollPage}
-              disabled={pollPage == 1}
+              disabled={pollPage === 1}
             />
             <text>
               Page {pollPage} of {pollPages}
@@ -141,7 +141,7 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
               size="small"
               icon="forward-outline"
               onPress={nextPollPage}
-              disabled={pollPage == pollPages}
+              disabled={pollPage === pollPages}
             />
           </hstack>
         )}
@@ -150,7 +150,7 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
           size="medium"
           appearance="primary"
           onPress={submitVote}
-          disabled={selectedOption == -1}
+          disabled={selectedOption === -1}
         >
           Vote!
         </button>

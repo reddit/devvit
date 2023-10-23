@@ -176,7 +176,7 @@ Devvit.addCustomPostType({
 
     // const interval = context.useInterval(async () => {
     //   const newLastComment: any = await getLastComment(context, context.postId);
-    //   if (newLastComment == undefined) {
+    //   if (newLastComment == null) {
     //     return;
     //   }
     //   if (lastComment.id != newLastComment.id) {
@@ -202,7 +202,7 @@ Devvit.addCustomPostType({
     };
 
     if (scoreInfo) {
-      if (scoreInfo.event.gameType == 'baseball') {
+      if (scoreInfo.event.gameType === 'baseball') {
         const baseBallScoreInfo = scoreInfo as BaseballGameScoreInfo;
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
         return BaseballScoreBoard(baseBallScoreInfo, lastComment, demoNext);

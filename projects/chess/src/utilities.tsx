@@ -9,7 +9,7 @@ export function getRowColFromSquare(lan: string) {
     lan = lan.substring(1);
   }
   const r = rows.indexOf(lan[1]);
-  if (r == -1) {
+  if (r === -1) {
     console.log(`***** Row is -1. ${olan}`);
   }
   return { row: r, column: cols.indexOf(lan[0]) };
@@ -32,6 +32,6 @@ export function pieceToImage(piece: string): string {
 export function isMyPiece(turn: Side, piece: string) {
   return (
     (turn === Side.white && PieceStrings.white.includes(piece)) ||
-    (turn == Side.black && PieceStrings.black.includes(piece))
+    (turn === Side.black && PieceStrings.black.includes(piece))
   );
 }

@@ -24,7 +24,7 @@ export const ConfirmPage: Devvit.BlockComponent<PollProps> = async (
       await tx.set(user, skipOption + '');
       await redis.incrBy(`polls:${postId}:${skipOption}`, 1);
       await tx.exec();
-      setVotes(votes.map((v, i) => (i == skipOption ? v + 1 : v)));
+      setVotes(votes.map((v, i) => (i === skipOption ? v + 1 : v)));
     }
     navigate(PageType.RESULTS);
   };

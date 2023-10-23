@@ -7,7 +7,7 @@ export function CommentBlock({
   username: string;
   commentBody: string;
 }): JSX.Element {
-  if (username == 'none') return;
+  if (username === 'none') return;
   return (
     <vstack width="100%" height="100%" alignment="bottom">
       <vstack reverse padding="medium">
@@ -61,7 +61,7 @@ export const debugComment: CommentData = {
 };
 
 export function basicDisplayStringForComment(comment: CommentData): string {
-  if (comment.id == `loading`) {
+  if (comment.id === `loading`) {
     return ``;
   }
   return `u/${comment.username}: ${comment.text}`;
@@ -82,7 +82,7 @@ Devvit.addTrigger({
   onEvent: async (event, context) => {
     // console.log(`CommentCreate context ${JSON.stringify(context)}`);
     // console.log(`CommentCreate event ${JSON.stringify(event)}`);
-    if (event.comment && event.author && event.post && event.comment?.parentId[0] != 't') {
+    if (event.comment && event.author && event.post && event.comment?.parentId[0] !== 't') {
       const commentData: CommentData = {
         id: event.comment?.id,
         username: event.author?.name,

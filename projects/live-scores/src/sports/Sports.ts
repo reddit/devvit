@@ -106,43 +106,43 @@ export function leaguesSupported(service: APIService): { label: string; value: s
 }
 
 export function getLeagueFromString(str: string): League {
-  if (str.toLowerCase() == 'mlb') {
+  if (str.toLowerCase() === 'mlb') {
     return League.MLB;
   }
-  if (str.toLowerCase() == 'nfl') {
+  if (str.toLowerCase() === 'nfl') {
     return League.NFL;
   }
-  if (str.toLowerCase() == 'nba') {
+  if (str.toLowerCase() === 'nba') {
     return League.NBA;
   }
-  if (str.toLowerCase() == 'nhl') {
+  if (str.toLowerCase() === 'nhl') {
     return League.NHL;
   }
-  if (str.toLowerCase() == 'eng.1') {
+  if (str.toLowerCase() === 'eng.1') {
     return League.EPL;
   }
-  if (str.toLowerCase() == 'usa.1') {
+  if (str.toLowerCase() === 'usa.1') {
     return League.MLS;
   }
-  if (str.toLowerCase() == 'college_football') {
+  if (str.toLowerCase() === 'college_football') {
     return League.CFB;
   }
-  if (str.toLowerCase() == 'wnba') {
+  if (str.toLowerCase() === 'wnba') {
     return League.WNBA;
   }
-  if (str.toLowerCase() == 'es_laliga') {
+  if (str.toLowerCase() === 'es_laliga') {
     return League.LALIGA;
   }
-  if (str.toLowerCase() == 'it_serie_a') {
+  if (str.toLowerCase() === 'it_serie_a') {
     return League.SERIEA;
   }
-  if (str.toLowerCase() == 'tr_super_lig') {
+  if (str.toLowerCase() === 'tr_super_lig') {
     return League.SUPERLIG;
   }
-  if (str.toLowerCase() == 'eng_efl_cup') {
+  if (str.toLowerCase() === 'eng_efl_cup') {
     return League.EFL;
   }
-  if (str.toLowerCase() == 'de_bundesliga') {
+  if (str.toLowerCase() === 'de_bundesliga') {
     return League.BUNDESLIGA;
   }
 

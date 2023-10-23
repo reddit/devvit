@@ -63,21 +63,21 @@ export const espnScoreboardCreationForm = Devvit.createForm(
     const filterBy = values['filterby'][0];
     const timezone = values['timezone'][0];
 
-    if (filterBy == 'all' && league == 'mlb') {
+    if (filterBy === 'all' && league === 'mlb') {
       const scores: BaseballGameScoreInfo[] = await fetchActiveGames<BaseballGameScoreInfo>(league);
       return ctx.ui.showForm(espnGameSelectForm, {
         league: league,
         timezone: timezone,
         events: scores.map((score: BaseballGameScoreInfo) => score.event),
       });
-    } else if (filterBy == 'all') {
+    } else if (filterBy === 'all') {
       const scores: GeneralGameScoreInfo[] = await fetchActiveGames<GeneralGameScoreInfo>(league);
       return ctx.ui.showForm(espnGameSelectForm, {
         league: league,
         timezone: timezone,
         events: scores.map((score: GeneralGameScoreInfo) => score.event),
       });
-    } else if (filterBy == 'team') {
+    } else if (filterBy === 'team') {
       const teams = await fetchAllTeams(league);
       return ctx.ui.showForm(espnSingleTeamSelectForm, {
         league: league,

@@ -29,12 +29,12 @@ export const InteractiveChessSquare: Devvit.BlockComponent<ChessSquareProps> = (
   _context: Devvit.Context
 ) => {
   const isSelected = highlights.find((h: Highlight) => {
-    return h.row == row && h.column == column && h.type == HighlightType.selected;
+    return h.row === row && h.column === column && h.type === HighlightType.selected;
   });
-  const squareColor = (row + column) % 2 == 0 ? BoardColors.light : BoardColors.dark;
+  const squareColor = (row + column) % 2 === 0 ? BoardColors.light : BoardColors.dark;
   const isMine = isMyPiece(turn, piece);
   const isMove = highlights.find((h: Highlight) => {
-    return h.row == row && h.column == column && h.type == HighlightType.move;
+    return h.row === row && h.column === column && h.type === HighlightType.move;
   });
 
   // console.log(`row/col: ${row}, ${column}, isMine: ${isMine}, isSelected: ${isSelected}, isMove: ${isMove}`);
@@ -46,7 +46,7 @@ export const InteractiveChessSquare: Devvit.BlockComponent<ChessSquareProps> = (
       border="thick"
       borderColor={isSelected ? BoardColors.selected : squareColor}
       onPress={() => {
-        if (!(isMine || isMove || piece != PieceType.BLANK)) return; // do nothing if this isn't a moveable piece
+        if (!(isMine || isMove || piece !== PieceType.BLANK)) return; // do nothing if this isn't a moveable piece
         console.log(`isMove: ${isMove} for ${row} ${column}`);
         if (isMove) {
           setNextMove(isMove.san as string);

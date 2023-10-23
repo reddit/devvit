@@ -66,7 +66,7 @@ export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
     option,
     votes: votes[index],
     total,
-    winner: votes[index] == max,
+    winner: votes[index] === max,
   }));
   zipped.sort((a, b) => b.votes - a.votes);
   const three = 3 * 60 * 1000;

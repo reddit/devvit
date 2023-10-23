@@ -620,14 +620,14 @@ function compareTimezones(zone1: string, zone2: string): number {
   ];
   const z1Index: number = preferredTimezones.indexOf(zone1);
   const z2Index: number = preferredTimezones.indexOf(zone2);
-  if (z1Index != z2Index) {
-    if (z1Index == -1) {
+  if (z1Index !== z2Index) {
+    if (z1Index === -1) {
       return 1;
-    } else if (z2Index == -1) {
+    } else if (z2Index === -1) {
       return -1;
     }
     return z1Index - z2Index;
-  } else if (z1Index == -1 && z2Index == -1) {
+  } else if (z1Index === -1 && z2Index === -1) {
     if (zone1 < zone2) {
       return -1;
     } else if (zone1 > zone2) {

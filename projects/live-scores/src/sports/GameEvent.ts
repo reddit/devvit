@@ -62,7 +62,7 @@ export function compareEvents(event1: GameEvent, event2: GameEvent): number {
   ];
   const event1Index = eventPriority.indexOf(event1.state);
   const event2Index = eventPriority.indexOf(event2.state);
-  if (event1Index != event2Index) {
+  if (event1Index !== event2Index) {
     return event1Index - event2Index;
   } else {
     if (event1.date < event2.date) {

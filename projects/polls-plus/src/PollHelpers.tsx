@@ -117,7 +117,7 @@ export const resetRedis = async (context: Devvit.Context): Promise<void> => {
 Devvit.addTrigger({
   event: 'CommentCreate',
   onEvent: async (event, context) => {
-    if (event.comment?.body == 'iddqd') {
+    if (event.comment?.body === 'iddqd') {
       const postId = event.post?.id;
       const redis = context.redis;
       const userId = event.author?.id;

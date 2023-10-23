@@ -64,7 +64,7 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
       await tx.set(userKey, selectedOption + '');
       await redis.incrBy(`polls:${postId}:${selectedOption}`, 1);
       await tx.exec();
-      setVotes(votes.map((v, i) => (i == selectedOption ? v + 1 : v)));
+      setVotes(votes.map((v, i) => (i === selectedOption ? v + 1 : v)));
     }
     navigate(PageType.RESULTS);
   };
@@ -87,7 +87,7 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
       })}
 
       <hstack>
-        <button onPress={submitVote} disabled={selectedOption == -1}>
+        <button onPress={submitVote} disabled={selectedOption === -1}>
           Vote!
         </button>
         <vstack alignment="middle">

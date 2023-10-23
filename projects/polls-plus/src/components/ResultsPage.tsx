@@ -78,7 +78,7 @@ export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
     option,
     votes: votes[index],
     total,
-    winner: votes[index] == max,
+    winner: votes[index] === max,
   }));
   zipped.sort((a, b) => b.votes - a.votes);
   const three = 3 * 60 * 1000;
@@ -130,7 +130,7 @@ export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
             size="small"
             icon="back-outline"
             onPress={prevPollPage}
-            disabled={pollPage == 1}
+            disabled={pollPage === 1}
           />
           <text>
             Page {pollPage} of {pollPages}
@@ -139,7 +139,7 @@ export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
             size="small"
             icon="forward-outline"
             onPress={nextPollPage}
-            disabled={pollPage == pollPages}
+            disabled={pollPage === pollPages}
           />
         </hstack>
       )}

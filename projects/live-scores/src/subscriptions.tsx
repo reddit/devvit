@@ -17,7 +17,7 @@ export async function getSubscriptions(ctx: Context, key?: string): Promise<stri
     if (subscriptions === undefined) {
       return [];
     }
-    return subscriptions.filter((sub) => key === undefined || key == sub);
+    return subscriptions.filter((sub) => key === undefined || key === sub);
   } catch (e: any) {
     console.log('Error during subscriptions fetch: ' + e);
   }

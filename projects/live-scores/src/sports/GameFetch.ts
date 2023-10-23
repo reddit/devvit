@@ -65,7 +65,7 @@ export async function fetchSubscriptions(context: Devvit.Context) {
       makeKeyForSubscription(gameSubscriptions[i]),
       JSON.stringify(results[i])
     );
-    if (results[i].event.state == EventState.FINAL) {
+    if (results[i].event.state === EventState.FINAL) {
       console.log(`Game ID ${results[i].event.id} (${results[i].event.awayTeam.abbreviation} @ \
 ${results[i].event.homeTeam.abbreviation}) has ended. Cancelling subscription ${subscriptions[i]}.`);
       await removeSubscription(context, subscriptions[i]);

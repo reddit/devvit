@@ -48,7 +48,7 @@ Devvit.addCustomPostType({
     //'8/8/8/4p1K1/2k1P3/8/8/8 b - - 0 1'
     let [fen, setFen] = useState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
     const chess = new Chess(fen);
-    let turn = chess.turn() == Side.white ? Side.white : Side.black;
+    let turn = chess.turn() === Side.white ? Side.white : Side.black;
     console.log(`Turn: ${turn}`);
     let [highlights, setHighlights] = useState(Array<Highlight>);
     let [activeSquare, setActiveSquare] = useState(BlankSquare);
@@ -57,7 +57,7 @@ Devvit.addCustomPostType({
     let moveH: Highlight[] = [];
 
     //TODO: gate behind a confirmation
-    if (nextMove != BlankSquare) {
+    if (nextMove !== BlankSquare) {
       // Make your move
       try {
         chess.move(nextMove);
@@ -72,14 +72,14 @@ Devvit.addCustomPostType({
         setHighlights([]);
         activeSquare = BlankSquare;
         setActiveSquare(BlankSquare);
-        turn = turn == Side.black ? Side.white : Side.black;
+        turn = turn === Side.black ? Side.white : Side.black;
       } catch (e) {
         console.log(e);
       }
     } else {
       console.log(`Active Square ${activeSquare}. Highlights: ${JSON.stringify(highlights)}`);
 
-      if (activeSquare && activeSquare != PieceType.BLANK) {
+      if (activeSquare && activeSquare !== PieceType.BLANK) {
         const moves: Move[] = chess.moves({ square: activeSquare as Square, verbose: true });
         moveH = moves.map((m: Move) => {
           const rc = getRowColFromSquare(m.to);
@@ -116,7 +116,7 @@ Devvit.addCustomPostType({
                 >
                   <VariableSpacer size="small" count={2} />
                 </hstack>
-                {turn == Side.white ? (
+                {turn === Side.white ? (
                   <vstack
                     cornerRadius="full"
                     backgroundColor="black"
@@ -141,7 +141,7 @@ Devvit.addCustomPostType({
               <text size="small">Available</text>
               <spacer size="medium" />
               <hstack gap="small" alignment="end">
-                {turn == Side.black ? (
+                {turn === Side.black ? (
                   <vstack
                     cornerRadius="full"
                     backgroundColor="black"
