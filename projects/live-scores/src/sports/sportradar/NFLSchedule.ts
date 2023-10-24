@@ -1,5 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { Team, Period } from './GenericModels.js';
+import { getAPIKey } from './APIKeys.js';
 
 export interface NFLGame {
   id: string;
@@ -36,7 +37,7 @@ export interface NFLSeason {
 
 export async function fetchNflCurrentWeek(context: Devvit.Context): Promise<NFLWeek | undefined> {
   let data;
-  const apiKey = await context.settings.get('nfl-api-key');
+  const apiKey = await getAPIKey('nfl-api-key', context);
   try {
     const request = new Request(
       `https://api.sportradar.us/nfl/official/trial/v7/en/games/current_week/schedule.json?api_key=${apiKey}`

@@ -19,6 +19,7 @@ import {
   makeKeyForPostId,
   fetchSubscriptions,
 } from './sports/GameFetch.js';
+import { resetAPIKeys } from './sports/sportradar/APIKeys.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -27,21 +28,16 @@ const UPDATE_FREQUENCY_MINUTES: number = 1;
 Devvit.configure({
   redditAPI: true, // context.reddit will now be available
   http: true,
+  redis: true,
   kvStore: true,
 });
 
-Devvit.addSettings([
-  {
-    type: 'string',
-    name: 'nfl-api-key',
-    label: 'Enter your NFL Sportsradar API key',
+Devvit.addTrigger({
+  events: ['AppInstall', 'AppUpgrade'],
+  onEvent: async (_, context) => {
+    await resetAPIKeys(context as any);
   },
-  {
-    type: 'string',
-    name: 'soccer-api-key',
-    label: 'Enter your Soccer Sportsradar API key',
-  },
-]);
+});
 
 Devvit.addMenuItem({
   label: 'LiveScores: Create ESPN scoreboard',

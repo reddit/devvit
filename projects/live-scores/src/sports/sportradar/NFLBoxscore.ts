@@ -4,6 +4,7 @@ import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
 import { NFL_TEAM_COLOR_MAP } from '../ColorMaps.js';
 import { Team, TeamRecord } from './GenericModels.js';
+import { getAPIKey } from './APIKeys.js';
 
 interface NFLBoxscoreSummary {
   season: NFLSeason;
@@ -69,7 +70,7 @@ export async function fetchNFLBoxscore(
   context: Devvit.Context
 ): Promise<GeneralGameScoreInfo | null> {
   let data;
-  const apiKey = await context.settings.get('nfl-api-key');
+  const apiKey = await getAPIKey('nfl-api-key', context);
   try {
     const request = new Request(
       `https://api.sportradar.us/nfl/official/trial/v7/en/games/${gameId}/boxscore.json?api_key=${apiKey}`

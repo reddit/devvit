@@ -2,13 +2,14 @@ import { Devvit } from '@devvit/public-api';
 import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
 import { EPL_TEAM_COLOR_MAP } from '../ColorMaps.js';
+import { getAPIKey } from './APIKeys.js';
 
 export async function fetchSoccerEvent(
   gameId: string,
   context: Devvit.Context
 ): Promise<GeneralGameScoreInfo | null> {
   let data;
-  const apiKey = await context.settings.get('soccer-api-key');
+  const apiKey = await getAPIKey('soccer-api-key', context);
   try {
     const request = new Request(
       `https://api.sportradar.us/soccer/trial/v4/en/sport_events/${gameId}/summary.json?api_key=${apiKey}`
