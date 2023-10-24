@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { SoccerLeague } from './SoccerLeagues.js';
-import { SoccerEvent, soccerGameScoreInfo } from './SoccerEvent.js';
+import { SoccerEvent, soccerScoreInfo } from './SoccerEvent.js';
 import { GeneralGameScoreInfo } from '../GameEvent.js';
 import { getAPIKey } from './APIKeys.js';
 
@@ -27,12 +27,12 @@ export async function fetchSoccerGames(
     return null;
   }
   const games = filterGames(parseSchedule(data).schedules);
-  return games.map((game) => soccerGameScoreInfo(game));
+  return games.map((game) => soccerScoreInfo(league.league, game));
 }
 
 function filterGames(games: SoccerEvent[]): SoccerEvent[] {
   const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setDate(yesterday.getDate() - 8);
 
   const tenDaysFromNow = new Date();
   tenDaysFromNow.setDate(tenDaysFromNow.getDate() + 10);

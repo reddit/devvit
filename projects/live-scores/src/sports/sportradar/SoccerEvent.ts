@@ -1,10 +1,10 @@
 import { Devvit } from '@devvit/public-api';
 import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
-import { EPL_TEAM_COLOR_MAP } from '../ColorMaps.js';
 import { getAPIKey } from './APIKeys.js';
 
 export async function fetchSoccerEvent(
+  league: string,
   gameId: string,
   context: Devvit.Context
 ): Promise<GeneralGameScoreInfo | null> {
@@ -12,7 +12,7 @@ export async function fetchSoccerEvent(
   const apiKey = await getAPIKey('soccer-api-key', context);
   try {
     const request = new Request(
-      `https://api.sportradar.us/soccer/trial/v4/en/sport_events/${gameId}/summary.json?api_key=${apiKey}`
+      `https://api.sportradar.us/soccer/trial/v4/en/sport_events/${gameId}/timeline.json?api_key=${apiKey}`
     );
     // console.log(request.url);
     const response = await fetch(request);
@@ -21,10 +21,10 @@ export async function fetchSoccerEvent(
     console.error(e);
     return null;
   }
-  return soccerGameScoreInfo(parseSoccerEvent(data));
+  return soccerScoreInfo(league, parseSoccerEvent(data));
 }
 
-export function soccerGameScoreInfo(soccerEvent: SoccerEvent): GeneralGameScoreInfo {
+export function soccerScoreInfo(league: string, soccerEvent: SoccerEvent): SoccerGameScoreInfo {
   const event = soccerEvent.sport_event;
   const status = soccerEvent.sport_event_status;
   const homeTeam = event.competitors[0];
@@ -34,31 +34,83 @@ export function soccerGameScoreInfo(soccerEvent: SoccerEvent): GeneralGameScoreI
       id: event.id,
       name: `${awayTeam.name} at ${homeTeam.name}`,
       date: event.start_time,
-      homeTeam: parseTeam(homeTeam),
-      awayTeam: parseTeam(awayTeam),
+      homeTeam: parseTeam(league, homeTeam),
+      awayTeam: parseTeam(league, awayTeam),
       state: eventState(status),
       gameType: 'soccer',
-      league: 'epl',
+      league: league,
       timingInfo: {
-        displayClock: status.clock?.played ?? `0:00`,
+        displayClock: clockString(status.clock),
         period: periodForStatus(status),
       },
     },
     homeScore: status.home_score ?? 0,
     awayScore: status.away_score ?? 0,
     service: APIService.SRSoccer,
+    summary: eventsSummary(soccerEvent.timeline),
   };
 }
 
-function parseTeam(team: SportEventCompetitor): TeamInfo {
+export interface SoccerGameScoreInfo extends GeneralGameScoreInfo {
+  homeGoals?: string | undefined;
+  awayGoals?: string | undefined;
+  homeRedCards?: string | undefined;
+  awayRedCards?: string | undefined;
+  summary?: GameEventSummary | undefined;
+}
+
+interface GameEventSummary {
+  homeGoals: TimelineEvent[];
+  awayGoals: TimelineEvent[];
+  homeRedCards: TimelineEvent[];
+  awayRedCards: TimelineEvent[];
+}
+
+function eventsSummary(timeline?: TimelineEvent[]): GameEventSummary | undefined {
+  if (timeline) {
+    const goals = timeline.filter((event) => event.type === 'score_change');
+    const homeGoals = goals.filter((goal) => goal.competitor === 'home' && goal.players !== null);
+    const awayGoals = goals.filter((goal) => goal.competitor === 'away' && goal.players !== null);
+
+    const redCards = timeline.filter(
+      (event) => event.type === 'red_card' || event.type === 'yellow_red_card'
+    );
+    const homeRedCards = redCards.filter(
+      (card) => card.competitor === 'home' && card.players !== null
+    );
+    const awayRedCards = redCards.filter(
+      (card) => card.competitor === 'away' && card.players !== null
+    );
+
+    return {
+      homeGoals: homeGoals,
+      awayGoals: awayGoals,
+      homeRedCards: homeRedCards,
+      awayRedCards: awayRedCards,
+    };
+  }
+}
+
+function clockString(clock: Clock | undefined): string {
+  if (clock && clock.stoppage_time_played) {
+    const regularTime = clock.played.split(':')[0].replace(/^0/, '');
+    const stoppageTime = clock.stoppage_time_played.split(':')[0].replace(/^0/, '');
+    return `${regularTime}’+${stoppageTime}’`;
+  } else if (clock) {
+    const regularTime = clock.played.split(':')[0].replace(/^0/, '');
+    return `${regularTime}’`;
+  }
+  return `0:00`;
+}
+
+function parseTeam(league: string, team: SportEventCompetitor): TeamInfo {
   return {
     id: team.id,
     name: team.name,
     abbreviation: team.abbreviation,
     fullName: team.name,
     location: team.name,
-    logo: `eng.1` + '-' + team.abbreviation.toLowerCase() + '.png',
-    color: EPL_TEAM_COLOR_MAP[team.abbreviation.toLowerCase()],
+    logo: league + '-' + team.abbreviation.toLowerCase() + '.png',
   };
 }
 
@@ -97,8 +149,8 @@ function periodForStatus(status: SportEventStatus): number {
 export interface SoccerEvent {
   sport_event: SportEvent;
   sport_event_status: SportEventStatus;
-  // statistics
-  // timelines
+  statistics?: SportEventStatistics;
+  timeline?: TimelineEvent[];
 }
 
 interface SportEvent {
@@ -114,11 +166,11 @@ interface SportEvent {
 interface SportEventCompetitor {
   id: string;
   name: string;
-  country: string;
-  country_code: string;
+  country?: string;
+  country_code?: string;
   abbreviation: string;
   qualifier: HomeAwayTeam;
-  gender: string;
+  gender?: string;
 }
 
 enum HomeAwayTeam {
@@ -213,6 +265,7 @@ interface SportEventStatus {
 interface Clock {
   played: string;
   stoppage_time_played?: string;
+  stoppage_time_announced?: string;
 }
 
 enum SportEventStatusType {
@@ -239,4 +292,72 @@ enum PeriodType {
   Pause = 'pause',
   Penalties = 'penalties',
   RegularPeriod = 'regular_period',
+}
+
+interface SportEventStatistics {
+  totals: SportEventStatisticsTotals;
+}
+
+interface SportEventStatisticsTotals {
+  competitors: SportEventStatisticCompetitor[];
+}
+
+interface SportEventStatisticCompetitor extends SportEventCompetitor {
+  statistics: SoccerTeamStatistics;
+  players?: SoccerPlayer[];
+}
+
+export interface SoccerPlayer {
+  statistics?: SoccerPlayerStatistics;
+  id: string;
+  name: string;
+  starter: boolean;
+  type?: string;
+}
+
+interface SoccerTeamStatistics {
+  corner_kicks: number;
+  fouls: number;
+  free_kicks: number;
+  offsides: number;
+  red_cards: number;
+  shots_blocked: number;
+  shots_off_target: number;
+  shots_total: number;
+  throw_ins: number;
+  yellow_cards: number;
+  yellow_red_cards: number;
+}
+
+interface SoccerPlayerStatistics {
+  assists: number;
+  goals_scored: number;
+  own_goals: number;
+  red_cards: number;
+  shots_blocked: number;
+  substituted_in: number;
+  substituted_out: number;
+  yellow_cards: number;
+  yellow_red_cards: number;
+}
+
+export interface TimelineEvent {
+  id: number;
+  type: string;
+  time: string;
+  period?: number;
+  period_type?: string;
+  match_time?: number;
+  match_clock?: string;
+  competitor?: HomeAwayTeam;
+  x?: number;
+  y?: number;
+  outcome?: string;
+  players?: SoccerPlayer[];
+  home_score?: number;
+  away_score?: number;
+  method?: string;
+  stoppage_time?: number;
+  stoppage_time_clock?: string;
+  break_name?: string;
 }

@@ -23,7 +23,8 @@ export enum League {
   LALIGA = `es_laliga`,
   SERIEA = `it_serie_a`,
   SUPERLIG = `tr_super_lig`,
-  EFL = `eng_efl_cup`,
+  EFLCUP = `eng_efl_cup`,
+  ECL = `eng_championship`,
   BUNDESLIGA = `de_bundesliga`,
 }
 
@@ -77,6 +78,10 @@ export function leaguesSupported(service: APIService): { label: string; value: s
         value: League.EPL,
       },
       {
+        label: getDisplayNameFromLeague(League.ECL),
+        value: League.ECL,
+      },
+      {
         label: getDisplayNameFromLeague(League.LALIGA),
         value: League.LALIGA,
       },
@@ -92,10 +97,10 @@ export function leaguesSupported(service: APIService): { label: string; value: s
         label: getDisplayNameFromLeague(League.SUPERLIG),
         value: League.SUPERLIG,
       },
-      {
-        label: getDisplayNameFromLeague(League.EFL),
-        value: League.EFL,
-      },
+      // {
+      //   label: getDisplayNameFromLeague(League.EFLCUP),
+      //   value: League.EFLCUP,
+      // },
       {
         label: getDisplayNameFromLeague(League.MLS),
         value: League.MLS,
@@ -121,6 +126,9 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'eng.1') {
     return League.EPL;
   }
+  if (str.toLowerCase() === 'epl') {
+    return League.EPL;
+  }
   if (str.toLowerCase() === 'usa.1') {
     return League.MLS;
   }
@@ -140,7 +148,10 @@ export function getLeagueFromString(str: string): League {
     return League.SUPERLIG;
   }
   if (str.toLowerCase() === 'eng_efl_cup') {
-    return League.EFL;
+    return League.EFLCUP;
+  }
+  if (str.toLowerCase() === 'eng_championship') {
+    return League.ECL;
   }
   if (str.toLowerCase() === 'de_bundesliga') {
     return League.BUNDESLIGA;
@@ -177,7 +188,9 @@ export function getSportFromLeague(league: League): string {
       return 'soccer';
     case League.SUPERLIG:
       return 'soccer';
-    case League.EFL:
+    case League.EFLCUP:
+      return 'soccer';
+    case League.ECL:
       return 'soccer';
     case League.BUNDESLIGA:
       return 'soccer';
@@ -197,7 +210,9 @@ export function getDisplayNameFromLeague(league: League): string {
     case League.NHL:
       return 'NHL';
     case League.EPL:
-      return 'Premier League';
+      return 'English Premier League';
+    case League.ECL:
+      return 'English Championship League';
     case League.MLS:
       return 'MLS';
     case League.CFB:
@@ -210,7 +225,7 @@ export function getDisplayNameFromLeague(league: League): string {
       return 'Serie A (IT)';
     case League.SUPERLIG:
       return 'Süper Lig (TR)';
-    case League.EFL:
+    case League.EFLCUP:
       return 'EFL Cup';
     case League.BUNDESLIGA:
       return 'Bundesliga (DE)';

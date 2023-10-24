@@ -24,7 +24,7 @@ function msToHMS(ms: number): string {
 
 export function Live(): JSX.Element {
   return (
-    <hstack backgroundColor="#FF4500" cornerRadius="medium" padding="xsmall">
+    <hstack backgroundColor="#FF4500" cornerRadius="full" padding="xsmall">
       <spacer size="small" />
       <text color="white">Live</text>
       <spacer size="small" />
@@ -50,7 +50,7 @@ export function TopBar({
     const currentTime = new Date().getTime();
     const timeDifference = gameTime - currentTime;
     return (
-      <hstack padding="medium" backgroundColor="black" alignment="center middle">
+      <hstack padding="medium" backgroundColor="alienblue-700" alignment="center middle">
         <text color="white" style="heading">
           {timeDifference > 0 ? `Starting in ${msToHMS(gameTime - currentTime)}` : 'Starting soon'}{' '}
           ...
@@ -59,7 +59,7 @@ export function TopBar({
     );
   } else if (state === EventState.FINAL) {
     return (
-      <hstack padding="medium" backgroundColor="black" alignment="center middle">
+      <hstack padding="medium" backgroundColor="alienblue-700" alignment="center middle">
         <text color="white" style="heading">
           Game has ended
         </text>
@@ -72,15 +72,17 @@ export function TopBar({
   } else if (event.timingInfo) {
     const { displayClock, period } = event.timingInfo;
     return (
-      <hstack padding="medium" backgroundColor="black" alignment="center middle">
+      <hstack padding="medium" backgroundColor="alienblue-700" alignment="center middle">
         <hstack alignment="start" grow>
           <vstack>
             <text color="white" style="heading">
               {displayClock}
             </text>
-            <text color="white" style="body">
-              {eventPeriodString(period, event.gameType)}
-            </text>
+            {event.gameType !== 'soccer' && (
+              <text color="white" style="body">
+                {eventPeriodString(period, event.gameType)}
+              </text>
+            )}
           </vstack>
         </hstack>
         <hstack alignment="end" grow>

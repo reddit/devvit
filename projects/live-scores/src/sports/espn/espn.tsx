@@ -237,7 +237,6 @@ function parseTeamInfo(league: string, team: any): TeamInfo {
     fullName: team['displayName'],
     location: team['location'],
     logo: league + '-' + team['abbreviation'].toLowerCase() + '.png',
-    color: '#' + team['color'],
   };
   return val;
 }

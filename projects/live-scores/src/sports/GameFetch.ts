@@ -83,7 +83,7 @@ function subscriptionFetches(
       eventFetches.push(fetchNFLBoxscore(gameSub.eventId, context));
     }
     if (gameSub.service === APIService.SRSoccer) {
-      eventFetches.push(fetchSoccerEvent(gameSub.eventId, context));
+      eventFetches.push(fetchSoccerEvent(gameSub.league, gameSub.eventId, context));
     } else {
       eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
     }

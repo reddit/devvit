@@ -155,8 +155,7 @@ export const srManualSoccerScoreboardCreateForm = Devvit.createForm(
   async ({ values }, ctx) => {
     const league = `epl`;
     const timezone = values['timezone'][0];
-
-    const game = await fetchSoccerEvent(values.gameId, ctx);
+    const game = await fetchSoccerEvent(league, values.gameId, ctx);
     const games = [game];
     return ctx.ui.showForm(srSoccerGameSelectionForm, {
       league: league,

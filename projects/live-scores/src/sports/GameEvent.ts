@@ -40,8 +40,6 @@ export type TeamInfo = {
   location: string;
   // Generated asset name from abbreviation + png file extension
   logo: string;
-  // team color provided or mapped in constants.ts
-  color: string;
 };
 
 export enum EventState {

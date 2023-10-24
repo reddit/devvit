@@ -214,7 +214,11 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
       service: APIService.SRSoccer,
     };
 
-    const gameInfo: GeneralGameScoreInfo | null = await fetchSoccerEvent(gameSub.eventId, context);
+    const gameInfo: GeneralGameScoreInfo | null = await fetchSoccerEvent(
+      league,
+      gameSub.eventId,
+      context
+    );
     let gameTitle: string = '';
     if (gameInfo !== null) {
       gameTitle = `${gameInfo.event.awayTeam.fullName} @ ${gameInfo.event.homeTeam.fullName}`;

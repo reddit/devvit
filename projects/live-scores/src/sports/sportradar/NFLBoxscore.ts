@@ -2,7 +2,6 @@ import { Devvit } from '@devvit/public-api';
 import { NFLGame, NFLSeason, NFLWeek } from './NFLSchedule.js';
 import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
-import { NFL_TEAM_COLOR_MAP } from '../ColorMaps.js';
 import { Team, TeamRecord } from './GenericModels.js';
 import { getAPIKey } from './APIKeys.js';
 
@@ -112,7 +111,6 @@ function parseTeam(league: string, team: any): TeamInfo {
     fullName: `${team.market} ${team.name}`,
     location: team.market,
     logo: league + '-' + team.alias.toLowerCase() + '.png',
-    color: NFL_TEAM_COLOR_MAP[team.alias.toLowerCase()],
   };
 }
 

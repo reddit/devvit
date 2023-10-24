@@ -17,24 +17,23 @@ export function GenericScoreBoard(
           event: scoreInfo.event,
         })}
         <zstack grow width={100}>
-          <hstack width={'100%'} height={'100%'}>
+          <vstack width={'100%'} height={'100%'}>
             {TeamBlock({
               isHomeTeam: false,
               name: scoreInfo.event.awayTeam.fullName,
               logo: scoreInfo.event.awayTeam.logo,
-              color: scoreInfo.event.awayTeam.color,
               score: scoreInfo.awayScore,
               state: scoreInfo.event.state,
             })}
+            <hstack border="thin" />
             {TeamBlock({
               isHomeTeam: true,
               name: scoreInfo.event.homeTeam.fullName,
               logo: scoreInfo.event.homeTeam.logo,
-              color: scoreInfo.event.homeTeam.color,
               score: scoreInfo.homeScore,
               state: scoreInfo.event.state,
             })}
-          </hstack>
+          </vstack>
           {CommentBlock({
             username: lastComment.username,
             commentBody: lastComment.text,

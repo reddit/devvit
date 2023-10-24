@@ -36,12 +36,11 @@ export function BaseballScoreBoard(
           event: scoreInfo.event,
         })}
         <zstack grow width={100}>
-          <hstack width={'100%'} height={'100%'}>
+          <vstack width={'100%'} height={'100%'}>
             {TeamBlock({
               isHomeTeam: false,
               name: scoreInfo.event.awayTeam.fullName,
               logo: scoreInfo.event.awayTeam.logo,
-              color: scoreInfo.event.awayTeam.color,
               score: scoreInfo.awayScore,
               state: scoreInfo.event.state,
               baseballProps: {
@@ -68,7 +67,6 @@ export function BaseballScoreBoard(
               isHomeTeam: true,
               name: scoreInfo.event.homeTeam.fullName,
               logo: scoreInfo.event.homeTeam.logo,
-              color: scoreInfo.event.homeTeam.color,
               score: scoreInfo.homeScore,
               state: scoreInfo.event.state,
               baseballProps: {
@@ -91,7 +89,7 @@ export function BaseballScoreBoard(
                 isDueUp: scoreInfo.inningState === InningState.MID,
               },
             })}
-          </hstack>
+          </vstack>
           {CommentBlock({
             username: lastComment.username,
             commentBody: lastComment.text,
@@ -223,13 +221,11 @@ export function sportSpecificContentBaseball(
 
   return (
     <>
-      {state === EventState.LIVE && isDueUp && <text color="white">Due Up</text>}
-      <text size="large" weight="bold" color="white">
+      {state === EventState.LIVE && isDueUp && <text>Due Up</text>}
+      <text size="large" weight="bold">
         {activePlayer}
       </text>
-      <text size="small" color="white">
-        {playerSummaryItemsFiltered.join(', ')}
-      </text>
+      <text size="small">{playerSummaryItemsFiltered.join(', ')}</text>
     </>
   );
 }

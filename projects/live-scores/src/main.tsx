@@ -5,13 +5,7 @@ import { CommentData, debugComment, getLastComment } from './components/comments
 import { nextMLBDemoPage } from './mock-scores/mlb/mock-mlb.js';
 import { BaseballGameScoreInfo } from './sports/espn/espn.js';
 import { APIService, GameSubscription, getLeagueFromString } from './sports/Sports.js';
-import { getSubscriptions, removeSubscription } from './subscriptions.js';
-import {
-  espnScoreboardCreationForm,
-  srManualSoccerScoreboardCreateForm,
-  srNflScoreboardCreationForm,
-  srSoccerScoreboardCreationForm,
-} from './forms/ScoreboardCreateForm.js';
+import { srSoccerScoreboardCreationForm } from './forms/ScoreboardCreateForm.js';
 import { EventState } from './sports/GameEvent.js';
 import {
   fetchDebugGameInfo,
@@ -19,6 +13,8 @@ import {
   makeKeyForPostId,
   fetchSubscriptions,
 } from './sports/GameFetch.js';
+import { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
+import { SoccerScoreboard } from './components/soccer.js';
 import { resetAPIKeys } from './sports/sportradar/APIKeys.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
@@ -39,32 +35,32 @@ Devvit.addTrigger({
   },
 });
 
-Devvit.addMenuItem({
-  label: 'LiveScores: Create ESPN scoreboard',
-  location: 'subreddit',
-  forUserType: `moderator`,
-  onPress: async (_event, { ui }) => {
-    return ui.showForm(espnScoreboardCreationForm);
-  },
-});
+// Devvit.addMenuItem({
+//   label: 'LiveScores: Create ESPN scoreboard',
+//   location: 'subreddit',
+//   forUserType: `moderator`,
+//   onPress: async (_event, { ui }) => {
+//     return ui.showForm(espnScoreboardCreationForm);
+//   },
+// });
 
-Devvit.addMenuItem({
-  label: 'LiveScores: Create NFL scoreboard',
-  location: 'subreddit',
-  forUserType: `moderator`,
-  onPress: async (_event, { ui }) => {
-    return ui.showForm(srNflScoreboardCreationForm);
-  },
-});
+// Devvit.addMenuItem({
+//   label: 'LiveScores: Create NFL scoreboard',
+//   location: 'subreddit',
+//   forUserType: `moderator`,
+//   onPress: async (_event, { ui }) => {
+//     return ui.showForm(srNflScoreboardCreationForm);
+//   },
+// });
 
-Devvit.addMenuItem({
-  label: 'LiveScores: Create manual football scoreboard',
-  location: 'subreddit',
-  forUserType: `moderator`,
-  onPress: async (_event, { ui }) => {
-    return ui.showForm(srManualSoccerScoreboardCreateForm);
-  },
-});
+// Devvit.addMenuItem({
+//   label: 'LiveScores: Create manual football scoreboard',
+//   location: 'subreddit',
+//   forUserType: `moderator`,
+//   onPress: async (_event, { ui }) => {
+//     return ui.showForm(srManualSoccerScoreboardCreateForm);
+//   },
+// });
 
 Devvit.addMenuItem({
   label: 'LiveScores: Create football scoreboard',
@@ -75,41 +71,41 @@ Devvit.addMenuItem({
   },
 });
 
-Devvit.addMenuItem({
-  label: 'LiveScores: Remove all subscriptions',
-  location: 'subreddit',
-  forUserType: `moderator`,
-  onPress: async (_, context) => {
-    const subscriptions = await getSubscriptions(context);
-    await Promise.all(
-      subscriptions.map(async (sub) => {
-        await removeSubscription(context, sub);
-      })
-    );
-    context.ui.showToast({
-      text: 'Removed all subscriptions',
-      appearance: 'success',
-    });
-  },
-});
+// Devvit.addMenuItem({
+//   label: 'LiveScores: Remove all subscriptions',
+//   location: 'subreddit',
+//   forUserType: `moderator`,
+//   onPress: async (_, context) => {
+//     const subscriptions = await getSubscriptions(context);
+//     await Promise.all(
+//       subscriptions.map(async (sub) => {
+//         await removeSubscription(context, sub);
+//       })
+//     );
+//     context.ui.showToast({
+//       text: 'Removed all subscriptions',
+//       appearance: 'success',
+//     });
+//   },
+// });
 
-Devvit.addMenuItem({
-  label: 'Livescores: Reset KV Store',
-  location: 'subreddit',
-  forUserType: `moderator`,
-  onPress: async (_, { kvStore, ui }) => {
-    const store = await kvStore.list();
-    await Promise.all(
-      store.map(async (key) => {
-        await kvStore.delete(key);
-      })
-    );
-    ui.showToast({
-      text: 'Wiped KV Store',
-      appearance: 'success',
-    });
-  },
-});
+// Devvit.addMenuItem({
+//   label: 'Livescores: Reset KV Store',
+//   location: 'subreddit',
+//   forUserType: `moderator`,
+//   onPress: async (_, { kvStore, ui }) => {
+//     const store = await kvStore.list();
+//     await Promise.all(
+//       store.map(async (key) => {
+//         await kvStore.delete(key);
+//       })
+//     );
+//     ui.showToast({
+//       text: 'Wiped KV Store',
+//       appearance: 'success',
+//     });
+//   },
+// });
 
 Devvit.addMenuItem({
   label: 'LiveScores: Create MLB Demo',
@@ -172,7 +168,7 @@ Devvit.addCustomPostType({
 
     // const interval = context.useInterval(async () => {
     //   const newLastComment: any = await getLastComment(context, context.postId);
-    //   if (newLastComment == null) {
+    //   if (newLastComment === null) {
     //     return;
     //   }
     //   if (lastComment.id != newLastComment.id) {
@@ -202,6 +198,10 @@ Devvit.addCustomPostType({
         const baseBallScoreInfo = scoreInfo as BaseballGameScoreInfo;
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
         return BaseballScoreBoard(baseBallScoreInfo, lastComment, demoNext);
+      } else if (scoreInfo.event.gameType === 'soccer') {
+        const soccerGameScoreInfo = scoreInfo as SoccerGameScoreInfo;
+        if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
+        return SoccerScoreboard(soccerGameScoreInfo, lastComment);
       } else {
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
         return GenericScoreBoard(scoreInfo, lastComment);
