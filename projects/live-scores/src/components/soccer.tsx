@@ -2,7 +2,6 @@ import { Devvit } from '@devvit/public-api';
 import { SoccerGameScoreInfo, TimelineEvent } from '../sports/sportradar/SoccerEvent.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
-import { CommentData, CommentBlock } from './comments.js';
 
 export type TeamBlockSoccer = {
   goals?: TimelineEvent[] | undefined;
@@ -64,10 +63,7 @@ function generateEventStrings(events: TimelineEvent[]): string[] {
   return result;
 }
 
-export function SoccerScoreboard(
-  scoreInfo: SoccerGameScoreInfo,
-  lastComment: CommentData
-): JSX.Element {
+export function SoccerScoreboard(scoreInfo: SoccerGameScoreInfo): JSX.Element {
   return (
     <blocks height="regular">
       <vstack cornerRadius="medium" grow>
@@ -102,10 +98,6 @@ export function SoccerScoreboard(
               },
             })}
           </vstack>
-          {CommentBlock({
-            username: lastComment.username,
-            commentBody: lastComment.text,
-          })}
         </zstack>
       </vstack>
     </blocks>

@@ -53,7 +53,7 @@ export const espnScoreboardCreationForm = Devvit.createForm(
           defaultValue: ['America/Los_Angeles'],
         },
       ],
-      title: 'Create Live Scoreboard Post',
+      title: 'Create Scoreboard Post',
       acceptLabel: 'Next',
       cancelLabel: 'Back',
     };

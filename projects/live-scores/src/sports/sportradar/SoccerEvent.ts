@@ -114,7 +114,7 @@ function parseTeam(league: string, team: SportEventCompetitor): TeamInfo {
   };
 }
 
-function parseSoccerEvent(jsonData: any): SoccerEvent {
+export function parseSoccerEvent(jsonData: any): SoccerEvent {
   return jsonData as SoccerEvent;
 }
 

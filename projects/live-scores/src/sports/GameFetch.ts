@@ -1,11 +1,11 @@
-import { mlbDemoForId } from '../mock-scores/mlb/mock-mlb.js';
+import { demoForId, leagueFromDemoId } from '../mock-scores/MockHelper.js';
 import { EventState, GeneralGameScoreInfo } from './GameEvent.js';
-import { APIService, GameSubscription } from './Sports.js';
+import { APIService, GameSubscription, getLeagueFromString, getSportFromLeague } from './Sports.js';
 import { fetchScoreForGame, parseGeneralGameScoreInfo } from './espn/espn.js';
 import { Devvit, KVStore } from '@devvit/public-api';
 import { getSubscriptions, removeSubscription } from '../subscriptions.js';
 import { fetchNFLBoxscore } from './sportradar/NFLBoxscore.js';
-import { fetchSoccerEvent } from './sportradar/SoccerEvent.js';
+import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
 
 export function makeKeyForSubscription(subscription: GameSubscription): string {
   return `info:${subscription.league}-${subscription.eventId}`;
@@ -29,8 +29,7 @@ export async function fetchCachedGameInfo(
   const gameSubscription: GameSubscription = JSON.parse(gameSubStr);
 
   if (gameSubscription.eventId.startsWith('demo')) {
-    const demo = mlbDemoForId(gameSubscription.eventId);
-    return parseGeneralGameScoreInfo(demo, `mlb`, `baseball`);
+    return fetchDebugGameInfo(gameSubscription.eventId);
   }
 
   const gameInfoStr: string | undefined = await kvStore.get(
@@ -44,7 +43,12 @@ export async function fetchCachedGameInfo(
 }
 
 export function fetchDebugGameInfo(debugId: string): GeneralGameScoreInfo {
-  return parseGeneralGameScoreInfo(mlbDemoForId(debugId), `mlb`, `baseball`);
+  const league = leagueFromDemoId(debugId);
+  const sport = getSportFromLeague(getLeagueFromString(league));
+  if (sport === `soccer`) {
+    return soccerScoreInfo(`eng.1`, parseSoccerEvent(demoForId(debugId)));
+  }
+  return parseGeneralGameScoreInfo(demoForId(debugId), league, sport);
 }
 
 export async function fetchSubscriptions(context: Devvit.Context) {

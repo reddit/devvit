@@ -2,9 +2,9 @@ import { Devvit, Post } from '@devvit/public-api';
 import { GenericScoreBoard } from './components/Scoreboard.js';
 import { BaseballScoreBoard } from './components/baseball.js';
 import { CommentData, debugComment, getLastComment } from './components/comments.js';
-import { nextMLBDemoPage } from './mock-scores/mlb/mock-mlb.js';
+import { nextMLBDemoPage } from './mock-scores/MockHelper.js';
 import { BaseballGameScoreInfo } from './sports/espn/espn.js';
-import { APIService, GameSubscription, getLeagueFromString } from './sports/Sports.js';
+import { APIService, GameSubscription, League, getLeagueFromString } from './sports/Sports.js';
 import { srSoccerScoreboardCreationForm } from './forms/ScoreboardCreateForm.js';
 import { EventState } from './sports/GameEvent.js';
 import {
@@ -137,6 +137,36 @@ Devvit.addMenuItem({
   },
 });
 
+Devvit.addMenuItem({
+  label: 'Create Soccer Demo Scoreboard',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, context) => {
+    const currentSubreddit = await context.reddit.getCurrentSubreddit();
+    const post: Post = await context.reddit.submitPost({
+      preview: (
+        <vstack padding="medium" cornerRadius="medium">
+          <text style="heading" size="medium">
+            Loading scoreboard for game...
+          </text>
+        </vstack>
+      ),
+      title: `Scoreboard: Soccer Demo`,
+      subredditName: currentSubreddit.name,
+    });
+    const gameSub: GameSubscription = {
+      league: League.EPL,
+      eventId: 'demo-epl-01',
+      service: APIService.SRSoccer,
+    };
+    await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
+    return context.ui.showToast({
+      text: 'Scoreboard Demo Post Created!',
+      appearance: 'success',
+    });
+  },
+});
+
 Devvit.addCustomPostType({
   name: 'Scoreboard',
   render: (context) => {
@@ -201,7 +231,7 @@ Devvit.addCustomPostType({
       } else if (scoreInfo.event.gameType === 'soccer') {
         const soccerGameScoreInfo = scoreInfo as SoccerGameScoreInfo;
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
-        return SoccerScoreboard(soccerGameScoreInfo, lastComment);
+        return SoccerScoreboard(soccerGameScoreInfo);
       } else {
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
         return GenericScoreBoard(scoreInfo, lastComment);
