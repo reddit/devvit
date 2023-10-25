@@ -44,6 +44,7 @@
     "@devvit/public-api": "0.10.8",
     "@devvit/public-api-old": "0.10.8",
     "@devvit/runtimes": "0.10.8",
+    "@devvit/ui-renderer": "0.10.8",
     "rxjs": "7.5.7"
   },
   "devDependencies": {
