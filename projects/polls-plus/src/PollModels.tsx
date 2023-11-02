@@ -8,6 +8,7 @@ export interface PollProps {
   navigate: (page: PageType) => void;
   remainingMillis: number;
   options: string[];
+  shuffledOptions: string[];
   optionsPerPollPage: number;
   pollPages: number;
   votes: number[];

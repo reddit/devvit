@@ -32,13 +32,13 @@ export const addPoll = Devvit.createForm(
         defaultValue: `2`,
         required: true,
       },
-      // {
-      //   name: 'randomizeOrder',
-      //   label: 'Randomize order of poll options',
-      //   type: 'boolean',
-      //   defaultValue: true,
-      //   helpText: `To reduce bias, options will be presented to the user in a random order.`
-      // },
+      {
+        name: 'randomizeOrder',
+        label: 'Shuffle order of poll options',
+        type: 'boolean',
+        defaultValue: true,
+        helpText: `To reduce bias, options will be presented to the user in a shuffled order.`,
+      },
       {
         name: 'allowShowResults',
         label: 'Include "Show Results" option',

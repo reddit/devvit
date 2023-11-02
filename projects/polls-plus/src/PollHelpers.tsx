@@ -16,6 +16,15 @@ export function isStringValid(string: string | undefined | null): boolean {
   return string !== null && string !== undefined && string?.trim() !== '';
 }
 
+export function shuffle<T>(arr: T[]) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+}
+
 // Keys and stuff
 
 export enum KeyType {

@@ -3,10 +3,10 @@ import { VotePage } from './components/VotePage.js';
 import { ResultsPage } from './components/ResultsPage.js';
 import { PageType, PollProps } from './PollModels.js';
 import { addPoll } from './components/CreatePoll.js';
-import { KeyType, key, userKey, resetRedis } from './PollHelpers.js';
+import { KeyType, key, userKey, resetRedis, shuffle } from './PollHelpers.js';
 import { ConfirmPage } from './components/ConfirmPage.js';
 
-Devvit.debug.emitSnapshots = true;
+// Devvit.debug.emitSnapshots = true;
 
 Devvit.configure({
   redis: true,
@@ -43,6 +43,12 @@ const App: Devvit.CustomPostComponent = async (context) => {
   const [options] = useState(async () => {
     const options = await redis.zRange(key(KeyType.options, postId), 0, -1);
     return options.map((option) => option.member);
+  });
+
+  const [shuffledOptions] = useState(async () => {
+    const array = [...options];
+    shuffle(array);
+    return array;
   });
 
   const [votes, setVotes] = useState(async () => {
@@ -92,6 +98,7 @@ const App: Devvit.CustomPostComponent = async (context) => {
   const props: PollProps = {
     navigate,
     options,
+    shuffledOptions,
     optionsPerPollPage,
     pollPages,
     setFinish,

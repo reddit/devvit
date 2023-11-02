@@ -34,6 +34,7 @@ export const PollOption = ({
 export const VotePage: Devvit.BlockComponent<PollProps> = async (
   {
     options,
+    shuffledOptions,
     votes,
     setVotes,
     navigate,
@@ -42,15 +43,20 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
     remainingMillis,
     description,
     allowShowResults,
+    randomizeOrder,
   },
   { redis, useState, userId, postId }
 ) => {
   const remaining = moment.duration(remainingMillis).humanize();
   const [selectedOption, setSelectedOption] = useState(-1);
+  const presentedOptions = randomizeOrder ? shuffledOptions : options;
 
   const submitVote: Devvit.Blocks.OnPressEventHandler = async () => {
     const user = userKey(userId, postId);
     const tx = await redis.watch(user);
+    const selectedOptionString = presentedOptions[selectedOption];
+    const optionIndex = options.indexOf(selectedOptionString);
+
     let already = false;
     try {
       already = !!(await redis.get(user));
@@ -62,10 +68,10 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
     if (already) {
       await tx.exec();
     } else {
-      await tx.set(user, selectedOption + '');
-      await redis.incrBy(`polls:${postId}:${selectedOption}`, 1);
+      await tx.set(user, optionIndex + '');
+      await redis.incrBy(`polls:${postId}:${optionIndex}`, 1);
       await tx.exec();
-      setVotes(votes.map((v, i) => (i === selectedOption ? v + 1 : v)));
+      setVotes(votes.map((v, i) => (i === optionIndex ? v + 1 : v)));
     }
     navigate(PageType.RESULTS);
   };
@@ -114,7 +120,7 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
       <spacer size="small" />
       <hstack border="thin"></hstack>
       <vstack gap="small" grow>
-        {options.slice(rangeStart, rangeEnd).map((option, index) => {
+        {presentedOptions.slice(rangeStart, rangeEnd).map((option, index) => {
           const props = {
             option,
             index: index + rangeStart,
