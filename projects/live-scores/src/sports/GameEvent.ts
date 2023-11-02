@@ -6,6 +6,7 @@ export type GeneralGameScoreInfo = {
   awayScore: number;
   extraContent?: string;
   service: APIService;
+  generatedDate?: string;
 };
 
 export type GameEvent = {

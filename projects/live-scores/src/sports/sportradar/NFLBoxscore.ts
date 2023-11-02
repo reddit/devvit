@@ -115,6 +115,7 @@ function parseTeam(league: string, team: any): TeamInfo {
 }
 
 export function nflGameScoreInfo(game: NFLBoxscore): GeneralGameScoreInfo {
+  const currentDate = new Date();
   return {
     event: {
       id: game.id,
@@ -133,6 +134,7 @@ export function nflGameScoreInfo(game: NFLBoxscore): GeneralGameScoreInfo {
     homeScore: game.summary.home.points,
     awayScore: game.summary.away.points,
     service: APIService.SRNFL,
+    generatedDate: currentDate.toISOString(),
   };
 }
 

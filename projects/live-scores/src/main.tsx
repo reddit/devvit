@@ -9,7 +9,7 @@ import { srSoccerScoreboardCreationForm } from './forms/ScoreboardCreateForm.js'
 import { EventState } from './sports/GameEvent.js';
 import {
   fetchDebugGameInfo,
-  fetchCachedGameInfo,
+  fetchCachedGameInfoForPostId,
   makeKeyForPostId,
   fetchSubscriptions,
 } from './sports/GameFetch.js';
@@ -176,12 +176,12 @@ Devvit.addCustomPostType({
       if (debugId) {
         return fetchDebugGameInfo(debugId);
       } else {
-        return await fetchCachedGameInfo(kvStore, postId);
+        return await fetchCachedGameInfoForPostId(kvStore, postId);
       }
     });
 
     const updateInterval = context.useInterval(async () => {
-      const data = await fetchCachedGameInfo(kvStore, postId);
+      const data = await fetchCachedGameInfoForPostId(kvStore, postId);
       data && setScoreInfo(data);
     }, 10000);
 
@@ -218,7 +218,7 @@ Devvit.addCustomPostType({
           service: APIService.ESPN,
         };
         await context.kvStore.put(makeKeyForPostId(postId), JSON.stringify(gameSub));
-        const update = await fetchCachedGameInfo(kvStore, postId);
+        const update = await fetchCachedGameInfoForPostId(kvStore, postId);
         setScoreInfo(update);
       }
     };

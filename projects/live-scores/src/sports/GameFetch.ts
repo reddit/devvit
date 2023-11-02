@@ -7,6 +7,10 @@ import { getSubscriptions, removeSubscription } from '../subscriptions.js';
 import { fetchNFLBoxscore } from './sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
 
+const CLOSE_TO_GAME_THRESHOLD_HOURS = 1;
+const STALE_INFO_THRESHOLD_HOURS = 6;
+const MS_TO_HOURS = 1000 * 60 * 60;
+
 export function makeKeyForSubscription(subscription: GameSubscription): string {
   return `info:${subscription.league}-${subscription.eventId}`;
 }
@@ -18,7 +22,7 @@ export function makeKeyForPostId(postId: string | undefined): string {
   return `post:${postId}`;
 }
 
-export async function fetchCachedGameInfo(
+export async function fetchCachedGameInfoForPostId(
   kvStore: KVStore,
   postId: string | undefined
 ): Promise<GeneralGameScoreInfo | null> {
@@ -31,10 +35,14 @@ export async function fetchCachedGameInfo(
   if (gameSubscription.eventId.startsWith('demo')) {
     return fetchDebugGameInfo(gameSubscription.eventId);
   }
+  return await fetchCachedGameInfoForGameSubscription(kvStore, gameSubscription);
+}
 
-  const gameInfoStr: string | undefined = await kvStore.get(
-    makeKeyForSubscription(gameSubscription)
-  );
+async function fetchCachedGameInfoForGameSubscription(
+  kvStore: KVStore,
+  sub: GameSubscription
+): Promise<GeneralGameScoreInfo | null> {
+  const gameInfoStr: string | undefined = await kvStore.get(makeKeyForSubscription(sub));
   if (gameInfoStr === undefined) {
     return null;
   }
@@ -60,21 +68,52 @@ export async function fetchSubscriptions(context: Devvit.Context) {
     eventId: JSON.parse(sub)['eventId'],
     service: JSON.parse(sub)['service'],
   }));
-  const eventFetches = subscriptionFetches(gameSubscriptions, context);
+  const filteredSubs = await filterSubscriptionsForFetch(gameSubscriptions, context.kvStore);
+  const eventFetches = subscriptionFetches(filteredSubs, context);
   const results: GeneralGameScoreInfo[] = (await Promise.all(eventFetches)).flatMap((result) =>
     result ? [result] : []
   );
-  for (let i = 0; i < gameSubscriptions.length; i++) {
-    await context.kvStore.put(
-      makeKeyForSubscription(gameSubscriptions[i]),
-      JSON.stringify(results[i])
-    );
-    if (results[i].event.state === EventState.FINAL) {
-      console.log(`Game ID ${results[i].event.id} (${results[i].event.awayTeam.abbreviation} @ \
-${results[i].event.homeTeam.abbreviation}) has ended. Cancelling subscription ${subscriptions[i]}.`);
-      await removeSubscription(context, subscriptions[i]);
+  for (let i = 0; i < filteredSubs.length; i++) {
+    const sub = filteredSubs[i];
+    const info = results[i];
+    await context.kvStore.put(makeKeyForSubscription(sub), JSON.stringify(info));
+    if (info.event.state === EventState.FINAL) {
+      console.log(`Game ID ${info.event.id} (${info.event.awayTeam.abbreviation} @ \
+${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.eventId}.`);
+      await removeSubscription(context, JSON.stringify(sub));
     }
   }
+}
+
+async function filterSubscriptionsForFetch(
+  subs: GameSubscription[],
+  kvStore: KVStore
+): Promise<GameSubscription[]> {
+  const filteredSubs: GameSubscription[] = [];
+  for (let i = 0; i < subs.length; i++) {
+    const sub = subs[i];
+    const info = await fetchCachedGameInfoForGameSubscription(kvStore, sub);
+    console.log(`Checking subscription ${sub.eventId} with event state ${info?.event.state}...`);
+    if (info && info.event.state === EventState.LIVE) {
+      filteredSubs.push(sub);
+    } else if (info) {
+      const now = new Date();
+      const start = new Date(info.event.date);
+      const lastFetch = info.generatedDate ? new Date(info.generatedDate) : null;
+      const closeToGameThreshold = CLOSE_TO_GAME_THRESHOLD_HOURS * MS_TO_HOURS;
+      const stalePregameThreshold = STALE_INFO_THRESHOLD_HOURS * MS_TO_HOURS;
+      if (
+        lastFetch === null ||
+        start.getTime() - now.getTime() < closeToGameThreshold ||
+        now.getTime() - lastFetch.getTime() > stalePregameThreshold
+      ) {
+        filteredSubs.push(sub);
+      } else {
+        console.log(`Skipping fetch on subscription - ${sub.eventId}`);
+      }
+    }
+  }
+  return filteredSubs;
 }
 
 function subscriptionFetches(

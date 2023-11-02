@@ -29,6 +29,7 @@ export function soccerScoreInfo(league: string, soccerEvent: SoccerEvent): Socce
   const status = soccerEvent.sport_event_status;
   const homeTeam = event.competitors[0];
   const awayTeam = event.competitors[1];
+  const currentDate = new Date();
   return {
     event: {
       id: event.id,
@@ -48,6 +49,7 @@ export function soccerScoreInfo(league: string, soccerEvent: SoccerEvent): Socce
     awayScore: status.away_score ?? 0,
     service: APIService.SRSoccer,
     summary: eventsSummary(soccerEvent.timeline),
+    generatedDate: currentDate.toISOString(),
   };
 }
 
@@ -125,6 +127,8 @@ function eventState(status: SportEventStatus): EventState {
     case SportEventStatusType.NOT_STARTED:
       return EventState.PRE;
     case SportEventStatusType.INPROGRESS:
+      return EventState.LIVE;
+    case SportEventStatusType.LIVE:
       return EventState.LIVE;
     case SportEventStatusType.CLOSED:
       return EventState.FINAL;
@@ -270,6 +274,7 @@ interface Clock {
 
 enum SportEventStatusType {
   CREATED = `created`,
+  LIVE = `live`,
   NOT_STARTED = `not_started`,
   INPROGRESS = `inprogress`,
   CLOSED = `closed`,

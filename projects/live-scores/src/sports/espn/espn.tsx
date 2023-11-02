@@ -204,6 +204,7 @@ export function parseGeneralGameScoreInfo(
   const competition = event.competitions[0];
   const homeCompetitor = competition.competitors.find((team: any) => team.homeAway === 'home');
   const awayCompetitor = competition.competitors.find((team: any) => team.homeAway === 'away');
+  const currentDate = new Date();
   const gameInfo: GeneralGameScoreInfo = {
     event: {
       id: event.id,
@@ -220,6 +221,7 @@ export function parseGeneralGameScoreInfo(
     awayScore: awayCompetitor.score,
     extraContent: competition.status.type.shortDetail,
     service: APIService.ESPN,
+    generatedDate: currentDate.toISOString(),
   };
 
   if (gameType.includes('baseball')) {
