@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { PageType, PollProps } from '../PollModels.js';
-import { KeyType, isStringValid, key, userKey } from '../PollHelpers.js';
+import { KeyType, key, userKey } from '../PollHelpers.js';
 import moment from 'moment';
 
 // const props = { option, index, selectedOption, setSelectedOption }
@@ -18,16 +18,19 @@ export const PollOption = ({
   const selectOption = (): void => setSelectedOption(index);
   const selected = index === selectedOption;
   return (
-    <hstack
-      alignment={'start middle'}
-      onPress={selectOption}
-      gap={'small'}
-      padding={'small'}
-      data-selection={index}
-    >
-      <icon name={selected ? 'radio-button-fill' : 'radio-button-outline'} />
-      <text>{option}</text>
-    </hstack>
+    <vstack>
+      <spacer size="small" />
+      <hstack
+        width="100%"
+        alignment={'start middle'}
+        onPress={selectOption}
+        gap={'small'}
+        data-selection={index}
+      >
+        <icon name={selected ? 'radio-button-fill' : 'radio-button-outline'} />
+        <text grow>{option}</text>
+      </hstack>
+    </vstack>
   );
 };
 
@@ -41,7 +44,6 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
     optionsPerPollPage,
     pollPages,
     remainingMillis,
-    description,
     allowShowResults,
     randomizeOrder,
   },
@@ -91,16 +93,12 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
   };
 
   return (
-    <vstack gap="none" padding="medium" grow>
-      <hstack grow alignment="middle">
-        <vstack alignment="middle">
-          <hstack>
-            <text style="heading" color="green">
-              Open
-            </text>
-            <text style="body">&nbsp;· {remaining} left</text>
-          </hstack>
-        </vstack>
+    <vstack height="100%" width="100%" padding="medium">
+      <hstack height="15%" width="100%" alignment="middle">
+        <text style="heading" color="green">
+          Open
+        </text>
+        <text style="body">&nbsp;· {remaining} left</text>
         <spacer grow />
         {
           allowShowResults && (
@@ -111,27 +109,23 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
           // <><text color='alienblue-500' onPress={() => navigate(PageType.CONFIRM)}>View Results</text></>
         }
       </hstack>
-      {isStringValid(description) && (
-        <>
-          <spacer size="small" />
-          <text style="metadata">{description}</text>
-        </>
-      )}
-      <spacer size="small" />
+      <spacer size="xsmall" />
       <hstack border="thin"></hstack>
-      <vstack gap="small" grow>
-        {presentedOptions.slice(rangeStart, rangeEnd).map((option, index) => {
-          const props = {
-            option,
-            index: index + rangeStart,
-            selectedOption,
-            setSelectedOption,
-          };
-          return <PollOption {...props} />;
-        })}
+      <vstack grow>
+        <spacer size="small" />
+        <vstack gap="medium">
+          {presentedOptions.slice(rangeStart, rangeEnd).map((option, index) => {
+            const props = {
+              option,
+              index: index + rangeStart,
+              selectedOption,
+              setSelectedOption,
+            };
+            return <PollOption {...props} />;
+          })}
+        </vstack>
       </vstack>
-      <spacer grow />
-      <hstack grow gap="medium" alignment="middle">
+      <hstack width="100%" height="15%" alignment="middle">
         {pollPages > 1 && (
           <hstack grow gap="medium" alignment="middle">
             <button
@@ -161,7 +155,6 @@ export const VotePage: Devvit.BlockComponent<PollProps> = async (
           Vote!
         </button>
       </hstack>
-      <spacer size="small" />
     </vstack>
   );
 };

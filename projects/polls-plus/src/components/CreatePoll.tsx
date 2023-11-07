@@ -4,6 +4,7 @@ import { key, KeyType } from '../PollHelpers.js';
 export const addPoll = Devvit.createForm(
   {
     title: 'Add a poll',
+    acceptLabel: 'Post',
     fields: [
       {
         name: 'question',
@@ -20,7 +21,7 @@ export const addPoll = Devvit.createForm(
       // },
       {
         name: 'answers',
-        label: 'Answers (use a comma to separate)',
+        label: 'Answers (up to 12 total, use a comma to separate)',
         type: 'paragraph',
         required: true,
         helpText: `E.g. "Red, Orange, Blue, Mother of Pearl"`,
@@ -51,7 +52,8 @@ export const addPoll = Devvit.createForm(
   async (event, { reddit, subredditId, ui, redis }) => {
     const sub = await reddit.getSubredditById(subredditId);
     const answers: ZMember[] = event.values.answers
-      .split(',')
+      .split(',') // Split int array
+      .slice(0, 12) // Only include the first 12 answers
       .map((answer: string, i: number) => ({ member: answer.trim(), score: i }));
     const options = {
       subredditName: sub.name,

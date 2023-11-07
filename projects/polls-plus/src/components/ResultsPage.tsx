@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { PageType, PollProps } from '../PollModels.js';
-import { formatCount, isStringValid } from '../PollHelpers.js';
+import { formatCount } from '../PollHelpers.js';
 import moment from 'moment';
 
 type ResultProps = {
@@ -44,12 +44,14 @@ const PollResult = ({ option, votes, total, winner }: ResultProps): JSX.Element 
   return (
     <zstack width={'100%'}>
       <PercentBar />
-      <hstack padding="small">
+      <hstack padding="small" width="100%">
         <text color="secondary-content" weight="bold">
           {nice}
         </text>
         <spacer size="medium" />
-        <text color="secondary-content">{option}</text>
+        <text grow color="secondary-content">
+          {option}
+        </text>
       </hstack>
     </zstack>
   );
@@ -67,7 +69,6 @@ export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
     total,
     remainingMillis,
     navigate,
-    description,
   },
   { postId, useState }
 ) => {
@@ -99,9 +100,9 @@ export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
   };
 
   return (
-    <vstack gap="none" padding="medium" grow>
+    <vstack width="100%" height="100%" padding="medium">
       {remainingMillis > 0 && (
-        <hstack grow alignment="middle">
+        <hstack height="15%" width="100%" alignment="middle">
           <text style="heading" color="green">
             Open
           </text>
@@ -109,40 +110,42 @@ export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
         </hstack>
       )}
       {remainingMillis <= 0 && (
-        <hstack grow alignment="middle">
+        <hstack height="15%" width="100%" alignment="middle">
           <text style="heading">Closed</text>
           <text style="body">&nbsp;· {formatCount(total)} votes</text>
         </hstack>
       )}
-      {isStringValid(description) && <text style="metadata">{description}</text>}
+      <spacer size="xsmall" />
       <hstack border="thin"></hstack>
 
-      <vstack gap="small" padding="small" grow>
+      <vstack gap="small" grow>
+        <spacer size="xsmall" />
         {zipped.slice(rangeStart, rangeEnd).map((props) => {
           return <PollResult {...props} />;
         })}
       </vstack>
 
-      <spacer grow />
-      {pollPages > 1 && (
-        <hstack grow gap="medium" alignment="middle">
-          <button
-            size="small"
-            icon="back-outline"
-            onPress={prevPollPage}
-            disabled={pollPage === 1}
-          />
-          <text>
-            Page {pollPage} of {pollPages}
-          </text>
-          <button
-            size="small"
-            icon="forward-outline"
-            onPress={nextPollPage}
-            disabled={pollPage === pollPages}
-          />
-        </hstack>
-      )}
+      <hstack width="100%" height="15%" alignment="middle">
+        {pollPages > 1 && (
+          <hstack grow gap="medium" alignment="middle">
+            <button
+              size="small"
+              icon="back-outline"
+              onPress={prevPollPage}
+              disabled={pollPage === 1}
+            />
+            <text>
+              Page {pollPage} of {pollPages}
+            </text>
+            <button
+              size="small"
+              icon="forward-outline"
+              onPress={nextPollPage}
+              disabled={pollPage === pollPages}
+            />
+          </hstack>
+        )}
+      </hstack>
 
       {!postId && ( // i.e. only in development mode.
         <vstack gap="medium">
