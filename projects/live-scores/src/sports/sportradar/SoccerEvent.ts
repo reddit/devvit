@@ -54,18 +54,15 @@ export function soccerScoreInfo(league: string, soccerEvent: SoccerEvent): Socce
 }
 
 export interface SoccerGameScoreInfo extends GeneralGameScoreInfo {
-  homeGoals?: string | undefined;
-  awayGoals?: string | undefined;
-  homeRedCards?: string | undefined;
-  awayRedCards?: string | undefined;
   summary?: GameEventSummary | undefined;
 }
 
-interface GameEventSummary {
+export interface GameEventSummary {
   homeGoals: TimelineEvent[];
   awayGoals: TimelineEvent[];
   homeRedCards: TimelineEvent[];
   awayRedCards: TimelineEvent[];
+  latestEvent?: TimelineEvent | undefined;
 }
 
 function eventsSummary(timeline?: TimelineEvent[]): GameEventSummary | undefined {
@@ -89,8 +86,21 @@ function eventsSummary(timeline?: TimelineEvent[]): GameEventSummary | undefined
       awayGoals: awayGoals,
       homeRedCards: homeRedCards,
       awayRedCards: awayRedCards,
+      latestEvent: getLastTimelineEventWithCommentary(timeline),
     };
   }
+}
+
+function getLastTimelineEventWithCommentary(timeline: TimelineEvent[]): TimelineEvent | undefined {
+  if (timeline) {
+    for (let i = timeline.length - 1; i >= 0; i--) {
+      const event = timeline[i];
+      if (event.commentaries && event.commentaries.length > 0) {
+        return event;
+      }
+    }
+  }
+  return undefined;
 }
 
 function clockString(clock: Clock | undefined): string {
@@ -103,6 +113,14 @@ function clockString(clock: Clock | undefined): string {
     return `${regularTime}’`;
   }
   return `0:00`;
+}
+
+export function formatAsFirstLastName(nameString: string): string {
+  return nameString
+    .split(',')
+    .reverse()
+    .map((s) => s.trim())
+    .join(' ');
 }
 
 function parseTeam(league: string, team: SportEventCompetitor): TeamInfo {
@@ -365,4 +383,9 @@ export interface TimelineEvent {
   stoppage_time?: number;
   stoppage_time_clock?: string;
   break_name?: string;
+  commentaries?: Commentary[];
+}
+
+interface Commentary {
+  text: string;
 }

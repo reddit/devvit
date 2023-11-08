@@ -33,8 +33,9 @@ export function TeamBlock({
   }
 
   return (
-    <vstack padding="medium" height={'50%'} alignment="start">
+    <vstack padding="small" height={'37%'} alignment="start">
       <hstack alignment={'start middle'} width={`100%`}>
+        <spacer size="small" />
         <image url={logo} imageHeight={32} imageWidth={32} />
         <spacer size="small" />
         <text size="large" weight="bold">
@@ -44,10 +45,13 @@ export function TeamBlock({
         <text size="xxlarge" weight="bold">
           {state === EventState.PRE ? '-' : score?.toString()}
         </text>
-        <spacer size="small" />
+        <spacer size="medium" />
       </hstack>
       <spacer size="small" />
-      {sportSpecificContent}
+      <hstack>
+        <spacer size="small" />
+        {sportSpecificContent}
+      </hstack>
     </vstack>
   );
 }

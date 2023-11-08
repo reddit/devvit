@@ -2,6 +2,7 @@ import { Devvit } from '@devvit/public-api';
 import { SoccerGameScoreInfo, TimelineEvent } from '../sports/sportradar/SoccerEvent.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
+import { Bubble } from './EventBubble.js';
 
 export type TeamBlockSoccer = {
   goals?: TimelineEvent[] | undefined;
@@ -97,6 +98,7 @@ export function SoccerScoreboard(scoreInfo: SoccerGameScoreInfo): JSX.Element {
                 redCards: scoreInfo.summary?.homeRedCards,
               },
             })}
+            {Bubble(scoreInfo)}
           </vstack>
         </zstack>
       </vstack>
