@@ -1,6 +1,9 @@
-import { VerifiedPublicImageHosts } from '@devvit/ui-renderer/blocks/templates/constants.js';
+export const REDD_IT = 'redd.it';
+export const REDDIT_STATIC = 'redditstatic.com';
+export const REDDIT_MEDIA = 'redditmedia.com';
+export const SNOO_DEV = 'snoo.dev';
 
-export const APPROVED_DOMAINS = VerifiedPublicImageHosts;
+export const APPROVED_DOMAINS = [REDD_IT, REDDIT_STATIC, REDDIT_MEDIA];
 
 export const POST_DATA_KEY = (postId: string): string => `countdown_${postId}`;
 export const POST_REMINDERS_KEY = (postId: string): string => `reminders_${postId}`;
