@@ -174,9 +174,8 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
     const eventOptions: { label: string; value: string }[] = data.events
       .map((event: GeneralGameScoreInfo) => ({
         value: `${data.league}-${event.event.id}`,
-        label: `${event.event.awayTeam.abbreviation} @ ${
-          event.event.homeTeam.abbreviation
-        } - ${new Date(event.event.date).toLocaleDateString('en-us', {
+        label: `${event.event.homeTeam.abbreviation} vs ${event.event.awayTeam.abbreviation} - 
+        ${new Date(event.event.date).toLocaleDateString('en-us', {
           weekday: 'short',
           month: 'short',
           day: 'numeric',
@@ -197,6 +196,13 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
           required: true,
           options: eventOptions,
         },
+        {
+          name: 'postTitle',
+          label: 'Post title',
+          type: 'string',
+          required: false,
+          helpText: `Optional post title. Leave blank for auto-generated title.`,
+        },
       ],
       title: 'Create Scoreboard Post',
       description: `League selected: ${getDisplayNameFromLeague(data['league'])}`,
@@ -205,6 +211,7 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
     };
   },
   async ({ values }, context) => {
+    const postTitle: string = values.postTitle;
     const league: string = values.game[0].split('-')[0];
     const eventId: string = values.game[0].split('-')[1];
     const gameSub: GameSubscription = {
@@ -220,7 +227,7 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
     );
     let gameTitle: string = '';
     if (gameInfo !== null) {
-      gameTitle = `${gameInfo.event.awayTeam.fullName} @ ${gameInfo.event.homeTeam.fullName}`;
+      gameTitle = `${gameInfo.event.homeTeam.fullName} vs ${gameInfo.event.awayTeam.fullName}`;
       await context.kvStore.put(makeKeyForSubscription(gameSub), JSON.stringify(gameInfo));
     }
     const success: boolean = await addSubscription(context, JSON.stringify(gameSub));
@@ -237,7 +244,7 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
           </text>
         </vstack>
       ),
-      title: `Scoreboard: ${gameTitle}`,
+      title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
       subredditName: currentSubreddit.name,
     });
     await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));

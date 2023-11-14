@@ -76,18 +76,6 @@ export function SoccerScoreboard(scoreInfo: SoccerGameScoreInfo): JSX.Element {
         <zstack grow width={100}>
           <vstack width={'100%'} height={'100%'}>
             {TeamBlock({
-              isHomeTeam: false,
-              name: scoreInfo.event.awayTeam.fullName,
-              logo: scoreInfo.event.awayTeam.logo,
-              score: scoreInfo.awayScore,
-              state: scoreInfo.event.state,
-              soccerProps: {
-                goals: scoreInfo.summary?.awayGoals,
-                redCards: scoreInfo.summary?.awayRedCards,
-              },
-            })}
-            <hstack border="thin" />
-            {TeamBlock({
               isHomeTeam: true,
               name: scoreInfo.event.homeTeam.fullName,
               logo: scoreInfo.event.homeTeam.logo,
@@ -96,6 +84,18 @@ export function SoccerScoreboard(scoreInfo: SoccerGameScoreInfo): JSX.Element {
               soccerProps: {
                 goals: scoreInfo.summary?.homeGoals,
                 redCards: scoreInfo.summary?.homeRedCards,
+              },
+            })}
+            <hstack border="thin" />
+            {TeamBlock({
+              isHomeTeam: false,
+              name: scoreInfo.event.awayTeam.fullName,
+              logo: scoreInfo.event.awayTeam.logo,
+              score: scoreInfo.awayScore,
+              state: scoreInfo.event.state,
+              soccerProps: {
+                goals: scoreInfo.summary?.awayGoals,
+                redCards: scoreInfo.summary?.awayRedCards,
               },
             })}
             {Bubble(scoreInfo)}
