@@ -34,6 +34,12 @@ export function infoForLeague(league: League): SoccerLeague {
     case League.MLS:
       // 2023 only, need new season ID in february 2024
       return { leagueId: 'sr:competition:242', seasonId: 'sr:season:101055', league: League.MLS };
+    case League.UEFACHAMPIONS:
+      return {
+        leagueId: 'sr:competition:7',
+        seasonId: 'sr:season:106479',
+        league: League.UEFACHAMPIONS,
+      };
   }
   return { leagueId: 'unknown', seasonId: 'unknown', league: League.UNKNOWN };
 }

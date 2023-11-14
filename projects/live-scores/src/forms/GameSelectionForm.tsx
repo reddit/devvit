@@ -174,8 +174,9 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
     const eventOptions: { label: string; value: string }[] = data.events
       .map((event: GeneralGameScoreInfo) => ({
         value: `${data.league}-${event.event.id}`,
-        label: `${event.event.awayTeam.abbreviation} @ ${event.event.homeTeam.abbreviation} - 
-        ${new Date(event.event.date).toLocaleDateString('en-us', {
+        label: `${event.event.awayTeam.abbreviation} @ ${
+          event.event.homeTeam.abbreviation
+        } - ${new Date(event.event.date).toLocaleDateString('en-us', {
           weekday: 'short',
           month: 'short',
           day: 'numeric',
@@ -183,9 +184,7 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
           minute: '2-digit',
           hour12: true,
           timeZone: data.timezone,
-        })} - 
-        ${eventStateToString(event.event.state)}
-      `,
+        })} - ${eventStateToString(event.event.state)}`,
       }))
       .sort();
 
@@ -199,7 +198,7 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
           options: eventOptions,
         },
       ],
-      title: 'Create Live Scoreboard Post',
+      title: 'Create Scoreboard Post',
       description: `League selected: ${getDisplayNameFromLeague(data['league'])}`,
       acceptLabel: 'Create Game Post!',
       cancelLabel: 'Cancel',

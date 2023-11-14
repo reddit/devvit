@@ -26,6 +26,16 @@ export enum League {
   EFLCUP = `eng_efl_cup`,
   ECL = `eng_championship`,
   BUNDESLIGA = `de_bundesliga`,
+  UEFACHAMPIONS = `uefa_champions`,
+}
+
+export enum Sport {
+  BASEBALL = 'baseball',
+  FOOTBALL = 'football',
+  BASKETBALL = 'basketball',
+  SOCCER = 'soccer',
+  HOCKEY = 'hockey',
+  UNKNOWN = '',
 }
 
 export function leaguesSupported(service: APIService): { label: string; value: string }[] {
@@ -73,6 +83,10 @@ export function leaguesSupported(service: APIService): { label: string; value: s
     ];
   } else if (service === APIService.SRSoccer) {
     return [
+      {
+        label: getDisplayNameFromLeague(League.UEFACHAMPIONS),
+        value: League.UEFACHAMPIONS,
+      },
       {
         label: getDisplayNameFromLeague(League.EPL),
         value: League.EPL,
@@ -156,46 +170,41 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'de_bundesliga') {
     return League.BUNDESLIGA;
   }
+  if (str.toLowerCase() === 'uefa_champions') {
+    return League.UEFACHAMPIONS;
+  }
 
   return League.UNKNOWN;
 }
 
-export function getSportFromLeagueString(str: string): string {
+export function getSportFromLeagueString(str: string): Sport {
   return getSportFromLeague(getLeagueFromString(str));
 }
 
-export function getSportFromLeague(league: League): string {
+export function getSportFromLeague(league: League): Sport {
   switch (league) {
     case League.MLB:
-      return 'baseball';
+      return Sport.BASEBALL;
     case League.NFL:
-      return 'football';
-    case League.NBA:
-      return 'basketball';
-    case League.NHL:
-      return 'hockey';
-    case League.EPL:
-      return 'soccer';
-    case League.MLS:
-      return 'soccer';
     case League.CFB:
-      return 'football';
+      return Sport.FOOTBALL;
+    case League.NBA:
     case League.WNBA:
-      return 'basketball';
+      return Sport.BASKETBALL;
+    case League.NHL:
+      return Sport.HOCKEY;
+    case League.EPL:
+    case League.MLS:
     case League.LALIGA:
-      return 'soccer';
     case League.SERIEA:
-      return 'soccer';
     case League.SUPERLIG:
-      return 'soccer';
     case League.EFLCUP:
-      return 'soccer';
     case League.ECL:
-      return 'soccer';
     case League.BUNDESLIGA:
-      return 'soccer';
+    case League.UEFACHAMPIONS:
+      return Sport.SOCCER;
     default:
-      return '';
+      return Sport.UNKNOWN;
   }
 }
 
@@ -229,6 +238,8 @@ export function getDisplayNameFromLeague(league: League): string {
       return 'EFL Cup';
     case League.BUNDESLIGA:
       return 'Bundesliga (DE)';
+    case League.UEFACHAMPIONS:
+      return 'UEFA Champions League';
     default:
       return '';
   }

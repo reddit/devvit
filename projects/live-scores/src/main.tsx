@@ -36,7 +36,7 @@ Devvit.addTrigger({
 });
 
 // Devvit.addMenuItem({
-//   label: 'LiveScores: Create ESPN scoreboard',
+//   label: 'Create ESPN scoreboard',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_event, { ui }) => {
@@ -45,7 +45,7 @@ Devvit.addTrigger({
 // });
 
 // Devvit.addMenuItem({
-//   label: 'LiveScores: Create NFL scoreboard',
+//   label: 'Create NFL scoreboard',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_event, { ui }) => {
@@ -54,7 +54,7 @@ Devvit.addTrigger({
 // });
 
 // Devvit.addMenuItem({
-//   label: 'LiveScores: Create manual football scoreboard',
+//   label: 'Create manual football scoreboard',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_event, { ui }) => {
@@ -63,7 +63,7 @@ Devvit.addTrigger({
 // });
 
 Devvit.addMenuItem({
-  label: 'LiveScores: Create football scoreboard',
+  label: 'Create Soccer Scoreboard (Internal)',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
@@ -72,7 +72,7 @@ Devvit.addMenuItem({
 });
 
 // Devvit.addMenuItem({
-//   label: 'LiveScores: Remove all subscriptions',
+//   label: 'Scoreboards: Remove all subscriptions',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_, context) => {
@@ -90,7 +90,7 @@ Devvit.addMenuItem({
 // });
 
 // Devvit.addMenuItem({
-//   label: 'Livescores: Reset KV Store',
+//   label: 'Scoreboards: Reset KV Store',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_, { kvStore, ui }) => {
@@ -108,7 +108,7 @@ Devvit.addMenuItem({
 // });
 
 Devvit.addMenuItem({
-  label: 'LiveScores: Create MLB Demo',
+  label: 'Create Baseball Scoreboard (Demo)',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, context) => {
@@ -138,7 +138,7 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'Create Soccer Demo Scoreboard',
+  label: 'Create Soccer Scoreboard (Demo)',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, context) => {
