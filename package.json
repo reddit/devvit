@@ -18,9 +18,7 @@
     "./load-test-projects": "./dist/load-test-projects/index.js",
     "./load-test-projects/*": "./dist/load-test-projects/*",
     "./project-templates": "./dist/project-templates/index.js",
-    "./project-templates/*": "./dist/project-templates/*",
-    "./actor-templates": "./dist/actor-templates",
-    "./actor-templates/*": "./dist/actor-templates/*"
+    "./project-templates/*": "./dist/project-templates/*"
   },
   "main": "./dist/index.js",
   "scripts": {
