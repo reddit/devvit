@@ -1,4 +1,4 @@
-import { Context } from '@devvit/public-api';
+import { Context, KVStore } from '@devvit/public-api';
 
 const MAX_SUBSCRIPTIONS = 10;
 const ALL_SUBSCRIPTIONS_KEY = 'subscriptions';
@@ -11,15 +11,15 @@ const ALL_SUBSCRIPTIONS_KEY = 'subscriptions';
  * those subscriptions matching this key.
  * @returns Promise<string[]> list of JSON-encoded subscription objects or nothing
  */
-export async function getSubscriptions(ctx: Context, key?: string): Promise<string[]> {
+export async function getSubscriptions(kvStore: KVStore, key?: string): Promise<string[]> {
   try {
-    const subscriptions: string[] | undefined = await ctx.kvStore.get(ALL_SUBSCRIPTIONS_KEY);
+    const subscriptions: string[] | undefined = await kvStore.get(ALL_SUBSCRIPTIONS_KEY);
     if (subscriptions === undefined) {
       return [];
     }
     return subscriptions.filter((sub) => key === undefined || key === sub);
   } catch (e: any) {
-    console.log('Error during subscriptions fetch: ' + e);
+    console.log('Error during subscriptions fetch:', e);
   }
   return [];
 }
@@ -36,7 +36,7 @@ export async function getSubscriptions(ctx: Context, key?: string): Promise<stri
  * @returns boolean whether or not the subscription was successfully added
  */
 export async function addSubscription(ctx: Context, key: string): Promise<boolean> {
-  const subscriptions: string[] = await getSubscriptions(ctx);
+  const subscriptions: string[] = await getSubscriptions(ctx.kvStore);
   if (key in subscriptions) {
     return true;
   }
@@ -61,18 +61,19 @@ export async function addSubscription(ctx: Context, key: string): Promise<boolea
  * @param key The subscription key to remove
  * @returns boolean whether the operation succeeded
  */
-export async function removeSubscription(ctx: Context, key: string): Promise<boolean> {
-  const subscriptions: string[] = await getSubscriptions(ctx);
+export async function removeSubscription(kvStore: KVStore, key: string): Promise<boolean> {
+  const subscriptions: string[] = await getSubscriptions(kvStore);
   const index = subscriptions.indexOf(key, 0);
   if (index < 0) {
     return true;
   }
   subscriptions.splice(index, 1);
   try {
-    await ctx.kvStore.put(ALL_SUBSCRIPTIONS_KEY, subscriptions);
+    await kvStore.put(ALL_SUBSCRIPTIONS_KEY, subscriptions);
   } catch (e: any) {
-    console.log('Error during subscriptions store: ' + e);
+    console.log('Error during subscriptions store:', e);
     return false;
   }
+  console.log('Removed subscription:', key);
   return true;
 }

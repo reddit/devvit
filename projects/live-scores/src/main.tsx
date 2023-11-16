@@ -12,10 +12,12 @@ import {
   fetchCachedGameInfoForPostId,
   makeKeyForPostId,
   fetchSubscriptions,
+  unsubscribePost,
 } from './sports/GameFetch.js';
 import { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
 import { SoccerScoreboard } from './components/soccer.js';
 import { resetAPIKeys } from './sports/sportradar/APIKeys.js';
+import { fetchAllSubsAndGames, subscriptionsForm } from './forms/SubscriptionsForm.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -76,10 +78,10 @@ Devvit.addMenuItem({
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_, context) => {
-//     const subscriptions = await getSubscriptions(context);
+//     const subscriptions = await getSubscriptions(context.kvStore);
 //     await Promise.all(
 //       subscriptions.map(async (sub) => {
-//         await removeSubscription(context, sub);
+//         await removeSubscription(context.kvStore, sub);
 //       })
 //     );
 //     context.ui.showToast({
@@ -106,6 +108,18 @@ Devvit.addMenuItem({
 //     });
 //   },
 // });
+
+Devvit.addMenuItem({
+  label: 'Scoreboard: Manage Subscriptions',
+  location: `subreddit`,
+  forUserType: `moderator`,
+  onPress: async (_event, context) => {
+    const games = await fetchAllSubsAndGames(context);
+    return context.ui.showForm(subscriptionsForm, {
+      subscriptions: games,
+    });
+  },
+});
 
 Devvit.addMenuItem({
   label: 'Create Baseball Scoreboard (Demo)',
@@ -266,6 +280,22 @@ Devvit.addTrigger({
     } catch (e) {
       console.log('error was not able to schedule:', e);
       throw e;
+    }
+  },
+});
+
+Devvit.addTrigger({
+  event: 'PostDelete',
+  onEvent: async (event, context) => {
+    await unsubscribePost(event.postId, context.kvStore);
+  },
+});
+
+Devvit.addTrigger({
+  event: 'ModAction',
+  onEvent: async (event, context) => {
+    if (event.action === `removelink` && event.targetPost) {
+      await unsubscribePost(event.targetPost.id, context.kvStore);
     }
   },
 });

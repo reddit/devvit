@@ -38,7 +38,7 @@ export async function fetchCachedGameInfoForPostId(
   return await fetchCachedGameInfoForGameSubscription(kvStore, gameSubscription);
 }
 
-async function fetchCachedGameInfoForGameSubscription(
+export async function fetchCachedGameInfoForGameSubscription(
   kvStore: KVStore,
   sub: GameSubscription
 ): Promise<GeneralGameScoreInfo | null> {
@@ -61,13 +61,16 @@ export function fetchDebugGameInfo(debugId: string): GeneralGameScoreInfo {
 
 export async function fetchSubscriptions(context: Devvit.Context) {
   console.log('Running game_subscription_thread...');
-  const subscriptions: string[] = await getSubscriptions(context);
+  const subscriptions: string[] = await getSubscriptions(context.kvStore);
   console.log('Found ' + subscriptions.length + ' active subscription(s)');
-  const gameSubscriptions: GameSubscription[] = subscriptions.map((sub: string) => ({
-    league: JSON.parse(sub)['league'],
-    eventId: JSON.parse(sub)['eventId'],
-    service: JSON.parse(sub)['service'],
-  }));
+  const gameSubscriptions: GameSubscription[] = subscriptions.map((sub: string) => {
+    const parsedSub = JSON.parse(sub);
+    return {
+      league: parsedSub['league'],
+      eventId: parsedSub['eventId'],
+      service: parsedSub['service'],
+    };
+  });
   const filteredSubs = await filterSubscriptionsForFetch(gameSubscriptions, context.kvStore);
   const eventFetches = subscriptionFetches(filteredSubs, context);
   const results: GeneralGameScoreInfo[] = (await Promise.all(eventFetches)).flatMap((result) =>
@@ -80,7 +83,7 @@ export async function fetchSubscriptions(context: Devvit.Context) {
     if (info.event.state === EventState.FINAL) {
       console.log(`Game ID ${info.event.id} (${info.event.awayTeam.abbreviation} @ \
 ${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.eventId}.`);
-      await removeSubscription(context, JSON.stringify(sub));
+      await removeSubscription(context.kvStore, JSON.stringify(sub));
     }
   }
 }
@@ -134,13 +137,12 @@ function subscriptionFetches(
   return eventFetches;
 }
 
-export async function unsubscribePost(
-  postId: string,
-  context: Devvit.Context
-): Promise<boolean | undefined> {
-  const gameSubStr: string | undefined = await context.kvStore.get(makeKeyForPostId(postId));
-  if (gameSubStr === undefined) {
-    return;
+export async function unsubscribePost(postId: string, kvStore: KVStore): Promise<boolean> {
+  const key = makeKeyForPostId(postId);
+  const gameSubString = await kvStore.get(key);
+  console.log(`Deleting subscription: ${gameSubString}`);
+  if (gameSubString && typeof gameSubString === 'string') {
+    return removeSubscription(kvStore, gameSubString);
   }
-  return await removeSubscription(context, gameSubStr);
+  return false;
 }

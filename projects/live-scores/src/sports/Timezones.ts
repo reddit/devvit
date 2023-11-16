@@ -636,3 +636,11 @@ function compareTimezones(zone1: string, zone2: string): number {
   }
   return 0;
 }
+
+export function formatDateForForms(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('en-us', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  });
+}
