@@ -7,8 +7,5 @@
   "dependencies": {
     "@devvit/protos": "0.10.9",
     "@devvit/public-api": "0.10.9"
-  },
-  "devDependencies": {
-    "@devvit/tsconfig": "0.10.9"
   }
 }

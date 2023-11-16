@@ -9,7 +9,6 @@
     "@devvit/shared-types": "0.10.9"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.9",
     "typescript": "*"
   }
 }
