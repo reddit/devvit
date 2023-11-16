@@ -617,6 +617,10 @@ function compareTimezones(zone1: string, zone2: string): number {
     'America/Denver',
     'America/Chicago',
     'America/New_York',
+    'Europe/London',
+    'Europe/Paris',
+    'Europe/Athens',
+    'Europe/Istanbul',
   ];
   const z1Index: number = preferredTimezones.indexOf(zone1);
   const z2Index: number = preferredTimezones.indexOf(zone2);

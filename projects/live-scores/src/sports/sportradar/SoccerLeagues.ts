@@ -40,6 +40,30 @@ export function infoForLeague(league: League): SoccerLeague {
         seasonId: 'sr:season:106479',
         league: League.UEFACHAMPIONS,
       };
+    case League.EFLLEAGUEONE:
+      return {
+        leagueId: 'sr:competition:24',
+        seasonId: 'sr:season:105945',
+        league: League.EFLLEAGUEONE,
+      };
+    case League.EFLLEAGUETWO:
+      return {
+        leagueId: 'sr:competition:25',
+        seasonId: 'sr:season:105947',
+        league: League.EFLLEAGUETWO,
+      };
+    case League.LIGAMXAPERTURA:
+      return {
+        leagueId: 'sr:competition:27464',
+        seasonId: 'sr:season:106433',
+        league: League.LIGAMXAPERTURA,
+      };
+    case League.LIGAMXCLAUSURA:
+      return {
+        leagueId: 'sr:competition:27466',
+        seasonId: 'sr:season:100751',
+        league: League.LIGAMXCLAUSURA,
+      };
   }
   return { leagueId: 'unknown', seasonId: 'unknown', league: League.UNKNOWN };
 }

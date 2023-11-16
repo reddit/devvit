@@ -27,6 +27,10 @@ export enum League {
   ECL = `eng_championship`,
   BUNDESLIGA = `de_bundesliga`,
   UEFACHAMPIONS = `uefa_champions`,
+  LIGAMXAPERTURA = `mx_liga_mx_apertura`,
+  LIGAMXCLAUSURA = `mx_liga_mx_clausura`,
+  EFLLEAGUEONE = `eng_league_one`,
+  EFLLEAGUETWO = `eng_league_two`,
 }
 
 export enum Sport {
@@ -119,6 +123,25 @@ export function leaguesSupported(service: APIService): { label: string; value: s
         label: getDisplayNameFromLeague(League.MLS),
         value: League.MLS,
       },
+      {
+        label: getDisplayNameFromLeague(League.EFLLEAGUEONE),
+        value: League.EFLLEAGUEONE,
+      },
+      {
+        label: getDisplayNameFromLeague(League.EFLLEAGUETWO),
+        value: League.EFLLEAGUETWO,
+      },
+      {
+        label: getDisplayNameFromLeague(League.LIGAMXAPERTURA),
+        value: League.LIGAMXAPERTURA,
+      },
+      // Liga MX splits season into two competitions -> Apertura and Clausura,
+      // we will want to enable Clausura at the end of 2023
+      // if we don't have a better automated process by then!
+      // {
+      //   label: getDisplayNameFromLeague(League.LIGAMXCLAUSURA),
+      //   value: League.LIGAMXCLAUSURA,
+      // },
     ];
   }
   return [];
@@ -173,6 +196,18 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'uefa_champions') {
     return League.UEFACHAMPIONS;
   }
+  if (str.toLowerCase() === 'eng_league_one') {
+    return League.EFLLEAGUEONE;
+  }
+  if (str.toLowerCase() === 'eng_league_two') {
+    return League.EFLLEAGUETWO;
+  }
+  if (str.toLowerCase() === 'mx_liga_mx_apertura') {
+    return League.LIGAMXAPERTURA;
+  }
+  if (str.toLowerCase() === 'mx_liga_mx_clausura') {
+    return League.LIGAMXCLAUSURA;
+  }
 
   return League.UNKNOWN;
 }
@@ -202,6 +237,10 @@ export function getSportFromLeague(league: League): Sport {
     case League.ECL:
     case League.BUNDESLIGA:
     case League.UEFACHAMPIONS:
+    case League.EFLLEAGUEONE:
+    case League.EFLLEAGUETWO:
+    case League.LIGAMXAPERTURA:
+    case League.LIGAMXCLAUSURA:
       return Sport.SOCCER;
     default:
       return Sport.UNKNOWN;
@@ -240,6 +279,14 @@ export function getDisplayNameFromLeague(league: League): string {
       return 'Bundesliga (DE)';
     case League.UEFACHAMPIONS:
       return 'UEFA Champions League';
+    case League.EFLLEAGUEONE:
+      return 'English League One';
+    case League.EFLLEAGUETWO:
+      return 'English League Two';
+    case League.LIGAMXAPERTURA:
+      return 'Liga MX Apertura';
+    case League.LIGAMXCLAUSURA:
+      return 'Liga MX Clausura';
     default:
       return '';
   }
