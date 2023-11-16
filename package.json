@@ -37,7 +37,6 @@
     "@devvit/build-pack": "0.10.9",
     "@devvit/builders": "0.10.9",
     "@devvit/linkers": "0.10.9",
-    "@devvit/plugins": "0.10.9",
     "@devvit/protos": "0.10.9",
     "@devvit/public-api": "0.10.9",
     "@devvit/public-api-old": "0.10.9",
