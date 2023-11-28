@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "devvit-chat",
+  "version": "0.10.9",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "vitest --run"
+  },
+  "dependencies": {
+    "@devvit/public-api": "0.10.9"
+  },
+  "devDependencies": {
+    "typescript": "4.9.3",
+    "vitest": "0.31.0"
+  }
+}
