@@ -13,6 +13,12 @@ export const IconsGallery: CustomPostComponent = (context) => {
 
   const icons = gallery.icons.map((icon) => <IconTile gallery={gallery} icon={icon} />);
 
+  const emptyBlock = (
+    <hstack padding={'small'}>
+      <hstack width={'140px'}></hstack>
+    </hstack>
+  );
+
   return (
     <blocks height={'tall'}>
       <zstack backgroundColor={'puregray-100'} grow>
@@ -20,7 +26,9 @@ export const IconsGallery: CustomPostComponent = (context) => {
           <Header gallery={gallery} />
           <spacer size={'small'} />
           <hstack alignment={'center'}>
-            <Columns count={2}>{icons}</Columns>
+            <Columns count={2} empty={emptyBlock}>
+              {icons}
+            </Columns>
           </hstack>
           <spacer size={'small'} grow />
           <Footer gallery={gallery} />

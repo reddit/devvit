@@ -2,10 +2,11 @@ import { Devvit } from '@devvit/public-api';
 
 interface ColumnsProps {
   count: number;
+  empty?: JSX.Element | undefined;
   children: JSX.Children;
 }
 
-export const Columns = ({ count, children }: ColumnsProps): JSX.Element => {
+export const Columns = ({ count, children, empty }: ColumnsProps): JSX.Element => {
   const rows: JSX.Element[] = [];
 
   // Divide the children into rows with N (count) children each.
@@ -13,12 +14,17 @@ export const Columns = ({ count, children }: ColumnsProps): JSX.Element => {
   const width = 100 / count;
   for (let i = 0; i < children.length; i += count) {
     const row = children.slice(i, i + count).map((c) => (
-      <vstack width={width}>
-        <hstack grow>{c}</hstack>
+      <vstack width={width} alignment={'top start'}>
+        {c}
       </vstack>
     ));
     const rowHasRoom = (): boolean => row.length < count;
-    while (rowHasRoom()) row.push(<hstack width={width} />);
+    while (rowHasRoom())
+      row.push(
+        <vstack width={width} alignment={'top start'}>
+          {empty ?? <></>}
+        </vstack>
+      );
     rows.push(<hstack gap="small">{row}</hstack>);
   }
 
