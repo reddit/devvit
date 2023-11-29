@@ -85,8 +85,8 @@ Devvit.addCustomPostType({
             </text>
             <image
               url="https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png"
-              imageHeight={100}
-              imageWidth={100}
+              imageHeight={25}
+              imageWidth={25}
             ></image>
           </vstack>
           <vstack>
@@ -99,8 +99,8 @@ Devvit.addCustomPostType({
               <circle fill="gold" stroke="maroon" stroke-width="2px" cx="5" cy="5" r="4" />
             </svg>
             '
-              imageHeight={100}
-              imageWidth={100}
+              imageHeight={25}
+              imageWidth={25}
             ></image>
           </vstack>
           <vstack>
@@ -109,8 +109,8 @@ Devvit.addCustomPostType({
             </text>
             <image
               url="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAgMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICAgICAgICAgICAgPGNpcmNsZSBmaWxsPSJnb2xkIiBzdHJva2U9Im1hcm9vbiIgc3Ryb2tlLXdpZHRoPSIycHgiIGN4PSI1IiBjeT0iNSIgcj0iNCIgLz4KICAgICAgICAgICAgPC9zdmc+"
-              imageHeight={100}
-              imageWidth={100}
+              imageHeight={25}
+              imageWidth={25}
             ></image>
           </vstack>
           <vstack>
@@ -119,8 +119,8 @@ Devvit.addCustomPostType({
             </text>
             <image
               url="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2010%2010%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Ccircle%20fill%3D%22gold%22%20stroke%3D%22maroon%22%20stroke-width%3D%222px%22%20cx%3D%225%22%20cy%3D%225%22%20r%3D%224%22%20%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fsvg%3E"
-              imageHeight={100}
-              imageWidth={100}
+              imageHeight={25}
+              imageWidth={25}
             ></image>
           </vstack>
         </hstack>
