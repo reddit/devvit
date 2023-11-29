@@ -72,7 +72,13 @@ export function TopBar({
   } else if (event.timingInfo) {
     const { displayClock, period } = event.timingInfo;
     return (
-      <hstack padding="medium" backgroundColor="alienblue-700" alignment="center middle">
+      <hstack
+        height={'18%'}
+        width={'100%'}
+        padding="medium"
+        backgroundColor="alienblue-700"
+        alignment="center middle"
+      >
         <hstack alignment="start" grow>
           <vstack>
             <text color="white" style="heading">

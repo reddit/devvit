@@ -67,13 +67,13 @@ function generateEventStrings(events: TimelineEvent[]): string[] {
 export function SoccerScoreboard(scoreInfo: SoccerGameScoreInfo): JSX.Element {
   return (
     <blocks height="regular">
-      <vstack cornerRadius="medium" grow>
+      <vstack cornerRadius="medium" height={'100%'} width={'100%'}>
         {TopBar({
           state: scoreInfo.event.state,
           date: scoreInfo.event.date,
           event: scoreInfo.event,
         })}
-        <zstack grow width={100}>
+        <zstack height={'82%'} width={'100%'}>
           <vstack width={'100%'} height={'100%'}>
             {TeamBlock({
               isHomeTeam: true,
@@ -100,6 +100,14 @@ export function SoccerScoreboard(scoreInfo: SoccerGameScoreInfo): JSX.Element {
             })}
             {Bubble(scoreInfo)}
           </vstack>
+          {scoreInfo.summary?.latestEvent?.type === 'score_change' && (
+            <vstack width={'100%'} height={'100%'} alignment="bottom">
+              <hstack alignment="end">
+                <image url="cheer-animation.gif" imageWidth={400} imageHeight={320} />
+              </hstack>
+              <spacer size="xsmall" />
+            </vstack>
+          )}
         </zstack>
       </vstack>
     </blocks>

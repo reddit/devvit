@@ -31,6 +31,7 @@ export enum League {
   LIGAMXCLAUSURA = `mx_liga_mx_clausura`,
   EFLLEAGUEONE = `eng_league_one`,
   EFLLEAGUETWO = `eng_league_two`,
+  CROATIA_HNL = `hr_hnl`,
 }
 
 export enum Sport {
@@ -142,6 +143,10 @@ export function leaguesSupported(service: APIService): { label: string; value: s
       //   label: getDisplayNameFromLeague(League.LIGAMXCLAUSURA),
       //   value: League.LIGAMXCLAUSURA,
       // },
+      {
+        label: getDisplayNameFromLeague(League.CROATIA_HNL),
+        value: League.CROATIA_HNL,
+      },
     ];
   }
   return [];
@@ -208,6 +213,9 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'mx_liga_mx_clausura') {
     return League.LIGAMXCLAUSURA;
   }
+  if (str.toLowerCase() === 'hr_hnl') {
+    return League.CROATIA_HNL;
+  }
 
   return League.UNKNOWN;
 }
@@ -241,6 +249,7 @@ export function getSportFromLeague(league: League): Sport {
     case League.EFLLEAGUETWO:
     case League.LIGAMXAPERTURA:
     case League.LIGAMXCLAUSURA:
+    case League.CROATIA_HNL:
       return Sport.SOCCER;
     default:
       return Sport.UNKNOWN;
@@ -287,6 +296,8 @@ export function getDisplayNameFromLeague(league: League): string {
       return 'Liga MX Apertura';
     case League.LIGAMXCLAUSURA:
       return 'Liga MX Clausura';
+    case League.CROATIA_HNL:
+      return `Hrvatska Nogometna Liga (HR)`;
     default:
       return '';
   }

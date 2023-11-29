@@ -64,6 +64,12 @@ export function infoForLeague(league: League): SoccerLeague {
         seasonId: 'sr:season:100751',
         league: League.LIGAMXCLAUSURA,
       };
+    case League.CROATIA_HNL:
+      return {
+        leagueId: 'sr:competition:170',
+        seasonId: 'sr:season:106503',
+        league: League.CROATIA_HNL,
+      };
   }
   return { leagueId: 'unknown', seasonId: 'unknown', league: League.UNKNOWN };
 }
