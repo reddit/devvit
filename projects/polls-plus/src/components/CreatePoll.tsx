@@ -53,8 +53,18 @@ export const addPoll = Devvit.createForm(
     const sub = await reddit.getSubredditById(subredditId);
     const answers: ZMember[] = event.values.answers
       .split(',') // Split int array
+      .filter((answer: string) => answer.trim() !== '') // Remove empty strings
       .slice(0, 12) // Only include the first 12 answers
       .map((answer: string, i: number) => ({ member: answer.trim(), score: i }));
+
+    if (answers.length < 2) {
+      ui.showToast({
+        text: 'Post Failed - You must include at least 2 poll options.',
+        appearance: 'neutral',
+      });
+      return;
+    }
+
     const options = {
       subredditName: sub.name,
       title: event.values.question,

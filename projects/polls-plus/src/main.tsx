@@ -129,7 +129,7 @@ const App: Devvit.CustomPostComponent = async (context) => {
 };
 
 Devvit.addMenuItem({
-  label: 'Create a new poll',
+  label: 'Create a new poll (Internal)',
   location: 'subreddit',
   onPress: (_event, context) => {
     context.ui.showForm(addPoll);
