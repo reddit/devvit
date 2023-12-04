@@ -6,6 +6,7 @@
   "type": "module",
   "dependencies": {
     "@devvit/public-api": "0.10.9",
+    "moment-timezone": "0.5.43",
     "tldts": "^6.0.14"
   },
   "devDependencies": {

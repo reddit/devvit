@@ -1,3 +1,4 @@
+import moment from 'moment-timezone';
 import { TIMEZONES } from './timezones.js';
 
 const MINUTES_IN_HOUR = 60;
@@ -46,16 +47,9 @@ export const createDatetime = (
  * @param dateTime ISO-8601 string
  * @param timeZone Timezone name as in Intl.supportedValuesOf('timeZone'). e.g. Europe/Amsterdam
  */
-export const getFormattedDueDate = (dateTime: string, timeZone?: string): string => {
-  return new Date(dateTime).toLocaleString(['en-US'], {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    timeZoneName: 'short',
-    timeZone,
-  });
+export const getFormattedDueDate = (dateTime: string, timeZone: string = 'UTC'): string => {
+  // desired date format "October 27, 2023 at 12:00 PM EDT"
+  return moment(dateTime).tz(timeZone).format('MMMM D, YYYY [at] h:mm A z');
 };
 
 type CountdownEntry = {

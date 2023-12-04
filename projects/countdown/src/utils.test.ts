@@ -65,11 +65,11 @@ describe('utils', () => {
   describe('format datetime from user input', () => {
     test('London timezone', () => {
       const datetime = getFormattedDueDate('2023-10-27T16:00:00.000Z', 'Europe/London');
-      expect(datetime).toBe('October 27, 2023 at 5:00 PM GMT+1');
+      expect(datetime).toBe('October 27, 2023 at 5:00 PM BST');
     });
     test('CET timezone', () => {
       const datetime = getFormattedDueDate('2023-09-16T14:00:00.000+02:00', 'Europe/Amsterdam');
-      expect(datetime).toBe('September 16, 2023 at 2:00 PM GMT+2');
+      expect(datetime).toBe('September 16, 2023 at 2:00 PM CEST');
     });
     test('ET timezone', () => {
       const datetime = getFormattedDueDate('2023-10-27T16:00:00.000Z', 'America/New_York');
