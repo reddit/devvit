@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "ci-chess",
-  "version": "0.10.10",
+  "version": "0.10.9",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.10",
+    "@devvit/public-api": "0.10.9",
     "chess.js": "^1.0.0-beta.6"
   },
   "devDependencies": {

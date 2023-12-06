@@ -1,13 +1,13 @@
 {
   "private": true,
   "name": "polls-new-dx",
-  "version": "0.10.10",
+  "version": "0.10.9",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/protos": "0.10.10",
-    "@devvit/public-api": "0.10.10",
-    "@devvit/shared-types": "0.10.10",
+    "@devvit/protos": "0.10.9",
+    "@devvit/public-api": "0.10.9",
+    "@devvit/shared-types": "0.10.9",
     "moment": "2.29.4",
     "moment-duration-format": "2.3.2",
     "numbro": "2.3.6"

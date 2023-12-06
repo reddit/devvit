@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "forms-multi-page",
-  "version": "0.10.10",
+  "version": "0.10.9",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -9,10 +9,10 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.10"
+    "@devvit/public-api": "0.10.9"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.10",
+    "@devvit/tsconfig": "0.10.9",
     "typescript": "5.3.2",
     "vitest": "0.31.0"
   }
