@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "remind-me-app-template",
-  "version": "0.10.9",
+  "version": "0.10.10",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -9,8 +9,8 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/protos": "0.10.9",
-    "@devvit/public-api": "0.10.9",
+    "@devvit/protos": "0.10.10",
+    "@devvit/public-api": "0.10.10",
     "chrono-node": "2.3.9"
   },
   "devDependencies": {
