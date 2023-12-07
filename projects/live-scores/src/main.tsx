@@ -1,5 +1,5 @@
 import { Devvit, Post } from '@devvit/public-api';
-import { GenericScoreBoard } from './components/Scoreboard.js';
+import { GenericScoreBoard, ScoreboardPage } from './components/Scoreboard.js';
 import { BaseballScoreBoard } from './components/baseball.js';
 import { CommentData, debugComment, getLastComment } from './components/comments.js';
 import { nextMLBDemoPage } from './mock-scores/MockHelper.js';
@@ -237,6 +237,8 @@ Devvit.addCustomPostType({
       }
     };
 
+    const [page, setPage] = useState(ScoreboardPage.SCORE);
+
     if (scoreInfo) {
       if (scoreInfo.event.gameType === 'baseball') {
         const baseBallScoreInfo = scoreInfo as BaseballGameScoreInfo;
@@ -245,7 +247,7 @@ Devvit.addCustomPostType({
       } else if (scoreInfo.event.gameType === 'soccer') {
         const soccerGameScoreInfo = scoreInfo as SoccerGameScoreInfo;
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
-        return SoccerScoreboard(soccerGameScoreInfo);
+        return SoccerScoreboard({ scoreInfo: soccerGameScoreInfo, page, setPage });
       } else {
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
         return GenericScoreBoard(scoreInfo, lastComment);

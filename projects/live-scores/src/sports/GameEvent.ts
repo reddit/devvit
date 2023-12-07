@@ -51,6 +51,12 @@ export enum EventState {
   DELAYED = 'delayed',
 }
 
+export function leagueAssetPath(event: GameEvent): string {
+  const sport = event.gameType;
+  const league = event.league;
+  return sport + '/' + league + '/';
+}
+
 export function compareEvents(event1: GameEvent, event2: GameEvent): number {
   const eventPriority: EventState[] = [
     EventState.PRE,

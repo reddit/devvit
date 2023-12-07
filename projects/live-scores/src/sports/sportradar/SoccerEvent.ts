@@ -49,12 +49,16 @@ export function soccerScoreInfo(league: string, soccerEvent: SoccerEvent): Socce
     awayScore: status.away_score ?? 0,
     service: APIService.SRSoccer,
     summary: eventsSummary(soccerEvent.timeline),
+    homeStats: soccerEvent.statistics?.totals.competitors[0],
+    awayStats: soccerEvent.statistics?.totals.competitors[1],
     generatedDate: currentDate.toISOString(),
   };
 }
 
 export interface SoccerGameScoreInfo extends GeneralGameScoreInfo {
   summary?: GameEventSummary | undefined;
+  homeStats?: SportEventStatisticCompetitor | undefined;
+  awayStats?: SportEventStatisticCompetitor | undefined;
 }
 
 export interface GameEventSummary {
@@ -325,7 +329,7 @@ interface SportEventStatisticsTotals {
   competitors: SportEventStatisticCompetitor[];
 }
 
-interface SportEventStatisticCompetitor extends SportEventCompetitor {
+export interface SportEventStatisticCompetitor extends SportEventCompetitor {
   statistics: SoccerTeamStatistics;
   players?: SoccerPlayer[];
 }
@@ -338,30 +342,36 @@ export interface SoccerPlayer {
   type?: string;
 }
 
-interface SoccerTeamStatistics {
+interface SoccerBaseStatistics {
   corner_kicks: number;
-  fouls: number;
-  free_kicks: number;
   offsides: number;
   red_cards: number;
   shots_blocked: number;
   shots_off_target: number;
-  shots_total: number;
-  throw_ins: number;
+  shots_on_target: number;
   yellow_cards: number;
   yellow_red_cards: number;
 }
 
-interface SoccerPlayerStatistics {
+export interface SoccerTeamStatistics extends SoccerBaseStatistics {
+  ball_possession: number;
+  cards_given: number;
+  fouls: number;
+  free_kicks: number;
+  goal_kicks: number;
+  injuries: number;
+  shots_saved: number;
+  shots_total: number;
+  substitutions: number;
+  throw_ins: number;
+}
+
+export interface SoccerPlayerStatistics extends SoccerBaseStatistics {
   assists: number;
   goals_scored: number;
   own_goals: number;
-  red_cards: number;
-  shots_blocked: number;
   substituted_in: number;
   substituted_out: number;
-  yellow_cards: number;
-  yellow_red_cards: number;
 }
 
 export interface TimelineEvent {

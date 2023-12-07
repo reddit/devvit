@@ -2,7 +2,21 @@ import { Devvit } from '@devvit/public-api';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
 import { CommentData, CommentBlock } from './comments.js';
-import { GeneralGameScoreInfo } from '../sports/GameEvent.js';
+import { GeneralGameScoreInfo, leagueAssetPath } from '../sports/GameEvent.js';
+
+export enum ScoreboardPage {
+  SCORE,
+  HOME_LINEUP,
+  AWAY_LINEUP,
+  HOME_STATS,
+  AWAY_STATS,
+}
+
+export interface ScoreboardProps {
+  scoreInfo: GeneralGameScoreInfo;
+  page: ScoreboardPage;
+  setPage: (page: ScoreboardPage) => void;
+}
 
 export function GenericScoreBoard(
   scoreInfo: GeneralGameScoreInfo,
@@ -12,8 +26,6 @@ export function GenericScoreBoard(
     <blocks height="regular">
       <vstack cornerRadius="medium" grow>
         {TopBar({
-          state: scoreInfo.event.state,
-          date: scoreInfo.event.date,
           event: scoreInfo.event,
         })}
         <zstack grow width={100}>
@@ -21,7 +33,7 @@ export function GenericScoreBoard(
             {TeamBlock({
               isHomeTeam: false,
               name: scoreInfo.event.awayTeam.fullName,
-              logo: scoreInfo.event.awayTeam.logo,
+              logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.awayTeam.logo,
               score: scoreInfo.awayScore,
               state: scoreInfo.event.state,
             })}
@@ -29,7 +41,7 @@ export function GenericScoreBoard(
             {TeamBlock({
               isHomeTeam: true,
               name: scoreInfo.event.homeTeam.fullName,
-              logo: scoreInfo.event.homeTeam.logo,
+              logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.homeTeam.logo,
               score: scoreInfo.homeScore,
               state: scoreInfo.event.state,
             })}

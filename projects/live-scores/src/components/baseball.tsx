@@ -3,7 +3,7 @@ import { BaseballGameScoreInfo, InningState } from '../sports/espn/espn.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
 import { CommentData, CommentBlock } from './comments.js';
-import { EventState } from '../sports/GameEvent.js';
+import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
 
 export type TeamBlockBaseball = {
   isPitching: boolean;
@@ -31,8 +31,6 @@ export function BaseballScoreBoard(
             isRunnerOnSecond: scoreInfo.isRunnerOnSecond,
             isRunnerOnThird: scoreInfo.isRunnerOnThird,
           },
-          state: scoreInfo.event.state,
-          date: scoreInfo.event.date,
           event: scoreInfo.event,
         })}
         <zstack grow width={100}>
@@ -40,7 +38,7 @@ export function BaseballScoreBoard(
             {TeamBlock({
               isHomeTeam: false,
               name: scoreInfo.event.awayTeam.fullName,
-              logo: scoreInfo.event.awayTeam.logo,
+              logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.awayTeam.logo,
               score: scoreInfo.awayScore,
               state: scoreInfo.event.state,
               baseballProps: {
@@ -66,7 +64,7 @@ export function BaseballScoreBoard(
             {TeamBlock({
               isHomeTeam: true,
               name: scoreInfo.event.homeTeam.fullName,
-              logo: scoreInfo.event.homeTeam.logo,
+              logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.homeTeam.logo,
               score: scoreInfo.homeScore,
               state: scoreInfo.event.state,
               baseballProps: {
@@ -116,19 +114,19 @@ function Base(
   const width = 32;
   return (
     <zstack>
-      <image url="bases-empty.png" imageHeight={height} imageWidth={width} />
+      <image url="baseball/bases-empty.png" imageHeight={height} imageWidth={width} />
       {isRunnerOnFirst ? (
-        <image url="bases-1b.png" imageHeight={height} imageWidth={width} />
+        <image url="baseball/bases-1b.png" imageHeight={height} imageWidth={width} />
       ) : (
         <></>
       )}
       {isRunnerOnSecond ? (
-        <image url="bases-2b.png" imageHeight={height} imageWidth={width} />
+        <image url="baseball/bases-2b.png" imageHeight={height} imageWidth={width} />
       ) : (
         <></>
       )}
       {isRunnerOnThird ? (
-        <image url="bases-3b.png" imageHeight={height} imageWidth={width} />
+        <image url="baseball/bases-3b.png" imageHeight={height} imageWidth={width} />
       ) : (
         <></>
       )}
@@ -177,7 +175,11 @@ export function topBarBaseballComponent(baseballProps: TopBarBaseball): JSX.Elem
     <hstack padding="medium" backgroundColor="black" alignment="center middle">
       {isActiveInning ? (
         <image
-          url={inningState === InningState.TOP ? 'inning_top.png' : 'inning_bottom.png'}
+          url={
+            inningState === InningState.TOP
+              ? 'baseball/inning_top.png'
+              : 'baseball/inning_bottom.png'
+          }
           imageHeight={8}
           imageWidth={8}
         />

@@ -35,16 +35,14 @@ export function Live(): JSX.Element {
 export function TopBar({
   baseballProps,
   basketBallProps,
-  date,
-  state,
   event,
 }: {
   baseballProps?: TopBarBaseball;
   basketBallProps?: TopBarBasketball;
-  date?: string;
-  state: EventState;
   event: GameEvent;
 }): JSX.Element {
+  const state = event.state;
+  const date = event.date;
   if (state === EventState.PRE && date) {
     const gameTime = new Date(date).getTime();
     const currentTime = new Date().getTime();
@@ -73,7 +71,7 @@ export function TopBar({
     const { displayClock, period } = event.timingInfo;
     return (
       <hstack
-        height={'18%'}
+        height={'58px'}
         width={'100%'}
         padding="medium"
         backgroundColor="alienblue-700"

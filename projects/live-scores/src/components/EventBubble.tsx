@@ -35,8 +35,8 @@ export function Bubble(scoreInfo?: SoccerGameScoreInfo): JSX.Element {
   }
 
   if (!primaryString && !secondaryString) {
-    primaryString = `📣 Recent plays will appear here`;
-    secondaryString = `Cheer your favorite team in the comments!`;
+    primaryString = `✨ New! Stats and lineup`;
+    secondaryString = `Click a team anytime to view details`;
   }
 
   return (
