@@ -39,7 +39,6 @@
     "@devvit/linkers": "0.10.10",
     "@devvit/protos": "0.10.10",
     "@devvit/public-api": "0.10.10",
-    "@devvit/public-api-old": "0.10.10",
     "@devvit/runtimes": "0.10.10",
     "@devvit/ui-renderer": "0.10.10",
     "rxjs": "7.5.7"
