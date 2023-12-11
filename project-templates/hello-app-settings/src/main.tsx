@@ -1,10 +1,10 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, SettingScope } from '@devvit/public-api';
 
 Devvit.configure({
   http: true,
 });
 
-Devvit.addAppSettings([
+Devvit.addSettings([
   {
     // This is the name of the setting which can be used to retrieve the value of the setting
     name: 'weather-api-key',
@@ -12,6 +12,7 @@ Devvit.addAppSettings([
     label: 'My weather api key',
     placeholder: 'Add your weather api key here',
     type: 'string',
+    scope: SettingScope.App,
     isSecret: true,
   },
 ]);
