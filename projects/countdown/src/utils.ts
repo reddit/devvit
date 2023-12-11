@@ -1,5 +1,7 @@
 import moment from 'moment-timezone';
 import { TIMEZONES } from './timezones.js';
+import { KVStore } from '@devvit/public-api';
+import { POST_DATA_KEY } from './constants.js';
 
 const MINUTES_IN_HOUR = 60;
 const HOURS_IN_DAY = 24;
@@ -60,7 +62,12 @@ export type TimeLeft = [CountdownEntry, CountdownEntry, CountdownEntry, Countdow
 
 export const getFormattedTimeLeft = (timeDiffMs: number): TimeLeft | null => {
   if (timeDiffMs <= 0) {
-    return null;
+    return [
+      { value: 0, label: 'days' },
+      { value: 0, label: 'hours' },
+      { value: 0, label: 'mins' },
+      { value: 0, label: 'sec' },
+    ];
   }
   const timeDiffSeconds = timeDiffMs / 1000;
   const seconds = Math.floor(timeDiffSeconds % 60);
@@ -75,3 +82,46 @@ export const getFormattedTimeLeft = (timeDiffMs: number): TimeLeft | null => {
     { value: seconds, label: 'sec' },
   ];
 };
+
+export const truncateString = (
+  input: string,
+  maxLength: number | undefined,
+  overflowCharacter: string = ''
+): string => {
+  if (maxLength === undefined || input.length <= maxLength) {
+    return input;
+  }
+  return `${input.slice(0, maxLength).trimEnd()}${overflowCharacter}`;
+};
+
+export type CountdownFormData = {
+  title: string;
+  description?: string;
+  date: string; // yyyy-mm-dd
+  time: [string]; // hh:mm 24h format
+  timezone: [string]; // Intl timezoneName
+  link_url?: string;
+  link_title?: string;
+  img_url?: string;
+};
+export type CountdownData = {
+  title: string;
+  description?: string;
+  dateTime: string; // ISO-8601
+  timezone?: string; // as in Intl.supportedValuesOf('timeZone'). e.g. Europe/Amsterdam
+  link_url?: string;
+  link_title?: string;
+  img_url: string | null;
+};
+
+export async function getPostAssociatedData(postId: string = 'test', kvStore: KVStore) {
+  if (!postId) {
+    return null;
+  }
+  const postAssociatedData: CountdownData | undefined = await kvStore.get(POST_DATA_KEY(postId));
+  if (!postAssociatedData) {
+    return null;
+  }
+
+  return postAssociatedData;
+}

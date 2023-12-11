@@ -6,6 +6,7 @@ import {
   POST_SCHEDULED_ACTION_KEY,
   REMIND_USERS_ACTION_ID,
 } from './constants.js';
+import { getFormattedDueDate, getPostAssociatedData } from './utils.js';
 
 Devvit.addSchedulerJob({
   name: REMIND_USERS_ACTION_ID,
@@ -20,12 +21,19 @@ Devvit.addSchedulerJob({
       return;
     }
 
+    const countdownData = await getPostAssociatedData(context.postId, context.kvStore);
+    if (!countdownData) {
+      return;
+    }
+
+    const formattedDueDate = getFormattedDueDate(countdownData.dateTime, countdownData.timezone);
+
     for (const userId of remindedUserIds) {
       const user = await context.reddit.getUserById(userId);
       await context.reddit.sendPrivateMessage({
         to: user.username,
         subject: '3..2..1..',
-        text: `Almost there! You asked me to remind you about [${post.title}](${post.permalink})`,
+        text: `Almost there! You asked me to remind you about [${post.title}](${post.permalink}) ending at ${formattedDueDate}`,
       });
     }
   },

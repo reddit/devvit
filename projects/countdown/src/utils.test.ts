@@ -3,6 +3,7 @@ import {
   getHourOptions,
   getFormattedTimeLeft,
   getFormattedDueDate,
+  truncateString,
 } from './utils.js';
 import { TIMEZONES } from './timezones.js';
 
@@ -87,11 +88,21 @@ describe('utils', () => {
 
   describe('get time left', () => {
     test('returns null if dates are equal', () => {
-      expect(getFormattedTimeLeft(0)).toBeNull();
+      expect(getFormattedTimeLeft(0)).toEqual([
+        { label: 'days', value: 0 },
+        { label: 'hours', value: 0 },
+        { label: 'mins', value: 0 },
+        { label: 'sec', value: 0 },
+      ]);
     });
 
     test('returns null if date provided has already passed', () => {
-      expect(getFormattedTimeLeft(-1000)).toBeNull();
+      expect(getFormattedTimeLeft(-1000)).toEqual([
+        { label: 'days', value: 0 },
+        { label: 'hours', value: 0 },
+        { label: 'mins', value: 0 },
+        { label: 'sec', value: 0 },
+      ]);
     });
 
     test('returns null if date provided has already passed', () => {
@@ -104,7 +115,6 @@ describe('utils', () => {
         { label: 'mins', value: 15 },
         { label: 'sec', value: 30 },
       ]);
-      vi.useRealTimers();
     });
   });
   describe('timezones', () => {
@@ -121,6 +131,41 @@ describe('utils', () => {
         'Europe/London',
         'Europe/Amsterdam',
       ]);
+    });
+  });
+
+  describe('string truncate', () => {
+    test('should do nothing if no maxLength is passed', () => {
+      const originalString = 'The quick brown fox jumps over the lazy dog';
+      expect(truncateString(originalString, undefined)).toBe(originalString);
+    });
+    test('should return empty string if 0 is passed', () => {
+      const originalString = 'The quick brown fox jumps over the lazy dog';
+      expect(truncateString(originalString, 0)).toBe('');
+    });
+    test('should trim the string to contain exactly maxLength characters', () => {
+      const originalString = 'The quick brown fox jumps over the lazy dog';
+      expect(truncateString(originalString, 2)).toBe('Th');
+    });
+    test('should remove trailing whitespace in output string', () => {
+      const originalString = 'The quick brown fox jumps over the lazy dog';
+      expect(truncateString(originalString, 4)).toBe('The');
+    });
+    test('should add the overflow character when it is specified', () => {
+      const originalString = 'The quick brown fox jumps over the lazy dog';
+      expect(truncateString(originalString, 2, '…')).toBe('Th…');
+    });
+    test('should not have whitespace before the overflow character', () => {
+      const originalString = 'The quick brown fox jumps over the lazy dog';
+      expect(truncateString(originalString, 10, '…')).toBe('The quick…');
+    });
+    test('should not add the overflow character if input is shorter than maxLength', () => {
+      const originalString = 'Hello world!';
+      expect(truncateString(originalString, 100, '…')).toBe(originalString);
+    });
+    test('should not add the overflow character if input is equal to maxLength', () => {
+      const originalString = 'ABC';
+      expect(truncateString(originalString, 3, '…')).toBe(originalString);
     });
   });
 });

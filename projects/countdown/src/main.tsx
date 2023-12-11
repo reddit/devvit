@@ -1,10 +1,14 @@
-import { BaseContext, ContextAPIClients, Devvit, Form, MediaPlugin } from '@devvit/public-api';
+import { Devvit, MediaPlugin } from '@devvit/public-api';
 import {
+  CountdownData,
+  CountdownFormData,
   createDatetime,
-  getHourOptions,
-  getFormattedTimeLeft,
-  getTimezones,
   getFormattedDueDate,
+  getFormattedTimeLeft,
+  getHourOptions,
+  getPostAssociatedData,
+  getTimezones,
+  truncateString,
 } from './utils.js';
 import { parse } from 'tldts';
 import { APPROVED_DOMAINS, ONE_MINUTE_IN_MS, POST_DATA_KEY } from './constants.js';
@@ -15,6 +19,7 @@ import {
   removeUserReminder,
   setPostReminder,
 } from './reminders.js';
+import { Preview } from './preview.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -43,41 +48,26 @@ async function getRedditImageUrl(imageUrl: string, media: MediaPlugin): Promise<
 const TIME_VALUES: DropdownOption[] = getHourOptions(2).map(mapValueToDropdownOption);
 const TIMEZONE_VALUES: DropdownOption[] = getTimezones().map(mapValueToDropdownOption);
 
-type CountdownFormData = {
-  title: string;
-  description?: string;
-  date: string; // yyyy-mm-dd
-  time: [string]; // hh:mm 24h format
-  timezone: [string]; // Intl timezoneName
-  link_url?: string;
-  link_title?: string;
-  img_url?: string;
-};
-
-type CountdownData = {
-  title: string;
-  description?: string;
-  dateTime: string; // ISO-8601
-  timezone?: string; // as in Intl.supportedValuesOf('timeZone'). e.g. Europe/Amsterdam
-  link_url?: string;
-  link_title?: string;
-  img_url: string | null;
-};
-
 const CountdownForm = Devvit.createForm(
   {
-    title: 'Create a countdown timer',
+    title: 'Create a Countdown Timer',
     fields: [
       { name: 'title', label: 'Post Title', type: 'string', required: true },
-      { name: 'description', label: 'Description', type: 'string' },
+      {
+        name: 'description',
+        label: 'Description',
+        type: 'string',
+        defaultValue: 'Mark your calendar!',
+        required: true,
+      },
       {
         type: 'group',
-        label: 'End date and time',
+        label: 'End Date and Time',
         fields: [
-          { name: 'date', label: 'Countdown date (yyyy-mm-dd)', type: 'string', required: true },
+          { name: 'date', label: 'Countdown Date (yyyy-mm-dd)', type: 'string', required: true },
           {
             name: 'time',
-            label: 'Countdown time',
+            label: 'Countdown Time',
             type: 'select',
             required: true,
             defaultValue: ['12:00'],
@@ -95,15 +85,15 @@ const CountdownForm = Devvit.createForm(
       },
       {
         type: 'group',
-        label: 'Add a link (optional)',
+        label: 'Add a Link (optional)',
         fields: [
-          { name: 'link_title', label: 'Link label', type: 'string' },
+          { name: 'link_title', label: 'Link Label', type: 'string' },
           { name: 'link_url', label: 'Destination URL', type: 'string' },
         ],
       },
       {
         type: 'group',
-        label: 'Add an image (optional)',
+        label: 'Add an Image (optional)',
         fields: [
           {
             name: 'img_url',
@@ -117,44 +107,52 @@ const CountdownForm = Devvit.createForm(
     acceptLabel: 'Next',
   },
   async (event, { reddit, kvStore, ui, subredditId, media, scheduler }) => {
-    const formData = event.values as CountdownFormData;
-    if (formData.img_url) {
-      // check valid domain
-      const domain = parse(formData.img_url).domain;
-      if (!domain) {
-        ui.showToast('Invalid image url provided');
+    try {
+      const formData = event.values as CountdownFormData;
+      if (formData.img_url) {
+        // check valid domain
+        const domain = parse(formData.img_url).domain;
+        if (!domain) {
+          ui.showToast('Invalid image url provided');
+          return;
+        }
+      }
+
+      const targetCountdownDateTimeString = createDatetime(
+        formData.date,
+        formData.time[0],
+        formData.timezone[0]
+      );
+
+      if (new Date(targetCountdownDateTimeString) <= new Date()) {
+        ui.showToast(
+          'Impossible to create the countdown with target date in the past. Please try a different date.'
+        );
         return;
       }
-    }
 
-    const postData: CountdownData = {
-      title: formData.title || '',
-      description: formData.description || '',
-      dateTime: createDatetime(formData.date, formData.time[0], formData.timezone[0]),
-      timezone: formData.timezone[0],
-      link_url: formData.link_url || '',
-      link_title: formData.link_title || '',
-      img_url: formData.img_url ? await getRedditImageUrl(formData.img_url, media) : null,
-    };
+      const postData: CountdownData = {
+        title: formData.title || '',
+        description: formData.description || '',
+        dateTime: targetCountdownDateTimeString,
+        timezone: formData.timezone[0],
+        link_url: formData.link_url || '',
+        link_title: formData.link_title || '',
+        img_url: formData.img_url ? await getRedditImageUrl(formData.img_url, media) : null,
+      };
 
-    const subredditName = (await reddit.getSubredditById(subredditId))?.name;
-    if (!subredditName) {
-      ui.showToast('Something went wrong, try again tomorrow');
-      return;
-    }
+      const subredditName = (await reddit.getSubredditById(subredditId))?.name;
+      if (!subredditName) {
+        ui.showToast('Something went wrong, try again tomorrow');
+        return;
+      }
 
-    await kvStore.put(POST_DATA_KEY('test'), postData);
-    try {
+      await kvStore.put(POST_DATA_KEY('test'), postData);
+
       const post = await reddit.submitPost({
         title: `[Countdown] ${postData.title}`,
         subredditName,
-        preview: (
-          <blocks height="regular">
-            <vstack>
-              <text>Something is coming...</text>
-            </vstack>
-          </blocks>
-        ),
+        preview: Preview(),
       });
 
       await kvStore.put(POST_DATA_KEY(post.id), postData);
@@ -163,8 +161,8 @@ const CountdownForm = Devvit.createForm(
 
       ui.showToast(`Countdown created!`);
     } catch (e) {
-      console.log(postData);
-      ui.showToast('Ooof, bad day, huh?');
+      console.log(event.values);
+      ui.showToast('Something went wrong, please try again later.');
     }
   }
 );
@@ -184,30 +182,6 @@ const ErrorState: Devvit.BlockComponent = () => {
   );
 };
 
-async function getPostAssociatedData(context: ContextAPIClients & BaseContext) {
-  const postId = context.postId || 'test';
-  if (!postId) {
-    return null;
-  }
-  const postAssociatedData: CountdownData | undefined = await context.kvStore.get(
-    POST_DATA_KEY(postId)
-  );
-  if (!postAssociatedData) {
-    return null;
-  }
-
-  return postAssociatedData;
-}
-
-const makeLinkForm = (postData: CountdownData): Form => {
-  return {
-    title: 'Copy the link to see it yourself!',
-    description: postData.link_url ? decodeURI(postData.link_url) : 'Just believe me',
-    fields: [],
-    acceptLabel: 'Cool!',
-  };
-};
-
 Devvit.addCustomPostType({
   name: 'Community Countdown',
   description: 'Mark the date!',
@@ -215,7 +189,7 @@ Devvit.addCustomPostType({
     const postId = context.postId || 'test';
 
     const [postAssociatedData] = context.useState(async () => {
-      return await getPostAssociatedData(context);
+      return await getPostAssociatedData(context.postId, context.kvStore);
     });
 
     if (!postAssociatedData) {
@@ -227,7 +201,7 @@ Devvit.addCustomPostType({
       return user?.id;
     });
 
-    const [isReminderActive, setIsReminderActive] = context.useState<boolean>(async () => {
+    const [isReminderSet, setIsReminderSet] = context.useState<boolean>(async () => {
       if (!currentUserId) {
         return false;
       }
@@ -241,42 +215,46 @@ Devvit.addCustomPostType({
       return Math.max(target - now, 0);
     });
 
+    const isCountdownActive = timeLeft > 0;
+
     const interval = context.useInterval(() => {
       setTimeLeft(timeLeft - 1000);
     }, 1000);
 
-    if (timeLeft > 0) {
+    if (isCountdownActive) {
       interval.start();
     } else {
       interval.stop();
     }
 
-    const linkForm = context.useForm(makeLinkForm(postAssociatedData), () => {});
-
     const formattedDueDate = getFormattedDueDate(
       postAssociatedData.dateTime,
       postAssociatedData.timezone
     );
+
     const formattedTimeLeft = getFormattedTimeLeft(timeLeft);
-    const hasLink = postAssociatedData.link_url;
+    const hasLink = Boolean(postAssociatedData.link_url);
     const imgUrl = postAssociatedData.img_url;
 
-    const renderEventHappened = () => {
-      if (!hasLink) {
-        return (
-          <text style="heading" size="xxlarge">
-            It happened!
-          </text>
-        );
+    const renderLinkButton = () => {
+      if (!postAssociatedData.link_url) {
+        return undefined;
       }
+
+      const linkTitle = truncateString(postAssociatedData.link_title || 'Click here!', 27, '…');
+
       return (
         <button
+          size="medium"
+          maxWidth="300px"
           appearance="primary"
+          icon="external-outline"
           onPress={() => {
-            context.ui.showForm(linkForm);
+            context.ui.navigateTo(postAssociatedData.link_url!);
           }}
+          disabled={isCountdownActive}
         >
-          {postAssociatedData.link_title || 'Click here!'}
+          {linkTitle}
         </button>
       );
     };
@@ -288,21 +266,29 @@ Devvit.addCustomPostType({
       return formattedTimeLeft.map((remainingTimeEntry) => (
         <vstack
           backgroundColor={imgUrl ? 'transparent' : '#E4EFFF'}
-          padding={imgUrl ? 'small' : 'medium'}
           cornerRadius="small"
           width={imgUrl ? '48px' : '68px'}
+          height={imgUrl ? '52px' : '76px'}
         >
+          <spacer grow />
           <text
             style="heading"
             size={imgUrl ? 'large' : 'xxlarge'}
             weight="bold"
             alignment="center"
+            color={imgUrl ? 'neutral-content-strong' : '#0F1A1C'}
           >
             {remainingTimeEntry.value || '0'}
           </text>
-          <text size="small" weight="regular" alignment="center">
+          <text
+            size="small"
+            weight="regular"
+            alignment="center"
+            color={imgUrl ? 'neutral-content' : '#2A3C42'}
+          >
             {remainingTimeEntry.label}
           </text>
+          <spacer grow />
         </vstack>
       ));
     };
@@ -315,70 +301,140 @@ Devvit.addCustomPostType({
 
       // the redundancy here is intentional
       // this way we make sure that we do exactly what user expects us to do
-      await (isReminderActive
+      await (isReminderSet
         ? removeUserReminder(currentUserId, postId, context.kvStore)
         : addUserReminder(currentUserId, postId, context.kvStore));
-      setIsReminderActive(!isReminderActive);
+      const newReminderSetStatus = !isReminderSet;
+      setIsReminderSet(newReminderSetStatus);
+      context.ui.showToast(newReminderSetStatus ? 'Reminder set' : 'Reminder removed');
     };
 
     const isEnoughTimeForReminder = timeLeft > 2 * ONE_MINUTE_IN_MS;
+    const isReminderActive = isEnoughTimeForReminder && isReminderSet;
+
+    function renderReminderButton() {
+      if (!currentUserId) {
+        return undefined;
+      }
+
+      return (
+        <button
+          size="large"
+          width="160px"
+          icon={isReminderActive ? 'notification-frequent-fill' : 'notification-outline'}
+          appearance="primary"
+          onPress={toggleReminder}
+          disabled={!isEnoughTimeForReminder}
+        >
+          {isReminderActive ? 'Reminder Set' : 'Remind Me'}
+        </button>
+      );
+    }
+
+    function renderSmallReminderButton() {
+      if (!currentUserId) {
+        return undefined;
+      }
+
+      return (
+        <button
+          size="small"
+          icon={isReminderActive ? 'notification-frequent-fill' : 'notification-outline'}
+          appearance={isEnoughTimeForReminder && !isReminderActive ? 'bordered' : 'primary'}
+          onPress={toggleReminder}
+          disabled={!isEnoughTimeForReminder}
+        ></button>
+      );
+    }
+
+    function renderPostBottom() {
+      if (imgUrl) {
+        return (
+          <>
+            <hstack gap={'none'} alignment="center">
+              {!isCountdownActive && hasLink ? (
+                <vstack>
+                  <spacer size={'medium'} />
+                  {renderLinkButton()}
+                </vstack>
+              ) : (
+                renderContentCountdown()
+              )}
+            </hstack>
+          </>
+        );
+      }
+      return (
+        <>
+          <hstack gap={imgUrl ? 'none' : 'small'} alignment="center">
+            {renderContentCountdown()}
+          </hstack>
+          <>
+            <spacer size={imgUrl ? 'small' : 'large'} />
+            {hasLink ? renderLinkButton() : renderReminderButton()}
+          </>
+        </>
+      );
+    }
 
     return (
       <blocks height="regular">
-        <vstack alignment="center" height={100} grow={true}>
-          <spacer grow={true}></spacer>
-          <text style="heading" size="xxlarge" alignment="center">
-            {postAssociatedData.description}
-          </text>
-          <spacer size="small"></spacer>
-          <text
-            style="heading"
-            size="small"
-            weight="regular"
-            alignment="center"
-            color="neutral-content"
-          >
-            {formattedDueDate}
-          </text>
-          {!imgUrl ? (
-            <spacer size="large"></spacer>
-          ) : (
-            <>
-              <spacer size="xsmall"></spacer>
-              <hstack alignment="center" padding="small">
-                <vstack cornerRadius="large">
-                  <image url={imgUrl} imageWidth={120} imageHeight={120} resizeMode="cover"></image>
-                </vstack>
-              </hstack>
-            </>
-          )}
-          {!formattedTimeLeft ? (
-            <hstack gap="medium" alignment="center" width="100%">
-              {renderEventHappened()}
+        <zstack width={100} height={100} grow>
+          <vstack alignment="center" height={100} width={100}>
+            <spacer grow></spacer>
+            <hstack width={100}>
+              <spacer width="56px" />
+              <text
+                style="heading"
+                size="xlarge"
+                alignment="center"
+                grow
+                color="neutral-content-strong"
+                overflow="ellipsis"
+                maxWidth="90%"
+              >
+                {postAssociatedData.description}
+              </text>
+              <spacer width="56px" />
             </hstack>
-          ) : (
-            <>
-              <hstack gap={imgUrl ? 'none' : 'small'} alignment="center">
-                {renderContentCountdown()}
-              </hstack>
-              {currentUserId && isEnoughTimeForReminder && (
-                <>
-                  <spacer size={imgUrl ? 'small' : 'large'} />
-                  <button
-                    size={imgUrl ? 'medium' : 'large'}
-                    width="160px"
-                    icon={!isReminderActive ? 'notification-outline' : 'notification-frequent-fill'}
-                    appearance="primary"
-                    onPress={toggleReminder}
-                  >
-                    {!isReminderActive ? 'Remind me' : 'Reminder set'}
-                  </button>
-                </>
-              )}
-            </>
-          )}
-          <spacer grow={true}></spacer>
-        </vstack>
+            <spacer size="xsmall"></spacer>
+            <text
+              style="heading"
+              size="small"
+              weight="regular"
+              alignment="center"
+              color="neutral-content"
+            >
+              {formattedDueDate}
+            </text>
+            {!imgUrl ? (
+              <spacer size="large"></spacer>
+            ) : (
+              <>
+                <spacer size="xsmall"></spacer>
+                <hstack alignment="center" padding="small">
+                  <vstack cornerRadius="large">
+                    <image
+                      url={imgUrl}
+                      imageWidth={120}
+                      imageHeight={120}
+                      resizeMode="cover"
+                    ></image>
+                  </vstack>
+                </hstack>
+              </>
+            )}
+
+            {renderPostBottom()}
+            <spacer grow={true}></spacer>
+          </vstack>
+          {hasLink || imgUrl ? (
+            <hstack padding="small" width={100}>
+              <spacer grow></spacer>
+              {renderSmallReminderButton()}
+            </hstack>
+          ) : undefined}
+        </zstack>
       </blocks>
     );
   },
