@@ -4,16 +4,43 @@ Devvit.configure({
   http: true,
 });
 
+const CITIES = new Set(['Rome', 'Tokyo']);
+
+function isValidCity(cityName: string | undefined): boolean {
+  return !!cityName && CITIES.has(cityName);
+}
+
 Devvit.addSettings([
   {
-    // This is the name of the setting which can be used to retrieve the value of the setting
-    name: 'weather-api-key',
-    // This label is used to provide more information in the CLI or in dev portal
-    label: 'My weather api key',
-    placeholder: 'Add your weather api key here',
     type: 'string',
+    name: 'weather-api-key',
+    label: 'My weather.com API key',
     scope: SettingScope.App,
     isSecret: true,
+  },
+  {
+    type: 'string',
+    name: 'Default City',
+    defaultValue: 'Rome',
+    label: 'Default city to show the weather for by default',
+    scope: SettingScope.Installation,
+    onValidate: ({ value }) => {
+      if (isValidCity(value)) {
+        return 'You must ender a valid city: ${validCities.join(", ")}';
+      }
+    },
+  },
+  {
+    type: 'number',
+    name: 'Default Forecast Window (in days)',
+    defaultValue: 3,
+    label: 'The number of days to show for forecast for by default',
+    scope: SettingScope.Installation,
+    onValidate: ({ value }) => {
+      if (!value || value < 10 || value < 1) {
+        return 'Forecast window must be from 1 to 10 days';
+      }
+    },
   },
 ]);
 
@@ -38,6 +65,41 @@ Devvit.addCustomPostType({
         </button>
       </vstack>
     );
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'New weather app',
+  location: 'subreddit',
+  /*
+   * _ tells Typescript we don't care about the first argument
+   * The second argument is a Context object--here we use object destructuring to
+   * pull just the parts we need. The code below is equivalient
+   * to using context.reddit and context.ui
+   */
+  onPress: async (_, { reddit, ui }) => {
+    const subreddit = await reddit.getCurrentSubreddit();
+
+    /*
+     * Submits the custom post to the specified subreddit
+     */
+    await reddit.submitPost({
+      // This will show while your custom post is loading
+      preview: (
+        <vstack padding="medium" cornerRadius="medium">
+          <text style="heading" size="medium">
+            Loading weather app...
+          </text>
+        </vstack>
+      ),
+      title: `${subreddit.name} Weather App`,
+      subredditName: subreddit.name,
+    });
+
+    ui.showToast({
+      text: `Successfully created a weather app!`,
+      appearance: 'success',
+    });
   },
 });
 
