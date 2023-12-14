@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "ci-countdown",
-  "version": "0.10.10",
+  "version": "0.10.11",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.10",
+    "@devvit/public-api": "0.10.11",
     "moment-timezone": "0.5.43",
     "tldts": "^6.0.14"
   },

@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "ci-live-scores",
-  "version": "0.10.10",
+  "version": "0.10.11",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.10"
+    "@devvit/public-api": "0.10.11"
   },
   "devDependencies": {
     "typescript": "5.3.2"

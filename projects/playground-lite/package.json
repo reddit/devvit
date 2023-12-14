@@ -1,13 +1,13 @@
 {
   "private": true,
   "name": "playground-lite",
-  "version": "0.10.10",
+  "version": "0.10.11",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/protos": "0.10.10",
-    "@devvit/public-api": "0.10.10",
-    "@devvit/shared-types": "0.10.10",
+    "@devvit/protos": "0.10.11",
+    "@devvit/public-api": "0.10.11",
+    "@devvit/shared-types": "0.10.11",
     "fast-xml-parser": "^4.2.7"
   },
   "devDependencies": {
