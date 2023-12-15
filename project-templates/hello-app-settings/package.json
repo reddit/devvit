@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "hello-app-settings-template",
-  "version": "0.10.11",
+  "version": "0.10.12",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {

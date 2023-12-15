@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "ci-slot-machine",
-  "version": "0.10.11",
+  "version": "0.10.12",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.11"
+    "@devvit/public-api": "0.10.12"
   },
   "devDependencies": {
     "typescript": "5.3.2"
