@@ -16,7 +16,7 @@ import {
 } from './sports/GameFetch.js';
 import { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
 import { SoccerScoreboard } from './components/soccer.js';
-import { resetAPIKeys } from './sports/sportradar/APIKeys.js';
+import { APIKey } from './sports/sportradar/APIKeys.js';
 import { fetchAllSubsAndGames, subscriptionsForm } from './forms/SubscriptionsForm.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
@@ -30,12 +30,22 @@ Devvit.configure({
   kvStore: true,
 });
 
-Devvit.addTrigger({
-  events: ['AppInstall', 'AppUpgrade'],
-  onEvent: async (_, context) => {
-    await resetAPIKeys(context as any);
+Devvit.addSettings([
+  {
+    name: APIKey.soccer,
+    label: 'Sportradar Soccer API Key',
+    type: 'string',
+    isSecret: true,
+    scope: 'app',
   },
-});
+  {
+    name: APIKey.nfl,
+    label: 'Sportradar NFL API Key',
+    type: 'string',
+    isSecret: true,
+    scope: 'app',
+  },
+]);
 
 // Devvit.addMenuItem({
 //   label: 'Create ESPN scoreboard',

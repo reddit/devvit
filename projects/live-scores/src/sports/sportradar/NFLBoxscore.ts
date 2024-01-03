@@ -3,7 +3,7 @@ import { NFLGame, NFLSeason, NFLWeek } from './NFLSchedule.js';
 import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
 import { Team, TeamRecord } from './GenericModels.js';
-import { getAPIKey } from './APIKeys.js';
+import { APIKey } from './APIKeys.js';
 
 interface NFLBoxscoreSummary {
   season: NFLSeason;
@@ -69,10 +69,10 @@ export async function fetchNFLBoxscore(
   context: Devvit.Context
 ): Promise<GeneralGameScoreInfo | null> {
   let data;
-  const apiKey = await getAPIKey('nfl-api-key', context);
+  const apiKey = await context.settings.get(APIKey.nfl);
   try {
     const request = new Request(
-      `https://api.sportradar.us/nfl/official/trial/v7/en/games/${gameId}/boxscore.json?api_key=${apiKey}`
+      `https://api.sportradar.us/nfl/official/production/v7/en/games/${gameId}/boxscore.json?api_key=${apiKey}`
     );
     // console.log(request.url);
     const response = await fetch(request);

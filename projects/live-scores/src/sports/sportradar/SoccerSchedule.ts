@@ -2,7 +2,7 @@ import { Devvit } from '@devvit/public-api';
 import { SoccerLeague } from './SoccerLeagues.js';
 import { SoccerEvent, soccerScoreInfo } from './SoccerEvent.js';
 import { GeneralGameScoreInfo } from '../GameEvent.js';
-import { getAPIKey } from './APIKeys.js';
+import { APIKey } from './APIKeys.js';
 
 export interface SoccerSchedule {
   generated_at: string;
@@ -14,10 +14,10 @@ export async function fetchSoccerGames(
   context: Devvit.Context
 ): Promise<GeneralGameScoreInfo[] | null> {
   let data;
-  const apiKey = await getAPIKey('soccer-api-key', context);
+  const apiKey = await context.settings.get(APIKey.soccer);
   try {
     const request = new Request(
-      `https://api.sportradar.us/soccer/trial/v4/en/seasons/${league.seasonId}/schedules.json?api_key=${apiKey}`
+      `https://api.sportradar.us/soccer/production/v4/en/seasons/${league.seasonId}/schedules.json?api_key=${apiKey}`
     );
     // console.log(request.url);
     const response = await fetch(request);
