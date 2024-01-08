@@ -55,19 +55,19 @@ export function soccerScoreInfo(league: string, soccerEvent: SoccerEvent): Socce
   };
 }
 
-export interface SoccerGameScoreInfo extends GeneralGameScoreInfo {
+export type SoccerGameScoreInfo = GeneralGameScoreInfo & {
   summary?: GameEventSummary | undefined;
   homeStats?: SportEventStatisticCompetitor | undefined;
   awayStats?: SportEventStatisticCompetitor | undefined;
-}
+};
 
-export interface GameEventSummary {
+export type GameEventSummary = {
   homeGoals: TimelineEvent[];
   awayGoals: TimelineEvent[];
   homeRedCards: TimelineEvent[];
   awayRedCards: TimelineEvent[];
   latestEvent?: TimelineEvent | undefined;
-}
+};
 
 function eventsSummary(timeline?: TimelineEvent[]): GameEventSummary | undefined {
   if (timeline) {
@@ -172,14 +172,14 @@ function periodForStatus(status: SportEventStatus): number {
   return 0;
 }
 
-export interface SoccerEvent {
+export type SoccerEvent = {
   sport_event: SportEvent;
   sport_event_status: SportEventStatus;
   statistics?: SportEventStatistics;
   timeline?: TimelineEvent[];
-}
+};
 
-interface SportEvent {
+type SportEvent = {
   id: string;
   start_time: string;
   sport_event_context: SportEventContext;
@@ -187,9 +187,9 @@ interface SportEvent {
   competitors: SportEventCompetitor[];
   venue: Venue;
   replaced_by?: string;
-}
+};
 
-interface SportEventCompetitor {
+type SportEventCompetitor = {
   id: string;
   name: string;
   country?: string;
@@ -197,19 +197,19 @@ interface SportEventCompetitor {
   abbreviation: string;
   qualifier: HomeAwayTeam;
   gender?: string;
-}
+};
 
 enum HomeAwayTeam {
   Away = 'away',
   Home = 'home',
 }
 
-interface SRCoverage {
+type SRCoverage = {
   type: string;
   sport_event_properties: SRCoverageProperties;
-}
+};
 
-interface SRCoverageProperties {
+type SRCoverageProperties = {
   lineups: boolean;
   venue: boolean;
   extended_player_stats: boolean;
@@ -227,43 +227,43 @@ interface SRCoverageProperties {
   basic_play_by_play: boolean;
   basic_player_stats: boolean;
   basic_team_stats: boolean;
-}
+};
 
-interface SportEventContext {
+type SportEventContext = {
   sport: BasicValue;
   category: BasicValue;
   competition: BasicValue;
   season: Season;
   stage?: Stage;
   round?: Round;
-}
+};
 
-interface Stage {
+type Stage = {
   order: number;
   type: string;
   phase: string;
   start_date: string;
   end_date: string;
   year: string;
-}
+};
 
-interface Round {
+type Round = {
   number: number;
-}
+};
 
-interface BasicValue {
+type BasicValue = {
   id: string;
   name: string;
-}
+};
 
-interface Season extends BasicValue {
+type Season = BasicValue & {
   start_date: string;
   end_date: string;
   year: string;
   competition_id: string;
-}
+};
 
-interface Venue {
+type Venue = {
   id: string;
   name: string;
   capacity: number;
@@ -272,9 +272,9 @@ interface Venue {
   map_coordinates: string;
   country_code: string;
   timezone: string;
-}
+};
 
-interface SportEventStatus {
+type SportEventStatus = {
   status: SportEventStatusType;
   match_status: string;
   home_score?: number;
@@ -286,13 +286,13 @@ interface SportEventStatus {
   winner_id?: string;
   period_scores?: PeriodScore[];
   clock?: Clock;
-}
+};
 
-interface Clock {
+type Clock = {
   played: string;
   stoppage_time_played?: string;
   stoppage_time_announced?: string;
-}
+};
 
 enum SportEventStatusType {
   CREATED = `created`,
@@ -304,12 +304,12 @@ enum SportEventStatusType {
   POSTPONED = `postponed`,
 }
 
-interface PeriodScore {
+type PeriodScore = {
   home_score: number;
   away_score: number;
   type: PeriodType;
   number: number;
-}
+};
 
 enum PeriodType {
   AwaitingExtra = 'awaiting_extra',
@@ -321,28 +321,28 @@ enum PeriodType {
   RegularPeriod = 'regular_period',
 }
 
-interface SportEventStatistics {
+type SportEventStatistics = {
   totals: SportEventStatisticsTotals;
-}
+};
 
-interface SportEventStatisticsTotals {
+type SportEventStatisticsTotals = {
   competitors: SportEventStatisticCompetitor[];
-}
+};
 
-export interface SportEventStatisticCompetitor extends SportEventCompetitor {
+export type SportEventStatisticCompetitor = SportEventCompetitor & {
   statistics: SoccerTeamStatistics;
   players?: SoccerPlayer[];
-}
+};
 
-export interface SoccerPlayer {
+export type SoccerPlayer = {
   statistics?: SoccerPlayerStatistics;
   id: string;
   name: string;
   starter: boolean;
   type?: string;
-}
+};
 
-interface SoccerBaseStatistics {
+type SoccerBaseStatistics = {
   corner_kicks: number;
   offsides: number;
   red_cards: number;
@@ -351,9 +351,9 @@ interface SoccerBaseStatistics {
   shots_on_target: number;
   yellow_cards: number;
   yellow_red_cards: number;
-}
+};
 
-export interface SoccerTeamStatistics extends SoccerBaseStatistics {
+export type SoccerTeamStatistics = SoccerBaseStatistics & {
   ball_possession: number;
   cards_given: number;
   fouls: number;
@@ -364,17 +364,17 @@ export interface SoccerTeamStatistics extends SoccerBaseStatistics {
   shots_total: number;
   substitutions: number;
   throw_ins: number;
-}
+};
 
-export interface SoccerPlayerStatistics extends SoccerBaseStatistics {
+export type SoccerPlayerStatistics = SoccerBaseStatistics & {
   assists: number;
   goals_scored: number;
   own_goals: number;
   substituted_in: number;
   substituted_out: number;
-}
+};
 
-export interface TimelineEvent {
+export type TimelineEvent = {
   id: number;
   type: string;
   time: string;
@@ -394,8 +394,8 @@ export interface TimelineEvent {
   stoppage_time_clock?: string;
   break_name?: string;
   commentaries?: Commentary[];
-}
+};
 
-interface Commentary {
+type Commentary = {
   text: string;
-}
+};

@@ -10,11 +10,11 @@ import { Bubble } from './EventBubble.js';
 import { ScoreboardPage } from './Scoreboard.js';
 import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
 
-export interface SoccerScoreboardProps {
+export type SoccerScoreboardProps = {
   scoreInfo: SoccerGameScoreInfo;
   page: ScoreboardPage;
   setPage: (page: ScoreboardPage) => void;
-}
+};
 
 export type TeamBlockSoccer = {
   goals?: TimelineEvent[] | undefined;

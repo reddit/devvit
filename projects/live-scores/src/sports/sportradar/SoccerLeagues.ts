@@ -1,10 +1,10 @@
 import { League } from '../Sports.js';
 
-export interface SoccerLeague {
+export type SoccerLeague = {
   leagueId: string;
   seasonId: string;
   league: League;
-}
+};
 
 // Eventually we can fetch these season IDs, but this will suffice for now (2023-2024 season)
 export function infoForLeague(league: League): SoccerLeague {

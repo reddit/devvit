@@ -5,10 +5,10 @@ const stepSize = 15;
 const headerHeight = 109;
 const initialOffset = 85;
 
-interface RowProps {
+type RowProps = {
   images: string[];
   size: number;
-}
+};
 
 function Row({ images, size }: RowProps) {
   return (
@@ -20,12 +20,12 @@ function Row({ images, size }: RowProps) {
   );
 }
 
-interface ReelProps {
+type ReelProps = {
   data: string[][];
   spin: boolean;
   context: Context;
   onEnd: (lastRows: string[][]) => void;
-}
+};
 
 export default function ({ data, spin, context, onEnd }: ReelProps) {
   const { useState, useInterval } = context;

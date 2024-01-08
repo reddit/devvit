@@ -1,10 +1,10 @@
 import { Devvit } from '@devvit/public-api';
 
-interface ColumnsProps {
+type ColumnsProps = {
   count: number;
   empty?: JSX.Element | undefined;
   children: JSX.Children;
-}
+};
 
 export const Columns = ({ count, children, empty }: ColumnsProps): JSX.Element => {
   const rows: JSX.Element[] = [];

@@ -1,10 +1,10 @@
 import { Devvit } from '@devvit/public-api';
 
-export interface TileProps {
+export type TileProps = {
   label?: string | undefined;
   padding?: Devvit.Blocks.ContainerPadding | undefined;
   children: JSX.Element | JSX.Element[];
-}
+};
 
 export const Tile = (props: TileProps): JSX.Element => {
   const { label, children } = props;

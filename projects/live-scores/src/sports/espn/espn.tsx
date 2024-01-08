@@ -12,7 +12,7 @@ import {
   getSportFromLeagueString,
 } from '../Sports.js';
 
-export interface BaseballGameScoreInfo extends GeneralGameScoreInfo {
+export type BaseballGameScoreInfo = GeneralGameScoreInfo & {
   // events[].competitions[].situation.onFirst
   isRunnerOnFirst: boolean;
   // events[].competitions[].situation.onSecond
@@ -39,7 +39,7 @@ export interface BaseballGameScoreInfo extends GeneralGameScoreInfo {
   pitcherSummery: string;
   // events[].competitions[].situation.batter.athlete.summary
   batterSummary: string;
-}
+};
 
 export enum InningState {
   UNKNOWN = '',

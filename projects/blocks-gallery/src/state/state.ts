@@ -3,10 +3,10 @@ import { ContextAPIClients, UseStateResult } from '@devvit/public-api';
 import { Page } from '../pages/page.js';
 import { CategoryPageState } from '../components/CategoryPage.js';
 
-export interface StatefulProps {
+export type StatefulProps = {
   useState: ContextAPIClients['useState'];
   goHome: () => void;
-}
+};
 
 const PAGES = [
   Page.HOME,

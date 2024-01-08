@@ -14,9 +14,9 @@ import {
 } from '../pages/index.js';
 import type { GalleryState } from '../state/state.js';
 
-export interface BlockGalleryProps {
+export type BlockGalleryProps = {
   state: GalleryState;
-}
+};
 
 export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
   const page = state.currentPage;

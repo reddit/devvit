@@ -1,11 +1,11 @@
 import { Devvit } from '@devvit/public-api';
 
-export interface BoxProps {
+export type BoxProps = {
   spacerSize?: Devvit.Blocks.SpacerSize;
   size?: number;
   color?: string;
   rounded?: boolean;
-}
+};
 
 const SIZE_PX: Record<Devvit.Blocks.SpacerSize, number> = {
   xsmall: 4,

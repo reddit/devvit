@@ -4,10 +4,10 @@ import { SoccerEvent, soccerScoreInfo } from './SoccerEvent.js';
 import { GeneralGameScoreInfo } from '../GameEvent.js';
 import { APIKey } from './APIKeys.js';
 
-export interface SoccerSchedule {
+export type SoccerSchedule = {
   generated_at: string;
   schedules: SoccerEvent[];
-}
+};
 
 export async function fetchSoccerGames(
   league: SoccerLeague,

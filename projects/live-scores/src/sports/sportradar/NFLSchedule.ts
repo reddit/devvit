@@ -2,7 +2,7 @@ import { Devvit } from '@devvit/public-api';
 import { Team, Period } from './GenericModels.js';
 import { APIKey } from './APIKeys.js';
 
-export interface NFLGame {
+export type NFLGame = {
   id: string;
   status: string;
   scheduled: string;
@@ -18,22 +18,22 @@ export interface NFLGame {
     away_points?: number;
     periods: Period[];
   };
-}
+};
 
-export interface NFLWeek {
+export type NFLWeek = {
   id: string;
   sequence: number;
   title: string;
   games?: NFLGame[];
-}
+};
 
-export interface NFLSeason {
+export type NFLSeason = {
   id: string;
   year: number;
   type: string;
   name: string;
   week?: NFLWeek;
-}
+};
 
 export async function fetchNflCurrentWeek(context: Devvit.Context): Promise<NFLWeek | undefined> {
   let data;

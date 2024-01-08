@@ -1,18 +1,18 @@
 import { Devvit } from '@devvit/public-api';
-import { NFLGame, NFLSeason, NFLWeek } from './NFLSchedule.js';
 import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
-import { Team, TeamRecord } from './GenericModels.js';
 import { APIKey } from './APIKeys.js';
+import { Team, TeamRecord } from './GenericModels.js';
+import { NFLGame, NFLSeason, NFLWeek } from './NFLSchedule.js';
 
-interface NFLBoxscoreSummary {
+type NFLBoxscoreSummary = {
   season: NFLSeason;
   week: NFLWeek;
   home: NFLGameTeam;
   away: NFLGameTeam;
-}
+};
 
-interface NFLGameTeam extends Team {
+type NFLGameTeam = Team & {
   market: string;
   used_timeouts: number;
   remaining_timeouts: number;
@@ -20,9 +20,9 @@ interface NFLGameTeam extends Team {
   used_challenges: number;
   remaining_challenges: number;
   record: TeamRecord;
-}
+};
 
-interface NFLBoxscoreSituation {
+type NFLBoxscoreSituation = {
   clock: string;
   down: number;
   yfd: number;
@@ -35,9 +35,9 @@ interface NFLBoxscoreSituation {
     sr_id: string;
     yardline: number;
   };
-}
+};
 
-interface LastEvent {
+type LastEvent = {
   type: string;
   id: string;
   sequence: number;
@@ -47,15 +47,15 @@ interface LastEvent {
   created_at: string;
   updated_at: string;
   wall_clock: string;
-}
+};
 
-export interface NFLBoxscore extends NFLGame {
+export type NFLBoxscore = NFLGame & {
   clock: string;
   quarter: number;
   summary: NFLBoxscoreSummary;
   situation: NFLBoxscoreSituation;
   last_event: LastEvent;
-}
+};
 
 export enum NFLBoxscoreStatus {
   CREATED = `created`,

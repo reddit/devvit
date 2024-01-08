@@ -12,11 +12,11 @@ export enum ScoreboardPage {
   AWAY_STATS,
 }
 
-export interface ScoreboardProps {
+export type ScoreboardProps = {
   scoreInfo: GeneralGameScoreInfo;
   page: ScoreboardPage;
   setPage: (page: ScoreboardPage) => void;
-}
+};
 
 export function GenericScoreBoard(
   scoreInfo: GeneralGameScoreInfo,

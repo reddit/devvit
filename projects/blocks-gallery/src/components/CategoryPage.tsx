@@ -42,9 +42,9 @@ export class CategoryPageState {
   goHome = (): void => this._goHome();
 }
 
-export interface SharedCategoryPageProps {
+export type SharedCategoryPageProps = {
   state: CategoryPageState;
-}
+};
 
 export type CategoryPageProps = SharedCategoryPageProps & {
   title?: string;
@@ -54,11 +54,11 @@ export type CategoryPageProps = SharedCategoryPageProps & {
   subCategoryPage?: boolean;
 };
 
-export interface CategoryProps {
+export type CategoryProps = {
   label: string;
   category: string;
   content: JSX.Element | JSX.Element[];
-}
+};
 
 export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
   const activeCategory = props.activeCategory || props.categories[0].category;

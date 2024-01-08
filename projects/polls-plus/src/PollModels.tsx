@@ -4,7 +4,7 @@ export enum PageType {
   CONFIRM,
 }
 
-export interface PollProps {
+export type PollProps = {
   navigate: (page: PageType) => void;
   remainingMillis: number;
   options: string[];
@@ -20,4 +20,4 @@ export interface PollProps {
   allowShowResults: boolean;
   randomizeOrder: boolean;
   reset: () => Promise<void>;
-}
+};

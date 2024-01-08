@@ -1,9 +1,9 @@
 import { Devvit } from '@devvit/public-api';
 
-interface ColumnsProps {
+type ColumnsProps = {
   count: number;
   children: JSX.Children;
-}
+};
 
 export const Columns = ({ count, children }: ColumnsProps): JSX.Element => {
   const rows: JSX.Element[] = [];

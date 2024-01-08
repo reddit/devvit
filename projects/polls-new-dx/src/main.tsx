@@ -15,7 +15,7 @@ export enum PageType {
   RESULTS,
 }
 
-export interface PollProps {
+export type PollProps = {
   navigate: (page: PageType) => void;
   remainingMillis: number;
   options: string[];
@@ -25,7 +25,7 @@ export interface PollProps {
   finish: number;
   total: number;
   reset: () => Promise<void>;
-}
+};
 
 export const formatCount = (count: number): string => {
   return numbro(count).format({
@@ -45,7 +45,7 @@ const App: Devvit.CustomPostComponent = async ({ redis, useState, postId, userId
     } catch {
       //
     }
-    return hasVoted ? PageType.RESULTS : PageType.VOTE
+    return hasVoted ? PageType.RESULTS : PageType.VOTE;
   });
 
   /**
