@@ -7,7 +7,7 @@ export function CommentBlock({
   username: string;
   commentBody: string;
 }): JSX.Element {
-  if (username === 'none') return;
+  if (username === 'none') return null;
   return (
     <vstack width="100%" height="100%" alignment="bottom">
       <vstack reverse padding="medium">

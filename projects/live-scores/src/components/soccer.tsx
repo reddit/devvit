@@ -1,14 +1,14 @@
 import { Devvit } from '@devvit/public-api';
+import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
 import {
   SoccerGameScoreInfo,
   SoccerTeamStatistics,
   TimelineEvent,
 } from '../sports/sportradar/SoccerEvent.js';
-import { TeamBlock } from './TeamBlock.js';
-import { TopBar } from './TopBar.js';
 import { Bubble } from './EventBubble.js';
 import { ScoreboardPage } from './Scoreboard.js';
-import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
+import { TeamBlock } from './TeamBlock.js';
+import { TopBar } from './TopBar.js';
 
 export type SoccerScoreboardProps = {
   scoreInfo: SoccerGameScoreInfo;
@@ -60,18 +60,18 @@ export function SportSpecificContentSoccer(props: TeamBlockSoccer): JSX.Element 
 
   return (
     <vstack>
-      {goalString && (
+      {goalString ? (
         <hstack>
           <spacer size="small" />
           <text wrap>⚽︎ {goalString}</text>
         </hstack>
-      )}
-      {redCardString && (
+      ) : null}
+      {redCardString ? (
         <hstack>
           <spacer size="small" />
           <text wrap>🟥 {redCardString}</text>
         </hstack>
-      )}
+      ) : null}
     </vstack>
   );
 }

@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
+import { EventState } from '../sports/GameEvent.js';
 import { TeamBlockBaseball, sportSpecificContentBaseball } from './baseball.js';
 import { TeamBlockBasketball, sportSpecificContentBasketball } from './basketball.js';
-import { EventState } from '../sports/GameEvent.js';
-import { TeamBlockSoccer, SportSpecificContentSoccer } from './soccer.js';
+import { SportSpecificContentSoccer, TeamBlockSoccer } from './soccer.js';
 
 export function TeamBlock({
   isHomeTeam,
@@ -38,7 +38,7 @@ export function TeamBlock({
         <spacer size="small" />
         <image url={logo} imageHeight={32} imageWidth={32} />
         <spacer size="small" />
-        {onPressAction && (
+        {onPressAction ? (
           <hstack alignment="start middle">
             <text size="large" weight="bold" lightColor="AlienBlue-600" darkColor="AlienBlue-400">
               {name}
@@ -51,12 +51,12 @@ export function TeamBlock({
               darkColor="AlienBlue-400"
             />
           </hstack>
-        )}
-        {!onPressAction && (
+        ) : null}
+        {!onPressAction ? (
           <text size="large" weight="bold">
             {name}
           </text>
-        )}
+        ) : null}
         <spacer grow />
         <text size="xxlarge" weight="bold">
           {state === EventState.PRE ? '-' : score?.toString()}
@@ -66,7 +66,7 @@ export function TeamBlock({
       <spacer size="small" />
       <hstack>
         <spacer size="small" />
-        {sportSpecificContent}
+        {sportSpecificContent ?? null}
       </hstack>
     </vstack>
   );

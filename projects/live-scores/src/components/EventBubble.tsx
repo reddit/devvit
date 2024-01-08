@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-import { SoccerGameScoreInfo, formatAsFirstLastName } from '../sports/sportradar/SoccerEvent.js';
 import { EventState } from '../sports/GameEvent.js';
+import { SoccerGameScoreInfo, formatAsFirstLastName } from '../sports/sportradar/SoccerEvent.js';
 
 export function Bubble(scoreInfo?: SoccerGameScoreInfo): JSX.Element {
   let primaryString: string | undefined;
@@ -66,12 +66,12 @@ export function Bubble(scoreInfo?: SoccerGameScoreInfo): JSX.Element {
             alignment="start middle"
             grow
           >
-            {primaryString && (
+            {primaryString ? (
               <text size="medium" weight="bold">
                 {primaryString}
               </text>
-            )}
-            {secondaryString && <text size="small">{secondaryString}</text>}
+            ) : null}
+            {secondaryString ? <text size="small">{secondaryString}</text> : null}
           </vstack>
           {/* <button appearance="primary">Cheer!</button> */}
           <spacer size="small" />

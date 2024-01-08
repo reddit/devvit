@@ -1,33 +1,33 @@
 import { Devvit } from '@devvit/public-api';
-import { Page } from '../types/page.js';
-import { FlagPage } from './FlagPage.js';
-import { LeaderboardPage } from './LeaderboardPage.js';
-import { InfoPage } from './InfoPage.js';
-import { Leaderboard, TournamentState, UserData } from '../types/state.js';
 import {
-  getLeaderboardState,
-  getTournamentState,
   fetchUserData,
+  getAutoDropJobId,
+  getLeaderboardState,
+  getNewUserScore,
+  getScoreByName,
+  getTournamentState,
+  saveTournamentStateSafe,
   updateScore,
   updateUserData,
-  getScoreByName,
-  saveTournamentStateSafe,
-  getNewUserScore,
-  getAutoDropJobId,
 } from '../api.js';
+import {
+  AUTO_DROP_INTERVAL_MINUTES,
+  MAX_COOLDOWN_SECONDS,
+  MIN_COOLDOWN_SECONDS,
+} from '../config.js';
+import { Keys, key_post } from '../keys.js';
+import { scheduleAutoDropJob } from '../scheduler.js';
+import { Page } from '../types/page.js';
+import { Leaderboard, TournamentState, UserData } from '../types/state.js';
 import {
   getHoldingDurationMs,
   insertFlagHolderToLeaderboard,
   minutesToMs,
   randomNumber,
 } from '../utils.js';
-import {
-  AUTO_DROP_INTERVAL_MINUTES,
-  MAX_COOLDOWN_SECONDS,
-  MIN_COOLDOWN_SECONDS,
-} from '../config.js';
-import { key_post, Keys } from '../keys.js';
-import { scheduleAutoDropJob } from '../scheduler.js';
+import { FlagPage } from './FlagPage.js';
+import { InfoPage } from './InfoPage.js';
+import { LeaderboardPage } from './LeaderboardPage.js';
 
 export const CaptureTheFlag: Devvit.CustomPostComponent = (context): JSX.Element => {
   const { useState } = context;
@@ -219,9 +219,8 @@ export const CaptureTheFlag: Devvit.CustomPostComponent = (context): JSX.Element
       );
     }
 
-    if (page === 'info') {
-      return <InfoPage setPage={setPage} />;
-    }
+    page satisfies 'info';
+    return <InfoPage setPage={setPage} />;
   };
 
   return (

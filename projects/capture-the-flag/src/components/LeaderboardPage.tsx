@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
 import { Page } from '../types/page.js';
-import { LeaderboardRow } from './LeaderboardRow.js';
-import { IconButton } from './IconButton.js';
 import { Leaderboard } from '../types/state.js';
+import { IconButton } from './IconButton.js';
+import { LeaderboardRow } from './LeaderboardRow.js';
 
 export interface LeaderboardPageProps {
   setPage: (page: Page) => void;
@@ -22,7 +22,7 @@ export const LeaderboardPage = (props: LeaderboardPageProps): JSX.Element => {
           {gameActive ? 'Leaderboard' : 'Game Over'}
         </text>
         <spacer size="medium" />
-        {gameActive ? <IconButton icon="close" onPress={() => setPage('flag')} /> : undefined}
+        {gameActive ? <IconButton icon="close" onPress={() => setPage('flag')} /> : null}
       </hstack>
 
       {/* Leaderboard */}

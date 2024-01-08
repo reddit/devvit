@@ -76,7 +76,6 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
         </hstack>
       )}
 
-      {/* Tabs */}
       <Tabs
         tabs={props.categories.map(({ label, category }) => ({
           label,
@@ -89,7 +88,7 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
 
       {
         // Page contents
-        props.categories.find((page) => page.category === activeCategory)?.content
+        props.categories.find((page) => page.category === activeCategory)?.content ?? null
       }
     </vstack>
   );

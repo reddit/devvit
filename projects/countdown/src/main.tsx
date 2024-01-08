@@ -1,4 +1,14 @@
 import { Devvit, MediaPlugin } from '@devvit/public-api';
+import { parse } from 'tldts';
+import { APPROVED_DOMAINS, ONE_MINUTE_IN_MS, POST_DATA_KEY } from './constants.js';
+import { Preview } from './preview.js';
+import {
+  addUserReminder,
+  getExistingReminders,
+  removePostAssociatedData,
+  removeUserReminder,
+  setPostReminder,
+} from './reminders.js';
 import {
   CountdownData,
   CountdownFormData,
@@ -10,16 +20,6 @@ import {
   getTimezones,
   truncateString,
 } from './utils.js';
-import { parse } from 'tldts';
-import { APPROVED_DOMAINS, ONE_MINUTE_IN_MS, POST_DATA_KEY } from './constants.js';
-import {
-  addUserReminder,
-  getExistingReminders,
-  removePostAssociatedData,
-  removeUserReminder,
-  setPostReminder,
-} from './reminders.js';
-import { Preview } from './preview.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -238,7 +238,7 @@ Devvit.addCustomPostType({
 
     const renderLinkButton = () => {
       if (!postAssociatedData.link_url) {
-        return undefined;
+        return null;
       }
 
       const linkTitle = truncateString(postAssociatedData.link_title || 'Click here!', 27, '…');
@@ -261,7 +261,7 @@ Devvit.addCustomPostType({
 
     const renderContentCountdown = () => {
       if (!formattedTimeLeft) {
-        return undefined;
+        return null;
       }
       return formattedTimeLeft.map((remainingTimeEntry) => (
         <vstack
@@ -314,7 +314,7 @@ Devvit.addCustomPostType({
 
     function renderReminderButton() {
       if (!currentUserId) {
-        return undefined;
+        return null;
       }
 
       return (
@@ -333,7 +333,7 @@ Devvit.addCustomPostType({
 
     function renderSmallReminderButton() {
       if (!currentUserId) {
-        return undefined;
+        return null;
       }
 
       return (
@@ -433,7 +433,7 @@ Devvit.addCustomPostType({
               <spacer grow></spacer>
               {renderSmallReminderButton()}
             </hstack>
-          ) : undefined}
+          ) : null}
         </zstack>
       </blocks>
     );
