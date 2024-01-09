@@ -1,105 +1,104 @@
 import { Devvit, SettingScope } from '@devvit/public-api';
 
-Devvit.configure({
-  http: true,
-});
+Devvit.configure({ media: true, redditAPI: true, http: true });
 
-const CITIES = new Set(['Rome', 'Tokyo']);
-
-function isValidCity(cityName: string | undefined): boolean {
-  return !!cityName && CITIES.has(cityName);
+export enum Setting {
+  OpenAIApiKey = 'open-ai-api-key',
+  JokeSubject = 'joke-subject',
 }
 
 Devvit.addSettings([
   {
     type: 'string',
-    name: 'weather-api-key',
-    label: 'My weather.com API key',
+    name: Setting.OpenAIApiKey,
+    label: 'My OpenAI API key',
     scope: SettingScope.App,
     isSecret: true,
   },
   {
     type: 'string',
-    name: 'Default City',
-    defaultValue: 'Rome',
-    label: 'Default city to show the weather for by default',
-    scope: SettingScope.Installation,
+    name: Setting.JokeSubject,
+    defaultValue: 'programming',
+    label: 'Subject of the jokes',
     onValidate: ({ value }) => {
-      if (isValidCity(value)) {
-        return 'You must ender a valid city: ${validCities.join(", ")}';
-      }
-    },
-  },
-  {
-    type: 'number',
-    name: 'Default Forecast Window (in days)',
-    defaultValue: 3,
-    label: 'The number of days to show for forecast for by default',
-    scope: SettingScope.Installation,
-    onValidate: ({ value }) => {
-      if (!value || value < 10 || value < 1) {
-        return 'Forecast window must be from 1 to 10 days';
+      if (!value) {
+        return 'You must enter a value for this field';
       }
     },
   },
 ]);
 
-Devvit.addCustomPostType({
-  name: 'Hello Blocks',
-  render: (context) => {
-    const fetchWeatherInfo = async () => {
-      const apiKey: string | undefined = await context.settings.get('weather-api-key');
-      if (apiKey) {
-        const request = new Request(`https://weather.com`, {
-          headers: { Authorization: apiKey },
-        });
-        const response = await fetch(request);
-        console.log('response ', response);
-      }
-    };
-    // Your custom post layout goes here!
-    return (
-      <vstack padding="medium" cornerRadius="medium" gap="medium" alignment="middle">
-        <button appearance="primary" onPress={() => fetchWeatherInfo()}>
-          Click me!
-        </button>
-      </vstack>
-    );
-  },
-});
-
 Devvit.addMenuItem({
-  label: 'New weather app',
+  label: 'Devvit Jokes',
   location: 'subreddit',
-  /*
-   * _ tells Typescript we don't care about the first argument
-   * The second argument is a Context object--here we use object destructuring to
-   * pull just the parts we need. The code below is equivalient
-   * to using context.reddit and context.ui
-   */
   onPress: async (_, { reddit, ui }) => {
     const subreddit = await reddit.getCurrentSubreddit();
-
-    /*
-     * Submits the custom post to the specified subreddit
-     */
     await reddit.submitPost({
-      // This will show while your custom post is loading
       preview: (
-        <vstack padding="medium" cornerRadius="medium">
-          <text style="heading" size="medium">
-            Loading weather app...
-          </text>
-        </vstack>
+        <blocks>
+          <vstack padding="medium" cornerRadius="medium" alignment="middle center">
+            <text style="heading" size="medium">
+              Loading...
+            </text>
+          </vstack>
+        </blocks>
       ),
-      title: `${subreddit.name} Weather App`,
+      title: 'Devvit Jokes',
       subredditName: subreddit.name,
     });
 
     ui.showToast({
-      text: `Successfully created a weather app!`,
+      text: `Look for the Devvit Jokes post.`,
       appearance: 'success',
     });
+  },
+});
+
+async function fetchResponse(context: Devvit.Context): Promise<string | void> {
+  const apiKey = await context.settings.get(Setting.OpenAIApiKey);
+  const settings = await context.settings.getAll();
+
+  return fetch('https://api.openai.com/v1/chat/completions', {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      model: 'gpt-3.5-turbo',
+      messages: [{ content: `Tell me a new joke ${settings[Setting.JokeSubject]}`, role: 'user' }],
+      max_tokens: 50, // You can adjust this based on the desired length of the joke
+      n: 1, // Number of completions
+    }),
+  })
+    .then(async (res) => {
+      const json = await res.json();
+      return json?.choices?.length > 0 ? json?.choices[0]?.message?.content : 'No response';
+    })
+    .catch((e) => {
+      console.log('Fetch error ', e);
+      return e.toString();
+    });
+}
+
+Devvit.addCustomPostType({
+  name: 'Devvit Jokes',
+  render: (context) => {
+    const [answer, setAnswer] = context.useState<string | undefined>(undefined);
+
+    async function onPress() {
+      const response = await fetchResponse(context);
+      setAnswer(response || 'No Response');
+    }
+
+    return (
+      <blocks height="tall">
+        <vstack>
+          <button onPress={onPress}>{'Tell me a joke'}</button>
+          <text>{answer}</text>
+        </vstack>
+      </blocks>
+    );
   },
 });
 

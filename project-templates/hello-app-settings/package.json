@@ -9,9 +9,10 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.11-next-2023-12-12-341009799.0"
+    "@devvit/public-api": "0.10.12"
   },
   "devDependencies": {
+    "@devvit/tsconfig": "0.10.12",
     "typescript": "4.9.3",
     "vitest": "0.31.1"
   }
