@@ -58,7 +58,7 @@ export const FlagPage = (props: FlagPageProps): JSX.Element => {
           <IconButton icon="contest" onPress={() => setPage('leaderboard')} />
         </hstack>
         <text color="rgba(255,255,255,0.7)" selectable={false}>
-          {attemptsLeft} attempts left
+          {attemptsLeft !== undefined ? `${attemptsLeft} attempts left` : ``}
         </text>
       </vstack>
     </vstack>
