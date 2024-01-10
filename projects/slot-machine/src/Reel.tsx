@@ -39,13 +39,13 @@ export default function ({ data, spin, context, onEnd }: ReelProps) {
     const maxVisibleRows = 4;
 
     if (data.length - startLine > maxVisibleRows) {
-      setCounter(counter + stepSize);
+      setCounter((counter) => counter + stepSize);
       if (counter > headerHeight) {
         setCounter(0);
         setStartLine((current) => current + 1);
       }
     } else if (counter < initialOffset) {
-      setCounter(counter + stepSize);
+      setCounter((counter) => counter + stepSize);
     } else {
       setStartLine(0);
       onEnd(currentRows);

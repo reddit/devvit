@@ -86,7 +86,7 @@ Devvit.addCustomPostType({
           Hello, {currentUsername ?? 'stranger'}! 👋
         </text>
         <text size="large">{`Click counter: ${counter}`}</text>
-        <button appearance="primary" onPress={() => setCounter(counter + 1)}>
+        <button appearance="primary" onPress={() => setCounter((counter) => counter + 1)}>
           Click me!
         </button>
       </vstack>
