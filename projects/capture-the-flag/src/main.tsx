@@ -64,6 +64,7 @@ const TournamentConfigForm = Devvit.createForm(
           duration === 1 ? 'hour' : 'hours'
         }!`,
       });
+      ui.navigateTo(post);
     } catch (e) {
       console.log(event.values);
       ui.showToast('Something went wrong, please try again later.');

@@ -107,7 +107,7 @@ export const getNewUserScore = async (
   holdingDurationMs: number
 ) => {
   const leaderboardKey = key_post(Keys.leaderboard, postId);
-  const userScore = await redis.zScore(leaderboardKey, username);
+  const userScore = (await redis.zScore(leaderboardKey, username)) ?? 0;
   const scoreIncrement = Math.ceil(holdingDurationMs / 1000);
   return userScore + scoreIncrement;
 };
