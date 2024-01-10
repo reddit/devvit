@@ -1,18 +1,18 @@
 import { Devvit } from '@devvit/public-api';
+import { NFLGame, NFLSeasonInfo, NFLWeek } from './NFLSchedule.js';
 import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
 import { APIKey } from './APIKeys.js';
 import { Team, TeamRecord } from './GenericModels.js';
-import { NFLGame, NFLSeason, NFLWeek } from './NFLSchedule.js';
 
 type NFLBoxscoreSummary = {
-  season: NFLSeason;
+  season: NFLSeasonInfo;
   week: NFLWeek;
   home: NFLGameTeam;
   away: NFLGameTeam;
 };
 
-type NFLGameTeam = Team & {
+export type NFLGameTeam = Team & {
   market: string;
   used_timeouts: number;
   remaining_timeouts: number;
@@ -37,7 +37,7 @@ type NFLBoxscoreSituation = {
   };
 };
 
-type LastEvent = {
+export type NFLBoxscoreLastEvent = {
   type: string;
   id: string;
   sequence: number;
@@ -54,12 +54,14 @@ export type NFLBoxscore = NFLGame & {
   quarter: number;
   summary: NFLBoxscoreSummary;
   situation: NFLBoxscoreSituation;
-  last_event: LastEvent;
+  last_event: NFLBoxscoreLastEvent;
 };
 
 export enum NFLBoxscoreStatus {
+  SCHEDULED = `scheduled`,
   CREATED = `created`,
   INPROGRESS = `inprogress`,
+  HALFTIME = `halftime`,
   CLOSED = `closed`,
   COMPLETE = `complete`,
 }
@@ -67,7 +69,7 @@ export enum NFLBoxscoreStatus {
 export async function fetchNFLBoxscore(
   gameId: string,
   context: Devvit.Context
-): Promise<GeneralGameScoreInfo | null> {
+): Promise<NFLGameScoreInfo | null> {
   let data;
   const apiKey = await context.settings.get(APIKey.nfl);
   try {
@@ -84,7 +86,7 @@ export async function fetchNFLBoxscore(
   return nflGameScoreInfo(parseNFLBoxscore(data));
 }
 
-function parseNFLBoxscore(jsonData: any): NFLBoxscore {
+export function parseNFLBoxscore(jsonData: any): NFLBoxscore {
   return {
     id: jsonData.id,
     status: jsonData.status,
@@ -114,7 +116,15 @@ function parseTeam(league: string, team: any): TeamInfo {
   };
 }
 
-export function nflGameScoreInfo(game: NFLBoxscore): GeneralGameScoreInfo {
+export type NFLGameScoreInfo = GeneralGameScoreInfo & {
+  summary: NFLBoxscoreSummary;
+  clock?: string;
+  quarter?: number;
+  situation?: NFLBoxscoreSituation;
+  lastEvent?: NFLBoxscoreLastEvent;
+};
+
+export function nflGameScoreInfo(game: NFLBoxscore): NFLGameScoreInfo {
   const currentDate = new Date();
   return {
     event: {
@@ -135,17 +145,23 @@ export function nflGameScoreInfo(game: NFLBoxscore): GeneralGameScoreInfo {
     awayScore: game.summary.away.points,
     service: APIService.SRNFL,
     generatedDate: currentDate.toISOString(),
+    summary: game.summary,
+    clock: game.clock,
+    quarter: game.quarter,
+    situation: game.situation,
+    lastEvent: game.last_event,
   };
 }
 
 function eventState(event: NFLBoxscore): EventState {
   switch (event.status) {
     case NFLBoxscoreStatus.CREATED:
+    case NFLBoxscoreStatus.SCHEDULED:
       return EventState.PRE;
     case NFLBoxscoreStatus.INPROGRESS:
+    case NFLBoxscoreStatus.HALFTIME:
       return EventState.LIVE;
     case NFLBoxscoreStatus.CLOSED:
-      return EventState.FINAL;
     case NFLBoxscoreStatus.COMPLETE:
       return EventState.FINAL;
   }

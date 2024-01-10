@@ -648,3 +648,9 @@ export function formatDateForForms(dateString: string): string {
     day: 'numeric',
   });
 }
+
+export function getRelativeDate(daysDiff: number): Date {
+  const temporaryDate = new Date();
+  temporaryDate.setDate(temporaryDate.getDate() + daysDiff);
+  return temporaryDate;
+}

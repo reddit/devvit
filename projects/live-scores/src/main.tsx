@@ -2,10 +2,13 @@ import { Devvit, Post } from '@devvit/public-api';
 import { GenericScoreBoard, ScoreboardPage } from './components/Scoreboard.js';
 import { BaseballScoreBoard } from './components/baseball.js';
 import { CommentData, debugComment, getLastComment } from './components/comments.js';
-import { nextMLBDemoPage } from './mock-scores/MockHelper.js';
+import { nextMLBDemoPage, nextNFLDemoPage } from './mock-scores/MockHelper.js';
 import { BaseballGameScoreInfo } from './sports/espn/espn.js';
 import { APIService, GameSubscription, League, getLeagueFromString } from './sports/Sports.js';
-import { srSoccerScoreboardCreationForm } from './forms/ScoreboardCreateForm.js';
+import {
+  srNflScoreboardCreationForm,
+  srSoccerScoreboardCreationForm,
+} from './forms/ScoreboardCreateForm.js';
 import { EventState } from './sports/GameEvent.js';
 import {
   fetchDebugGameInfo,
@@ -18,6 +21,8 @@ import { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
 import { SoccerScoreboard } from './components/soccer.js';
 import { APIKey } from './sports/sportradar/APIKeys.js';
 import { fetchAllSubsAndGames, subscriptionsForm } from './forms/SubscriptionsForm.js';
+import { NFLGameScoreInfo } from './sports/sportradar/NFLBoxscore.js';
+import { FootballScoreboard } from './components/football/FootballScoreboard.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -56,14 +61,14 @@ Devvit.addSettings([
 //   },
 // });
 
-// Devvit.addMenuItem({
-//   label: 'Create NFL scoreboard',
-//   location: 'subreddit',
-//   forUserType: `moderator`,
-//   onPress: async (_event, { ui }) => {
-//     return ui.showForm(srNflScoreboardCreationForm);
-//   },
-// });
+Devvit.addMenuItem({
+  label: 'Create NFL Scoreboard (Internal)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srNflScoreboardCreationForm);
+  },
+});
 
 // Devvit.addMenuItem({
 //   label: 'Create manual football scoreboard',
@@ -131,35 +136,35 @@ Devvit.addMenuItem({
   },
 });
 
-Devvit.addMenuItem({
-  label: 'Create Baseball Scoreboard (Demo)',
-  location: 'subreddit',
-  forUserType: `moderator`,
-  onPress: async (_event, context) => {
-    const currentSubreddit = await context.reddit.getCurrentSubreddit();
-    const post: Post = await context.reddit.submitPost({
-      preview: (
-        <vstack padding="medium" cornerRadius="medium">
-          <text style="heading" size="medium">
-            Loading scoreboard for game...
-          </text>
-        </vstack>
-      ),
-      title: `Scoreboard: Demo`,
-      subredditName: currentSubreddit.name,
-    });
-    const gameSub: GameSubscription = {
-      league: getLeagueFromString('mlb'),
-      eventId: 'demo-mlb-01',
-      service: APIService.ESPN,
-    };
-    await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
-    return context.ui.showToast({
-      text: 'Scoreboard Demo Post Created!',
-      appearance: 'success',
-    });
-  },
-});
+// Devvit.addMenuItem({
+//   label: 'Create Baseball Scoreboard (Demo)',
+//   location: 'subreddit',
+//   forUserType: `moderator`,
+//   onPress: async (_event, context) => {
+//     const currentSubreddit = await context.reddit.getCurrentSubreddit();
+//     const post: Post = await context.reddit.submitPost({
+//       preview: (
+//         <vstack padding="medium" cornerRadius="medium">
+//           <text style="heading" size="medium">
+//             Loading scoreboard for game...
+//           </text>
+//         </vstack>
+//       ),
+//       title: `Scoreboard: Demo`,
+//       subredditName: currentSubreddit.name,
+//     });
+//     const gameSub: GameSubscription = {
+//       league: getLeagueFromString('mlb'),
+//       eventId: 'demo-mlb-01',
+//       service: APIService.ESPN,
+//     };
+//     await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
+//     return context.ui.showToast({
+//       text: 'Scoreboard Demo Post Created!',
+//       appearance: 'success',
+//     });
+//   },
+// });
 
 Devvit.addMenuItem({
   label: 'Create Soccer Scoreboard (Demo)',
@@ -186,6 +191,36 @@ Devvit.addMenuItem({
     await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
     return context.ui.showToast({
       text: 'Scoreboard Demo Post Created!',
+      appearance: 'success',
+    });
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'Create NFL Scoreboard (Demo)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, context) => {
+    const currentSubreddit = await context.reddit.getCurrentSubreddit();
+    const post: Post = await context.reddit.submitPost({
+      preview: (
+        <vstack padding="medium" cornerRadius="medium">
+          <text style="heading" size="medium">
+            Loading scoreboard for game...
+          </text>
+        </vstack>
+      ),
+      title: `Scoreboard: Football Demo`,
+      subredditName: currentSubreddit.name,
+    });
+    const gameSub: GameSubscription = {
+      league: League.NFL,
+      eventId: 'demo-nfl-game-01',
+      service: APIService.SRNFL,
+    };
+    await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
+    return context.ui.showToast({
+      text: 'NFL Demo Post Created!',
       appearance: 'success',
     });
   },
@@ -234,12 +269,23 @@ Devvit.addCustomPostType({
 
     const demoNext = async () => {
       const pageId = scoreInfo?.event.id;
-      if (pageId?.startsWith('demo')) {
+      if (pageId?.startsWith('demo-mlb')) {
         const nextPage = nextMLBDemoPage(pageId);
         const gameSub: GameSubscription = {
           league: getLeagueFromString('mlb'),
           eventId: nextPage,
           service: APIService.ESPN,
+        };
+        await context.kvStore.put(makeKeyForPostId(postId), JSON.stringify(gameSub));
+        const update = await fetchCachedGameInfoForPostId(kvStore, postId);
+        setScoreInfo(update);
+      }
+      if (pageId?.startsWith('demo-nfl-game')) {
+        const nextPage = nextNFLDemoPage(pageId);
+        const gameSub: GameSubscription = {
+          league: getLeagueFromString('nfl'),
+          eventId: nextPage,
+          service: APIService.SRNFL,
         };
         await context.kvStore.put(makeKeyForPostId(postId), JSON.stringify(gameSub));
         const update = await fetchCachedGameInfoForPostId(kvStore, postId);
@@ -258,6 +304,10 @@ Devvit.addCustomPostType({
         const soccerGameScoreInfo = scoreInfo as SoccerGameScoreInfo;
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
         return SoccerScoreboard({ scoreInfo: soccerGameScoreInfo, page, setPage });
+      } else if (scoreInfo.event.gameType === 'football') {
+        const footballGameScoreInfo = scoreInfo as NFLGameScoreInfo;
+        if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
+        return FootballScoreboard({ scoreInfo: footballGameScoreInfo }, demoNext);
       } else {
         if (scoreInfo.event.state === EventState.FINAL) updateInterval.stop();
         return GenericScoreBoard(scoreInfo, lastComment);

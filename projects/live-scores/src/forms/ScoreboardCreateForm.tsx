@@ -1,14 +1,14 @@
 import { Devvit } from '@devvit/public-api';
 import { BaseballGameScoreInfo, fetchActiveGames, fetchAllTeams } from '../sports/espn/espn.js';
 import { timezoneOptions } from '../sports/Timezones.js';
-import { APIService, getLeagueFromString, leaguesSupported } from '../sports/Sports.js';
+import { APIService, League, getLeagueFromString, leaguesSupported } from '../sports/Sports.js';
 import {
   espnGameSelectForm,
   srSoccerGameSelectionForm,
   srNflGameSelectForm,
 } from './GameSelectionForm.js';
 import { espnSingleTeamSelectForm } from './SingleTeamSelectionForm.js';
-import { fetchNflCurrentWeek } from '../sports/sportradar/NFLSchedule.js';
+import { fetchNflSchedule, filteredGamesFromSeason } from '../sports/sportradar/NFLSchedule.js';
 import { GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
 import { fetchSoccerGames } from '../sports/sportradar/SoccerSchedule.js';
@@ -93,12 +93,17 @@ export const srNflScoreboardCreationForm = Devvit.createForm(
     return {
       fields: [
         {
-          name: 'league',
-          label: 'League',
-          helpText: 'Select a league',
+          name: 'seasonType',
+          label: 'Reagular/Post Season',
+          helpText: 'Show regular season or post season games',
           type: 'select',
           required: true,
-          options: leaguesSupported(APIService.SRNFL),
+          options: [
+            { label: 'Pre Season', value: 'PRE' },
+            { label: 'Regular Season', value: 'REG' },
+            { label: 'Post Season', value: 'PST' },
+          ],
+          defaultValue: ['PST'],
         },
         {
           name: 'timezone',
@@ -110,19 +115,21 @@ export const srNflScoreboardCreationForm = Devvit.createForm(
           defaultValue: ['America/Los_Angeles'],
         },
       ],
-      title: 'Create SR Live Scoreboard Post',
+      title: 'Create NFL Scoreboard Post',
       acceptLabel: 'Next',
       cancelLabel: 'Back',
     };
   },
   async ({ values }, ctx) => {
-    const league = values['league'][0];
+    const league = League.NFL;
+    const seasonType = values['seasonType'][0];
     const timezone = values['timezone'][0];
-    const schedule = await fetchNflCurrentWeek(ctx);
+    const schedule = await fetchNflSchedule(seasonType, ctx);
+    const games = await filteredGamesFromSeason(schedule);
     return ctx.ui.showForm(srNflGameSelectForm, {
       league: league,
       timezone: timezone,
-      events: schedule?.games,
+      events: games,
     });
   }
 );

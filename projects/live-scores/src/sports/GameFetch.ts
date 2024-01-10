@@ -4,10 +4,11 @@ import { APIService, GameSubscription, getLeagueFromString, getSportFromLeague }
 import { fetchScoreForGame, parseGeneralGameScoreInfo } from './espn/espn.js';
 import { Devvit, KVStore } from '@devvit/public-api';
 import { getSubscriptions, removeSubscription } from '../subscriptions.js';
-import { fetchNFLBoxscore } from './sportradar/NFLBoxscore.js';
+import { fetchNFLBoxscore, nflGameScoreInfo, parseNFLBoxscore } from './sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
 
-const CLOSE_TO_GAME_THRESHOLD_HOURS = 1;
+// TODO YO! CHANGE THIS BACK TO 1HR WHEN YOU FINISH TESTING
+const CLOSE_TO_GAME_THRESHOLD_HOURS = 240;
 const STALE_INFO_THRESHOLD_HOURS = 6;
 const MS_TO_HOURS = 1000 * 60 * 60;
 
@@ -55,6 +56,9 @@ export function fetchDebugGameInfo(debugId: string): GeneralGameScoreInfo {
   const sport = getSportFromLeague(getLeagueFromString(league));
   if (sport === `soccer`) {
     return soccerScoreInfo(`eng.1`, parseSoccerEvent(demoForId(debugId)));
+  }
+  if (league === `nfl`) {
+    return nflGameScoreInfo(parseNFLBoxscore(demoForId(debugId)));
   }
   return parseGeneralGameScoreInfo(demoForId(debugId), league, sport);
 }
@@ -127,8 +131,7 @@ function subscriptionFetches(
   gameSubscriptions.forEach((gameSub: GameSubscription) => {
     if (gameSub.service === APIService.SRNFL) {
       eventFetches.push(fetchNFLBoxscore(gameSub.eventId, context));
-    }
-    if (gameSub.service === APIService.SRSoccer) {
+    } else if (gameSub.service === APIService.SRSoccer) {
       eventFetches.push(fetchSoccerEvent(gameSub.league, gameSub.eventId, context));
     } else {
       eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));

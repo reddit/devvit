@@ -31,8 +31,8 @@ export async function fetchSoccerGames(
 }
 
 function filterGames(games: SoccerEvent[]): SoccerEvent[] {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 8);
+  const eightDaysAgo = new Date();
+  eightDaysAgo.setDate(eightDaysAgo.getDate() - 8);
 
   const tenDaysFromNow = new Date();
   tenDaysFromNow.setDate(tenDaysFromNow.getDate() + 10);
@@ -44,7 +44,7 @@ function filterGames(games: SoccerEvent[]): SoccerEvent[] {
       return false;
     }
     const gameDate = new Date(game.sport_event.start_time);
-    return gameDate >= yesterday && gameDate <= tenDaysFromNow;
+    return gameDate >= eightDaysAgo && gameDate <= tenDaysFromNow;
   });
 }
 function parseSchedule(jsonData: any): SoccerSchedule {
