@@ -17,7 +17,20 @@ export type FootballFieldProps = {
   info: NFLGameScoreInfo;
 };
 
-function Field(division: number): JSX.Element {
+function FieldImage(): JSX.Element {
+  return (
+    <image
+      resizeMode="fill"
+      height={'100%'}
+      width={'100%'}
+      imageWidth={'544px'}
+      imageHeight={'96px'}
+      url="football/field.png"
+    />
+  );
+}
+
+function _Field(division: number): JSX.Element {
   const endzone = division; // NFL size endzone
   const fieldLength = 10 * division; // NFL size field
   return (
@@ -35,7 +48,7 @@ function Field(division: number): JSX.Element {
   );
 }
 
-function YardMarkers(division: number): JSX.Element {
+function _YardMarkers(division: number): JSX.Element {
   const elements = [];
   for (let i = 0; i <= 10; i++) {
     const yard = (i > 5 ? 10 - i : i) * 10; // yards 10 to 50 back to 10
@@ -61,16 +74,26 @@ function YardMarkers(division: number): JSX.Element {
   return <>{elements}</>;
 }
 
-function TeamLogos(event: GameEvent): JSX.Element {
+function TeamLogos(division: number, event: GameEvent): JSX.Element {
   const homeLogo = leagueAssetPath(event) + event.homeTeam.logo;
   const awayLogo = leagueAssetPath(event) + event.awayTeam.logo;
   return (
     <hstack width={'100%'} height={'100%'} alignment="center middle">
-      <spacer width="4px" />
-      <image imageWidth="16px" imageHeight="16px" url={awayLogo} />
+      <image
+        resizeMode="fit"
+        width={`${division}%`}
+        imageWidth="16px"
+        imageHeight="16px"
+        url={awayLogo}
+      />
       <spacer size="small" grow />
-      <image imageWidth="16px" imageHeight="16px" url={homeLogo} />
-      <spacer width="4px" />
+      <image
+        resizeMode="fit"
+        width={`${division}%`}
+        imageWidth="16px"
+        imageHeight="16px"
+        url={homeLogo}
+      />
     </hstack>
   );
 }
@@ -140,10 +163,11 @@ export function FootballField(props: FootballFieldProps): JSX.Element {
   return (
     <hstack width={'100%'} height={'100%'} backgroundColor="pink" alignment="center middle">
       <zstack width={'100%'} height={'100%'} alignment="start middle">
-        {Field(division)}
-        {YardMarkers(division)}
+        {/* {Field(division)}
+        {YardMarkers(division)} */}
+        {FieldImage()}
         {Ball(ballCoord, direction)}
-        {TeamLogos(props.info.event)}
+        {TeamLogos(division, props.info.event)}
       </zstack>
     </hstack>
   );
