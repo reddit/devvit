@@ -121,6 +121,13 @@ export const srNflGameSelectForm = Devvit.createForm(
           required: true,
           options: eventOptions,
         },
+        {
+          name: 'postTitle',
+          label: 'Post title',
+          type: 'string',
+          required: false,
+          helpText: `Optional post title. Leave blank for auto-generated title.`,
+        },
       ],
       title: 'Create Live Scoreboard Post',
       description: `League selected: ${getDisplayNameFromLeague(data['league'])}`,
@@ -129,6 +136,7 @@ export const srNflGameSelectForm = Devvit.createForm(
     };
   },
   async ({ values }, ctx) => {
+    const postTitle: string = values.postTitle;
     const league: string = values.game[0].split('*')[0];
     const eventId: string = values.game[0].split('*')[1];
     const gameSub: GameSubscription = {
@@ -158,7 +166,7 @@ export const srNflGameSelectForm = Devvit.createForm(
           </text>
         </vstack>
       ),
-      title: `Scoreboard: ${gameTitle}`,
+      title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
       subredditName: currentSubreddit.name,
     });
     await ctx.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));

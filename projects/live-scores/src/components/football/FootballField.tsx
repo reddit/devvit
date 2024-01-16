@@ -20,12 +20,12 @@ export type FootballFieldProps = {
 function FieldImage(): JSX.Element {
   return (
     <image
-      resizeMode="fill"
       height={'100%'}
       width={'100%'}
-      imageWidth={'544px'}
-      imageHeight={'96px'}
+      imageWidth={'1292px'}
+      imageHeight={'228px'}
       url="football/field.png"
+      resizeMode="fill"
     />
   );
 }
@@ -82,16 +82,16 @@ function TeamLogos(division: number, event: GameEvent): JSX.Element {
       <image
         resizeMode="fit"
         width={`${division}%`}
-        imageWidth="16px"
-        imageHeight="16px"
+        imageWidth="240px"
+        imageHeight="240px"
         url={awayLogo}
       />
       <spacer size="small" grow />
       <image
         resizeMode="fit"
         width={`${division}%`}
-        imageWidth="16px"
-        imageHeight="16px"
+        imageWidth="240px"
+        imageHeight="240px"
         url={homeLogo}
       />
     </hstack>
@@ -99,22 +99,21 @@ function TeamLogos(division: number, event: GameEvent): JSX.Element {
 }
 
 function Ball(ballCoordinates: number, direction: PossessionDirection): JSX.Element {
-  const ballEmojiOffset = 8;
-  const directionRight = direction === PossessionDirection.Right;
+  const url =
+    direction === PossessionDirection.Right
+      ? 'football/football-right-white.png'
+      : 'football/football-left-white.png';
   return (
-    <hstack width={'100%'} height={'100%'} reverse={directionRight ? true : false}>
-      <spacer width={`${ballEmojiOffset}px`} />
-      <vstack width={`${ballCoordinates}%`}>
+    <hstack width={'100%'} height={'100%'} alignment="start top">
+      <vstack height={'100%'} width={`${ballCoordinates}%`} alignment="end top">
         <spacer size="small" />
-        <text size="xlarge" color="yellow" alignment={directionRight ? 'start' : 'end'}>
-          {ballText(direction)}
-        </text>
+        <image width={'48px'} height={'22px'} imageWidth="72px" imageHeight="33px" url={url} />
       </vstack>
     </hstack>
   );
 }
 
-function ballText(direction: PossessionDirection): string {
+function _ballText(direction: PossessionDirection): string {
   switch (direction) {
     case PossessionDirection.Left:
       return '←🏈';
@@ -148,20 +147,20 @@ export function FootballField(props: FootballFieldProps): JSX.Element {
   // For math, divide the field into 12 equal sections
   // Note - Canadian Football will require adjustments throughout
   const division = 100 / 12;
-  const absoluteBallLocation =
-    direction === PossessionDirection.Right
-      ? side !== PossessionSide.Left
-        ? ballLocation
-        : ballLocation + 2 * (50 - ballLocation)
-      : side === PossessionSide.Left
-      ? ballLocation
-      : ballLocation + 2 * (50 - ballLocation);
+  const absBallLocation =
+    side === PossessionSide.Left ? ballLocation + 10 : ballLocation + 2 * (50 - ballLocation) + 10;
 
   // convert to 10 zones, and translate to division coordinates + add endzone (CFL will need adjustments)
-  const ballCoord = (absoluteBallLocation / 10) * division + division;
+  const ballCoord = (absBallLocation / 10) * division + division;
 
   return (
-    <hstack width={'100%'} height={'100%'} backgroundColor="pink" alignment="center middle">
+    <hstack
+      width={'100%'}
+      height={'100%'}
+      alignment="center middle"
+      border="thin"
+      borderColor="#B8ECA5"
+    >
       <zstack width={'100%'} height={'100%'} alignment="start middle">
         {/* {Field(division)}
         {YardMarkers(division)} */}

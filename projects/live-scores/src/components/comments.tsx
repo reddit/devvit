@@ -71,28 +71,28 @@ function keyForPostId(postId: string | undefined): string {
   return `lastComment-${postId}`;
 }
 
-async function storeLastComment(context: TriggerContext, commentData: CommentData): Promise<void> {
+async function _storeLastComment(context: TriggerContext, commentData: CommentData): Promise<void> {
   await context.kvStore.put(keyForPostId(commentData.postId), commentData);
 }
 
 // Disable comments for now, revisit in near future (2023-10-19)
 
-Devvit.addTrigger({
-  event: 'CommentCreate',
-  onEvent: async (event, context) => {
-    // console.log(`CommentCreate context ${JSON.stringify(context)}`);
-    // console.log(`CommentCreate event ${JSON.stringify(event)}`);
-    if (event.comment && event.author && event.post && event.comment?.parentId[0] !== 't') {
-      const commentData: CommentData = {
-        id: event.comment?.id,
-        username: event.author?.name,
-        text: event.comment?.body,
-        postId: event.post?.id,
-      };
-      await storeLastComment(context, commentData);
-      console.log(`Last Comment Updated! ${commentData.username} : ${commentData.text}`);
-    } else {
-      console.log(`Invalid Comment ${event.comment?.id} on post ${event.post?.id}`);
-    }
-  },
-});
+// Devvit.addTrigger({
+//   event: 'CommentCreate',
+//   onEvent: async (event, context) => {
+//     // console.log(`CommentCreate context ${JSON.stringify(context)}`);
+//     // console.log(`CommentCreate event ${JSON.stringify(event)}`);
+//     if (event.comment && event.author && event.post && event.comment?.parentId[0] !== 't') {
+//       const commentData: CommentData = {
+//         id: event.comment?.id,
+//         username: event.author?.name,
+//         text: event.comment?.body,
+//         postId: event.post?.id,
+//       };
+//       await _storeLastComment(context, commentData);
+//       console.log(`Last Comment Updated! ${commentData.username} : ${commentData.text}`);
+//     } else {
+//       console.log(`Invalid Comment ${event.comment?.id} on post ${event.post?.id}`);
+//     }
+//   },
+// });

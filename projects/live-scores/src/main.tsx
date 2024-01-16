@@ -244,7 +244,11 @@ Devvit.addCustomPostType({
       data && setScoreInfo(data);
     }, 10000);
 
-    updateInterval.start();
+    if (scoreInfo?.event.state === EventState.FINAL) {
+      updateInterval.stop();
+    } else {
+      updateInterval.start();
+    }
 
     const [lastComment, _setLastComment] = context.useState<CommentData>(async () => {
       if (context.debug.metadata?.['debug-id']?.values?.[0]) {

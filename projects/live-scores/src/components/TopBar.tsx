@@ -36,19 +36,31 @@ export function TopBar({
   baseballProps,
   basketBallProps,
   event,
+  color,
+  height,
 }: {
   baseballProps?: TopBarBaseball;
   basketBallProps?: TopBarBasketball;
   event: GameEvent;
+  color?: string;
+  height?: Devvit.Blocks.SizeString;
 }): JSX.Element {
   const state = event.state;
   const date = event.date;
+  const backgroundColor = color ?? 'alienblue-700';
+  const barHeight = height ?? '58px';
   if (state === EventState.PRE && date) {
     const gameTime = new Date(date).getTime();
     const currentTime = new Date().getTime();
     const timeDifference = gameTime - currentTime;
+
     return (
-      <hstack padding="medium" backgroundColor="alienblue-700" alignment="center middle">
+      <hstack
+        height={barHeight}
+        padding="medium"
+        backgroundColor={backgroundColor}
+        alignment="center middle"
+      >
         <text color="white" style="heading">
           {timeDifference > 0 ? `Starting in ${msToHMS(gameTime - currentTime)}` : 'Starting soon'}{' '}
           ...
@@ -57,7 +69,12 @@ export function TopBar({
     );
   } else if (state === EventState.FINAL) {
     return (
-      <hstack padding="medium" backgroundColor="alienblue-700" alignment="center middle">
+      <hstack
+        height={barHeight}
+        padding="medium"
+        backgroundColor={backgroundColor}
+        alignment="center middle"
+      >
         <text color="white" style="heading">
           Game has ended
         </text>
@@ -71,10 +88,10 @@ export function TopBar({
     const { displayClock, period } = event.timingInfo;
     return (
       <hstack
-        height={'58px'}
+        height={barHeight}
         width={'100%'}
         padding="medium"
-        backgroundColor="alienblue-700"
+        backgroundColor={backgroundColor}
         alignment="center middle"
       >
         <hstack alignment="start" grow>

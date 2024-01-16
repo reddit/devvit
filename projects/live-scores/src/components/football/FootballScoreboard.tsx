@@ -1,38 +1,50 @@
 import { Devvit } from '@devvit/public-api';
-import {
-  NFLBoxscoreLastEvent,
-  NFLGameScoreInfo,
-  NFLGameTeam,
-} from '../../sports/sportradar/NFLBoxscore.js';
+import { NFLGameScoreInfo, NFLGameTeam } from '../../sports/sportradar/NFLBoxscore.js';
 import { EventState, leagueAssetPath } from '../../sports/GameEvent.js';
 import { FootballField } from './FootballField.js';
-import { Live, TopBar } from '../TopBar.js';
+import { TopBar } from '../TopBar.js';
 import { eventPeriodString } from '../../sports/espn/espn.js';
+
+enum Color {
+  primaryFont = '#F2F4F5',
+  secondaryFont = '#B8C5C9',
+  liveRed = '#FF4500',
+  transparentHeader = '#0B1416b3',
+}
 
 function Header(info: NFLGameScoreInfo): JSX.Element {
   const isHalftime = info.clock === `00:00` && info.quarter === 2;
   const isEndOfQuarter = info.clock === `00:00`;
   return (
-    <hstack width={'100%'} height={'23%'} backgroundColor="alienblue-700" alignment="center middle">
-      <spacer size="small" />
-      <vstack width={'20%'} alignment="start middle">
-        <text size="medium" style="heading">
-          {!isHalftime ? (!isEndOfQuarter ? info.clock : 'End') : 'Halftime'}
-        </text>
-        {!isHalftime && info.quarter ? (
-          <text size="xsmall">{eventPeriodString(info.quarter, 'football')}</text>
-        ) : null}
+    <vstack width={'100%'} height={'30%'} backgroundColor="#0B1416b3" alignment="center middle">
+      <vstack maxWidth={'296px'} width={'90%'} alignment="center middle">
+        <hstack gap="small" width={'100%'} alignment="center middle">
+          <text size="small" style="heading" color={Color.primaryFont}>
+            {!isHalftime ? (!isEndOfQuarter ? info.clock : 'End') : 'Halftime'}
+          </text>
+          {!isHalftime && info.quarter ? (
+            <>
+              <text size="small" style="heading" color={Color.primaryFont}>{` • `}</text>
+              <text size="small" style="heading" color={Color.primaryFont}>
+                {eventPeriodString(info.quarter, 'football')}
+              </text>
+            </>
+          ) : null}
+          {info.event.state === EventState.LIVE ? (
+            <>
+              <text size="small" style="heading" color={Color.primaryFont}>{` • `}</text>
+              <text size="small" style="heading" color={Color.liveRed}>
+                Live
+              </text>
+            </>
+          ) : null}
+        </hstack>
+        <spacer size="xsmall" />
+        <hstack width={'100%'} height={'56px'}>
+          {FootballField({ info })}
+        </hstack>
       </vstack>
-      <spacer size="xsmall" grow />
-      <hstack width={'50%'} height={'48px'}>
-        {FootballField({ info })}
-      </hstack>
-      <spacer size="xsmall" grow />
-      <hstack width="20%" alignment="end middle">
-        {info.event.state === EventState.LIVE && Live()}
-      </hstack>
-      <spacer size="small" />
-    </hstack>
+    </vstack>
   );
 }
 
@@ -64,12 +76,18 @@ function PossessionComponent(team: NFLGameTeam, info: NFLGameScoreInfo): JSX.Ele
   const downString = `${down(info.situation.down)} & ${info.situation.yfd}`;
   const yardline = info.situation.location.alias + ' ' + info.situation.location.yardline;
   return (
-    <hstack height={'100%'} width={'75px'} alignment="start middle" grow>
+    <hstack height={'100%'} alignment="start middle" grow>
       <text>🏈</text>
       <spacer width="4px" />
-      <vstack alignment="top start">
-        {hasPossession ? <text size="medium">{downString}</text> : null}
-        <text size="medium">{yardline}</text>
+      <vstack height={'100%'} alignment="start middle">
+        {hasPossession ? (
+          <text color="#B8C5C9" size="medium">
+            {downString}
+          </text>
+        ) : null}
+        <text color="#B8C5C9" size="medium">
+          {yardline}
+        </text>
       </vstack>
     </hstack>
   );
@@ -82,11 +100,11 @@ function timeoutsLeftString(tol: number) {
 function ScoreComponent(team: NFLGameTeam, info: NFLGameScoreInfo): JSX.Element {
   return (
     <vstack height="100%" width={'44px'} alignment="end middle">
-      <text size="xxlarge" style="heading">
+      <text color={Color.primaryFont} size="xlarge" style="heading">
         {team.points}
       </text>
       {info.event.state === EventState.LIVE && (
-        <text size="xsmall" style="metadata">
+        <text color={Color.secondaryFont} size="xsmall" style="metadata">
           {timeoutsLeftString(team.remaining_timeouts)}
         </text>
       )}
@@ -99,19 +117,21 @@ function Team(isHome: Boolean, info: NFLGameScoreInfo): JSX.Element {
   let logo = isHome ? info.event.homeTeam.logo : info.event.awayTeam.logo;
   let logoUrl = leagueAssetPath(info.event) + logo;
   return (
-    <hstack width={'100%'} height={'22%'} alignment="start middle">
+    <hstack width={'100%'} height={'20%'} alignment="start middle">
       <hstack height={'100%'} alignment="start middle" grow>
         <spacer size="small" />
-        <image url={logoUrl} imageHeight={32} imageWidth={32} />
+        <image url={logoUrl} height={'32px'} width={'32px'} imageHeight={240} imageWidth={240} />
         <spacer size="small" />
         <vstack alignment="top start">
-          <text size="small">{team.market}</text>
-          <text size="large" style="heading">
+          <text color={Color.primaryFont} size="small">
+            {team.market}
+          </text>
+          <text color={Color.primaryFont} size="large" style="heading">
             {team.name}
           </text>
         </vstack>
       </hstack>
-      <hstack alignment="center middle">
+      <hstack height={'100%'} alignment="center middle">
         {PossessionComponent(team, info)}
         {ScoreComponent(team, info)}
       </hstack>
@@ -120,7 +140,21 @@ function Team(isHome: Boolean, info: NFLGameScoreInfo): JSX.Element {
   );
 }
 
-function LastEvent(event?: NFLBoxscoreLastEvent): JSX.Element {
+function LastEvent(info: NFLGameScoreInfo): JSX.Element {
+  let primaryString: string | undefined;
+  let secondaryString: string | undefined;
+
+  if (info.event.state === EventState.FINAL) {
+    primaryString = `📣 Game has ended`;
+    secondaryString = `Join the discussion in the comments!`;
+  } else if (info.lastEvent) {
+    primaryString = `📣 Latest Update (${info.lastEvent.clock ?? ''})`;
+    secondaryString = info.lastEvent.description ?? '';
+  } else {
+    primaryString = `🏈 Game has not started yet`;
+    secondaryString = `Join the discussion in the comments!`;
+  }
+
   return (
     <hstack width="100%" alignment="middle center" padding="small" grow>
       <vstack
@@ -128,20 +162,20 @@ function LastEvent(event?: NFLBoxscoreLastEvent): JSX.Element {
         height="100%"
         alignment="middle start"
         border="thin"
-        cornerRadius="full"
-        borderColor="alienblue-600"
+        cornerRadius="medium"
+        borderColor="#485A66"
+        backgroundColor="#0B1416b3"
       >
         <hstack width="100%" grow>
           <spacer size="medium" />
           <vstack alignment="start middle" grow>
-            <text size="medium" weight="bold">
-              📣 Latest Update ({event?.clock ?? ''})
+            <text color={Color.primaryFont} size="medium" weight="bold">
+              {primaryString}
             </text>
-            <text size="small" wrap={true}>
-              {event?.description ?? ''}
+            <text color={Color.secondaryFont} size="small" wrap={true}>
+              {secondaryString}
             </text>
           </vstack>
-          {/* <button appearance="primary">Cheer!</button> */}
           <spacer size="small" />
         </hstack>
       </vstack>
@@ -159,16 +193,22 @@ export function FootballScoreboard(
 ): JSX.Element {
   return (
     <zstack width={'100%'} height={'100%'}>
+      <image
+        width={'100%'}
+        height={'100%'}
+        imageWidth={1136}
+        imageHeight={648}
+        url="football/background.png"
+        resizeMode="cover"
+      />
       <vstack width={'100%'} height={'100%'}>
         {props.scoreInfo.event.state === EventState.LIVE && Header(props.scoreInfo)}
         {props.scoreInfo.event.state !== EventState.LIVE &&
-          TopBar({ event: props.scoreInfo.event })}
-
+          TopBar({ event: props.scoreInfo.event, color: Color.transparentHeader, height: '30%' })}
         {Team(false, props.scoreInfo)}
         <hstack border="thin" />
         {Team(true, props.scoreInfo)}
-
-        {props.scoreInfo.event.state === EventState.LIVE && LastEvent(props.scoreInfo.lastEvent)}
+        {LastEvent(props.scoreInfo)}
       </vstack>
       {props.scoreInfo.event.id.startsWith(`demo-nfl-game`) && (
         <hstack width={'100%'} height={'100%'} alignment="end bottom">
