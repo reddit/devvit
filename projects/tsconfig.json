@@ -1,7 +1,0 @@
-{
-  "extends": "@devvit/tsconfig/base.json",
-  "compilerOptions": {
-    "lib": ["WebWorker"],
-    "noEmit": true
-  }
-}
