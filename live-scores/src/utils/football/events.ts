@@ -80,13 +80,13 @@ export function getCurrentEventData(
     secondaryString = navigationEventOverride.description ?? '';
   } else if (info.event.state === EventState.FINAL) {
     primaryString = `Game has ended`;
-    secondaryString = `Join the discussion in the comments!`;
+    secondaryString = `Join the discussion in the comments, or expand this section to see the play-by-play`;
   } else if (info.lastEvent) {
     primaryString = `Latest Update (${info.lastEvent.clock ?? ''})`;
     secondaryString = info.lastEvent.description ?? '';
   } else {
-    primaryString = `Game has not started yet`;
-    secondaryString = `Join the discussion in the comments!`;
+    primaryString = `✨ New! Play history is here`;
+    secondaryString = `Once the game starts, expand this section to see the current and past plays`;
   }
   return { primaryString, secondaryString };
 }

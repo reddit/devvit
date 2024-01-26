@@ -135,7 +135,7 @@ export const srNflGameSelectForm = Devvit.createForm(
           helpText:
             'Example: Latest Update (04:20) - A person just scored a bunch of points. Wow, go sports!',
           type: 'boolean',
-          defaultValue: true,
+          defaultValue: false,
         },
       ],
       title: 'Create Scoreboard Post',
@@ -249,7 +249,7 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
           helpText:
             'Example: Latest Update (04:20) - A person just scored a bunch of points. Wow, go sports!',
           type: 'boolean',
-          defaultValue: true,
+          defaultValue: false,
         },
       ],
       title: 'Create Scoreboard Post',
