@@ -11,8 +11,8 @@ export type ReactionScore = {
   count: number;
 };
 
-function counterKey(reactionId: string, postId: string, eventId: string) {
-  return `${postId}:${eventId}:reactions:${reactionId}`;
+function reactionsHashKey(postId: string, eventId: string) {
+  return `${postId}:${eventId}:reactions`;
 }
 
 export async function incrementReaction(
@@ -25,20 +25,8 @@ export async function incrementReaction(
   if (!postId || !eventId) {
     return;
   }
-  const key = counterKey(reaction.id, postId, eventId);
-  await redis.incrBy(key, value);
-}
-
-export async function getReactionScore(
-  reaction: Reaction,
-  postId: string,
-  eventId: string,
-  redis: RedisClient
-): Promise<ReactionScore> {
-  const key = counterKey(reaction.id, postId, eventId);
-  const value = await redis.get(key);
-  const score = value ? parseInt(value) : 0;
-  return { reaction, count: score };
+  const key = reactionsHashKey(postId, eventId);
+  await redis.hincrby(key, reaction.id, value);
 }
 
 export async function configurePostWithAvailableReactions(
@@ -74,10 +62,12 @@ export async function getAllReactionScores(
     return [];
   }
   const reactions = await getAvailableReactions(redis, postId);
-  const scores = await Promise.all(
-    reactions.map((reaction) => getReactionScore(reaction, postId, eventId, redis))
-  );
-  return scores;
+  const scores = await redis.hgetall(reactionsHashKey(postId, eventId));
+  console.log('scores', scores);
+  return reactions.map((reaction) => {
+    const score = scores ? parseInt(scores[reaction.id]) : 0;
+    return { reaction, count: score };
+  });
 }
 
 export const defaultReactions: Reaction[] = [
@@ -100,7 +90,7 @@ export const defaultReactions: Reaction[] = [
 
 export function friendlyNumber(num: number) {
   if (!Number.isFinite(num) || num < 0) {
-    return '--'; // Input validation for non-negative numbers
+    return '0'; // Input validation for non-negative numbers
   }
   if (num < 1000) {
     return num.toLocaleString(); // Formats numbers below 1000 with commas

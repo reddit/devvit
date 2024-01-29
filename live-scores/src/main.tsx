@@ -6,6 +6,7 @@ import { nextMLBDemoPage, nextNFLDemoPage } from './mock-scores/MockHelper.js';
 import { BaseballGameScoreInfo } from './sports/espn/espn.js';
 import { APIService, GameSubscription, League, getLeagueFromString } from './sports/Sports.js';
 import {
+  srNbaScoreboardCreationForm,
   srNflScoreboardCreationForm,
   srSoccerScoreboardCreationForm,
 } from './forms/ScoreboardCreateForm.js';
@@ -65,6 +66,13 @@ Devvit.addSettings([
   {
     name: APIKey.nfl,
     label: 'Sportradar NFL API Key',
+    type: 'string',
+    isSecret: true,
+    scope: 'app',
+  },
+  {
+    name: APIKey.nba,
+    label: 'Sportradar NBA API Key',
     type: 'string',
     isSecret: true,
     scope: 'app',
@@ -137,7 +145,7 @@ export const AppContent: Devvit.BlockComponent<{
       demoNext
     );
   } else {
-    return GenericScoreBoard(scoreInfo, lastComment);
+    return GenericScoreBoard(scoreInfo);
   }
 };
 
@@ -156,6 +164,15 @@ Devvit.addMenuItem({
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
     return ui.showForm(srNflScoreboardCreationForm);
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'Create NBA Scoreboard (Internal)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srNbaScoreboardCreationForm);
   },
 });
 

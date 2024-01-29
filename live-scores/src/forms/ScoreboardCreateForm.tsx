@@ -6,6 +6,7 @@ import {
   espnGameSelectForm,
   srSoccerGameSelectionForm,
   srNflGameSelectForm,
+  srNbaGameSelectForm,
 } from './GameSelectionForm.js';
 import { espnSingleTeamSelectForm } from './SingleTeamSelectionForm.js';
 import { fetchNflSchedule, filteredGamesFromSeason } from '../sports/sportradar/NFLSchedule.js';
@@ -13,6 +14,10 @@ import { GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
 import { fetchSoccerGames } from '../sports/sportradar/SoccerSchedule.js';
 import { infoForLeague } from '../sports/sportradar/SoccerLeagues.js';
+import {
+  fetchNbaSchedule,
+  filterGamesFromNbaSeason,
+} from '../sports/sportradar/BasketballSchedule.js';
 
 export const espnScoreboardCreationForm = Devvit.createForm(
   () => {
@@ -210,5 +215,47 @@ export const srSoccerScoreboardCreationForm = Devvit.createForm(
       timezone: timezone,
       events: games,
     });
+  }
+);
+
+export const srNbaScoreboardCreationForm = Devvit.createForm(
+  () => {
+    return {
+      fields: [
+        {
+          name: 'seasonType',
+          label: 'Reagular/Post Season',
+          helpText: 'Show regular season or post season games',
+          type: 'select',
+          required: true,
+          options: [
+            { label: 'Pre Season', value: 'PRE' },
+            { label: 'Regular Season', value: 'REG' },
+            { label: 'Post Season', value: 'PST' },
+          ],
+          defaultValue: ['REG'],
+        },
+        {
+          name: 'timezone',
+          label: 'Timezone',
+          helpText: 'Timezone to display game times in',
+          type: 'select',
+          required: false,
+          options: timezoneOptions,
+          defaultValue: ['America/Los_Angeles'],
+        },
+      ],
+      title: 'Create NBA Scoreboard Post',
+      acceptLabel: 'Next',
+      cancelLabel: 'Back',
+    };
+  },
+  async ({ values }, ctx) => {
+    const league = League.NBA;
+    const seasonType = values['seasonType'][0];
+    const timezone = values['timezone'][0];
+    const schedule = await fetchNbaSchedule(seasonType, ctx);
+    const games = await filterGamesFromNbaSeason(schedule);
+    return ctx.ui.showForm(srNbaGameSelectForm, { league, timezone, events: games });
   }
 );

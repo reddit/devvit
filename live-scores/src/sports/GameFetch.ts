@@ -12,9 +12,10 @@ import {
 } from './sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
 import { storeLastEvent } from './sportradar/LastEvents.js';
+import { fetchNBAGame } from './sportradar/BasketballPlayByPlay.js';
 
 const CLOSE_TO_GAME_THRESHOLD_HOURS = 1;
-const STALE_INFO_THRESHOLD_HOURS = 6;
+const STALE_INFO_THRESHOLD_HOURS = 1;
 const MS_TO_HOURS = 1000 * 60 * 60;
 
 export function makeKeyForSubscription(subscription: GameSubscription): string {
@@ -163,6 +164,8 @@ function subscriptionFetches(
       eventFetches.push(fetchNFLBoxscore(gameSub.eventId, context));
     } else if (gameSub.service === APIService.SRSoccer) {
       eventFetches.push(fetchSoccerEvent(gameSub.league, gameSub.eventId, context));
+    } else if (gameSub.service === APIService.SRNBA) {
+      eventFetches.push(fetchNBAGame(gameSub.eventId, context));
     } else {
       eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
     }

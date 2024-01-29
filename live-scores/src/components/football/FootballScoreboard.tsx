@@ -321,7 +321,12 @@ function ReactionButton(
         imageWidth={48}
       />
       <spacer size="xsmall" />
-      <text minWidth={'24px'} size="small" color={isOnline ? Color.primaryFont : Color.offlineFont}>
+      <text
+        selectable={false}
+        minWidth={'24px'}
+        size="small"
+        color={isOnline ? Color.primaryFont : Color.offlineFont}
+      >
         {friendlyNumber(reaction.count)}
       </text>
       <spacer size="small" />

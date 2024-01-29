@@ -8,6 +8,7 @@ export enum APIService {
   ESPN = `espn`,
   SRNFL = `sr_nfl`,
   SRSoccer = `sr_soccer`,
+  SRNBA = `sr_nba`,
 }
 
 export enum League {

@@ -1,7 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
-import { CommentData, CommentBlock } from './comments.js';
 import { GeneralGameScoreInfo, leagueAssetPath } from '../sports/GameEvent.js';
 
 export enum ScoreboardPage {
@@ -18,10 +17,7 @@ export type ScoreboardProps = {
   setPage: (page: ScoreboardPage) => void;
 };
 
-export function GenericScoreBoard(
-  scoreInfo: GeneralGameScoreInfo,
-  lastComment: CommentData
-): JSX.Element {
+export function GenericScoreBoard(scoreInfo: GeneralGameScoreInfo): JSX.Element {
   return (
     <blocks height="regular">
       <vstack cornerRadius="medium" grow>
@@ -47,10 +43,6 @@ export function GenericScoreBoard(
               state: scoreInfo.event.state,
             })}
           </vstack>
-          {CommentBlock({
-            username: lastComment.username,
-            commentBody: lastComment.text,
-          })}
         </zstack>
       </vstack>
     </blocks>
