@@ -277,14 +277,11 @@ function EventOverlay(
                 </text>
               </hstack>
               <spacer grow></spacer>
-              <text
-                color={resetNavigationColor}
-                size="small"
-                weight="bold"
-                onPress={onResetNavigation}
-              >
-                Jump to latest
-              </text>
+              <hstack onPress={onResetNavigation}>
+                <text color={resetNavigationColor} size="small" weight="bold">
+                  Jump to latest
+                </text>
+              </hstack>
               <spacer grow></spacer>
               <hstack alignment="center middle" onPress={onNavigateNext || undefined}>
                 <text color={nextColor} size="small" weight="bold">
