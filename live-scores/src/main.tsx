@@ -594,7 +594,8 @@ Devvit.addSchedulerJob({
       return;
     }
 
-    await postLatestEvents(context, allScoreInfos);
+    // 1/30/2024 - Removing autocomments for now
+    // await postLatestEvents(context, allScoreInfos);
 
     const dynamicCacheLoaderFlag = await context.settings.get(
       AppSettings.enableDynamicCachedLoader

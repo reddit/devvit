@@ -133,14 +133,6 @@ export const srNflGameSelectForm = Devvit.createForm(
           required: false,
           helpText: `Optional post title. Leave blank for auto-generated title.`,
         },
-        {
-          name: 'eventComments',
-          label: 'Allow Scoreboard to create comments for game events?',
-          helpText:
-            'Example: Latest Update (04:20) - A person just scored a bunch of points. Wow, go sports!',
-          type: 'boolean',
-          defaultValue: false,
-        },
       ],
       title: 'Create Scoreboard Post',
       description: `League selected: ${getDisplayNameFromLeague(data['league'])}`,
@@ -152,7 +144,6 @@ export const srNflGameSelectForm = Devvit.createForm(
     const postTitle: string = values.postTitle;
     const league: string = values.game[0].split('*')[0];
     const eventId: string = values.game[0].split('*')[1];
-    const allowComments: boolean = values.eventComments;
     const gameSub: GameSubscription = {
       league: getLeagueFromString(league),
       eventId: eventId,
@@ -177,8 +168,6 @@ export const srNflGameSelectForm = Devvit.createForm(
       title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
       subredditName: currentSubreddit.name,
     });
-
-    await toggleEventComments(allowComments, post.id, ctx.redis);
 
     const eventPostIdInfo = await ctx.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
     let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
@@ -247,14 +236,6 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
           required: false,
           helpText: `Optional post title. Leave blank for auto-generated title.`,
         },
-        {
-          name: 'eventComments',
-          label: 'Allow Scoreboard to create comments for game events?',
-          helpText:
-            'Example: Latest Update (04:20) - A person just scored a bunch of points. Wow, go sports!',
-          type: 'boolean',
-          defaultValue: false,
-        },
       ],
       title: 'Create Scoreboard Post',
       description: `League selected: ${getDisplayNameFromLeague(data['league'])}`,
@@ -266,7 +247,6 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
     const postTitle: string = values.postTitle;
     const league: string = values.game[0].split('-')[0];
     const eventId: string = values.game[0].split('-')[1];
-    const allowComments: boolean = values.eventComments;
     const gameSub: GameSubscription = {
       league: getLeagueFromString(league),
       eventId: eventId,
@@ -294,8 +274,6 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
       title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
       subredditName: currentSubreddit.name,
     });
-
-    await toggleEventComments(allowComments, post.id, context.redis);
 
     const eventPostIdInfo = await context.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
     let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
@@ -360,14 +338,6 @@ export const srNbaGameSelectForm = Devvit.createForm(
           required: false,
           helpText: `Optional post title. Leave blank for auto-generated title.`,
         },
-        {
-          name: 'eventComments',
-          label: 'Allow Scoreboard to create comments for game events?',
-          helpText:
-            'Example: Latest Update (04:20) - A person just scored a bunch of points. Wow, go sports!',
-          type: 'boolean',
-          defaultValue: false,
-        },
       ],
       title: 'Create Scoreboard Post',
       description: `League selected: ${getDisplayNameFromLeague(data['league'])}`,
@@ -379,7 +349,6 @@ export const srNbaGameSelectForm = Devvit.createForm(
     const postTitle: string = values.postTitle;
     const league: string = values.game[0].split('*')[0];
     const eventId: string = values.game[0].split('*')[1];
-    const allowComments: boolean = values.eventComments;
     const gameSub: GameSubscription = {
       league: getLeagueFromString(league),
       eventId: eventId,
@@ -404,8 +373,6 @@ export const srNbaGameSelectForm = Devvit.createForm(
       title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
       subredditName: currentSubreddit.name,
     });
-
-    await toggleEventComments(allowComments, post.id, ctx.redis);
 
     const eventPostIdInfo = await ctx.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
     let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
