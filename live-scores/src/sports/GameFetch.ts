@@ -173,10 +173,31 @@ function subscriptionFetches(
   return eventFetches;
 }
 
-export async function unsubscribePost(postId: string, kvStore: KVStore): Promise<boolean> {
+export async function handlePostRemoval(postId: string, kvStore: KVStore): Promise<boolean> {
   const key = makeKeyForPostId(postId);
-  const gameSubString = await kvStore.get(key);
-  console.log(`Deleting subscription: ${gameSubString}`);
+  const gameSubString = await kvStore.get<string>(key);
+  if (!gameSubString) {
+    return false;
+  }
+  const gameSubscription: GameSubscription = JSON.parse(gameSubString);
+  const postsKey = makeKeyForEventId(gameSubscription.eventId);
+  const rawPosts = await kvStore.get<string>(postsKey);
+  console.log(
+    `Beginning removal of post ${postId} from event ${gameSubscription.eventId} with posts: ${rawPosts}`
+  );
+  let posts: string[] = [];
+  if (rawPosts) {
+    const postIdsForEventId: { postIds: string[] } = JSON.parse(rawPosts);
+    posts = postIdsForEventId.postIds.filter((id) => id !== postId);
+    if (postIdsForEventId.postIds.length !== posts.length) {
+      console.log(`Detected change, rewriting posts for event`);
+      await kvStore.put(postsKey, JSON.stringify({ postIds: posts }));
+    }
+  }
+  if (posts.length > 0) {
+    console.log(`Leaving subscription alive for other posts... ${gameSubscription.eventId}`);
+    return false;
+  }
   if (gameSubString && typeof gameSubString === 'string') {
     return removeSubscription(kvStore, gameSubString);
   }

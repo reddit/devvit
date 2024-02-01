@@ -16,7 +16,7 @@ import {
   fetchCachedGameInfoForPostId,
   makeKeyForPostId,
   fetchSubscriptions,
-  unsubscribePost,
+  handlePostRemoval,
   makeKeyForEventId,
 } from './sports/GameFetch.js';
 import { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
@@ -696,7 +696,7 @@ Devvit.addTrigger({
 Devvit.addTrigger({
   event: 'PostDelete',
   onEvent: async (event, context) => {
-    await unsubscribePost(event.postId, context.kvStore);
+    await handlePostRemoval(event.postId, context.kvStore);
   },
 });
 
@@ -704,7 +704,7 @@ Devvit.addTrigger({
   event: 'ModAction',
   onEvent: async (event, context) => {
     if (event.action === `removelink` && event.targetPost) {
-      await unsubscribePost(event.targetPost.id, context.kvStore);
+      await handlePostRemoval(event.targetPost.id, context.kvStore);
     }
   },
 });

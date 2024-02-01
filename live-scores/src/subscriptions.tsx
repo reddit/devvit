@@ -37,9 +37,11 @@ export async function getSubscriptions(kvStore: KVStore, key?: string): Promise<
  */
 export async function addSubscription(ctx: Context, key: string): Promise<boolean> {
   const subscriptions: string[] = await getSubscriptions(ctx.kvStore);
-  if (key in subscriptions) {
+  if (subscriptions.includes(key)) {
+    console.log(`subscription ${key} is already active`);
     return true;
   }
+  console.log(`adding subscription ${key}`);
   if (subscriptions.length >= MAX_SUBSCRIPTIONS) {
     ctx.ui.showToast('Post Failed - Too many active subscriptions.');
     return false;
