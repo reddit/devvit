@@ -65,7 +65,8 @@ export async function getAllReactionScores(
   const scores = await redis.hgetall(reactionsHashKey(postId, eventId));
   // console.log('scores', scores);
   return reactions.map((reaction) => {
-    const score = scores ? parseInt(scores[reaction.id]) : 0;
+    const scoreValue = scores ? scores[reaction.id] : '0';
+    const score = scoreValue ? parseInt(scoreValue) : 0;
     return { reaction, count: score };
   });
 }
