@@ -2,6 +2,8 @@ export type GameSubscription = {
   league: League;
   eventId: string;
   service: APIService;
+  simulationId?: string;
+  recordingId?: string;
 };
 
 export enum APIService {
@@ -9,6 +11,7 @@ export enum APIService {
   SRNFL = `sr_nfl`,
   SRSoccer = `sr_soccer`,
   SRNBA = `sr_nba`,
+  SRNFLSim = `sr_nfl_sim`,
 }
 
 export enum League {

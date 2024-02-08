@@ -42,7 +42,7 @@ import { updateCustomPost } from './utils/updateRedditPost.js';
 import { getAllEventIds } from './sports/sportradar/LastEvents.js';
 import { CurrentEventData, DevvitState, noop, Nullable } from './utils/types.js';
 import { getNavigationCallbacks } from './utils/football/events.js';
-import { postLatestEvents } from './EventComment.js';
+import { srManualNFLScoreboardCreateForm } from './forms/ManualGameCreateForm.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -157,6 +157,15 @@ export const AppContent: Devvit.BlockComponent<{
 //     return ui.showForm(espnScoreboardCreationForm);
 //   },
 // });
+
+Devvit.addMenuItem({
+  label: 'Create simulated NFL scoreboard (Internal)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srManualNFLScoreboardCreateForm);
+  },
+});
 
 Devvit.addMenuItem({
   label: 'Create NFL Scoreboard (Internal)',

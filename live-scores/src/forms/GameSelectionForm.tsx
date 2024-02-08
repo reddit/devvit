@@ -18,9 +18,6 @@ import {
 } from '../sports/GameFetch.js';
 import { LoadingState, LoadingStateFootball } from '../components/Loading.js';
 import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
-import { toggleEventComments } from '../EventComment.js';
-import { AppContent } from '../main.js';
-import { ScoreboardPage } from '../components/Scoreboard.js';
 import { BasketballGame } from '../sports/sportradar/BasketballModels.js';
 import { fetchNBAGame } from '../sports/sportradar/BasketballPlayByPlay.js';
 
@@ -194,7 +191,6 @@ export const srNflGameSelectForm = Devvit.createForm(
       ctx.kvStore.put(makeKeyForEventId(gameSub.eventId), JSON.stringify(newEventPostIdInfo)),
       ctx.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub)),
     ]);
-    // We need this so than we can pull the post ID for a
     return ctx.ui.showToast({
       text: 'Scoreboard Post Created!',
       appearance: 'success',
@@ -399,7 +395,6 @@ export const srNbaGameSelectForm = Devvit.createForm(
       ctx.kvStore.put(makeKeyForEventId(gameSub.eventId), JSON.stringify(newEventPostIdInfo)),
       ctx.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub)),
     ]);
-    // We need this so than we can pull the post ID for a
     return ctx.ui.showToast({
       text: 'Scoreboard Post Created!',
       appearance: 'success',

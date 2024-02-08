@@ -86,6 +86,25 @@ export async function fetchNFLBoxscore(
   return nflGameScoreInfo(parseNFLBoxscore(data));
 }
 
+export async function fetchNFLSimulationBoxscore(
+  recordingId: string,
+  sessionId: string
+): Promise<NFLGameScoreInfo | null> {
+  let data;
+  try {
+    const request = new Request(
+      `https://playback.sportradar.com/replay/nfl/${recordingId}?feed=boxscore&contentType=json&sessionId=${sessionId}`
+    );
+    // console.log(request.url);
+    const response = await fetch(request);
+    data = await response.json();
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+  return nflGameScoreInfo(parseNFLBoxscore(data));
+}
+
 export function parseNFLBoxscore(jsonData: any): NFLBoxscore {
   return {
     id: jsonData.id,

@@ -207,7 +207,7 @@ function LastEvent(
         ) : null}
         <hstack height="4px" width={100} onPress={onClick} />
       </vstack>
-      <spacer size="xsmall" />
+      <spacer size="small" />
     </vstack>
   );
 }

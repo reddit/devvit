@@ -7,6 +7,7 @@ import { getSubscriptions, removeSubscription } from '../subscriptions.js';
 import {
   NFLGameScoreInfo,
   fetchNFLBoxscore,
+  fetchNFLSimulationBoxscore,
   nflGameScoreInfo,
   parseNFLBoxscore,
 } from './sportradar/NFLBoxscore.js';
@@ -19,6 +20,9 @@ const STALE_INFO_THRESHOLD_HOURS = 1;
 const MS_TO_HOURS = 1000 * 60 * 60;
 
 export function makeKeyForSubscription(subscription: GameSubscription): string {
+  if (subscription.simulationId) {
+    return `info:${subscription.league}-${subscription.eventId}-${subscription.simulationId}`;
+  }
   return `info:${subscription.league}-${subscription.eventId}`;
 }
 
@@ -89,6 +93,8 @@ export async function fetchSubscriptions(context: Devvit.Context): Promise<{
       league: parsedSub['league'],
       eventId: parsedSub['eventId'],
       service: parsedSub['service'],
+      simulationId: parsedSub['simulationId'],
+      recordingId: parsedSub['recordingId'],
     };
   });
   const filteredSubs = await filterSubscriptionsForFetch(gameSubscriptions, context.kvStore);
@@ -166,6 +172,14 @@ function subscriptionFetches(
       eventFetches.push(fetchSoccerEvent(gameSub.league, gameSub.eventId, context));
     } else if (gameSub.service === APIService.SRNBA) {
       eventFetches.push(fetchNBAGame(gameSub.eventId, context));
+    } else if (gameSub.service === APIService.SRNFLSim) {
+      if (!gameSub.simulationId || !gameSub.recordingId) {
+        console.log(
+          `No simulation or recording ID found for NFL simulation subscription ${gameSub.eventId}`
+        );
+      } else {
+        eventFetches.push(fetchNFLSimulationBoxscore(gameSub.recordingId, gameSub.simulationId));
+      }
     } else {
       eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
     }
