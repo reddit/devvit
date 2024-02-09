@@ -28,8 +28,8 @@ export function PixelSymbol(props: PixelSymbolProps): JSX.Element {
 
   return (
     <image
-      imageHeight={height}
-      imageWidth={width}
+      imageHeight={scaledHeight}
+      imageWidth={scaledWidth}
       height={scaledHeight}
       width={scaledWidth}
       description={type}

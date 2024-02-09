@@ -55,8 +55,8 @@ export function PixelText(props: PixelTextProps): JSX.Element {
 
   return (
     <image
-      imageHeight={height}
-      imageWidth={width}
+      imageHeight={scaledHeight}
+      imageWidth={scaledWidth}
       height={scaledHeight}
       width={scaledWidth}
       description={children[0]}
