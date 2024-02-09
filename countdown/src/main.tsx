@@ -1,6 +1,11 @@
 import { Devvit, MediaPlugin } from '@devvit/public-api';
 import { parse } from 'tldts';
-import { APPROVED_DOMAINS, ONE_MINUTE_IN_MS, POST_DATA_KEY } from './constants.js';
+import {
+  APPROVED_DOMAINS,
+  ApprovedDomainsFormatted,
+  ONE_MINUTE_IN_MS,
+  POST_DATA_KEY,
+} from './constants.js';
 import { Preview } from './preview.js';
 import {
   addUserReminder,
@@ -99,7 +104,7 @@ const CountdownForm = Devvit.createForm(
             name: 'img_url',
             label: 'Image URL',
             type: 'string',
-            helpText: 'We recommend using an image with a transparent or solid color background',
+            helpText: `Allowed domains: ${ApprovedDomainsFormatted}`,
           },
         ],
       },
@@ -131,6 +136,16 @@ const CountdownForm = Devvit.createForm(
         return;
       }
 
+      let imageUrl: string | null;
+
+      try {
+        imageUrl = formData.img_url ? await getRedditImageUrl(formData.img_url, media) : null;
+      } catch (e) {
+        ui.showToast('Image upload failed.');
+        ui.showToast(`Please use images from ${ApprovedDomainsFormatted}.`);
+        return;
+      }
+
       const postData: CountdownData = {
         title: formData.title || '',
         description: formData.description || '',
@@ -138,7 +153,7 @@ const CountdownForm = Devvit.createForm(
         timezone: formData.timezone[0],
         link_url: formData.link_url || '',
         link_title: formData.link_title || '',
-        img_url: formData.img_url ? await getRedditImageUrl(formData.img_url, media) : null,
+        img_url: imageUrl,
       };
 
       const subredditName = (await reddit.getSubredditById(subredditId))?.name;
@@ -160,6 +175,7 @@ const CountdownForm = Devvit.createForm(
       await setPostReminder(postData.dateTime, scheduler, post.id, kvStore);
 
       ui.showToast(`Countdown created!`);
+      ui.navigateTo(post);
     } catch (e) {
       console.log(event.values);
       ui.showToast('Something went wrong, please try again later.');
