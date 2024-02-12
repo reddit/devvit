@@ -39,6 +39,7 @@ export function PixelText(props: PixelTextProps): JSX.Element {
     characters.push(`<path
       d="${glyph.path}"
       transform="translate(${xOffset} 0)"
+      fill="${color}"
       fill-rule="evenodd"
       clip-rule="evenodd"
     />`);
@@ -66,7 +67,6 @@ export function PixelText(props: PixelTextProps): JSX.Element {
           width="${width}"
           height="${height}"
           viewBox="0 0 ${width} ${height}"
-          fill="${color}"
           xmlns="http://www.w3.org/2000/svg"
         >
           ${characters.join('')}

@@ -39,11 +39,11 @@ export function PixelSymbol(props: PixelSymbolProps): JSX.Element {
           width="${width}"
           height="${height}"
           viewBox="0 0 ${width} ${height}"
-          fill="${color}"
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
             d="${glyph.path}"
+            fill="${color}"
             fill-rule="evenodd"
             clip-rule="evenodd"
           />
