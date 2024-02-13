@@ -1,0 +1,6 @@
+{
+  "extends": "@devvit/public-api/devvit.tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  }
+}
