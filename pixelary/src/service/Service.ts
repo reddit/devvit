@@ -113,17 +113,20 @@ export class Service {
     await this.redis
       .zScore(this.scoreBoardKey, userName)
       .then(async (score) => {
-        console.log(
-          'Update ScoreBoard for %s => %d + %d = %d',
-          userName,
-          score,
-          points,
-          score + points
-        );
-        await this.redis.zAdd(this.scoreBoardKey, {
-          member: userName,
-          score: score + points,
-        });
+        // user's score can be null when scoreboard key doesn't exist
+        if (score) {
+          console.log(
+            'Update ScoreBoard for %s => %d + %d = %d',
+            userName,
+            score,
+            points,
+            score + points
+          );
+          await this.redis.zAdd(this.scoreBoardKey, {
+            member: userName,
+            score: score + points,
+          });
+        }
       })
       .catch(async (err) => {
         console.log('Error: %s', err);
@@ -144,7 +147,8 @@ export class Service {
 
   async getUserPoints(userName: string): Promise<number> {
     try {
-      return await this.redis.zScore(this.scoreBoardKey, userName);
+      // user's score can be null when scoreboard key doesn't exist
+      return (await this.redis.zScore(this.scoreBoardKey, userName)) ?? 0;
     } catch (error) {
       return 0;
     }
