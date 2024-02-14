@@ -1,4 +1,4 @@
-import { Devvit, Context } from '@devvit/public-api';
+import { Devvit, Context, UseIntervalResult } from '@devvit/public-api';
 import { editorPages } from './editorPages.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PixelSymbol } from '../../components/PixelSymbol.js';
@@ -8,21 +8,13 @@ interface CardDrawPageProps {
   word: string;
   setPage: (page: editorPages) => void;
   cardDrawCountdown: number;
-  setCardDrawCountdown: (duration: number) => void;
+  cardDrawTimer: UseIntervalResult;
 }
 
-export const CardDrawPage = (props: CardDrawPageProps, context: Context): JSX.Element => {
-  const { setPage, word, cardDrawCountdown, setCardDrawCountdown } = props;
-  const { useInterval } = context;
+export const CardDrawPage = (props: CardDrawPageProps): JSX.Element => {
+  const { word, cardDrawCountdown, cardDrawTimer } = props;
 
-  const timer = useInterval(() => {
-    if (cardDrawCountdown > 1) {
-      setCardDrawCountdown(cardDrawCountdown - 1);
-    } else {
-      setPage('editor');
-    }
-  }, 1000);
-  timer.start();
+  cardDrawTimer.start();
 
   const height: Devvit.Blocks.SizeString = '350px';
   const width: Devvit.Blocks.SizeString = '250px';

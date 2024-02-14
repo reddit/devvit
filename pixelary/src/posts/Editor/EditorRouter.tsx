@@ -1,18 +1,13 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, UseIntervalResult, FormKey } from '@devvit/public-api';
 import { OverviewPage } from './OverviewPage.js';
 import { HowToPlayPage } from './HowToPlayPage.js';
 import { LeaderboardPage } from '../../components/LeaderboardPage.js';
 import { CardDrawPage } from './CardDrawPage.js';
 import { EditorPage } from './EditorPage.js';
 import { ReviewPage } from './ReviewPage.js';
-import { getRandomString } from '../../utils/getRandomString.js';
-import Words from '../../data/words.json';
-import Settings from '../../settings.json';
 import { DailyDrawingRecord } from '../../types/DailyDrawingRecord.js';
-import { blankCanvas } from '../../utils/blankCanvas.js';
 import { editorPages } from './editorPages.js';
 import { LeaderboardEntry } from '../../types/LeaderboardEntry.js';
-import { s } from 'vitest/dist/reporters-3OMQDZar.js';
 
 interface EditorRouterProps {
   page: string;
@@ -20,17 +15,19 @@ interface EditorRouterProps {
   data: number[];
   setData: (data: number[]) => void;
   word: string;
-  setWord: (word: string) => void;
   leaderboard: LeaderboardEntry[];
   cardDrawCountdown: number;
-  setCardDrawCountdown: (duration: number) => void;
+  cardDrawTimer: UseIntervalResult;
   drawingCountdown: number;
-  setDrawingCountdown: (countdown: number) => void;
+  drawingTimer: UseIntervalResult;
   currentColor: number;
   setCurrentColor: (color: number) => void;
   dailyDrawings: DailyDrawingRecord[];
   setDailyDrawings: (drawings: DailyDrawingRecord[]) => void;
   userPoints: number;
+  cancelConfirmationForm: FormKey;
+  clearData: () => void;
+  saveDrawing: (drawing: DailyDrawingRecord) => void;
 }
 
 export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
@@ -40,26 +37,20 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
     data,
     setData,
     word,
-    setWord,
     leaderboard,
     cardDrawCountdown,
-    setCardDrawCountdown,
     drawingCountdown,
-    setDrawingCountdown,
+    drawingTimer,
     currentColor,
     setCurrentColor,
     dailyDrawings,
     setDailyDrawings,
     userPoints,
+    cardDrawTimer,
+    cancelConfirmationForm,
+    clearData,
+    saveDrawing,
   } = props;
-
-  function clearData() {
-    const randomWord = getRandomString(Words);
-    setWord(randomWord.toUpperCase());
-    setData(blankCanvas);
-    setDrawingCountdown(Settings.drawingDuration);
-    setCardDrawCountdown(Settings.cardDrawDuration);
-  }
 
   let currentPage;
   switch (page) {
@@ -82,7 +73,7 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
           word={word}
           setPage={setPage}
           cardDrawCountdown={cardDrawCountdown}
-          setCardDrawCountdown={setCardDrawCountdown}
+          cardDrawTimer={cardDrawTimer}
         />
       );
       break;
@@ -96,7 +87,7 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
           currentColor={currentColor}
           setCurrentColor={setCurrentColor}
           drawingCountdown={drawingCountdown}
-          setDrawingCountdown={setDrawingCountdown}
+          drawingTimer={drawingTimer}
         />
       );
       break;
@@ -109,6 +100,8 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
           setPage={setPage}
           dailyDrawings={dailyDrawings}
           setDailyDrawings={setDailyDrawings}
+          cancelConfirmationForm={cancelConfirmationForm}
+          saveDrawing={saveDrawing}
         />
       );
       break;

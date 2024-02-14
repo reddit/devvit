@@ -4,6 +4,7 @@
     "guesserPoints": 100,
     "drawerPoints": 500,
     "dailyDrawingsExpiration": 86400000,
+    "feedbackDuration": 15,
     "cardDrawDuration": 5,
     "drawingDuration": 60,
     "guesserPointMultiplier": [

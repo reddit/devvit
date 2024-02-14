@@ -1,4 +1,4 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, FormKey } from '@devvit/public-api';
 import { ViewerPage } from './ViewerPage.js';
 import { LeaderboardPage } from '../../components/LeaderboardPage.js';
 import { PostData } from '../../types/PostData.js';
@@ -10,17 +10,12 @@ interface ViewerRouterProps {
   setPage: (page: viewerPages) => void;
   leaderboard: LeaderboardEntry[];
   postData: PostData;
-  username: string;
-  feedback: boolean;
-  setFeedback: (feedback: boolean) => void;
-  feedbackDuration: number;
-  setFeedbackDuration: (duration: number) => void;
+  showFeedback: boolean;
   pointsEarned: number;
-  setPointsEarned: (points: number) => void;
   isSolvedByUser: boolean;
-  setIsSolvedByUser: (isSolved: boolean) => void;
   isSolved: boolean;
   isAuthor: boolean;
+  guessForm: FormKey;
 }
 
 export const ViewerRouter = (props: ViewerRouterProps): JSX.Element => {
@@ -29,17 +24,12 @@ export const ViewerRouter = (props: ViewerRouterProps): JSX.Element => {
     setPage,
     leaderboard,
     postData,
-    username,
-    feedback,
-    setFeedback,
-    feedbackDuration,
-    setFeedbackDuration,
+    showFeedback,
     pointsEarned,
-    setPointsEarned,
     isSolvedByUser,
-    setIsSolvedByUser,
     isSolved,
     isAuthor,
+    guessForm,
   } = props;
 
   let currentPage;
@@ -49,17 +39,12 @@ export const ViewerRouter = (props: ViewerRouterProps): JSX.Element => {
         <ViewerPage
           setPage={setPage}
           postData={postData}
-          username={username}
-          feedback={feedback}
-          setFeedback={setFeedback}
-          feedbackDuration={feedbackDuration}
-          setFeedbackDuration={setFeedbackDuration}
+          showFeedback={showFeedback}
           pointsEarned={pointsEarned}
-          setPointsEarned={setPointsEarned}
           isSolvedByUser={isSolvedByUser}
-          setIsSolvedByUser={setIsSolvedByUser}
           isSolved={isSolved}
           isAuthor={isAuthor}
+          guessForm={guessForm}
         />
       );
       break;

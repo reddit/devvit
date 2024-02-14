@@ -1,4 +1,4 @@
-import { Devvit, Context } from '@devvit/public-api';
+import { Devvit, UseIntervalResult } from '@devvit/public-api';
 import Settings from '../../settings.json';
 import { splitArray } from '../../utils/splitArray.js';
 import { StyledButton } from '../../components/StyledButton.js';
@@ -13,23 +13,22 @@ interface EditorPageProps {
   data: number[];
   setData: (data: number[]) => void;
   drawingCountdown: number;
-  setDrawingCountdown: (countdown: number) => void;
+  drawingTimer: UseIntervalResult;
   currentColor: number;
   setCurrentColor: (color: number) => void;
 }
 
-export const EditorPage = (props: EditorPageProps, context: Context): JSX.Element => {
+export const EditorPage = (props: EditorPageProps): JSX.Element => {
   const {
     word,
     setPage,
     data,
     setData,
     drawingCountdown,
-    setDrawingCountdown,
+    drawingTimer,
     currentColor,
     setCurrentColor,
   } = props;
-  const { useInterval } = context;
   const size = 284;
   const sizeInPixels: Devvit.Blocks.SizeString = `${size / Settings.resolution}px`;
 
@@ -83,14 +82,7 @@ export const EditorPage = (props: EditorPageProps, context: Context): JSX.Elemen
     </hstack>
   );
 
-  const timer = useInterval(() => {
-    if (drawingCountdown > 1) {
-      setDrawingCountdown(drawingCountdown - 1);
-    } else {
-      setPage('review');
-    }
-  }, 1000);
-  timer.start();
+  drawingTimer.start();
 
   return (
     <vstack width="100%" height="100%" alignment="center top" padding="large">
@@ -99,7 +91,14 @@ export const EditorPage = (props: EditorPageProps, context: Context): JSX.Elemen
         <hstack width="100%" alignment="middle">
           <PixelText scale={3}>{word}</PixelText>
           <spacer grow />
-          <StyledButton width="80px" label="DONE" onPress={() => setPage('review')} />
+          <StyledButton
+            width="80px"
+            label="DONE"
+            onPress={() => {
+              drawingTimer.stop();
+              setPage('review');
+            }}
+          />
         </hstack>
         <hstack width="100%" alignment="center middle" gap="small">
           <PixelSymbol type="clock" />
