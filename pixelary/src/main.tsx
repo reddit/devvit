@@ -3,6 +3,7 @@ import { Pixelary } from './components/Pixelary.js';
 import { LoadingState } from './components/LoadingState.js';
 import { Service } from './service/Service.js';
 import { UserSettings } from './types/UserSettings.js';
+import { PostData } from './types/PostData.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -64,6 +65,40 @@ Devvit.addMenuItem({
     redis.set('#endedFlairId', endedFlair.id);
 
     ui.showToast('Pixelary installed!');
+  },
+});
+
+// Mod action to reveal the word
+const WordReveal = Devvit.createForm(
+  (data: { word?: string }) => {
+    return {
+      title: 'Pixelary word hidden in the post',
+      description: data.word || 'Something went wrong',
+      fields: [],
+      acceptLabel: 'Ok',
+      cancelLabel: 'Got it',
+    };
+  },
+  () => {}
+);
+
+Devvit.addMenuItem({
+  label: '[Pixelary] Reveal the word',
+  location: 'post',
+  forUserType: 'moderator',
+  onPress: async (event, context) => {
+    const heroPostId = await context.redis.get('#heroPostId');
+    if (heroPostId === event.targetId) {
+      context.ui.showToast('Nothing to reveal on main game post');
+      return;
+    }
+    const postDataJSON = await context.redis.get(`post-${event.targetId}`);
+    if (!postDataJSON) {
+      context.ui.showToast('No word is associated with this post');
+      return;
+    }
+    const postData = JSON.parse(postDataJSON) as PostData;
+    context.ui.showForm(WordReveal, { word: postData.word });
   },
 });
 

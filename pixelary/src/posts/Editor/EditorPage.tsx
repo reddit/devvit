@@ -13,7 +13,8 @@ interface EditorPageProps {
   data: number[];
   setData: (data: number[]) => void;
   drawingCountdown: number;
-  drawingTimer: UseIntervalResult;
+  cancelDrawingTimer: () => void;
+  fallbackTimerUpdate: () => void;
   currentColor: number;
   setCurrentColor: (color: number) => void;
 }
@@ -25,11 +26,12 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     data,
     setData,
     drawingCountdown,
-    drawingTimer,
+    cancelDrawingTimer,
+    fallbackTimerUpdate,
     currentColor,
     setCurrentColor,
   } = props;
-  const size = 284;
+  const size = 275;
   const sizeInPixels: Devvit.Blocks.SizeString = `${size / Settings.resolution}px`;
 
   const pixels = data.map((pixel, index) => (
@@ -38,6 +40,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
         const newData = data;
         newData[index] = currentColor;
         setData(newData);
+        fallbackTimerUpdate();
       }}
       height={sizeInPixels}
       width={sizeInPixels}
@@ -46,7 +49,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
   ));
 
   const grid = (
-    <vstack cornerRadius="small" border="thick" borderColor="black" height="288px" width="288px">
+    <vstack cornerRadius="small" border="thick" borderColor="black" height="275px" width="275px">
       {splitArray(pixels, Settings.resolution).map((row) => (
         <hstack>{row}</hstack>
       ))}
@@ -57,10 +60,10 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     <hstack>
       {Settings.colors.map((c, i) => (
         <>
-          <Shadow height="29px" width="29px">
+          <Shadow height="27.25px" width="27.25px">
             <hstack
-              height="29px"
-              width="29px"
+              height="27.25px"
+              width="27.25px"
               padding="small"
               cornerRadius="small"
               backgroundColor={c}
@@ -69,6 +72,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
               alignment="center middle"
               onPress={() => {
                 setCurrentColor(i);
+                fallbackTimerUpdate();
               }}
             >
               {currentColor === i && (
@@ -76,13 +80,11 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
               )}
             </hstack>
           </Shadow>
-          {i !== Settings.colors.length - 1 && <spacer width="4px" />}
+          {i !== Settings.colors.length - 1 && <spacer size="xsmall" />}
         </>
       ))}
     </hstack>
   );
-
-  drawingTimer.start();
 
   return (
     <vstack width="100%" height="100%" alignment="center top" padding="large">
@@ -95,7 +97,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
             width="80px"
             label="DONE"
             onPress={() => {
-              drawingTimer.stop();
+              cancelDrawingTimer();
               setPage('review');
             }}
           />
@@ -107,7 +109,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
         </hstack>
       </vstack>
       <spacer grow />
-      <Shadow height="288px" width="288px">
+      <Shadow height="275px" width="275px">
         {grid}
       </Shadow>
       <spacer grow />

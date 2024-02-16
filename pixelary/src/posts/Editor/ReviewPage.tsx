@@ -80,7 +80,7 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
   return (
     <vstack width="100%" height="100%" alignment="center middle" padding="large">
       <vstack alignment="center" gap="medium">
-        <PixelText scale={3}>Submit drawing?</PixelText>
+        <PixelText scale={3}>Submit?</PixelText>
         <hstack gap="small" alignment="center">
           <PixelText>Get</PixelText>
           <PixelSymbol type="star" />

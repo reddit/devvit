@@ -13,6 +13,8 @@ import { viewerPages } from '../posts/Viewer/viewerPages.js';
 import { formatNumberWithCommas } from '../utils/formatNumbers.js';
 import { getScoreMultiplier } from '../utils/getScoreMultiplier.js';
 
+type NavigationPage = editorPages | viewerPages;
+
 export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
   if (!context.postId) {
     throw new Error('No post id found in context');
@@ -28,7 +30,7 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     }
     return PostMode.Viewer.toString();
   });
-  const [page, setPage] = useState<editorPages | viewerPages>('default');
+  const [page, setPage] = useState<NavigationPage>('default');
   const [data, setData] = useState<number[]>(blankCanvas);
   const randomWord = getRandomString(Words);
   const [word, setWord] = useState<string>(randomWord);
@@ -85,36 +87,63 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     return await service.getPointsEarnedByUser(postId!, userId!);
   });
 
-  // Card Draw Timer
-  const [cardDrawCountdown, setCardDrawCountdown] = useState(Settings.cardDrawDuration);
-  const cardDrawTimer = useInterval(() => {
-    if (cardDrawCountdown > 1) {
-      setCardDrawCountdown(cardDrawCountdown - 1);
-    } else {
-      cardDrawTimer.stop();
-      setCardDrawCountdown(Settings.cardDrawDuration);
-      setPage('editor');
+  // [Start] Countdown Timers
+  const [countdownState, setCountdownState] = useState<{
+    startTime: number;
+    durationMs: number;
+    timeLeftMs: number;
+    finalRedirect: NavigationPage;
+  } | null>(null);
+
+  function updateCountdownState() {
+    if (!countdownState) {
+      countdownTimer.stop();
+      return;
     }
+    const timeLeftMs = countdownState.durationMs - (Date.now() - countdownState.startTime);
+    if (timeLeftMs <= 0) {
+      const finalRedirect = countdownState.finalRedirect;
+      cancelTimer();
+      setPage(finalRedirect);
+      // this is a hack since we can no longer start the timer inside the render function
+      // since we need to also set the state beforehand
+      if (finalRedirect === 'editor') {
+        startDrawingTimer();
+      }
+      return;
+    }
+    setCountdownState({ ...countdownState, timeLeftMs });
+  }
+
+  const countdownTimer = useInterval(() => {
+    updateCountdownState();
   }, 1000);
 
-  // Drawing Timer
-  const [drawingCountdown, setDrawingCountdown] = useState(Settings.drawingDuration);
-  const drawingTimer = useInterval(() => {
-    if (drawingCountdown > 1) {
-      setDrawingCountdown(drawingCountdown - 1);
-    } else {
-      drawingTimer.stop();
-      setDrawingCountdown(Settings.drawingDuration);
-      setPage('review');
-    }
-  }, 1000);
+  const startTimer = (durationMs: number, redirectPage: NavigationPage) => {
+    setCountdownState({
+      startTime: Date.now(),
+      durationMs,
+      finalRedirect: redirectPage,
+      timeLeftMs: durationMs,
+    });
+    countdownTimer.start();
+  };
+
+  const startCardDrawTimer = () => startTimer(Settings.cardDrawDuration * 1000, 'editor');
+  const startDrawingTimer = () => startTimer(Settings.drawingDuration * 1000, 'review');
+
+  const cancelTimer = () => {
+    setCountdownState(null);
+    countdownTimer.stop();
+  };
+
+  // [End] Countdown Timer
 
   function clearData() {
     const randomWord = getRandomString(Words);
     setWord(randomWord.toUpperCase());
     setData(blankCanvas);
-    setDrawingCountdown(Settings.drawingDuration);
-    setCardDrawCountdown(Settings.cardDrawDuration);
+    cancelTimer();
   }
 
   function saveDrawing(drawing: DailyDrawingRecord) {
@@ -242,10 +271,17 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
           setData={setData}
           word={word}
           leaderboard={leaderboard}
-          cardDrawCountdown={cardDrawCountdown}
-          cardDrawTimer={cardDrawTimer}
-          drawingCountdown={drawingCountdown}
-          drawingTimer={drawingTimer}
+          cardDrawTimeLeft={
+            countdownState
+              ? Math.round(countdownState.timeLeftMs / 1000)
+              : Settings.cardDrawDuration
+          }
+          setCardDrawTimer={startCardDrawTimer}
+          drawingTimeLeft={
+            countdownState ? Math.round(countdownState.timeLeftMs / 1000) : Settings.drawingDuration
+          }
+          cancelDrawingTimer={cancelTimer}
+          fallbackTimerUpdate={updateCountdownState}
           currentColor={currentColor}
           setCurrentColor={setCurrentColor}
           dailyDrawings={dailyDrawings}

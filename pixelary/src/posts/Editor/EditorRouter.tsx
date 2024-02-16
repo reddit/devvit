@@ -16,10 +16,11 @@ interface EditorRouterProps {
   setData: (data: number[]) => void;
   word: string;
   leaderboard: LeaderboardEntry[];
-  cardDrawCountdown: number;
-  cardDrawTimer: UseIntervalResult;
-  drawingCountdown: number;
-  drawingTimer: UseIntervalResult;
+  cardDrawTimeLeft: number;
+  setCardDrawTimer: () => void;
+  cancelDrawingTimer: () => void;
+  drawingTimeLeft: number;
+  fallbackTimerUpdate: () => void;
   currentColor: number;
   setCurrentColor: (color: number) => void;
   dailyDrawings: DailyDrawingRecord[];
@@ -38,15 +39,16 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
     setData,
     word,
     leaderboard,
-    cardDrawCountdown,
-    drawingCountdown,
-    drawingTimer,
+    cardDrawTimeLeft,
+    drawingTimeLeft,
+    cancelDrawingTimer,
+    fallbackTimerUpdate,
     currentColor,
     setCurrentColor,
     dailyDrawings,
     setDailyDrawings,
     userPoints,
-    cardDrawTimer,
+    setCardDrawTimer,
     cancelConfirmationForm,
     clearData,
     saveDrawing,
@@ -56,7 +58,12 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
   switch (page) {
     case 'default':
       currentPage = (
-        <OverviewPage dailyDrawings={dailyDrawings} userPoints={userPoints} setPage={setPage} />
+        <OverviewPage
+          dailyDrawings={dailyDrawings}
+          userPoints={userPoints}
+          setPage={setPage}
+          startCardDrawTimer={setCardDrawTimer}
+        />
       );
       break;
     case 'leaderboard':
@@ -69,12 +76,7 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
       break;
     case 'card-draw':
       currentPage = (
-        <CardDrawPage
-          word={word}
-          setPage={setPage}
-          cardDrawCountdown={cardDrawCountdown}
-          cardDrawTimer={cardDrawTimer}
-        />
+        <CardDrawPage word={word} setPage={setPage} cardDrawCountdown={cardDrawTimeLeft} />
       );
       break;
     case 'editor':
@@ -86,8 +88,9 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
           setPage={setPage}
           currentColor={currentColor}
           setCurrentColor={setCurrentColor}
-          drawingCountdown={drawingCountdown}
-          drawingTimer={drawingTimer}
+          drawingCountdown={drawingTimeLeft}
+          cancelDrawingTimer={cancelDrawingTimer}
+          fallbackTimerUpdate={fallbackTimerUpdate}
         />
       );
       break;

@@ -8,13 +8,10 @@ interface CardDrawPageProps {
   word: string;
   setPage: (page: editorPages) => void;
   cardDrawCountdown: number;
-  cardDrawTimer: UseIntervalResult;
 }
 
 export const CardDrawPage = (props: CardDrawPageProps): JSX.Element => {
-  const { word, cardDrawCountdown, cardDrawTimer } = props;
-
-  cardDrawTimer.start();
+  const { word, cardDrawCountdown } = props;
 
   const height: Devvit.Blocks.SizeString = '350px';
   const width: Devvit.Blocks.SizeString = '250px';

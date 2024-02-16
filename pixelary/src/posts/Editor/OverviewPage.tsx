@@ -11,17 +11,18 @@ interface OverviewPageProps {
   setPage: (page: editorPages) => void;
   dailyDrawings: DailyDrawingRecord[];
   userPoints: number;
+  startCardDrawTimer: () => void;
 }
 
 export const OverviewPage = async (
   props: OverviewPageProps,
   context: Context
 ): Promise<JSX.SyncElement> => {
-  const { setPage, dailyDrawings, userPoints } = props;
+  const { setPage, dailyDrawings, userPoints, startCardDrawTimer } = props;
   const { reddit, ui } = context;
 
   const firstNullIndex = dailyDrawings.findIndex((drawing) => drawing === null);
-  const tileSize = 91;
+  const tileSize = 87.5;
   const tileSizeInPixels = `${tileSize}px`;
 
   const myDrawings = await Promise.all(
@@ -61,7 +62,14 @@ export const OverviewPage = async (
             cornerRadius="small"
             backgroundColor="rgba(255,255,255,0.3)"
             alignment="center middle"
-            onPress={isFirstNullIndex ? () => setPage('card-draw') : undefined}
+            onPress={
+              isFirstNullIndex
+                ? () => {
+                    setPage('card-draw');
+                    startCardDrawTimer();
+                  }
+                : undefined
+            }
           >
             {isFirstNullIndex && <icon size="large" color="black" name="add-fill" />}
           </hstack>
@@ -91,9 +99,9 @@ export const OverviewPage = async (
       <spacer grow />
 
       <hstack width="100%" alignment="center">
-        <StyledButton width="138px" label="INFO" onPress={() => setPage('how-to-play')} />
-        <spacer width="12px" />
-        <StyledButton width="138px" label="SCORES" onPress={() => setPage('leaderboard')} />
+        <StyledButton width="131.5px" label="INFO" onPress={() => setPage('how-to-play')} />
+        <spacer width="8px" />
+        <StyledButton width="131.5px" label="SCORES" onPress={() => setPage('leaderboard')} />
       </hstack>
     </vstack>
   );
