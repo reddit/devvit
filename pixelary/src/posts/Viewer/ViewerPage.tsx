@@ -54,12 +54,17 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
         resizeMode="cover"
       />
       <vstack width="100%" height="100%" padding="large" alignment="center middle">
-        <hstack gap="small" alignment="center">
-          <PixelSymbol type="clock" />
-          <PixelText>{postIsExpired ? 'Ended' : `${formatDuration(timeLeft)} left`}</PixelText>
+        {/* Header */}
+        <hstack width="100%" alignment="middle">
+          <hstack gap="small">
+            <PixelSymbol type="clock" />
+            <PixelText>{postIsExpired ? 'Ended' : `${formatDuration(timeLeft)}`}</PixelText>
+          </hstack>
+          <spacer grow />
+          <StyledIconButton icon="leaderboard" onPress={() => setPage('leaderboard')} />
         </hstack>
 
-        <spacer size="large" />
+        <spacer size="large" grow />
 
         <zstack alignment="center middle">
           <Drawing data={data} />
@@ -75,7 +80,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           {showFeedback && isSolvedByUser && <PointsToast value={pointsEarned} />}
         </zstack>
 
-        <spacer size="large" />
+        <spacer size="large" grow />
 
         {!postIsExpired && !isSolvedByUser && !isAuthor && (
           <vstack alignment="center">
@@ -88,7 +93,12 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           </vstack>
         )}
 
-        {isAuthor && <PixelText>You drew this!</PixelText>}
+        {isAuthor && (
+          <vstack>
+            <PixelText>You drew this!</PixelText>
+            <spacer size="small" />
+          </vstack>
+        )}
 
         {!postIsExpired && !isAuthor && !isSolvedByUser && (
           <hstack gap="small">
@@ -122,10 +132,6 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           </hstack>
         )}
       </vstack>
-
-      <hstack width="100%" alignment="end" padding="large">
-        <StyledIconButton icon="leaderboard" onPress={() => setPage('leaderboard')} />
-      </hstack>
     </zstack>
   );
 };

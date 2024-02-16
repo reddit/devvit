@@ -89,25 +89,29 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
   return (
     <vstack width="100%" height="100%" alignment="center top" padding="large">
       {/* Header */}
-      <vstack width="100%" gap="small" alignment="center">
-        <hstack width="100%" alignment="middle">
+      <hstack width="100%" alignment="middle">
+        <vstack>
           <PixelText scale={3}>{word}</PixelText>
-          <spacer grow />
-          <StyledButton
-            width="80px"
-            label="DONE"
-            onPress={() => {
-              cancelDrawingTimer();
-              setPage('review');
-            }}
-          />
-        </hstack>
-        <hstack width="100%" alignment="center middle" gap="small">
-          <PixelSymbol type="clock" />
-          <PixelText>{drawingCountdown.toString()}</PixelText>
-          <PixelText>{`second${drawingCountdown === 1 ? '' : 's'} left`}</PixelText>
-        </hstack>
-      </vstack>
+          <spacer size="xsmall" />
+          <hstack width="100%" alignment="center middle" gap="small">
+            <PixelSymbol type="clock" />
+            <PixelText>{drawingCountdown.toString()}</PixelText>
+            <PixelText>s</PixelText>
+          </hstack>
+        </vstack>
+
+        <spacer grow />
+
+        <StyledButton
+          width="80px"
+          label="DONE"
+          onPress={() => {
+            cancelDrawingTimer();
+            setPage('review');
+          }}
+        />
+      </hstack>
+
       <spacer grow />
       <Shadow height="275px" width="275px">
         {grid}

@@ -22,7 +22,7 @@ export const OverviewPage = async (
   const { reddit, ui } = context;
 
   const firstNullIndex = dailyDrawings.findIndex((drawing) => drawing === null);
-  const tileSize = 87.5;
+  const tileSize = 83.5;
   const tileSizeInPixels = `${tileSize}px`;
 
   const myDrawings = await Promise.all(

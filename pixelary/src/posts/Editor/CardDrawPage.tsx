@@ -37,9 +37,9 @@ export const CardDrawPage = (props: CardDrawPageProps): JSX.Element => {
 
       {/* Countdown timer */}
       <hstack gap="medium" alignment="middle">
-        <PixelSymbol scale={3} type="arrow-right" color="rgba(0,0,0,0.3)" />
+        <PixelSymbol scale={3} type="arrow-right" color="#ffffff" />
         <PixelText scale={3}>{cardDrawCountdown.toString()}</PixelText>
-        <PixelSymbol scale={3} type="arrow-left" color="rgba(0,0,0,0.3)" />
+        <PixelSymbol scale={3} type="arrow-left" color="#ffffff" />
       </hstack>
     </vstack>
   );
