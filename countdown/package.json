@@ -1,19 +1,19 @@
 {
   "private": true,
   "name": "ci-countdown",
-  "version": "0.10.14",
+  "version": "0.10.15",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
     "test": "vitest run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.14",
+    "@devvit/public-api": "0.10.15",
     "moment-timezone": "0.5.43",
     "tldts": "^6.0.14"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.14",
+    "@devvit/tsconfig": "0.10.15",
     "typescript": "5.3.2",
     "vitest": "0.31.0"
   }
