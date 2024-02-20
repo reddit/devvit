@@ -1,7 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import Settings from '../settings.json';
 import { generateRandomArray } from '../utils/generateRandomArray.js';
-import { splitArray } from '../utils/splitArray.js';
 import { Shadow } from './Shadow.js';
 
 interface DrawingProps {
@@ -14,36 +13,56 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
   const dummyData = generateRandomArray(Settings.resolution * Settings.resolution);
   const { data = dummyData, size = 275, onPress } = props;
   const borderSize = 4;
-  const pixelSize: Devvit.Blocks.SizeString = `${(size - borderSize) / Settings.resolution}px`;
+  const height: Devvit.Blocks.SizeString = `${size - borderSize}px`;
+  const width: Devvit.Blocks.SizeString = `${size - borderSize}px`;
 
-  const pixels = data.map((pixel, _index) => (
-    <hstack
-      height={pixelSize}
-      width={pixelSize}
-      backgroundColor={Settings.colors[pixel] || 'transparent'}
-    />
-  ));
+  function indexToXY(index: number, resolution: number) {
+    return {
+      x: index % resolution,
+      y: Math.floor(index / resolution),
+    };
+  }
 
-  const height: Devvit.Blocks.SizeString = `${size}px`;
-  const width: Devvit.Blocks.SizeString = `${size}px`;
-
-  const grid = (
-    <Shadow width={width} height={height}>
-      <vstack
-        width={width}
-        height={height}
-        onPress={onPress}
+  return (
+    <Shadow width={width} height={height} onPress={onPress}>
+      <hstack
         cornerRadius="small"
         border="thick"
         borderColor="black"
+        width={width}
+        height={height}
         backgroundColor="white"
       >
-        {splitArray(pixels, Settings.resolution).map((row) => (
-          <hstack>{row}</hstack>
-        ))}
-      </vstack>
+        <image
+          imageWidth={size}
+          imageHeight={size}
+          width="100%"
+          height="100%"
+          description="Drawing"
+          resizeMode="fill"
+          url={`data:image/svg+xml,
+            <svg
+              width="${Settings.resolution}"
+              height="${Settings.resolution}"
+              viewBox="0 0 ${Settings.resolution} ${Settings.resolution}"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              ${data.map((pixel, index) => {
+                const { x, y } = indexToXY(index, Settings.resolution);
+                return `
+                  <rect
+                    x="${x}"
+                    y="${y}"
+                    width="1"
+                    height="1"
+                    fill="${Settings.colors[pixel] || '#ffffff'}"
+                  />
+                `;
+              })}
+            </svg>
+          `}
+        />
+      </hstack>
     </Shadow>
   );
-
-  return grid;
 };

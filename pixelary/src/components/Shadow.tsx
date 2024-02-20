@@ -4,13 +4,14 @@ interface ShadowProps {
   height: Devvit.Blocks.SizeString;
   width: Devvit.Blocks.SizeString;
   children: JSX.Element;
+  onPress?: () => void;
 }
 
 export const Shadow = (props: ShadowProps): JSX.Element => {
-  const { height, width, children } = props;
+  const { height, width, children, onPress } = props;
 
   return (
-    <zstack alignment="start top">
+    <zstack alignment="start top" onPress={onPress}>
       {/* Shadow */}
       <vstack>
         <spacer size="xsmall" />
