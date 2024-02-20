@@ -12,12 +12,16 @@ interface DrawingProps {
 
 export const Drawing = (props: DrawingProps): JSX.Element => {
   const dummyData = generateRandomArray(Settings.resolution * Settings.resolution);
-  const { data = dummyData, size = 256, onPress } = props;
+  const { data = dummyData, size = 275, onPress } = props;
   const borderSize = 4;
   const pixelSize: Devvit.Blocks.SizeString = `${(size - borderSize) / Settings.resolution}px`;
 
   const pixels = data.map((pixel, _index) => (
-    <hstack height={pixelSize} width={pixelSize} backgroundColor={Settings.colors[pixel]} />
+    <hstack
+      height={pixelSize}
+      width={pixelSize}
+      backgroundColor={Settings.colors[pixel] || 'transparent'}
+    />
   ));
 
   const height: Devvit.Blocks.SizeString = `${size}px`;

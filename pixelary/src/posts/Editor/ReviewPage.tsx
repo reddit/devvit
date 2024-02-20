@@ -97,12 +97,12 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
       {/* Footer */}
       <hstack alignment="center" width="100%">
         <StyledButton
-          width="122px"
+          width="131px"
           label="CANCEL"
           onPress={() => ui.showForm(cancelConfirmationForm)}
         />
-        <spacer width="12px" />
-        <StyledButton width="122px" label="SUBMIT" onPress={submitDrawing} />
+        <spacer size="small" />
+        <StyledButton width="131px" label="SUBMIT" onPress={submitDrawing} />
       </hstack>
     </vstack>
   );

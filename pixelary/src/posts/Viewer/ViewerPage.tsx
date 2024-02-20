@@ -4,7 +4,6 @@ import { PostData } from '../../types/PostData.js';
 import Settings from '../../settings.json';
 import { formatDuration } from '../../utils/formatDuration.js';
 import { StyledButton } from '../../components/StyledButton.js';
-import { StyledIconButton } from '../../components/StyledIconButton.js';
 import { getScoreMultiplier } from '../../utils/getScoreMultiplier.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PixelSymbol } from '../../components/PixelSymbol.js';
@@ -35,7 +34,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
     guessForm,
   } = props;
   const { ui } = context;
-  const { data, date }: PostData = postData;
+  const { word, data, date }: PostData = postData;
 
   const timeLeft = new Date(date).getTime() + Settings.postLiveSpan - Date.now();
   const postIsExpired = timeLeft < 0;
@@ -54,19 +53,16 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
         resizeMode="cover"
       />
       <vstack width="100%" height="100%" padding="large" alignment="center middle">
-        {/* Header */}
-        <hstack width="100%" alignment="middle">
-          <hstack gap="small">
-            <PixelSymbol type="clock" />
-            <PixelText>{postIsExpired ? 'Ended' : `${formatDuration(timeLeft)}`}</PixelText>
-          </hstack>
-          <spacer grow />
-          <StyledIconButton icon="leaderboard" onPress={() => setPage('leaderboard')} />
+        {/* Time left */}
+        <hstack gap="small">
+          <PixelSymbol type="clock" />
+          <PixelText>{postIsExpired ? 'Ended' : `${formatDuration(timeLeft)} left`}</PixelText>
         </hstack>
 
-        <spacer size="large" grow />
+        <spacer size="small" />
+        <spacer size="medium" />
 
-        <zstack alignment="center middle">
+        <zstack alignment="center middle" height="279px" width="279px">
           <Drawing data={data} />
           {showFeedback && !isSolvedByUser && (
             <image
@@ -85,18 +81,24 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
         {!postIsExpired && !isSolvedByUser && !isAuthor && (
           <vstack alignment="center">
             <StyledButton
-              width="256px"
+              width="275px"
               label="GUESS THE WORD"
               onPress={() => ui.showForm(guessForm)}
             />
-            <spacer size="small" />
+            <spacer size="medium" />
           </vstack>
         )}
 
-        {isAuthor && (
+        {(isSolved || isAuthor || postIsExpired) && (
+          <vstack>
+            <PixelText scale={3}>{word}</PixelText>
+            <spacer size="xsmall" />
+          </vstack>
+        )}
+
+        {isAuthor && !isSolved && (
           <vstack>
             <PixelText>You drew this!</PixelText>
-            <spacer size="small" />
           </vstack>
         )}
 
@@ -104,13 +106,13 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           <hstack gap="small">
             <PixelText>{`For ${formatNumberWithCommas(points)}`}</PixelText>
             <PixelSymbol type="star" />
-            <PixelText>{`(${scoreMultiplier}x)`}</PixelText>
+            <PixelText>{` (${scoreMultiplier}x)`}</PixelText>
           </hstack>
         )}
 
         {!isAuthor && isSolvedByUser && (
           <hstack gap="small">
-            <PixelText>Solved for</PixelText>
+            <PixelText>Earned</PixelText>
             <PixelText>{formatNumberWithCommas(pointsEarned)}</PixelText>
             <PixelSymbol type="star" />
           </hstack>
@@ -124,12 +126,12 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           </hstack>
         )}
 
-        {isAuthor && !isSolved && (
-          <hstack gap="small">
-            <PixelText>{`Get ${formatNumberWithCommas(Settings.drawerPoints)}`}</PixelText>
-            <PixelSymbol type="star" />
-            <PixelText>if guessed</PixelText>
-          </hstack>
+        {(isSolved || postIsExpired || isAuthor) && (
+          <vstack>
+            <spacer size="small" />
+            <spacer size="medium" />
+            <StyledButton width="275px" label="SCORES" onPress={() => setPage('leaderboard')} />
+          </vstack>
         )}
       </vstack>
     </zstack>

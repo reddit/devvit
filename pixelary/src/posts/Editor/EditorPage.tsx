@@ -31,8 +31,10 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     currentColor,
     setCurrentColor,
   } = props;
-  const size = 275;
-  const sizeInPixels: Devvit.Blocks.SizeString = `${size / Settings.resolution}px`;
+
+  const size = '275px';
+  const innerSize = 271;
+  const pixelSize: Devvit.Blocks.SizeString = `${innerSize / Settings.resolution}px`;
 
   const pixels = data.map((pixel, index) => (
     <hstack
@@ -42,14 +44,14 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
         setData(newData);
         fallbackTimerUpdate();
       }}
-      height={sizeInPixels}
-      width={sizeInPixels}
+      height={pixelSize}
+      width={pixelSize}
       backgroundColor={Settings.colors[pixel]}
     />
   ));
 
   const grid = (
-    <vstack cornerRadius="small" border="thick" borderColor="black" height="275px" width="275px">
+    <vstack cornerRadius="small" border="thick" borderColor="black" height={size} width={size}>
       {splitArray(pixels, Settings.resolution).map((row) => (
         <hstack>{row}</hstack>
       ))}
@@ -64,7 +66,6 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
             <hstack
               height="27.25px"
               width="27.25px"
-              padding="small"
               cornerRadius="small"
               backgroundColor={c}
               border="thick"
@@ -86,17 +87,19 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     </hstack>
   );
 
+  const drawingIsBlank = !data.some((value) => value !== -1);
+
   return (
     <vstack width="100%" height="100%" alignment="center top" padding="large">
       {/* Header */}
       <hstack width="100%" alignment="middle">
-        <vstack>
+        <vstack alignment="top start">
           <PixelText scale={3}>{word}</PixelText>
-          <spacer size="xsmall" />
-          <hstack width="100%" alignment="center middle" gap="small">
+          <spacer size="small" />
+          <hstack alignment="middle" gap="small">
             <PixelSymbol type="clock" />
             <PixelText>{drawingCountdown.toString()}</PixelText>
-            <PixelText>s</PixelText>
+            <PixelText>s left</PixelText>
           </hstack>
         </vstack>
 
@@ -113,8 +116,18 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
       </hstack>
 
       <spacer grow />
-      <Shadow height="275px" width="275px">
-        {grid}
+      <Shadow height={size} width={size}>
+        <zstack height={size} width={size} alignment="middle center" cornerRadius="small">
+          <image
+            imageHeight={512}
+            imageWidth={512}
+            height={`${innerSize}px`}
+            width={`${innerSize}px`}
+            url="grid-template.png"
+          />
+          {drawingIsBlank && <PixelText color="#B2B2B2">Tap to draw</PixelText>}
+          {grid}
+        </zstack>
       </Shadow>
       <spacer grow />
       {colorPalette}

@@ -88,7 +88,7 @@ export const OverviewPage = async (
       <spacer grow />
 
       <vstack gap="large" width="100%" alignment="center">
-        <vstack maxWidth="343px" width="100%" alignment="center" gap="small">
+        <vstack width="100%" alignment="center" gap="small">
           <PixelText scale={3}>My drawings</PixelText>
           <PixelText scale={2}>3x drawings per day</PixelText>
         </vstack>
@@ -99,9 +99,9 @@ export const OverviewPage = async (
       <spacer grow />
 
       <hstack width="100%" alignment="center">
-        <StyledButton width="131.5px" label="INFO" onPress={() => setPage('how-to-play')} />
-        <spacer width="8px" />
-        <StyledButton width="131.5px" label="SCORES" onPress={() => setPage('leaderboard')} />
+        <StyledButton width="131px" label="INFO" onPress={() => setPage('how-to-play')} />
+        <spacer size="small" />
+        <StyledButton width="131px" label="SCORES" onPress={() => setPage('leaderboard')} />
       </hstack>
     </vstack>
   );
