@@ -83,13 +83,13 @@ export type NukePostProps = {
       }
   
       const verbage =
-        shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
+        shouldLock && shouldRemove ? 'remove and lock' : shouldLock ? 'lock' : 'remove';
   
       if (shouldRemove) {
         const postId = props.postId;
         await context.modLog
           .add({
-            action: 'removelink',
+            action: 'removecomment',
             target: postId,
             details: 'comment-mop app',
             description: `u/${user.username} used comment-mop to ${verbage} all comments of this post.`,
@@ -195,7 +195,7 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
     }
 
     const verbage =
-      shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
+      shouldLock && shouldRemove ? 'remove and lock' : shouldLock ? 'lock' : 'remove';
 
     if (shouldRemove) {
       const commentId = props.commentId;
