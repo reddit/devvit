@@ -1,10 +1,13 @@
 import { Devvit } from '@devvit/public-api';
-import { EventState, GameEvent } from '../sports/GameEvent.js';
+import type { GameEvent } from '../sports/GameEvent.js';
+import { EventState } from '../sports/GameEvent.js';
 import { eventPeriodString } from '../sports/espn/espn.js';
-import { TopBarBaseball, topBarBaseballComponent } from './baseball.js';
-import { TopBarBasketball, topBarBasketballComponent } from './basketball.js';
+import type { TopBarBaseball } from './baseball.js';
+import { topBarBaseballComponent } from './baseball.js';
+import type { TopBarBasketball } from './basketball.js';
+import { topBarBasketballComponent } from './basketball.js';
 
-function msToHMS(ms: number): string {
+export function msToHMS(ms: number): string {
   // 1- Convert to seconds:
   let seconds = ms / 1000;
   // 2- Extract hours:

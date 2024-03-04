@@ -1,16 +1,20 @@
-import { Devvit, Post, StateSetter } from '@devvit/public-api';
+import type { Post, StateSetter } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { GenericScoreBoard, ScoreboardPage } from './components/Scoreboard.js';
 import { BaseballScoreBoard } from './components/baseball.js';
-import { CommentData, debugComment, getLastComment } from './components/comments.js';
+import type { CommentData } from './components/comments.js';
+import { debugComment, getLastComment } from './components/comments.js';
 import { nextMLBDemoPage, nextNFLDemoPage } from './mock-scores/MockHelper.js';
-import { BaseballGameScoreInfo } from './sports/espn/espn.js';
-import { APIService, GameSubscription, League, getLeagueFromString } from './sports/Sports.js';
+import type { BaseballGameScoreInfo } from './sports/espn/espn.js';
+import type { GameSubscription } from './sports/Sports.js';
+import { APIService, League, getLeagueFromString } from './sports/Sports.js';
 import {
   srNbaScoreboardCreationForm,
   srNflScoreboardCreationForm,
   srSoccerScoreboardCreationForm,
 } from './forms/ScoreboardCreateForm.js';
-import { EventState, GeneralGameScoreInfo } from './sports/GameEvent.js';
+import type { GeneralGameScoreInfo } from './sports/GameEvent.js';
+import { EventState } from './sports/GameEvent.js';
 import {
   fetchDebugGameInfo,
   fetchCachedGameInfoForPostId,
@@ -19,16 +23,15 @@ import {
   handlePostRemoval,
   makeKeyForEventId,
 } from './sports/GameFetch.js';
-import { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
+import type { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
 import { SoccerScoreboard } from './components/soccer.js';
 import { APIKey, AppSettings } from './sports/sportradar/APIKeys.js';
 import { fetchAllSubsAndGames, subscriptionsForm } from './forms/SubscriptionsForm.js';
-import { NFLBoxscoreLastEvent, NFLGameScoreInfo } from './sports/sportradar/NFLBoxscore.js';
+import type { NFLBoxscoreLastEvent, NFLGameScoreInfo } from './sports/sportradar/NFLBoxscore.js';
 import { FootballScoreboard } from './components/football/FootballScoreboard.js';
 import { LoadingState, LoadingStateFootball } from './components/Loading.js';
+import type { Reaction, ReactionScore } from './Reactions.js';
 import {
-  Reaction,
-  ReactionScore,
   combineReactionScores,
   configurePostWithAvailableReactions,
   debugLocalReactions,
@@ -40,9 +43,13 @@ import {
 } from './Reactions.js';
 import { updateCustomPost } from './utils/updateRedditPost.js';
 import { getAllEventIds } from './sports/sportradar/LastEvents.js';
-import { CurrentEventData, DevvitState, noop, Nullable } from './utils/types.js';
+import type { CurrentEventData, DevvitState, Nullable } from './utils/types.js';
+import { noop } from './utils/types.js';
 import { getNavigationCallbacks } from './utils/football/events.js';
 import { srManualNFLScoreboardCreateForm } from './forms/ManualGameCreateForm.js';
+import { BasketballScoreboard } from './components/basketball/BasketballScoreboard.js';
+import type { BasketballGameScoreInfo } from './sports/sportradar/BasketballPlayByPlay.js';
+import { totalEventsCount } from './sports/sportradar/BasketballPlayByPlayEvents.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -103,6 +110,7 @@ export const AppContent: Devvit.BlockComponent<{
   onNavigateNext: Nullable<() => void>;
   onNavigatePrev: Nullable<() => void>;
   onResetNavigation: () => void;
+  eventIndexOverride: number | null;
 }> = ({
   scoreInfo,
   lastComment,
@@ -119,6 +127,7 @@ export const AppContent: Devvit.BlockComponent<{
   onNavigateNext,
   onNavigatePrev,
   onResetNavigation,
+  eventIndexOverride,
 }) => {
   if (scoreInfo.event.gameType === 'baseball') {
     const baseBallScoreInfo = scoreInfo as BaseballGameScoreInfo;
@@ -144,6 +153,15 @@ export const AppContent: Devvit.BlockComponent<{
       },
       demoNext
     );
+  } else if (scoreInfo.event.gameType === 'basketball') {
+    const basketballGameScoreInfo = scoreInfo as BasketballGameScoreInfo;
+    return BasketballScoreboard({
+      info: basketballGameScoreInfo,
+      eventIndexOverride: eventIndexOverride ?? -1,
+      onNavigateNext,
+      onNavigatePrev,
+      onResetNavigation,
+    });
   } else {
     return GenericScoreBoard(scoreInfo);
   }
@@ -533,8 +551,6 @@ Devvit.addCustomPostType({
         ? undefined
         : combineReactionScores(reactionScores, localReactions);
 
-    const nflScoreInfo = scoreInfo as NFLGameScoreInfo;
-
     const updatePastReactions = async (eventId: string | null): Promise<void> => {
       if (!eventId) {
         setPastReactions(undefined);
@@ -544,19 +560,88 @@ Devvit.addCustomPostType({
       setPastReactions(reactionsForEvent);
     };
 
-    const { onNavigatePrev, onNavigateNext } = getNavigationCallbacks(
-      context.redis,
-      navigationEventOverride,
-      gameEventIds,
-      nflScoreInfo,
-      setNavigationEventOverride,
-      updatePastReactions
-    );
+    // FOOTBALL!
+    if (scoreInfo.event.gameType === 'football') {
+      const nflScoreInfo = scoreInfo as NFLGameScoreInfo;
+      const { onNavigatePrev, onNavigateNext } = getNavigationCallbacks(
+        context.redis,
+        navigationEventOverride,
+        gameEventIds,
+        nflScoreInfo,
+        setNavigationEventOverride,
+        updatePastReactions
+      );
 
-    const onResetNavigation = () => {
-      setNavigationEventOverride(null);
-    };
+      const onResetNavigation: () => void = () => {
+        setNavigationEventOverride(null);
+      };
 
+      return (
+        <AppContent
+          isOnline={true}
+          demoNext={demoNext}
+          lastComment={lastComment}
+          page={page}
+          reactions={reactions}
+          pastReactions={pastReactions}
+          scoreInfo={scoreInfo}
+          setPage={setPage}
+          onReactionPress={onReactionPress}
+          lastEventOverlayState={lastEventOverlayState}
+          gameEventIds={gameEventIds}
+          navigationEventOverride={navigationEventOverride}
+          onNavigatePrev={onNavigatePrev}
+          onNavigateNext={onNavigateNext}
+          onResetNavigation={onResetNavigation}
+          eventIndexOverride={null}
+        />
+      );
+    }
+
+    // BASKETBALL!
+    if (scoreInfo.event.gameType === 'basketball') {
+      const basketballGameScoreInfo = scoreInfo as BasketballGameScoreInfo;
+      const totalEvents = totalEventsCount(basketballGameScoreInfo);
+      const [eventIndexOverride, setEventIndexOverride] = useState(-1);
+
+      const onNavigateNext: () => void = () => {
+        if (eventIndexOverride >= 0) {
+          const newIndex = eventIndexOverride + 1;
+          setEventIndexOverride(newIndex < totalEvents - 1 ? newIndex : -1);
+        }
+      };
+      const onNavigatePrev: () => void = () => {
+        if (eventIndexOverride !== 0) {
+          const newIndex = eventIndexOverride === -1 ? totalEvents - 2 : eventIndexOverride - 1;
+          setEventIndexOverride(newIndex >= 0 ? newIndex : -1);
+        }
+      };
+      const onResetNavigation: () => void = () => {
+        setEventIndexOverride(-1);
+      };
+      return (
+        <AppContent
+          isOnline={true}
+          demoNext={demoNext}
+          lastComment={lastComment}
+          page={page}
+          reactions={reactions}
+          pastReactions={pastReactions}
+          scoreInfo={scoreInfo}
+          setPage={setPage}
+          onReactionPress={onReactionPress}
+          lastEventOverlayState={lastEventOverlayState}
+          gameEventIds={gameEventIds}
+          navigationEventOverride={navigationEventOverride}
+          onNavigatePrev={onNavigatePrev}
+          onNavigateNext={onNavigateNext}
+          onResetNavigation={onResetNavigation}
+          eventIndexOverride={eventIndexOverride}
+        />
+      );
+    }
+
+    // OTHER SPORTS!
     return (
       <AppContent
         isOnline={true}
@@ -571,9 +656,10 @@ Devvit.addCustomPostType({
         lastEventOverlayState={lastEventOverlayState}
         gameEventIds={gameEventIds}
         navigationEventOverride={navigationEventOverride}
-        onNavigatePrev={onNavigatePrev}
-        onNavigateNext={onNavigateNext}
-        onResetNavigation={onResetNavigation}
+        onNavigatePrev={null}
+        onNavigateNext={null}
+        onResetNavigation={noop}
+        eventIndexOverride={null}
       />
     );
   },
@@ -663,6 +749,7 @@ Devvit.addSchedulerJob({
               onNavigatePrev={null}
               onNavigateNext={null}
               onResetNavigation={noop}
+              eventIndexOverride={null}
             />
           ));
 
