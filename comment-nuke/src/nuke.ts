@@ -90,7 +90,7 @@ export type NukePostProps = {
       }
   
       const verbage =
-        shouldLock && shouldRemove ? 'remove and lock' : shouldLock ? 'locked' : 'removed';
+        shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
   
       if (shouldRemove) {
         const postId = props.postId;
@@ -202,7 +202,7 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
     }
 
     const verbage =
-      shouldLock && shouldRemove ? 'remove and lock' : shouldLock ? 'locked' : 'removed';
+      shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
 
     if (shouldRemove) {
       const commentId = props.commentId;
