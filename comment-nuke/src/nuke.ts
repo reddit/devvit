@@ -47,8 +47,15 @@ export type NukePostProps = {
       const user = await context.reddit.getCurrentUser();
       const modPermissions = await user.getModPermissionsForSubreddit(post.subredditName);
       const canManagePosts = modPermissions.includes('all') || modPermissions.includes('posts');
+
+      console.log(
+        `Mod Info: r/${post.subredditName} u/${user.username} permissions:${modPermissions}: ${
+          canManagePosts ? 'Can mod' : 'Cannot mod'
+        }`
+      );
   
       if (!canManagePosts) {
+        console.info('A user without the correct mod permissions tried to comment mop.');
         return {
           message: 'You do you not have the correct mod permissions to do this.',
           success: false,
@@ -83,7 +90,7 @@ export type NukePostProps = {
       }
   
       const verbage =
-        shouldLock && shouldRemove ? 'remove and lock' : shouldLock ? 'lock' : 'remove';
+        shouldLock && shouldRemove ? 'remove and lock' : shouldLock ? 'locked' : 'removed';
   
       if (shouldRemove) {
         const postId = props.postId;
@@ -195,7 +202,7 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
     }
 
     const verbage =
-      shouldLock && shouldRemove ? 'remove and lock' : shouldLock ? 'lock' : 'remove';
+      shouldLock && shouldRemove ? 'remove and lock' : shouldLock ? 'locked' : 'removed';
 
     if (shouldRemove) {
       const commentId = props.commentId;
