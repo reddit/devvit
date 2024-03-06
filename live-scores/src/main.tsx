@@ -10,6 +10,8 @@ import type { GameSubscription } from './sports/Sports.js';
 import { APIService, League, getLeagueFromString } from './sports/Sports.js';
 import {
   srNbaScoreboardCreationForm,
+  srNbaSimScoreboardCreationForm,
+  srNcaaMBScoreboardCreationForm,
   srNflScoreboardCreationForm,
   srSoccerScoreboardCreationForm,
 } from './forms/ScoreboardCreateForm.js';
@@ -80,6 +82,13 @@ Devvit.addSettings([
   {
     name: APIKey.nba,
     label: 'Sportradar NBA API Key',
+    type: 'string',
+    isSecret: true,
+    scope: 'app',
+  },
+  {
+    name: APIKey.ncaamb,
+    label: 'Sportradar NCAA Mens Basketball API Key',
     type: 'string',
     isSecret: true,
     scope: 'app',
@@ -200,6 +209,24 @@ Devvit.addMenuItem({
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
     return ui.showForm(srNbaScoreboardCreationForm);
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'Create NBA Sim Scoreboard (Internal)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srNbaSimScoreboardCreationForm);
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'Create NCAA Mens Basketball Scoreboard (Internal)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srNcaaMBScoreboardCreationForm);
   },
 });
 

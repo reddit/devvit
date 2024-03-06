@@ -2,7 +2,7 @@ import type { Devvit } from '@devvit/public-api';
 import type { GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { EventState } from '../GameEvent.js';
 import { APIKey } from './APIKeys.js';
-import { APIService } from '../Sports.js';
+import { APIService, League } from '../Sports.js';
 import type {
   BasketballGame,
   BasketballPeriod,
@@ -32,16 +32,36 @@ export type BasketballGameScoreInfoEvent = {
 
 export async function fetchNBAGame(
   gameId: string,
-  context: Devvit.Context
+  context: Devvit.Context,
+  service: APIService
 ): Promise<BasketballGameScoreInfo | null> {
   const apiKey = await context.settings.get(APIKey.nba);
+  const apiType = service === APIService.SRNBASim ? 'simulation' : 'production';
   try {
-    const url = `https://api.sportradar.us/nba/production/v8/en/games/${gameId}/pbp.json?api_key=${apiKey}`;
+    const url = `https://api.sportradar.us/nba/${apiType}/v8/en/games/${gameId}/pbp.json?api_key=${apiKey}`;
     // console.log(request.url);
     const response = await fetch(url);
     if (!response.ok) throw Error(`HTTP error ${response.status}: ${response.statusText}`);
     const data = await response.json();
-    return basketballGameScoreInfo(data);
+    return basketballGameScoreInfo(data, League.NBA, service);
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
+export async function fetchNCAAMensBasketballGame(
+  gameId: string,
+  context: Devvit.Context
+): Promise<BasketballGameScoreInfo | null> {
+  const apiKey = await context.settings.get(APIKey.ncaamb);
+  try {
+    const url = `https://api.sportradar.us/ncaamb/production/v8/en/games/${gameId}/pbp.json?api_key=${apiKey}`;
+    // console.log(url);
+    const response = await fetch(url);
+    if (!response.ok) throw Error(`HTTP error ${response.status}: ${response.statusText}`);
+    const data = await response.json();
+    return basketballGameScoreInfo(data, League.NCAAMB, APIService.SRNCAAMB);
   } catch (e) {
     console.error(e);
     return null;
@@ -62,36 +82,44 @@ function parseTeam(league: string, team: BasketballTeam): TeamInfo {
     teamNameWithMarket = team.name;
     teamNameWithoutMarket = team.name;
   }
+  const logo =
+    league === 'ncaamb' ? `${team.id}.png` : league + '-' + team.alias.toLowerCase() + '.png';
   return {
     id: team.id,
     name: teamNameWithoutMarket,
     abbreviation: team.alias,
     fullName: `${teamNameWithMarket}`,
     location: team.market ?? ``,
-    logo: league + '-' + team.alias.toLowerCase() + '.png',
+    logo: logo,
   };
 }
 
-export function basketballGameScoreInfo(game: unknown): BasketballGameScoreInfo {
+export function basketballGameScoreInfo(
+  game: unknown,
+  league: League,
+  service: APIService
+): BasketballGameScoreInfo {
   const currentDate = new Date();
+  const period = league === League.NCAAMB ? game.half : game.quarter;
+  const defaultClock = league === League.NCAAMB ? '20:00' : '12:00';
   return {
     event: {
       id: game.id,
       name: `${game.away.name} at ${game.home.name}`,
       date: game.scheduled,
-      homeTeam: parseTeam(`nba`, game.home),
-      awayTeam: parseTeam(`nba`, game.away),
+      homeTeam: parseTeam(league, game.home),
+      awayTeam: parseTeam(league, game.away),
       state: eventState(game),
       gameType: 'basketball',
-      league: 'nba',
+      league: league,
       timingInfo: {
-        displayClock: game.clock ?? `12:00`,
-        period: game.quarter ?? 1,
+        displayClock: game.clock ?? defaultClock,
+        period: period ?? 1,
       },
     },
     homeScore: game.home.points ?? 0,
     awayScore: game.away.points ?? 0,
-    service: APIService.SRNBA,
+    service: service,
     generatedDate: currentDate.toISOString(),
     periods: parsePeriods(game.periods),
   };

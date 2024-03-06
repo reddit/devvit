@@ -12,6 +12,8 @@ export enum APIService {
   SRSoccer = `sr_soccer`,
   SRNBA = `sr_nba`,
   SRNFLSim = `sr_nfl_sim`,
+  SRNCAAMB = `sr_ncaamb`,
+  SRNBASim = `sr_nba_sim`,
 }
 
 export enum League {
@@ -36,6 +38,7 @@ export enum League {
   EFLLEAGUEONE = `eng_league_one`,
   EFLLEAGUETWO = `eng_league_two`,
   CROATIA_HNL = `hr_hnl`,
+  NCAAMB = 'ncaamb',
 }
 
 export enum Sport {
@@ -214,6 +217,9 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'hr_hnl') {
     return League.CROATIA_HNL;
   }
+  if (str.toLowerCase() === 'ncaamb') {
+    return League.NCAAMB;
+  }
 
   return League.UNKNOWN;
 }
@@ -231,6 +237,7 @@ export function getSportFromLeague(league: League): Sport {
       return Sport.FOOTBALL;
     case League.NBA:
     case League.WNBA:
+    case League.NCAAMB:
       return Sport.BASKETBALL;
     case League.NHL:
       return Sport.HOCKEY;
@@ -296,6 +303,8 @@ export function getDisplayNameFromLeague(league: League): string {
       return 'Liga MX Clausura';
     case League.CROATIA_HNL:
       return `Hrvatska Nogometna Liga (HR)`;
+    case League.NCAAMB:
+      return `NCAA Men's Basketball`;
     default:
       return '';
   }

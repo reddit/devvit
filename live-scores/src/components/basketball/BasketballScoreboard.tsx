@@ -92,7 +92,7 @@ function Clock(info: BasketballGameScoreInfo): JSX.Element {
         <hstack width={'100%'} height={'100%'} alignment="start middle">
           <spacer size="small" />
           <text size="small" style="heading" color={Color.primaryFont}>
-            {eventPeriodStringShort(info.event.timingInfo.period, 'basketball')}
+            {eventPeriodStringShort(info.event.timingInfo.period, 'basketball', info.event.league)}
           </text>
         </hstack>
         <hstack width={'100%'} height={'100%'} alignment="end middle">
@@ -121,6 +121,7 @@ function Team(info: BasketballGameScoreInfo, isHome: Boolean): JSX.Element {
   const outerAlignment = isHome ? 'end bottom' : 'start bottom';
   const innerAlignment = isHome ? 'end middle' : 'start middle';
   const teamColor = NBA_TEAM_COLOR_MAP[team.abbreviation.toLowerCase()];
+  const teamName = info.event.league === 'ncaamb' ? team.abbreviation : team.name;
 
   return (
     <vstack width={'50%'} height={'100%'} alignment={outerAlignment}>
@@ -137,7 +138,7 @@ function Team(info: BasketballGameScoreInfo, isHome: Boolean): JSX.Element {
             {score}
           </text>
           <text size="medium" style="metadata" color={Color.primaryFont}>
-            {team.name.toLocaleUpperCase()}
+            {teamName.toLocaleUpperCase()}
           </text>
         </vstack>
         {isHome ? (

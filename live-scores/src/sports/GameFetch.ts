@@ -1,11 +1,13 @@
 import { demoForId, leagueFromDemoId } from '../mock-scores/MockHelper.js';
-import { EventState, GeneralGameScoreInfo } from './GameEvent.js';
-import { APIService, GameSubscription, getLeagueFromString, getSportFromLeague } from './Sports.js';
+import type { GeneralGameScoreInfo } from './GameEvent.js';
+import { EventState } from './GameEvent.js';
+import type { GameSubscription } from './Sports.js';
+import { APIService, getLeagueFromString, getSportFromLeague } from './Sports.js';
 import { fetchScoreForGame, parseGeneralGameScoreInfo } from './espn/espn.js';
-import { Devvit, KVStore } from '@devvit/public-api';
+import type { Devvit, KVStore } from '@devvit/public-api';
 import { getSubscriptions, removeSubscription } from '../subscriptions.js';
+import type { NFLGameScoreInfo } from './sportradar/NFLBoxscore.js';
 import {
-  NFLGameScoreInfo,
   fetchNFLBoxscore,
   fetchNFLSimulationBoxscore,
   nflGameScoreInfo,
@@ -13,7 +15,7 @@ import {
 } from './sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
 import { storeLastEvent } from './sportradar/LastEvents.js';
-import { fetchNBAGame } from './sportradar/BasketballPlayByPlay.js';
+import { fetchNBAGame, fetchNCAAMensBasketballGame } from './sportradar/BasketballPlayByPlay.js';
 
 const CLOSE_TO_GAME_THRESHOLD_HOURS = 1;
 const STALE_INFO_THRESHOLD_HOURS = 1;
@@ -170,8 +172,10 @@ function subscriptionFetches(
       eventFetches.push(fetchNFLBoxscore(gameSub.eventId, context));
     } else if (gameSub.service === APIService.SRSoccer) {
       eventFetches.push(fetchSoccerEvent(gameSub.league, gameSub.eventId, context));
-    } else if (gameSub.service === APIService.SRNBA) {
-      eventFetches.push(fetchNBAGame(gameSub.eventId, context));
+    } else if (gameSub.service === APIService.SRNBA || gameSub.service === APIService.SRNBASim) {
+      eventFetches.push(fetchNBAGame(gameSub.eventId, context, gameSub.service));
+    } else if (gameSub.service === APIService.SRNCAAMB) {
+      eventFetches.push(fetchNCAAMensBasketballGame(gameSub.eventId, context));
     } else if (gameSub.service === APIService.SRNFLSim) {
       if (!gameSub.simulationId || !gameSub.recordingId) {
         console.log(

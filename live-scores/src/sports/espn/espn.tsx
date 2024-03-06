@@ -7,6 +7,7 @@ import type {
 import { EventState } from '../GameEvent.js';
 import {
   APIService,
+  League,
   getLeagueFromString,
   getSportFromLeague,
   getSportFromLeagueString,
@@ -300,7 +301,18 @@ function eventPeriodToString(sport: string): string {
   }
 }
 
-export function eventPeriodStringShort(period: number, sport: string): string {
+export function eventPeriodStringShort(period: number, sport: string, league: string): string {
+  if (league === League.NCAAMB) {
+    switch (period) {
+      case 1:
+        return `1st`;
+      case 2:
+        return `2nd`;
+      default:
+        // First OT is just OT, then 2OT, 3OT, etc.
+        return `${period - 2 > 1 ? period - 2 : ''}OT`;
+    }
+  }
   switch (period) {
     case 0.5:
       return `HT`;
@@ -317,9 +329,10 @@ export function eventPeriodStringShort(period: number, sport: string): string {
       return `4th`;
     default:
       if (sport === 'hockey') {
-        return `${period - 3}OT`;
+        return `${period - 3 > 1 ? period - 3 : ''}OT`;
       }
-      return `${period - 4 > 0 ? period - 4 : ''}OT`;
+      // First OT is just OT, then 2OT, 3OT, etc.
+      return `${period - 4 > 1 ? period - 4 : ''}OT`;
   }
 }
 

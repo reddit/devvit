@@ -1,21 +1,25 @@
 import { Devvit } from '@devvit/public-api';
-import { BaseballGameScoreInfo, fetchActiveGames, fetchAllTeams } from '../sports/espn/espn.js';
+import type { BaseballGameScoreInfo } from '../sports/espn/espn.js';
+import { fetchActiveGames, fetchAllTeams } from '../sports/espn/espn.js';
 import { timezoneOptions } from '../sports/Timezones.js';
 import { APIService, League, getLeagueFromString, leaguesSupported } from '../sports/Sports.js';
 import {
   espnGameSelectForm,
   srSoccerGameSelectionForm,
   srNflGameSelectForm,
-  srNbaGameSelectForm,
+  srBasketballGameSelectForm,
+  srBasketballSimGameSelectForm,
 } from './GameSelectionForm.js';
 import { espnSingleTeamSelectForm } from './SingleTeamSelectionForm.js';
 import { fetchNflSchedule, filteredGamesFromSeason } from '../sports/sportradar/NFLSchedule.js';
-import { GeneralGameScoreInfo } from '../sports/GameEvent.js';
+import type { GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
 import { fetchSoccerGames } from '../sports/sportradar/SoccerSchedule.js';
 import { infoForLeague } from '../sports/sportradar/SoccerLeagues.js';
 import {
   fetchNbaSchedule,
+  fetchNbaSimSchedule,
+  fetchNcaaMensBasketballSchedule,
   filterGamesFromNbaSeason,
 } from '../sports/sportradar/BasketballSchedule.js';
 
@@ -256,6 +260,76 @@ export const srNbaScoreboardCreationForm = Devvit.createForm(
     const timezone = values['timezone'][0];
     const schedule = await fetchNbaSchedule(seasonType, ctx);
     const games = await filterGamesFromNbaSeason(schedule);
-    return ctx.ui.showForm(srNbaGameSelectForm, { league, timezone, events: games });
+    return ctx.ui.showForm(srBasketballGameSelectForm, { league, timezone, events: games });
+  }
+);
+
+export const srNbaSimScoreboardCreationForm = Devvit.createForm(
+  () => {
+    return {
+      fields: [
+        {
+          name: 'timezone',
+          label: 'Timezone',
+          helpText: 'Timezone to display game times in',
+          type: 'select',
+          required: false,
+          options: timezoneOptions,
+          defaultValue: ['America/Los_Angeles'],
+        },
+      ],
+      title: 'Create NBA SIM Scoreboard Post',
+      acceptLabel: 'Next',
+      cancelLabel: 'Back',
+    };
+  },
+  async ({ values }, ctx) => {
+    const league = League.NBA;
+    const timezone = values['timezone'][0];
+    const schedule = await fetchNbaSimSchedule(ctx);
+    const games = await filterGamesFromNbaSeason(schedule);
+    return ctx.ui.showForm(srBasketballSimGameSelectForm, { league, timezone, events: games });
+  }
+);
+
+export const srNcaaMBScoreboardCreationForm = Devvit.createForm(
+  () => {
+    return {
+      fields: [
+        {
+          name: 'seasonType',
+          label: 'Reagular/Conference/Post Season',
+          helpText: 'Show regular season, conference tournament, or post season games',
+          type: 'select',
+          required: true,
+          options: [
+            { label: 'Regular Season', value: 'REG' },
+            { label: 'Conference Tournament', value: 'CT' },
+            { label: 'Post Season', value: 'PST' },
+          ],
+          defaultValue: ['REG'],
+        },
+        {
+          name: 'timezone',
+          label: 'Timezone',
+          helpText: 'Timezone to display game times in',
+          type: 'select',
+          required: false,
+          options: timezoneOptions,
+          defaultValue: ['America/Los_Angeles'],
+        },
+      ],
+      title: 'Create NBA Scoreboard Post',
+      acceptLabel: 'Next',
+      cancelLabel: 'Back',
+    };
+  },
+  async ({ values }, ctx) => {
+    const league = League.NCAAMB;
+    const seasonType = values['seasonType'][0];
+    const timezone = values['timezone'][0];
+    const schedule = await fetchNcaaMensBasketballSchedule(seasonType, ctx);
+    const games = await filterGamesFromNbaSeason(schedule);
+    return ctx.ui.showForm(srBasketballGameSelectForm, { league, timezone, events: games });
   }
 );
