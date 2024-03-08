@@ -1,80 +1,92 @@
-import { Devvit, Context, FormKey } from '@devvit/public-api';
+import type { Context, FormKey } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { Drawing } from '../../components/Drawing.js';
-import { LoadingState } from '../../components/LoadingState.js';
-import { PostData } from '../../types/PostData.js';
 import Settings from '../../settings.json';
-import { DailyDrawingRecord } from '../../types/DailyDrawingRecord.js';
+import type { PostData } from '../../types/PostData.js';
 import { StyledButton } from '../../components/StyledButton.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PixelSymbol } from '../../components/PixelSymbol.js';
-import { editorPages } from './editorPages.js';
+import type { editorPages } from './editorPages.js';
 import { formatNumberWithCommas } from '../../utils/formatNumbers.js';
+import { LoadingState } from '../../components/LoadingState.js';
+import { Service } from '../../service/Service.js';
+import type { GameSettings } from '../../types/GameSettings.js';
 
 interface ReviewPageProps {
   word: string;
   setPage: (page: editorPages) => void;
-  dailyDrawings: DailyDrawingRecord[];
-  setDailyDrawings: (drawings: DailyDrawingRecord[]) => void;
+  dailyDrawings: PostData[];
+  setDailyDrawings: (drawings: PostData[]) => void;
   data: number[];
   clearData: () => void;
   cancelConfirmationForm: FormKey;
-  saveDrawing: (drawing: DailyDrawingRecord) => void;
+  currentSubreddit: string;
+  username: string;
+  gameSettings: GameSettings;
 }
 
 export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Element => {
-  const { setPage, clearData, data, word, cancelConfirmationForm, saveDrawing } = props;
-  const { reddit, ui, redis, scheduler } = context;
+  const {
+    word,
+    setPage,
+    data,
+    clearData,
+    cancelConfirmationForm,
+    dailyDrawings,
+    setDailyDrawings,
+    currentSubreddit,
+    username,
+    gameSettings,
+  } = props;
+  const { ui, reddit, redis, scheduler } = context;
+  const service = new Service(redis);
 
-  async function submitDrawing() {
-    const currentUser = await reddit.getCurrentUser();
-    const currentSubreddit = await reddit.getCurrentSubreddit();
-    const activeFlairId = await redis.get('#activeFlairId');
-
-    // BE is configured to run this API call as the user so that the post is submitted by the user
+  async function submitDrawingHandler(): Promise<void> {
+    // The back-end is configured to run this app's submitPost calls as the user
     const post = await reddit.submitPost({
       title: 'What is this?',
-      subredditName: currentSubreddit.name,
+      subredditName: currentSubreddit,
       preview: <LoadingState />,
     });
 
-    // Apply flair with a separate API call so that it's applied by the app account
-    reddit.setPostFlair({
-      subredditName: currentSubreddit.name,
-      postId: post.id,
-      flairTemplateId: activeFlairId,
-    });
-
-    const postData: PostData = {
+    const postData = {
       word,
       data,
-      author: currentUser.username,
-      authorId: currentUser.id,
-      date: new Date(),
+      authorUsername: username,
+      date: Date.now(),
+      postId: post.id,
+      expired: false,
+      solved: false,
+      published: !!post.id,
     };
 
-    redis.set(`post-${post.id}`, JSON.stringify(postData));
-
-    const currentDate = new Date();
-    const futureDate = new Date(currentDate.getTime() + Settings.postLiveSpan);
-
-    scheduler.runJob({
-      name: 'PostExpiration',
-      data: {
+    await Promise.all([
+      // Post flair is applied with a second API call so that it's applied by the app account (a mod)
+      reddit.setPostFlair({
+        subredditName: currentSubreddit,
         postId: post.id,
-        answer: word,
-      },
-      runAt: futureDate,
-    });
+        flairTemplateId: gameSettings.activeFlairId,
+      }),
+      // Store post data
+      service.storePostData(postData),
+      // Schedule post expiration
+      scheduler.runJob({
+        name: 'PostExpiration',
+        data: {
+          postId: post.id,
+          answer: word,
+        },
+        runAt: new Date(Date.now() + Settings.postLiveSpan),
+      }),
+      // Store daily drawing
+      service.storeDailyDrawing(postData),
+    ]);
 
-    saveDrawing({
-      word,
-      data,
-      postId: post.id,
-    });
-
-    ui.showToast('Submitted post!');
+    // Update the UI
+    setDailyDrawings([...dailyDrawings, postData]);
     setPage('default');
     clearData();
+    ui.showToast('Drawing submitted');
   }
 
   return (
@@ -102,7 +114,7 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
           onPress={() => ui.showForm(cancelConfirmationForm)}
         />
         <spacer size="small" />
-        <StyledButton width="131px" label="SUBMIT" onPress={submitDrawing} />
+        <StyledButton width="131px" label="SUBMIT" onPress={submitDrawingHandler} />
       </hstack>
     </vstack>
   );

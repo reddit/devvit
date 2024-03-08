@@ -359,6 +359,16 @@
     "width": 6,
     "height": 7
   },
+  "$": {
+    "path": "M2 0H4V1H6V2H2V3H5V4H6V5H5V6H4V7H2V6H0V5H4V4H1V3H0V2H1V1H2V0Z",
+    "width": 6,
+    "height": 7
+  },
+  ":": {
+    "path": "M0 2H2V4H0V5H2V7H0V2Z",
+    "width": 2,
+    "height": 7
+  },
   "arrow-left": {
     "path": "M4 1H2V2H1V3H0V4H1V5H2V6H4V5H3V4H6V3H3V2H4V1Z",
     "width": 6,

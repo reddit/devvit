@@ -1,9 +1,8 @@
-import { Data, Devvit, Form } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { Pixelary } from './components/Pixelary.js';
 import { LoadingState } from './components/LoadingState.js';
 import { Service } from './service/Service.js';
-import { UserSettings } from './types/UserSettings.js';
-import { PostData } from './types/PostData.js';
+import type { UserSettings } from './types/UserSettings.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -24,47 +23,67 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { ui, redis, reddit } = context;
+    const { ui, redis, reddit, scheduler } = context;
+    const service = new Service(redis);
     const community = await reddit.getCurrentSubreddit();
-    const postFlairEnabled = await community.postFlairsEnabled;
 
+    // Check if post flairs are enabled in the community
+    const postFlairEnabled = await community.postFlairsEnabled;
     if (!postFlairEnabled) {
       ui.showToast('Enable post flairs first!');
       return;
     }
 
-    const heroPostId = await redis.get('#heroPostId');
-
-    if (heroPostId) {
+    // Check if Pixelary is already installed
+    const currentSettings = await service.getGameSettings();
+    if (currentSettings && currentSettings.heroPostId) {
       ui.showToast('Pixelary is already installed!');
       return;
     }
 
+    // Create the main game post and pin it to the top
     const post = await reddit.submitPost({
       title: 'Pixelary',
       subredditName: community.name,
       preview: <LoadingState />,
     });
-    post.sticky();
-    redis.set('#heroPostId', post.id);
 
+    await post.sticky();
+
+    // Create the game state flairs (active and ended)
     const activeFlair = await reddit.createPostFlairTemplate({
       subredditName: community.name,
       text: 'Active',
       textColor: 'dark',
       backgroundColor: '#46D160',
     });
-    redis.set('#activeFlairId', activeFlair.id);
-
     const endedFlair = await reddit.createPostFlairTemplate({
       subredditName: community.name,
       text: 'Ended',
       textColor: 'light',
       backgroundColor: '#EA0027',
     });
-    redis.set('#endedFlairId', endedFlair.id);
 
-    ui.showToast('Pixelary installed!');
+    // Store the game settings
+    await service.storeGameSettings({
+      activeFlairId: activeFlair.id,
+      endedFlairId: endedFlair.id,
+      heroPostId: post.id,
+    });
+
+    // Schedule minutly updates of the score board
+    await scheduler.runJob({ cron: '* * * * *', name: 'UpdateScoreBoard' });
+
+    ui.showToast('Installed Pixelary!');
+  },
+});
+
+// Schedule job for updating the score board
+Devvit.addSchedulerJob({
+  name: 'UpdateScoreBoard',
+  onRun: async (_event, context) => {
+    const service = new Service(context.redis);
+    await service.updateScoreBoard();
   },
 });
 
@@ -87,40 +106,80 @@ Devvit.addMenuItem({
   location: 'post',
   forUserType: 'moderator',
   onPress: async (event, context) => {
-    const heroPostId = await context.redis.get('#heroPostId');
-    if (heroPostId === event.targetId) {
+    const { postId, redis, userId } = context;
+    const service = new Service(redis);
+    const gameSettings = await service.getGameSettings();
+
+    if (gameSettings.heroPostId === postId) {
       context.ui.showToast('Nothing to reveal on main game post');
       return;
     }
-    const postDataJSON = await context.redis.get(`post-${event.targetId}`);
-    if (!postDataJSON) {
+
+    const postData = await service.getPostData(event.targetId, userId!);
+    if (!postData) {
       context.ui.showToast('No word is associated with this post');
       return;
     }
-    const postData = JSON.parse(postDataJSON) as PostData;
+
     context.ui.showForm(WordReveal, { word: postData.word });
   },
 });
 
-// Change the flair of a Viewer post when it expires
+// Moderator action to expire a drawing post
+Devvit.addMenuItem({
+  label: '[Pixelary] Expire post',
+  location: 'post',
+  forUserType: 'moderator',
+  onPress: async (event, context) => {
+    const { scheduler, redis, postId, ui, userId } = context;
+    const service = new Service(redis);
+    const postData = await service.getPostData(event.targetId, userId!);
+
+    if (!postData) {
+      ui.showToast('No post data found');
+      return;
+    }
+
+    await scheduler.runJob({
+      name: 'PostExpiration',
+      data: {
+        postId: context.postId,
+        answer: postData.word,
+      },
+      runAt: new Date(),
+    });
+
+    console.log(`Expiring post: ${postId}`);
+    ui.showToast('Post expired');
+  },
+});
+
+// Do the following when a drawing post expires
 Devvit.addSchedulerJob({
   name: 'PostExpiration',
   onRun: async (event, context) => {
     const { reddit, redis } = context;
     const { postId, answer } = event.data!;
+    const service = new Service(redis);
+    const gameSettings = await service.getGameSettings();
     const currentSubreddit = await reddit.getCurrentSubreddit();
-    const endFlairId = await redis.get('#endedFlairId');
+
+    await service.storePostData({
+      postId,
+      expired: true,
+    });
+
     await reddit.setPostFlair({
       subredditName: currentSubreddit.name,
       postId: postId,
-      flairTemplateId: endFlairId,
+      flairTemplateId: gameSettings.endedFlairId,
     });
     if (answer) {
       const comment = await reddit.submitComment({
         id: postId,
         text: `The answer was: ${answer}`,
       });
-      comment.distinguish(true);
+      await comment.distinguish(true);
     }
   },
 });
@@ -140,7 +199,7 @@ const resetDailyDrawingsForm = Devvit.createForm(
     const user = await reddit.getUserByUsername(username);
     const service = new Service(redis);
     const key = service.getDailyDrawingsKey(user.id);
-    redis.del(key);
+    await redis.del(key);
     ui.showToast('Reset daily drawings!');
   }
 );
@@ -155,19 +214,6 @@ Devvit.addMenuItem({
   },
 });
 
-//DEBUG ONLY
-Devvit.addMenuItem({
-  label: '[Pixelary] Reset solved drawings',
-  location: 'subreddit',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const { redis, ui } = context;
-    const service = new Service(redis);
-    service.resetSolvedDrawings();
-    ui.showToast('Reset solved drawings!');
-  },
-});
-
 //ADMIN ONLY
 Devvit.addMenuItem({
   label: '[Pixelary] Get incorrect guesses',
@@ -178,7 +224,7 @@ Devvit.addMenuItem({
     const service = new Service(redis);
     const guesses = await service.getIncorrectGuesses();
     const currentUser = await reddit.getCurrentUser();
-    reddit.sendPrivateMessage({
+    await reddit.sendPrivateMessage({
       to: currentUser.username,
       subject: 'Pixelary: Incorrect guesses',
       text: JSON.stringify(guesses),
@@ -195,26 +241,8 @@ Devvit.addMenuItem({
   onPress: async (_event, context) => {
     const { redis, ui } = context;
     const service = new Service(redis);
-    service.deleteIncorrectGuesses();
+    await service.deleteIncorrectGuesses();
     ui.showToast('Deleted incorrect guesses');
-  },
-});
-
-//DEBUG ONLY
-Devvit.addMenuItem({
-  label: '[Pixelary] Expire post',
-  location: 'post',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const { scheduler } = context;
-    console.log('Expiring post');
-    await scheduler.runJob({
-      name: 'PostExpiration',
-      data: {
-        postId: context.postId,
-      },
-      runAt: new Date(),
-    });
   },
 });
 
@@ -235,10 +263,10 @@ const notificationSettingsForm = Devvit.createForm(
       ],
     };
   },
-  (event, context) => {
+  async (event, context) => {
     const { redis, ui, userId } = context;
     const service = new Service(redis);
-    service.saveUserSettings(userId!, event.values as UserSettings);
+    await service.saveUserSettings(userId!, event.values as UserSettings);
     ui.showToast('Saved settings!');
   }
 );

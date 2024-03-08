@@ -1,7 +1,13 @@
 export type PostData = {
   word: string;
   data: number[];
-  author: string;
-  authorId: string;
-  date: Date;
+  authorUsername: string;
+  date: number;
+  expired?: boolean;
+  published: boolean;
+  postId?: string;
+  solved?: boolean;
+  pointsEarnedBy?: {
+    [username: string]: number;
+  };
 };

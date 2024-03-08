@@ -1,24 +1,25 @@
-import { Context, Devvit } from '@devvit/public-api';
+import type { Context } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { LeaderboardRow } from './LeaderboardRow.js';
 import { PageHeader } from './PageHeader.js';
-import { LeaderboardEntry } from '../types/LeaderboardEntry.js';
+import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 
 interface LeaderboardPageProps {
   onClose: () => void;
-  leaderboard: LeaderboardEntry[];
+  scores: ScoreBoardEntry[];
 }
 
 export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): JSX.Element => {
-  const { onClose, leaderboard } = props;
+  const { onClose, scores } = props;
   const { ui } = context;
 
   return (
     <vstack width="100%" height="100%" alignment="center" padding="large" gap="large">
-      <PageHeader title="High Scores" onClose={onClose} />
+      <PageHeader title="High Scores" description="Last 7 days" onClose={onClose} />
 
-      {/* Leaderboard */}
+      {/* List of top N high scores */}
       <vstack gap="small" width="100%">
-        {leaderboard.map((row, index) => (
+        {scores.map((row, index) => (
           <LeaderboardRow
             rank={index + 1}
             name={row.member}

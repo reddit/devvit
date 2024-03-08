@@ -1,14 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { CreatePreview } from '../../components/Preview.js';
 
-function shuffleArray<T>(array: T[]): T[] {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
-
 export const BingoForm = Devvit.createForm(
   {
     title: 'Create bingo board',
@@ -30,14 +22,17 @@ export const BingoForm = Devvit.createForm(
     ],
   },
   async (event, { reddit, subredditId, ui, redis }) => {
-    const answers: string[] = event.values.answers.split(',');
-    // TODO add empty value validation
+    const answersRaw: string = event.values.answers;
+    const answers: string[] = answersRaw
+      .split(',')
+      .map((answer) => answer.trim())
+      .filter((answer) => Boolean(answer));
+
     if (answers.length !== 16) {
       ui.showToast('Please enter exactly 16 answers');
       return;
     }
 
-    shuffleArray(answers); //shuffle the answers
     const title: string = event.values.title;
     const subredditName = (await reddit.getSubredditById(subredditId))?.name;
 
@@ -50,7 +45,7 @@ export const BingoForm = Devvit.createForm(
     //store postID and answers in redis
     await redis.set(post.id, JSON.stringify(answers));
 
-    ui.navigateTo(post);
     ui.showToast(`Bingo board created!`);
+    ui.navigateTo(post);
   }
 );

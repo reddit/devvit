@@ -3,7 +3,7 @@ import { PixelText } from './PixelText.js';
 import { Shadow } from './Shadow.js';
 
 interface StyledButtonProps {
-  onPress: () => void;
+  onPress: () => void | Promise<void>;
   label: string;
   width: Devvit.Blocks.SizeString;
 }
