@@ -319,7 +319,7 @@ export const srNcaaMBScoreboardCreationForm = Devvit.createForm(
           defaultValue: ['America/Los_Angeles'],
         },
       ],
-      title: 'Create NBA Scoreboard Post',
+      title: 'Create NCAA Scoreboard Post',
       acceptLabel: 'Next',
       cancelLabel: 'Back',
     };
