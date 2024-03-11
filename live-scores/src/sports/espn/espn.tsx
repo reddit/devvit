@@ -1,12 +1,13 @@
-import {
-  EventState,
+import type {
   GameEvent,
   GameEventTimingInfo,
   GeneralGameScoreInfo,
   TeamInfo,
 } from '../GameEvent.js';
+import { EventState } from '../GameEvent.js';
 import {
   APIService,
+  League,
   getLeagueFromString,
   getSportFromLeague,
   getSportFromLeagueString,
@@ -67,7 +68,7 @@ export async function fetchActiveGames<T extends GeneralGameScoreInfo>(
   }
 
   const gameInfos: T[] = [];
-  data['events'].forEach((event: any) => {
+  data['events'].forEach((event: unknown) => {
     gameInfos.push(parseGeneralGameScoreInfo(event, league, sport) as T);
   });
   return gameInfos;
@@ -91,11 +92,11 @@ export async function fetchNextEventForTeam(teamId: string, league: string): Pro
   const event = data.team.nextEvent[0];
   const homeTeam = parseTeamInfo(
     league,
-    event.competitions[0].competitors.find((team: any) => team.homeAway === 'home').team
+    event.competitions[0].competitors.find((team: unknown) => team.homeAway === 'home').team
   );
   const awayTeam = parseTeamInfo(
     league,
-    event.competitions[0].competitors.find((team: any) => team.homeAway === 'away').team
+    event.competitions[0].competitors.find((team: unknown) => team.homeAway === 'away').team
   );
   const timing = parseTimingInfo(event.competitions[0].status);
   return {
@@ -149,12 +150,12 @@ export async function fetchAllTeams(league: string): Promise<TeamInfo[]> {
     return [];
   }
   const allTeams = data.sports[0].leagues[0].teams;
-  return allTeams.map((team: any) => parseTeamInfo(league, team['team']));
+  return allTeams.map((team: unknown) => parseTeamInfo(league, team['team']));
 }
 
 function populateBaseballInfo(
   gameInfo: GeneralGameScoreInfo,
-  competition: any
+  competition: unknown
 ): BaseballGameScoreInfo {
   const baseballInfo: BaseballGameScoreInfo = {
     ...gameInfo,
@@ -197,13 +198,13 @@ function populateBaseballInfo(
 }
 
 export function parseGeneralGameScoreInfo(
-  event: any,
+  event: unknown,
   league: string,
   gameType: string
 ): GeneralGameScoreInfo | BaseballGameScoreInfo {
   const competition = event.competitions[0];
-  const homeCompetitor = competition.competitors.find((team: any) => team.homeAway === 'home');
-  const awayCompetitor = competition.competitors.find((team: any) => team.homeAway === 'away');
+  const homeCompetitor = competition.competitors.find((team: unknown) => team.homeAway === 'home');
+  const awayCompetitor = competition.competitors.find((team: unknown) => team.homeAway === 'away');
   const currentDate = new Date();
   const gameInfo: GeneralGameScoreInfo = {
     event: {
@@ -231,7 +232,7 @@ export function parseGeneralGameScoreInfo(
   return gameInfo;
 }
 
-function parseTeamInfo(league: string, team: any): TeamInfo {
+function parseTeamInfo(league: string, team: unknown): TeamInfo {
   const val: TeamInfo = {
     id: team['id'],
     name: team['shortDisplayName'],
@@ -243,7 +244,7 @@ function parseTeamInfo(league: string, team: any): TeamInfo {
   return val;
 }
 
-function parseTimingInfo(status: any): GameEventTimingInfo {
+function parseTimingInfo(status: unknown): GameEventTimingInfo {
   const val: GameEventTimingInfo = {
     clock: status['clock'],
     displayClock: status['displayClock'],
@@ -252,7 +253,7 @@ function parseTimingInfo(status: any): GameEventTimingInfo {
   return val;
 }
 
-function parseEventState(event: any): EventState {
+function parseEventState(event: unknown): EventState {
   switch (event['competitions'][0]['status']['type']['name']) {
     case 'STATUS_SCHEDULED':
       return EventState.PRE;
@@ -297,6 +298,41 @@ function eventPeriodToString(sport: string): string {
       return 'Half';
     default:
       return 'Period';
+  }
+}
+
+export function eventPeriodStringShort(period: number, sport: string, league: string): string {
+  if (league === League.NCAAMB) {
+    switch (period) {
+      case 1:
+        return `1st`;
+      case 2:
+        return `2nd`;
+      default:
+        // First OT is just OT, then 2OT, 3OT, etc.
+        return `${period - 2 > 1 ? period - 2 : ''}OT`;
+    }
+  }
+  switch (period) {
+    case 0.5:
+      return `HT`;
+    case 1:
+      return `1st`;
+    case 2:
+      return `2nd`;
+    case 3:
+      return `3rd`;
+    case 4:
+      if (sport === 'hockey') {
+        return `OT`;
+      }
+      return `4th`;
+    default:
+      if (sport === 'hockey') {
+        return `${period - 3 > 1 ? period - 3 : ''}OT`;
+      }
+      // First OT is just OT, then 2OT, 3OT, etc.
+      return `${period - 4 > 1 ? period - 4 : ''}OT`;
   }
 }
 

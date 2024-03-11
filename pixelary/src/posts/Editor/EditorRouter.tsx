@@ -1,13 +1,15 @@
-import { Devvit, UseIntervalResult, FormKey } from '@devvit/public-api';
+import type { FormKey } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { OverviewPage } from './OverviewPage.js';
 import { HowToPlayPage } from './HowToPlayPage.js';
 import { LeaderboardPage } from '../../components/LeaderboardPage.js';
 import { CardDrawPage } from './CardDrawPage.js';
 import { EditorPage } from './EditorPage.js';
 import { ReviewPage } from './ReviewPage.js';
-import { DailyDrawingRecord } from '../../types/DailyDrawingRecord.js';
-import { editorPages } from './editorPages.js';
-import { LeaderboardEntry } from '../../types/LeaderboardEntry.js';
+import type { PostData } from '../../types/PostData.js';
+import type { editorPages } from './editorPages.js';
+import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
+import type { GameSettings } from '../../types/GameSettings.js';
 
 interface EditorRouterProps {
   page: string;
@@ -15,7 +17,7 @@ interface EditorRouterProps {
   data: number[];
   setData: (data: number[]) => void;
   word: string;
-  leaderboard: LeaderboardEntry[];
+  scores: ScoreBoardEntry[];
   cardDrawTimeLeft: number;
   setCardDrawTimer: () => void;
   cancelDrawingTimer: () => void;
@@ -23,12 +25,14 @@ interface EditorRouterProps {
   fallbackTimerUpdate: () => void;
   currentColor: number;
   setCurrentColor: (color: number) => void;
-  dailyDrawings: DailyDrawingRecord[];
-  setDailyDrawings: (drawings: DailyDrawingRecord[]) => void;
+  dailyDrawings: PostData[];
+  setDailyDrawings: (drawings: PostData[]) => void;
   userPoints: number;
   cancelConfirmationForm: FormKey;
   clearData: () => void;
-  saveDrawing: (drawing: DailyDrawingRecord) => void;
+  currentSubreddit: string;
+  username: string;
+  gameSettings: GameSettings;
 }
 
 export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
@@ -38,7 +42,7 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
     data,
     setData,
     word,
-    leaderboard,
+    scores,
     cardDrawTimeLeft,
     drawingTimeLeft,
     cancelDrawingTimer,
@@ -51,25 +55,27 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
     setCardDrawTimer,
     cancelConfirmationForm,
     clearData,
-    saveDrawing,
+    currentSubreddit,
+    username,
+    gameSettings,
   } = props;
+
+  const overviewPage = (
+    <OverviewPage
+      dailyDrawings={dailyDrawings}
+      userPoints={userPoints}
+      setPage={setPage}
+      startCardDrawTimer={setCardDrawTimer}
+    />
+  );
 
   let currentPage;
   switch (page) {
     case 'default':
-      currentPage = (
-        <OverviewPage
-          dailyDrawings={dailyDrawings}
-          userPoints={userPoints}
-          setPage={setPage}
-          startCardDrawTimer={setCardDrawTimer}
-        />
-      );
+      currentPage = overviewPage;
       break;
     case 'leaderboard':
-      currentPage = (
-        <LeaderboardPage leaderboard={leaderboard} onClose={() => setPage('default')} />
-      );
+      currentPage = <LeaderboardPage scores={scores} onClose={() => setPage('default')} />;
       break;
     case 'how-to-play':
       currentPage = <HowToPlayPage setPage={setPage} />;
@@ -104,9 +110,14 @@ export const EditorRouter = (props: EditorRouterProps): JSX.Element => {
           dailyDrawings={dailyDrawings}
           setDailyDrawings={setDailyDrawings}
           cancelConfirmationForm={cancelConfirmationForm}
-          saveDrawing={saveDrawing}
+          currentSubreddit={currentSubreddit}
+          username={username}
+          gameSettings={gameSettings}
         />
       );
+      break;
+    default:
+      currentPage = overviewPage;
       break;
   }
 

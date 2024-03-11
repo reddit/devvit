@@ -1,6 +1,7 @@
-import { Devvit, Context, FormKey } from '@devvit/public-api';
+import type { Context, FormKey } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { Drawing } from '../../components/Drawing.js';
-import { PostData } from '../../types/PostData.js';
+import type { PostData } from '../../types/PostData.js';
 import Settings from '../../settings.json';
 import { formatDuration } from '../../utils/formatDuration.js';
 import { StyledButton } from '../../components/StyledButton.js';
@@ -8,7 +9,7 @@ import { getScoreMultiplier } from '../../utils/getScoreMultiplier.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PixelSymbol } from '../../components/PixelSymbol.js';
 import { PointsToast } from '../../components/PointsToast.js';
-import { viewerPages } from './viewerPages.js';
+import type { viewerPages } from './viewerPages.js';
 import { formatNumberWithCommas } from '../../utils/formatNumbers.js';
 
 interface ViewerPageProps {
@@ -16,29 +17,20 @@ interface ViewerPageProps {
   postData: PostData;
   showFeedback: boolean;
   pointsEarned: number;
-  isSolvedByUser: boolean;
   isSolved: boolean;
   isAuthor: boolean;
   guessForm: FormKey;
 }
 
 export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Element => {
-  const {
-    setPage,
-    postData,
-    showFeedback,
-    pointsEarned,
-    isSolvedByUser,
-    isSolved,
-    isAuthor,
-    guessForm,
-  } = props;
+  const { setPage, postData, showFeedback, pointsEarned, isSolved, isAuthor, guessForm } = props;
   const { ui } = context;
-  const { word, data, date }: PostData = postData;
+  const { word, data, date, expired = false }: PostData = postData;
 
-  const timeLeft = new Date(date).getTime() + Settings.postLiveSpan - Date.now();
-  const postIsExpired = timeLeft < 0;
-  const scoreMultiplier = getScoreMultiplier(date);
+  const isSolvedByUser = pointsEarned > 0;
+
+  const timeLeft = date + Settings.postLiveSpan - Date.now();
+  const scoreMultiplier = getScoreMultiplier(Date.now());
   const points = Settings.guesserPoints * scoreMultiplier;
 
   return (
@@ -56,7 +48,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
         {/* Time left */}
         <hstack gap="small">
           <PixelSymbol type="clock" />
-          <PixelText>{postIsExpired ? 'Ended' : `${formatDuration(timeLeft)} left`}</PixelText>
+          <PixelText>{expired ? 'Ended' : `${formatDuration(timeLeft)} left`}</PixelText>
         </hstack>
 
         <spacer size="small" />
@@ -78,7 +70,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
 
         <spacer size="large" grow />
 
-        {!postIsExpired && !isSolvedByUser && !isAuthor && (
+        {!expired && !isSolvedByUser && !isAuthor && (
           <vstack alignment="center">
             <StyledButton
               width="275px"
@@ -89,7 +81,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           </vstack>
         )}
 
-        {(isSolved || isAuthor || postIsExpired) && (
+        {(isSolved || isAuthor || expired || isSolvedByUser) && (
           <vstack>
             <PixelText scale={3}>{word}</PixelText>
             <spacer size="xsmall" />
@@ -102,7 +94,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           </vstack>
         )}
 
-        {!postIsExpired && !isAuthor && !isSolvedByUser && (
+        {!expired && !isAuthor && !isSolvedByUser && (
           <hstack gap="small">
             <PixelText>{`For ${formatNumberWithCommas(points)}`}</PixelText>
             <PixelSymbol type="star" />
@@ -126,7 +118,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           </hstack>
         )}
 
-        {(isSolved || postIsExpired || isAuthor) && (
+        {(isSolved || expired || isAuthor || isSolvedByUser) && (
           <vstack>
             <spacer size="small" />
             <spacer size="medium" />

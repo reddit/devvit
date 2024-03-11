@@ -1,5 +1,5 @@
-import { Devvit, Context, UseIntervalResult } from '@devvit/public-api';
-import { editorPages } from './editorPages.js';
+import { Devvit } from '@devvit/public-api';
+import type { editorPages } from './editorPages.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PixelSymbol } from '../../components/PixelSymbol.js';
 import { Shadow } from '../../components/Shadow.js';

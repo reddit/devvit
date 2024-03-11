@@ -8,10 +8,8 @@ interface Range {
 
 const ranges: Range[] = Settings.guesserPointMultiplier;
 
-export function getScoreMultiplier(inputDate: Date): number {
-  const then = new Date(inputDate);
-  const now = new Date();
-  const durationInMilliseconds = now.getTime() - then.getTime();
+export function getScoreMultiplier(postCreationTime: number): number {
+  const durationInMilliseconds = Date.now() - postCreationTime;
 
   for (const range of ranges) {
     if (durationInMilliseconds >= range.start && durationInMilliseconds < range.end) {

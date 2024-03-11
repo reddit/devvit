@@ -1,18 +1,19 @@
-import { Devvit, FormKey } from '@devvit/public-api';
+import type { FormKey } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { ViewerPage } from './ViewerPage.js';
 import { LeaderboardPage } from '../../components/LeaderboardPage.js';
-import { PostData } from '../../types/PostData.js';
-import { viewerPages } from './viewerPages.js';
-import { LeaderboardEntry } from '../../types/LeaderboardEntry.js';
+import type { PostData } from '../../types/PostData.js';
+import type { viewerPages } from './viewerPages.js';
+import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
+import { PixelText } from '../../components/PixelText.js';
 
 interface ViewerRouterProps {
   page: string;
   setPage: (page: viewerPages) => void;
-  leaderboard: LeaderboardEntry[];
-  postData: PostData;
+  scores: ScoreBoardEntry[];
+  postData: PostData | undefined;
   showFeedback: boolean;
   pointsEarned: number;
-  isSolvedByUser: boolean;
   isSolved: boolean;
   isAuthor: boolean;
   guessForm: FormKey;
@@ -22,36 +23,41 @@ export const ViewerRouter = (props: ViewerRouterProps): JSX.Element => {
   const {
     page,
     setPage,
-    leaderboard,
+    scores,
     postData,
     showFeedback,
     pointsEarned,
-    isSolvedByUser,
     isSolved,
     isAuthor,
     guessForm,
   } = props;
 
+  if (!postData) {
+    return <PixelText>Loading ...</PixelText>;
+  }
+
+  const viewerPage = (
+    <ViewerPage
+      setPage={setPage}
+      postData={postData}
+      showFeedback={showFeedback}
+      pointsEarned={pointsEarned}
+      isSolved={isSolved}
+      isAuthor={isAuthor}
+      guessForm={guessForm}
+    />
+  );
+
   let currentPage;
   switch (page) {
     case 'default':
-      currentPage = (
-        <ViewerPage
-          setPage={setPage}
-          postData={postData}
-          showFeedback={showFeedback}
-          pointsEarned={pointsEarned}
-          isSolvedByUser={isSolvedByUser}
-          isSolved={isSolved}
-          isAuthor={isAuthor}
-          guessForm={guessForm}
-        />
-      );
+      currentPage = viewerPage;
       break;
     case 'leaderboard':
-      currentPage = (
-        <LeaderboardPage leaderboard={leaderboard} onClose={() => setPage('default')} />
-      );
+      currentPage = <LeaderboardPage scores={scores} onClose={() => setPage('default')} />;
+      break;
+    default:
+      currentPage = viewerPage;
       break;
   }
 

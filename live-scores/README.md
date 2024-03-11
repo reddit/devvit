@@ -21,12 +21,9 @@ An interactive post-type for sports games developed by Reddit! Install the app, 
 * NFL
 
 ### Basketball
-*Coming soon!*
-
 **Supported Leagues**
-
 * NBA
-* WNBA
+* NCAA Mens
 
 ## Creating a Scoreboard post
 

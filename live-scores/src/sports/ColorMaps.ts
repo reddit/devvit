@@ -116,6 +116,7 @@ export const NBA_TEAM_COLOR_MAP: Record<string, string> = {
   den: '#0E2240',
   det: '#C8102E',
   gs: '#1D428A',
+  gsw: '#1D428A',
   hou: '#CE1141',
   ind: '#FDBB30',
   lac: '#C8102E',
@@ -125,7 +126,9 @@ export const NBA_TEAM_COLOR_MAP: Record<string, string> = {
   mil: '#00471B',
   min: '#236192',
   no: '#0C2340',
+  nop: '#0C2340',
   ny: '#006BB6',
+  nyk: '#006BB6',
   okc: '#007AC1',
   orl: '#0077C0',
   phi: '#006BB6',
@@ -133,9 +136,13 @@ export const NBA_TEAM_COLOR_MAP: Record<string, string> = {
   por: '#E03A3E',
   sac: '#5A2D81',
   sa: '#C4CED4',
+  sas: '#C4CED4',
   tor: '#CE1141',
+  uta: '#002B5C',
+  utah: '#002B5C',
   uth: '#002B5C',
   was: '#002B5C',
+  wsh: '#002B5C',
 };
 
 export const EPL_TEAM_COLOR_MAP: Record<string, string> = {

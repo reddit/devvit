@@ -1,11 +1,11 @@
-import { Devvit, UseIntervalResult } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import Settings from '../../settings.json';
 import { splitArray } from '../../utils/splitArray.js';
 import { StyledButton } from '../../components/StyledButton.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PixelSymbol } from '../../components/PixelSymbol.js';
 import { Shadow } from '../../components/Shadow.js';
-import { editorPages } from './editorPages.js';
+import type { editorPages } from './editorPages.js';
 
 interface EditorPageProps {
   word: string;
