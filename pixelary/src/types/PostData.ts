@@ -7,7 +7,5 @@ export type PostData = {
   published: boolean;
   postId?: string;
   solved?: boolean;
-  pointsEarnedBy?: {
-    [username: string]: number;
-  };
+  pointsEarnedByUser?: number;
 };

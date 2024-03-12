@@ -31,7 +31,7 @@ interface EditorRouterProps {
   cancelConfirmationForm: FormKey;
   clearData: () => void;
   currentSubreddit: string;
-  username: string;
+  username: string | null;
   gameSettings: GameSettings;
 }
 

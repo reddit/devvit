@@ -81,7 +81,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           </vstack>
         )}
 
-        {(isSolved || isAuthor || expired || isSolvedByUser) && (
+        {(isAuthor || expired || isSolvedByUser) && (
           <vstack>
             <PixelText scale={3}>{word}</PixelText>
             <spacer size="xsmall" />
@@ -118,7 +118,7 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           </hstack>
         )}
 
-        {(isSolved || expired || isAuthor || isSolvedByUser) && (
+        {(expired || isAuthor || isSolvedByUser) && (
           <vstack>
             <spacer size="small" />
             <spacer size="medium" />
