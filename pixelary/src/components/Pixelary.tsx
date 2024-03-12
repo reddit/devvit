@@ -32,13 +32,19 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
   const { useState, useInterval, useForm, redis, postId, reddit, ui } = context;
   const service = new Service(redis);
 
-  const [[currentSubreddit, username]] = useState<string[]>(async () => {
-    return await Promise.all([
-      reddit.getCurrentSubreddit().then((sub) => sub.name),
-      reddit.getCurrentUser().then((user) => user.username),
-    ]);
-  });
+  const getUser = (): Promise<null | string> => {
+    if (!context.userId) {
+      return Promise.resolve(null);
+    }
+    return reddit
+      .getCurrentUser()
+      .then((user) => user.username)
+      .catch(() => null);
+  };
 
+  const [[currentSubreddit, username]] = useState<[string, string | null]>(async () => {
+    return await Promise.all([reddit.getCurrentSubreddit().then((sub) => sub.name), getUser()]);
+  });
   const maxLength = 8;
 
   const [{ gameSettings, postData, scores }] = useState<InitialData>(
@@ -99,7 +105,7 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
 
   // How many points has the user earned from this drawing.
   const [pointsEarned, setPointsEarned] = useState<number>(
-    postData?.pointsEarnedBy?.[username] || 0
+    username ? postData?.pointsEarnedByUser || 0 : 0
   );
 
   // [Start] Countdown Timers
@@ -176,7 +182,7 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
       const postData: PostData = {
         word,
         data,
-        authorUsername: username,
+        authorUsername: username!,
         date: Date.now(),
         published: false,
       };
@@ -223,19 +229,6 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
               id: postId!,
               text: `${username} is the first to solve this drawing!`,
             });
-
-            const authorSettings = await service.getUserSettings(authorUsername!);
-            if (authorSettings.drawingGuessed) {
-              const post = await reddit.getPostById(postId!);
-              const url = post.permalink;
-              await reddit.sendPrivateMessage({
-                to: authorUsername,
-                subject: 'Pixelary: Your drawing was solved!',
-                text: `[u/${username}](https://reddit.com/u/${username}) just solved your [drawing of "${formattedGuess}"](${url}). You earned ${formatNumberWithCommas(
-                  Settings.drawerPoints
-                )} points. Great job!`,
-              });
-            }
           }
         })
         .catch((err) => {

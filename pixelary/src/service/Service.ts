@@ -3,7 +3,6 @@ import Settings from '../settings.json';
 import Words from '../data/words.json';
 import { getScoreMultiplier } from '../utils/getScoreMultiplier.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
-import type { UserSettings } from '../types/UserSettings.js';
 import type { GameSettings } from '../types/GameSettings.js';
 import type { PostData } from '../types/PostData.js';
 
@@ -45,9 +44,8 @@ export class Service {
       this.storePostData({
         postId: postId,
         solved: true,
-        pointsEarnedBy: {
-          [username]: points,
-        },
+        pointsEarnedByUser: points,
+        username,
       }),
       // Update score for drawing author if it was the first time being solved
       !isSolved &&
@@ -124,11 +122,11 @@ export class Service {
   }
 
   // Fetching user rank and score
-  async getScoreBoardUserEntry(username: string | undefined): Promise<{
+  async getScoreBoardUserEntry(username: string | null): Promise<{
     rank: number;
     score: number;
   }> {
-    if (username === undefined)
+    if (username === null)
       return {
         rank: -1,
         score: 0,
@@ -204,7 +202,11 @@ export class Service {
     await this.redis.expire(key, Settings.dailyDrawingsExpiration);
   }
 
-  async getDailyDrawings(username: string): Promise<PostData[]> {
+  async getDailyDrawings(username: string | null): Promise<PostData[]> {
+    if (!username) {
+      return [];
+    }
+
     const key = this.getDailyDrawingsKey(username);
     const data = await this.redis.hgetall(key);
 
@@ -228,12 +230,12 @@ export class Service {
     return `post-${postId}`;
   }
 
-  async getPostData(postId: string, username: string | undefined): Promise<PostData | undefined> {
+  async getPostData(postId: string, username: string | null): Promise<PostData | undefined> {
     const key = this.getPostDataKey(postId);
     // TODO: Swap out with HMGET and a list of fields when supported
     const data = await this.redis.hgetall(key);
 
-    if (!data || !data.postId || !username) {
+    if (!data || !data.postId) {
       return undefined;
     }
 
@@ -255,9 +257,7 @@ export class Service {
 
     const pointsEarnedByUserKey = `pointsEarnedBy:${username}`;
     if (data[pointsEarnedByUserKey]) {
-      response.pointsEarnedBy = {
-        [username]: parseInt(data[pointsEarnedByUserKey]),
-      };
+      response.pointsEarnedByUser = parseInt(data[pointsEarnedByUserKey]);
     }
 
     return response;
@@ -271,9 +271,8 @@ export class Service {
     date?: number;
     expired?: boolean;
     solved?: boolean;
-    pointsEarnedBy?: {
-      [username: string]: number;
-    };
+    pointsEarnedByUser?: number;
+    username?: string;
   }): Promise<void> {
     const hashData: Record<string, string> = {
       postId: data.postId,
@@ -292,41 +291,18 @@ export class Service {
       hashData.date = JSON.stringify(data.date);
     }
     if (data.expired) {
-      hashData.expired = data.expired ? 'true' : 'false';
+      hashData.expired = JSON.stringify(data.expired);
     }
     if (data.solved) {
-      hashData.solved = data.solved ? 'true' : 'false';
+      hashData.solved = JSON.stringify(data.solved);
     }
-    if (data.pointsEarnedBy) {
-      const username = Object.keys(data.pointsEarnedBy)[0];
-      const value = Object.values(data.pointsEarnedBy)[0];
-      const pointsEarnedByKey = `pointsEarnedBy:${username}`;
-      hashData[pointsEarnedByKey] = JSON.stringify(value);
+    if (data.pointsEarnedByUser) {
+      const pointsEarnedByUserKey = `pointsEarnedBy:${data.username}`;
+      hashData[pointsEarnedByUserKey] = JSON.stringify(data.pointsEarnedByUser);
     }
 
     const key = this.getPostDataKey(data.postId);
     await this.redis.hset(key, hashData);
-  }
-
-  // User settings
-  getUserSettingsKey(username: string): string {
-    return `user-settings:${username}`;
-  }
-
-  async getUserSettings(username: string): Promise<UserSettings> {
-    const key = this.getUserSettingsKey(username);
-    const data = await this.redis.get(key);
-    if (!data) {
-      return {
-        drawingGuessed: true,
-      };
-    }
-    return JSON.parse(data);
-  }
-
-  async saveUserSettings(username: string, settings: UserSettings): Promise<void> {
-    const key = this.getUserSettingsKey(username);
-    await this.redis.set(key, JSON.stringify(settings));
   }
 
   // Game settings

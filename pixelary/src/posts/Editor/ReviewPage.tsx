@@ -21,7 +21,7 @@ interface ReviewPageProps {
   clearData: () => void;
   cancelConfirmationForm: FormKey;
   currentSubreddit: string;
-  username: string;
+  username: string | null;
   gameSettings: GameSettings;
 }
 
@@ -42,6 +42,11 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
   const service = new Service(redis);
 
   async function submitDrawingHandler(): Promise<void> {
+    if (!username) {
+      ui.showToast('Please log in to submit a drawing');
+      return;
+    }
+
     // The back-end is configured to run this app's submitPost calls as the user
     const post = await reddit.submitPost({
       title: 'What is this?',

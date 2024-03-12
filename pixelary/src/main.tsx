@@ -2,7 +2,6 @@ import { Devvit } from '@devvit/public-api';
 import { Pixelary } from './components/Pixelary.js';
 import { LoadingState } from './components/LoadingState.js';
 import { Service } from './service/Service.js';
-import type { UserSettings } from './types/UserSettings.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -194,11 +193,10 @@ const resetDailyDrawingsForm = Devvit.createForm(
     acceptLabel: 'Reset',
   },
   async (event, context) => {
-    const { reddit, redis, ui } = context;
+    const { redis, ui } = context;
     const username = event.values.username;
-    const user = await reddit.getUserByUsername(username);
     const service = new Service(redis);
-    const key = service.getDailyDrawingsKey(user.id);
+    const key = service.getDailyDrawingsKey(username);
     await redis.del(key);
     ui.showToast('Reset daily drawings!');
   }
@@ -243,42 +241,6 @@ Devvit.addMenuItem({
     const service = new Service(redis);
     await service.deleteIncorrectGuesses();
     ui.showToast('Deleted incorrect guesses');
-  },
-});
-
-// User settings
-const notificationSettingsForm = Devvit.createForm(
-  (data) => {
-    return {
-      title: 'Notification settings',
-      description: 'Get a notification when ...',
-      acceptLabel: 'Save',
-      fields: [
-        {
-          name: 'drawingGuessed',
-          label: 'Someone guesses your drawing',
-          type: 'boolean',
-          defaultValue: data.drawingGuessed,
-        },
-      ],
-    };
-  },
-  async (event, context) => {
-    const { redis, ui, userId } = context;
-    const service = new Service(redis);
-    await service.saveUserSettings(userId!, event.values as UserSettings);
-    ui.showToast('Saved settings!');
-  }
-);
-
-Devvit.addMenuItem({
-  label: '[Pixelary] User settings',
-  location: 'subreddit',
-  onPress: async (_event, context) => {
-    const { redis, ui, userId } = context;
-    const service = new Service(redis);
-    const settings = await service.getUserSettings(userId!);
-    ui.showForm(notificationSettingsForm, settings);
   },
 });
 
