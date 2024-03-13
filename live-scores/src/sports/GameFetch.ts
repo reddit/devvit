@@ -16,6 +16,7 @@ import {
 import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
 import { storeLastEvent } from './sportradar/LastEvents.js';
 import { fetchNBAGame, fetchNCAAMensBasketballGame } from './sportradar/BasketballPlayByPlay.js';
+import { fetchSimulatedGameScoreInfo } from './GameSimulator.js';
 
 const CLOSE_TO_GAME_THRESHOLD_HOURS = 1;
 const STALE_INFO_THRESHOLD_HOURS = 1;
@@ -43,10 +44,10 @@ export function makeKeyForEventId(eventId: string | undefined): string {
 }
 
 export async function fetchCachedGameInfoForPostId(
-  kvStore: KVStore,
+  context: Devvit.Context,
   postId: string | undefined
 ): Promise<GeneralGameScoreInfo | null> {
-  const gameSubStr: string | undefined = await kvStore.get(makeKeyForPostId(postId));
+  const gameSubStr: string | undefined = await context.kvStore.get(makeKeyForPostId(postId));
   if (gameSubStr === undefined) {
     return null;
   }
@@ -55,7 +56,10 @@ export async function fetchCachedGameInfoForPostId(
   if (gameSubscription.eventId.startsWith('demo')) {
     return fetchDebugGameInfo(gameSubscription.eventId);
   }
-  return await fetchCachedGameInfoForGameSubscription(kvStore, gameSubscription);
+  if (gameSubscription.service === APIService.SimulatorNBA) {
+    return fetchSimulatedGameScoreInfo(gameSubscription.eventId, context);
+  }
+  return await fetchCachedGameInfoForGameSubscription(context.kvStore, gameSubscription);
 }
 
 export async function fetchCachedGameInfoForGameSubscription(
@@ -184,6 +188,8 @@ function subscriptionFetches(
       } else {
         eventFetches.push(fetchNFLSimulationBoxscore(gameSub.recordingId, gameSub.simulationId));
       }
+    } else if (gameSub.service === APIService.SimulatorNBA) {
+      eventFetches.push(fetchSimulatedGameScoreInfo(gameSub.eventId, context));
     } else {
       eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
     }

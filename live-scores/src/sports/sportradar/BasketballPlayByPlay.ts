@@ -28,6 +28,8 @@ export type BasketballGameScoreInfoEvent = {
   description: string;
   number: number;
   event_type: string;
+  home_points: number;
+  away_points: number;
 };
 
 export async function fetchNBAGame(
@@ -68,7 +70,7 @@ export async function fetchNCAAMensBasketballGame(
   }
 }
 
-function parseTeam(league: string, team: BasketballTeam): TeamInfo {
+export function parseTeam(league: string, team: BasketballTeam): TeamInfo {
   // I can't believe I need to do this - pregame data has market in the name, live data does not
   let teamNameWithoutMarket: string;
   let teamNameWithMarket: string;
@@ -138,6 +140,8 @@ function parsePeriods(periods?: BasketballPeriod[]): BasketballGameScoreInfoPeri
           description: event.description,
           number: event.number,
           event_type: event.event_type,
+          home_points: event.home_points,
+          away_points: event.away_points,
         };
       }),
     };

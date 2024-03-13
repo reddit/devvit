@@ -52,6 +52,7 @@ import { srManualNFLScoreboardCreateForm } from './forms/ManualGameCreateForm.js
 import { BasketballScoreboard } from './components/basketball/BasketballScoreboard.js';
 import type { BasketballGameScoreInfo } from './sports/sportradar/BasketballPlayByPlay.js';
 import { totalEventsCount } from './sports/sportradar/BasketballPlayByPlayEvents.js';
+import { createNBASimulationPost, resetSimulator } from './sports/GameSimulator.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -213,7 +214,7 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'Create NBA Sim Scoreboard (Internal)',
+  label: 'Create NBA SportRadar Sim Scoreboard (Internal)',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
@@ -321,6 +322,24 @@ Devvit.addMenuItem({
 // });
 
 Devvit.addMenuItem({
+  label: 'Create NBA Simulator Post (Demo)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, context) => {
+    await createNBASimulationPost(context);
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'Restart NBA Simulator Post (Demo)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, context) => {
+    await resetSimulator(context);
+  },
+});
+
+Devvit.addMenuItem({
   label: 'Create Soccer Scoreboard (Demo)',
   location: 'subreddit',
   forUserType: `moderator`,
@@ -372,14 +391,14 @@ Devvit.addMenuItem({
 Devvit.addCustomPostType({
   name: 'Scoreboard',
   render: (context) => {
-    const { useState, postId, kvStore, redis } = context;
+    const { useState, postId, redis } = context;
     const debugId = context.debug.metadata?.['debug-id']?.values?.[0];
 
     const [scoreInfo, setScoreInfo] = useState(async () => {
       if (debugId) {
         return fetchDebugGameInfo(debugId);
       } else {
-        return await fetchCachedGameInfoForPostId(kvStore, postId);
+        return await fetchCachedGameInfoForPostId(context, postId);
       }
     });
 
@@ -435,7 +454,7 @@ Devvit.addCustomPostType({
 
     const updateInterval = context.useInterval(async () => {
       const previousScoreInfo = scoreInfo;
-      const data = await fetchCachedGameInfoForPostId(kvStore, postId);
+      const data = await fetchCachedGameInfoForPostId(context, postId);
       data && setScoreInfo(data);
       const newEvents = await getAllEventIds(redis, data?.event.id);
       setGameEventIds(newEvents);
@@ -481,7 +500,7 @@ Devvit.addCustomPostType({
           service: APIService.ESPN,
         };
         await context.kvStore.put(makeKeyForPostId(postId), JSON.stringify(gameSub));
-        const update = await fetchCachedGameInfoForPostId(kvStore, postId);
+        const update = await fetchCachedGameInfoForPostId(context, postId);
         setScoreInfo(update);
       }
       if (pageId?.startsWith('demo-nfl-game')) {
@@ -493,7 +512,7 @@ Devvit.addCustomPostType({
         };
         await context.kvStore.put(makeKeyForPostId(postId), JSON.stringify(gameSub));
         const oldInfo = scoreInfo;
-        const update = await fetchCachedGameInfoForPostId(kvStore, postId);
+        const update = await fetchCachedGameInfoForPostId(context, postId);
         setScoreInfo(update);
         if (oldInfo && update) {
           if (debugId) {

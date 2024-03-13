@@ -1,7 +1,9 @@
 import { Devvit } from '@devvit/public-api';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
-import { GeneralGameScoreInfo, leagueAssetPath } from '../sports/GameEvent.js';
+import type { GeneralGameScoreInfo } from '../sports/GameEvent.js';
+import { leagueAssetPath } from '../sports/GameEvent.js';
+import type { BasketballGameScoreInfo } from '../sports/sportradar/BasketballPlayByPlay.js';
 
 export enum ScoreboardPage {
   SCORE,
@@ -18,6 +20,13 @@ export type ScoreboardProps = {
 };
 
 export function GenericScoreBoard(scoreInfo: GeneralGameScoreInfo): JSX.Element {
+  let pbp: string = '';
+  if (scoreInfo.event.gameType === 'basketball') {
+    const bball = scoreInfo as BasketballGameScoreInfo;
+    const lastPeriod = bball.periods?.[bball.periods.length - 1] ?? undefined;
+    const lastEvent = lastPeriod?.events[lastPeriod.events.length - 1] ?? undefined;
+    pbp = lastEvent ? `${lastEvent.clock} - ${lastEvent.description}` : '';
+  }
   return (
     <blocks height="regular">
       <vstack cornerRadius="medium" grow>
@@ -42,6 +51,9 @@ export function GenericScoreBoard(scoreInfo: GeneralGameScoreInfo): JSX.Element 
               score: scoreInfo.homeScore,
               state: scoreInfo.event.state,
             })}
+            <hstack border="thin">
+              <text>{pbp}</text>
+            </hstack>
           </vstack>
         </zstack>
       </vstack>
