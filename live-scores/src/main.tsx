@@ -51,7 +51,10 @@ import { getNavigationCallbacks } from './utils/football/events.js';
 import { srManualNFLScoreboardCreateForm } from './forms/ManualGameCreateForm.js';
 import { BasketballScoreboard } from './components/basketball/BasketballScoreboard.js';
 import type { BasketballGameScoreInfo } from './sports/sportradar/BasketballPlayByPlay.js';
-import { totalEventsCount } from './sports/sportradar/BasketballPlayByPlayEvents.js';
+import {
+  getEventAtIndex,
+  totalEventsCount,
+} from './sports/sportradar/BasketballPlayByPlayEvents.js';
 import { createNBASimulationPost, resetSimulator } from './sports/GameSimulator.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
@@ -113,13 +116,13 @@ export const AppContent: Devvit.BlockComponent<{
   isOnline: boolean;
   reactions: ReactionScore[] | undefined;
   pastReactions: ReactionScore[] | undefined;
-  onReactionPress: (reaction: Reaction) => Promise<void>;
+  onReactionPress: (reaction: Reaction, eventId?: string) => Promise<void>;
   lastEventOverlayState: DevvitState<CurrentEventData | null>;
   navigationEventOverride: NFLBoxscoreLastEvent | null;
   gameEventIds: string[];
-  onNavigateNext: Nullable<() => void>;
-  onNavigatePrev: Nullable<() => void>;
-  onResetNavigation: () => void;
+  onNavigateNext: Nullable<() => Promise<void>>;
+  onNavigatePrev: Nullable<() => Promise<void>>;
+  onResetNavigation: Nullable<() => Promise<void>>;
   eventIndexOverride: number | null;
 }> = ({
   scoreInfo,
@@ -168,6 +171,9 @@ export const AppContent: Devvit.BlockComponent<{
     return BasketballScoreboard({
       info: basketballGameScoreInfo,
       eventIndexOverride: eventIndexOverride ?? -1,
+      reactions,
+      pastReactions,
+      onReactionPress,
       onNavigateNext,
       onNavigatePrev,
       onResetNavigation,
@@ -415,19 +421,27 @@ Devvit.addCustomPostType({
       useState<NFLBoxscoreLastEvent | null>(null);
 
     const [reactionScores, setReactionScores] = useState(async () => {
-      if (scoreInfo?.event.gameType === 'football') {
+      if (scoreInfo?.event.gameType === 'football' || scoreInfo?.event.gameType === 'basketball') {
         if (debugId) {
           return debugReactions();
-        } else {
-          const info = scoreInfo as NFLGameScoreInfo;
-          return await getAllReactionScores(context.redis, postId, info.lastEvent?.id);
         }
+        const lastEventId =
+          scoreInfo?.event.gameType === 'football'
+            ? (scoreInfo as NFLGameScoreInfo).lastEvent?.id
+            : (scoreInfo as BasketballGameScoreInfo).latestEvent?.id;
+        return await getAllReactionScores(
+          context.redis,
+          postId,
+          lastEventId,
+          scoreInfo?.event.gameType
+        );
       }
       return [];
     });
 
     const [localReactions, setLocalReactions] = useState(async () => {
-      if (scoreInfo?.event.gameType === 'football') {
+      if (scoreInfo?.event.gameType === 'football' || scoreInfo?.event.gameType === 'basketball') {
+        const isBasketball = scoreInfo?.event.gameType === 'basketball';
         if (debugId) {
           return debugLocalReactions();
         } else {
@@ -437,6 +451,9 @@ Devvit.addCustomPostType({
             return {
               reaction,
               count: 0,
+              eventId: isBasketball
+                ? (scoreInfo as BasketballGameScoreInfo).latestEvent?.id
+                : undefined,
             };
           });
           return scores;
@@ -463,8 +480,15 @@ Devvit.addCustomPostType({
       }
     }, 10000);
 
+    const postGameReactionInterval = context.useInterval(async () => {
+      if (scoreInfo && localReactions.some((r) => r.count > 0)) {
+        await reactionUpdate(scoreInfo, scoreInfo);
+      }
+    }, 5000);
+
     if (scoreInfo?.event.state === EventState.FINAL) {
       updateInterval.stop();
+      postGameReactionInterval.start();
     } else {
       updateInterval.start();
     }
@@ -531,18 +555,28 @@ Devvit.addCustomPostType({
       newInfo?: GeneralGameScoreInfo
     ): Promise<void> {
       if (oldInfo?.event.gameType === 'football') {
-        const updated = newInfo as NFLGameScoreInfo;
-        const old = oldInfo as NFLGameScoreInfo;
+        const oldLastEventId = (oldInfo as NFLGameScoreInfo).lastEvent?.id;
+        const newLastEventId = (newInfo as NFLGameScoreInfo).lastEvent?.id;
         await Promise.all(
           localReactions.map(async (r) => {
             if (r.count > 0) {
-              return incrementReaction(
-                r.reaction,
-                r.count,
-                context.redis,
-                postId,
-                old.lastEvent?.id
-              );
+              return incrementReaction(r.reaction, r.count, context.redis, postId, oldLastEventId);
+            }
+          })
+        );
+        resetUserReactions();
+        if (debugId) {
+          setReactionScores(debugReactions());
+        } else {
+          const reactions = await getAllReactionScores(context.redis, postId, newLastEventId);
+          setReactionScores(reactions);
+        }
+      } else if (oldInfo?.event.gameType === 'basketball') {
+        const newLastEventId = (newInfo as BasketballGameScoreInfo).latestEvent?.id;
+        await Promise.all(
+          localReactions.map(async (r) => {
+            if (r.count > 0 && r.eventId) {
+              return incrementReaction(r.reaction, r.count, context.redis, postId, r.eventId);
             }
           })
         );
@@ -553,9 +587,14 @@ Devvit.addCustomPostType({
           const reactions = await getAllReactionScores(
             context.redis,
             postId,
-            updated.lastEvent?.id
+            newLastEventId,
+            'basketball'
           );
           setReactionScores(reactions);
+        }
+        if (eventIndexOverride !== -1) {
+          const event = getEventAtIndex(eventIndexOverride, oldInfo);
+          await updatePastReactions(event?.id ?? null);
         }
       }
     }
@@ -565,23 +604,42 @@ Devvit.addCustomPostType({
         return {
           reaction: r.reaction,
           count: 0,
+          eventId: scoreInfo?.event.gameType === 'basketball' ? r.eventId : undefined,
         };
       });
       setLocalReactions(scores);
     }
 
-    const onReactionPress = async (reaction: Reaction): Promise<void> => {
-      const scores = localReactions.map((r) => {
-        if (r.reaction.id === reaction.id) {
-          return {
-            reaction: r.reaction,
-            count: r.count + 1,
-          };
-        } else {
-          return r;
+    const onReactionPress = async (reaction: Reaction, eventId?: string): Promise<void> => {
+      const isBasketball = scoreInfo?.event.gameType === 'basketball';
+      const current = localReactions.find(
+        (r) => r.reaction.id === reaction.id && r.eventId === eventId
+      );
+      if (current) {
+        const scores = localReactions.map((r) => {
+          if (r.reaction.id === reaction.id && r.eventId === eventId) {
+            return {
+              reaction: r.reaction,
+              count: r.count + 1,
+              eventId: isBasketball ? r.eventId : undefined,
+            };
+          } else {
+            return r;
+          }
+        });
+        setLocalReactions(scores);
+      } else {
+        if (eventId) {
+          setLocalReactions([
+            ...localReactions,
+            {
+              reaction: reaction,
+              count: 1,
+              eventId: isBasketball ? eventId : undefined,
+            },
+          ]);
         }
-      });
-      setLocalReactions(scores);
+      }
     };
 
     if (!scoreInfo) {
@@ -595,16 +653,30 @@ Devvit.addCustomPostType({
     const reactions =
       scoreInfo.event.state === EventState.FINAL
         ? undefined
-        : combineReactionScores(reactionScores, localReactions);
+        : combineReactionScores(reactionScores, localReactions, scoreInfo.event.gameType);
+
+    // const reactions = combineReactionScores(reactionScores, localReactions, scoreInfo.event.gameType);
+    const combinedPastReactions = combineReactionScores(
+      pastReactions,
+      localReactions,
+      scoreInfo.event.gameType
+    );
 
     const updatePastReactions = async (eventId: string | null): Promise<void> => {
       if (!eventId) {
         setPastReactions(undefined);
         return;
       }
-      const reactionsForEvent = await getAllReactionScores(context.redis, postId, eventId);
+      const reactionsForEvent = await getAllReactionScores(
+        context.redis,
+        postId,
+        eventId,
+        scoreInfo.event.gameType
+      );
       setPastReactions(reactionsForEvent);
     };
+
+    const [eventIndexOverride, setEventIndexOverride] = useState(-1);
 
     // FOOTBALL!
     if (scoreInfo.event.gameType === 'football') {
@@ -618,7 +690,7 @@ Devvit.addCustomPostType({
         updatePastReactions
       );
 
-      const onResetNavigation: () => void = () => {
+      const onResetNavigation = async (): Promise<void> => {
         setNavigationEventOverride(null);
       };
 
@@ -648,21 +720,25 @@ Devvit.addCustomPostType({
     if (scoreInfo.event.gameType === 'basketball') {
       const basketballGameScoreInfo = scoreInfo as BasketballGameScoreInfo;
       const totalEvents = totalEventsCount(basketballGameScoreInfo);
-      const [eventIndexOverride, setEventIndexOverride] = useState(-1);
 
-      const onNavigateNext: () => void = () => {
+      const onNavigateNext = async (): Promise<void> => {
         if (eventIndexOverride >= 0) {
           const newIndex = eventIndexOverride + 1;
+          const event = getEventAtIndex(newIndex, basketballGameScoreInfo);
+          await updatePastReactions(event?.id ?? null);
           setEventIndexOverride(newIndex < totalEvents - 1 ? newIndex : -1);
         }
       };
-      const onNavigatePrev: () => void = () => {
+      const onNavigatePrev = async (): Promise<void> => {
         if (eventIndexOverride !== 0) {
           const newIndex = eventIndexOverride === -1 ? totalEvents - 2 : eventIndexOverride - 1;
+          const event = getEventAtIndex(newIndex, basketballGameScoreInfo);
+          await updatePastReactions(event?.id ?? null);
           setEventIndexOverride(newIndex >= 0 ? newIndex : -1);
         }
       };
-      const onResetNavigation: () => void = () => {
+      const onResetNavigation = async (): Promise<void> => {
+        await updatePastReactions(null);
         setEventIndexOverride(-1);
       };
       return (
@@ -672,7 +748,7 @@ Devvit.addCustomPostType({
           lastComment={lastComment}
           page={page}
           reactions={reactions}
-          pastReactions={pastReactions}
+          pastReactions={combinedPastReactions}
           scoreInfo={scoreInfo}
           setPage={setPage}
           onReactionPress={onReactionPress}
@@ -704,7 +780,7 @@ Devvit.addCustomPostType({
         navigationEventOverride={navigationEventOverride}
         onNavigatePrev={null}
         onNavigateNext={null}
-        onResetNavigation={noop}
+        onResetNavigation={null}
         eventIndexOverride={null}
       />
     );
@@ -794,7 +870,7 @@ Devvit.addSchedulerJob({
               gameEventIds={[]}
               onNavigatePrev={null}
               onNavigateNext={null}
-              onResetNavigation={noop}
+              onResetNavigation={null}
               eventIndexOverride={null}
             />
           ));

@@ -4,11 +4,12 @@ import { basketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
 import type { GameSubscription } from './Sports.js';
 import { APIService, League, getLeagueFromString } from './Sports.js';
 import { EventState } from './GameEvent.js';
-import { LoadingState } from '../components/Loading.js';
 import { addSubscription } from '../subscriptions.js';
-import { makeKeyForSubscription, makeKeyForPostId } from './GameFetch.js';
+import { makeKeyForSubscription, makeKeyForPostId, makeKeyForEventId } from './GameFetch.js';
 import { APIKey } from './sportradar/APIKeys.js';
 import { filteredBasketballEvents } from './sportradar/BasketballPlayByPlayEvents.js';
+import { LoadingState } from '../components/Loading.js';
+import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
 
 export type SimulatorProps = {
   gameId: string;
@@ -46,7 +47,7 @@ async function initializeSimulator(
   // check if we already have this game downloaded
   const existingGame = await context.redis.get(`sim:full-game:${props.gameId}`);
   if (existingGame) {
-    console.log('Lucky you! we already have this simulator game cached! GameID: ${props.gameId}');
+    console.log(`Lucky you! we already have this simulator game cached! GameID: ${props.gameId}`);
     storedFullGame = JSON.parse(existingGame);
     return simulatedGameScoreInfo(JSON.parse(existingGame), config, context);
   }
@@ -80,7 +81,6 @@ export async function fetchSimulatedGameScoreInfo(
   if (storedFullGame !== null) {
     return simulatedGameScoreInfo(storedFullGame, config, context);
   }
-  console.log('Simulator Game not stored, grabbing from redis');
   const fullGameString = await context.redis.get(fullGameDataKey(gameId));
   if (fullGameString) {
     const fullGame: unknown = JSON.parse(fullGameString);
@@ -133,6 +133,7 @@ function simulatedGameScoreInfo(
     service: APIService.SimulatorNBA,
     generatedDate: currentDate.toISOString(),
     periods: periods,
+    latestEvent: latestEvent,
   };
 }
 
@@ -206,11 +207,36 @@ export async function createNBASimulationPost(context: Devvit.Context): Promise<
     title: `Simulator: ${gameTitle}`,
     subredditName: currentSubreddit.name,
   });
-  await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub)),
-    context.ui.showToast({
-      text: 'Scoreboard Post Created!',
-      appearance: 'success',
-    });
+
+  const eventPostIdInfo = await context.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
+  let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
+  if (eventPostIdInfo) {
+    const info = JSON.parse(eventPostIdInfo);
+
+    newEventPostIdInfo = {
+      ...info,
+      postIds: [...info.postIds, post.id],
+    };
+  } else {
+    newEventPostIdInfo = {
+      postIds: [post.id],
+    };
+  }
+
+  await Promise.all([
+    configurePostWithAvailableReactions(post.id, context.redis, defaultReactions),
+    /**
+     * We need this so that inside of the task scheduler we can find postIDs for given events.
+     * This is used to create a cached loading screen as a fallback for errors in case something
+     * breaks. It also makes the loading experience look very similar to the live version.
+     */
+    context.kvStore.put(makeKeyForEventId(gameSub.eventId), JSON.stringify(newEventPostIdInfo)),
+    context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub)),
+  ]);
+  return context.ui.showToast({
+    text: 'Scoreboard Post Created!',
+    appearance: 'success',
+  });
 }
 
 export async function resetSimulator(context: Devvit.Context): Promise<void> {

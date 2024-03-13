@@ -1,5 +1,5 @@
 import { Devvit } from '@devvit/public-api';
-import {
+import type {
   NFLBoxscoreLastEvent,
   NFLGameScoreInfo,
   NFLGameTeam,
@@ -8,9 +8,11 @@ import { EventState, leagueAssetPath } from '../../sports/GameEvent.js';
 import { FootballField } from './FootballField.js';
 import { TopBar } from '../TopBar.js';
 import { eventPeriodString } from '../../sports/espn/espn.js';
-import { Reaction, ReactionScore, friendlyNumber } from '../../Reactions.js';
-import { CurrentEventData, DevvitState, Nullable } from '../../utils/types.js';
+import type { Reaction, ReactionScore } from '../../Reactions.js';
+import type { CurrentEventData, DevvitState, Nullable } from '../../utils/types.js';
 import { getCurrentEventData, getPositionAndTotalEvents } from '../../utils/football/events.js';
+import type { OnReactionPress } from '../ReactionsButtons.js';
+import { Reactions } from '../ReactionsButtons.js';
 
 enum Color {
   primaryFont = '#F2F4F5',
@@ -157,7 +159,7 @@ function Team(isHome: Boolean, info: NFLGameScoreInfo): JSX.Element {
 
 function LastEvent(
   lastEventData: CurrentEventData,
-  onReactionPress: (reaction: Reaction) => Promise<void>,
+  onReactionPress: (reaction: Reaction, eventId?: string) => Promise<void>,
   onClick: () => void,
   reactions: ReactionScore[] | undefined,
   isOnline: boolean
@@ -222,7 +224,7 @@ function EventOverlay(
   currentPosition: number,
   onNavigatePrev: Nullable<() => void>,
   onNavigateNext: Nullable<() => void>,
-  onResetNavigation: () => void
+  onResetNavigation: Nullable<() => void>
 ): JSX.Element {
   const activeNavigationColor = '#F2F4F5';
   const inactiveNavigationColor = '#FFFFFF40';
@@ -277,7 +279,7 @@ function EventOverlay(
                 </text>
               </hstack>
               <spacer grow></spacer>
-              <hstack onPress={onResetNavigation}>
+              <hstack onPress={onResetNavigation || undefined}>
                 <text color={resetNavigationColor} size="small" weight="bold">
                   Jump to latest
                 </text>
@@ -297,59 +299,6 @@ function EventOverlay(
   );
 }
 
-function ReactionButton(
-  reaction: ReactionScore,
-  onReactionPress: Nullable<(reaction: Reaction) => Promise<void>>,
-  isOnline: boolean
-): JSX.Element {
-  return (
-    <hstack
-      height="32px"
-      minWidth="64px"
-      border="thin"
-      borderColor={Color.reactionBorder}
-      cornerRadius="full"
-      alignment="center middle"
-      onPress={onReactionPress ? () => onReactionPress(reaction.reaction) : undefined}
-    >
-      <spacer size="small" />
-      <image
-        url={reaction.reaction.url}
-        height={'24px'}
-        width={'24px'}
-        imageHeight={48}
-        imageWidth={48}
-      />
-      <spacer size="xsmall" />
-      <text
-        selectable={false}
-        minWidth={'24px'}
-        size="small"
-        color={isOnline ? Color.primaryFont : Color.offlineFont}
-      >
-        {friendlyNumber(reaction.count)}
-      </text>
-      <spacer size="small" />
-    </hstack>
-  );
-}
-
-function Reactions(
-  reactions: ReactionScore[],
-  onReactionPress: Nullable<(reaction: Reaction) => Promise<void>>,
-  isOnline: boolean
-): JSX.Element {
-  return (
-    <hstack gap="small" alignment="center middle">
-      {reactions.map((r) => (
-        <>{ReactionButton(r, onReactionPress, isOnline)}</>
-      ))}
-    </hstack>
-  );
-}
-
-type OnReactionPress = (reaction: Reaction) => Promise<void>;
-
 export interface FootballScoreboardProps {
   scoreInfo: NFLGameScoreInfo;
   reactions: ReactionScore[] | undefined;
@@ -361,7 +310,7 @@ export interface FootballScoreboardProps {
   gameEventIds: string[];
   onNavigateNext: Nullable<() => void>;
   onNavigatePrev: Nullable<() => void>;
-  onResetNavigation: () => void;
+  onResetNavigation: Nullable<() => void>;
 }
 
 export function FootballScoreboard(
@@ -383,7 +332,9 @@ export function FootballScoreboard(
 
   const closeLastEventOverlay = (): void => {
     setLastEventOverlay(null);
-    onResetNavigation();
+    if (onResetNavigation) {
+      onResetNavigation();
+    }
   };
 
   const onOverlayReactionPress = props.navigationEventOverride ? null : props.onReactionPress;

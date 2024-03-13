@@ -14,6 +14,7 @@ import { filteredBasketballEvents } from './BasketballPlayByPlayEvents.js';
 // Reduced types from BasketballModels.ts to keep storage size (and redis read size) in check
 export type BasketballGameScoreInfo = GeneralGameScoreInfo & {
   periods?: BasketballGameScoreInfoPeriod[];
+  latestEvent?: BasketballGameScoreInfoEvent;
 };
 
 export type BasketballGameScoreInfoPeriod = {
@@ -124,7 +125,17 @@ export function basketballGameScoreInfo(
     service: service,
     generatedDate: currentDate.toISOString(),
     periods: parsePeriods(game.periods),
+    latestEvent: latestEvent(game.periods),
   };
+}
+
+function latestEvent(
+  periods?: BasketballGameScoreInfoPeriod[]
+): BasketballGameScoreInfoEvent | undefined {
+  if (!periods) return undefined;
+  const lastPeriod = periods[periods.length - 1];
+  if (!lastPeriod) return undefined;
+  return lastPeriod.events[lastPeriod.events.length - 1];
 }
 
 function parsePeriods(periods?: BasketballPeriod[]): BasketballGameScoreInfoPeriod[] | undefined {
