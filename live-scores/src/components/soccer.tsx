@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
-import {
+import type {
   SoccerGameScoreInfo,
   SoccerTeamStatistics,
   TimelineEvent,
@@ -230,7 +230,7 @@ function LineupComponent(props: SoccerScoreboardProps): JSX.Element {
       <vstack padding="small" width={'100%'} height={'100%'}>
         {TeamNameBarComponent(props)}
         <spacer size="small" />
-        <vstack padding="medium" width={'100%'} alignment="top center">
+        <vstack padding="medium" width={'100%'} alignment="top center" grow>
           {players.length > 0 && LineupGrid(players, columnCount)}
           {players.length === 0 && (
             <vstack alignment="top center">
@@ -239,7 +239,6 @@ function LineupComponent(props: SoccerScoreboardProps): JSX.Element {
             </vstack>
           )}
         </vstack>
-        <spacer size="xsmall" grow />
         <hstack alignment="center middle">
           <button
             onPress={() => {
@@ -348,10 +347,9 @@ function StatsComponent(props: SoccerScoreboardProps): JSX.Element {
       <vstack padding="small" width={'100%'} height={'100%'}>
         {TeamNameBarComponent(props)}
         <spacer size="xsmall" />
-        <vstack padding="medium" width={'100%'} alignment="top center">
+        <vstack padding="medium" width={'100%'} grow alignment="top center">
           {StatsGrid(stats, columnCount)}
         </vstack>
-        <spacer size="xsmall" grow />
         <hstack alignment="center middle">
           <button
             onPress={() => {
