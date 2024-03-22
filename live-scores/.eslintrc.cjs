@@ -1,6 +1,12 @@
 /* eslint-env node */
 const path = require('path');
+const base = require('@devvit/eslint-config/base.cjs');
 
-module.exports = require('@devvit/eslint-config/base.cjs');
-module.exports.parserOptions.project = path.join(__dirname, 'tsconfig.json');
-module.exports.ignorePatterns.push('esbuild.preview.mjs');
+module.exports = {
+  ...base,
+  parserOptions: {
+    ...base.parserOptions,
+    project: path.join(__dirname, 'tsconfig.json'),
+  },
+  ignorePatterns: [...base.ignorePatterns, 'esbuild.preview.mjs'],
+};

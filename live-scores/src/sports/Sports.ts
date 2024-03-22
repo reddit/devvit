@@ -14,6 +14,7 @@ export enum APIService {
   SRNFLSim = `sr_nfl_sim`,
   SRNCAAMB = `sr_ncaamb`,
   SRNBASim = `sr_nba_sim`,
+  SimulatorNBA = `simulator_nba`,
 }
 
 export enum League {

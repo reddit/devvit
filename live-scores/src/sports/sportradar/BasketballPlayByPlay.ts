@@ -14,6 +14,7 @@ import { filteredBasketballEvents } from './BasketballPlayByPlayEvents.js';
 // Reduced types from BasketballModels.ts to keep storage size (and redis read size) in check
 export type BasketballGameScoreInfo = GeneralGameScoreInfo & {
   periods?: BasketballGameScoreInfoPeriod[];
+  latestEvent?: BasketballGameScoreInfoEvent;
 };
 
 export type BasketballGameScoreInfoPeriod = {
@@ -28,6 +29,8 @@ export type BasketballGameScoreInfoEvent = {
   description: string;
   number: number;
   event_type: string;
+  home_points: number;
+  away_points: number;
 };
 
 export async function fetchNBAGame(
@@ -68,7 +71,7 @@ export async function fetchNCAAMensBasketballGame(
   }
 }
 
-function parseTeam(league: string, team: BasketballTeam): TeamInfo {
+export function parseTeam(league: string, team: BasketballTeam): TeamInfo {
   // I can't believe I need to do this - pregame data has market in the name, live data does not
   let teamNameWithoutMarket: string;
   let teamNameWithMarket: string;
@@ -122,7 +125,17 @@ export function basketballGameScoreInfo(
     service: service,
     generatedDate: currentDate.toISOString(),
     periods: parsePeriods(game.periods),
+    latestEvent: latestEvent(game.periods),
   };
+}
+
+function latestEvent(
+  periods?: BasketballGameScoreInfoPeriod[]
+): BasketballGameScoreInfoEvent | undefined {
+  if (!periods) return undefined;
+  const lastPeriod = periods[periods.length - 1];
+  if (!lastPeriod) return undefined;
+  return lastPeriod.events[lastPeriod.events.length - 1];
 }
 
 function parsePeriods(periods?: BasketballPeriod[]): BasketballGameScoreInfoPeriod[] | undefined {
@@ -138,6 +151,8 @@ function parsePeriods(periods?: BasketballPeriod[]): BasketballGameScoreInfoPeri
           description: event.description,
           number: event.number,
           event_type: event.event_type,
+          home_points: event.home_points,
+          away_points: event.away_points,
         };
       }),
     };

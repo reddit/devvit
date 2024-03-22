@@ -1,4 +1,4 @@
-import { RedisClient } from '@devvit/public-api';
+import type { RedisClient } from '@devvit/public-api';
 
 export type Reaction = {
   id: string;
@@ -9,9 +9,10 @@ export type Reaction = {
 export type ReactionScore = {
   reaction: Reaction;
   count: number;
+  eventId?: string;
 };
 
-function reactionsHashKey(postId: string, eventId: string) {
+function reactionsHashKey(postId: string, eventId: string): string {
   return `${postId}:${eventId}:reactions`;
 }
 
@@ -21,7 +22,7 @@ export async function incrementReaction(
   redis: RedisClient,
   postId?: string,
   eventId?: string
-) {
+): Promise<void> {
   if (!postId || !eventId) {
     return;
   }
@@ -33,12 +34,12 @@ export async function configurePostWithAvailableReactions(
   postId: string,
   redis: RedisClient,
   reactions?: Reaction[]
-) {
+): Promise<void> {
   if (!reactions) {
     return;
   }
   const key = `${postId}:reactions`;
-  redis.set(key, JSON.stringify(reactions));
+  await redis.set(key, JSON.stringify(reactions));
 }
 
 export async function getAvailableReactions(
@@ -56,18 +57,19 @@ export async function getAvailableReactions(
 export async function getAllReactionScores(
   redis: RedisClient,
   postId?: string,
-  eventId?: string
+  eventId?: string,
+  sport?: string
 ): Promise<ReactionScore[]> {
   if (!postId || !eventId) {
     return [];
   }
+  const isBasketball = sport === `basketball`;
   const reactions = await getAvailableReactions(redis, postId);
   const scores = await redis.hgetall(reactionsHashKey(postId, eventId));
-  // console.log('scores', scores);
   return reactions.map((reaction) => {
     const scoreValue = scores ? scores[reaction.id] : '0';
     const score = scoreValue ? parseInt(scoreValue) : 0;
-    return { reaction, count: score };
+    return { reaction: reaction, count: score, eventId: isBasketball ? eventId : undefined };
   });
 }
 
@@ -89,7 +91,7 @@ export const defaultReactions: Reaction[] = [
   },
 ];
 
-export function friendlyNumber(num: number) {
+export function friendlyNumber(num: number): string {
   if (!Number.isFinite(num) || num < 0) {
     return '0'; // Input validation for non-negative numbers
   }
@@ -109,16 +111,20 @@ export function friendlyNumber(num: number) {
 
 export function combineReactionScores(
   first?: ReactionScore[],
-  second?: ReactionScore[]
+  second?: ReactionScore[],
+  sport?: string
 ): ReactionScore[] | undefined {
-  const combinedReactions = first?.map((r) => {
-    const innerReaction = second?.find((inner) => inner.reaction.id === r.reaction.id);
+  const isBasketball = sport === `basketball`;
+  return first?.map((r) => {
+    const innerReaction = second?.find(
+      (inner) => inner.reaction.id === r.reaction.id && inner.eventId === r.eventId
+    );
     return {
       reaction: r.reaction,
       count: r.count + (innerReaction ? innerReaction.count : 0),
+      eventId: isBasketball ? r.eventId : undefined,
     };
   });
-  return combinedReactions;
 }
 
 export function debugReactions(): ReactionScore[] {

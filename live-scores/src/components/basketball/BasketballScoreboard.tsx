@@ -14,6 +14,8 @@ import {
 } from '../../sports/sportradar/BasketballPlayByPlayEvents.js';
 import type { Nullable } from '../../utils/types.js';
 import { msToHMS } from '../TopBar.js';
+import type { Reaction, ReactionScore } from '../../Reactions.js';
+import { Reactions } from '../ReactionsButtons.js';
 
 enum Color {
   primaryFont = '#F2F4F5',
@@ -226,6 +228,8 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
 
   const hideClockTime = info.event.state === EventState.FINAL && props.eventIndexOverride === -1;
 
+  const reactions = props.eventIndexOverride === -1 ? props.reactions : props.pastReactions;
+
   return (
     <vstack width={'100%'} height={`${appWindowHeight - headerHeight}px`}>
       <spacer size="medium" />
@@ -263,7 +267,13 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
 
       <hstack width={'100%'} height={`${reactionsHeight}px`} alignment="middle center">
         <spacer size="medium" />
-        {/* <text color={Color.primaryFont}>Reactions go here</text> */}
+        {reactions ? (
+          <hstack width={100}>
+            <vstack width="12px" height={100} />
+            {Reactions(reactions, props.onReactionPress, true)}
+            <vstack grow height={100} />
+          </hstack>
+        ) : null}
         <spacer size="medium" />
       </hstack>
 
@@ -290,7 +300,12 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
             Prev
           </text>
         </hstack>
-        <hstack grow height={'100%'} alignment="center middle" onPress={props.onResetNavigation}>
+        <hstack
+          grow
+          height={'100%'}
+          alignment="center middle"
+          onPress={props.onResetNavigation ?? undefined}
+        >
           <text
             weight="bold"
             color={props.eventIndexOverride === -1 ? Color.offlineFont : Color.primaryFont}
@@ -324,12 +339,17 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
   );
 }
 
+type OnReactionPress = (reaction: Reaction, eventId?: string) => Promise<void>;
+
 export interface BasketballScoreboardProps {
   info: BasketballGameScoreInfo;
   eventIndexOverride: number;
-  onNavigateNext?: Nullable<() => void>;
-  onNavigatePrev?: Nullable<() => void>;
-  onResetNavigation?: () => void;
+  reactions: ReactionScore[] | undefined;
+  pastReactions: ReactionScore[] | undefined;
+  onReactionPress: OnReactionPress;
+  onNavigateNext: Nullable<() => void>;
+  onNavigatePrev: Nullable<() => void>;
+  onResetNavigation: Nullable<() => void>;
 }
 
 export function BasketballScoreboard(props: BasketballScoreboardProps): JSX.Element {

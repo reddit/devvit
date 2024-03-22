@@ -230,10 +230,6 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
               text: `${username} is the first to solve this drawing!`,
             });
           }
-        })
-        .catch((err) => {
-          console.log(err);
-          ui.showToast('Something went wrong with saving the drawing solved event');
         });
     } else {
       setShowFeedback(true);
