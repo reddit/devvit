@@ -6,14 +6,13 @@ import type {
   TimelineEvent,
 } from '../sports/sportradar/SoccerEvent.js';
 import { Bubble } from './EventBubble.js';
+import type { ScoreboardProps } from './Scoreboard.js';
 import { ScoreboardPage } from './Scoreboard.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
 
-export type SoccerScoreboardProps = {
+export type SoccerScoreboardProps = ScoreboardProps & {
   scoreInfo: SoccerGameScoreInfo;
-  page: ScoreboardPage;
-  setPage: (page: ScoreboardPage) => void;
 };
 
 export type TeamBlockSoccer = {

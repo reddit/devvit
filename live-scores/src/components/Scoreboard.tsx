@@ -10,13 +10,17 @@ export enum ScoreboardPage {
   HOME_LINEUP,
   AWAY_LINEUP,
   HOME_STATS,
+  HOME_STATS_MORE,
   AWAY_STATS,
+  AWAY_STATS_MORE,
 }
+
+export type NavigateToPage = (page: ScoreboardPage) => void;
 
 export type ScoreboardProps = {
   scoreInfo: GeneralGameScoreInfo;
   page: ScoreboardPage;
-  setPage: (page: ScoreboardPage) => void;
+  setPage: NavigateToPage;
 };
 
 export function GenericScoreBoard(scoreInfo: GeneralGameScoreInfo): JSX.Element {

@@ -15,8 +15,11 @@ import {
 } from './sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
 import { storeLastEvent } from './sportradar/LastEvents.js';
+import type { BasketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
 import { fetchNBAGame, fetchNCAAMensBasketballGame } from './sportradar/BasketballPlayByPlay.js';
 import { fetchSimulatedGameScoreInfo } from './GameSimulator.js';
+import type { BasketballSummary } from './sportradar/BasketballSummary.js';
+import { fetchBasketballSummary } from './sportradar/BasketballSummary.js';
 
 const CLOSE_TO_GAME_THRESHOLD_HOURS = 1;
 const STALE_INFO_THRESHOLD_HOURS = 1;
@@ -41,6 +44,40 @@ export function makeKeyForEventId(eventId: string | undefined): string {
     throw new Error('Undefined eventId in makeKeyForEventId');
   }
   return `event:${eventId}`;
+}
+
+export async function fetchCachedBasketballSummary(
+  postId: string,
+  scoreInfo: BasketballGameScoreInfo,
+  context: Devvit.Context
+): Promise<BasketballSummary | null> {
+  if (scoreInfo?.event.gameType === 'basketball' && postId !== undefined) {
+    const gameSubStr: string | undefined = await context.kvStore.get(makeKeyForPostId(postId));
+    if (gameSubStr === undefined) {
+      return null;
+    }
+    const gameSubscription: GameSubscription = JSON.parse(gameSubStr);
+    if (
+      gameSubscription.service === APIService.SRNBA ||
+      gameSubscription.service === APIService.SRNCAAMB ||
+      gameSubscription.service === APIService.SimulatorNBA ||
+      gameSubscription.service === APIService.SRNBASim
+    ) {
+      const ttl = scoreInfo.event.state === EventState.FINAL ? 1000 * 60 * 60 * 6 : 60000;
+      return await context.cache(
+        async () => {
+          return await fetchBasketballSummary(
+            scoreInfo.event.id,
+            scoreInfo.event.league,
+            context,
+            gameSubscription.service
+          );
+        },
+        { key: `${scoreInfo.event.id}:summary`, ttl: ttl }
+      );
+    }
+  }
+  return null;
 }
 
 export async function fetchCachedGameInfoForPostId(

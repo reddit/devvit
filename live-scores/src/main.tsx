@@ -24,6 +24,7 @@ import {
   fetchSubscriptions,
   handlePostRemoval,
   makeKeyForEventId,
+  fetchCachedBasketballSummary,
 } from './sports/GameFetch.js';
 import type { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
 import { SoccerScoreboard } from './components/soccer.js';
@@ -56,6 +57,7 @@ import {
   totalEventsCount,
 } from './sports/sportradar/BasketballPlayByPlayEvents.js';
 import { createNBASimulationPost, resetSimulator } from './sports/GameSimulator.js';
+import type { BasketballSummary } from './sports/sportradar/BasketballSummary.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -123,7 +125,10 @@ export const AppContent: Devvit.BlockComponent<{
   onNavigateNext: Nullable<() => Promise<void>>;
   onNavigatePrev: Nullable<() => Promise<void>>;
   onResetNavigation: Nullable<() => Promise<void>>;
+  onToggleSpoilerFree: () => Promise<void>;
   eventIndexOverride: number | null;
+  basketballSummary: BasketballSummary | null;
+  spoilerFree: boolean;
 }> = ({
   scoreInfo,
   lastComment,
@@ -140,7 +145,10 @@ export const AppContent: Devvit.BlockComponent<{
   onNavigateNext,
   onNavigatePrev,
   onResetNavigation,
+  onToggleSpoilerFree,
   eventIndexOverride,
+  basketballSummary,
+  spoilerFree,
 }) => {
   if (scoreInfo.event.gameType === 'baseball') {
     const baseBallScoreInfo = scoreInfo as BaseballGameScoreInfo;
@@ -169,7 +177,9 @@ export const AppContent: Devvit.BlockComponent<{
   } else if (scoreInfo.event.gameType === 'basketball') {
     const basketballGameScoreInfo = scoreInfo as BasketballGameScoreInfo;
     return BasketballScoreboard({
-      info: basketballGameScoreInfo,
+      scoreInfo: basketballGameScoreInfo,
+      page,
+      setPage,
       eventIndexOverride: eventIndexOverride ?? -1,
       reactions,
       pastReactions,
@@ -177,6 +187,9 @@ export const AppContent: Devvit.BlockComponent<{
       onNavigateNext,
       onNavigatePrev,
       onResetNavigation,
+      onToggleSpoilerFree,
+      summary: basketballSummary,
+      spoilerFree: spoilerFree,
     });
   } else {
     return GenericScoreBoard(scoreInfo);
@@ -394,11 +407,60 @@ Devvit.addMenuItem({
   },
 });
 
+Devvit.addMenuItem({
+  label: 'Scoreboard - Toggle Spoiler-free Mode',
+  location: 'post',
+  postFilter: 'currentApp',
+  onPress: async (_event, context) => {
+    if (context.userId) {
+      const currentSpoilerString = await context.redis.global.get(`spoiler-free:${context.userId}`);
+      await context.redis.global.set(
+        `spoiler-free:${context.userId}`,
+        currentSpoilerString === 'true' ? 'false' : 'true'
+      );
+      return context.ui.showToast({
+        text: `Spoiler-free mode ${
+          currentSpoilerString === 'true' ? 'disabled' : 'enabled'
+        } - Please refresh!`,
+        appearance: 'success',
+      });
+    }
+    return context.ui.showToast({
+      text: 'Error toggling spoiler-free mode',
+      appearance: 'neutral',
+    });
+  },
+});
+
 Devvit.addCustomPostType({
   name: 'Scoreboard',
   render: (context) => {
     const { useState, postId, redis } = context;
     const debugId = context.debug.metadata?.['debug-id']?.values?.[0];
+
+    const [spoilerFree, setSpoilerFree] = useState(async () => {
+      if (debugId) {
+        return false;
+      }
+      if (context.userId) {
+        const spoilerFree = await context.redis.global.get(`spoiler-free:${context.userId}`);
+        return spoilerFree === 'true';
+      }
+      return false;
+    });
+
+    const onToggleSpoilerFree = async (): Promise<void> => {
+      if (context.userId) {
+        const currentSpoilerString = await context.redis.global.get(
+          `spoiler-free:${context.userId}`
+        );
+        await context.redis.global.set(
+          `spoiler-free:${context.userId}`,
+          currentSpoilerString === 'true' ? 'false' : 'true'
+        );
+        setSpoilerFree(currentSpoilerString === 'true' ? false : true);
+      }
+    };
 
     const [scoreInfo, setScoreInfo] = useState(async () => {
       if (debugId) {
@@ -406,6 +468,16 @@ Devvit.addCustomPostType({
       } else {
         return await fetchCachedGameInfoForPostId(context, postId);
       }
+    });
+
+    const [summary, setSummary] = useState(async () => {
+      if (debugId) {
+        return null;
+      }
+      if (postId && scoreInfo?.event.gameType === 'basketball') {
+        return await fetchCachedBasketballSummary(postId, scoreInfo, context);
+      }
+      return null;
     });
 
     // history of game events
@@ -478,17 +550,23 @@ Devvit.addCustomPostType({
       if (previousScoreInfo && data) {
         await reactionUpdate(previousScoreInfo, data);
       }
-    }, 10000);
-
-    const postGameReactionInterval = context.useInterval(async () => {
-      if (scoreInfo && localReactions.some((r) => r.count > 0)) {
-        await reactionUpdate(scoreInfo, scoreInfo);
+      if (postId && scoreInfo?.event.gameType === 'basketball') {
+        const updatedSummary = await fetchCachedBasketballSummary(postId, scoreInfo, context);
+        setSummary(updatedSummary);
       }
-    }, 5000);
+      if (context.userId) {
+        const storedSpoilerString = await context.redis.global.get(
+          `spoiler-free:${context.userId}`
+        );
+        const storedSpoilerFree = storedSpoilerString === 'true';
+        if (storedSpoilerFree !== spoilerFree) {
+          setSpoilerFree(storedSpoilerFree);
+        }
+      }
+    }, 10000);
 
     if (scoreInfo?.event.state === EventState.FINAL) {
       updateInterval.stop();
-      postGameReactionInterval.start();
     } else {
       updateInterval.start();
     }
@@ -612,6 +690,15 @@ Devvit.addCustomPostType({
 
     const onReactionPress = async (reaction: Reaction, eventId?: string): Promise<void> => {
       const isBasketball = scoreInfo?.event.gameType === 'basketball';
+
+      if (scoreInfo?.event.state === EventState.FINAL) {
+        await incrementReaction(reaction, 1, context.redis, postId, eventId);
+        if (eventId) {
+          await updatePastReactions(eventId);
+        }
+        return;
+      }
+
       const current = localReactions.find(
         (r) => r.reaction.id === reaction.id && r.eventId === eventId
       );
@@ -711,7 +798,10 @@ Devvit.addCustomPostType({
           onNavigatePrev={onNavigatePrev}
           onNavigateNext={onNavigateNext}
           onResetNavigation={onResetNavigation}
+          onToggleSpoilerFree={onToggleSpoilerFree}
           eventIndexOverride={null}
+          basketballSummary={null}
+          spoilerFree={spoilerFree}
         />
       );
     }
@@ -758,7 +848,10 @@ Devvit.addCustomPostType({
           onNavigatePrev={onNavigatePrev}
           onNavigateNext={onNavigateNext}
           onResetNavigation={onResetNavigation}
+          onToggleSpoilerFree={onToggleSpoilerFree}
           eventIndexOverride={eventIndexOverride}
+          basketballSummary={summary}
+          spoilerFree={spoilerFree}
         />
       );
     }
@@ -781,7 +874,10 @@ Devvit.addCustomPostType({
         onNavigatePrev={null}
         onNavigateNext={null}
         onResetNavigation={null}
+        onToggleSpoilerFree={onToggleSpoilerFree}
         eventIndexOverride={null}
+        basketballSummary={null}
+        spoilerFree={spoilerFree}
       />
     );
   },
@@ -871,7 +967,10 @@ Devvit.addSchedulerJob({
               onNavigatePrev={null}
               onNavigateNext={null}
               onResetNavigation={null}
+              onToggleSpoilerFree={async () => {}}
               eventIndexOverride={null}
+              basketballSummary={null}
+              spoilerFree={false}
             />
           ));
 
