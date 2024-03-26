@@ -307,7 +307,7 @@ export const srNcaaMBScoreboardCreationForm = Devvit.createForm(
             { label: 'Conference Tournament', value: 'CT' },
             { label: 'Post Season', value: 'PST' },
           ],
-          defaultValue: ['REG'],
+          defaultValue: ['PST'],
         },
         {
           name: 'timezone',

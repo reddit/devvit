@@ -155,7 +155,7 @@ export const AppContent: Devvit.BlockComponent<{
     return BaseballScoreBoard(baseBallScoreInfo, lastComment, demoNext);
   } else if (scoreInfo.event.gameType === 'soccer') {
     const soccerGameScoreInfo = scoreInfo as SoccerGameScoreInfo;
-    return SoccerScoreboard({ scoreInfo: soccerGameScoreInfo, page, setPage });
+    return SoccerScoreboard({ scoreInfo: soccerGameScoreInfo, page, setPage, spoilerFree });
   } else if (scoreInfo.event.gameType === 'football') {
     const footballGameScoreInfo = scoreInfo as NFLGameScoreInfo;
     return FootballScoreboard(

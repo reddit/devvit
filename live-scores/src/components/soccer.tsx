@@ -13,12 +13,14 @@ import { TopBar } from './TopBar.js';
 
 export type SoccerScoreboardProps = ScoreboardProps & {
   scoreInfo: SoccerGameScoreInfo;
+  spoilerFree: boolean;
 };
 
 export type TeamBlockSoccer = {
   goals?: TimelineEvent[] | undefined;
   redCards?: TimelineEvent[] | undefined;
   onPressAction?: () => void;
+  spoilerFree: boolean;
 };
 
 enum SoccerStat {
@@ -134,6 +136,7 @@ function ScoreComponent(props: SoccerScoreboardProps): JSX.Element {
             onPressAction: () => {
               props.setPage(ScoreboardPage.HOME_LINEUP);
             },
+            spoilerFree: props.spoilerFree,
           },
         })}
         <hstack border="thin" />
@@ -149,6 +152,7 @@ function ScoreComponent(props: SoccerScoreboardProps): JSX.Element {
             onPressAction: () => {
               props.setPage(ScoreboardPage.AWAY_LINEUP);
             },
+            spoilerFree: props.spoilerFree,
           },
         })}
         {Bubble(scoreInfo)}

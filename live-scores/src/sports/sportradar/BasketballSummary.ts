@@ -26,16 +26,22 @@ export async function fetchBasketballSummary(
 export function getPlayerStatsForTeam(team: BasketballSummaryTeam): BasketballSummaryPlayer[] {
   // sort by points, tiebreak by starter, then onCourt, then alphabetical last name
   return team.players.sort((a, b) => {
-    if (a.statistics.points !== b.statistics.points)
-      return b.statistics.points - a.statistics.points;
-    if (a.starter !== b.starter) return b.starter ? 1 : -1;
-    if (a.on_court !== b.on_court) return b.on_court ? 1 : -1;
-    if (a.statistics.assists !== b.statistics.assists)
-      return b.statistics.assists - a.statistics.assists;
-    if (a.statistics.rebounds !== b.statistics.rebounds)
-      return b.statistics.rebounds - a.statistics.rebounds;
-    if (a.statistics.minutes !== b.statistics.minutes)
-      return b.statistics.minutes !== '00:00' ? 1 : -1;
+    if (a.statistics && b.statistics) {
+      if (a.statistics.points !== b.statistics.points)
+        return b.statistics.points - a.statistics.points;
+      if (a.starter !== b.starter) return b.starter ? 1 : -1;
+      if (a.on_court !== b.on_court) return b.on_court ? 1 : -1;
+      if (a.statistics.assists !== b.statistics.assists)
+        return b.statistics.assists - a.statistics.assists;
+      if (a.statistics.rebounds !== b.statistics.rebounds)
+        return b.statistics.rebounds - a.statistics.rebounds;
+      if (a.statistics.minutes !== b.statistics.minutes)
+        return b.statistics.minutes !== '00:00' ? 1 : -1;
+    }
+    // Some small time college games don't have comprehensive stats, sort those with stats first
+    const aHasStats = a.statistics !== undefined;
+    const bHasStats = b.statistics !== undefined;
+    if (aHasStats !== bHasStats) return aHasStats ? -1 : 1;
     return a.last_name.localeCompare(b.last_name);
   });
 }
@@ -89,10 +95,10 @@ export type BasketballSummaryPlayer = {
   played?: boolean;
   active?: boolean;
   starter?: boolean;
-  on_court: boolean;
-  sr_id: string;
-  reference: string;
-  statistics: BasketballSummaryPlayerStatistics;
+  on_court?: boolean;
+  sr_id?: string;
+  reference?: string;
+  statistics?: BasketballSummaryPlayerStatistics;
   not_playing_reason?: string;
   not_playing_description?: string;
 };

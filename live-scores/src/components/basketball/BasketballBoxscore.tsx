@@ -109,12 +109,12 @@ function playerRow(player: BasketballSummaryPlayer): JSX.Element {
       <spacer size="small" />
       {titleCell(`${player.first_name.charAt(0)}. ${player.last_name}`, true, player.on_court)}
       <hstack width={'75%'} height={'100%'} alignment="end">
-        {statCell(stats.minutes ? stats.minutes : '0:00', true)}
-        {statCell(stats.points ? stats.points.toLocaleString() : '0')}
-        {statCell(stats.rebounds ? stats.rebounds.toLocaleString() : '0')}
-        {statCell(stats.assists ? stats.assists.toLocaleString() : '0')}
-        {statCell(stats.steals ? stats.steals.toLocaleString() : '0')}
-        {statCell(stats.blocks ? stats.blocks.toLocaleString() : `0`)}
+        {statCell(stats?.minutes ? stats.minutes : '-', true)}
+        {statCell(stats?.points ? stats.points.toLocaleString() : '0')}
+        {statCell(stats?.rebounds ? stats.rebounds.toLocaleString() : '0')}
+        {statCell(stats?.assists ? stats.assists.toLocaleString() : '0')}
+        {statCell(stats?.steals ? stats.steals.toLocaleString() : '0')}
+        {statCell(stats?.blocks ? stats.blocks.toLocaleString() : `0`)}
         <spacer size="small" />
       </hstack>
     </hstack>

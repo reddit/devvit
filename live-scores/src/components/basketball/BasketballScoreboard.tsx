@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
-import type {
-  BasketballGameScoreInfo,
-  BasketballGameScoreInfoPeriod,
+import {
+  type BasketballGameScoreInfo,
+  type BasketballGameScoreInfoPeriod,
 } from '../../sports/sportradar/BasketballPlayByPlay.js';
 import { eventPeriodStringShort } from '../../sports/espn/espn.js';
 import { EventState, leagueAssetPath } from '../../sports/GameEvent.js';
@@ -236,6 +236,44 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
   const currentPeriod: BasketballGameScoreInfoPeriod = info.periods[info.periods.length - 1];
   const latestEvent = currentPeriod.events[currentPeriod.events.length - 1];
 
+  if (!latestEvent) {
+    if (info.event.state === EventState.FINAL) {
+      const scoreString = props.spoilerFree
+        ? `(Hidden)`
+        : `${Math.max(info.homeScore, info.awayScore)} - ${Math.min(
+            info.homeScore,
+            info.awayScore
+          )}`;
+      return (
+        <vstack
+          gap="small"
+          width={'100%'}
+          height={`${320 - headerHeight}px`}
+          alignment="top center"
+        >
+          <spacer size="small" />
+          <text width={'90%'} style="heading" size="large" color={BasketballColor.primaryFont}>
+            Game has ended
+          </text>
+          <text width={'90%'} size="medium" color={BasketballColor.secondaryFont}>
+            Final Score {scoreString}.
+          </text>
+        </vstack>
+      );
+    }
+    return (
+      <vstack gap="medium" width={'100%'} height={`${320 - headerHeight}px`} alignment="top center">
+        <spacer size="small" />
+        <text width={'90%'} style="heading" size="medium" color={BasketballColor.primaryFont} wrap>
+          Sorry, this game does not have play by play statistics
+        </text>
+        <text width={'90%'} size="medium" color={BasketballColor.secondaryFont} wrap>
+          You can view players and limited stats by clicking on a team
+        </text>
+      </vstack>
+    );
+  }
+
   if (info.event.state === EventState.FINAL) {
     const scoreString = props.spoilerFree
       ? `(Hidden)`
@@ -252,7 +290,10 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
       ? getEventAtIndex(props.eventIndexOverride, info) ?? latestEvent
       : latestEvent;
 
-  const hideClockTime = info.event.state === EventState.FINAL && props.eventIndexOverride === -1;
+  const hideClockTime =
+    (info.event.state === EventState.FINAL ||
+      displayEvent.event_type === BasketballEventType.unknown) &&
+    props.eventIndexOverride === -1;
 
   const reactions = props.eventIndexOverride === -1 ? props.reactions : props.pastReactions;
 

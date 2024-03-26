@@ -87,6 +87,7 @@ export enum BasketballEventType {
   twopointmade = 'twopointmade',
   twopointmiss = 'twopointmiss',
   endofgame = 'endofgame',
+  unknown = 'unknown',
 }
 
 export function titleForEventType(eventType: string): string {
