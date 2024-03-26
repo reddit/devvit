@@ -1,8 +1,11 @@
 import { Devvit } from '@devvit/public-api';
 import { EventState } from '../sports/GameEvent.js';
-import { TeamBlockBaseball, sportSpecificContentBaseball } from './baseball.js';
-import { TeamBlockBasketball, sportSpecificContentBasketball } from './basketball.js';
-import { SportSpecificContentSoccer, TeamBlockSoccer } from './soccer.js';
+import type { TeamBlockBaseball } from './baseball.js';
+import { sportSpecificContentBaseball } from './baseball.js';
+import type { TeamBlockBasketball } from './basketball.js';
+import { sportSpecificContentBasketball } from './basketball.js';
+import type { TeamBlockSoccer } from './soccer.js';
+import { SportSpecificContentSoccer } from './soccer.js';
 
 export function TeamBlock({
   isHomeTeam,
@@ -24,12 +27,14 @@ export function TeamBlock({
   soccerProps?: TeamBlockSoccer;
 }): JSX.Element {
   let sportSpecificContent;
+  let spoilerFree = false;
   if (baseballProps) {
     sportSpecificContent = sportSpecificContentBaseball(state, baseballProps);
   } else if (basketballProps) {
     sportSpecificContent = sportSpecificContentBasketball(state, isHomeTeam, basketballProps);
   } else if (soccerProps) {
     sportSpecificContent = SportSpecificContentSoccer(soccerProps);
+    spoilerFree = soccerProps.spoilerFree;
   }
   const onPressAction = soccerProps?.onPressAction;
   return (
@@ -59,14 +64,14 @@ export function TeamBlock({
         ) : null}
         <spacer grow />
         <text size="xxlarge" weight="bold">
-          {state === EventState.PRE ? '-' : score?.toString()}
+          {state === EventState.PRE ? '-' : spoilerFree ? '?' : score?.toString()}
         </text>
         <spacer size="medium" />
       </hstack>
       <spacer size="small" />
       <hstack>
         <spacer size="small" />
-        {sportSpecificContent ?? null}
+        {(!spoilerFree && sportSpecificContent) ?? null}
       </hstack>
     </vstack>
   );

@@ -9,7 +9,8 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.17"
+    "@devvit/public-api": "0.10.17",
+    "tldts": "^6.0.14"
   },
   "devDependencies": {
     "@devvit/eslint-config": "0.10.17",

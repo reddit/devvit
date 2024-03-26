@@ -1,5 +1,22 @@
 import { Devvit } from '@devvit/public-api';
 import { CreatePreview } from '../../components/Preview.js';
+import { parse } from 'tldts';
+
+export const REDD_IT: string = 'redd.it';
+export const REDDIT_STATIC: string = 'redditstatic.com';
+export const REDDIT_MEDIA: string = 'redditmedia.com';
+export const APPROVED_DOMAINS: string[] = [REDD_IT, REDDIT_STATIC, REDDIT_MEDIA];
+export const ApprovedDomainsFormatted: string = APPROVED_DOMAINS.map(
+  (domain) => `"${domain}"`
+).join(', ');
+
+function isRedditImage(imageUrl: string | undefined): boolean {
+  if (!imageUrl) {
+    return true;
+  }
+  const domain = parse(imageUrl).domain;
+  return APPROVED_DOMAINS.includes(domain || '');
+}
 
 export const BingoForm = Devvit.createForm(
   {
@@ -19,6 +36,13 @@ export const BingoForm = Devvit.createForm(
         type: 'string',
         required: true,
       },
+      {
+        name: 'backgroundUrl',
+        label: 'Custom background image url (optional)',
+        type: 'string',
+        required: false,
+        helpText: `Allowed domains: ${ApprovedDomainsFormatted}`,
+      },
     ],
   },
   async (event, { reddit, subredditId, ui, redis }) => {
@@ -33,6 +57,12 @@ export const BingoForm = Devvit.createForm(
       return;
     }
 
+    const isValidImage = isRedditImage(event.values.backgroundUrl);
+    if (!isValidImage) {
+      ui.showToast(`Please use images from ${ApprovedDomainsFormatted}.`);
+      return;
+    }
+
     const title: string = event.values.title;
     const subredditName = (await reddit.getSubredditById(subredditId))?.name;
 
@@ -44,6 +74,7 @@ export const BingoForm = Devvit.createForm(
 
     //store postID and answers in redis
     await redis.set(post.id, JSON.stringify(answers));
+    await redis.set(`${post.id}_bg`, event.values.backgroundUrl);
 
     ui.showToast(`Bingo board created!`);
     ui.navigateTo(post);

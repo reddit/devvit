@@ -1,1 +1,1 @@
-export type Tile = { text: string; active: boolean };
+export type TileItem = { text: string; active: boolean };

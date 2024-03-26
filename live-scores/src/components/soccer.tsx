@@ -6,20 +6,21 @@ import type {
   TimelineEvent,
 } from '../sports/sportradar/SoccerEvent.js';
 import { Bubble } from './EventBubble.js';
+import type { ScoreboardProps } from './Scoreboard.js';
 import { ScoreboardPage } from './Scoreboard.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
 
-export type SoccerScoreboardProps = {
+export type SoccerScoreboardProps = ScoreboardProps & {
   scoreInfo: SoccerGameScoreInfo;
-  page: ScoreboardPage;
-  setPage: (page: ScoreboardPage) => void;
+  spoilerFree: boolean;
 };
 
 export type TeamBlockSoccer = {
   goals?: TimelineEvent[] | undefined;
   redCards?: TimelineEvent[] | undefined;
   onPressAction?: () => void;
+  spoilerFree: boolean;
 };
 
 enum SoccerStat {
@@ -135,6 +136,7 @@ function ScoreComponent(props: SoccerScoreboardProps): JSX.Element {
             onPressAction: () => {
               props.setPage(ScoreboardPage.HOME_LINEUP);
             },
+            spoilerFree: props.spoilerFree,
           },
         })}
         <hstack border="thin" />
@@ -150,6 +152,7 @@ function ScoreComponent(props: SoccerScoreboardProps): JSX.Element {
             onPressAction: () => {
               props.setPage(ScoreboardPage.AWAY_LINEUP);
             },
+            spoilerFree: props.spoilerFree,
           },
         })}
         {Bubble(scoreInfo)}

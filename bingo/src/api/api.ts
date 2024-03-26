@@ -1,5 +1,5 @@
 import type { RedisClient } from '@devvit/public-api';
-import type { Tile } from '../types.js';
+import type { TileItem } from '../types.js';
 
 const Keys = {
   userTiles: (postId: string, username: string) => `userTiles:${postId}:${username}`,
@@ -9,7 +9,7 @@ export const getUserTiles = async (
   redis: RedisClient,
   postId: string,
   currentUserName: string
-): Promise<Tile[] | null> => {
+): Promise<TileItem[] | null> => {
   const storedTiles = await redis.get(Keys.userTiles(postId, currentUserName));
   if (!storedTiles) {
     return null;
@@ -21,7 +21,7 @@ export const setUserTiles = async (
   redis: RedisClient,
   postId: string,
   currentUserName: string,
-  tiles: Tile[]
+  tiles: TileItem[]
 ): Promise<void> => {
   const tilesData = JSON.stringify(tiles);
   await redis.set(Keys.userTiles(postId, currentUserName), tilesData);

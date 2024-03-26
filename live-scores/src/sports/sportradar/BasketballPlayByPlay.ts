@@ -102,30 +102,31 @@ export function basketballGameScoreInfo(
   league: League,
   service: APIService
 ): BasketballGameScoreInfo {
+  const gameData = game as unknown;
   const currentDate = new Date();
-  const period = league === League.NCAAMB ? game.half : game.quarter;
+  const period = league === League.NCAAMB ? gameData.half : gameData.quarter;
   const defaultClock = league === League.NCAAMB ? '20:00' : '12:00';
   return {
     event: {
-      id: game.id,
-      name: `${game.away.name} at ${game.home.name}`,
-      date: game.scheduled,
-      homeTeam: parseTeam(league, game.home),
-      awayTeam: parseTeam(league, game.away),
-      state: eventState(game),
+      id: gameData.id,
+      name: `${gameData.away.name} at ${gameData.home.name}`,
+      date: gameData.scheduled,
+      homeTeam: parseTeam(league, gameData.home),
+      awayTeam: parseTeam(league, gameData.away),
+      state: eventState(gameData),
       gameType: 'basketball',
       league: league,
       timingInfo: {
-        displayClock: game.clock ?? defaultClock,
+        displayClock: gameData.clock ?? defaultClock,
         period: period ?? 1,
       },
     },
-    homeScore: game.home.points ?? 0,
-    awayScore: game.away.points ?? 0,
+    homeScore: gameData.home.points ?? 0,
+    awayScore: gameData.away.points ?? 0,
     service: service,
     generatedDate: currentDate.toISOString(),
-    periods: parsePeriods(game.periods),
-    latestEvent: latestEvent(game.periods),
+    periods: parsePeriods(gameData.periods),
+    latestEvent: latestEvent(gameData.periods),
   };
 }
 
