@@ -1,29 +1,44 @@
 import type { Context, FormKey } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
-import { Drawing } from '../../components/Drawing.js';
-import type { PostData } from '../../types/PostData.js';
-import Settings from '../../settings.json';
-import { formatDuration } from '../../utils/formatDuration.js';
-import { StyledButton } from '../../components/StyledButton.js';
-import { getScoreMultiplier } from '../../utils/getScoreMultiplier.js';
-import { PixelText } from '../../components/PixelText.js';
-import { PixelSymbol } from '../../components/PixelSymbol.js';
-import { PointsToast } from '../../components/PointsToast.js';
-import type { viewerPages } from './viewerPages.js';
-import { formatNumberWithCommas } from '../../utils/formatNumbers.js';
+import { Drawing } from './Drawing.js';
+import type { PostData } from '../types/PostData.js';
+import Settings from '../settings.json';
+import { formatDuration } from '../utils/formatDuration.js';
+import { StyledButton } from './StyledButton.js';
+import { getScoreMultiplier } from '../utils/getScoreMultiplier.js';
+import { PixelText } from './PixelText.js';
+import { PixelSymbol } from './PixelSymbol.js';
+import { PointsToast } from './PointsToast.js';
+import type { pages } from '../types/pages.js';
+import { formatNumberWithCommas } from '../utils/formatNumbers.js';
+import { Service } from '../service/Service.js';
 
 interface ViewerPageProps {
-  setPage: (page: viewerPages) => void;
+  setPage: (page: pages) => void;
   postData: PostData;
   showFeedback: boolean;
   pointsEarned: number;
   isSolved: boolean;
   isAuthor: boolean;
   guessForm: FormKey;
+  username: string | null;
+  heroPostId?: string;
+  canDraw: boolean;
 }
 
 export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Element => {
-  const { setPage, postData, showFeedback, pointsEarned, isSolved, isAuthor, guessForm } = props;
+  const {
+    setPage,
+    postData,
+    showFeedback,
+    pointsEarned,
+    isSolved,
+    isAuthor,
+    guessForm,
+    username,
+    heroPostId,
+    canDraw,
+  } = props;
   const { ui } = context;
   const { word, data, date, expired = false }: PostData = postData;
 
@@ -122,7 +137,35 @@ export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Elemen
           <vstack>
             <spacer size="small" />
             <spacer size="medium" />
-            <StyledButton width="275px" label="SCORES" onPress={() => setPage('leaderboard')} />
+            <hstack width="100%" alignment="center">
+              <StyledButton
+                width={canDraw ? '131px' : '275px'}
+                label="SCORES"
+                onPress={() => setPage('leaderboard')}
+              />
+              {canDraw && (
+                <>
+                  <spacer size="small" />
+                  <StyledButton
+                    width="131px"
+                    label="DRAW"
+                    onPress={async () => {
+                      const service = new Service(context.redis);
+                      const [drawingsLeft, Post] = await Promise.all([
+                        await service.getDailyDrawingsLeft(username),
+                        await context.reddit.getPostById(heroPostId!),
+                      ]);
+
+                      if (drawingsLeft <= 0) {
+                        ui.showToast('No drawings left today');
+                      } else {
+                        ui.navigateTo(Post);
+                      }
+                    }}
+                  />
+                </>
+              )}
+            </hstack>
           </vstack>
         )}
       </vstack>

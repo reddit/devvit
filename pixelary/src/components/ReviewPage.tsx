@@ -1,20 +1,20 @@
 import type { Context, FormKey } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
-import { Drawing } from '../../components/Drawing.js';
-import Settings from '../../settings.json';
-import type { PostData } from '../../types/PostData.js';
-import { StyledButton } from '../../components/StyledButton.js';
-import { PixelText } from '../../components/PixelText.js';
-import { PixelSymbol } from '../../components/PixelSymbol.js';
-import type { editorPages } from './editorPages.js';
-import { formatNumberWithCommas } from '../../utils/formatNumbers.js';
-import { LoadingState } from '../../components/LoadingState.js';
-import { Service } from '../../service/Service.js';
-import type { GameSettings } from '../../types/GameSettings.js';
+import { Drawing } from './Drawing.js';
+import Settings from '../settings.json';
+import type { PostData } from '../types/PostData.js';
+import { StyledButton } from './StyledButton.js';
+import { PixelText } from './PixelText.js';
+import { PixelSymbol } from './PixelSymbol.js';
+import type { pages } from '../types/pages.js';
+import { formatNumberWithCommas } from '../utils/formatNumbers.js';
+import { LoadingState } from './LoadingState.js';
+import { Service } from '../service/Service.js';
+import type { GameSettings } from '../types/GameSettings.js';
 
 interface ReviewPageProps {
   word: string;
-  setPage: (page: editorPages) => void;
+  setPage: (page: pages) => void;
   dailyDrawings: PostData[];
   setDailyDrawings: (drawings: PostData[]) => void;
   data: number[];
@@ -23,6 +23,7 @@ interface ReviewPageProps {
   currentSubreddit: string;
   username: string | null;
   gameSettings: GameSettings;
+  isHero: boolean;
 }
 
 export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Element => {
@@ -37,6 +38,7 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
     currentSubreddit,
     username,
     gameSettings,
+    isHero,
   } = props;
   const { ui, reddit, redis, scheduler } = context;
   const service = new Service(redis);
@@ -89,7 +91,7 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
 
     // Update the UI
     setDailyDrawings([...dailyDrawings, postData]);
-    setPage('default');
+    setPage(isHero ? 'overview' : 'viewer');
     clearData();
     ui.showToast('Drawing submitted');
   }

@@ -1,15 +1,15 @@
 import { Devvit } from '@devvit/public-api';
-import Settings from '../../settings.json';
-import { splitArray } from '../../utils/splitArray.js';
-import { StyledButton } from '../../components/StyledButton.js';
-import { PixelText } from '../../components/PixelText.js';
-import { PixelSymbol } from '../../components/PixelSymbol.js';
-import { Shadow } from '../../components/Shadow.js';
-import type { editorPages } from './editorPages.js';
+import Settings from '../settings.json';
+import { splitArray } from '../utils/splitArray.js';
+import { StyledButton } from './StyledButton.js';
+import { PixelText } from './PixelText.js';
+import { PixelSymbol } from './PixelSymbol.js';
+import { Shadow } from './Shadow.js';
+import type { pages } from '../types/pages.js';
 
 interface EditorPageProps {
   word: string;
-  setPage: (page: editorPages) => void;
+  setPage: (page: pages) => void;
   data: number[];
   setData: (data: number[]) => void;
   drawingCountdown: number;
@@ -33,7 +33,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
   } = props;
 
   const size = '275px';
-  const innerSize = 271;
+  const innerSize = 275;
   const pixelSize: Devvit.Blocks.SizeString = `${innerSize / Settings.resolution}px`;
 
   const pixels = data.map((pixel, index) => (
@@ -51,7 +51,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
   ));
 
   const grid = (
-    <vstack cornerRadius="small" border="thick" borderColor="black" height={size} width={size}>
+    <vstack height={size} width={size} padding="none">
       {splitArray(pixels, Settings.resolution).map((row) => (
         <hstack>{row}</hstack>
       ))}
@@ -63,22 +63,21 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
       {Settings.colors.map((c, i) => (
         <>
           <Shadow height="27.25px" width="27.25px">
-            <hstack
-              height="27.25px"
-              width="27.25px"
-              cornerRadius="small"
-              backgroundColor={c}
-              border="thick"
-              borderColor="black"
-              alignment="center middle"
-              onPress={() => {
-                setCurrentColor(i);
-                fallbackTimerUpdate();
-              }}
-            >
-              {currentColor === i && (
-                <PixelSymbol type="checkmark" color={c === '#FFFFFF' ? 'black' : 'white'} />
-              )}
+            <hstack height="27.25px" width="27.25px" padding="xsmall" backgroundColor="black">
+              <hstack
+                height="100%"
+                width="100%"
+                backgroundColor={c}
+                alignment="center middle"
+                onPress={() => {
+                  setCurrentColor(i);
+                  fallbackTimerUpdate();
+                }}
+              >
+                {currentColor === i && (
+                  <PixelSymbol type="checkmark" color={c === '#FFFFFF' ? 'black' : 'white'} />
+                )}
+              </hstack>
             </hstack>
           </Shadow>
           {i !== Settings.colors.length - 1 && <spacer size="xsmall" />}
@@ -117,12 +116,12 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
 
       <spacer grow />
       <Shadow height={size} width={size}>
-        <zstack height={size} width={size} alignment="middle center" cornerRadius="small">
+        <zstack height={size} width={size} alignment="middle center" backgroundColor="white">
           <image
             imageHeight={512}
             imageWidth={512}
-            height={`${innerSize}px`}
-            width={`${innerSize}px`}
+            height={size}
+            width={size}
             url="grid-template.png"
           />
           {drawingIsBlank && <PixelText color="#B2B2B2">Tap to draw</PixelText>}

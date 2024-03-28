@@ -1,12 +1,12 @@
 import { Devvit } from '@devvit/public-api';
-import type { editorPages } from './editorPages.js';
-import { PixelText } from '../../components/PixelText.js';
-import { PixelSymbol } from '../../components/PixelSymbol.js';
-import { Shadow } from '../../components/Shadow.js';
+import type { pages } from '../types/pages.js';
+import { PixelText } from './PixelText.js';
+import { PixelSymbol } from './PixelSymbol.js';
+import { Shadow } from './Shadow.js';
 
 interface CardDrawPageProps {
   word: string;
-  setPage: (page: editorPages) => void;
+  setPage: (page: pages) => void;
   cardDrawCountdown: number;
 }
 
@@ -20,18 +20,17 @@ export const CardDrawPage = (props: CardDrawPageProps): JSX.Element => {
     <vstack width="100%" height="100%" alignment="center middle" gap="large">
       {/* Card */}
       <Shadow height={height} width={width}>
-        <vstack
-          height={height}
-          width={width}
-          cornerRadius="small"
-          backgroundColor="white"
-          border="thick"
-          borderColor="black"
-          alignment="center middle"
-          gap="medium"
-        >
-          <PixelText>You are drawing</PixelText>
-          <PixelText scale={3}>{word}</PixelText>
+        <vstack height={height} width={width} padding="none" backgroundColor="black">
+          <vstack
+            height="100%"
+            width="100%"
+            backgroundColor="white"
+            alignment="center middle"
+            gap="medium"
+          >
+            <PixelText>You are drawing</PixelText>
+            <PixelText scale={3}>{word}</PixelText>
+          </vstack>
         </vstack>
       </Shadow>
 

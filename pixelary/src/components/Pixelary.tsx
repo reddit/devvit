@@ -1,23 +1,25 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
-import { EditorRouter } from '../posts/Editor/EditorRouter.js';
-import { ViewerRouter } from '../posts/Viewer/ViewerRouter.js';
-import { PostMode } from '../posts/PostMode.js';
 import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
 import { getRandomString } from '../utils/getRandomString.js';
 import Words from '../data/words.json';
 import { blankCanvas } from '../utils/blankCanvas.js';
-import type { editorPages } from '../posts/Editor/editorPages.js';
-import type { viewerPages } from '../posts/Viewer/viewerPages.js';
+import type { pages } from '../types/pages.js';
 import { formatNumberWithCommas } from '../utils/formatNumbers.js';
 import { getScoreMultiplier } from '../utils/getScoreMultiplier.js';
 import type { PostData } from '../types/PostData.js';
 import { PixelText } from '../components/PixelText.js';
 import type { GameSettings } from '../types/GameSettings.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
+import { CardDrawPage } from '../components/CardDrawPage.js';
+import { EditorPage } from '../components/EditorPage.js';
+import { InfoPage } from '../components/InfoPage.js';
+import { LeaderboardPage } from '../components/LeaderboardPage.js';
+import { OverviewPage } from '../components/OverviewPage.js';
+import { ReviewPage } from '../components/ReviewPage.js';
+import { ViewerPage } from '../components/ViewerPage.js';
 
-type NavigationPage = editorPages | viewerPages;
 type InitialData = {
   gameSettings: GameSettings;
   postData: PostData;
@@ -91,13 +93,10 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     return await service.getDailyDrawings(username);
   });
 
-  const [page, setPage] = useState<NavigationPage>('default');
   const [data, setData] = useState<number[]>(blankCanvas);
   const randomWord = getRandomString(Words);
   const [word, setWord] = useState<string>(randomWord);
   const [currentColor, setCurrentColor] = useState<number>(1);
-  const postType =
-    gameSettings?.heroPostId === postId ? PostMode.Editor.toString() : PostMode.Viewer.toString();
 
   const [scoreBoardUser] = useState(async () => await service.getScoreBoardUserEntry(username));
   const isSolved = postData?.solved ?? false;
@@ -113,7 +112,7 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     startTime: number;
     durationMs: number;
     timeLeftMs: number;
-    finalRedirect: NavigationPage;
+    finalRedirect: pages;
   } | null>(null);
 
   function updateCountdownState(): void {
@@ -140,7 +139,7 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     updateCountdownState();
   }, 1000);
 
-  const startTimer = (durationMs: number, redirectPage: NavigationPage): void => {
+  const startTimer = (durationMs: number, redirectPage: pages): void => {
     setCountdownState({
       startTime: Date.now(),
       durationMs,
@@ -167,7 +166,10 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     cancelTimer();
   }
 
-  // Cancel drawing confirmation
+  /*
+   * Cancel drawing confirmation form
+   */
+
   const cancelConfirmationForm = useForm(
     {
       title: 'Are you sure?',
@@ -189,13 +191,16 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
 
       await service.storeDailyDrawing(postData);
       setDailyDrawings([...dailyDrawings, postData]);
-      setPage('default');
+      setPage('overview');
       clearData();
       ui.showToast('Drawing canceled');
     }
   );
 
-  // Guess feedback timer
+  /*
+   * Guess feedback timer
+   */
+
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
   const [feedbackDuration, setFeedbackDuration] = useState(Settings.feedbackDuration);
   const guessFeedbackTimer = useInterval(() => {
@@ -208,7 +213,10 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     }
   }, 100);
 
-  // Guess validation
+  /*
+   * Guess validation
+   */
+
   async function validateGuess(guess: string): Promise<void> {
     if (!postData) {
       return;
@@ -238,7 +246,10 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     }
   }
 
-  // Guess form
+  /*
+   * Guess form
+   */
+
   const guessForm = useForm(
     {
       title: 'Guess the word',
@@ -259,64 +270,126 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     }
   );
 
-  let currentPost;
-  switch (postType) {
-    case PostMode.Editor:
-      currentPost = (
-        <EditorRouter
-          page={page}
-          setPage={setPage}
-          data={data}
-          setData={setData}
+  /*
+   * Page Router
+   *
+   * Default to a viewer page if the post is not the hero post.
+   * If the post is the hero post, default to the overview page.
+   * Can be extended to include more page types in the future.
+   */
+
+  const isHero = gameSettings?.heroPostId === postId;
+  const [page, setPage] = useState<pages>(isHero ? 'overview' : 'viewer');
+
+  let currentPage;
+  switch (page) {
+    case 'card-draw':
+      currentPage = (
+        <CardDrawPage
           word={word}
-          scores={scores}
-          cardDrawTimeLeft={
+          setPage={setPage}
+          cardDrawCountdown={
             countdownState
               ? Math.round(countdownState.timeLeftMs / 1000)
               : Settings.cardDrawDuration
           }
-          setCardDrawTimer={startCardDrawTimer}
-          drawingTimeLeft={
+        />
+      );
+      break;
+    case 'editor':
+      currentPage = (
+        <EditorPage
+          word={word}
+          data={data}
+          setData={setData}
+          setPage={setPage}
+          currentColor={currentColor}
+          setCurrentColor={setCurrentColor}
+          drawingCountdown={
             countdownState ? Math.round(countdownState.timeLeftMs / 1000) : Settings.drawingDuration
           }
           cancelDrawingTimer={cancelTimer}
           fallbackTimerUpdate={updateCountdownState}
-          currentColor={currentColor}
-          setCurrentColor={setCurrentColor}
-          dailyDrawings={dailyDrawings}
-          setDailyDrawings={setDailyDrawings}
-          userPoints={scoreBoardUser.score}
-          cancelConfirmationForm={cancelConfirmationForm}
-          clearData={clearData}
-          currentSubreddit={currentSubreddit}
-          username={username}
-          gameSettings={gameSettings}
         />
       );
       break;
-    case PostMode.Viewer:
-      currentPost = (
-        <ViewerRouter
-          page={page}
+    case 'info':
+      currentPage = <InfoPage onClose={() => setPage(isHero ? 'overview' : 'viewer')} />;
+      break;
+    case 'leaderboard':
+      currentPage = (
+        <LeaderboardPage scores={scores} onClose={() => setPage(isHero ? 'overview' : 'viewer')} />
+      );
+      break;
+    case 'overview':
+      currentPage = (
+        <OverviewPage
+          dailyDrawings={dailyDrawings}
+          userPoints={scoreBoardUser.score}
           setPage={setPage}
-          scores={scores}
+          startCardDrawTimer={startCardDrawTimer}
+          username={username}
+        />
+      );
+      break;
+    case 'review':
+      currentPage = (
+        <ReviewPage
+          data={data}
+          word={word}
+          clearData={clearData}
+          setPage={setPage}
+          dailyDrawings={dailyDrawings}
+          setDailyDrawings={setDailyDrawings}
+          cancelConfirmationForm={cancelConfirmationForm}
+          currentSubreddit={currentSubreddit}
+          username={username}
+          gameSettings={gameSettings}
+          isHero={isHero}
+        />
+      );
+      break;
+    case 'viewer':
+      currentPage = (
+        <ViewerPage
+          setPage={setPage}
           postData={postData}
-          isSolved={isSolved}
-          pointsEarned={pointsEarned}
           showFeedback={showFeedback}
+          pointsEarned={pointsEarned}
+          isSolved={isSolved}
           isAuthor={isAuthor}
           guessForm={guessForm}
+          username={username}
+          heroPostId={gameSettings.heroPostId}
+          canDraw={dailyDrawings.length < Settings.dailyDrawingsQuota}
         />
       );
       break;
     default:
-      currentPost = (
+      currentPage = (
         <vstack height="100%" width="100%" alignment="center middle">
-          <PixelText>Loading ...</PixelText>
+          <PixelText>Something went wrong</PixelText>
         </vstack>
       );
       break;
   }
 
-  return currentPost;
+  /*
+   * Return the custom post unit
+   */
+
+  return (
+    <zstack width="100%" height="100%" alignment="top start">
+      <image
+        imageHeight={1024}
+        imageWidth={1500}
+        height="100%"
+        width="100%"
+        url="background.png"
+        description="Striped blue background"
+        resizeMode="cover"
+      />
+      {currentPage}
+    </zstack>
+  );
 };

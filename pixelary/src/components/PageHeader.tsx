@@ -19,7 +19,7 @@ export const PageHeader = (props: PageHeaderProps): JSX.Element => {
       </vstack>
 
       <spacer size="medium" grow />
-      <StyledButton width="44px" label="X" onPress={onClose} />
+      <StyledButton width="40px" label="X" onPress={onClose} />
     </hstack>
   );
 };

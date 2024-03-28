@@ -13,16 +13,11 @@ export const Shadow = (props: ShadowProps): JSX.Element => {
   return (
     <zstack alignment="start top" onPress={onPress}>
       {/* Shadow */}
-      <vstack>
+      <vstack width="100%" height="100%">
         <spacer size="xsmall" />
-        <hstack>
+        <hstack width="100%" height="100%">
           <spacer size="xsmall" />
-          <hstack
-            height={height}
-            width={width}
-            cornerRadius="small"
-            backgroundColor="rgba(0,0,0,0.2)"
-          />
+          <hstack height={height} width={width} backgroundColor="rgba(0,0,0,0.2)" />
         </hstack>
       </vstack>
 

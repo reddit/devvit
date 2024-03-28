@@ -16,7 +16,7 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
   const height: Devvit.Blocks.SizeString = `${size - borderSize}px`;
   const width: Devvit.Blocks.SizeString = `${size - borderSize}px`;
 
-  function indexToXY(index: number, resolution: number) {
+  function indexToXY(index: number, resolution: number): { x: number; y: number } {
     return {
       x: index % resolution,
       y: Math.floor(index / resolution),
@@ -25,22 +25,16 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
 
   return (
     <Shadow width={width} height={height} onPress={onPress}>
-      <hstack
-        cornerRadius="small"
-        border="thick"
-        borderColor="black"
-        width={width}
-        height={height}
-        backgroundColor="white"
-      >
-        <image
-          imageWidth={size}
-          imageHeight={size}
-          width="100%"
-          height="100%"
-          description="Drawing"
-          resizeMode="fill"
-          url={`data:image/svg+xml,
+      <hstack width={width} height={height} backgroundColor="black" padding="none">
+        <hstack width="100%" height="100%" backgroundColor="white">
+          <image
+            imageWidth={size}
+            imageHeight={size}
+            width="100%"
+            height="100%"
+            description="Drawing"
+            resizeMode="fill"
+            url={`data:image/svg+xml,
             <svg
               width="${Settings.resolution}"
               height="${Settings.resolution}"
@@ -61,7 +55,8 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
               })}
             </svg>
           `}
-        />
+          />
+        </hstack>
       </hstack>
     </Shadow>
   );

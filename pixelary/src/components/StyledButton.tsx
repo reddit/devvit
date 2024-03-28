@@ -11,21 +11,20 @@ interface StyledButtonProps {
 export const StyledButton = (props: StyledButtonProps): JSX.Element => {
   const { onPress, label, width } = props;
 
-  const height: Devvit.Blocks.SizeString = '44px';
+  const height: Devvit.Blocks.SizeString = '40px';
 
   return (
     <Shadow height={height} width={width}>
       <hstack
         height={height}
         width={width}
-        alignment="middle center"
-        backgroundColor="#4F4F4F"
-        cornerRadius="small"
-        border="thick"
-        borderColor="black"
         onPress={onPress}
+        backgroundColor="black"
+        padding="xsmall"
       >
-        <PixelText color="white">{label}</PixelText>
+        <hstack height="100%" width="100%" alignment="middle center" backgroundColor="#444444">
+          <PixelText color="white">{label}</PixelText>
+        </hstack>
       </hstack>
     </Shadow>
   );

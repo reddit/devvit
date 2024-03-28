@@ -14,7 +14,6 @@ export const PointsToast = (props: PointsToastProps): JSX.Element => {
     <hstack cornerRadius="full" padding="small" backgroundColor="white">
       <hstack
         alignment="middle center"
-        cornerRadius="full"
         backgroundColor="#F2C94C"
         grow={false}
         padding="medium"

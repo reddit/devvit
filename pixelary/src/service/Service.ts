@@ -225,6 +225,23 @@ export class Service {
     return output;
   }
 
+  async getDailyDrawingsLeft(username: string | null): Promise<number> {
+    const defaultValue = Settings.dailyDrawingsQuota;
+    if (!username) {
+      return defaultValue;
+    }
+    try {
+      const key = this.getDailyDrawingsKey(username);
+      const data = await this.redis.hkeys(key);
+      if (!data) {
+        return defaultValue;
+      }
+      return defaultValue - data.length;
+    } catch (error) {
+      throw new Error('Error getting daily drawings left');
+    }
+  }
+
   // Post data
   getPostDataKey(postId: string): string {
     return `post-${postId}`;

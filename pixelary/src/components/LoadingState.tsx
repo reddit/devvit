@@ -1,7 +1,16 @@
 import { Devvit } from '@devvit/public-api';
 
 export const LoadingState = (): JSX.Element => (
-  <vstack height="100%" width="100%" alignment="center middle">
+  <zstack width="100%" height="100%" alignment="center middle">
+    <image
+      imageHeight={1024}
+      imageWidth={1500}
+      height="100%"
+      width="100%"
+      url="background.png"
+      description="Striped blue background"
+      resizeMode="cover"
+    />
     <image
       url="spinner.gif"
       description="Loading ..."
@@ -11,5 +20,5 @@ export const LoadingState = (): JSX.Element => (
       height="128px"
       resizeMode="scale-down"
     />
-  </vstack>
+  </zstack>
 );

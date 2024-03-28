@@ -14,17 +14,16 @@ export const PointsPill = (props: PointsPillProps): JSX.Element => {
   return (
     <hstack
       alignment="middle center"
-      cornerRadius="full"
-      height="32px"
+      height="40px"
       onPress={onPress}
       backgroundColor="white"
       grow={false}
     >
-      <spacer width="12px" />
+      <spacer size="medium" />
       <PixelText>{formatNumberWithCommas(value)}</PixelText>
       <spacer size="small" />
       <PixelSymbol type="star" />
-      <spacer width="12px" />
+      <spacer size="medium" />
     </hstack>
   );
 };
