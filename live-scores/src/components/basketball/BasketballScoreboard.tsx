@@ -16,28 +16,13 @@ import type { Nullable } from '../../utils/types.js';
 import { msToHMS } from '../TopBar.js';
 import type { Reaction, ReactionScore } from '../../Reactions.js';
 import { Reactions } from '../ReactionsButtons.js';
-import type { ScoreboardProps } from '../Scoreboard.js';
-import { ScoreboardPage } from '../Scoreboard.js';
+import type { NavigateToPage, ScoreboardProps } from '../Scoreboard.js';
+import { ScoreboardColor, ScoreboardPage } from '../Scoreboard.js';
 import type { BasketballSummary } from '../../sports/sportradar/BasketballSummary.js';
 import { BasketballBoxscore } from './BasketballBoxscore.js';
+import { SettingsPage } from '../Settings.js';
 
-export enum BasketballColor {
-  primaryFont = '#F2F4F5',
-  secondaryFont = '#B8C5C9',
-  offlineFont = '#FFFFFF40',
-  liveRed = '#FF4500',
-  offline = '#82959B',
-  transparentHeader = '#0B1416b3',
-  transparentBorder = '#FFFFFF80',
-  border = '#485A66',
-  reactionBorder = '#8A8D86',
-  courtBrown = '#6A3C00',
-  greyBackground = '#33464C',
-  coolGrey = `#4B6066`,
-  onlineGreen = `#55BD46`,
-}
-
-const headerHeight = 76;
+const headerHeight = 106;
 const appWindowHeight = 320;
 
 function Clock(info: BasketballGameScoreInfo): JSX.Element {
@@ -51,13 +36,13 @@ function Clock(info: BasketballGameScoreInfo): JSX.Element {
         <hstack
           height={'24px'}
           width={'144px'}
-          backgroundColor={BasketballColor.transparentHeader}
+          backgroundColor={ScoreboardColor.transparentHeader}
           cornerRadius="full"
           alignment="middle center"
           gap="medium"
-          borderColor={BasketballColor.transparentBorder}
+          borderColor={ScoreboardColor.transparentBorder}
         >
-          <text size="small" style="metadata" color={BasketballColor.secondaryFont}>
+          <text size="small" style="metadata" color={ScoreboardColor.secondaryFont}>
             {timeDifference > 0
               ? `Starting in ${msToHMS(gameTime - currentTime)}`
               : 'Starting soon'}
@@ -73,13 +58,13 @@ function Clock(info: BasketballGameScoreInfo): JSX.Element {
         <hstack
           height={'24px'}
           width={'144px'}
-          backgroundColor={BasketballColor.transparentHeader}
+          backgroundColor={ScoreboardColor.transparentHeader}
           cornerRadius="full"
           alignment="middle center"
           gap="medium"
-          borderColor={BasketballColor.transparentBorder}
+          borderColor={ScoreboardColor.transparentBorder}
         >
-          <text size="small" style="metadata" color={BasketballColor.secondaryFont}>
+          <text size="small" style="metadata" color={ScoreboardColor.secondaryFont}>
             Game Over
           </text>
         </hstack>
@@ -91,15 +76,15 @@ function Clock(info: BasketballGameScoreInfo): JSX.Element {
       <zstack
         height={'24px'}
         width={'144px'}
-        backgroundColor={BasketballColor.transparentHeader}
+        backgroundColor={ScoreboardColor.transparentHeader}
         cornerRadius="full"
         alignment="middle center"
         gap="medium"
-        borderColor={BasketballColor.transparentBorder}
+        borderColor={ScoreboardColor.transparentBorder}
       >
         <hstack width={'100%'} height={'100%'} alignment="start middle">
           <spacer size="small" />
-          <text size="small" style="heading" color={BasketballColor.primaryFont}>
+          <text size="small" style="heading" color={ScoreboardColor.primaryFont}>
             {eventPeriodStringShort(info.event.timingInfo.period, 'basketball', info.event.league)}
           </text>
         </hstack>
@@ -114,7 +99,7 @@ function Clock(info: BasketballGameScoreInfo): JSX.Element {
           />
           <spacer size="xsmall" />
         </hstack>
-        <text size="small" style="heading" color={BasketballColor.primaryFont}>
+        <text size="small" style="heading" color={ScoreboardColor.primaryFont}>
           {info.event.timingInfo.displayClock}
         </text>
       </zstack>
@@ -133,15 +118,14 @@ function Team(props: BasketballScoreboardProps, isHome: Boolean): JSX.Element {
   const teamName = info.event.league === 'ncaamb' ? team.abbreviation : team.name;
 
   return (
-    <vstack
-      width={'50%'}
-      height={'100%'}
-      alignment={outerAlignment}
-      onPress={() => {
-        props.setPage(isHome ? ScoreboardPage.HOME_STATS : ScoreboardPage.AWAY_STATS);
-      }}
-    >
-      <hstack width={'100%'} alignment={outerAlignment}>
+    <vstack width={'50%'} height={'100%'} alignment={outerAlignment}>
+      <hstack
+        width={'100%'}
+        alignment={outerAlignment}
+        onPress={() => {
+          props.setPage(isHome ? ScoreboardPage.HOME_STATS : ScoreboardPage.AWAY_STATS);
+        }}
+      >
         <spacer size="small" />
         {isHome ? null : (
           <>
@@ -150,15 +134,15 @@ function Team(props: BasketballScoreboardProps, isHome: Boolean): JSX.Element {
           </>
         )}
         <vstack height={'48px'} alignment={innerAlignment}>
-          <text size="xxlarge" style="heading" color={BasketballColor.primaryFont}>
+          <text size="xxlarge" style="heading" color={ScoreboardColor.primaryFont}>
             {props.spoilerFree ? '?' : score}
           </text>
           <hstack alignment="middle">
-            <text size="medium" style="metadata" color={BasketballColor.primaryFont}>
+            <text size="medium" style="metadata" color={ScoreboardColor.primaryFont}>
               {teamName.toLocaleUpperCase()}
             </text>
             <spacer size="xsmall" />
-            <icon name="right-fill" size="xsmall" color={BasketballColor.primaryFont} />
+            <icon name="right-fill" size="xsmall" color={ScoreboardColor.primaryFont} />
           </hstack>
         </vstack>
         {isHome ? (
@@ -184,16 +168,32 @@ function Teams(props: BasketballScoreboardProps): JSX.Element {
   );
 }
 
+function SettingsButton(setPage: NavigateToPage): JSX.Element {
+  return (
+    <vstack width={'100%'} height={'100%'} alignment="end top" padding="small">
+      <hstack
+        height="24px"
+        width="24px"
+        alignment="center middle"
+        onPress={() => setPage(ScoreboardPage.SETTINGS)}
+      >
+        <icon name="settings-outline" size="medium" color={ScoreboardColor.primaryFont} />
+      </hstack>
+    </vstack>
+  );
+}
+
 function Header(props: BasketballScoreboardProps): JSX.Element {
   return (
     <zstack
       width={'100%'}
       height={`${headerHeight}px`}
       alignment="center top"
-      backgroundColor={BasketballColor.transparentHeader}
+      backgroundColor={ScoreboardColor.transparentHeader}
     >
       {Teams(props)}
       {Clock(props.scoreInfo)}
+      {SettingsButton(props.setPage)}
     </zstack>
   );
 }
@@ -217,18 +217,15 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
     return (
       <vstack gap="medium" width={'100%'} height={`${320 - headerHeight}px`} alignment="top center">
         <spacer size="small" />
-        <text width={'90%'} style="heading" size="large" color={BasketballColor.primaryFont}>
-          ✨ New! Box Scores & Spoiler Mode
+        <text width={'90%'} style="heading" size="large" color={ScoreboardColor.primaryFont}>
+          ✨ While you wait, see what's new!
         </text>
-        <text width={'90%'} color={BasketballColor.primaryFont}>
-          Click a team to see their box score
+        <text width={'90%'} color={ScoreboardColor.secondaryFont}>
+          Box scores are now available. Click a team name to see a list of players and stats.
         </text>
-        <text width={'90%'} color={BasketballColor.primaryFont} wrap>
-          {`Enable or disable spoiler mode using the post’s overflow (three dots) menu. This setting is saved as the scoreboard default`}
+        <text width={'90%'} color={ScoreboardColor.secondaryFont} wrap>
+          We've also added settings to customize your scoreboard experience.
         </text>
-        <button onPress={() => props.onToggleSpoilerFree()}>
-          {props.spoilerFree ? `Turn off Spoiler-Free Mode` : `Turn on Spoiler-Free Mode`}
-        </button>
       </vstack>
     );
   }
@@ -252,10 +249,10 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
           alignment="top center"
         >
           <spacer size="small" />
-          <text width={'90%'} style="heading" size="large" color={BasketballColor.primaryFont}>
+          <text width={'90%'} style="heading" size="large" color={ScoreboardColor.primaryFont}>
             Game has ended
           </text>
-          <text width={'90%'} size="medium" color={BasketballColor.secondaryFont}>
+          <text width={'90%'} size="medium" color={ScoreboardColor.secondaryFont}>
             Final Score {scoreString}.
           </text>
         </vstack>
@@ -264,10 +261,10 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
     return (
       <vstack gap="medium" width={'100%'} height={`${320 - headerHeight}px`} alignment="top center">
         <spacer size="small" />
-        <text width={'90%'} style="heading" size="medium" color={BasketballColor.primaryFont} wrap>
+        <text width={'90%'} style="heading" size="medium" color={ScoreboardColor.primaryFont} wrap>
           Sorry, this game does not have play by play statistics
         </text>
-        <text width={'90%'} size="medium" color={BasketballColor.secondaryFont} wrap>
+        <text width={'90%'} size="medium" color={ScoreboardColor.secondaryFont} wrap>
           You can view players and limited stats by clicking on a team
         </text>
       </vstack>
@@ -304,13 +301,13 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
       <hstack width={'100%'} height={`${eventHeaderHeight}px`} alignment="middle">
         <spacer size="medium" />
         <hstack grow height={'100%'} alignment="start middle">
-          <text style="heading" size="large" color={BasketballColor.primaryFont}>
+          <text style="heading" size="large" color={ScoreboardColor.primaryFont}>
             {titleForEventType(displayEvent.event_type)}{' '}
             {hideClockTime ? null : `(${displayEvent.clock})`}
           </text>
         </hstack>
         <hstack grow height={'100%'} alignment="end middle">
-          <text style="metadata" color={BasketballColor.secondaryFont}>
+          <text style="metadata" color={ScoreboardColor.secondaryFont}>
             {eventNumber} of {totalEvents}
           </text>
         </hstack>
@@ -322,7 +319,7 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
         <spacer size="medium" />
         <text
           size="medium"
-          color={BasketballColor.secondaryFont}
+          color={ScoreboardColor.secondaryFont}
           maxHeight={`${descriptionHeight}px`}
           grow
           wrap
@@ -344,7 +341,7 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
         <spacer size="medium" />
       </hstack>
 
-      <hstack width={'100%'} height={'1px'} backgroundColor={BasketballColor.transparentBorder} />
+      <hstack width={'100%'} height={'1px'} backgroundColor={ScoreboardColor.transparentBorder} />
 
       <hstack width={'100%'} height={`${navigationHeight}px`} alignment="middle">
         <hstack
@@ -358,8 +355,8 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
             name="caret-left"
             color={
               props.eventIndexOverride === 0
-                ? BasketballColor.offlineFont
-                : BasketballColor.primaryFont
+                ? ScoreboardColor.offlineFont
+                : ScoreboardColor.primaryFont
             }
           />
           <spacer size="xsmall" />
@@ -367,8 +364,8 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
             weight="bold"
             color={
               props.eventIndexOverride === 0
-                ? BasketballColor.offlineFont
-                : BasketballColor.primaryFont
+                ? ScoreboardColor.offlineFont
+                : ScoreboardColor.primaryFont
             }
             selectable={false}
           >
@@ -385,8 +382,8 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
             weight="bold"
             color={
               props.eventIndexOverride === -1
-                ? BasketballColor.offlineFont
-                : BasketballColor.primaryFont
+                ? ScoreboardColor.offlineFont
+                : ScoreboardColor.primaryFont
             }
             selectable={false}
           >
@@ -403,8 +400,8 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
             weight="bold"
             color={
               props.eventIndexOverride === -1
-                ? BasketballColor.offlineFont
-                : BasketballColor.primaryFont
+                ? ScoreboardColor.offlineFont
+                : ScoreboardColor.primaryFont
             }
             selectable={false}
           >
@@ -415,8 +412,8 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
             name="caret-right"
             color={
               props.eventIndexOverride === -1
-                ? BasketballColor.offlineFont
-                : BasketballColor.primaryFont
+                ? ScoreboardColor.offlineFont
+                : ScoreboardColor.primaryFont
             }
           />
           <spacer size="small" />
@@ -444,7 +441,7 @@ export type BasketballScoreboardProps = ScoreboardProps & {
 
 export function BasketballScoreboard(props: BasketballScoreboardProps): JSX.Element {
   return (
-    <vstack width={'100%'} height={'100%'} backgroundColor={BasketballColor.greyBackground}>
+    <vstack width={'100%'} height={'100%'} backgroundColor={ScoreboardColor.greyBackground}>
       {props.page === ScoreboardPage.SCORE ? Header(props) : null}
       {props.page === ScoreboardPage.SCORE ? EventBubble(props) : null}
       {props.page === ScoreboardPage.HOME_STATS || props.page === ScoreboardPage.HOME_STATS_MORE
@@ -452,6 +449,13 @@ export function BasketballScoreboard(props: BasketballScoreboardProps): JSX.Elem
         : null}
       {props.page === ScoreboardPage.AWAY_STATS || props.page === ScoreboardPage.AWAY_STATS_MORE
         ? BasketballBoxscore(props, false)
+        : null}
+      {props.page === ScoreboardPage.SETTINGS
+        ? SettingsPage({
+            navigateToPage: props.setPage,
+            spoilerFreeSetting: props.spoilerFree,
+            onSpoilerFreeToggle: props.onToggleSpoilerFree,
+          })
         : null}
     </vstack>
   );

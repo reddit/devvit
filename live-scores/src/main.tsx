@@ -155,7 +155,8 @@ export const AppContent: Devvit.BlockComponent<{
     return BaseballScoreBoard(baseBallScoreInfo, lastComment, demoNext);
   } else if (scoreInfo.event.gameType === 'soccer') {
     const soccerGameScoreInfo = scoreInfo as SoccerGameScoreInfo;
-    return SoccerScoreboard({ scoreInfo: soccerGameScoreInfo, page, setPage, spoilerFree });
+    // Spoiler free default to false until settings page added to soccer
+    return SoccerScoreboard({ scoreInfo: soccerGameScoreInfo, page, setPage, spoilerFree: false });
   } else if (scoreInfo.event.gameType === 'football') {
     const footballGameScoreInfo = scoreInfo as NFLGameScoreInfo;
     return FootballScoreboard(
@@ -407,31 +408,6 @@ Devvit.addMenuItem({
   },
 });
 
-Devvit.addMenuItem({
-  label: 'Scoreboard - Toggle Spoiler-free Mode',
-  location: 'post',
-  postFilter: 'currentApp',
-  onPress: async (_event, context) => {
-    if (context.userId) {
-      const currentSpoilerString = await context.redis.global.get(`spoiler-free:${context.userId}`);
-      await context.redis.global.set(
-        `spoiler-free:${context.userId}`,
-        currentSpoilerString === 'true' ? 'false' : 'true'
-      );
-      return context.ui.showToast({
-        text: `Spoiler-free mode ${
-          currentSpoilerString === 'true' ? 'disabled' : 'enabled'
-        } - Please refresh!`,
-        appearance: 'success',
-      });
-    }
-    return context.ui.showToast({
-      text: 'Error toggling spoiler-free mode',
-      appearance: 'neutral',
-    });
-  },
-});
-
 Devvit.addCustomPostType({
   name: 'Scoreboard',
   render: (context) => {
@@ -450,16 +426,15 @@ Devvit.addCustomPostType({
     });
 
     const onToggleSpoilerFree = async (): Promise<void> => {
+      const updatedSetting = !spoilerFree;
+      setSpoilerFree(updatedSetting);
       if (context.userId) {
-        const currentSpoilerString = await context.redis.global.get(
-          `spoiler-free:${context.userId}`
-        );
         await context.redis.global.set(
           `spoiler-free:${context.userId}`,
-          currentSpoilerString === 'true' ? 'false' : 'true'
+          updatedSetting ? 'true' : 'false'
         );
-        setSpoilerFree(currentSpoilerString === 'true' ? false : true);
       }
+      context.ui.showToast(`Scores are ${updatedSetting ? 'now hidden' : 'no longer hidden'}`);
     };
 
     const [scoreInfo, setScoreInfo] = useState(async () => {
@@ -553,15 +528,6 @@ Devvit.addCustomPostType({
       if (postId && scoreInfo?.event.gameType === 'basketball') {
         const updatedSummary = await fetchCachedBasketballSummary(postId, scoreInfo, context);
         setSummary(updatedSummary);
-      }
-      if (context.userId) {
-        const storedSpoilerString = await context.redis.global.get(
-          `spoiler-free:${context.userId}`
-        );
-        const storedSpoilerFree = storedSpoilerString === 'true';
-        if (storedSpoilerFree !== spoilerFree) {
-          setSpoilerFree(storedSpoilerFree);
-        }
       }
     }, 10000);
 

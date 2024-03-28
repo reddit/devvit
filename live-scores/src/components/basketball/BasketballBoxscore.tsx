@@ -1,13 +1,12 @@
 import { Devvit } from '@devvit/public-api';
 import type { BasketballScoreboardProps } from './BasketballScoreboard.js';
-import { BasketballColor } from './BasketballScoreboard.js';
 import type {
   BasketballSummaryPlayer,
   BasketballSummaryTeam,
 } from '../../sports/sportradar/BasketballSummary.js';
 import { getPlayerStatsForTeam } from '../../sports/sportradar/BasketballSummary.js';
 import type { NavigateToPage } from '../Scoreboard.js';
-import { ScoreboardPage } from '../Scoreboard.js';
+import { ScoreboardColor, ScoreboardPage } from '../Scoreboard.js';
 import { leagueAssetPath } from '../../sports/GameEvent.js';
 import { NBA_TEAM_COLOR_MAP } from '../../sports/ColorMaps.js';
 
@@ -18,10 +17,10 @@ export function BasketballBoxscore(
   if (!props.summary?.home.players || !props.summary?.away.players)
     return (
       <vstack height={'100%'} width={'100%'} alignment="center middle">
-        <text color={BasketballColor.primaryFont}>
+        <text color={ScoreboardColor.primaryFont}>
           Hmm... we don't have any stats for that team yet.
         </text>
-        <text color={BasketballColor.primaryFont}>Check back after the game starts!</text>
+        <text color={ScoreboardColor.primaryFont}>Check back after the game starts!</text>
         <spacer />
         <button onPress={() => props.setPage(ScoreboardPage.SCORE)}>Back to scoreboard</button>
       </vstack>
@@ -52,13 +51,13 @@ function teamHeader(
   closeAction: NavigateToPage
 ): JSX.Element {
   return (
-    <vstack height={`48px`} width={'100%'} backgroundColor={BasketballColor.transparentHeader}>
+    <vstack height={`48px`} width={'100%'} backgroundColor={ScoreboardColor.transparentHeader}>
       <hstack height={'44px'} width={'100%'}>
         <hstack alignment="start middle">
           <spacer size="medium" />
           <image imageWidth="32px" imageHeight="32px" url={logoUrl} />
           <spacer size="small" />
-          <text size="xlarge" weight="bold" color={BasketballColor.primaryFont}>
+          <text size="xlarge" weight="bold" color={ScoreboardColor.primaryFont}>
             {`${team.market} ${team.name}`.toLocaleUpperCase()}
           </text>
         </hstack>
@@ -66,7 +65,7 @@ function teamHeader(
           <icon
             name="close-outline"
             size="medium"
-            color={BasketballColor.primaryFont}
+            color={ScoreboardColor.primaryFont}
             onPress={() => closeAction(ScoreboardPage.SCORE)}
           />
         </hstack>
@@ -81,7 +80,7 @@ function statCell(val: string, isLarge: boolean = false): JSX.Element {
   const cellWidth = isLarge ? '30%' : '12%';
   return (
     <hstack width={cellWidth} height={'100%'} alignment="end middle">
-      <text color={BasketballColor.primaryFont}>{val}</text>
+      <text color={ScoreboardColor.primaryFont}>{val}</text>
     </hstack>
   );
 }
@@ -89,12 +88,12 @@ function statCell(val: string, isLarge: boolean = false): JSX.Element {
 function titleCell(title: string, isPlayer: boolean = true, onCourt: boolean = false): JSX.Element {
   return (
     <hstack grow height={'100%'} alignment="start middle">
-      <text color={BasketballColor.primaryFont} weight={isPlayer ? 'regular' : 'bold'}>
+      <text color={ScoreboardColor.primaryFont} weight={isPlayer ? 'regular' : 'bold'}>
         {title}
       </text>
       <spacer size="xsmall" />
       {onCourt ? (
-        <text size="xxlarge" color={BasketballColor.onlineGreen}>
+        <text size="xxlarge" color={ScoreboardColor.onlineGreen}>
           •
         </text>
       ) : null}
@@ -123,7 +122,7 @@ function playerRow(player: BasketballSummaryPlayer): JSX.Element {
 
 function statHeaderRow(): JSX.Element {
   return (
-    <hstack width={'100%'} height={'32px'} backgroundColor={BasketballColor.coolGrey}>
+    <hstack width={'100%'} height={'32px'} backgroundColor={ScoreboardColor.coolGrey}>
       <spacer size="small" />
       {titleCell('Player', false)}
       <hstack width={'75%'} height={'100%'} alignment="end">
@@ -160,12 +159,12 @@ function morePlayersButton(page: ScoreboardPage, onPress: NavigateToPage): JSX.E
         width={'132px'}
         alignment="center middle"
         cornerRadius="full"
-        backgroundColor={BasketballColor.transparentHeader}
+        backgroundColor={ScoreboardColor.transparentHeader}
         onPress={() => onPress(navigateToPage)}
       >
-        <icon name={buttonIcon} size="small" color={BasketballColor.primaryFont} />
+        <icon name={buttonIcon} size="small" color={ScoreboardColor.primaryFont} />
         <spacer size="small" />
-        <text color={BasketballColor.primaryFont}>{buttonText}</text>
+        <text color={ScoreboardColor.primaryFont}>{buttonText}</text>
       </hstack>
       <spacer size="small" />
     </vstack>
