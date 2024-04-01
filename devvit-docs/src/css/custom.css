@@ -1,0 +1,126 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #ff4500;
+  --ifm-color-primary-dark: #d93a00;
+  --ifm-color-primary-darker: #962900;
+  --ifm-color-primary-darkest: #721f00;
+  --ifm-color-primary-light: #fe7c53;
+  --ifm-color-primary-lighter: #ffbea6;
+  --ifm-color-primary-lightest: #fff6f3;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --ifm-heading-color: #0f1a1c;
+  --ifm-font-color-base-inverse: #0f1a1c;
+  --ifm-color-secondary: #ffffff;
+  --ifm-button-background-color: var(--ifm-color-primary);
+  --ifm-button-color: var(--ifm-color-primary-lightest);
+  --ifm-link-color: #ff4500;
+  --ifm-navbar-link-color: #ff4500;
+  /* --ifm-background-color: #ffffff; */
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  --ifm-color-primary: #fe7c53;
+  --ifm-color-primary-dark: #d93a00;
+  --ifm-color-primary-darker: #962900;
+  --ifm-color-primary-darkest: #721f00;
+  --ifm-color-primary-light: #ffd5c6;
+  --ifm-color-primary-lighter: #ffede5;
+  --ifm-color-primary-lightest: #fff6f3;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  --ifm-heading-color: #ffede5;
+  --ifm-font-color-base-inverse: #ffede5;
+  --ifm-button-background-color: #ffede5;
+  --ifm-color-secondary: #1a282d;
+  --ifm-footer-link-color: #ffede5;
+  --ifm-background-color: #0f1a1c;
+  --ifm-navbar-background-color: #0f1a1c;
+}
+
+.hero--primary {
+  background-color: var(--ifm-color-secondary);
+}
+
+.button.button--secondary {
+  background-color: var(--ifm-color-primary);
+  color: white;
+  border-radius: 999px;
+  font-size: smaller;
+}
+
+.heading {
+  text-align: center;
+  margin: 0;
+  padding: 2rem;
+  background-color: var(--ifm-background-color);
+}
+
+[data-theme='dark'] .heading {
+  background-color: #0f1a1c;
+}
+
+.row {
+  justify-content: center;
+}
+
+[data-theme='dark'] .features_src-components-HomepageFeatures-styles-module {
+  background-color: #0f1a1c;
+}
+
+.feature {
+  border: 1px solid #0000001a;
+  border-radius: 4px;
+  margin: 10px;
+  background-color: #ffffff;
+}
+
+[data-theme='dark'] .feature {
+  background-color: #1a282d;
+  border: 1px solid #ffffff33;
+}
+
+.feature h3 {
+  color: var(--ifm-color-primary);
+}
+
+#__docusaurus > footer {
+  --ifm-footer-background-color: #ffffff;
+  --ifm-footer-link-color: var(--ifm-font-color-base-inverse);
+  --ifm-footer-color: var(--ifm-font-color-base-inverse);
+}
+
+[data-theme='dark'] footer {
+  background-color: #131f23;
+  color: #ffede5;
+}
+
+.footer .container.container-fluid {
+  text-align: center;
+}
+
+.footer__copyright {
+  font-size: smaller;
+  margin-top: 5em;
+}
+
+.footer__title {
+  font-size: larger;
+  color: var(--ifm-font-color-base-inverse);
+}
+
+[data-theme='dark'] #__docusaurus {
+  background-color: #0b1416;
+}
+
+.dsla-search-wrapper {
+  min-width: 10rem;
+}

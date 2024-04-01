@@ -1,0 +1,16 @@
+{
+  "path": "yarn.lock",
+  "type": "yarn",
+  "allowed-schemes": [
+    "https:",
+    "ssh:",
+    "file:",
+    "npm:",
+    "workspace:",
+    "patch:"
+  ],
+  "allowed-hosts": [
+    "github.snooguts.net",
+    "artifactory.build.ue1.snooguts.net"
+  ]
+}

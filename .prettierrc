@@ -1,0 +1,12 @@
+{
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "overrides": [
+    {
+      "files": "*.ts",
+      "options": {
+        "parser": "babel-ts"
+      }
+    }
+  ]
+}

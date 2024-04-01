@@ -1,0 +1,59 @@
+{
+  "baseBranch": "origin/main",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": ["TRACE_ENVELOPES"],
+      "outputs": [
+        "dist/**",
+        "packages/dev-server/client/generated/**",
+        "packages/protos/src/index.ts",
+        "packages/protos/src/types/**",
+        "packages/public-api/src/abstractions/Devvit.ts",
+        "packages/public-api/src/devvit/internals/semanticColors.ts",
+        "packages/web-worker-fork/cjs/**",
+        "node_modules/@reddit/shreddit.styles/**"
+      ]
+    },
+    "dev": {
+      "cache": false
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "env": ["TRACE_ENVELOPES"],
+      "outputs": []
+    },
+    "test:size": {
+      "outputs": []
+    },
+    "test:types": {
+      "outputs": []
+    },
+    "test:update": {
+      "env": ["TRACE_ENVELOPES"],
+      "outputs": ["**/*.snap"]
+    },
+    "test:unit": {
+      "env": ["TRACE_ENVELOPES"],
+      "outputs": []
+    },
+    "test:ui": {
+      "env": ["TRACE_ENVELOPES"],
+      "outputs": []
+    },
+    "test:unit-with-coverage": {
+      "env": ["TRACE_ENVELOPES"],
+      "outputs": []
+    },
+    "clean": {
+      "cache": false,
+      "outputs": []
+    },
+    "clobber": {
+      "cache": false,
+      "outputs": []
+    }
+  }
+}
