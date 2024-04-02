@@ -1,5 +1,6 @@
-import { Devvit } from '@devvit/public-api';
-import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
+import type { Devvit } from '@devvit/public-api';
+import type { GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
+import { EventState } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
 import { APIKey } from './APIKeys.js';
 
@@ -138,7 +139,7 @@ function parseTeam(league: string, team: SportEventCompetitor): TeamInfo {
   };
 }
 
-export function parseSoccerEvent(jsonData: any): SoccerEvent {
+export function parseSoccerEvent(jsonData: unknown): SoccerEvent {
   return jsonData as SoccerEvent;
 }
 

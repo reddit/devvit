@@ -14,6 +14,7 @@ import {
   srNcaaMBScoreboardCreationForm,
   srNflScoreboardCreationForm,
   srSoccerScoreboardCreationForm,
+  srCricketScoreboardCreationForm,
 } from './forms/ScoreboardCreateForm.js';
 import type { GeneralGameScoreInfo } from './sports/GameEvent.js';
 import { EventState } from './sports/GameEvent.js';
@@ -106,6 +107,13 @@ Devvit.addSettings([
     isSecret: false,
     scope: 'app',
     defaultValue: 'DISABLED',
+  },
+  {
+    name: APIKey.cricket,
+    label: 'Sportradar Cricket API Key',
+    type: 'string',
+    isSecret: true,
+    scope: 'app',
   },
 ]);
 
@@ -266,6 +274,15 @@ Devvit.addMenuItem({
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
     return ui.showForm(srSoccerScoreboardCreationForm);
+  },
+});
+
+Devvit.addMenuItem({
+  label: 'Create Cricket Scoreboard (Internal)',
+  location: 'subreddit',
+  forUserType: `moderator`,
+  onPress: async (_event, { ui }) => {
+    return ui.showForm(srCricketScoreboardCreationForm);
   },
 });
 

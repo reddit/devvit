@@ -14,6 +14,7 @@ import {
   parseNFLBoxscore,
 } from './sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
+import { fetchCricketMatch } from './sportradar/CricketMatch.js';
 import { storeLastEvent } from './sportradar/LastEvents.js';
 import type { BasketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
 import { fetchNBAGame, fetchNCAAMensBasketballGame } from './sportradar/BasketballPlayByPlay.js';
@@ -227,6 +228,8 @@ function subscriptionFetches(
       }
     } else if (gameSub.service === APIService.SimulatorNBA) {
       eventFetches.push(fetchSimulatedGameScoreInfo(gameSub.eventId, context));
+    } else if (gameSub.service === APIService.SRCricket) {
+      eventFetches.push(fetchCricketMatch(gameSub.league, gameSub.eventId, context));
     } else {
       eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
     }

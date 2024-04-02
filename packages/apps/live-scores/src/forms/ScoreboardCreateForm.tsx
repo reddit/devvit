@@ -9,13 +9,16 @@ import {
   srNflGameSelectForm,
   srBasketballGameSelectForm,
   srBasketballSimGameSelectForm,
+  srCricketMatchSelectionForm,
 } from './GameSelectionForm.js';
 import { espnSingleTeamSelectForm } from './SingleTeamSelectionForm.js';
 import { fetchNflSchedule, filteredGamesFromSeason } from '../sports/sportradar/NFLSchedule.js';
 import type { GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
 import { fetchSoccerGames } from '../sports/sportradar/SoccerSchedule.js';
+import { fetchCricketSportEvents } from '../sports/sportradar/CricketTournaments.js';
 import { infoForLeague } from '../sports/sportradar/SoccerLeagues.js';
+import { infoForCricketLeague } from '../sports/sportradar/CricketLeague.js';
 import {
   fetchNbaSchedule,
   fetchNbaSimSchedule,
@@ -331,5 +334,45 @@ export const srNcaaMBScoreboardCreationForm = Devvit.createForm(
     const schedule = await fetchNcaaMensBasketballSchedule(seasonType, ctx);
     const games = await filterGamesFromNbaSeason(schedule);
     return ctx.ui.showForm(srBasketballGameSelectForm, { league, timezone, events: games });
+  }
+);
+
+export const srCricketScoreboardCreationForm = Devvit.createForm(
+  () => {
+    return {
+      fields: [
+        {
+          name: 'league',
+          label: 'League',
+          helpText: 'Select a league or competition',
+          type: 'select',
+          required: true,
+          options: leaguesSupported(APIService.SRCricket),
+        },
+        {
+          name: 'timezone',
+          label: 'Timezone',
+          helpText: 'Timezone to display game times in',
+          type: 'select',
+          required: false,
+          options: timezoneOptions,
+          defaultValue: ['America/Los_Angeles'],
+        },
+      ],
+      title: 'Create Cricket Scoreboard Post',
+      acceptLabel: 'Next',
+      cancelLabel: 'Back',
+    };
+  },
+  async ({ values }, context) => {
+    const league = values['league'][0];
+    const timezone = values['timezone'][0];
+    const cricketLeague = infoForCricketLeague(getLeagueFromString(league));
+    const games = await fetchCricketSportEvents(cricketLeague, context);
+    return context.ui.showForm(srCricketMatchSelectionForm, {
+      league: league,
+      timezone: timezone,
+      events: games,
+    });
   }
 );

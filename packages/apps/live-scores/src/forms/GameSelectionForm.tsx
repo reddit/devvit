@@ -9,6 +9,8 @@ import type { GameEvent, GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { compareEvents } from '../sports/GameEvent.js';
 import { fetchNFLBoxscore } from '../sports/sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
+import type { CricketSportEvent } from '../sports/sportradar/CricketMatch.js';
+import { fetchCricketMatch } from '../sports/sportradar/CricketMatch.js';
 import {
   makeKeyForSubscription,
   makeKeyForPostId,
@@ -88,6 +90,56 @@ export const espnGameSelectForm = Devvit.createForm(
   }
 );
 
+async function createGamePost(
+  ctx: Devvit.Context,
+  gameSub: GameSubscription,
+  gameTitle: string,
+  postTitle: string,
+  loadingState: JSX.Element
+): Promise<void> {
+  const success: boolean = await addSubscription(ctx, JSON.stringify(gameSub));
+  if (!success) {
+    return ctx.ui.showToast(`An error occurred. Please try again.`);
+  }
+  const { reddit } = ctx;
+  const currentSubreddit = await reddit.getCurrentSubreddit();
+  const post: Post = await reddit.submitPost({
+    preview: loadingState,
+    title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
+    subredditName: currentSubreddit.name,
+  });
+
+  const eventPostIdInfo = await ctx.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
+  let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
+  if (eventPostIdInfo) {
+    const info = JSON.parse(eventPostIdInfo);
+
+    newEventPostIdInfo = {
+      ...info,
+      postIds: [...info.postIds, post.id],
+    };
+  } else {
+    newEventPostIdInfo = {
+      postIds: [post.id],
+    };
+  }
+
+  await Promise.all([
+    configurePostWithAvailableReactions(post.id, ctx.redis, defaultReactions),
+    /**
+     * We need this so that inside of the task scheduler we can find postIDs for given events.
+     * This is used to create a cached loading screen as a fallback for errors in case something
+     * breaks. It also makes the loading experience look very similar to the live version.
+     */
+    ctx.kvStore.put(makeKeyForEventId(gameSub.eventId), JSON.stringify(newEventPostIdInfo)),
+    ctx.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub)),
+  ]);
+  return ctx.ui.showToast({
+    text: 'Scoreboard Post Created!',
+    appearance: 'success',
+  });
+}
+
 export const srNflGameSelectForm = Devvit.createForm(
   (data) => {
     const eventOptions: { label: string; value: string }[] = data.events
@@ -132,53 +184,13 @@ export const srNflGameSelectForm = Devvit.createForm(
     };
 
     const gameInfo = await fetchNFLBoxscore(gameSub.eventId, ctx);
-
     let gameTitle: string = '';
     if (gameInfo !== null && gameInfo !== undefined) {
       gameTitle = `${gameInfo.event.awayTeam.fullName} @ ${gameInfo.event.homeTeam.fullName}`;
       await ctx.kvStore.put(makeKeyForSubscription(gameSub), JSON.stringify(gameInfo));
     }
-    const success: boolean = await addSubscription(ctx, JSON.stringify(gameSub));
-    if (!success) {
-      return ctx.ui.showToast(`An error occurred. Please try again.`);
-    }
-    const { reddit } = ctx;
-    const currentSubreddit = await reddit.getCurrentSubreddit();
-    const post: Post = await reddit.submitPost({
-      preview: <LoadingStateFootball />,
-      title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
-      subredditName: currentSubreddit.name,
-    });
 
-    const eventPostIdInfo = await ctx.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
-    let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
-    if (eventPostIdInfo) {
-      const info = JSON.parse(eventPostIdInfo);
-
-      newEventPostIdInfo = {
-        ...info,
-        postIds: [...info.postIds, post.id],
-      };
-    } else {
-      newEventPostIdInfo = {
-        postIds: [post.id],
-      };
-    }
-
-    await Promise.all([
-      configurePostWithAvailableReactions(post.id, ctx.redis, defaultReactions),
-      /**
-       * We need this so that inside of the task scheduler we can find postIDs for given events.
-       * This is used to create a cached loading screen as a fallback for errors in case something
-       * breaks. It also makes the loading experience look very similar to the live version.
-       */
-      ctx.kvStore.put(makeKeyForEventId(gameSub.eventId), JSON.stringify(newEventPostIdInfo)),
-      ctx.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub)),
-    ]);
-    return ctx.ui.showToast({
-      text: 'Scoreboard Post Created!',
-      appearance: 'success',
-    });
+    await createGamePost(ctx, gameSub, gameTitle, postTitle, <LoadingStateFootball />);
   }
 );
 
@@ -231,48 +243,14 @@ export const srSoccerGameSelectionForm = Devvit.createForm(
       gameSub.eventId,
       context
     );
+
     let gameTitle: string = '';
-    if (gameInfo !== null) {
+    if (gameInfo !== null && gameInfo !== undefined) {
       gameTitle = `${gameInfo.event.homeTeam.fullName} vs ${gameInfo.event.awayTeam.fullName}`;
       await context.kvStore.put(makeKeyForSubscription(gameSub), JSON.stringify(gameInfo));
     }
-    const success: boolean = await addSubscription(context, JSON.stringify(gameSub));
-    if (!success) {
-      return context.ui.showToast(`An error occurred. Please try again.`);
-    }
-    const { reddit } = context;
-    const currentSubreddit = await reddit.getCurrentSubreddit();
-    const post: Post = await reddit.submitPost({
-      preview: LoadingState(),
-      title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
-      subredditName: currentSubreddit.name,
-    });
 
-    const eventPostIdInfo = await context.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
-    let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
-    if (eventPostIdInfo) {
-      const info = JSON.parse(eventPostIdInfo);
-
-      newEventPostIdInfo = {
-        ...info,
-        postIds: [...info.postIds, post.id],
-      };
-    } else {
-      newEventPostIdInfo = {
-        postIds: [post.id],
-      };
-    }
-
-    await context.kvStore.put(
-      makeKeyForEventId(gameSub.eventId),
-      JSON.stringify(newEventPostIdInfo)
-    );
-
-    await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
-    return context.ui.showToast({
-      text: 'Scoreboard Post Created!',
-      appearance: 'success',
-    });
+    await createGamePost(context, gameSub, gameTitle, postTitle, LoadingState());
   }
 );
 
@@ -389,45 +367,74 @@ async function fetchAndCreateBasketballGamePost(
     gameTitle = `${gameInfo.event.awayTeam.fullName} @ ${gameInfo.event.homeTeam.fullName}`;
     await ctx.kvStore.put(makeKeyForSubscription(gameSub), JSON.stringify(gameInfo));
   }
-  const success: boolean = await addSubscription(ctx, JSON.stringify(gameSub));
-  if (!success) {
-    return ctx.ui.showToast(`An error occurred. Please try again.`);
-  }
-  const { reddit } = ctx;
-  const currentSubreddit = await reddit.getCurrentSubreddit();
-  const post: Post = await reddit.submitPost({
-    preview: LoadingState(),
-    title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
-    subredditName: currentSubreddit.name,
-  });
 
-  const eventPostIdInfo = await ctx.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
-  let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
-  if (eventPostIdInfo) {
-    const info = JSON.parse(eventPostIdInfo);
+  await createGamePost(ctx, gameSub, gameTitle, postTitle, LoadingState());
+}
 
-    newEventPostIdInfo = {
-      ...info,
-      postIds: [...info.postIds, post.id],
+export const srCricketMatchSelectionForm = Devvit.createForm(
+  (data) => {
+    const eventOptions: { label: string; value: string }[] = data.events
+      .map((event: CricketSportEvent) => ({
+        value: `${data.league}-${event.id}`,
+        label: `${event.competitors[0].abbreviation} vs ${event.competitors[1].abbreviation} - 
+        ${dateStringFromEvent(event.scheduled, data.timezone)}}`,
+      }))
+      .sort();
+
+    return {
+      fields: [
+        {
+          name: 'game',
+          label: 'Game',
+          type: 'select',
+          required: true,
+          options: eventOptions,
+        },
+        {
+          name: 'postTitle',
+          label: 'Post title',
+          type: 'string',
+          required: false,
+          helpText: `Optional post title. Leave blank for auto-generated title.`,
+        },
+      ],
+      title: 'Create Scoreboard Post',
+      description: `League selected: ${getDisplayNameFromLeague(data['league'])}`,
+      acceptLabel: 'Create Game Post!',
+      cancelLabel: 'Cancel',
     };
-  } else {
-    newEventPostIdInfo = {
-      postIds: [post.id],
-    };
+  },
+  async ({ values }, ctx) => {
+    const service = APIService.SRCricket;
+    await fetchAndCreateCricketMatchPost(ctx, service, values);
+  }
+);
+
+async function fetchAndCreateCricketMatchPost(
+  context: Devvit.Context,
+  service: APIService,
+  values: Data
+): Promise<void> {
+  const postTitle: string = values.postTitle;
+  const league: string = values.game[0].split('-')[0];
+  const eventId: string = values.game[0].split('-')[1];
+  const gameSub: GameSubscription = {
+    league: getLeagueFromString(league),
+    eventId: eventId,
+    service: service,
+  };
+
+  const gameInfo: GeneralGameScoreInfo | null = await fetchCricketMatch(
+    league,
+    gameSub.eventId,
+    context
+  );
+
+  let gameTitle: string = '';
+  if (gameInfo !== null && gameInfo !== undefined) {
+    gameTitle = `${gameInfo.event.homeTeam.fullName} vs ${gameInfo.event.awayTeam.fullName}`;
+    await context.kvStore.put(makeKeyForSubscription(gameSub), JSON.stringify(gameInfo));
   }
 
-  await Promise.all([
-    configurePostWithAvailableReactions(post.id, ctx.redis, defaultReactions),
-    /**
-     * We need this so that inside of the task scheduler we can find postIDs for given events.
-     * This is used to create a cached loading screen as a fallback for errors in case something
-     * breaks. It also makes the loading experience look very similar to the live version.
-     */
-    ctx.kvStore.put(makeKeyForEventId(gameSub.eventId), JSON.stringify(newEventPostIdInfo)),
-    ctx.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub)),
-  ]);
-  return ctx.ui.showToast({
-    text: 'Scoreboard Post Created!',
-    appearance: 'success',
-  });
+  await createGamePost(context, gameSub, gameTitle, postTitle, LoadingState());
 }

@@ -15,6 +15,7 @@ export enum APIService {
   SRNCAAMB = `sr_ncaamb`,
   SRNBASim = `sr_nba_sim`,
   SimulatorNBA = `simulator_nba`,
+  SRCricket = `sr_cricket`,
 }
 
 export enum League {
@@ -40,6 +41,7 @@ export enum League {
   EFLLEAGUETWO = `eng_league_two`,
   CROATIA_HNL = `hr_hnl`,
   NCAAMB = 'ncaamb',
+  IPL = 'ipl',
 }
 
 export enum Sport {
@@ -48,6 +50,7 @@ export enum Sport {
   BASKETBALL = 'basketball',
   SOCCER = 'soccer',
   HOCKEY = 'hockey',
+  CRICKET = 'cricket',
   UNKNOWN = '',
 }
 
@@ -150,6 +153,13 @@ export function leaguesSupported(service: APIService): { label: string; value: s
         value: League.CROATIA_HNL,
       },
     ];
+  } else if (service === APIService.SRCricket) {
+    return [
+      {
+        label: getDisplayNameFromLeague(League.IPL),
+        value: League.IPL,
+      },
+    ];
   }
   return [];
 }
@@ -221,6 +231,9 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'ncaamb') {
     return League.NCAAMB;
   }
+  if (str.toLowerCase() === 'ipl') {
+    return League.IPL;
+  }
 
   return League.UNKNOWN;
 }
@@ -257,6 +270,8 @@ export function getSportFromLeague(league: League): Sport {
     case League.LIGAMXCLAUSURA:
     case League.CROATIA_HNL:
       return Sport.SOCCER;
+    case League.IPL:
+      return Sport.CRICKET;
     default:
       return Sport.UNKNOWN;
   }
@@ -306,6 +321,8 @@ export function getDisplayNameFromLeague(league: League): string {
       return `Hrvatska Nogometna Liga (HR)`;
     case League.NCAAMB:
       return `NCAA Men's Basketball`;
+    case League.IPL:
+      return 'Indian Premier League';
     default:
       return '';
   }

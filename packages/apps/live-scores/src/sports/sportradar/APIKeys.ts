@@ -3,6 +3,7 @@ export enum APIKey {
   nfl = `sr-nfl-api-key`,
   nba = `sr-nba-api-key`,
   ncaamb = `sr-ncaamb-api-key`,
+  cricket = `sr-cricket-api-key`,
 }
 
 export enum AppSettings {
