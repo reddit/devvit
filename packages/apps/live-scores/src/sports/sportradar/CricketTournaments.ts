@@ -1,6 +1,6 @@
 import type { Devvit } from '@devvit/public-api';
 import type { CricketLeague } from './CricketLeague.js';
-import type { CricketSportEvent } from './CricketMatch.js';
+import type { CricketSportEvent } from './CricketModels.js';
 import { APIKey } from './APIKeys.js';
 import { getRelativeDate } from '../Timezones.js';
 
@@ -26,17 +26,22 @@ export async function fetchCricketSportEvents(
     );
     const response = await fetch(request);
     data = await response.json();
+
+    if (!isCricketTournaments(data)) {
+      console.error('error parsing cricket tournament');
+      return null;
+    }
+
+    let matches = parseMatches(data).sport_events;
+    matches = matches.map((match, index) => {
+      match.matchNumber = `${index + 1}-${matches.length}`;
+      return match;
+    });
+    return filterMatches(matches);
   } catch (e) {
     console.error(e);
     return null;
   }
-
-  if (!isCricketTournaments(data)) {
-    console.error('Error when parsing cricket tournaments, invalid data');
-    return null;
-  }
-
-  return filterMatches(parseMatches(data).sport_events);
 }
 
 function isCricketTournaments(jsonData: unknown): jsonData is CricketTournaments {
@@ -52,8 +57,8 @@ function isCricketTournaments(jsonData: unknown): jsonData is CricketTournaments
 }
 
 function filterMatches(games: CricketSportEvent[]): CricketSportEvent[] {
-  const earliestScheduleDate = getRelativeDate(-1);
-  const latestScheduleDate = getRelativeDate(2);
+  const earliestScheduleDate = getRelativeDate(-7);
+  const latestScheduleDate = getRelativeDate(7);
 
   // Filter the games based on start_time
   return games.filter((game) => {

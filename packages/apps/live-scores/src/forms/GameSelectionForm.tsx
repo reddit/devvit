@@ -9,12 +9,13 @@ import type { GameEvent, GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { compareEvents } from '../sports/GameEvent.js';
 import { fetchNFLBoxscore } from '../sports/sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
-import type { CricketSportEvent } from '../sports/sportradar/CricketMatch.js';
+import type { CricketSportEvent } from '../sports/sportradar/CricketModels.js';
 import { fetchCricketMatch } from '../sports/sportradar/CricketMatch.js';
 import {
   makeKeyForSubscription,
   makeKeyForPostId,
   makeKeyForEventId,
+  makeKeyForEventNumber,
 } from '../sports/GameFetch.js';
 import { LoadingState, LoadingStateFootball } from '../components/Loading.js';
 import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
@@ -375,9 +376,9 @@ export const srCricketMatchSelectionForm = Devvit.createForm(
   (data) => {
     const eventOptions: { label: string; value: string }[] = data.events
       .map((event: CricketSportEvent) => ({
-        value: `${data.league}-${event.id}`,
+        value: `${data.league}-${event.id}-${data.timezone}-${event.matchNumber}`,
         label: `${event.competitors[0].abbreviation} vs ${event.competitors[1].abbreviation} - 
-        ${dateStringFromEvent(event.scheduled, data.timezone)}}`,
+        ${dateStringFromEvent(event.scheduled, data.timezone)}`,
       }))
       .sort();
 
@@ -418,6 +419,9 @@ async function fetchAndCreateCricketMatchPost(
   const postTitle: string = values.postTitle;
   const league: string = values.game[0].split('-')[0];
   const eventId: string = values.game[0].split('-')[1];
+  const timezone: string = values.game[0].split('-')[2];
+  const eventNumber: string = values.game[0].split('-')[3];
+  const eventTotal: string = values.game[0].split('-')[4];
   const gameSub: GameSubscription = {
     league: getLeagueFromString(league),
     eventId: eventId,
@@ -433,6 +437,10 @@ async function fetchAndCreateCricketMatchPost(
   let gameTitle: string = '';
   if (gameInfo !== null && gameInfo !== undefined) {
     gameTitle = `${gameInfo.event.homeTeam.fullName} vs ${gameInfo.event.awayTeam.fullName}`;
+    await context.kvStore.put(
+      makeKeyForEventNumber(eventId),
+      eventNumber + '-' + eventTotal + '-' + timezone
+    );
     await context.kvStore.put(makeKeyForSubscription(gameSub), JSON.stringify(gameInfo));
   }
 

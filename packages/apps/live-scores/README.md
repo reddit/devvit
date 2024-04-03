@@ -25,6 +25,10 @@ An interactive post-type for sports games developed by Reddit! Install the app, 
 * NBA
 * NCAA Mens
 
+### Cricket
+**Supported Leagues**
+* IPL
+
 ## Creating a Scoreboard post
 
 * Install the app from this page!

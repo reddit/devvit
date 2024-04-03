@@ -20,7 +20,7 @@ export function TeamBlock({
   isHomeTeam: boolean;
   name: string;
   logo: string;
-  score?: number;
+  score?: string;
   state: EventState;
   baseballProps?: TeamBlockBaseball;
   basketballProps?: TeamBlockBasketball;

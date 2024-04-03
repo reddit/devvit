@@ -59,6 +59,8 @@ import {
 } from './sports/sportradar/BasketballPlayByPlayEvents.js';
 import { createNBASimulationPost, resetSimulator } from './sports/GameSimulator.js';
 import type { BasketballSummary } from './sports/sportradar/BasketballSummary.js';
+import { CricketScoreboard } from './components/cricket.js';
+import type { CricketMatchScoreInfo } from './sports/sportradar/CricketModels.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
 
@@ -200,9 +202,11 @@ export const AppContent: Devvit.BlockComponent<{
       summary: basketballSummary,
       spoilerFree: spoilerFree,
     });
-  } else {
-    return GenericScoreBoard(scoreInfo);
+  } else if (scoreInfo.event.gameType === 'cricket') {
+    const cricketMatchScoreInfo = scoreInfo as CricketMatchScoreInfo;
+    return CricketScoreboard({ scoreInfo: cricketMatchScoreInfo, page, setPage });
   }
+  return GenericScoreBoard(scoreInfo);
 };
 
 // Devvit.addMenuItem({

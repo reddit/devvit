@@ -1,9 +1,9 @@
-import { APIService } from './Sports.js';
+import type { APIService } from './Sports.js';
 
 export type GeneralGameScoreInfo = {
   event: GameEvent;
-  homeScore: number;
-  awayScore: number;
+  homeScore: string;
+  awayScore: string;
   extraContent?: string;
   service: APIService;
   generatedDate?: string;

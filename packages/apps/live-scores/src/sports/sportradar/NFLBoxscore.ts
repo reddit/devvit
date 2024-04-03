@@ -1,9 +1,10 @@
-import { Devvit } from '@devvit/public-api';
-import { NFLGame, NFLSeasonInfo, NFLWeek } from './NFLSchedule.js';
-import { EventState, GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
+import type { Devvit } from '@devvit/public-api';
+import type { NFLGame, NFLSeasonInfo, NFLWeek } from './NFLSchedule.js';
+import type { GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
+import { EventState } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
 import { APIKey } from './APIKeys.js';
-import { Team, TeamRecord } from './GenericModels.js';
+import type { Team, TeamRecord } from './GenericModels.js';
 
 type NFLBoxscoreSummary = {
   season: NFLSeasonInfo;
@@ -105,7 +106,7 @@ export async function fetchNFLSimulationBoxscore(
   return nflGameScoreInfo(parseNFLBoxscore(data));
 }
 
-export function parseNFLBoxscore(jsonData: any): NFLBoxscore {
+export function parseNFLBoxscore(jsonData: unknown): NFLBoxscore {
   return {
     id: jsonData.id,
     status: jsonData.status,
@@ -124,7 +125,7 @@ export function parseNFLBoxscore(jsonData: any): NFLBoxscore {
   };
 }
 
-function parseTeam(league: string, team: any): TeamInfo {
+function parseTeam(league: string, team: unknown): TeamInfo {
   return {
     id: team.id,
     name: team.name,
@@ -160,8 +161,8 @@ export function nflGameScoreInfo(game: NFLBoxscore): NFLGameScoreInfo {
         period: game.quarter,
       },
     },
-    homeScore: game.summary.home.points,
-    awayScore: game.summary.away.points,
+    homeScore: String(game.summary.home.points),
+    awayScore: String(game.summary.away.points),
     service: APIService.SRNFL,
     generatedDate: currentDate.toISOString(),
     summary: game.summary,
