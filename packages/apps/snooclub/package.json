@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "name": "snoo-club",
+  "version": "0.10.17",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@devvit/protos": "0.10.17",
+    "@devvit/public-api": "0.10.17",
+    "base64-js": "1.5.1"
+  },
+  "devDependencies": {
+    "@devvit/eslint-config": "0.10.17",
+    "@devvit/tsconfig": "0.10.17",
+    "typescript": "5.3.2",
+    "vitest": "0.31.0"
+  }
+}
