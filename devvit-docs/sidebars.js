@@ -72,6 +72,7 @@ const sidebars = {
           id: 'api/redditapi/classes/RedditAPIClient.RedditAPIClient',
         },
         'redis',
+        'realtime',
         'scheduler',
         'secrets_storage',
         'event_triggers',
@@ -90,12 +91,12 @@ const sidebars = {
         image: '/img/small_snoo.png',
       },
       items: [
-        `custom_posts`,
+        'custom_posts',
         'custom_post_project_guide',
-        `app_image_assets`,
+        'app_image_assets',
         'dimensions',
         'working_with_usestate',
-        `working_with_useinterval`,
+        'working_with_useinterval',
       ],
     },
     {

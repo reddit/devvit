@@ -4,6 +4,12 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 To use the latest version of Devvit, follow the [upgrade instructions](https://developers.reddit.com/docs/update-devvit).
 
+## Devvit 0.10.18: Realtime and menu action filters
+
+**Release Date: April 4, 2024**
+
+Devvit 0.10.18 introduces an experimental feature: [Realtime](realtime.md) to create live, event-driven custom posts. We’ve also added a filter that lets you decide where menu actions show up in custom posts.
+
 ## Devvit 0.10.16: New look and more on Blocks
 
 **Release Date: February 22, 2023**

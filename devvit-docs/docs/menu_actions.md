@@ -12,21 +12,13 @@ On new Reddit, comment menu actions in modqueue are only available in card view.
 
 ## Supported Contexts
 
-The context lets you define where the menu action shows up. The options for `location` are:
+You can decide where the menu action shows up by specifying the context property. For example, setting the location to ‘comment’ will only show the menu action on comments.
 
-- "comment"
-- "post"
-- "subreddit"
-
-There is a `postFilter` (optional) property that you can use to only show "post" actions on posts that satisfy the criteria.
-
-For example, you can use the `"currentApp"` filter to only display the menu item on [custom posts](./custom_post_usage.md) that were created by your app.
-
-You can also define the `forUserType` (optional) to specify the types of users that can see the menu action. The options are:
-
-- "moderator"
-
-(More `forUserType` options are coming soon!)
+| Property               | Values                         | Description                                                                     |
+| ---------------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| location (required)    | `comment`, `post`, `subreddit` | Determines where the menu action appears in the custom post.                    |
+| postFilter (optional)  | `currentApp`                   | Shows the action created by your app. The default is no filtering.              |
+| forUserType (optional) | `moderator`                    | Specifies the user types that can see the menu action. The default is everyone. |
 
 ## Limitations
 
@@ -49,52 +41,4 @@ Devvit.addMenuItem({
     context.ui.showToast(`Hello from a ${event.location}!`);
   },
 });
-```
-
-## Dynamic Forms
-
-You can create dynamic form by passing in a data object as the 2nd argument into `ui.showForm`. Once data is passed in you can access it from the createForm function.
-
-The example below includes a random string into the label of the form field:
-
-```ts
-import { Devvit } from '@devvit/public-api';
-
-const dynamicForm = Devvit.createForm(
-  (data) => {
-    console.log(data);
-
-    return {
-      fields: [
-        {
-          name: 'when',
-          label: `a string (default: ${data.text})`,
-          type: 'string',
-          defaultValue: data.text,
-        },
-      ],
-      title: 'Rule Form',
-      acceptLabel: 'Send Rule',
-    };
-  },
-  ({ values }, ctx) => {
-    return ctx.ui.showToast(`You sent ${values.when}`);
-  }
-);
-
-Devvit.addMenuItem({
-  label: 'Show a dynamic form',
-  location: 'post',
-  onPress: async (_event, { ui }) => {
-    const randomString = Math.random().toString(36).substring(7);
-
-    const formData = {
-      text: randomString,
-    };
-
-    return ui.showForm(dynamicForm, formData);
-  },
-});
-
-export default Devvit;
 ```

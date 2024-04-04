@@ -62,6 +62,7 @@
           "id": "api/redditapi/classes/RedditAPIClient.RedditAPIClient"
         },
         "redis",
+        "realtime",
         "scheduler",
         "secrets_storage",
         "event_triggers",
