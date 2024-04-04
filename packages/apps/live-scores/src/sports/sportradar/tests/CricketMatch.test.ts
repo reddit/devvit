@@ -26,30 +26,6 @@ import { CricketQualifierType, CricketEventStatusType } from '../CricketModels.j
 import type { TeamInfo } from '../../GameEvent.js';
 import { EventState } from '../../GameEvent.js';
 
-test('Get match time string', async () => {
-  const matchScheduled = '2024-03-22T14:30:00+00:00';
-
-  let currentDate = new Date('2024-03-21T14:30:00+00:00');
-  let matchTime = getMatchTimeString(matchScheduled, currentDate);
-  expect(matchTime).toEqual('Tomorrow');
-
-  currentDate = new Date('2024-03-23T14:30:00+00:00');
-  matchTime = getMatchTimeString(matchScheduled, currentDate);
-  expect(matchTime).toEqual('Yesterday');
-
-  currentDate = new Date('2024-03-22T14:30:00+00:00');
-  matchTime = getMatchTimeString(matchScheduled, currentDate);
-  expect(matchTime).toEqual('10:30 AM');
-
-  currentDate = new Date('2024-03-20T14:30:00+00:00');
-  matchTime = getMatchTimeString(matchScheduled, currentDate);
-  expect(matchTime).toEqual('March 22, 2024');
-
-  currentDate = new Date('2024-03-24T14:30:00+00:00');
-  matchTime = getMatchTimeString(matchScheduled, currentDate);
-  expect(matchTime).toEqual('March 22, 2024');
-});
-
 const tournament: CricketTournament = {
   id: 'id',
   name: 'name',
@@ -94,6 +70,31 @@ const cricketMatch: CricketMatch = {
     innings: [],
   },
 };
+
+test('Get match time string', async () => {
+  cricketMatch.sport_event_status.status = CricketEventStatusType.CREATED;
+  cricketMatch.sport_event.scheduled = '2024-03-22T14:30:00+00:00';
+
+  let currentDate = new Date('2024-03-21T14:30:00+00:00');
+  let matchTime = getMatchTimeString(cricketMatch, currentDate);
+  expect(matchTime).toEqual('Tomorrow');
+
+  currentDate = new Date('2024-03-23T14:30:00+00:00');
+  matchTime = getMatchTimeString(cricketMatch, currentDate);
+  expect(matchTime).toEqual('Yesterday');
+
+  currentDate = new Date('2024-03-22T14:30:00+00:00');
+  matchTime = getMatchTimeString(cricketMatch, currentDate);
+  expect(matchTime).toEqual('10:30 AM');
+
+  currentDate = new Date('2024-03-20T14:30:00+00:00');
+  matchTime = getMatchTimeString(cricketMatch, currentDate);
+  expect(matchTime).toEqual('March 22, 2024');
+
+  currentDate = new Date('2024-03-24T14:30:00+00:00');
+  matchTime = getMatchTimeString(cricketMatch, currentDate);
+  expect(matchTime).toEqual('March 22, 2024');
+});
 
 const homeTeam: CricketCompetitor = {
   id: 'home_id',

@@ -46,7 +46,7 @@ export function topBarCricketComponent(cricketProps: TopBarCricket): JSX.Element
   //   text += `${match_number} • `;
   // }
 
-  let text = ` ${league} `;
+  let text = `• ${league} `;
 
   if (location !== undefined) {
     text += ` • ${location}`;
@@ -56,7 +56,7 @@ export function topBarCricketComponent(cricketProps: TopBarCricket): JSX.Element
     <hstack height="58px" padding="medium" alignment="center middle">
       <hstack alignment="center" grow>
         <text color={`${timeColor}`} style="heading" size="medium" wrap={true} alignment="center">
-          {match_time} •
+          {match_time}
         </text>
         <text style="heading" size="medium" wrap={true} alignment="center">
           &nbsp;{text}

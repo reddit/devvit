@@ -76,9 +76,7 @@ export function cricketMatchInfo(
     cricketMatch.sport_event_status.status === CricketEventStatusType.LIVE ||
     cricketMatch.sport_event_status.status === CricketEventStatusType.INPROGRESS;
 
-  const matchTime = isLive
-    ? 'LIVE'
-    : getMatchTimeString(cricketMatch.sport_event.scheduled, new Date(), timezone);
+  const matchTime = isLive ? 'LIVE' : getMatchTimeString(cricketMatch, new Date(), timezone);
 
   let matchNumberString: string | undefined = undefined;
   if (matchNumber !== undefined) {
@@ -291,13 +289,16 @@ function isMatchDateToday(matchDate: Date, todaysDate: Date, timezone?: string):
 }
 
 export function getMatchTimeString(
-  scheduledTimeString: string,
+  cricketMatch: CricketMatch,
   todaysDate: Date,
   timezone?: string
 ): string {
-  const matchDate = new Date(scheduledTimeString);
+  const matchDate = new Date(cricketMatch.sport_event.scheduled);
 
-  if (todaysDate > matchDate) {
+  if (
+    cricketMatch.sport_event_status.status === CricketEventStatusType.CLOSED ||
+    cricketMatch.sport_event_status.status === CricketEventStatusType.COMPLETE
+  ) {
     return matchDate.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
