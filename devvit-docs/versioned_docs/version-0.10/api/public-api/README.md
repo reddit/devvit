@@ -1,4 +1,4 @@
-# @devvit/public-api - v0.10.17
+# @devvit/public-api - v0.10.18
 
 ## Table of contents
 
@@ -727,19 +727,26 @@ represented losslessly in plain JSON.
 
 #### Type declaration
 
-| Name           | Type                                                                                                                                                    | Description                                                 |
-| :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :---------------------------------------------------------- |
-| `description?` | `string`                                                                                                                                                | An optional description for the menu item                   |
-| `forUserType?` | [`MenuItemUserType`](README.md#menuitemusertype) \| [`MenuItemUserType`](README.md#menuitemusertype)[]                                                  | The user type(s) that the menu item should be displayed for |
-| `label`        | `string`                                                                                                                                                | The label of the menu item                                  |
-| `location`     | [`MenuItemLocation`](README.md#menuitemlocation) \| [`MenuItemLocation`](README.md#menuitemlocation)[]                                                  | The location(s) where the menu item should be displayed     |
-| `onPress`      | (`event`: [`MenuItemOnPressEvent`](README.md#menuitemonpressevent), `context`: [`Context`](modules/Devvit.md#context)) => `void` \| `Promise`\<`void`\> | A function that is called when the menu item is pressed     |
+| Name           | Type                                                                                                                                                    | Description                                                                   |
+| :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------- |
+| `description?` | `string`                                                                                                                                                | An optional description for the menu item                                     |
+| `forUserType?` | [`MenuItemUserType`](README.md#menuitemusertype) \| [`MenuItemUserType`](README.md#menuitemusertype)[]                                                  | The user type(s) that the menu item should be displayed for                   |
+| `label`        | `string`                                                                                                                                                | The label of the menu item                                                    |
+| `location`     | [`MenuItemLocation`](README.md#menuitemlocation) \| [`MenuItemLocation`](README.md#menuitemlocation)[]                                                  | The location(s) where the menu item should be displayed                       |
+| `postFilter?`  | [`MenuItemPostFilter`](README.md#menuitempostfilter)                                                                                                    | The filter that applies to post menu items. Has no effect on non-post actions |
+| `onPress`      | (`event`: [`MenuItemOnPressEvent`](README.md#menuitemonpressevent), `context`: [`Context`](modules/Devvit.md#context)) => `void` \| `Promise`\<`void`\> | A function that is called when the menu item is pressed                       |
 
 ---
 
 ### <a id="menuitemlocation" name="menuitemlocation"></a> MenuItemLocation
 
 Ƭ **MenuItemLocation**: `"subreddit"` \| `"post"` \| `"comment"`
+
+---
+
+### <a id="menuitempostfilter" name="menuitempostfilter"></a> MenuItemPostFilter
+
+Ƭ **MenuItemPostFilter**: `"currentApp"`
 
 ---
 

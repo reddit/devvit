@@ -11,6 +11,7 @@
 - [authorId](models.Post.md#authorid)
 - [authorName](models.Post.md#authorname)
 - [body](models.Post.md#body)
+- [bodyHtml](models.Post.md#bodyhtml)
 - [comments](models.Post.md#comments)
 - [createdAt](models.Post.md#createdat)
 - [distinguishedBy](models.Post.md#distinguishedby)
@@ -126,6 +127,16 @@
 ### <a id="body" name="body"></a> body
 
 • `get` **body**(): `undefined` \| `string`
+
+#### Returns
+
+`undefined` \| `string`
+
+---
+
+### <a id="bodyhtml" name="bodyhtml"></a> bodyHtml
+
+• `get` **bodyHtml**(): `undefined` \| `string`
 
 #### Returns
 
@@ -770,11 +781,11 @@ Add a mod note for why the post was removed
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Post`](models.Post.md), `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"url"` \| `"subredditId"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
+▸ **toJSON**(): `Pick`\<[`Post`](models.Post.md), `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"url"` \| `"subredditId"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
 
 #### Returns
 
-`Pick`\<[`Post`](models.Post.md), `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"url"` \| `"subredditId"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
+`Pick`\<[`Post`](models.Post.md), `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"url"` \| `"subredditId"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
 
 ---
 

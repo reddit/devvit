@@ -13,7 +13,9 @@
         "title": "Get started",
         "description": "This section is designed to get you up and running fast.",
         "slug": "/get-started",
-        "keywords": ["guides"],
+        "keywords": [
+          "guides"
+        ],
         "image": "/img/small_snoo.png"
       },
       "items": [
@@ -36,7 +38,11 @@
         "type": "doc",
         "id": "examples/overview"
       },
-      "items": ["examples/playpens", "examples/apps", "examples/tutorials"]
+      "items": [
+        "examples/playpens",
+        "examples/apps",
+        "examples/tutorials"
+      ]
     },
     {
       "type": "category",
@@ -46,7 +52,9 @@
         "title": "Explore the possibilities",
         "description": "This section contains features and capabilities you can use in your app.",
         "slug": "/category/devvit-capabilities",
-        "keywords": ["capabilities"],
+        "keywords": [
+          "capabilities"
+        ],
         "image": "/img/small_snoo.png"
       },
       "items": [
@@ -77,7 +85,9 @@
         "title": "Create an experience",
         "description": "Dive in an see what you can create with custom posts.",
         "slug": "/category/devvit-custom-posts",
-        "keywords": ["custom-posts"],
+        "keywords": [
+          "custom-posts"
+        ],
         "image": "/img/small_snoo.png"
       },
       "items": [
@@ -166,10 +176,16 @@
         "title": "Create, test, and debug your apps",
         "description": "Tools that help you build.",
         "slug": "/category/devvit-resources",
-        "keywords": ["resources"],
+        "keywords": [
+          "resources"
+        ],
         "image": "/img/small_snoo.png"
       },
-      "items": ["mod_resources", "support", "changelog"]
+      "items": [
+        "mod_resources",
+        "support",
+        "changelog"
+      ]
     }
   ]
 }

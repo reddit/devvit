@@ -1,8 +1,10 @@
 # Class: RedditAPIClient
 
-Connect to the Reddit API.
+[RedditAPIClient](../modules/RedditAPIClient.md).RedditAPIClient
 
-To use the [RedditAPIClient](../modules/RedditAPIClient.md), add it to the plugin configuration at the top of the file.
+The Reddit API Client
+
+To use the Reddit API Client, add it to the plugin configuration at the top of the file.
 
 **`Example`**
 
