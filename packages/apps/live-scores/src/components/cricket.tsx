@@ -66,6 +66,41 @@ export function topBarCricketComponent(cricketProps: TopBarCricket): JSX.Element
   );
 }
 
+export function splitNameInTwoLines(name: string): [string, string] {
+  let firstLine: string = name;
+  let secondLine: string = '';
+
+  const totalChars = name.length;
+
+  if (totalChars <= 15) {
+    return [firstLine, secondLine];
+  }
+  const namesArray = name.split(' ');
+
+  if (namesArray.length === 2) {
+    firstLine = namesArray[0].trim();
+    secondLine = namesArray[1].trim();
+    return [firstLine, secondLine];
+  }
+
+  let remainingIndexes = namesArray.length - 1;
+  for (let i = remainingIndexes; i >= 0; i--) {
+    secondLine = namesArray[i] + ' ' + secondLine;
+    // I was trying to find a balance were it would break in a nice way.
+    // The idea is that the second line has more text than the first one.
+    if (secondLine.length >= totalChars / 2.7) {
+      remainingIndexes = i;
+      break;
+    }
+  }
+  firstLine = '';
+  for (let i = 0; i < remainingIndexes; i++) {
+    firstLine += namesArray[i] + ' ';
+  }
+
+  return [firstLine.trim(), secondLine.trim()];
+}
+
 function CricketTeamBlock({
   name,
   logo,
@@ -81,17 +116,24 @@ function CricketTeamBlock({
   state: EventState;
   isWinningTeam: boolean;
 }): JSX.Element {
+  const [firstLine, secondLine] = splitNameInTwoLines(name);
+
   return (
     <vstack padding="small" height={`72px`} width={'100%'} alignment={'middle'}>
       <hstack alignment={'middle'} width={`100%`}>
         <spacer size="small" />
         <image url={logo} imageHeight={32} imageWidth={32} />
-        <spacer size="xsmall" />
-        <hstack alignment={'start middle'} height={`50px`} grow>
-          <text size="large" weight="bold" wrap={true} grow>
-            {name}
+        <spacer size="medium" />
+        <vstack alignment={'start middle'}>
+          <text size="large" weight="bold" wrap={true}>
+            {firstLine}
           </text>
-        </hstack>
+          {secondLine !== '' ? (
+            <text size="large" weight="bold" wrap={true}>
+              {secondLine}
+            </text>
+          ) : null}
+        </vstack>
         <spacer grow />
         <hstack alignment={'bottom'}>
           <text size="xlarge" weight="bold">

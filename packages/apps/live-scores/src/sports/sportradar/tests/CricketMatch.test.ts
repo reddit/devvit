@@ -25,6 +25,7 @@ import type {
 import { CricketQualifierType, CricketEventStatusType } from '../CricketModels.js';
 import type { TeamInfo } from '../../GameEvent.js';
 import { EventState } from '../../GameEvent.js';
+import { splitNameInTwoLines } from '../../../components/cricket.js';
 
 const tournament: CricketTournament = {
   id: 'id',
@@ -237,6 +238,37 @@ test('EventState from CricketEventStatusType ', async () => {
   expect(eventState(CricketEventStatusType.CLOSED)).toBe(EventState.FINAL);
   expect(eventState(CricketEventStatusType.COMPLETE)).toBe(EventState.FINAL);
   expect(eventState(CricketEventStatusType.POSTPONED)).toBe(EventState.UNKNOWN);
+});
+
+/// test splitNameInTwoLines
+test('splitNameInTwoLines Lucknow Super Giants', async () => {
+  const [line1, line2] = splitNameInTwoLines('Lucknow Super Giants');
+  expect(line1).toBe('Lucknow');
+  expect(line2).toBe('Super Giants');
+});
+
+test('splitNameInTwoLines Chennai Super Kings', async () => {
+  const [line1, line2] = splitNameInTwoLines('Chennai Super Kings');
+  expect(line1).toBe('Chennai');
+  expect(line2).toBe('Super Kings');
+});
+
+test('splitNameInTwoLines Royal Challengers Bengaluru', async () => {
+  const [line1, line2] = splitNameInTwoLines('Royal Challengers Bengaluru');
+  expect(line1).toBe('Royal Challengers');
+  expect(line2).toBe('Bengaluru');
+});
+
+test('splitNameInTwoLines Punjab Kings', async () => {
+  const [line1, line2] = splitNameInTwoLines('Punjab Kings');
+  expect(line1).toBe('Punjab Kings');
+  expect(line2).toBe('');
+});
+
+test('splitNameInTwoLines Rajasthan Royals', async () => {
+  const [line1, line2] = splitNameInTwoLines('Rajasthan Royals');
+  expect(line1).toBe('Rajasthan');
+  expect(line2).toBe('Royals');
 });
 
 /// test getTeam for a specificed qualifier from competitors
