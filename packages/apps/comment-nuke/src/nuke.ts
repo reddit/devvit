@@ -55,7 +55,7 @@ export type NukePostProps = {
       );
   
       if (!canManagePosts) {
-        console.info('A user without the correct mod permissions tried to comment mop.');
+        console.info('A user without the correct mod permissions tried to nuke all comments of a post.');
         return {
           message: 'You do you not have the correct mod permissions to do this.',
           success: false,
