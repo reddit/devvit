@@ -232,7 +232,6 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
     message = 'Mop failed! Please try again later.';
     console.error(`${err.toString()}`);
   }
-  
 
   return { success, message };
 }
