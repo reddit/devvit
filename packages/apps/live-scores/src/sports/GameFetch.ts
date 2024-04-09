@@ -54,6 +54,13 @@ export function makeKeyForEventNumber(eventId: string | undefined): string {
   return `eventNumber:${eventId}`;
 }
 
+export function makeKeyForChatUrl(eventId: string | undefined): string {
+  if (eventId === undefined) {
+    throw new Error('Undefined eventId in makeKeyForEventNumber');
+  }
+  return `chatUrl:${eventId}`;
+}
+
 export async function fetchCachedBasketballSummary(
   postId: string,
   scoreInfo: BasketballGameScoreInfo,

@@ -16,6 +16,7 @@ import {
   makeKeyForPostId,
   makeKeyForEventId,
   makeKeyForEventNumber,
+  makeKeyForChatUrl,
 } from '../sports/GameFetch.js';
 import { LoadingState, LoadingStateFootball } from '../components/Loading.js';
 import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
@@ -97,10 +98,11 @@ async function createGamePost(
   gameTitle: string,
   postTitle: string,
   loadingState: JSX.Element
-): Promise<void> {
+): Promise<string | undefined> {
   const success: boolean = await addSubscription(ctx, JSON.stringify(gameSub));
   if (!success) {
-    return ctx.ui.showToast(`An error occurred. Please try again.`);
+    ctx.ui.showToast(`An error occurred. Please try again.`);
+    return undefined;
   }
   const { reddit } = ctx;
   const currentSubreddit = await reddit.getCurrentSubreddit();
@@ -135,10 +137,11 @@ async function createGamePost(
     ctx.kvStore.put(makeKeyForEventId(gameSub.eventId), JSON.stringify(newEventPostIdInfo)),
     ctx.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub)),
   ]);
-  return ctx.ui.showToast({
+  ctx.ui.showToast({
     text: 'Scoreboard Post Created!',
     appearance: 'success',
   });
+  return post.id;
 }
 
 export const srNflGameSelectForm = Devvit.createForm(
@@ -398,6 +401,13 @@ export const srCricketMatchSelectionForm = Devvit.createForm(
           required: false,
           helpText: `Optional post title. Leave blank for auto-generated title.`,
         },
+        {
+          name: 'chatUrl',
+          label: 'Chat Room URL',
+          type: 'string',
+          required: false,
+          helpText: `Optional chat URL. Leave black for not showing the 'Join the Chat button' in the post unit.`,
+        },
       ],
       title: 'Create Scoreboard Post',
       description: `League selected: ${getDisplayNameFromLeague(data['league'])}`,
@@ -407,9 +417,31 @@ export const srCricketMatchSelectionForm = Devvit.createForm(
   },
   async ({ values }, ctx) => {
     const service = APIService.SRCricket;
+    if (values.chatUrl) {
+      if (!validChatURL(values.chatUrl)) {
+        ctx.ui.showToast(
+          `Invalid Chat URL. Please copy the chat URL from mobile app / room / share chat. It should follow the format https://www.reddit.com/r/{subreddit}/s/{chat-id}`
+        );
+        return;
+      }
+    }
     await fetchAndCreateCricketMatchPost(ctx, service, values);
   }
 );
+
+export function validChatURL(str: string): boolean {
+  try {
+    const url = new URL(str);
+    // A chat url follows this shape https://www.reddit.com/r/{subreddit}/s/{chat-id}
+    const paths = url.pathname.split('/');
+    if (paths.length !== 5) {
+      return false;
+    }
+    return url.hostname === 'www.reddit.com' && paths[1] === 'r' && paths[3] === 's';
+  } catch (error) {
+    return false;
+  }
+}
 
 async function fetchAndCreateCricketMatchPost(
   context: Devvit.Context,
@@ -417,6 +449,7 @@ async function fetchAndCreateCricketMatchPost(
   values: Data
 ): Promise<void> {
   const postTitle: string = values.postTitle;
+  const chatUrl: string = values.chatUrl;
   const league: string = values.game[0].split('-')[0];
   const eventId: string = values.game[0].split('-')[1];
   const timezone: string = values.game[0].split('-')[2];
@@ -431,18 +464,28 @@ async function fetchAndCreateCricketMatchPost(
   const gameInfo: GeneralGameScoreInfo | null = await fetchCricketMatch(
     league,
     gameSub.eventId,
-    context
+    context,
+    chatUrl,
+    timezone,
+    eventNumber,
+    eventTotal
   );
 
   let gameTitle: string = '';
   if (gameInfo !== null && gameInfo !== undefined) {
     gameTitle = `${gameInfo.event.homeTeam.fullName} vs ${gameInfo.event.awayTeam.fullName}`;
-    await context.kvStore.put(
-      makeKeyForEventNumber(eventId),
-      eventNumber + '-' + eventTotal + '-' + timezone
-    );
     await context.kvStore.put(makeKeyForSubscription(gameSub), JSON.stringify(gameInfo));
   }
 
-  await createGamePost(context, gameSub, gameTitle, postTitle, LoadingState());
+  const postId = await createGamePost(context, gameSub, gameTitle, postTitle, LoadingState());
+
+  if (postId !== undefined) {
+    await context.redis.set(
+      makeKeyForEventNumber(eventId),
+      eventNumber + '-' + eventTotal + '-' + timezone
+    );
+    if (chatUrl) {
+      await context.redis.set(makeKeyForChatUrl(eventId), chatUrl);
+    }
+  }
 }

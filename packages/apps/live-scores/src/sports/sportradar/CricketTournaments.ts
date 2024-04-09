@@ -57,8 +57,8 @@ function isCricketTournaments(jsonData: unknown): jsonData is CricketTournaments
 }
 
 function filterMatches(games: CricketSportEvent[]): CricketSportEvent[] {
-  const earliestScheduleDate = getRelativeDate(-7);
-  const latestScheduleDate = getRelativeDate(7);
+  const earliestScheduleDate = getRelativeDate(-10);
+  const latestScheduleDate = getRelativeDate(10);
 
   // Filter the games based on start_time
   return games.filter((game) => {

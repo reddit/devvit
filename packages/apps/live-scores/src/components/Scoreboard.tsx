@@ -38,6 +38,7 @@ export type ScoreboardProps = {
   scoreInfo: GeneralGameScoreInfo;
   page: ScoreboardPage;
   setPage: NavigateToPage;
+  onNavigateTo: (url: string) => Promise<void>;
 };
 
 export function GenericScoreBoard(scoreInfo: GeneralGameScoreInfo): JSX.Element {
