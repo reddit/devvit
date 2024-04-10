@@ -12,18 +12,16 @@ import type {
   CricketPlayer,
   CricketTeam,
   CricketInning,
+  BasicCricketMatchInfo,
 } from './CricketModels.js';
 import { CricketQualifierType, CricketEventStatusType } from './CricketModels.js';
-import { makeKeyForChatUrl, makeKeyForEventNumber } from '../GameFetch.js';
 
 export async function fetchCricketMatch(
   league: string,
   matchId: string,
   context: Devvit.Context,
-  chatUrl?: string,
-  timezone?: string,
-  matchNumber?: string,
-  totalMatches?: string
+  postId?: string,
+  basicCricketMatchInfo?: BasicCricketMatchInfo
 ): Promise<CricketMatchScoreInfo | null> {
   let data;
   const apiKey = await context.settings.get(APIKey.cricket);
@@ -38,34 +36,27 @@ export async function fetchCricketMatch(
 
     const match = parseCricketMatch(data);
 
-    if (
-      timezone === null ||
-      timezone === undefined ||
-      matchNumber === null ||
-      matchNumber === undefined ||
-      totalMatches === null ||
-      totalMatches === undefined
-    ) {
-      const matchInfo: string | undefined = await context.redis.get(
-        makeKeyForEventNumber(match.sport_event.id)
+    if (postId && basicCricketMatchInfo === undefined) {
+      const stringJSON = await context.redis.get(
+        makeKeyForCricketMatchInfo(postId, match.sport_event.id)
       );
-      if (matchInfo !== undefined) {
-        matchNumber = matchInfo.split('-')[0];
-        totalMatches = matchInfo.split('-')[1];
-        timezone = matchInfo.split('-')[2];
+      if (stringJSON) {
+        basicCricketMatchInfo = JSON.parse(stringJSON);
       }
     }
 
-    if (chatUrl === null || chatUrl === undefined) {
-      const url = await context.redis.get(makeKeyForChatUrl(match.sport_event.id));
-      chatUrl = url;
-    }
-
-    return cricketMatchInfo(context, league, match, matchNumber, totalMatches, timezone, chatUrl);
+    return cricketMatchInfo(league, match, basicCricketMatchInfo);
   } catch (e) {
     console.error(e);
     return null;
   }
+}
+
+export function makeKeyForCricketMatchInfo(postId: string, eventId: string | undefined): string {
+  if (eventId === undefined) {
+    throw new Error('Undefined eventId in makeKeyForCricketMatchInfo');
+  }
+  return `cricketInfo:${eventId}:${postId}`;
 }
 
 export function parseCricketMatch(jsonData: unknown): CricketMatch {
@@ -73,13 +64,9 @@ export function parseCricketMatch(jsonData: unknown): CricketMatch {
 }
 
 export function cricketMatchInfo(
-  context: Devvit.Context,
   league: string,
   cricketMatch: CricketMatch,
-  matchNumber: string | undefined,
-  totalMatches: string | undefined,
-  timezone: string | undefined,
-  chatUrl: string | undefined
+  basicCricketMatchInfo: BasicCricketMatchInfo | undefined
 ): CricketMatchScoreInfo | null {
   const event = cricketMatch.sport_event;
   const status = cricketMatch.sport_event_status;
@@ -96,11 +83,13 @@ export function cricketMatchInfo(
     cricketMatch.sport_event_status.status === CricketEventStatusType.LIVE ||
     cricketMatch.sport_event_status.status === CricketEventStatusType.INPROGRESS;
 
-  const matchTime = isLive ? 'LIVE' : getMatchTimeString(cricketMatch, new Date(), timezone);
+  const matchTime = isLive
+    ? 'LIVE'
+    : getMatchTimeString(cricketMatch, new Date(), basicCricketMatchInfo?.timezone);
 
   let matchNumberString: string | undefined = undefined;
-  if (matchNumber !== undefined) {
-    const suffix = ordinalSuffixOf(Number(matchNumber));
+  if (basicCricketMatchInfo?.matchNumber !== undefined) {
+    const suffix = ordinalSuffixOf(Number(basicCricketMatchInfo.matchNumber));
     matchNumberString = suffix + ' match';
   }
 
@@ -130,7 +119,7 @@ export function cricketMatchInfo(
     awayTeam,
     sortedBattingResults,
     new Date(),
-    timezone
+    basicCricketMatchInfo?.timezone
   );
 
   const homeStats = getInfoStats(cricketMatch, homeResults);
@@ -162,10 +151,14 @@ export function cricketMatchInfo(
     winningQualifier: winningQualifier,
     firstBattingQualifier: getFirstBattingQualifier(sortedBattingResults),
     bottomBarFirstLine: firstLine,
-    bottomBarSecondLine: getSecondLine(cricketMatch, matchNumber, totalMatches),
+    bottomBarSecondLine: getSecondLine(
+      cricketMatch,
+      basicCricketMatchInfo?.matchNumber,
+      basicCricketMatchInfo?.totalMatches
+    ),
     homeInfoStats: homeStats,
     awayInfoStats: awayStats,
-    chatUrl: chatUrl,
+    chatUrl: basicCricketMatchInfo?.chatUrl,
   };
 }
 

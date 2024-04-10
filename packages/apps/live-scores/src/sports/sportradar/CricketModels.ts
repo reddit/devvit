@@ -14,6 +14,13 @@ export type CricketMatchScoreInfo = GeneralGameScoreInfo & {
   chatUrl: string | undefined;
 };
 
+export type BasicCricketMatchInfo = {
+  timezone?: string;
+  matchNumber?: string;
+  totalMatches?: string;
+  chatUrl?: string;
+};
+
 export type CricketScoreInfoStats = {
   displayOvers: number;
   battingStats?: string;

@@ -9,14 +9,18 @@ import type { GameEvent, GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { compareEvents } from '../sports/GameEvent.js';
 import { fetchNFLBoxscore } from '../sports/sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
-import type { CricketSportEvent } from '../sports/sportradar/CricketModels.js';
-import { fetchCricketMatch } from '../sports/sportradar/CricketMatch.js';
+import type {
+  CricketSportEvent,
+  BasicCricketMatchInfo,
+} from '../sports/sportradar/CricketModels.js';
+import {
+  fetchCricketMatch,
+  makeKeyForCricketMatchInfo,
+} from '../sports/sportradar/CricketMatch.js';
 import {
   makeKeyForSubscription,
   makeKeyForPostId,
   makeKeyForEventId,
-  makeKeyForEventNumber,
-  makeKeyForChatUrl,
 } from '../sports/GameFetch.js';
 import { LoadingState, LoadingStateFootball } from '../components/Loading.js';
 import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
@@ -99,11 +103,6 @@ async function createGamePost(
   postTitle: string,
   loadingState: JSX.Element
 ): Promise<string | undefined> {
-  const success: boolean = await addSubscription(ctx, JSON.stringify(gameSub));
-  if (!success) {
-    ctx.ui.showToast(`An error occurred. Please try again.`);
-    return undefined;
-  }
   const { reddit } = ctx;
   const currentSubreddit = await reddit.getCurrentSubreddit();
   const post: Post = await reddit.submitPost({
@@ -111,6 +110,14 @@ async function createGamePost(
     title: postTitle && postTitle.length > 0 ? postTitle : `Scoreboard: ${gameTitle}`,
     subredditName: currentSubreddit.name,
   });
+
+  gameSub.postId = post.id;
+
+  const success: boolean = await addSubscription(ctx, JSON.stringify(gameSub));
+  if (!success) {
+    ctx.ui.showToast(`An error occurred. Please try again.`);
+    return undefined;
+  }
 
   const eventPostIdInfo = await ctx.kvStore.get<string>(makeKeyForEventId(gameSub.eventId));
   let newEventPostIdInfo: { postIds: string[] } | undefined = undefined;
@@ -449,26 +456,27 @@ async function fetchAndCreateCricketMatchPost(
   values: Data
 ): Promise<void> {
   const postTitle: string = values.postTitle;
-  const chatUrl: string = values.chatUrl;
   const league: string = values.game[0].split('-')[0];
   const eventId: string = values.game[0].split('-')[1];
-  const timezone: string = values.game[0].split('-')[2];
-  const eventNumber: string = values.game[0].split('-')[3];
-  const eventTotal: string = values.game[0].split('-')[4];
   const gameSub: GameSubscription = {
     league: getLeagueFromString(league),
     eventId: eventId,
     service: service,
   };
 
+  const basicCricketMatchInfo: BasicCricketMatchInfo = {
+    timezone: values.game[0].split('-')[2],
+    matchNumber: values.game[0].split('-')[3],
+    totalMatches: values.game[0].split('-')[4],
+    chatUrl: values.chatUrl,
+  };
+
   const gameInfo: GeneralGameScoreInfo | null = await fetchCricketMatch(
     league,
     gameSub.eventId,
     context,
-    chatUrl,
-    timezone,
-    eventNumber,
-    eventTotal
+    undefined,
+    basicCricketMatchInfo
   );
 
   let gameTitle: string = '';
@@ -479,13 +487,10 @@ async function fetchAndCreateCricketMatchPost(
 
   const postId = await createGamePost(context, gameSub, gameTitle, postTitle, LoadingState());
 
-  if (postId !== undefined) {
+  if (basicCricketMatchInfo && postId !== undefined) {
     await context.redis.set(
-      makeKeyForEventNumber(eventId),
-      eventNumber + '-' + eventTotal + '-' + timezone
+      makeKeyForCricketMatchInfo(postId, eventId),
+      JSON.stringify(basicCricketMatchInfo)
     );
-    if (chatUrl) {
-      await context.redis.set(makeKeyForChatUrl(eventId), chatUrl);
-    }
   }
 }

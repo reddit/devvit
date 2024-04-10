@@ -47,20 +47,6 @@ export function makeKeyForEventId(eventId: string | undefined): string {
   return `event:${eventId}`;
 }
 
-export function makeKeyForEventNumber(eventId: string | undefined): string {
-  if (eventId === undefined) {
-    throw new Error('Undefined eventId in makeKeyForEventNumber');
-  }
-  return `eventNumber:${eventId}`;
-}
-
-export function makeKeyForChatUrl(eventId: string | undefined): string {
-  if (eventId === undefined) {
-    throw new Error('Undefined eventId in makeKeyForEventNumber');
-  }
-  return `chatUrl:${eventId}`;
-}
-
 export async function fetchCachedBasketballSummary(
   postId: string,
   scoreInfo: BasketballGameScoreInfo,
@@ -150,6 +136,7 @@ export async function fetchSubscriptions(context: Devvit.Context): Promise<{
     return {
       league: parsedSub['league'],
       eventId: parsedSub['eventId'],
+      postId: parsedSub['postId'],
       service: parsedSub['service'],
       simulationId: parsedSub['simulationId'],
       recordingId: parsedSub['recordingId'],
@@ -264,7 +251,9 @@ function subscriptionFetches(
     } else if (gameSub.service === APIService.SimulatorNBA) {
       eventFetches.push(fetchSimulatedGameScoreInfo(gameSub.eventId, context));
     } else if (gameSub.service === APIService.SRCricket) {
-      eventFetches.push(fetchCricketMatch(gameSub.league, gameSub.eventId, context));
+      eventFetches.push(
+        fetchCricketMatch(gameSub.league, gameSub.eventId, context, gameSub.postId)
+      );
     } else {
       eventFetches.push(fetchScoreForGame(gameSub.eventId, gameSub.league));
     }
