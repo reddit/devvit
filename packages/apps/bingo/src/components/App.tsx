@@ -4,6 +4,7 @@ import { getUserTiles, setUserTiles } from '../api/api.js';
 import { Tile } from './Tile.js';
 import { TileDetails } from './TileDetails.js';
 import type { TileItem } from '../types.js';
+import { BINGO_TILES_COUNT } from '../constants.js';
 
 const createTile = (answer: string): TileItem => ({ text: answer, active: false });
 
@@ -104,7 +105,9 @@ export const App = (context: Devvit.Context): JSX.Element => {
       return answers.map(createTile);
     }
 
-    const shuffledTiles: TileItem[] = shuffleArray(answers).map(createTile);
+    const shuffledTiles: TileItem[] = shuffleArray(answers)
+      .slice(0, BINGO_TILES_COUNT)
+      .map(createTile);
     await setUserTiles(context.redis, context.postId!, currentUserName, shuffledTiles);
     return shuffledTiles;
   });
@@ -296,9 +299,16 @@ export const App = (context: Devvit.Context): JSX.Element => {
               {currentUserName ? (
                 <>
                   <spacer size="xsmall" />
-                  <button size="small" icon="share" appearance="primary" onPress={onSharePress}>
-                    Share
-                  </button>
+                  <hstack
+                    width="32px"
+                    height="32px"
+                    backgroundColor="#EAEDEF"
+                    onPress={onSharePress}
+                    alignment="center middle"
+                    cornerRadius="full"
+                  >
+                    <icon name="share" color="#000000" size="small" />
+                  </hstack>
                 </>
               ) : null}
               <vstack width="8px" />

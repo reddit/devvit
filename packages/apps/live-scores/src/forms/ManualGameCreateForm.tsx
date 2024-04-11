@@ -1,4 +1,5 @@
-import { Devvit, Post } from '@devvit/public-api';
+import type { Post } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
 import { LoadingStateFootball } from '../components/Loading.js';
 import {
@@ -6,7 +7,8 @@ import {
   makeKeyForEventId,
   makeKeyForPostId,
 } from '../sports/GameFetch.js';
-import { GameSubscription, getLeagueFromString, APIService, League } from '../sports/Sports.js';
+import type { GameSubscription } from '../sports/Sports.js';
+import { getLeagueFromString, APIService, League } from '../sports/Sports.js';
 import { fetchNFLSimulationBoxscore } from '../sports/sportradar/NFLBoxscore.js';
 import { addSubscription } from '../subscriptions.js';
 

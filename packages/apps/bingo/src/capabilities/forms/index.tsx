@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 import { CreatePreview } from '../../components/Preview.js';
 import { parse } from 'tldts';
+import { BINGO_TILES_COUNT } from '../../constants.js';
 
 export const REDD_IT: string = 'redd.it';
 export const REDDIT_STATIC: string = 'redditstatic.com';
@@ -32,7 +33,7 @@ export const BingoForm = Devvit.createForm(
       },
       {
         name: 'answers',
-        label: 'Bingo answers (exactly 16 options, use a comma to separate)',
+        label: `Bingo answers (at least ${BINGO_TILES_COUNT} options, use a comma to separate)`,
         type: 'string',
         required: true,
       },
@@ -52,8 +53,8 @@ export const BingoForm = Devvit.createForm(
       .map((answer) => answer.trim())
       .filter((answer) => Boolean(answer));
 
-    if (answers.length !== 16) {
-      ui.showToast('Please enter exactly 16 answers');
+    if (answers.length < BINGO_TILES_COUNT) {
+      ui.showToast(`Please enter at least ${BINGO_TILES_COUNT} answers`);
       return;
     }
 

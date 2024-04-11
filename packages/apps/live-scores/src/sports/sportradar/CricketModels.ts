@@ -6,10 +6,25 @@ export type CricketMatchScoreInfo = GeneralGameScoreInfo & {
   matchNumber?: string;
   location?: string;
   winningQualifier?: CricketQualifierType;
+  firstBattingQualifier: CricketQualifierType;
   bottomBarFirstLine: string;
   bottomBarSecondLine?: string;
-  homeDisplayOvers: string;
-  awayDisplayOvers: string;
+  homeInfoStats: CricketScoreInfoStats;
+  awayInfoStats: CricketScoreInfoStats;
+  chatUrl: string | undefined;
+};
+
+export type BasicCricketMatchInfo = {
+  timezone?: string;
+  matchNumber?: string;
+  totalMatches?: string;
+  chatUrl?: string;
+};
+
+export type CricketScoreInfoStats = {
+  displayOvers: number;
+  battingStats?: string;
+  bowlingStats?: string;
 };
 
 export type CricketMatch = {
@@ -76,12 +91,29 @@ export type CricketTeam = {
 };
 
 export type CricketTeamStatistics = {
-  batting: {
+  batting?: {
     runs: number;
     balls_remaining: number;
     overs_remaining: number;
     wickets_lost: number;
+    players: CricketPlayer[];
   };
+  bowling?: {
+    players: CricketPlayer[];
+  };
+};
+
+export type CricketPlayer = {
+  id: string;
+  name: string;
+  statistics: CricketPlayerStatistic;
+};
+
+export type CricketPlayerStatistic = {
+  balls_faced?: number;
+  runs?: number;
+  conceded_runs?: number;
+  wickets?: number;
 };
 
 export type CricketSportEventStatus = {
@@ -121,10 +153,11 @@ export enum CricketEventStatusType {
 
 export type BattingResult = {
   battingTeamId: string;
+  bowlingTeamId: string;
   inningNumber: number;
-  oversRemaning: number;
+  oversRemaning?: number;
   oversCompleted: number;
-  ballsRemaning: number;
+  ballsRemaning?: number;
   wicketsLost: number;
   runs: number;
   qualifierType: CricketQualifierType;

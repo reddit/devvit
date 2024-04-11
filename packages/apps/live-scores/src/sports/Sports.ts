@@ -1,6 +1,7 @@
 export type GameSubscription = {
   league: League;
   eventId: string;
+  postId?: string;
   service: APIService;
   simulationId?: string;
   recordingId?: string;

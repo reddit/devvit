@@ -356,7 +356,7 @@ export const srCricketScoreboardCreationForm = Devvit.createForm(
           type: 'select',
           required: false,
           options: timezoneOptions,
-          defaultValue: ['Asia/Calcutta'],
+          defaultValue: ['Asia/Kolkata'],
         },
       ],
       title: 'Create Cricket Scoreboard Post',

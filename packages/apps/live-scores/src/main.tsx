@@ -139,6 +139,7 @@ export const AppContent: Devvit.BlockComponent<{
   eventIndexOverride: number | null;
   basketballSummary: BasketballSummary | null;
   spoilerFree: boolean;
+  onNavigateTo: (url: string) => Promise<void>;
 }> = ({
   scoreInfo,
   lastComment,
@@ -159,6 +160,7 @@ export const AppContent: Devvit.BlockComponent<{
   eventIndexOverride,
   basketballSummary,
   spoilerFree,
+  onNavigateTo,
 }) => {
   if (scoreInfo.event.gameType === 'baseball') {
     const baseBallScoreInfo = scoreInfo as BaseballGameScoreInfo;
@@ -166,7 +168,13 @@ export const AppContent: Devvit.BlockComponent<{
   } else if (scoreInfo.event.gameType === 'soccer') {
     const soccerGameScoreInfo = scoreInfo as SoccerGameScoreInfo;
     // Spoiler free default to false until settings page added to soccer
-    return SoccerScoreboard({ scoreInfo: soccerGameScoreInfo, page, setPage, spoilerFree: false });
+    return SoccerScoreboard({
+      scoreInfo: soccerGameScoreInfo,
+      page,
+      setPage,
+      spoilerFree: false,
+      onNavigateTo,
+    });
   } else if (scoreInfo.event.gameType === 'football') {
     const footballGameScoreInfo = scoreInfo as NFLGameScoreInfo;
     return FootballScoreboard(
@@ -191,6 +199,7 @@ export const AppContent: Devvit.BlockComponent<{
       scoreInfo: basketballGameScoreInfo,
       page,
       setPage,
+      onNavigateTo,
       eventIndexOverride: eventIndexOverride ?? -1,
       reactions,
       pastReactions,
@@ -204,7 +213,7 @@ export const AppContent: Devvit.BlockComponent<{
     });
   } else if (scoreInfo.event.gameType === 'cricket') {
     const cricketMatchScoreInfo = scoreInfo as CricketMatchScoreInfo;
-    return CricketScoreboard({ scoreInfo: cricketMatchScoreInfo, page, setPage });
+    return CricketScoreboard({ scoreInfo: cricketMatchScoreInfo, page, setPage, onNavigateTo });
   }
   return GenericScoreBoard(scoreInfo);
 };
@@ -456,6 +465,10 @@ Devvit.addCustomPostType({
         );
       }
       context.ui.showToast(`Scores are ${updatedSetting ? 'now hidden' : 'no longer hidden'}`);
+    };
+
+    const onNavigateTo = async (url: string): Promise<void> => {
+      context.ui.navigateTo(url);
     };
 
     const [scoreInfo, setScoreInfo] = useState(async () => {
@@ -789,6 +802,7 @@ Devvit.addCustomPostType({
           eventIndexOverride={null}
           basketballSummary={null}
           spoilerFree={spoilerFree}
+          onNavigateTo={onNavigateTo}
         />
       );
     }
@@ -839,6 +853,7 @@ Devvit.addCustomPostType({
           eventIndexOverride={eventIndexOverride}
           basketballSummary={summary}
           spoilerFree={spoilerFree}
+          onNavigateTo={onNavigateTo}
         />
       );
     }
@@ -865,6 +880,7 @@ Devvit.addCustomPostType({
         eventIndexOverride={null}
         basketballSummary={null}
         spoilerFree={spoilerFree}
+        onNavigateTo={onNavigateTo}
       />
     );
   },
@@ -958,6 +974,7 @@ Devvit.addSchedulerJob({
               eventIndexOverride={null}
               basketballSummary={null}
               spoilerFree={false}
+              onNavigateTo={async () => {}}
             />
           ));
 

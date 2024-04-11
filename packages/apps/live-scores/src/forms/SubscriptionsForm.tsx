@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-import { GameSubscription } from '../sports/Sports.js';
-import { GeneralGameScoreInfo } from '../sports/GameEvent.js';
+import type { GameSubscription } from '../sports/Sports.js';
+import type { GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { getSubscriptions, removeSubscription } from '../subscriptions.js';
 import { formatDateForForms } from '../sports/Timezones.js';
 import { fetchCachedGameInfoForGameSubscription } from '../sports/GameFetch.js';
@@ -14,6 +14,7 @@ export async function fetchAllSubsAndGames(context: Devvit.Context): Promise<Gam
     return {
       league: parsedSub['league'],
       eventId: parsedSub['eventId'],
+      postId: parsedSub['postId'],
       service: parsedSub['service'],
     };
   });

@@ -15,7 +15,6 @@ import type { GameSettings } from '../types/GameSettings.js';
 interface ReviewPageProps {
   word: string;
   setPage: (page: pages) => void;
-  dailyDrawings: PostData[];
   setDailyDrawings: (drawings: PostData[]) => void;
   data: number[];
   clearData: () => void;
@@ -33,7 +32,6 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
     data,
     clearData,
     cancelConfirmationForm,
-    dailyDrawings,
     setDailyDrawings,
     currentSubreddit,
     username,
@@ -46,6 +44,21 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
   async function submitDrawingHandler(): Promise<void> {
     if (!username) {
       ui.showToast('Please log in to submit a drawing');
+      return;
+    }
+
+    const dailyDrawings = await service.getDailyDrawings(username);
+
+    // check if user has slots to submit the drawing
+    if (dailyDrawings.length >= Settings.dailyDrawingsQuota) {
+      ui.showToast({
+        text: 'No drawings left today',
+        appearance: 'neutral',
+      });
+      // Update the UI
+      setDailyDrawings(dailyDrawings);
+      setPage(isHero ? 'overview' : 'viewer');
+      clearData();
       return;
     }
 

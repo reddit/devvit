@@ -1,13 +1,15 @@
 import { Devvit } from '@devvit/public-api';
 import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
-import type { CricketMatchScoreInfo } from '../sports/sportradar/CricketModels.js';
+import type {
+  CricketMatchScoreInfo,
+  CricketScoreInfoStats,
+} from '../sports/sportradar/CricketModels.js';
 import { CricketQualifierType } from '../sports/sportradar/CricketModels.js';
 import { ScoreboardPage } from './Scoreboard.js';
+import type { ScoreboardProps } from './Scoreboard.js';
 
-export type CricketScoreboardProps = {
+export type CricketScoreboardProps = ScoreboardProps & {
   scoreInfo: CricketMatchScoreInfo;
-  page: ScoreboardPage;
-  setPage: (page: ScoreboardPage) => void;
 };
 
 export function CricketScoreboard(props: CricketScoreboardProps): JSX.Element {
@@ -39,7 +41,7 @@ export type TopBarCricket = {
 export function topBarCricketComponent(cricketProps: TopBarCricket): JSX.Element {
   const { is_live, match_time, league, location } = cricketProps;
 
-  const timeColor = is_live ? 'red' : '';
+  const timeColor = is_live ? '#FF4500' : '';
   // let text = '';
 
   // if (match_number !== undefined && match_number !== null) {
@@ -55,10 +57,30 @@ export function topBarCricketComponent(cricketProps: TopBarCricket): JSX.Element
   return (
     <hstack height="58px" padding="medium" alignment="center middle">
       <hstack alignment="center" grow>
-        <text color={`${timeColor}`} style="heading" size="medium" wrap={true} alignment="center">
-          {match_time}
-        </text>
-        <text style="heading" size="medium" wrap={true} alignment="center">
+        {is_live === true ? (
+          <text color={`${timeColor}`} style="heading" size="medium" wrap={true} alignment="center">
+            {match_time}
+          </text>
+        ) : (
+          <text
+            style="heading"
+            size="medium"
+            wrap={true}
+            alignment="center"
+            lightColor="#181C1F"
+            darkColor="#82959B"
+          >
+            {match_time}
+          </text>
+        )}
+        <text
+          style="heading"
+          size="medium"
+          wrap={true}
+          alignment="center"
+          lightColor="#181C1F"
+          darkColor="#82959B"
+        >
           &nbsp;{text}
         </text>
       </hstack>
@@ -105,16 +127,16 @@ function CricketTeamBlock({
   name,
   logo,
   score,
-  displayOvers,
   state,
   isWinningTeam,
+  stats,
 }: {
   name: string;
   logo: string;
   score?: string;
-  displayOvers: string;
   state: EventState;
   isWinningTeam: boolean;
+  stats: CricketScoreInfoStats;
 }): JSX.Element {
   const [firstLine, secondLine] = splitNameInTwoLines(name);
 
@@ -135,15 +157,39 @@ function CricketTeamBlock({
           ) : null}
         </vstack>
         <spacer grow />
-        <hstack alignment={'bottom'}>
-          <text size="xlarge" weight="bold">
-            {state === EventState.PRE ? '0' : score?.toString()}
-          </text>
-          <spacer size="xsmall" />
-          <text size="medium" weight="bold">
-            {displayOvers}
-          </text>
-        </hstack>
+        <vstack>
+          <hstack alignment={'bottom end'}>
+            <text size="xlarge" weight="bold">
+              {state === EventState.PRE ? '0' : (score ?? 0).toString()}
+            </text>
+            <spacer size="xsmall" />
+            <text size="medium" weight="bold">
+              ({stats.displayOvers})
+            </text>
+          </hstack>
+          {stats.battingStats !== null ? (
+            <text
+              size="xsmall"
+              weight="bold"
+              alignment="end"
+              lightColor="#576F76"
+              darkColor="#82959B"
+            >
+              {stats.battingStats}
+            </text>
+          ) : null}
+          {stats.bowlingStats !== null ? (
+            <text
+              size="xsmall"
+              weight="bold"
+              alignment="end"
+              lightColor="#576F76"
+              darkColor="#82959B"
+            >
+              {stats.bowlingStats}
+            </text>
+          ) : null}
+        </vstack>
         <spacer size="xsmall" />
         {isWinningTeam ? (
           <icon
@@ -164,26 +210,34 @@ function CricketTeamBlock({
 function ScoreComponent(props: CricketScoreboardProps): JSX.Element {
   const scoreInfo = props.scoreInfo;
 
+  const homeTeamBlock = CricketTeamBlock({
+    name: scoreInfo.event.homeTeam.name,
+    logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.homeTeam.logo,
+    score: scoreInfo.homeScore,
+    state: scoreInfo.event.state,
+    isWinningTeam: scoreInfo.winningQualifier === CricketQualifierType.Home,
+    stats: scoreInfo.homeInfoStats,
+  });
+
+  const awayTeamBlock = CricketTeamBlock({
+    name: scoreInfo.event.awayTeam.name,
+    logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.awayTeam.logo,
+    score: scoreInfo.awayScore,
+    state: scoreInfo.event.state,
+    isWinningTeam: scoreInfo.winningQualifier === CricketQualifierType.Away,
+    stats: scoreInfo.awayInfoStats,
+  });
+
   return (
     <zstack height={`148px`} width={'100%'}>
       <vstack width={'100%'} height={'100%'}>
-        {CricketTeamBlock({
-          name: scoreInfo.event.homeTeam.name,
-          logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.homeTeam.logo,
-          score: scoreInfo.homeScore,
-          displayOvers: scoreInfo.homeDisplayOvers,
-          state: scoreInfo.event.state,
-          isWinningTeam: scoreInfo.winningQualifier === CricketQualifierType.Home,
-        })}
+        {props.scoreInfo.firstBattingQualifier === CricketQualifierType.Home
+          ? homeTeamBlock
+          : awayTeamBlock}
         <hstack border="thick" lightBorderColor="#EEF1F3" darkBorderColor="#04090A" />
-        {CricketTeamBlock({
-          name: scoreInfo.event.awayTeam.name,
-          logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.awayTeam.logo,
-          score: scoreInfo.awayScore,
-          displayOvers: scoreInfo.awayDisplayOvers,
-          state: scoreInfo.event.state,
-          isWinningTeam: scoreInfo.winningQualifier === CricketQualifierType.Away,
-        })}
+        {props.scoreInfo.firstBattingQualifier === CricketQualifierType.Home
+          ? awayTeamBlock
+          : homeTeamBlock}
       </vstack>
     </zstack>
   );
@@ -194,11 +248,11 @@ function BottomBar(props: CricketScoreboardProps): JSX.Element {
   return (
     <vstack
       alignment={'middle'}
-      width={'100%'}
       height={`120px`}
       lightBackgroundColor="#EEF1F3"
       darkBackgroundColor="#04090A"
     >
+      <spacer grow />
       <text style="heading" size="medium" weight="bold" alignment="center">
         {scoreInfo.bottomBarFirstLine}
       </text>
@@ -214,6 +268,27 @@ function BottomBar(props: CricketScoreboardProps): JSX.Element {
           {scoreInfo.bottomBarSecondLine}
         </text>
       ) : null}
+      {scoreInfo.chatUrl !== undefined && scoreInfo.chatUrl !== '' ? (
+        <spacer size="medium" />
+      ) : null}
+      {scoreInfo.chatUrl !== undefined && scoreInfo.chatUrl !== '' ? (
+        <hstack alignment={'middle center'}>
+          <spacer grow />
+          <button
+            size="small"
+            appearance="primary"
+            onPress={() => {
+              if (scoreInfo.chatUrl !== undefined) {
+                props.onNavigateTo(scoreInfo.chatUrl).catch((err) => console.log(err));
+              }
+            }}
+          >
+            Join the Chat
+          </button>
+          <spacer grow />
+        </hstack>
+      ) : null}
+      <spacer grow />
     </vstack>
   );
 }
