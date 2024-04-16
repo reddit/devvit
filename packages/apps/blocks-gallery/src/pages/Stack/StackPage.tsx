@@ -5,6 +5,7 @@ import { CategoryPage } from '../../components/CategoryPage.js';
 import { StackDirectionCategory } from './StackDirectionCategory.js';
 import { StackRoundingCategory } from './StackRoundingCategory.js';
 import { StackAlignmentCategory } from './StackAlignmentCategory.js';
+import { StackAlignment2Category } from './StackAlignment2Category.js';
 import { StackGapCategory } from './StackGapCategory.js';
 import { StackPaddingCategory } from './StackPaddingCategory.js';
 import { StackBorderCategory } from './StackBorderCategory.js';
@@ -33,6 +34,11 @@ export const StacksPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
       label: 'Alignment',
       category: 'alignment',
       content: <StackAlignmentCategory state={state} />,
+    },
+    {
+      label: 'Alignment 2',
+      category: 'alignment2',
+      content: <StackAlignment2Category state={state} />,
     },
     {
       label: 'Corner radius',

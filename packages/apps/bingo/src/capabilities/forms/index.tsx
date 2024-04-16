@@ -1,23 +1,9 @@
 import { Devvit } from '@devvit/public-api';
 import { CreatePreview } from '../../components/Preview.js';
-import { parse } from 'tldts';
-import { BINGO_TILES_COUNT } from '../../constants.js';
-
-export const REDD_IT: string = 'redd.it';
-export const REDDIT_STATIC: string = 'redditstatic.com';
-export const REDDIT_MEDIA: string = 'redditmedia.com';
-export const APPROVED_DOMAINS: string[] = [REDD_IT, REDDIT_STATIC, REDDIT_MEDIA];
-export const ApprovedDomainsFormatted: string = APPROVED_DOMAINS.map(
-  (domain) => `"${domain}"`
-).join(', ');
-
-function isRedditImage(imageUrl: string | undefined): boolean {
-  if (!imageUrl) {
-    return true;
-  }
-  const domain = parse(imageUrl).domain;
-  return APPROVED_DOMAINS.includes(domain || '');
-}
+import { BINGO_TILES_COUNT, theme } from '../../constants.js';
+import type { ThemeConfig } from '../../types.js';
+import type { BingoSettings } from '../settings/index.js';
+import { ApprovedDomainsFormatted, isRedditImage } from '../../utils/utils.js';
 
 export const BingoForm = Devvit.createForm(
   {
@@ -38,7 +24,7 @@ export const BingoForm = Devvit.createForm(
         required: true,
       },
       {
-        name: 'backgroundUrl',
+        name: 'theme_appBgImg',
         label: 'Custom background image url (optional)',
         type: 'string',
         required: false,
@@ -46,7 +32,7 @@ export const BingoForm = Devvit.createForm(
       },
     ],
   },
-  async (event, { reddit, subredditId, ui, redis }) => {
+  async (event, { reddit, subredditId, ui, redis, settings }) => {
     const answersRaw: string = event.values.answers;
     const answers: string[] = answersRaw
       .split(',')
@@ -58,11 +44,27 @@ export const BingoForm = Devvit.createForm(
       return;
     }
 
-    const isValidImage = isRedditImage(event.values.backgroundUrl);
-    if (!isValidImage) {
+    const isValidBgImage = isRedditImage(event.values.theme_appBgImg);
+    if (!isValidBgImage) {
       ui.showToast(`Please use images from ${ApprovedDomainsFormatted}.`);
       return;
     }
+
+    const settingsValues = (await settings.getAll()) as BingoSettings;
+
+    const postTheme: ThemeConfig = {
+      appBgImg: event.values.theme_appBgImg || settingsValues.theme_appBgImg || '',
+      logoImg: settingsValues.theme_logoImg || theme.standard.logoImg,
+      logoImgWidth: settingsValues.theme_logoImgWidth || theme.standard.logoImgWidth,
+      appBackgroundColor:
+        settingsValues.theme_appBackgroundColor || theme.standard.appBackgroundColor,
+      tileBg: settingsValues.theme_tileBg || theme.standard.tileBg,
+      tileBgActive: settingsValues.theme_tileBgActive || theme.standard.tileBgActive,
+      tileBorder: settingsValues.theme_tileBorder || theme.standard.tileBorder,
+      tileBorderActive: settingsValues.theme_tileBorderActive || theme.standard.tileBorderActive,
+      tileText: settingsValues.theme_tileText || theme.standard.tileText,
+      tileTextActive: settingsValues.theme_tileTextActive || theme.standard.tileTextActive,
+    };
 
     const title: string = event.values.title;
     const subredditName = (await reddit.getSubredditById(subredditId))?.name;
@@ -75,7 +77,7 @@ export const BingoForm = Devvit.createForm(
 
     //store postID and answers in redis
     await redis.set(post.id, JSON.stringify(answers));
-    await redis.set(`${post.id}_bg`, event.values.backgroundUrl);
+    await redis.set(`${post.id}_theme`, JSON.stringify(postTheme));
 
     ui.showToast(`Bingo board created!`);
     ui.navigateTo(post);

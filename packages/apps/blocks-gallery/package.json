@@ -9,6 +9,8 @@
     "@devvit/shared-types": "0.10.18"
   },
   "devDependencies": {
+    "@devvit/eslint-config": "0.10.18",
+    "@devvit/tsconfig": "0.10.18",
     "typescript": "5.3.2"
   }
 }

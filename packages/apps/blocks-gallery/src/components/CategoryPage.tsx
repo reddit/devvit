@@ -62,6 +62,34 @@ export type CategoryProps = {
 
 export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
   const activeCategory = props.activeCategory || props.categories[0].category;
+  const matchCategory = (categoryProp: CategoryProps) => {
+    return categoryProp.category === activeCategory;
+   };
+  const activeCategoryIndex = Math.max(props.categories.findIndex(matchCategory), 0);
+  const tabCategories = props.categories.slice(Math.max(activeCategoryIndex - 1, 0), Math.min(activeCategoryIndex + 2, props.categories.length));
+  const backTabOnPress = () => {
+    const backCategoryIndex = Math.max(activeCategoryIndex - 1, 0)
+    const backCategory = props.categories[backCategoryIndex].category;
+    props.onCategoryChanged(backCategory)
+  };
+  const forwardTabOnPress = () => {
+    const forwardCategoryIndex = Math.min(activeCategoryIndex + 1, props.categories.length - 1)
+    const forwardCategory = props.categories[forwardCategoryIndex].category;
+    props.onCategoryChanged(forwardCategory)
+  };
+
+  const backTabIcon = <icon
+    name={'back'}
+    color={activeCategoryIndex == 0 ? 'lightgray' : 'black'}
+    onPress={backTabOnPress}
+  />;
+
+  const forwardTabIcon = <icon
+    name={'forward'}
+    color={activeCategoryIndex == props.categories.length-1 ? 'lightgray' : 'black'}
+    onPress={forwardTabOnPress}
+  />;
+
   return (
     <vstack gap="small" grow>
       {/* Header */}
@@ -77,13 +105,15 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
       )}
 
       <Tabs
-        tabs={props.categories.map(({ label, category }) => ({
+        tabs={tabCategories.map(({ label, category }) => ({
           label,
           isActive: category === activeCategory,
           onPress: () => {
             props.onCategoryChanged(category);
           },
         }))}
+        backIcon={backTabIcon}
+        forwardIcon={forwardTabIcon}
       />
 
       {

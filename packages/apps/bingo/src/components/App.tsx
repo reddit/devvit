@@ -4,7 +4,8 @@ import { getUserTiles, setUserTiles } from '../api/api.js';
 import { Tile } from './Tile.js';
 import { TileDetails } from './TileDetails.js';
 import type { TileItem } from '../types.js';
-import { BINGO_TILES_COUNT } from '../constants.js';
+import { BINGO_TILES_COUNT, staticColors, theme } from '../constants.js';
+import type { ThemeConfig } from '../types.js';
 
 const createTile = (answer: string): TileItem => ({ text: answer, active: false });
 
@@ -112,9 +113,29 @@ export const App = (context: Devvit.Context): JSX.Element => {
     return shuffledTiles;
   });
 
-  const [customBg] = context.useState<string | null>(async () => {
-    const imageUrl = await context.redis.get(`${context.postId}_bg`);
-    return imageUrl || null;
+  const [themeConfig] = context.useState<ThemeConfig>(async () => {
+    const postThemeConfigJSON = await context.redis.get(`${context.postId}_theme`);
+    if (!postThemeConfigJSON) {
+      return theme.standard;
+    }
+
+    const postThemeConfig = JSON.parse(postThemeConfigJSON) as ThemeConfig;
+    if (!postThemeConfig) {
+      return theme.standard;
+    }
+
+    return {
+      appBgImg: postThemeConfig.appBgImg || '',
+      logoImg: postThemeConfig.logoImg || theme.standard.logoImg,
+      logoImgWidth: postThemeConfig.logoImgWidth || theme.standard.logoImgWidth,
+      appBackgroundColor: postThemeConfig.appBackgroundColor || theme.standard.appBackgroundColor,
+      tileBg: postThemeConfig.tileBg || theme.standard.tileBg,
+      tileBgActive: postThemeConfig.tileBgActive || theme.standard.tileBgActive,
+      tileBorder: postThemeConfig.tileBorder || theme.standard.tileBorder,
+      tileBorderActive: postThemeConfig.tileBorderActive || theme.standard.tileBorderActive,
+      tileText: postThemeConfig.tileText || theme.standard.tileText,
+      tileTextActive: postThemeConfig.tileTextActive || theme.standard.tileTextActive,
+    };
   });
 
   const [lastSyncedTiles, setLastSyncedTiles] = context.useState<TileItem[]>(
@@ -254,45 +275,60 @@ export const App = (context: Devvit.Context): JSX.Element => {
         text={tile.text}
         active={tile.active}
         onPress={() => onTilePress(index)}
+        themeConfig={themeConfig}
       />
     </>
   );
 
+  const bgImage = themeConfig.appBgImg;
   return (
-    <zstack alignment="center middle" height="100%" width="100%" backgroundColor="#FF4500">
-      <image
-        url={customBg || 'bg.png'}
-        imageWidth={770}
-        imageHeight={320}
-        width={100}
-        height={100}
-        resizeMode="cover"
-        description="Bingo board background"
-      />
+    <zstack
+      alignment="center middle"
+      height="100%"
+      width="100%"
+      backgroundColor={themeConfig.appBackgroundColor}
+    >
+      {bgImage ? (
+        <image
+          url={bgImage}
+          imageWidth={770}
+          imageHeight={320}
+          width={100}
+          height={100}
+          resizeMode="cover"
+          description="Bingo board background"
+        />
+      ) : null}
       {!isConfirmationVisible && !isSuccessVisible && (
         <vstack alignment="top center" height="100%" width="100%">
           <hstack alignment="start middle" height="46px" width="100%">
             <hstack height={100} width={100} alignment="center middle">
               <vstack width="8px" />
               <image
-                url="logo.png"
-                imageWidth="108px"
+                url={themeConfig.logoImg}
+                imageWidth={`${themeConfig.logoImgWidth}px`}
                 imageHeight="32px"
-                width="108px"
+                width={`${themeConfig.logoImgWidth}px`}
                 height="32px"
               />
               <spacer grow />
               <hstack
                 width="32px"
                 height="32px"
-                backgroundColor={isEasyEyeMode ? '#1A282D' : '#EAEDEF'}
+                backgroundColor={
+                  isEasyEyeMode ? staticColors.topRowButtonBgActive : staticColors.topRowButtonBg
+                }
                 onPress={() => setIsEasyEyeMode(!isEasyEyeMode)}
                 alignment="center middle"
                 cornerRadius="full"
               >
                 <icon
                   name="text-size-outline"
-                  color={isEasyEyeMode ? '#FFFFFF' : '#000000'}
+                  color={
+                    isEasyEyeMode
+                      ? staticColors.topRowButtonTextActive
+                      : staticColors.topRowButtonText
+                  }
                   size="small"
                 />
               </hstack>
@@ -302,12 +338,12 @@ export const App = (context: Devvit.Context): JSX.Element => {
                   <hstack
                     width="32px"
                     height="32px"
-                    backgroundColor="#EAEDEF"
+                    backgroundColor={staticColors.topRowButtonBg}
                     onPress={onSharePress}
                     alignment="center middle"
                     cornerRadius="full"
                   >
-                    <icon name="share" color="#000000" size="small" />
+                    <icon name="share" color={staticColors.topRowButtonText} size="small" />
                   </hstack>
                 </>
               ) : null}
@@ -317,13 +353,7 @@ export const App = (context: Devvit.Context): JSX.Element => {
 
           <hstack>
             <vstack width="8px" />
-            <vstack
-              grow
-              alignment="middle center"
-              border="thick"
-              borderColor="#D93A00"
-              cornerRadius="small"
-            >
+            <vstack grow alignment="middle center" border="thick" borderColor="transparent">
               <hstack alignment="middle center">
                 {tiles.slice(0, 4).map((tile, index) => renderTileRow(index, tile))}
               </hstack>

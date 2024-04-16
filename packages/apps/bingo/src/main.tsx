@@ -1,5 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import './capabilities/actions/index.js';
+import './capabilities/settings/index.js';
 import { App } from './components/App.js';
 
 Devvit.configure({
