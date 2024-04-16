@@ -178,6 +178,11 @@ const sidebars = {
       },
       items: ['mod_resources', 'support', 'changelog'],
     },
+    {
+      type: 'doc',
+      label: 'Guidelines',
+      id: 'guidelines',
+    },
   ],
 };
 
