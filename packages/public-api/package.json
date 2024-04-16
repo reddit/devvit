@@ -1,0 +1,74 @@
+{
+  "name": "@devvit/public-api",
+  "version": "0.10.18",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./*": "./dist/*"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "yarn build:icon-types && yarn build:semantic-colors && tsc && cp -a devvit.tsconfig.json dist/ && yarn build:types && yarn build:min && yarn build:unmin",
+    "build:icon-types": "make-icons src/types/icons.ts",
+    "build:min": "esbuild   --bundle --sourcemap=linked --target=es2020 --format=esm  --metafile=dist/meta.min.json --outfile=dist/public-api.min.js --external:@devvit/protos --minify src/index.ts",
+    "build:semantic-colors": "node scripts/make-semantic-colors.js",
+    "build:types": "api-extractor run && sed -ne '/declare global {/,$ p' src/devvit/Devvit.ts >> dist/public-api.d.ts",
+    "build:unmin": "esbuild --bundle --sourcemap=inline --target=es2020 --format=iife --metafile=dist/meta.json     --outfile=dist/public-api.iife.js --global-name=devvitPublicAPI                    src/index.ts",
+    "clean": "rm -rf .turbo api-extractor coverage dist src/devvit/internals/semanticColors.ts src/types/icons.ts || :",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "dev": "tsc -w",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepublishOnly": "publish-package-json",
+    "test": "yarn test:unit && yarn test:types && yarn test:size",
+    "test:size": "filesize",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@devvit/protos": "0.10.18",
+    "@devvit/runtimes": "0.10.18",
+    "@devvit/shared-types": "0.10.18",
+    "base64-js": "1.5.1",
+    "clone-deep": "4.0.1",
+    "core-js": "3.27.2",
+    "lodash.isequal": "4.5.0"
+  },
+  "devDependencies": {
+    "@ampproject/filesize": "4.3.0",
+    "@devvit/eslint-config": "0.10.18",
+    "@devvit/repo-tools": "0.10.18",
+    "@devvit/tsconfig": "0.10.18",
+    "@microsoft/api-extractor": "7.41.0",
+    "@reddit/faceplate-ui": "11.1.0",
+    "@types/clone-deep": "4.0.1",
+    "@types/core-js": "2.5.6",
+    "@types/lodash.isequal": "4.5.6",
+    "@vitest/coverage-c8": "0.32.0",
+    "esbuild": "0.18.12",
+    "eslint": "8.9.0",
+    "typescript": "5.3.2",
+    "vitest": "0.31.0"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  },
+  "filesize": {
+    "dist/public-api.min.js": {
+      "gzip": "77 KB",
+      "none": "255 KB"
+    }
+  },
+  "source": "./src/index.ts"
+}

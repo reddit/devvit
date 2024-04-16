@@ -1,0 +1,37 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`when circuit-breaking: false > receiving request 1`] = `
+{
+  "App.useAsync-0": {
+    "data": null,
+    "error": null,
+    "loading": true,
+  },
+}
+`;
+
+exports[`when circuit-breaking: false > receiving response 1`] = `
+{
+  "data": "hi world!",
+  "error": null,
+  "loading": false,
+}
+`;
+
+exports[`when circuit-breaking: true > receiving request 1`] = `
+{
+  "App.useAsync-0": {
+    "data": null,
+    "error": null,
+    "loading": true,
+  },
+}
+`;
+
+exports[`when circuit-breaking: true > receiving response 1`] = `
+{
+  "data": "hi world!",
+  "error": null,
+  "loading": false,
+}
+`;

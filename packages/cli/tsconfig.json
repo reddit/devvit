@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "exclude": ["node_modules", "src/templates/pen/**/*"],
+  "extends": "@devvit/tsconfig/base.json",
+  "include": ["src/**/*"]
+}

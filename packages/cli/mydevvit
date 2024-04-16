@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -eu
+
+# If MY_PORTAL isn't set, set it to 1 - we want to use a local portal when calling mydevvit,
+# but respect the user's choice if they set a specific name here first
+export MY_PORTAL="${MY_PORTAL:-1}"
+
+if [ "x${MY_PORTAL}" = "x0" ]; then
+	unset MY_PORTAL
+fi
+
+# Hacky symlink-like script to allow generated binaries in development.
+exec "$(dirname "$0")"/bin/devvit.js "$@"

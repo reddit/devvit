@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`useInterval > initial state is stopped 1`] = `
+{
+  "component.useInterval-2": {
+    "duration": {
+      "nanos": 0,
+      "seconds": 1,
+    },
+    "running": false,
+  },
+  "component.useInterval-3": {
+    "duration": {
+      "nanos": 700000000,
+      "seconds": 0,
+    },
+    "running": false,
+  },
+  "component.useState-0": {
+    "foo": "bar",
+  },
+  "component.useState-1": 0,
+}
+`;
+
+exports[`useInterval > you can start inside the render 1`] = `
+{
+  "startInRender.useInterval-0": {
+    "duration": {
+      "nanos": 0,
+      "seconds": 1,
+    },
+    "running": true,
+  },
+}
+`;
+
+exports[`useInterval > you can start inside the render 2`] = `
+{
+  "intervals": {
+    "startInRender.useInterval-0": {
+      "duration": {
+        "nanos": 0,
+        "seconds": 1,
+      },
+    },
+  },
+}
+`;

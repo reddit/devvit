@@ -1,0 +1,36 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`state setter > can be used multiple times in a component 1`] = `
+{
+  "multiComponent.useState-0": 0,
+  "multiComponent.useState-1": "bar",
+  "multiComponent.useState-2": {
+    "hello": "world",
+  },
+}
+`;
+
+exports[`useState > initial state > async initializer resolves 1`] = `
+{
+  "asyncComponent.useAsyncState-0": {
+    "loading": true,
+    "value": null,
+  },
+}
+`;
+
+exports[`useState > initial state > uses the given initial state 1`] = `
+{
+  "syncImportComponent.useState-0": {
+    "foo": "bar",
+  },
+}
+`;
+
+exports[`useState > initial state > uses the given initial state 2`] = `
+{
+  "syncLegacyComponent.useState-0": {
+    "foo": "bar",
+  },
+}
+`;

@@ -1,0 +1,4 @@
+{
+  "extends": "@devvit/tsconfig/base.json",
+  "compilerOptions": { "noEmit": true }
+}

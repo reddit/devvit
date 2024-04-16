@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+
+  "compilerOptions": {
+    // Maximize type checking.
+    // "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    // "noUncheckedIndexedAccess": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "strict": true,
+
+    // Type to ES2020.
+    "lib": ["ES2020", "WebWorker"],
+    "target": "ES2020",
+
+    // Improve compatibility with compilers that aren't type system aware and
+    // don't transform type-only imports.
+    "isolatedModules": true,
+    // "verbatimModuleSyntax": true,
+
+    // Allow JSON type-checking and imports.
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    // Allow and check plain JavaScript.
+    "allowJs": true,
+    "checkJs": true,
+
+    // Improve import support.
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    // Blocks
+    "jsx": "react",
+    "jsxFactory": "Devvit.createElement",
+    "jsxFragmentFactory": "Devvit.Fragment",
+
+    // Required by @devvit/protos.
+    "skipLibCheck": true,
+
+    // Imply unit test imports.
+    "types": ["vitest/globals"]
+  },
+
+  // https://github.com/microsoft/TypeScript/wiki/Performance#misconfigured-include-and-exclude
+  "exclude": ["**/node_modules", "**/.*/"]
+}
