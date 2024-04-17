@@ -8,6 +8,7 @@ export * from './Post.js';
 export * from './PrivateMessage.js';
 export * from './Subreddit.js';
 export * from './User.js';
+export * from './Vault.js';
 export * from './Widget.js';
 export * from './WikiPage.js';
 export * from './PostCollection.js';

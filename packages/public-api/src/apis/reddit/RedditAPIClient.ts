@@ -43,6 +43,7 @@ import type {
   UpdateWikiPageOptions,
   WikiPageRevision,
   WikiPageSettings,
+  Vault,
 } from './models/index.js';
 import {
   AboutLocations,
@@ -59,6 +60,8 @@ import {
   Widget,
   WikiPage,
   getModerationLog,
+  getVaultByAddress,
+  getVaultByUserId,
 } from './models/index.js';
 
 type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;
@@ -1564,5 +1567,31 @@ export class RedditAPIClient {
       },
       this.#metadata
     );
+  }
+
+  /**
+   * Gets a {@link Vault} for the specified address.
+   *
+   * @param {string} address - The address (starting with 0x) of the Vault.
+   * @example
+   * ```ts
+   * const vault = await reddit.getVaultByAddress('0x205ee28744456bDBf180A0Fa7De51e0F116d54Ed');
+   * ```
+   */
+  getVaultByAddress(address: string): Promise<Vault> {
+    return getVaultByAddress(address, this.#metadata);
+  }
+
+  /**
+   * Gets a {@link Vault} for the specified user.
+   *
+   * @param {string} userId - The ID (starting with t2_) of the Vault owner.
+   * @example
+   * ```ts
+   * const vault = await reddit.getVaultByUserId('t2_1w72');
+   * ```
+   */
+  getVaultByUserId(userId: string): Promise<Vault> {
+    return getVaultByUserId(asTID<T2ID>(userId), this.#metadata);
   }
 }

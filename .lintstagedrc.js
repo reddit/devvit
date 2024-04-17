@@ -3,7 +3,7 @@ const eslintConfigDir = path.join(__dirname, './packages/eslint-config/');
 
 module.exports = {
   // This will match unwanted files like .lintstagedrc.js'*.{cjs,js,jsx,mjs,cts,mts,ts,tsx}'
-  '!((.lintstagedrc)|(.yarn/**/*)|(packages/cli/src/templates/pen/src/main)|packages/eslint-config/base).{cjs,js,jsx,mjs,cts,mts,ts,tsx}':
+  '!((.lintstagedrc)|(.yarn/**/*)|(packages/cli/src/templates/pen/src/main)|packages/eslint-config/base|packages/runtime-lite/polyfills/define-global-intl|packages/runtime-lite/src/workers/MobileEntrypoint).{cjs,js,jsx,mjs,cts,mts,ts,tsx}':
     [
       // Since this passes every file along to the linters, and redlint ignores some
       // of our files, it'll throw a warning and refuse to let us commit. Thus, we
