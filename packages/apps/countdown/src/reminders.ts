@@ -1,4 +1,5 @@
-import { Devvit, KVStore, Scheduler } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
+import type { KVStore, Scheduler } from '@devvit/public-api';
 import {
   ONE_MINUTE_IN_MS,
   POST_DATA_KEY,
@@ -44,7 +45,7 @@ export async function setPostReminder(
   scheduler: Scheduler,
   postId: string,
   kvStore: KVStore
-) {
+): Promise<void> {
   const reminderDateTimestamp = new Date(countdownDatetime).getTime() - ONE_MINUTE_IN_MS;
   // not setting any reminders if the event happens soon enough
   if (reminderDateTimestamp <= Date.now()) {
@@ -64,7 +65,11 @@ export const getExistingReminders = async (postId: string, kvStore: KVStore): Pr
   return ((await kvStore.get(postRemindersKey)) as string[] | undefined) || [];
 };
 
-export const addUserReminder = async (userId: string, postId: string, kvStore: KVStore) => {
+export const addUserReminder = async (
+  userId: string,
+  postId: string,
+  kvStore: KVStore
+): Promise<void> => {
   const existingReminders = await getExistingReminders(postId, kvStore);
   // should not happen, but better be safe here
   if (existingReminders.includes(userId)) {
@@ -74,7 +79,11 @@ export const addUserReminder = async (userId: string, postId: string, kvStore: K
   await kvStore.put(POST_REMINDERS_KEY(postId), newReminders);
 };
 
-export const removeUserReminder = async (userId: string, postId: string, kvStore: KVStore) => {
+export const removeUserReminder = async (
+  userId: string,
+  postId: string,
+  kvStore: KVStore
+): Promise<void> => {
   const existingReminders = await getExistingReminders(postId, kvStore);
   // should not happen, but better be safe here
   if (!existingReminders.includes(userId)) {
@@ -88,7 +97,7 @@ export const removePostAssociatedData = async (
   postId: string,
   kvStore: KVStore,
   scheduler: Scheduler
-) => {
+): Promise<void> => {
   const schedulerJobId = await kvStore.get(POST_SCHEDULED_ACTION_KEY(postId));
   if (schedulerJobId) {
     await scheduler.cancelJob(String(schedulerJobId));

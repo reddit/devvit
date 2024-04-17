@@ -1,6 +1,6 @@
 import moment from 'moment-timezone';
 import { TIMEZONES } from './timezones.js';
-import { KVStore } from '@devvit/public-api';
+import type { KVStore } from '@devvit/public-api';
 import { POST_DATA_KEY } from './constants.js';
 
 const MINUTES_IN_HOUR = 60;
@@ -114,7 +114,10 @@ export type CountdownData = {
   img_url: string | null;
 };
 
-export async function getPostAssociatedData(postId: string = 'test', kvStore: KVStore) {
+export async function getPostAssociatedData(
+  postId: string = 'test',
+  kvStore: KVStore
+): Promise<CountdownData | null> {
   if (!postId) {
     return null;
   }

@@ -18,6 +18,7 @@
     "clean": "turbo run clean --output-logs=new-only && rm -rf .husky/_ .eslintcache .nojekyll faceplate-docs",
     "clean:all": "yarn clean && yarn clean:go",
     "clean:go": "make -C devvit-compute-go clean",
+    "clean:nuke": "yarn cache clean --all && git clean -dffx -e .idea -e devvit.iml",
     "clobber": "npx --yes turbo run clobber --output-logs=new-only && rm -rf node_modules",
     "dev": "turbo run dev --output-logs=new-only --parallel",
     "docs:build": "yarn workspace devvit-docs docs:build",

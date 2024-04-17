@@ -5,7 +5,7 @@ export type MediaAsset = {
 
 export type UploadMediaOptions = {
   url: string;
-  type: string;
+  type: 'image' | 'gif' | 'video';
 };
 
 export type MediaPlugin = {
