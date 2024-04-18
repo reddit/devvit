@@ -273,7 +273,7 @@ export default class Upload extends ProjectCommand {
 
     const appCreationRequest = AppCreationRequest.fromPartial({
       name: projectConfig.name,
-      description,
+      description: description ?? '',
       isNsfw,
       categories,
       captcha: '',
@@ -416,7 +416,7 @@ export default class Upload extends ProjectCommand {
 
     // Actually create the app version
     const appVersionCreationRequest = AppVersionCreationRequest.fromPartial({
-      appId: appInfo.app?.id,
+      appId: appInfo.app?.id ?? '',
       visibility,
       about,
       validInstallTypes: [InstallationType.SUBREDDIT], // TODO: Once we have user/global installs, we'll need to ask about this.
@@ -473,7 +473,7 @@ export default class Upload extends ProjectCommand {
             bundler.bundle(
               actorDir,
               ActorSpec.fromPartial({
-                name: actorDir.split(path.sep).at(-1),
+                name: actorDir.split(path.sep).at(-1) ?? '',
                 owner: username,
                 version: version,
               })

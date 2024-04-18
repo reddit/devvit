@@ -115,7 +115,7 @@ export default class Logs extends DevvitCommand {
     );
 
     return RemoteLogSubredditAppNameFilter.fromPartial({
-      subreddit: result.installation?.location?.id,
+      subreddit: result.installation?.location?.id ?? '',
       appName,
     });
   }

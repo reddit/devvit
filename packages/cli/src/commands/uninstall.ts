@@ -65,7 +65,7 @@ export default class Uninstall extends DevvitCommand {
               UUID.fromPartial({ id: installation.id })
             );
             const appVersionInfo = await this.#appVersionClient.Get(
-              UUID.fromPartial({ id: fullInstallInfo.appVersion?.id })
+              UUID.fromPartial({ id: fullInstallInfo.appVersion?.id ?? '' })
             );
             if (appVersionInfo.app?.slug === appName) {
               // This is the one we want to uninstall

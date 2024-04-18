@@ -116,7 +116,7 @@ export default class Playtest extends Upload {
     for (let i = 0; i < 5 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
       // version is still building: wait and try again
       await sleep(1000);
-      const info = await this.appVersionClient.Get(appVersionInfo);
+      const info = await this.appVersionClient.Get({ id: appVersionInfo.id });
 
       if (!info.appVersion) {
         this.error('Something went wrong, no app version available.');

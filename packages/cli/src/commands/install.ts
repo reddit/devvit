@@ -98,7 +98,7 @@ export default class Install extends DevvitCommand {
         } else {
           installationInfo = await this.#installationsClient.Upgrade(
             InstallationUpgradeRequest.fromPartial({
-              id: existingInstallInfo.installation?.id,
+              id: existingInstallInfo.installation?.id ?? '',
               appVersionId: appVersion.id,
             })
           );
