@@ -94,6 +94,7 @@ const sidebars = {
         'custom_posts',
         'custom_post_project_guide',
         'app_image_assets',
+        'post_size',
         'dimensions',
         'working_with_usestate',
         'working_with_useinterval',
