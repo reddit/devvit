@@ -1,4 +1,3 @@
-import { REDDIT_DESKTOP } from '@devvit/dev-server/server/config.js';
 import type { AppVersionInfo, Bundle, FullAppInfo, FullInstallationInfo } from '@devvit/protos';
 import {
   ActorSpec,
@@ -27,6 +26,7 @@ import path from 'path';
 import type { Subscription } from 'rxjs';
 import { filter, map, merge, retry } from 'rxjs';
 import Upload from '../commands/upload.js';
+import { REDDIT_DESKTOP } from '../lib/config.js';
 import { fetchSubredditSubscriberCount } from '../lib/http/gql.js';
 import { PlaytestServer } from '../lib/playtest-server.js';
 import type { CommandFlags } from '../lib/types/oclif.js';

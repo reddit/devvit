@@ -1,6 +1,6 @@
-import stringLength from 'string-length';
 import chalk from 'chalk';
 import os from 'node:os';
+import stringLength from 'string-length';
 
 const STYLES = Object.freeze({
   SINGLE: {
@@ -46,19 +46,19 @@ type BoxOptions = {
   color?: chalk.Chalk;
 };
 
-const defualtBoxOptions: Required<BoxOptions> = {
+const defaultBoxOptions: Required<BoxOptions> = {
   padding: { x: 1, y: 0 },
   style: 'SINGLE',
   color: chalk.white,
 };
 export function logInBox(
   message: string,
-  opts: BoxOptions = defualtBoxOptions,
+  opts: BoxOptions = defaultBoxOptions,
   log: typeof console.log = console.log
 ): void {
-  const padding = opts.padding ?? defualtBoxOptions.padding;
-  const style = STYLES[opts.style ?? defualtBoxOptions.style];
-  const color = opts.color ?? defualtBoxOptions.color;
+  const padding = opts.padding ?? defaultBoxOptions.padding;
+  const style = STYLES[opts.style ?? defaultBoxOptions.style];
+  const color = opts.color ?? defaultBoxOptions.color;
 
   const lines = message.split(os.EOL);
   const maxLength = Math.max(...lines.map((line) => stringLength(line)));

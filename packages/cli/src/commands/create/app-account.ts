@@ -1,10 +1,10 @@
-import { Args, Flags } from '@oclif/core';
-import { DevvitCommand, toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
-import { createAppClient } from '../../util/clientGenerators.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import { getCaptcha } from '../../util/captcha.js';
-import { MY_PORTAL_ENABLED } from '@devvit/dev-server/server/config.js';
+import { Args, Flags } from '@oclif/core';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
+import { MY_PORTAL_ENABLED } from '../../lib/config.js';
+import { getCaptcha } from '../../util/captcha.js';
+import { createAppClient } from '../../util/clientGenerators.js';
+import { DevvitCommand, toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 
 export default class CreateApp extends DevvitCommand {
   static override hidden = true;

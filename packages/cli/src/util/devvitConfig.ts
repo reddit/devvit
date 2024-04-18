@@ -2,9 +2,9 @@ import { writeFile } from 'node:fs/promises';
 import { validateConfig } from '../vendor/@reddit/json-config/0.4.2/index.js';
 import * as v from '../vendor/@reddit/json-config/0.4.2/validators.js';
 
-import { isFile } from '@devvit/dev-server/server/io/file-util.js';
 import type { JSONObject } from '@devvit/shared-types/json.js';
 import path from 'path';
+import { isFile } from './file-util.js';
 import { dumpJsonToYaml, readYamlToJson } from './files.js';
 
 const DEVVIT_CONFIG_FILE = 'devvit.yaml';

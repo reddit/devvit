@@ -1,7 +1,7 @@
 import type {
-  FullAppVersionInfo,
-  FullAppInfo,
   AppInfo,
+  FullAppInfo,
+  FullAppVersionInfo,
   LinkedBundle,
   OptionalVersionVisibility,
 } from '@devvit/protos';
@@ -11,17 +11,17 @@ import {
   InstallationType,
   VersionVisibility,
 } from '@devvit/protos';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
 import chalk from 'chalk';
-import { DEVVIT_PORTAL_URL } from '../util/config.js';
-import { DevvitVersion } from '@devvit/shared-types/Version.js';
+import open from 'open';
 import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import { handleTwirpError } from '../util/twirp-error-handler.js';
 import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
-import { readLine } from '@devvit/dev-server/server/io/input-util.js';
-import open from 'open';
+import { DEVVIT_PORTAL_URL } from '../util/config.js';
+import { readLine } from '../util/input-util.js';
+import { handleTwirpError } from '../util/twirp-error-handler.js';
 
 export default class Publish extends ProjectCommand {
   static override description =

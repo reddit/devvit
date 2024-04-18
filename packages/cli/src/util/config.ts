@@ -3,7 +3,7 @@ import {
   MY_PORTAL_ENABLED,
   REDDIT_DOT_COM,
   STAGE_USER_NAME,
-} from '@devvit/dev-server/server/config.js';
+} from '../lib/config.js';
 
 /** Relative build products directory filename. Used for Bundle JSON. */
 export const distDirFilename: string = 'dist';

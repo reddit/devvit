@@ -16,36 +16,6 @@ import {
   UploadNewMediaRequest,
   VersionVisibility,
 } from '@devvit/protos';
-import { Flags, ux } from '@oclif/core';
-import fs from 'node:fs';
-import fsp from 'node:fs/promises';
-import path from 'node:path';
-import inquirer from 'inquirer';
-import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
-import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
-import type { DevvitConfig } from '../util/devvitConfig.js';
-import { updateDevvitConfig } from '../util/devvitConfig.js';
-import { TwirpError, TwirpErrorCode } from 'twirp-ts';
-import { readPackageJSON } from '../util/package-managers/package-util.js';
-import glob from 'tiny-glob';
-import chalk from 'chalk';
-import { DEVVIT_PORTAL_URL } from '../util/config.js';
-import { Bundler } from '../util/Bundler.js';
-import { dirExists } from '../util/files.js';
-import { ProjectCommand } from '../util/commands/ProjectCommand.js';
-import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import {
-  ACTOR_SRC_DIR,
-  ACTOR_SRC_PRIMARY_NAME,
-  ACTORS_DIR_LEGACY,
-  ASSET_HASHING_ALGO,
-  MAX_ALLOWED_SUBSCRIBER_COUNT,
-} from '@devvit/shared-types/constants.js';
-import tinyglob from 'tiny-glob';
-import { createHash } from 'crypto';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
-import { handleTwirpError } from '../util/twirp-error-handler.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
   ASSET_DIRNAME,
@@ -54,10 +24,39 @@ import {
   MAX_ASSET_NON_GIF_SIZE,
   prettyPrintSize,
 } from '@devvit/shared-types/Assets.js';
-import { MY_PORTAL_ENABLED } from '@devvit/dev-server/server/config.js';
-import { getCaptcha } from '../util/captcha.js';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
+import {
+  ACTORS_DIR_LEGACY,
+  ACTOR_SRC_DIR,
+  ACTOR_SRC_PRIMARY_NAME,
+  ASSET_HASHING_ALGO,
+  MAX_ALLOWED_SUBSCRIBER_COUNT,
+} from '@devvit/shared-types/constants.js';
+import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
+import { Flags, ux } from '@oclif/core';
+import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
+import chalk from 'chalk';
+import { createHash } from 'crypto';
+import inquirer from 'inquirer';
 import { exec } from 'node:child_process';
+import fs from 'node:fs';
+import fsp from 'node:fs/promises';
+import path from 'node:path';
+import { default as glob, default as tinyglob } from 'tiny-glob';
+import { TwirpError, TwirpErrorCode } from 'twirp-ts';
+import { MY_PORTAL_ENABLED } from '../lib/config.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
+import { Bundler } from '../util/Bundler.js';
+import { getCaptcha } from '../util/captcha.js';
+import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
+import { ProjectCommand } from '../util/commands/ProjectCommand.js';
+import { DEVVIT_PORTAL_URL } from '../util/config.js';
+import type { DevvitConfig } from '../util/devvitConfig.js';
+import { updateDevvitConfig } from '../util/devvitConfig.js';
+import { dirExists } from '../util/files.js';
+import { readPackageJSON } from '../util/package-managers/package-util.js';
+import { handleTwirpError } from '../util/twirp-error-handler.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;

@@ -1,16 +1,15 @@
 import type { Hook } from '@oclif/core';
-import type { SemVer } from 'semver';
-import semver from 'semver';
-import fetch from 'node-fetch';
 import { ux } from '@oclif/core';
 import inquirer from 'inquirer';
+import fetch from 'node-fetch';
+import type { SemVer } from 'semver';
+import semver from 'semver';
 
 import UploadCommand from '../../../commands/upload.js';
-import StartCommand from '../../../commands/start.js';
 
 const NPM_REGISTRY_DIST_TAGS_URL = 'https://registry.npmjs.org/-/package/@devvit/cli/dist-tags';
 
-const COMMANDS_TO_CHECK_UPDATES = [UploadCommand.id, StartCommand.id];
+const COMMANDS_TO_CHECK_UPDATES = [UploadCommand.id];
 
 const hook: Hook<'init'> = async function (options) {
   // Check updates

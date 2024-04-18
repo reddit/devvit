@@ -1,8 +1,8 @@
+import type { StoredToken } from '@devvit/protos';
 import type { JSONObject } from '@devvit/shared-types/json.js';
 import fetch from 'node-fetch';
 import { GQL_QUERY_URL } from '../../util/config.js';
-import type { StoredToken } from '@devvit/protos';
-import { MY_PORTAL_ENABLED } from '@devvit/dev-server/server/config.js';
+import { MY_PORTAL_ENABLED } from '../config.js';
 
 // TODO: figure out how to get proper types from graphql.ts in portal
 const IDENTITY_QUERY_HASH = '1936294e5fc812fe34e30c5527b69400a8c44becf417c0c44acffebd3f1632d6';

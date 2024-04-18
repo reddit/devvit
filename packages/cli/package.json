@@ -43,7 +43,6 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@devvit/build-pack": "0.10.18",
-    "@devvit/dev-server": "0.10.18",
     "@devvit/play": "0.0.35",
     "@devvit/protos": "0.10.18",
     "@devvit/public-api": "0.10.18",
@@ -56,7 +55,8 @@
     "@oclif/plugin-help": "5.2.14",
     "@oclif/plugin-not-found": "2.3.34",
     "@oclif/plugin-warn-if-update-available": "2.0.45",
-    "chalk": "5.2.0",
+    "chalk": "4.1.2",
+    "chokidar": "3.5.3",
     "date-fns": "2.29.3",
     "file-type": "18.2.1",
     "get-port": "6.1.2",

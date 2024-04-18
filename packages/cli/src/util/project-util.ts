@@ -1,5 +1,5 @@
-import { isFile } from '@devvit/dev-server/server/io/file-util.js';
 import path from 'node:path';
+import { isFile } from './file-util.js';
 
 const devvitConfigFilename = 'devvit.yaml';
 

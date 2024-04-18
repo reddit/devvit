@@ -1,17 +1,17 @@
-import { DOT_DEVVIT_DIR_FILENAME } from '@devvit/dev-server/server/config.js';
-import { readLine } from '@devvit/dev-server/server/io/input-util.js';
-import { NodeFSAuthenticationPlugin } from '@devvit/dev-server/server/plugins/authentication/NodeFSAuthenticationPlugin.js';
 import type { StoredToken } from '@devvit/protos';
 import { Empty } from '@devvit/protos';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { Command } from '@oclif/core';
 import open from 'open';
+import { NodeFSAuthenticationPlugin } from '../../lib/auth/NodeFSAuthenticationPlugin.js';
+import { DOT_DEVVIT_DIR_FILENAME } from '../../lib/config.js';
+import { readDevvitConfig } from '../../util/devvitConfig.js';
+import { findProjectRoot } from '../../util/project-util.js';
 import { AUTH_CONFIG } from '../auth.js';
 import { createWaitlistClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
+import { readLine } from '../input-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
-import { readDevvitConfig } from '../../util/devvitConfig.js';
-import { findProjectRoot } from '../../util/project-util.js';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`

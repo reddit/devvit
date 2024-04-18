@@ -1,8 +1,8 @@
-import { DEVVIT_PORTAL_URL } from './config.js';
-import open from 'open';
 import inquirer from 'inquirer';
-import { localCodeServer } from '@devvit/dev-server/server/plugins/dev-server/local-code-server.js';
-import { readLine } from '@devvit/dev-server/server/io/input-util.js';
+import open from 'open';
+import { localCodeServer } from '../lib/auth/local-code-server.js';
+import { DEVVIT_PORTAL_URL } from './config.js';
+import { readLine } from './input-util.js';
 
 export type GetCaptchaOptions = {
   copyPaste: boolean;
