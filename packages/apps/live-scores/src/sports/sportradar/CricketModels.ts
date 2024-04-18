@@ -97,10 +97,16 @@ export type CricketTeamStatistics = {
     overs_remaining: number;
     wickets_lost: number;
     players: CricketPlayer[];
+    partnerships: CricketPartnership[];
   };
   bowling?: {
     players: CricketPlayer[];
   };
+};
+
+export type CricketPartnership = {
+  wicket_number: number;
+  end: number;
 };
 
 export type CricketPlayer = {

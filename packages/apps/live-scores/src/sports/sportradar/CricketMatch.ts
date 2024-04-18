@@ -182,10 +182,33 @@ export function getInfoStats(
     ) {
       displayOvers = cricketMatch.sport_event_status.display_overs;
     } else {
-      displayOvers = cricketMatch.sport_event_status.allotted_overs;
+      const battingInning = cricketMatch.statistics.innings
+        .filter((inning) => {
+          return inning.batting_team === battingResult.battingTeamId;
+        })
+        .find(Boolean);
+      if (battingInning) {
+        const teamResults = battingInning.teams
+          .filter((team) => {
+            return team.id === battingResult?.battingTeamId;
+          })
+          .find(Boolean);
+        const partnerships = teamResults?.statistics.batting?.partnerships;
+        if (
+          partnerships &&
+          partnerships.length > 0 &&
+          partnerships[partnerships.length - 1].wicket_number === 10 &&
+          partnerships[partnerships.length - 1].end
+        ) {
+          displayOvers = partnerships[partnerships.length - 1].end;
+        } else {
+          displayOvers = cricketMatch.sport_event_status.allotted_overs;
+        }
+      } else {
+        displayOvers = cricketMatch.sport_event_status.allotted_overs;
+      }
     }
   }
-
   return {
     displayOvers: displayOvers,
     battingStats: getBattingStats(cricketMatch, battingResult?.battingTeamId),
