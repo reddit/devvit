@@ -774,19 +774,69 @@ export namespace Devvit {
       | 'destructive'
       | 'caution'
       | 'success';
+    /**
+     * Affects the button height.
+     * small = 32px;
+     * medium = 40px;
+     * large = 48px;
+     */
     export type ButtonSize = 'small' | 'medium' | 'large';
     export type ColorString = string;
+    /**
+     * thin = 1px;
+     * thick = 2px;
+     */
     export type ContainerBorderWidth = Thickness;
+    /**
+     * small = 8px;
+     * medium = 16px;
+     * large = 24px;
+     */
     export type ContainerCornerRadius = 'none' | 'small' | 'medium' | 'large' | 'full';
+    /**
+     * small = 8px;
+     * medium = 16px;
+     * large = 32px;
+     */
     export type ContainerGap = 'none' | 'small' | 'medium' | 'large';
+    /**
+     * xsmall = 4px;
+     * small = 8px;
+     * medium = 16px;
+     * large = 32px;
+     */
     export type ContainerPadding = 'none' | 'xsmall' | 'small' | 'medium' | 'large';
     export type FullSnooSize = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge';
     export type HorizontalAlignment = 'start' | 'center' | 'end';
+    /**
+     * xsmall = 12px;
+     * small = 16px;
+     * medium = 20px;
+     * large = 24px;
+     */
     export type IconSize = 'xsmall' | 'small' | 'medium' | 'large';
     export type ImageResizeMode = 'none' | 'fit' | 'fill' | 'cover' | 'scale-down';
+    /**
+     * xsmall = 4px;
+     * small = 8px;
+     * medium = 16px;
+     * large = 32px;
+     */
     export type SpacerSize = 'xsmall' | 'small' | 'medium' | 'large';
     export type SpacerShape = 'invisible' | 'thin' | 'square';
+    /**
+     * thin = 1px;
+     * thick = 2px;
+     */
     export type TextOutline = Thickness;
+    /**
+     * xsmall = 10px;
+     * small = 12px;
+     * medium = 14px;
+     * large = 16px;
+     * xlarge = 18px;
+     * xxlarge = 24px;
+     */
     export type TextSize = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge';
     export type TextStyle = 'body' | 'metadata' | 'heading';
     export type TextWeight = 'regular' | 'bold';
