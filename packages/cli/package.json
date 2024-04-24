@@ -55,6 +55,7 @@
     "@oclif/plugin-help": "5.2.14",
     "@oclif/plugin-not-found": "2.3.34",
     "@oclif/plugin-warn-if-update-available": "2.0.45",
+    "@types/ws": "8.5.10",
     "chalk": "4.1.2",
     "chokidar": "3.5.3",
     "date-fns": "2.29.3",
