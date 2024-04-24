@@ -72,4 +72,4 @@ export default Devvit;
 
 ## Test your app
 
-Use `devvit upload` to check your app in a test subreddit (image uploads won’t work in Developer Studio).
+Use `devvit upload` to check your app in a test subreddit.

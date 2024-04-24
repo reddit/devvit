@@ -43,10 +43,6 @@ Once the app is installed, the configuration settings are available on the Insta
 
 ![Config Form Example](./assets/config_form_blank_example.png)
 
-:::note
-
-App configurations are not available in Developer Studio.
-
 :::
 
 ## Input types

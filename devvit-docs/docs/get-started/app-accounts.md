@@ -8,10 +8,6 @@ When a new app is created, the app account is automatically generated when you u
 
 By default, the app account username is based on your app’s identifier. For example, if you run `devvit new my-first-app`, the user account ID will be `my-first-app-zzz`. The three-letter suffix makes creation easy by ensuring your app has a unique name.
 
-:::note
-
-When you’re testing in Developer Studio, the app will act from the developer's user account, not the generated app user account.
-
 :::
 
 ## Permissions
