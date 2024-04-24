@@ -368,11 +368,13 @@ export class User {
   }
 
   /** @internal */
-  static async getFromMetadata(key: string, metadata: Metadata | undefined): Promise<User> {
+  static async getFromMetadata(
+    key: string,
+    metadata: Metadata | undefined
+  ): Promise<User | undefined> {
     assertNonNull(metadata);
     const userId = getFromMetadata(key, metadata);
-    assertNonNull(userId);
-    return User.getById(asT2ID(userId), metadata);
+    return userId ? User.getById(asT2ID(userId), metadata) : Promise.resolve(undefined);
   }
 
   /** @internal */

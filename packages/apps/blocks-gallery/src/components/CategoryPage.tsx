@@ -1,4 +1,5 @@
 import type { UseStateResult } from '@devvit/public-api';
+import { Columns } from '../components/Columns.js';
 import { Devvit } from '@devvit/public-api';
 import type { StatefulProps } from '../state/state.js';
 import { Tabs } from './Tabs.js';
@@ -46,12 +47,18 @@ export type SharedCategoryPageProps = {
   state: CategoryPageState;
 };
 
+export enum CategoryPageType {
+  Tabs,
+  Buttons,
+};
+
 export type CategoryPageProps = SharedCategoryPageProps & {
   title?: string;
   categories: CategoryProps[];
   activeCategory: string;
   onCategoryChanged: (category: string) => void;
   subCategoryPage?: boolean;
+  type?: CategoryPageType;
 };
 
 export type CategoryProps = {
@@ -61,7 +68,8 @@ export type CategoryProps = {
 };
 
 export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
-  const activeCategory = props.activeCategory || props.categories[0].category;
+  const selectedCategory = props.activeCategory
+  const activeCategory = selectedCategory || props.categories[0].category;
   const matchCategory = (categoryProp: CategoryProps) => {
     return categoryProp.category === activeCategory;
    };
@@ -90,7 +98,9 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
     onPress={forwardTabOnPress}
   />;
 
-  return (
+  const pageType = props.type || CategoryPageType.Tabs;
+
+  const tabsPage: JSX.Element = (
     <vstack gap="small" grow>
       {/* Header */}
       {props.subCategoryPage ? (
@@ -122,4 +132,55 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
       }
     </vstack>
   );
+
+  const categoryPageButtons = props.categories.map(({ label, category }) => (
+    <button
+      onPress={() => {
+        props.onCategoryChanged(category);
+      }}
+    >
+      {label}
+    </button>
+  ));
+
+  const buttonsPageBackImpl = () => {
+    if (selectedCategory == null || selectedCategory.length == 0) {
+      console.log(`HERE!!! selected category: ${selectedCategory} home set: ${props.state?.goHome != null}`)
+      props.state?.goHome();
+    } else {
+      props.onCategoryChanged("");
+    }
+  };
+
+  const buttonsPage: JSX.Element = (
+    <vstack gap="small">
+      {/* Header */}
+      {props.subCategoryPage ? (
+        <></>
+      ) : (
+        <hstack alignment="start middle" gap="small">
+          <button onPress={buttonsPageBackImpl} appearance="secondary" size="small" icon="back" />
+          <text selectable={false} size="xlarge" weight="bold" color="neutral-content">
+            {props.title}
+          </text>
+        </hstack>
+      )}  
+
+      { (selectedCategory == null || selectedCategory.length == 0) ? (
+            <Columns count={2}>{categoryPageButtons}</Columns>
+        ) : (
+          <text style={'heading'} selectable={false} color="neutral-content-weak">
+            {selectedCategory}
+          </text>
+        )
+      }
+
+      {
+        // Only show content if category selected
+        props.categories.find((page) => page.category === selectedCategory)?.content ?? null
+      }
+    </vstack>
+  );
+
+  return (pageType === CategoryPageType.Tabs) ? tabsPage : buttonsPage;
 };

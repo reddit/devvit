@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
 import type { CategoryProps, SharedCategoryPageProps } from '../../components/CategoryPage.js';
-import { CategoryPage } from '../../components/CategoryPage.js';
+import { CategoryPage, CategoryPageType } from '../../components/CategoryPage.js';
 import { StackDirectionCategory } from './StackDirectionCategory.js';
 import { StackRoundingCategory } from './StackRoundingCategory.js';
 import { StackAlignmentCategory } from './StackAlignmentCategory.js';
@@ -10,6 +10,7 @@ import { StackGapCategory } from './StackGapCategory.js';
 import { StackPaddingCategory } from './StackPaddingCategory.js';
 import { StackBorderCategory } from './StackBorderCategory.js';
 import { StackReverseCategory } from './StackReverseCategory.js';
+import { StackZStackCategory } from './ZStack/StackZStackCategory.js';
 import { Page } from '../page.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
@@ -55,6 +56,11 @@ export const StacksPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
       category: 'reverse',
       content: <StackReverseCategory />,
     },
+    {
+      label: 'ZStack',
+      category: 'zstack',
+      content: <StackZStackCategory state={state}/>,
+    },
   ];
   return (
     <CategoryPage
@@ -63,6 +69,7 @@ export const StacksPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
       activeCategory={state.category}
       onCategoryChanged={state.setCategory}
       title={StringUtil.capitalize(Page.STACKS)}
+      type={CategoryPageType.Buttons}
     />
   );
 };

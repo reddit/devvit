@@ -315,14 +315,15 @@ export class RedditAPIClient {
 
   /**
    * Get the current calling user based on the provided metadata.
+   * Resolves to undefined for logged-out custom post renders.
    *
-   * @returns A Promise that resolves to a User object.
+   * @returns A Promise that resolves to a User object or undefined
    * @example
    * ```ts
    * const user = await reddit.getCurrentUser(metadata);
    * ```
    */
-  getCurrentUser(): Promise<User> {
+  getCurrentUser(): Promise<User | undefined> {
     return User.getFromMetadata(Header.User, this.#metadata);
   }
 
@@ -336,7 +337,7 @@ export class RedditAPIClient {
    * ```
    */
   getAppUser(): Promise<User> {
-    return User.getFromMetadata(Header.AppUser, this.#metadata);
+    return User.getFromMetadata(Header.AppUser, this.#metadata) as Promise<User>;
   }
 
   /**

@@ -34,7 +34,7 @@ Devvit.addCustomPostType({
     // request once on the first render and cache the result across re-renders.
     const [username] = ctx.useState(async () => {
       const user = await ctx.reddit.getCurrentUser();
-      return user.username;
+      return user!.username;
     });
 
     // Cache the user response, initially empty.
