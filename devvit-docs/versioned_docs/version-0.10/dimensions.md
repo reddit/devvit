@@ -1,81 +1,73 @@
-# Setting dimensions
+# Dimensions
 
-Specify the height and element dimensions.
+Create responsive custom posts.
 
-There are two sets of dimensions that you’ll need to think about when creating a custom post: the height of the post itself and the dimensions of the elements within the post. These dimensions will let you create responsive designs that will render consistently across platforms.
+:::note
+This is an experimental capability that may not be available on older mobile app versions.
+:::
 
-## Post height
+Dimensions provides a way for you to create responsive custom posts by giving you the dimensions of the root node as part of the context object. This lets you write responsive interfaces based on the space available within the context object.
 
-Height is a property on `addCustomPostType`. You can set the height to regular or tall. By default, posts are regular height.
+Dimensions are dynamic and update in real time if the device or viewport changes. You can also resize your screen as you develop to see how your posts respond in real time. This is the same post displayed on a phone (left) and a tablet (right):
 
-### [Playground link](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAbaDJgDoIAgQGEJaMlwAKxMwBUAnoRgAKYBooVIseLwBy0GDzIbhQAFjB4AOYhZN48ZBAyMoHBGDBgQhjeAPpYxGBkMAAelAC8AHxUwe6pZBIYYBROVe4UADyyxFgA1mhlze6toh3dvc0AlMHMGswTmmBFJOQUQmwQEjKU2iIoIHQwGGh4eQgAjMxAA)
+![dimensions](./assets/dimensions.png)
 
-### Code sample
+You can use dimensions to:
+
+- Show a different experience on mobile compared to desktop (e.g., one column on mobile and two columns on desktop)
+- Use pixel-based calculations for precision where percentages won’t work.
+
+## Getting dimensions
+
+Dimension information is specified in density-independent pixels. These pixel units are located on the context object.
+
+| Dimension | Description                                                                                                                                                                |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Height    | The pixel unit height of the custom post. This is a fixed value that will not change based on the height property provided on `Devvit.addCustomPostType`.                  |
+| Width     | The pixel width of the containing box for your custom post.                                                                                                                |
+| Scale     | The [pixel scale](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio) that determines the resolution for how your custom post renders on the device. |
+
+## Example
+
+This example shows a custom post that specifies dimensions.
 
 ```tsx
-import { Devvit } from '@devvit/public-api';
-
 Devvit.addCustomPostType({
-  name: 'Name',
-  height: 'tall',
-  render: (_context) => {
-    return <blocks></blocks>;
+  name: 'Dimensions app',
+  render: (context) => {
+    const {
+      dimensions: { height, width, scale },
+    } = context;
+    return width < 300 ? <SmallApp /> : <BigApp />;
   },
 });
-
-export default Devvit;
 ```
 
-## Elements height and width
-
-Elements in blocks have a height, width, and a corresponding minimum and maximum size for each. Elements are defined using pixels or percentages.
-
-### [Playground Link](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAbaDJgDoIAgQGEJaMlwAKxMwBUAnoRgAKYBooVIseLwBy0GDzIbhQYMGBCGN4A+ljEYGQwAB6UALwAfFTB7qFkEhhgFE5Z7hQAPHRmEFgA1mnF7mpkpQAWlTUUAO54AmTNKTwATACshIk8FM0weADmzWT9w6PjUlXV05wS4UbEMqT9shIBaaWirWSrdQUlDU1nq53dvQsjYxNTs-ODL8ur68Sbxh2ex46xgYR4x1ObVqFGKjRa0IePT6XyWbxmc2eaJWNT+AO2uww-VCAghJzuNUu13cJwq50pxQAlMFmBpmMzNGAkiRyBQhGwIBIZJRtCIUCA6DAMGg8HEEABGZhAA)
-
-### Code sample in pixels
+This example shows that dimensions always references the root element, even if it’s in a child element. Although `MyHeader` is a component within the root element, this does not change the custom post dimensions provided in the context object.
 
 ```tsx
-import { Devvit } from '@devvit/public-api';
-
-Devvit.addCustomPostType({
-  name: 'Name',
-  render: (_context) => {
-    return (
-      <vstack>
-        <hstack width="25px" height="25px" backgroundColor="blue"></hstack>
-        <hstack width="25px" height="25px" backgroundColor="green"></hstack>
-        <hstack width="25px" height="25px" backgroundColor="red"></hstack>
-      </vstack>
-    );
-  },
-});
-
-export default Devvit;
-```
-
-## Min/max height and width
-
-You can also specify the minimum and maximum height and width in your custom post to get the desired layout across platforms. Use `minWidth`, `maxWidth`, `minHeight`, and `maxHeight` to set these parameters.
-
-### [Playground link](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAbaDJgDoIAgQGEJaMlwAKxMwBUAnoRgAKYBooVIseLwBy0GDzIbhQYMGBCGN4A+ljEYGQwAB6UALwAfFTB7qFkEhhgFE5Z7hQAPHRmEFgA1hQA7ngCZAAWKTwAjAAMnYSJPBRQEIkAEjB4AObNZG1dPX0UUlXV45wS4UbEMqRtdjAyW3U8acUlJaXNlTVppQnJFGh4AF4wKWogiYkyEBjjMG9pAGUuDAKAAZb6-Cg2JKUUahUqiW5ka6iC5kJbHAqnMqiCroq7FACUwWYGmYxM0YCSJHIFCEbAgEhklG0Ig0KBAdBgGAecQQ7WYQA)
-
-### Code sample with maxHeight
-
-```tsx
-import { Devvit } from '@devvit/public-api';
+export const MyHeader: Devvit.BlockComponent = (props, context) => {
+  // Dimensions reflect the custom post, not the Header component
+  const {
+    dimensions: { height, width, scale },
+  } = context;
+  return (
+    <vstack width={width < 500 ? '300px' : '500px'} height="20px" backgroundColor="blue">
+      <text>Header</text>
+    </vstack>
+  );
+};
 
 Devvit.addCustomPostType({
   name: 'Name',
   render: (_context) => {
-    return (
-      <vstack width="100px" maxHeight="100px" backgroundColor="yellow">
-        <hstack>
-          <text size="xxlarge">Some Large Text Here</text>
-        </hstack>
-      </vstack>
-    );
+    return <MyHeader />;
   },
 });
-
-export default Devvit;
 ```
+
+## Limitations
+
+- Dimensions are only for the custom post box.
+- Dimensions for specific elements within the custom post box are not supported.
+- Dimensions for specific device screen sizes (phone, tablet, desktop) are not supported.

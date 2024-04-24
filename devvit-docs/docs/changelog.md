@@ -6,7 +6,7 @@ To use the latest version of Devvit, follow the [upgrade instructions](https://d
 
 ## Devvit 0.10.19: Dimensions
 
-**Release Date: April 16, 2024**
+**Release Date: April 24, 2024**
 
 Devvit 0.10.19 lets you build responsive custom posts that render based on the user’s device. You can now use [dimensions](dimensions.md) within the context object to build a responsive app, and this experimental feature lets you resize your screen as you develop to see how your posts will respond in real time.
 
