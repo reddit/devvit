@@ -1,6 +1,7 @@
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 
 export default class Run extends ProjectCommand {
+  static override hidden = true;
   static deprecated = true;
   static override description =
     'DEPRECATED. To test your app, please use `devvit playtest` instead';

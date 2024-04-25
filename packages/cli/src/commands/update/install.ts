@@ -2,6 +2,7 @@ import { Args } from '@oclif/core';
 import { DevvitCommand, toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 
 export default class UpdateInstall extends DevvitCommand {
+  static override hidden = true;
   static deprecated = true;
   static override aliases = ['update'];
 
