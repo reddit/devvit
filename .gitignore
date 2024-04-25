@@ -70,6 +70,7 @@ server/static/
 
 # Go workspace
 go.work.sum
+vendor/
 
 vitest.config.js.timestamp-*.mjs
 
