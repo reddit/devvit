@@ -45,7 +45,9 @@ export type ModeratorPermission =
   | 'config'
   | 'flair'
   | 'chat_operator'
-  | 'chat_config';
+  | 'chat_config'
+  | 'channels'
+  | 'chat_community';
 
 export type CreateRelationshipOptions = {
   subredditName: string;
