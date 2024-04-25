@@ -226,17 +226,14 @@ Devvit.addCustomPostType({
       return reminders.includes(currentUserId);
     });
 
-    const [timeLeft, setTimeLeft] = context.useState(() => {
-      const now = Date.now();
-      const target = new Date(postAssociatedData.dateTime).getTime();
-      return Math.max(target - now, 0);
-    });
+    const now = Date.now();
+    const timeLeft = Math.max(new Date(postAssociatedData.dateTime).getTime() - now, 0);
 
     const isCountdownActive = timeLeft > 0;
 
-    const interval = context.useInterval(() => {
-      setTimeLeft(timeLeft - 1000);
-    }, 1000);
+    // Update the UI every second if there's time left in the countdown.
+    // Time left is recalculated in the component on each render, so call an anonymous function at the interval.
+    const interval = context.useInterval(() => {}, 1000);
 
     if (isCountdownActive) {
       interval.start();
