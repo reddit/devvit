@@ -1,0 +1,35 @@
+{
+  // See also `npx api-extractor init` template for copious documentation.
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+
+  // .d.ts is the only supported input. api-extractor runs on the output of tsc.
+  "mainEntryPointFilePath": "<projectFolder>/dist/index.d.ts",
+
+  // to-do: support @devvit/protos.
+  "bundledPackages": ["@devvit/runtimes", "@devvit/shared-types"],
+
+  "newlineKind": "lf",
+
+  "apiReport": { "enabled": false },
+  "docModel": { "enabled": false },
+  "dtsRollup": { "enabled": true },
+
+  // to-do: reevaluate suppressing these warnings. At time of writing, there
+  // were many and any warning is treated as an error.
+  "messages": {
+    "extractorMessageReporting": {
+      "ae-forgotten-export": { "logLevel": "none" },
+      "ae-missing-release-tag": { "logLevel": "none" }
+    },
+
+    "tsdocMessageReporting": {
+      "tsdoc-param-tag-missing-hyphen": { "logLevel": "none" },
+      "tsdoc-undefined-tag": { "logLevel": "none" },
+      "tsdoc-param-tag-with-invalid-name": { "logLevel": "none" },
+      "tsdoc-escape-right-brace": { "logLevel": "none" },
+      "tsdoc-malformed-inline-tag": { "logLevel": "none" },
+      "tsdoc-param-tag-with-invalid-type": { "logLevel": "none" },
+      "tsdoc-at-sign-in-word": { "logLevel": "none" }
+    }
+  }
+}

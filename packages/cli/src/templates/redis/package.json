@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "name": "redis-template",
+  "version": "0.10.15",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "dependencies": {
+    "@devvit/public-api": "0.10.15"
+  },
+  "devDependencies": {
+    "typescript": "5.3.2"
+  }
+}

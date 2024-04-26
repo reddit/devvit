@@ -1,0 +1,193 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`useForm > emits an effect on render 1`] = `
+{
+  "blocks": {
+    "actions": [],
+    "config": {
+      "rootConfig": {
+        "children": [
+          {
+            "actions": [
+              {
+                "data": {},
+                "id": "App.button.onPress",
+                "type": 0,
+              },
+            ],
+            "config": {
+              "buttonConfig": {
+                "buttonAppearance": undefined,
+                "buttonSize": undefined,
+                "disabled": undefined,
+                "icon": undefined,
+                "text": "Open Form",
+                "textColor": undefined,
+                "textColors": undefined,
+              },
+            },
+            "id": undefined,
+            "key": undefined,
+            "size": undefined,
+            "sizes": undefined,
+            "type": 3,
+          },
+        ],
+        "height": 320,
+      },
+    },
+    "id": undefined,
+    "key": undefined,
+    "size": undefined,
+    "sizes": undefined,
+    "type": 0,
+  },
+  "effects": [
+    {
+      "showForm": {
+        "form": {
+          "acceptLabel": "Yup",
+          "cancelLabel": "Nope",
+          "fields": [
+            {
+              "defaultValue": {
+                "boolValue": undefined,
+                "fieldType": 0,
+                "groupValue": undefined,
+                "isSecret": undefined,
+                "listValue": undefined,
+                "numberValue": undefined,
+                "selectionValue": undefined,
+                "stringValue": undefined,
+              },
+              "disabled": undefined,
+              "fieldConfig": {
+                "booleanConfig": undefined,
+                "groupConfig": undefined,
+                "listConfig": undefined,
+                "numberConfig": undefined,
+                "paragraphConfig": undefined,
+                "selectionConfig": undefined,
+                "stringConfig": {
+                  "maxLength": undefined,
+                  "minLength": undefined,
+                  "placeholder": undefined,
+                },
+              },
+              "fieldId": "name",
+              "fieldType": 0,
+              "helpText": undefined,
+              "isSecret": undefined,
+              "label": "Name",
+              "required": undefined,
+            },
+          ],
+          "id": "form.hook.App.useForm-0.0",
+          "shortDescription": "This is a test form",
+          "title": "Test Form",
+        },
+      },
+      "type": 3,
+    },
+  ],
+  "state": {
+    "__generation": 1,
+  },
+}
+`;
+
+exports[`useForm > test rendering FormSubmittedEvent 1`] = `
+{
+  "blocks": {
+    "actions": [],
+    "config": {
+      "rootConfig": {
+        "children": [
+          {
+            "actions": [],
+            "config": {
+              "stackConfig": {
+                "alignment": undefined,
+                "backgroundColor": undefined,
+                "backgroundColors": undefined,
+                "border": undefined,
+                "children": [
+                  {
+                    "actions": [
+                      {
+                        "data": {},
+                        "id": "App2.vstack.button-0.onPress",
+                        "type": 0,
+                      },
+                    ],
+                    "config": {
+                      "buttonConfig": {
+                        "buttonAppearance": undefined,
+                        "buttonSize": undefined,
+                        "disabled": undefined,
+                        "icon": undefined,
+                        "text": "Open Form",
+                        "textColor": undefined,
+                        "textColors": undefined,
+                      },
+                    },
+                    "id": undefined,
+                    "key": "0",
+                    "size": undefined,
+                    "sizes": undefined,
+                    "type": 3,
+                  },
+                  {
+                    "actions": [],
+                    "config": {
+                      "textConfig": {
+                        "alignment": undefined,
+                        "color": undefined,
+                        "colors": undefined,
+                        "outline": undefined,
+                        "overflow": 1,
+                        "selectable": undefined,
+                        "size": 3,
+                        "style": undefined,
+                        "text": "Genghis Corgi",
+                        "weight": undefined,
+                        "wrap": undefined,
+                      },
+                    },
+                    "id": undefined,
+                    "key": "1",
+                    "size": undefined,
+                    "sizes": undefined,
+                    "type": 2,
+                  },
+                ],
+                "cornerRadius": undefined,
+                "direction": 1,
+                "gap": undefined,
+                "padding": undefined,
+                "reverse": undefined,
+              },
+            },
+            "id": undefined,
+            "key": undefined,
+            "size": undefined,
+            "sizes": undefined,
+            "type": 1,
+          },
+        ],
+        "height": 320,
+      },
+    },
+    "id": undefined,
+    "key": undefined,
+    "size": undefined,
+    "sizes": undefined,
+    "type": 0,
+  },
+  "effects": [],
+  "state": {
+    "App2.useState-0": "Genghis Corgi",
+    "__generation": 2,
+  },
+}
+`;

@@ -108,6 +108,7 @@ whenever possible and iterating over it using a combination of `hscan`, `hkeys` 
 | [hkeys](https://redis.io/commands/hkeys/)     | Returns all field names in the hash stored at key.                              |
 | [hscan](https://redis.io/commands/hscan/)     | Iterates fields of Hash types and their associated values.                      |
 | [hincrby](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value         |
+| [hlen](https://redis.io/commands/hlen/)       | Returns the number of fields contained in the hash stored at key.               |
 
 ### Numbers
 

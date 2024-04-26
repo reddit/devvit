@@ -5,7 +5,7 @@ experience. Our guidelines are designed to protect and enhance the redditor user
 
 ## Reddit Policies apply
 
-Keep in mind that your app must comply with all applicable Reddit Policies, which include the Developer Platform Program Agreement, but also our [User Agreement](https://www.redditinc.com/policies/), [Privacy Policy](https://www.reddit.com/policies/privacy-policy), [Content Policy](https://www.redditinc.com/policies/content-policy) and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements) (“Reddit Terms & Policies”). Based on these policies, Reddit may review your app prior to hosting it, and/or take enforcement actions ranging from temporary suspension to permanent removal of your app, blocking your access to Reddit's Developer Platform, or suspending your developer account.
+Keep in mind that your app must comply with all applicable Reddit policies, which include the Reddit [Developer Terms](https://www.redditinc.com/policies/developer-terms) and [Data API Terms](https://www.redditinc.com/policies/data-api-terms), as well as our [User Agreement](https://www.redditinc.com/policies/), [Privacy Policy](https://www.reddit.com/policies/privacy-policy), [Content Policy](https://www.redditinc.com/policies/content-policy) and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements) (“Reddit Terms & Policies”). Based on these policies, Reddit may review your app prior to hosting it, and/or take enforcement actions ranging from temporary suspension to permanent removal of your app, blocking your access to Reddit's Developer Platform, or suspending your developer account.
 
 ## Devvitquette
 

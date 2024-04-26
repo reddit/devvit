@@ -94,6 +94,7 @@ const sidebars = {
         'custom_posts',
         'custom_post_project_guide',
         'app_image_assets',
+        'post_size',
         'dimensions',
         'working_with_usestate',
         'working_with_useinterval',
@@ -177,6 +178,11 @@ const sidebars = {
         image: '/img/small_snoo.png',
       },
       items: ['mod_resources', 'support', 'changelog'],
+    },
+    {
+      type: 'doc',
+      label: 'Guidelines',
+      id: 'guidelines',
     },
   ],
 };

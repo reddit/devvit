@@ -12,6 +12,18 @@ export type CricketScoreboardProps = ScoreboardProps & {
   scoreInfo: CricketMatchScoreInfo;
 };
 
+enum CricketColor {
+  liveRed = '#FF4500',
+  topBarLightColor = '#181C1F',
+  topBarDarkColor = '#82959B',
+  statsLightColor = '#576F76',
+  statsDarkColor = '#82959B',
+  iconLightColor = '#0F1A1C',
+  iconDarkColor = '#F2F4F5',
+  borderLightColor = '#EEF1F3',
+  borderDarkColor = '#04090A',
+}
+
 export function CricketScoreboard(props: CricketScoreboardProps): JSX.Element {
   return (
     <blocks height="regular">
@@ -41,7 +53,7 @@ export type TopBarCricket = {
 export function topBarCricketComponent(cricketProps: TopBarCricket): JSX.Element {
   const { is_live, match_time, league, location } = cricketProps;
 
-  const timeColor = is_live ? '#FF4500' : '';
+  const timeColor = is_live ? CricketColor.liveRed : '';
   // let text = '';
 
   // if (match_number !== undefined && match_number !== null) {
@@ -67,8 +79,8 @@ export function topBarCricketComponent(cricketProps: TopBarCricket): JSX.Element
             size="medium"
             wrap={true}
             alignment="center"
-            lightColor="#181C1F"
-            darkColor="#82959B"
+            lightColor={CricketColor.topBarLightColor}
+            darkColor={CricketColor.topBarDarkColor}
           >
             {match_time}
           </text>
@@ -78,8 +90,8 @@ export function topBarCricketComponent(cricketProps: TopBarCricket): JSX.Element
           size="medium"
           wrap={true}
           alignment="center"
-          lightColor="#181C1F"
-          darkColor="#82959B"
+          lightColor={CricketColor.topBarLightColor}
+          darkColor={CricketColor.topBarDarkColor}
         >
           &nbsp;{text}
         </text>
@@ -172,8 +184,8 @@ function CricketTeamBlock({
               size="xsmall"
               weight="bold"
               alignment="end"
-              lightColor="#576F76"
-              darkColor="#82959B"
+              lightColor={CricketColor.statsLightColor}
+              darkColor={CricketColor.statsDarkColor}
             >
               {stats.battingStats}
             </text>
@@ -183,8 +195,8 @@ function CricketTeamBlock({
               size="xsmall"
               weight="bold"
               alignment="end"
-              lightColor="#576F76"
-              darkColor="#82959B"
+              lightColor={CricketColor.statsLightColor}
+              darkColor={CricketColor.statsDarkColor}
             >
               {stats.bowlingStats}
             </text>
@@ -196,8 +208,8 @@ function CricketTeamBlock({
             width={'20px'}
             height={'20px'}
             name="caret-left-fill"
-            lightColor="#0F1A1C"
-            darkColor="#F2F4F5"
+            lightColor={CricketColor.iconLightColor}
+            darkColor={CricketColor.iconDarkColor}
           />
         ) : (
           <spacer width={'20px'} height={'20px'} />
@@ -234,7 +246,11 @@ function ScoreComponent(props: CricketScoreboardProps): JSX.Element {
         {props.scoreInfo.firstBattingQualifier === CricketQualifierType.Home
           ? homeTeamBlock
           : awayTeamBlock}
-        <hstack border="thick" lightBorderColor="#EEF1F3" darkBorderColor="#04090A" />
+        <hstack
+          border="thick"
+          lightBorderColor={CricketColor.borderLightColor}
+          darkBorderColor={CricketColor.borderDarkColor}
+        />
         {props.scoreInfo.firstBattingQualifier === CricketQualifierType.Home
           ? awayTeamBlock
           : homeTeamBlock}
@@ -249,8 +265,8 @@ function BottomBar(props: CricketScoreboardProps): JSX.Element {
     <vstack
       alignment={'middle'}
       height={`120px`}
-      lightBackgroundColor="#EEF1F3"
-      darkBackgroundColor="#04090A"
+      lightBackgroundColor={CricketColor.borderLightColor}
+      darkBackgroundColor={CricketColor.borderDarkColor}
     >
       <spacer grow />
       <text style="heading" size="medium" weight="bold" alignment="center">
@@ -262,8 +278,8 @@ function BottomBar(props: CricketScoreboardProps): JSX.Element {
           size="medium"
           weight="bold"
           alignment="center"
-          lightColor="#576F76"
-          darkColor="#82959B"
+          lightColor={CricketColor.statsLightColor}
+          darkColor={CricketColor.statsDarkColor}
         >
           {scoreInfo.bottomBarSecondLine}
         </text>

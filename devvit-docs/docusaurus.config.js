@@ -7,13 +7,13 @@ const darkCodeTheme = themes.dracula;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Developer Platform',
+  title: 'Reddit for Developers',
   tagline: 'An app for anything',
   url: 'https://developers.reddit.com',
   baseUrl: process.env.DOCUSAURUS_BASE_URL ?? '/',
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/64x64.png',
+  favicon: 'img/orangered_icon_devvit_fill.svg',
   markdown: {
     format: 'detect',
   },
@@ -32,9 +32,8 @@ const config = {
   },
   presets: [
     [
-      'classic',
-      /** @type {import('@docusaurus/preset-classic').Options} */
-      ({
+      '@docusaurus/preset-classic',
+      {
         docs: {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: require.resolve('./sidebars.js'),
@@ -44,7 +43,11 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-      }),
+        gtag: {
+          trackingID: 'G-GWE79J8M6R',
+          anonymizeIP: true,
+        },
+      },
     ],
     
   ],

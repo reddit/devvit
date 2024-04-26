@@ -27,10 +27,10 @@ yarn install
 
 ### Check out your post!
 
-4. Open your app in the Devvit studio to test your custom post. Run the following command in the root of your project:
+4. Open your app in your test subreddit. Run the following command in the root of your project:
 
 ```bash
-devvit start
+devvit playtest <replace with your test subreddit name>
 ```
 
 You'll see a "Hello" post that looks like this:

@@ -202,6 +202,10 @@ async function filterSubscriptionsForFetch(
   const filteredSubs: GameSubscription[] = [];
   for (let i = 0; i < subs.length; i++) {
     const sub = subs[i];
+    if (sub.eventId === undefined) {
+      continue;
+    }
+
     const info = await fetchCachedGameInfoForGameSubscription(kvStore, sub);
     console.log(`Checking subscription ${sub.eventId} with event state ${info?.event.state}...`);
     if (info && info.event.state === EventState.LIVE) {

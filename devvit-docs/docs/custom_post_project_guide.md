@@ -12,7 +12,7 @@ This guide will show you how to:
 In this section, you’ll learn how to:
 
 - Build a “Click me” click counter custom post type
-- View and the test your custom post in Developer Studio
+- View and the test your custom post online
 
 ### Start a project​
 
@@ -41,10 +41,10 @@ yarn install
 
 ### Check out your post
 
-Open your app in Developer Studio to test your custom post. Run the following command in the root of your project.
+Open your app in your test subreddit. Run the following command in the root of your project:
 
-```ts
-devvit start
+```bash
+devvit playtest <replace with your test subreddit name>
 ```
 
 You'll see a "Hello" post that looks like this:

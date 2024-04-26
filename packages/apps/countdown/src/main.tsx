@@ -1,4 +1,5 @@
-import { Devvit, MediaPlugin } from '@devvit/public-api';
+import type { MediaPlugin } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { parse } from 'tldts';
 import {
   APPROVED_DOMAINS,
@@ -14,9 +15,8 @@ import {
   removeUserReminder,
   setPostReminder,
 } from './reminders.js';
+import type { CountdownData, CountdownFormData } from './utils.js';
 import {
-  CountdownData,
-  CountdownFormData,
   createDatetime,
   getFormattedDueDate,
   getFormattedTimeLeft,
@@ -25,6 +25,7 @@ import {
   getTimezones,
   truncateString,
 } from './utils.js';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -35,7 +36,7 @@ Devvit.configure({
 
 type DropdownOption = { label: string; value: string };
 
-const mapValueToDropdownOption = (inputValue: string) => {
+const mapValueToDropdownOption = (inputValue: string): DropdownOption => {
   return { value: inputValue, label: inputValue };
 };
 
@@ -45,8 +46,7 @@ async function getRedditImageUrl(imageUrl: string, media: MediaPlugin): Promise<
     return imageUrl;
   }
 
-  const extension = imageUrl.split('.').pop() || 'jpg';
-  const { mediaUrl } = await media.upload({ url: imageUrl, type: extension });
+  const { mediaUrl } = await media.upload({ url: imageUrl, type: 'image' });
   return mediaUrl;
 }
 
@@ -141,6 +141,7 @@ const CountdownForm = Devvit.createForm(
       try {
         imageUrl = formData.img_url ? await getRedditImageUrl(formData.img_url, media) : null;
       } catch (e) {
+        console.log(StringUtil.caughtToString(e));
         ui.showToast('Image upload failed.');
         ui.showToast(`Please use images from ${ApprovedDomainsFormatted}.`);
         return;
@@ -225,17 +226,14 @@ Devvit.addCustomPostType({
       return reminders.includes(currentUserId);
     });
 
-    const [timeLeft, setTimeLeft] = context.useState(() => {
-      const now = Date.now();
-      const target = new Date(postAssociatedData.dateTime).getTime();
-      return Math.max(target - now, 0);
-    });
+    const now = Date.now();
+    const timeLeft = Math.max(new Date(postAssociatedData.dateTime).getTime() - now, 0);
 
     const isCountdownActive = timeLeft > 0;
 
-    const interval = context.useInterval(() => {
-      setTimeLeft(timeLeft - 1000);
-    }, 1000);
+    // Update the UI every second if there's time left in the countdown.
+    // Time left is recalculated in the component on each render, so call an anonymous function at the interval.
+    const interval = context.useInterval(() => {}, 1000);
 
     if (isCountdownActive) {
       interval.start();
@@ -252,7 +250,7 @@ Devvit.addCustomPostType({
     const hasLink = Boolean(postAssociatedData.link_url);
     const imgUrl = postAssociatedData.img_url;
 
-    const renderLinkButton = () => {
+    const renderLinkButton = (): JSX.Element => {
       if (!postAssociatedData.link_url) {
         return null;
       }
@@ -275,7 +273,7 @@ Devvit.addCustomPostType({
       );
     };
 
-    const renderContentCountdown = () => {
+    const renderContentCountdown = (): JSX.Element => {
       if (!formattedTimeLeft) {
         return null;
       }
@@ -309,7 +307,7 @@ Devvit.addCustomPostType({
       ));
     };
 
-    const toggleReminder = async () => {
+    const toggleReminder = async (): Promise<void> => {
       // impossible in practice, just a typeguard
       if (!currentUserId) {
         return;
@@ -328,7 +326,7 @@ Devvit.addCustomPostType({
     const isEnoughTimeForReminder = timeLeft > 2 * ONE_MINUTE_IN_MS;
     const isReminderActive = isEnoughTimeForReminder && isReminderSet;
 
-    function renderReminderButton() {
+    function renderReminderButton(): JSX.Element {
       if (!currentUserId) {
         return null;
       }
@@ -347,7 +345,7 @@ Devvit.addCustomPostType({
       );
     }
 
-    function renderSmallReminderButton() {
+    function renderSmallReminderButton(): JSX.Element {
       if (!currentUserId) {
         return null;
       }
@@ -363,7 +361,7 @@ Devvit.addCustomPostType({
       );
     }
 
-    function renderPostBottom() {
+    function renderPostBottom(): JSX.Element {
       if (imgUrl) {
         return (
           <>

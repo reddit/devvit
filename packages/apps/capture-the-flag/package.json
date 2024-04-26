@@ -1,14 +1,14 @@
 {
   "private": true,
   "name": "capture-the-flag",
-  "version": "0.10.18",
+  "version": "0.10.19",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.18"
+    "@devvit/public-api": "0.10.19"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.18",
+    "@devvit/tsconfig": "0.10.19",
     "typescript": "5.3.2",
     "vitest": "0.31.0"
   }

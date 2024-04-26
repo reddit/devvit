@@ -1,0 +1,120 @@
+{
+  "name": "@devvit/cli",
+  "version": "0.10.19",
+  "description": "Reddit's Dev Platform CLI Tool",
+  "license": "BSD-3-Clause",
+  "author": "@reddit/dev-platform",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./*": "./dist/*",
+    "./bin/devvit": "./bin/devvit.js"
+  },
+  "bin": {
+    "devvit-cli": "./bin/devvit.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc && yarn build:copy",
+    "build:copy": "cp -a ./src/util/templates ./dist/util; rm -rf ./dist/templates; cp -a ./src/templates ./dist/templates",
+    "clean": "rm -rf .turbo coverage dist docs.json oclif.manifest.json",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "dev": "tsc --watch",
+    "install:dev": "./scripts/install.sh",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepack": "yarn build && oclif manifest",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "test": "concurrently -n 'unit,types,lint,oclif' 'yarn test:unit' 'yarn test:types' 'yarn test:lint' 'yarn test:oclif'",
+    "test:lint": "yarn lint",
+    "test:oclif": "oclif manifest",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@devvit/build-pack": "0.10.19",
+    "@devvit/play": "0.0.35",
+    "@devvit/protos": "0.10.19",
+    "@devvit/public-api": "0.10.19",
+    "@devvit/runtimes": "0.10.19",
+    "@devvit/shared-types": "0.10.19",
+    "@improbable-eng/grpc-web": "0.15.0",
+    "@improbable-eng/grpc-web-node-http-transport": "0.15.0",
+    "@oclif/core": "2.9.4",
+    "@oclif/plugin-autocomplete": "2.3.3",
+    "@oclif/plugin-help": "5.2.14",
+    "@oclif/plugin-not-found": "2.3.34",
+    "@oclif/plugin-warn-if-update-available": "2.0.45",
+    "@types/ws": "8.5.10",
+    "chalk": "4.1.2",
+    "chokidar": "3.5.3",
+    "date-fns": "2.29.3",
+    "file-type": "18.2.1",
+    "get-port": "6.1.2",
+    "inquirer": "9.1.4",
+    "isomorphic-git": "1.21.0",
+    "js-yaml": "4.1.0",
+    "listr": "0.14.3",
+    "lookpath": "1.2.2",
+    "mustache": "4.2.0",
+    "node-fetch": "3.3.0",
+    "open": "8.4.0",
+    "ps-node": "^0.1.6",
+    "rxjs": "7.8.1",
+    "semver": "7.5.0",
+    "string-length": "5.0.1",
+    "tiny-glob": "0.2.9",
+    "tsv": "0.2.0",
+    "twirp-ts": "2.5.0",
+    "ws": "8.11.0"
+  },
+  "devDependencies": {
+    "@devvit/eslint-config": "0.10.19",
+    "@devvit/repo-tools": "0.10.19",
+    "@devvit/tsconfig": "0.10.19",
+    "@types/file-type": "10.9.1",
+    "@types/inquirer": "9.0.3",
+    "@types/js-yaml": "4.0.5",
+    "@types/mustache": "4.2.2",
+    "@types/node": "18.18.2",
+    "@types/open": "6.2.1",
+    "@types/ps-node": "0.1.1",
+    "@types/tsv": "0.2.1",
+    "chai": "4.3.7",
+    "concurrently": "7.5.0",
+    "eslint": "8.9.0",
+    "oclif": "3.10.0",
+    "shx": "0.3.4",
+    "tmp-promise": "3.0.3",
+    "typescript": "5.3.2",
+    "vitest": "0.31.0"
+  },
+  "engines": {
+    "node": ">=18.18.2"
+  },
+  "oclif": {
+    "bin": "devvit",
+    "dirname": "devvit",
+    "commands": "./dist/commands",
+    "flexibleTaxonomy": true,
+    "plugins": [
+      "@oclif/plugin-not-found",
+      "@oclif/plugin-warn-if-update-available"
+    ],
+    "helpClass": "./dist/lib/help",
+    "topicSeparator": " ",
+    "hooks": {
+      "init": "./dist/lib/hooks/init/check-update.js"
+    }
+  }
+}

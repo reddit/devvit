@@ -1,4 +1,5 @@
-import { Context, KVStore } from '@devvit/public-api';
+import type { Context, KVStore } from '@devvit/public-api';
+import type { GameSubscription } from './sports/Sports.js';
 
 const MAX_SUBSCRIPTIONS = 10;
 const ALL_SUBSCRIPTIONS_KEY = 'subscriptions';
@@ -18,7 +19,7 @@ export async function getSubscriptions(kvStore: KVStore, key?: string): Promise<
       return [];
     }
     return subscriptions.filter((sub) => key === undefined || key === sub);
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.log('Error during subscriptions fetch:', e);
   }
   return [];
@@ -49,7 +50,7 @@ export async function addSubscription(ctx: Context, key: string): Promise<boolea
   subscriptions.push(key);
   try {
     await ctx.kvStore.put(ALL_SUBSCRIPTIONS_KEY, subscriptions);
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.log('Error during subscriptions store: ' + e);
     return false;
   }
@@ -64,15 +65,30 @@ export async function addSubscription(ctx: Context, key: string): Promise<boolea
  * @returns boolean whether the operation succeeded
  */
 export async function removeSubscription(kvStore: KVStore, key: string): Promise<boolean> {
-  const subscriptions: string[] = await getSubscriptions(kvStore);
-  const index = subscriptions.indexOf(key, 0);
+  const gameSubscription: GameSubscription = JSON.parse(key);
+  const subscriptionsStrings: string[] = await getSubscriptions(kvStore);
+
+  const subscriptions = subscriptionsStrings.flatMap((subscriptionString) => {
+    const gameSubscription: GameSubscription = JSON.parse(subscriptionString);
+    return gameSubscription;
+  });
+
+  const index = subscriptions.findIndex((subs) => {
+    return (
+      subs.league === gameSubscription.league &&
+      subs.service === gameSubscription.service &&
+      subs.eventId === gameSubscription.eventId &&
+      subs.postId === gameSubscription.postId
+    );
+  });
+
   if (index < 0) {
     return true;
   }
-  subscriptions.splice(index, 1);
+  subscriptionsStrings.splice(index, 1);
   try {
-    await kvStore.put(ALL_SUBSCRIPTIONS_KEY, subscriptions);
-  } catch (e: any) {
+    await kvStore.put(ALL_SUBSCRIPTIONS_KEY, subscriptionsStrings);
+  } catch (e: unknown) {
     console.log('Error during subscriptions store:', e);
     return false;
   }

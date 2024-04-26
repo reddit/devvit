@@ -1,4 +1,4 @@
-# @devvit/public-api - v0.10.18
+# @devvit/public-api - v0.10.19
 
 ## Table of contents
 

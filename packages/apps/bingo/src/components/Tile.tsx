@@ -1,10 +1,12 @@
 import { Devvit } from '@devvit/public-api';
+import type { ThemeConfig } from '../types.js';
 
 type TileProps = {
   text: string;
   active: boolean;
   isEasyEyeMode: boolean;
   onPress: () => void | Promise<void>;
+  themeConfig: ThemeConfig;
 };
 
 export const wrapText = (
@@ -54,24 +56,24 @@ export const wrapText = (
 };
 
 export const Tile = (props: TileProps): JSX.Element => {
-  const { text, active, onPress } = props;
+  const { text, active, themeConfig, onPress } = props;
   const chunkedText = wrapText(text, props.isEasyEyeMode ? 11 : 12, props.isEasyEyeMode ? 3 : 4);
 
   return (
     <hstack
-      backgroundColor={active ? '#55BD46' : '#FFFFFF'} //selected : unselected
+      backgroundColor={active ? themeConfig.tileBgActive : themeConfig.tileBg} //selected : unselected
       height="66px"
       width="79px"
       alignment="center middle"
       onPress={onPress}
       border="thin"
-      borderColor={active ? '#4caa3f' : '#e5e5e5'}
+      borderColor={active ? themeConfig.tileBorderActive : themeConfig.tileBorder}
     >
       <vstack grow width={100} height={100} alignment="center middle">
         {chunkedText.map((row) => (
           <text
             selectable={false}
-            color={active ? 'white' : 'black'}
+            color={active ? themeConfig.tileTextActive : themeConfig.tileText}
             weight="bold"
             size={props.isEasyEyeMode ? 'small' : 'xsmall'}
           >

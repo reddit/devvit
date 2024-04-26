@@ -29,9 +29,8 @@ export const StackAlignmentPreview = ({ mode }: { mode: string }): JSX.Element =
 
   const content = options.map(([label, style]) => (
     <Tile label={label} padding="small">
-      <zstack alignment={style as Alignment} backgroundColor="#EAEDEF">
-        <Box size={2} />
-        <Box size={1} color="#0045AC" rounded />
+      <zstack height="64px" width="64px" alignment={style as Alignment} backgroundColor="#EAEDEF">
+        <zstack height="32px" width="32px" backgroundColor="#0045AC" cornerRadius="full" />
       </zstack>
     </Tile>
   ));
