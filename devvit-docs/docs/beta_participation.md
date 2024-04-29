@@ -1,4 +1,4 @@
-# Beta Participation
+# Beta participation
 
 ## Support
 

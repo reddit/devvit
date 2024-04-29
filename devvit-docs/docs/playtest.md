@@ -1,16 +1,12 @@
-# Playtest your app
+# Playtest
 
-Test your app while it's still in development.
+Playtest lets your test your app while it's still in development. Playtest installs your app to a test subreddit and uploads a new version whenever you save changes to your app code. You can see your app changes and logs in real time using real data.
 
-Playtest installs your app to a test subreddit and uploads a new version whenever you save changes to your app code. You can see your app changes and logs in real time using real data.
-
-One caveat: your test subreddit cannot have more than 50 members. Once installed, your playtest app will be visible to other users on the subreddit.
+One caveat: your test subreddit cannot have more than 50 subscribers. Once installed, your playtest app will be visible to other users on the subreddit.
 
 ## Start a playtest
 
-To start a playtest:
-
-1. Run `devvit upload` to upload your app to the Community Apps directory.
+1. Run `devvit upload` to upload your app to the Apps directory.
 2. Open a terminal and enter this command from the root of your project.
 
 ```bash
@@ -59,4 +55,4 @@ $ devvit upload
 
 This will automatically bump your app version to the next patch release. For example, if your playtest version is 0.0.1.6, the upload command will remove the playtest version increment and change your app version to 0.0.2.
 
-Once you [publish your app](./publish.md) to the Community Apps Directory, it will be available for users to install.
+Once you [publish your app](./dev_guide.mdx/#9publish) to the Apps Directory, it will be available for users to install.
