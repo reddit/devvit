@@ -46,8 +46,13 @@ async function getRedditImageUrl(imageUrl: string, media: MediaPlugin): Promise<
     return imageUrl;
   }
 
-  const { mediaUrl } = await media.upload({ url: imageUrl, type: 'image' });
-  return mediaUrl;
+  try {
+    const { mediaUrl } = await media.upload({ url: imageUrl, type: 'image' });
+    return mediaUrl;
+  } catch (e) {
+    console.log(StringUtil.caughtToString(e));
+    throw new Error('Image upload failed');
+  }
 }
 
 const TIME_VALUES: DropdownOption[] = getHourOptions(2).map(mapValueToDropdownOption);
