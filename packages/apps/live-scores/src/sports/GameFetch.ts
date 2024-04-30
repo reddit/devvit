@@ -216,9 +216,17 @@ async function filterSubscriptionsForFetch(
       const lastFetch = info.generatedDate ? new Date(info.generatedDate) : null;
       const closeToGameThreshold = CLOSE_TO_GAME_THRESHOLD_HOURS * MS_TO_HOURS;
       const stalePregameThreshold = STALE_INFO_THRESHOLD_HOURS * MS_TO_HOURS;
+      const isCricketGameSkipException = (): boolean => {
+        // For cricket we will keep the subscription for 24hrs after the game reached FINAL state, but we don't want to keep
+        // fetching every time, so we add this exception check to skip and it should only fetch every hour when game ended.
+        return (
+          (info.event.gameType === 'cricket' && info.event.state !== EventState.FINAL) ||
+          info.event.gameType !== 'cricket'
+        );
+      };
       if (
         lastFetch === null ||
-        start.getTime() - now.getTime() < closeToGameThreshold ||
+        (start.getTime() - now.getTime() < closeToGameThreshold && isCricketGameSkipException()) ||
         now.getTime() - lastFetch.getTime() > stalePregameThreshold
       ) {
         filteredSubs.push(sub);
