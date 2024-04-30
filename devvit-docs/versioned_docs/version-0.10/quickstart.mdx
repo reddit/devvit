@@ -1,0 +1,55 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Quickstart
+
+Here's the tl;dr for building on the Developer Platform. Apps are written in [TypeScript](https://www.typescriptlang.org/). Before you get started, ensure that [Node.js](https://nodejs.org/) is installed. Additionally, you'll need to moderate ('everything' permissions) a test [subreddit](https://mods.reddithelp.com/hc/en-us/articles/360001766991-How-to-create-a-subreddit) (less than 50 members).
+
+Run the following commands to install the [`@devvit`](https://www.npmjs.com/package/devvit) CLI, then create, upload, and preview your app:
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+```bash
+npm install -g devvit
+devvit login
+devvit new my-project
+cd my-project
+devvit upload
+devvit playtest <your-subreddit>
+```
+  </TabItem>
+  <TabItem value="yarn" label="Yarn">
+```bash
+yarn global add devvit
+devvit login
+devvit new my-project
+cd my-project
+devvit upload
+devvit playtest <your-subreddit>
+```
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm" default>
+```bash
+pnpm install -g devvit
+devvit login
+devvit new my-project
+cd my-project
+devvit upload
+devvit playtest <your-subreddit>
+```
+  </TabItem>
+</Tabs>
+
+Visit your subreddit and interact with your app. As you make and save code modifications, playtest will automatically build and deploy the app to your subreddit. Simply refresh the page to view the latest changes.
+
+While the playtest is active, you will be streaming logs from the app. This is useful for debugging and gaining insights into how your app is running.
+
+To stop the playtest, press `Ctrl + c`.
+
+## Next steps
+
+Now you know how to create and deploy apps! Next up, try the following:
+
+- Check out the [examples](examples/overview.mdx) to see what others have created.
+- Learn how to [publish](dev_guide/#9-publish) your app and make it public in the Apps directory.
+- Follow the [Remind Me](examples/tutorials/remind_me.md) tutorial.

@@ -19,9 +19,14 @@ const sidebars = {
       id: 'introduction',
     },
     {
+      type: 'doc',
+      label: 'Quickstart',
+      id: 'quickstart',
+    },
+    {
       type: 'category',
       label: 'Getting started',
-      items: ['quickstart', 'dev_guide', 'about_devvit'],
+      items: ['dev_guide', 'about_devvit'],
     },
     {
       type: 'category',
