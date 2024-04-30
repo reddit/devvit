@@ -25,7 +25,7 @@ Please use one of these labels when submitting a new issue:
 Once issues are added to our internal tracking system, they will be labeled as “synced”.
 
 ## Security issues
-Security issues take special priority and are handled separately from our public tracker via [Hackerone](https://www.hackerone.com/). Please do not submit security issues here on GitHub, as all issues are public and publishing them increases the risk of abuse.
+Security issues take special priority and are handled separately from our public tracker via [Hackerone](https://www.hackerone.com/reddit?type=team). Please do not submit security issues here on GitHub, as all issues are public and publishing them increases the risk of abuse.
 
 ## How to make a pull request
 Make sure to fork the repository and create a new branch when making changes to a project. Full instructions on setting up dependencies from your branch off our monorepo are detailed below. If you need to brush up on the process of creating a PR, [learn more here](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project).
@@ -40,7 +40,7 @@ Make sure to fork the repository and create a new branch when making changes to 
 
 ## When changes are reviewed
 
-We'll try to review your PR as soon as possible within one business week of submission. Small changes or updates to our documention will be faster than changes made to other projects, especially apps. Please note that all not PRs will be accepted and review times may vary.
+We'll try to review your PR as soon as possible within one business week of submission. Small changes or updates to our documention will be faster than changes made to other projects, especially apps. Please note that not all PRs will be accepted and review times may vary.
 
 # reddit-devplatform-monorepo
 
@@ -74,10 +74,10 @@ maintain that lockfile internally, so you don't need to worry about it in this r
 
 ### Running commands for a specific workspace
 
-- Top level `yarn <foo>` commands run through [turborepo](https://github.com/vercel/turborepo for
+- Top level `yarn <foo>` commands run through [turborepo](https://github.com/vercel/turborepo) for
   all packages
-- `yarn workspace <package-name> foo` will do `yarn run foo`only for the package with matching
-  `<package-name>`field from a specific `package.json`
+- `yarn workspace <package-name> foo` will do `yarn run foo` only for the package with matching
+  `<package-name>` field from a specific `package.json`
 
 ### Build all packages
 
