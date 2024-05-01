@@ -6,6 +6,11 @@
       "id": "introduction"
     },
     {
+      "type": "doc",
+      "label": "Quickstart",
+      "id": "quickstart"
+    },
+    {
       "type": "category",
       "label": "Get started",
       "link": {
@@ -19,7 +24,6 @@
         "image": "/img/small_snoo.png"
       },
       "items": [
-        "get-started/quickstart",
         "get-started/environment",
         "get-started/create-app",
         "get-started/upload",
