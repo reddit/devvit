@@ -25,7 +25,6 @@ Permissions fall in one of three categories.
 | UI                             | Permissions the app needs for the UI elements it uses.                               |
 | User data handling             | Permissions the app needs for the way it manages user data.                          |
 | Mod permissions (required)     | Permission the app needs to create an [app account](###app-accounts) with everything |
-| permissions on your subreddit. |
 
 You can see the permissions an app requires on the app details page, install details page, and in the CLI.
 
