@@ -1,6 +1,6 @@
 # Redis
 
-Add a database to store and retrieve data.
+Adds a database to store and retrieve data.
 
 The Redis plugin is designed to be fast, scalable and secure, and it supports a subset of the full Redis API, including:
 
