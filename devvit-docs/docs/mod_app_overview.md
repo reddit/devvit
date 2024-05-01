@@ -34,7 +34,7 @@ You can see the permissions an app requires on the app details page, install det
 
 Each app has an “app account”’ which is basically a user account for the app. The app account may take mod actions, write posts/comments, or send messages programmatically. These accounts are not human-operated or logged into.
 
-Currently, app accounts are granted full mod permissions. In the future they will be granted more granular permissions based on the actions they need to take.
+Currently, app accounts are granted full mod permissions. In the future, they will be granted more granular permissions based on the actions they need to take.
 
 ![app details](./assets/app_account_everything_permissions.png)
 
