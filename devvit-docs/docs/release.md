@@ -4,7 +4,7 @@ Now you're ready to make your app available to other redditors.
 
 ## Upload your app
 
-Uploading your app creates a private version of the app that you can see on developers.reddit.com. You can install this private version into subreddits you moderate to test and debug your app before you publish it.
+Uploading your app creates a private version of the app that you can see on [developers.reddit.com](https://developers.reddit.com). You can install this private version into subreddits you moderate to test and debug your app before you publish it.
 
 To upload your app, enter `devvit upload` in your project directory. Your app's version number will be automatically incremented by 1 at this time, e.g. if this is your second upload, then your app would be version 2.0.0.0.
 
