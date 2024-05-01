@@ -3,7 +3,7 @@
 Create live and event-driven custom posts.
 
 :::note
-This is an experimental feature that currently only works on Web clients, Mobile support is coming soon. Developer experience may change significantly prior to GA.
+This is an experimental feature that currently only works on Web clients. Mobile support is coming soon. Developer experience may change significantly prior to GA.
 :::
 
 Realtime provides a set of primitives that lets you build custom posts that are:
