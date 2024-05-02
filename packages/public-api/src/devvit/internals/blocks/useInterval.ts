@@ -47,7 +47,7 @@ export function makeUseIntervalHook(reconciler: BlocksReconciler): UseIntervalHo
 
       currentState[hookIndex] = {
         running: true,
-        lastRun: Date.now(),
+        lastRun: currentState[hookIndex]?.lastRun ?? Date.now(),
         preventCallback: false,
         type: Hook.INTERVAL,
       };

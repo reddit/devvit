@@ -108,6 +108,42 @@ describe('useInterval', () => {
     expect(hookValue.lastRun).toBeDefined();
   });
 
+  test('start func preserve lastRun value if exist', async () => {
+    const callback = vi.fn();
+    const lastRun = Date.now() - 70;
+    const reconciler = new BlocksReconciler(
+      (_props: JSX.Props, { useInterval }: Devvit.Context) => {
+        const interval = useInterval(callback, 100);
+        interval.start();
+        return <text>Text</text>;
+      },
+      BlockRenderRequest.fromPartial({
+        type: BlockRenderEventType.RENDER_EFFECT_EVENT,
+      }),
+      {
+        __renderState: {
+          'root.anonymous': [
+            {
+              lastRun: lastRun,
+              running: true,
+              preventCallback: false,
+            },
+          ],
+        },
+      },
+      mockMetadata,
+      undefined
+    );
+
+    // render
+    await reconciler.render();
+    expect(callback).not.toHaveBeenCalled();
+
+    const componentState = reconciler.state.__renderState['root.anonymous'];
+    const hookValue = componentState[0] as UseIntervalHookState;
+    expect(hookValue.lastRun).toBe(lastRun);
+  });
+
   test('starts if delay is less than 100ms', async () => {
     const consoleSpy = vi.spyOn(console, 'error');
     const delayMs = 50;
