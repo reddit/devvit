@@ -12,7 +12,7 @@ import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
 import { Devvit } from '../../../devvit/Devvit.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
-import { asModPermissions, formatModeratorPermissions } from '../helpers/permissions.js';
+import { formatModeratorPermissions, validModPermissions } from '../helpers/permissions.js';
 import type { GetCommentsByUserOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { UserFlair } from './Flair.js';
@@ -142,7 +142,7 @@ export class User {
 
     if (data.modPermissions) {
       for (const [subredditName, permissions] of Object.entries(data.modPermissions)) {
-        this.#modPermissionsBySubreddit.set(subredditName, permissions.map(asModPermissions));
+        this.#modPermissionsBySubreddit.set(subredditName, validModPermissions(permissions));
       }
     }
 

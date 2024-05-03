@@ -8,8 +8,10 @@ export const MODERATOR_PERMISSIONS = [
   'mail',
   'config',
   'flair',
-  'chat_operator',
+  'channels',
   'chat_config',
+  'chat_community',
+  'chat_operator',
 ];
 
 export function formatPermissions(
@@ -27,10 +29,8 @@ export function formatModeratorPermissions(permissions: string[]): string {
   return formatPermissions(permissions, MODERATOR_PERMISSIONS, true);
 }
 
-export function asModPermissions(permission: string): ModeratorPermission {
-  if (MODERATOR_PERMISSIONS.includes(permission)) {
-    return permission as ModeratorPermission;
-  }
-
-  throw new Error(`Invalid moderator permission: ${permission}`);
+export function validModPermissions(permissions: string[]): ModeratorPermission[] {
+  return permissions.filter((permission) =>
+    MODERATOR_PERMISSIONS.includes(permission)
+  ) as ModeratorPermission[];
 }
