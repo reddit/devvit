@@ -6,10 +6,7 @@
       "env": ["TRACE_ENVELOPES"],
       "outputs": [
         "dist/**",
-        "packages/dev-server/client/generated/**",
-        "packages/protos/src/index.ts",
         "packages/protos/src/types/**",
-        "packages/public-api/src/abstractions/Devvit.ts",
         "packages/public-api/src/devvit/internals/semanticColors.ts",
         "packages/web-worker-fork/cjs/**",
         "node_modules/@reddit/shreddit.styles/**"
