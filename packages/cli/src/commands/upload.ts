@@ -7,7 +7,6 @@ import type {
   UploadNewMediaResponse,
 } from '@devvit/protos';
 import {
-  ActorSpec,
   AppCreationRequest,
   AppVersionCreationRequest,
   FullAppInfo,
@@ -27,7 +26,6 @@ import {
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import {
-  ACTORS_DIR_LEGACY,
   ACTOR_SRC_DIR,
   ACTOR_SRC_PRIMARY_NAME,
   ASSET_HASHING_ALGO,
@@ -445,41 +443,13 @@ export default class Upload extends ProjectCommand {
     const bundler = new Bundler(typecheck);
 
     try {
-      const srcDirPath = path.join(this.projectRoot, ACTOR_SRC_DIR);
-
-      if (await dirExists(srcDirPath)) {
-        /**
-         * For Apps with `./src/*`
-         */
-        return [
-          await bundler.bundle(
-            srcDirPath,
-            ActorSpec.fromPartial({
-              name: ACTOR_SRC_PRIMARY_NAME,
-              owner: username,
-              version: version,
-            })
-          ),
-        ];
-      } else {
-        /**
-         * For Apps with `./actors/*`
-         */
-        const actorDirs = await glob(path.join(this.projectRoot, ACTORS_DIR_LEGACY, '*'));
-
-        return await Promise.all(
-          actorDirs.map((actorDir) =>
-            bundler.bundle(
-              actorDir,
-              ActorSpec.fromPartial({
-                name: actorDir.split(path.sep).at(-1) ?? '',
-                owner: username,
-                version: version,
-              })
-            )
-          )
-        );
-      }
+      return [
+        await bundler.bundle(path.join(this.projectRoot, ACTOR_SRC_DIR), {
+          name: ACTOR_SRC_PRIMARY_NAME,
+          owner: username,
+          version: version,
+        }),
+      ];
     } catch (err) {
       this.error(StringUtil.caughtToString(err));
     }

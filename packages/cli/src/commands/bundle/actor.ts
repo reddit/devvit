@@ -1,9 +1,5 @@
 import { ActorSpec, Bundle } from '@devvit/protos';
-import {
-  ACTORS_DIR_LEGACY,
-  ACTOR_SRC_DIR,
-  ACTOR_SRC_PRIMARY_NAME,
-} from '@devvit/shared-types/constants.js';
+import { ACTOR_SRC_DIR } from '@devvit/shared-types/constants.js';
 import { Args } from '@oclif/core';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -12,7 +8,6 @@ import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { distDirFilename } from '../../util/config.js';
 import { readDevvitConfig } from '../../util/devvitConfig.js';
-import { dirExists } from '../../util/files.js';
 
 export default class BundleActor extends ProjectCommand {
   static override description = 'Bundle an actor into bundle.json';
@@ -37,11 +32,10 @@ export default class BundleActor extends ProjectCommand {
     const config = await readDevvitConfig(this.projectRoot);
 
     const actorName = args.name;
-    const actorPath = await this.#getActorRelativePath(actorName);
 
     const actorBundler = new Bundler();
     const bundle = await actorBundler.bundle(
-      actorPath,
+      ACTOR_SRC_DIR,
       ActorSpec.fromPartial({
         name: actorName,
         owner: username,
@@ -74,25 +68,5 @@ export default class BundleActor extends ProjectCommand {
     }
 
     return username;
-  }
-
-  /**
-   * @description checks that the specified actor name exists as a folder in project
-   */
-  async #getActorRelativePath(actorName: string): Promise<string> {
-    const actorRelativePath =
-      actorName === ACTOR_SRC_PRIMARY_NAME
-        ? ACTOR_SRC_DIR
-        : path.join(ACTORS_DIR_LEGACY, actorName);
-
-    const fullPath = path.join(this.projectRoot, actorRelativePath);
-    const actorFolderExists = await dirExists(fullPath);
-
-    if (!actorFolderExists) {
-      this.error(
-        `Actor: ${actorName} does not exist in your project. Please make sure that the correct folder exists under /actors`
-      );
-    }
-    return actorRelativePath;
   }
 }
