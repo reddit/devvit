@@ -127,3 +127,21 @@ Devvit.addMenuItem({
 });
 export default Devvit;
 ```
+
+## Faster scheduler
+
+:::note
+This feature is experimental, which means the design is not final but it's still available for you to use.
+:::
+
+Scheduled jobs currently perform one scheduled run per minute. To go faster, you can now run jobs every second by adding seconds granularity to your cron expression.
+
+```tsx
+await scheduler.runJob({
+      name: 'run_every_30_seconds',
+      cron: '*/30 * * * * *',
+    });
+}
+```
+
+How frequent a scheduled job runs will depend on how long the job takes to complete and how many jobs are running in parallel. This means a job may take a bit longer than scheduled, but the overall resolution should be better than a minute.
