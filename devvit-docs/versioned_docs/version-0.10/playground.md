@@ -62,6 +62,6 @@ Playgrounds are a fast, iterative way to test your code, but there are some thin
 
 ## Troubleshooting
 
-### `CircuitBreakerResponse` / `ServerCallRequired`
+Playground doesn't support the complete set of Devvit APIs because many require a live reddit.com production server to run. For example, none of the `Devvit.Context` APIs are enabled, so `await context.reddit.getCurrentUser()` will fail.
 
-Playgrounds don't support the complete Devvit app APIs, since many require a live reddit.com production server to run. For example, none of the `Devvit.Context` APIs are enabled so `await context.reddit.getCurrentUser()` would fail. Calls to unsupported APIs throw a `CircuitBreakerResponse` error with a `ServerCallRequired` message. If you see this error, don't worry--your app may run in production. It's usually fine to comment out this code or put in placeholder values.
+Calls to unsupported APIs throw a `CircuitBreakerResponse` error with a `ServerCallRequired` message. If you see this error, don't worry. Your app may run in production, and it's usually fine to comment out this code or put in placeholder values.

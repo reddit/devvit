@@ -4,6 +4,26 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 To use the latest version of Devvit, follow the [upgrade instructions](https://developers.reddit.com/docs/update-devvit).
 
+## Devvit 0.10.20 Experimental faster scheduler and breaking changes
+
+**Release Date: May 7, 2024**
+
+Devvit 0.10.20 introduces an experimental feature update that lets you [run scheduled jobs faster](scheduler.md#faster-scheduler) by adding seconds to your cron expression.
+
+**Breaking changes**
+
+- Two new moderator permissions were added: `channels` and `chat community`. This is a breaking change, which means:
+
+  - You’ll need to update your app and push a new version.
+  - Every installer needs to update their app to the latest version.
+
+- The `currentUser()` method can be undefined to support logged out users. This change doesn’t impact existing apps, but when you upgrade your app, you’ll need to handle both undefined and normal user object responses from this method.
+
+**Updates**
+
+- Fixed `useInterval` loop reliability on mobile clients.
+- Removed deprecated commands from `devvit help`.
+
 ## Devvit 0.10.19: Dimensions
 
 **Release Date: April 24, 2024**

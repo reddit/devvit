@@ -1,10 +1,10 @@
-# Debug your app
+# Logging
 
 Stream log events from your installed app to your command line to enable troubleshooting your app.
 
 ## Create logs
 
-Any logs sent to `console` will be available via [`devvit logs`](../cli/logs.md) for installed apps. For example, `console.log()`, `console.info()` and `console.error()` will produce logs with timestamps as expected.
+Any logs sent to `console` will be available via `devvit logs` for installed apps. For example, `console.log()`, `console.info()` and `console.error()` will produce logs with timestamps as expected.
 
 The following example creates a basic app that simply creates a single log.
 
@@ -16,7 +16,7 @@ Devvit.addMenuItem({
   label: 'Create a log!',
   onPress: (event, context) => {
     console.log('Action called!');
-    context.ui.showToast(`Sucessfully logged!`);
+    context.ui.showToast(`Successfully logged!`);
   },
 });
 

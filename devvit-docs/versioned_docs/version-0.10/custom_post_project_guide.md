@@ -12,7 +12,7 @@ This guide will show you how to:
 In this section, you’ll learn how to:
 
 - Build a “Click me” click counter custom post type
-- View and the test your custom post in Developer Studio
+- View and the test your custom post online
 
 ### Start a project​
 
