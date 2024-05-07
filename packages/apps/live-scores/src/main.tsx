@@ -1025,24 +1025,20 @@ Devvit.addTrigger({
     const subscriptionJobs = jobs.filter((job) => {
       return job.name === 'game_subscription_thread';
     });
-    if (subscriptionJobs.length > 1) {
-      console.log(
-        `Found ${subscriptionJobs.length} subscription jobs, canceling all but the first one`
-      );
-      for (let i = 1; i < subscriptionJobs.length; i++) {
+    if (subscriptionJobs.length > 0) {
+      console.log(`Found ${subscriptionJobs.length} subscription jobs, canceling all jobs`);
+      for (let i = 0; i < subscriptionJobs.length; i++) {
         console.log('Canceling job:', subscriptionJobs[i].id);
         await context.scheduler.cancelJob(subscriptionJobs[i].id);
       }
-    } else if (subscriptionJobs.length === 0) {
-      console.log('No subscription job found on app upgrade, scheduling a new one');
-      await context.scheduler.runJob({
-        cron: `*/${UPDATE_FREQUENCY_MINUTES} * * * *`,
-        name: 'game_subscription_thread',
-        data: {},
-      });
-    } else {
-      console.log('Scheduler job validated. All systems go!');
     }
+
+    console.log(`Creating a new game subscription job`);
+    await context.scheduler.runJob({
+      cron: `*/${UPDATE_FREQUENCY_MINUTES} * * * *`,
+      name: 'game_subscription_thread',
+      data: {},
+    });
   },
 });
 
