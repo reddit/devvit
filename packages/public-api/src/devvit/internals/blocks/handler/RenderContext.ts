@@ -20,6 +20,8 @@ export class RenderContext implements EffectEmitter {
   _prevHookId: string = '';
   _effects: { [key: string]: Effect } = {};
   _changed: { [key: string]: boolean } = {};
+  /** Events that will re-enter the dispatcher queue */
+  _requeueEvents: UIEvent[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _rootProps: { [key: string]: any } = {};
   _generated: { [key: string]: boolean } = {};
@@ -79,6 +81,13 @@ export class RenderContext implements EffectEmitter {
 
   emitEffect(dedupeKey: string, effect: Effect): void {
     this._effects[dedupeKey] = effect;
+  }
+
+  /**
+   * Adds event that will re-enter the dispatcher queue
+   */
+  addToRequeueEvents(event: UIEvent): void {
+    this._requeueEvents.push(event);
   }
 
   get effects(): Effect[] {

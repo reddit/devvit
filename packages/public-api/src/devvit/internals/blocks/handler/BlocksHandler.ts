@@ -1,11 +1,5 @@
-import {
-  EffectType,
-  type Effect,
-  type Metadata,
-  type UIEvent,
-  type UIRequest,
-  type UIResponse,
-} from '@devvit/protos';
+import type { UIEvent } from '@devvit/protos';
+import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
 import { ContextBuilder } from './ContextBuilder.js';
 import { BlocksTransformer } from '../BlocksTransformer.js';
 import type { BlockElement } from '../../../Devvit.js';
@@ -167,15 +161,11 @@ export class BlocksHandler {
         if (progress) {
           context._state = progress._state;
           context._effects = progress._effects;
-          remaining.forEach((e, i) => {
-            const effect: Effect = {
-              type: EffectType.EFFECT_SEND_EVENT,
-              sendEvent: {
-                event: e,
-                jumpsQueue: true,
-              },
-            };
-            context.emitEffect(`remaining-${i}`, effect);
+          remaining.forEach((e) => {
+            // e.retry = true;
+            const requeueEvent = { ...e };
+            requeueEvent.retry = true;
+            context.addToRequeueEvents(requeueEvent);
           });
           break;
         } else {
@@ -183,29 +173,23 @@ export class BlocksHandler {
         }
       }
 
-      /**
-       * If we have any SendEventEffects, we can push them back on the queue to process them locally
-       */
-      for (const [key, effect] of Object.entries(context._effects)) {
-        if (effect.sendEvent?.event) {
-          if (!isMainQueue && !effect.sendEvent?.event?.async) {
-            // We're async, this is a main queue event.  We need to send it back to the platform to let
-            // the platform synchronize it.
-            break;
-          }
-
-          if (isMainQueue && effect.sendEvent?.event?.async && !isBlockingSSR) {
-            // We're main queue, and this is an async event.  We're not in SSR mode, so let's prioritize
-            // returning control quickly to the platform so we don't block event loops.
-            break;
-          }
-
-          //Ok, we can handle this event locally.
-          const event = effect.sendEvent.event;
-          eventsToProcess.push(event);
-          delete context._effects[key];
+      const remainingRequeueEvents: UIEvent[] = [];
+      for (const event of context._requeueEvents) {
+        if (!isMainQueue && !event.async) {
+          // We're async, this is a main queue event.  We need to send it back to the platform to let
+          // the platform synchronize it.
+          remainingRequeueEvents.push(event);
+          continue;
         }
+        if (isMainQueue && event.async && !isBlockingSSR) {
+          // We're main queue, and this is an async event.  We're not in SSR mode, so let's prioritize
+          // returning control quickly to the platform so we don't block event loops.
+          remainingRequeueEvents.push(event);
+          continue;
+        }
+        eventsToProcess.push(event);
       }
+      context._requeueEvents = remainingRequeueEvents;
 
       /**
        * If we're going back through this again, we need to capture the progress, and the remaining events.
@@ -232,6 +216,7 @@ export class BlocksHandler {
       state: context._state,
       effects: context.effects,
       blocks,
+      events: context._requeueEvents,
     };
   }
 

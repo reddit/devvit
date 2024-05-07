@@ -45,6 +45,7 @@ exports[`BlocksHandler > actions handler > should not call the action handler on
     "type": 0,
   },
   "effects": [],
+  "events": [],
   "state": {},
 }
 `;
@@ -113,6 +114,7 @@ exports[`BlocksHandler > function components > should pass children 1`] = `
     "type": 0,
   },
   "effects": [],
+  "events": [],
   "state": {},
 }
 `;
@@ -160,6 +162,7 @@ exports[`BlocksHandler > transformation > should inject a root element 1`] = `
     "type": 0,
   },
   "effects": [],
+  "events": [],
   "state": {},
 }
 `;

@@ -2,7 +2,6 @@ import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { AsyncUseStateInitializer, UseAsyncResult } from '../../../../types/hooks.js';
 
 import type { AsyncResponse, UIEvent } from '@devvit/protos';
-import { EffectType } from '@devvit/protos';
 import type { Hook, HookParams } from './types.js';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
@@ -27,16 +26,13 @@ class AsyncHook<S extends JSONValue> implements Hook {
     if (this.state.data === null && this.state.error === null && this.state.loading === false) {
       this.state.loading = true;
       this.#changed();
-      context.emitEffect(this.#hookId, {
-        type: EffectType.EFFECT_SEND_EVENT,
-        sendEvent: {
-          event: {
-            asyncRequest: { requestId: this.#hookId },
-            async: true,
-            hook: this.#hookId,
-          },
-        },
-      });
+
+      const requeueEvent: UIEvent = {
+        hook: this.#hookId,
+        async: true,
+        asyncRequest: { requestId: this.#hookId },
+      };
+      context.addToRequeueEvents(requeueEvent);
     }
   }
 
@@ -61,15 +57,11 @@ class AsyncHook<S extends JSONValue> implements Hook {
         }
       }
 
-      context.emitEffect(this.#hookId, {
-        type: EffectType.EFFECT_SEND_EVENT,
-        sendEvent: {
-          event: {
-            asyncResponse,
-            hook: this.#hookId,
-          },
-        },
-      });
+      const requeueEvent: UIEvent = {
+        asyncResponse: asyncResponse,
+        hook: this.#hookId,
+      };
+      context.addToRequeueEvents(requeueEvent);
     } else if (event.asyncResponse) {
       const result: UseAsyncResult<S> = {
         data: event.asyncResponse.data?.value as S | null,

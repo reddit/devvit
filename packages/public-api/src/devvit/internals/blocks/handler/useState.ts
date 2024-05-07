@@ -1,4 +1,4 @@
-import { EffectType } from '@devvit/protos';
+import type { UIEvent } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import type {
   AsyncUseStateInitializer,
@@ -63,11 +63,11 @@ class AsyncStateHook<S extends JSONValue> implements Hook {
     if (this.state.value === null && !this.state.loading) {
       this.state.loading = true;
       this.#changed();
-      renderContext.emitEffect(this.#hookId, {
-        type: EffectType.EFFECT_SEND_EVENT,
-        // This is on the main queue, because it blocks app load.
-        sendEvent: { event: { asyncRequest: { requestId: this.#hookId }, hook: this.#hookId } },
-      });
+      const requeueEvent: UIEvent = {
+        asyncRequest: { requestId: this.#hookId },
+        hook: this.#hookId,
+      };
+      renderContext.addToRequeueEvents(requeueEvent);
       throw new RenderInterruptError();
     }
   }

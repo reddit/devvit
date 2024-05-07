@@ -65,8 +65,8 @@ describe('BlocksHandler', () => {
       const response = await handler.handle(EmptyRequest, mockMetadata);
       expect(JSON.stringify(response.blocks)).toContain('loading');
 
-      expect(response.effects.length).toEqual(1);
-      expect(response.effects[0].sendEvent?.event?.asyncRequest).toBeDefined();
+      expect(response.events.length).toEqual(1);
+      expect(response.events[0].asyncRequest).toBeDefined();
     });
 
     test('should process all futures in blocking SSR mode', async () => {
@@ -74,6 +74,7 @@ describe('BlocksHandler', () => {
       const response = await handler.handle({ events: [{ blocking: {} }] }, mockMetadata);
       expect(JSON.stringify(response.blocks)).toContain('done');
       expect(response.effects.length).toEqual(0);
+      expect(response.events.length).toEqual(0);
     });
 
     test('should be able to batch events and make progress', async () => {
@@ -105,10 +106,11 @@ describe('BlocksHandler', () => {
       // 3 successes, one fail, one deferred success
       const response = await handler.handle(req, mockMetadata);
       expect(findHookState(counterRef)).toEqual(3);
-      expect(response.effects.length).toEqual(2);
-      expect(response.effects[0].sendEvent?.event).toEqual(nay);
-      expect(response.effects[1].sendEvent?.event).toEqual(req.events[0]);
-      expect(response.effects[1].sendEvent?.jumpsQueue).toEqual(true);
+      expect(response.events.length).toEqual(2);
+      expect(response.events[0].hook).toEqual(nay.hook);
+      expect(response.events[0].retry).toEqual(true);
+      expect(response.events[1].hook).toEqual(req.events[0].hook);
+      expect(response.events[1].retry).toEqual(true);
     });
 
     test('should fail if the first event fails', async () => {

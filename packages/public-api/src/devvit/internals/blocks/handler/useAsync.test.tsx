@@ -55,10 +55,10 @@ describe.each([true, false])(`when circuit-breaking: %s`, (circuitBreaking) => {
     const handler = new BlocksHandler(App);
 
     const response = await handler.handle(EmptyRequest, mockMetadata);
-    expect(JSON.stringify(response.blocks)).toContain('loading');
 
-    expect(response.effects.length).toEqual(1);
-    expect(response.effects[0].sendEvent?.event).toEqual(asyncRequestEvent(asyncRef));
+    expect(JSON.stringify(response.blocks)).toContain('loading');
+    expect(response.events.length).toEqual(1);
+    expect(response.events[0]).toEqual(asyncRequestEvent(asyncRef));
   });
 
   test('receiving request', async () => {
@@ -72,8 +72,8 @@ describe.each([true, false])(`when circuit-breaking: %s`, (circuitBreaking) => {
     response = await handler.handle(request, mockMetadata);
 
     expect(response.blocks).toBeFalsy();
-    expect(response.effects.length).toEqual(1);
-    expect(response.effects[0].sendEvent?.event).toEqual(asyncResponseEvent(asyncRef));
+    expect(response.events.length).toEqual(1);
+    expect(response.events[0]).toEqual(asyncResponseEvent(asyncRef));
   });
 
   test('receiving response', async () => {

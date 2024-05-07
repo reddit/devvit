@@ -130,17 +130,17 @@ describe('useState', () => {
       const response = await handler.handle(EmptyRequest, mockMetadata);
 
       expect(response.state).toMatchSnapshot();
-      expect(response.effects.length).toEqual(1);
+      expect(response.events.length).toEqual(1);
       expect(response.blocks).toBeUndefined();
 
-      const event = response.effects[0].sendEvent?.event!;
+      const event = response.events[0];
       expect(event?.async).toBeFalsy();
       const next: UIRequest = {
         events: [event],
         state: response.state,
       };
       const nextResponse = await handler.handle(next, mockMetadata);
-      expect(nextResponse.effects.length).toEqual(0);
+      expect(nextResponse.events.length).toEqual(0);
       expect(JSON.stringify(nextResponse.blocks ?? '')).toContain('hello world');
     });
   });
