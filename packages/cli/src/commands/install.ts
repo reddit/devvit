@@ -1,12 +1,12 @@
-import type { FullInstallationInfo } from '@devvit/protos';
+import { UUID } from '@devvit/protos';
+import type { FullInstallationInfo } from '@devvit/protos/community';
 import {
   GetAllWithInstallLocationRequest,
   InstallationCreationRequest,
   InstallationType,
   InstallationUpgradeRequest,
   NutritionCategory,
-  UUID,
-} from '@devvit/protos';
+} from '@devvit/protos/community';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
 import os from 'node:os';

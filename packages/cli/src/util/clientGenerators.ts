@@ -1,23 +1,23 @@
+import type { RemoteLogConsumer } from '@devvit/protos';
+import { RemoteLogConsumerClientImpl } from '@devvit/protos';
 import type {
   AppClient,
   AppVersionClient,
+  DevPortalAppSettingsClient,
   FeedbackClient,
   InstallationsClient,
-  RemoteLogConsumer,
-  WaitlistClient,
-  DevPortalAppSettingsClient,
   WaitlistAdminClient,
-} from '@devvit/protos';
+  WaitlistClient,
+} from '@devvit/protos/community';
 import {
   AppClientJSON,
   AppVersionClientJSON,
+  DevPortalAppSettingsClientJSON,
   FeedbackClientJSON,
   InstallationsClientJSON,
-  RemoteLogConsumerClientImpl,
-  WaitlistClientJSON,
-  DevPortalAppSettingsClientJSON,
   WaitlistAdminClientJSON,
-} from '@devvit/protos';
+  WaitlistClientJSON,
+} from '@devvit/protos/community';
 import { Headers } from 'node-fetch';
 import {
   HEADER_DEVVIT_CANARY,

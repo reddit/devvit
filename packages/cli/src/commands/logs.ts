@@ -1,11 +1,10 @@
 import {
-  GetByAppNameAndInstallLocationRequest,
-  InstallationType,
   RemoteLogQuery,
   RemoteLogSubredditAppNameFilter,
   RemoteLogType,
   Severity,
 } from '@devvit/protos';
+import { GetByAppNameAndInstallLocationRequest, InstallationType } from '@devvit/protos/community';
 import { Args, Flags } from '@oclif/core';
 import { sub } from 'date-fns';
 import type { Subscription } from 'rxjs';

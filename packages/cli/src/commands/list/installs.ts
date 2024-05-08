@@ -1,19 +1,19 @@
+import { UUID } from '@devvit/protos';
 import type {
   AppInfo,
   FullInstallationInfo,
   InstallationInfo,
   MultipleInstallationsResponse,
-} from '@devvit/protos';
+} from '@devvit/protos/community';
 import {
-  GetAllWithInstallerRequest,
   GetAllWithInstallLocationRequest,
+  GetAllWithInstallerRequest,
   InstallationType,
-  UUID,
-} from '@devvit/protos';
-import { Args, ux } from '@oclif/core';
-import { DevvitCommand, toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
-import { createInstallationsClient } from '../../util/clientGenerators.js';
+} from '@devvit/protos/community';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
+import { Args, ux } from '@oclif/core';
+import { createInstallationsClient } from '../../util/clientGenerators.js';
+import { DevvitCommand, toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 
 enum SearchType {
   MINE,

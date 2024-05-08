@@ -1,16 +1,16 @@
+import type { LinkedBundle } from '@devvit/protos';
 import type {
   AppInfo,
   FullAppInfo,
   FullAppVersionInfo,
-  LinkedBundle,
   OptionalVersionVisibility,
-} from '@devvit/protos';
+} from '@devvit/protos/community';
 import {
   AppVersionUpdateRequest,
   GetAppBySlugRequest,
   InstallationType,
   VersionVisibility,
-} from '@devvit/protos';
+} from '@devvit/protos/community';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';

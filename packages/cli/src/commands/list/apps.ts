@@ -1,8 +1,8 @@
-import type { AppInfo } from '@devvit/protos';
-import { GetAllWithOwnerRequest } from '@devvit/protos';
+import type { AppInfo } from '@devvit/protos/community';
+import { GetAllWithOwnerRequest } from '@devvit/protos/community';
 import { ux } from '@oclif/core';
-import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import { createAppClient } from '../../util/clientGenerators.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 
 export default class ListApps extends DevvitCommand {
   static override description = 'List all apps that you have published';

@@ -1,11 +1,11 @@
+import type { Bundle } from '@devvit/protos';
 import type {
   AppAccountExistsResponse,
   AppVersionInfo,
-  Bundle,
   Categories,
   MediaSignature,
   UploadNewMediaResponse,
-} from '@devvit/protos';
+} from '@devvit/protos/community';
 import {
   AppCreationRequest,
   AppVersionCreationRequest,
@@ -14,7 +14,7 @@ import {
   InstallationType,
   UploadNewMediaRequest,
   VersionVisibility,
-} from '@devvit/protos';
+} from '@devvit/protos/community';
 import {
   ALLOWED_ASSET_EXTENSIONS,
   ASSET_DIRNAME,
