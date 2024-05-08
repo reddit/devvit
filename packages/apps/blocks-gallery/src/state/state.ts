@@ -31,8 +31,10 @@ export class GalleryState {
   readonly _currentPage: UseStateResult<Page>;
   readonly _pageStates: Record<Page, CategoryPageState>;
   readonly showToast: (message: string) => void;
+  readonly _context: ContextAPIClients;
 
   constructor(renderContext: ContextAPIClients) {
+    this._context = renderContext;
     const { useState } = renderContext;
     const goHome = (): void => {
       this.currentPage = Page.HOME;
@@ -61,5 +63,9 @@ export class GalleryState {
 
   pageState(page: Page): CategoryPageState {
     return this._pageStates[page];
+  }
+
+  get context(): ContextAPIClients {
+    return this._context;
   }
 }

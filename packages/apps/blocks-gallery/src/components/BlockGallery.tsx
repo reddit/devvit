@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+import type { SharedCategoryPageProps } from '../components/CategoryPage.js';
 
 import {
   ButtonPage,
@@ -21,13 +22,15 @@ export type BlockGalleryProps = {
 export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
   const page = state.currentPage;
   const pageState = state.pageState(page);
+  const context = state.context
+  const sharedState: SharedCategoryPageProps = {state: pageState}
   return (
     <vstack padding="medium" grow>
       {page === Page.HOME && <HomePage state={state} />}
       {page === Page.BUTTONS && <ButtonPage state={pageState} />}
       {page === Page.IMAGES && <ImagePage state={pageState} />}
       {page === Page.SPACERS && <SpacerPage state={pageState} />}
-      {page === Page.STACKS && <StacksPage state={pageState} />}
+      {page === Page.STACKS && <StacksPage sharedState={sharedState} context={context} />}
       {page === Page.TEXT && <TextPage state={pageState} />}
       {page === Page.ICON && <IconPage state={pageState} />}
       {page === Page.COLOR && <ColorPage state={pageState} />}

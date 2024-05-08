@@ -59,6 +59,7 @@ export type CategoryPageProps = SharedCategoryPageProps & {
   onCategoryChanged: (category: string) => void;
   subCategoryPage?: boolean;
   type?: CategoryPageType;
+  onConfigureCategory?: () => void;
 };
 
 export type CategoryProps = {
@@ -104,7 +105,16 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
     <vstack gap="small" grow>
       {/* Header */}
       {props.subCategoryPage ? (
-        <></>
+         (props.onConfigureCategory) ? (
+          <hstack gap={'medium'} alignment={'start middle'}>
+            <button size={'small'} onPress={props.onConfigureCategory}>
+              configure
+            </button>
+            <text style={'heading'} selectable={false} color="neutral-content-weak">
+              {props.title}
+            </text>
+          </hstack>
+        ) : (<></>)
       ) : (
         <hstack alignment="start middle" gap="small">
           <button onPress={props.state?.goHome} appearance="secondary" size="small" icon="back" />
@@ -145,7 +155,6 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
 
   const buttonsPageBackImpl = () => {
     if (selectedCategory == null || selectedCategory.length == 0) {
-      console.log(`HERE!!! selected category: ${selectedCategory} home set: ${props.state?.goHome != null}`)
       props.state?.goHome();
     } else {
       props.onCategoryChanged("");
