@@ -31,7 +31,7 @@
     "lint:fix": "yarn lint --fix",
     "prepublishOnly": "publish-package-json",
     "test": "yarn test:unit && yarn test:types && yarn test:size",
-    "test:size": "echo \"dist/public-api.min.js uncompressed bundle size: $(stat -c '%s' dist/public-api.min.js|numfmt --to-unit=Ki --format=%.1f) KiB\" && bundlesize",
+    "test:size": "filesize",
     "test:types": "tsc --noEmit",
     "test:unit": "vitest run",
     "test:unit-with-coverage": "vitest run --coverage"
@@ -47,6 +47,7 @@
     "lodash.isequal": "4.5.0"
   },
   "devDependencies": {
+    "@ampproject/filesize": "4.3.0",
     "@devvit/eslint-config": "0.10.20",
     "@devvit/repo-tools": "0.10.20",
     "@devvit/tsconfig": "0.10.20",
@@ -56,7 +57,6 @@
     "@types/core-js": "2.5.6",
     "@types/lodash.isequal": "4.5.6",
     "@vitest/coverage-c8": "0.32.0",
-    "bundlesize": "0.18.2",
     "chokidar-cli": "3.0.0",
     "esbuild": "0.18.12",
     "eslint": "8.9.0",
@@ -66,17 +66,11 @@
   "publishConfig": {
     "directory": "dist"
   },
-  "bundlesize": [
-    {
-      "compression": "gzip",
-      "maxSize": "78 KB",
-      "path": "dist/public-api.min.js"
-    },
-    {
-      "compression": "none",
-      "maxSize": "255 KB",
-      "path": "dist/public-api.min.js"
+  "filesize": {
+    "dist/public-api.min.js": {
+      "gzip": "78 KB",
+      "none": "255 KB"
     }
-  ],
+  },
   "source": "./src/index.ts"
 }
