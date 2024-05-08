@@ -1,10 +1,4 @@
-import type {
-  AuthenticationRequest,
-  Empty,
-  OAuthProvider,
-  ValidationRequest,
-} from '@devvit/protos';
-import { AuthenticationResponse } from '@devvit/protos';
+import type { Empty } from '@devvit/protos';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import open from 'open';
 import type { Observable, Subscription } from 'rxjs';
@@ -33,7 +27,7 @@ export type NodeFSAuthenticationPluginConfig = {
 /**
  * @description server side Node FS implementation of an authentication plugin
  */
-export class NodeFSAuthenticationPlugin implements OAuthProvider, Disposable {
+export class NodeFSAuthenticationPlugin implements Disposable {
   readonly #authCfg: NodeFSAuthenticationPluginConfig['auth'];
 
   readonly authTokenStore: AuthTokenStore;
@@ -73,26 +67,25 @@ export class NodeFSAuthenticationPlugin implements OAuthProvider, Disposable {
     return { token: token, copyPaste };
   }
 
-  async Authenticate(_request: AuthenticationRequest): Promise<AuthenticationResponse> {
-    const validation = await this.Validate({});
-    if (validation.storedToken) {
+  async Authenticate(): Promise<StoredToken> {
+    const validation = await this.Validate();
+    if (validation) {
       return validation;
     }
     const newToken = await this.#login();
     await this.authTokenStore.writeFSToken(newToken);
-    return AuthenticationResponse.fromJSON({ storedToken: newToken });
+    return newToken;
   }
 
-  async Validate(_request: ValidationRequest): Promise<AuthenticationResponse> {
+  async Validate(): Promise<StoredToken | undefined> {
     try {
       const token = await this.#getCurrentTokenRefreshedIfNeeded();
       if (token) {
-        return AuthenticationResponse.fromJSON({ storedToken: token });
+        return token;
       }
     } catch (err) {
       console.error(`Validation error: ${StringUtil.caughtToString(err)}`);
     }
-    return {};
   }
 
   /**
@@ -102,7 +95,7 @@ export class NodeFSAuthenticationPlugin implements OAuthProvider, Disposable {
    * 2. Before the current auth token is about to expire, the auth store will be
    *    requested to refresh.
    */
-  NotifyAuthenticationUpdates(_request: Empty): Observable<AuthenticationResponse> {
+  NotifyAuthenticationUpdates(_request: Empty): Observable<TokenInfo | undefined> {
     // subscribe to token changes on FS and set up auto refresh token
     if (!this.#authTokenStoreUpdatesSubscription) {
       this.#authTokenStoreUpdatesSubscription = this.authTokenStore.updates.subscribe(
@@ -111,11 +104,7 @@ export class NodeFSAuthenticationPlugin implements OAuthProvider, Disposable {
     }
 
     return this.authTokenStore.updates.pipe(
-      map((v) =>
-        AuthenticationResponse.fromJSON({
-          storedToken: v.token.hasScopes(this.#authCfg.scopes) ? v : undefined,
-        })
-      )
+      map((v) => (v.token.hasScopes(this.#authCfg.scopes) ? v : undefined))
     );
   }
 
@@ -165,13 +154,15 @@ export class NodeFSAuthenticationPlugin implements OAuthProvider, Disposable {
     // refresh 10 minutes before actual expiry
     const refreshIn = curStoredToken.token.expiresAt.getTime() - Date.now() - 10 * 60 * 1000;
     if (refreshIn <= 0) {
-      this.Authenticate({})
+      // to-do: why isn't this awaited?
+      this.Authenticate()
         .then()
         .catch((err) => console.error(StringUtil.caughtToString(err)));
       return;
     }
 
     this.autoRefreshTokenTimeout = setTimeout(() => {
+      // to-do: why isn't this awaited?
       this.refreshStoredToken(curStoredToken.token.refreshToken, !!curStoredToken.copyPaste)
         .then()
         .catch(() => {});

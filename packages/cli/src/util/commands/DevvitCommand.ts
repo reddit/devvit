@@ -1,9 +1,9 @@
-import type { StoredToken } from '@devvit/protos';
 import { Empty } from '@devvit/protos';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { Command } from '@oclif/core';
 import open from 'open';
 import { NodeFSAuthenticationPlugin } from '../../lib/auth/NodeFSAuthenticationPlugin.js';
+import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { DOT_DEVVIT_DIR_FILENAME } from '../../lib/config.js';
 import { readDevvitConfig } from '../../util/devvitConfig.js';
 import { findProjectRoot } from '../../util/project-util.js';
@@ -39,11 +39,8 @@ export abstract class DevvitCommand extends Command {
   }
 
   getAccessTokenAndLoginIfNeeded = async (copyPaste?: boolean): Promise<StoredToken> => {
-    if (copyPaste) {
-      return await this.oauthSvc.loginViaCopyPaste();
-    } else {
-      return (await this.oauthSvc.Authenticate({})).storedToken!;
-    }
+    if (copyPaste) return await this.oauthSvc.loginViaCopyPaste();
+    return await this.oauthSvc.Authenticate();
   };
 
   getAccessToken = async (): Promise<StoredToken | undefined> => {

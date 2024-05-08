@@ -1,7 +1,8 @@
-import { vi } from 'vitest';
-import type { TwirpError } from 'twirp-ts';
-import { NodeFetchRPC, ContentType } from './node-fetch-twirp-rpc.js';
 import { Response } from 'node-fetch';
+import type { TwirpError } from 'twirp-ts';
+import { vi } from 'vitest';
+import { StoredToken } from '../lib/auth/StoredToken.js';
+import { ContentType, NodeFetchRPC } from './node-fetch-twirp-rpc.js';
 
 const { mockFetch } = vi.hoisted(() => {
   return { mockFetch: vi.fn(), Headers: vi.fn() };
@@ -17,12 +18,15 @@ vi.mock('node-fetch', async (importOriginal) => {
 const rpc = NodeFetchRPC({
   baseUrl: 'https://test.com',
   getToken: () =>
-    Promise.resolve({
-      refreshToken: 'refreshToken_test',
-      accessToken: 'accessToken_test',
-      scope: 'scope_test',
-      tokenType: 'tokenType_test',
-    }),
+    Promise.resolve(
+      new StoredToken({
+        expiresAt: Date.now() + 99999,
+        refreshToken: 'refreshToken_test',
+        accessToken: 'accessToken_test',
+        scope: 'scope_test',
+        tokenType: 'tokenType_test',
+      })
+    ),
 });
 
 describe('NodeFetchRPC', () => {
