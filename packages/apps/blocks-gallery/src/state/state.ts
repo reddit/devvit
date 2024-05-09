@@ -13,6 +13,7 @@ const PAGES = [
   Page.BUTTONS,
   Page.IMAGES,
   Page.STACKS,
+  Page.STACKPADDINGGAP,
   Page.SPACERS,
   Page.TEXT,
   Page.ICON,

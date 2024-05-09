@@ -39,6 +39,12 @@ export function infoForLeague(league: League): SoccerLeague {
         seasonId: 'sr:season:106479',
         league: League.UEFACHAMPIONS,
       };
+    case League.UEFAEURO:
+      return {
+        leagueId: 'sr:competition:1',
+        seasonId: 'sr:season:92261',
+        league: League.UEFAEURO,
+      };
     case League.EFLLEAGUEONE:
       return {
         leagueId: 'sr:competition:24',

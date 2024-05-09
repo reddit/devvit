@@ -240,7 +240,7 @@ export const srNbaScoreboardCreationForm = Devvit.createForm(
             { label: 'Regular Season', value: 'REG' },
             { label: 'Post Season', value: 'PST' },
           ],
-          defaultValue: ['REG'],
+          defaultValue: ['PST'],
         },
         {
           name: 'timezone',

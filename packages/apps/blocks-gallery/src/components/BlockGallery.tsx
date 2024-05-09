@@ -11,6 +11,7 @@ import {
   SizePage,
   SpacerPage,
   StacksPage,
+  StackPaddingGapPage,
   TextPage,
 } from '../pages/index.js';
 import type { GalleryState } from '../state/state.js';
@@ -35,6 +36,7 @@ export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
       {page === Page.ICON && <IconPage state={pageState} />}
       {page === Page.COLOR && <ColorPage state={pageState} />}
       {page === Page.SIZE && <SizePage state={pageState} />}
+      {page === Page.STACKPADDINGGAP && <StackPaddingGapPage state={pageState} />}
     </vstack>
   );
 };

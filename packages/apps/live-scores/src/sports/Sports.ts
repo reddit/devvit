@@ -43,6 +43,7 @@ export enum League {
   CROATIA_HNL = `hr_hnl`,
   NCAAMB = 'ncaamb',
   IPL = 'ipl',
+  UEFAEURO = 'uefa_euro',
 }
 
 export enum Sport {
@@ -103,6 +104,10 @@ export function leaguesSupported(service: APIService): { label: string; value: s
       {
         label: getDisplayNameFromLeague(League.UEFACHAMPIONS),
         value: League.UEFACHAMPIONS,
+      },
+      {
+        label: getDisplayNameFromLeague(League.UEFAEURO),
+        value: League.UEFAEURO,
       },
       {
         label: getDisplayNameFromLeague(League.EPL),
@@ -235,6 +240,9 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'ipl') {
     return League.IPL;
   }
+  if (str.toLowerCase() === 'uefa_euro') {
+    return League.UEFAEURO;
+  }
 
   return League.UNKNOWN;
 }
@@ -270,6 +278,7 @@ export function getSportFromLeague(league: League): Sport {
     case League.LIGAMXAPERTURA:
     case League.LIGAMXCLAUSURA:
     case League.CROATIA_HNL:
+    case League.UEFAEURO:
       return Sport.SOCCER;
     case League.IPL:
       return Sport.CRICKET;
@@ -310,6 +319,8 @@ export function getDisplayNameFromLeague(league: League): string {
       return 'Bundesliga (DE)';
     case League.UEFACHAMPIONS:
       return 'UEFA Champions League';
+    case League.UEFAEURO:
+      return 'UEFA European Championship';
     case League.EFLLEAGUEONE:
       return 'English League One';
     case League.EFLLEAGUETWO:

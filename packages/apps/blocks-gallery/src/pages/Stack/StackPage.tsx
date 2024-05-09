@@ -12,6 +12,7 @@ import { StackReverseCategory } from './StackReverseCategory.js';
 import { StackZStackCategory } from './ZStack/StackZStackCategory.js';
 import { Page } from '../page.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { StackPaddingGapPage } from './StackPaddingGapPage.js';
 
 export const StacksPage = ({ sharedState, context }: { sharedState: SharedCategoryPageProps,  context: ContextAPIClients }): JSX.Element => {
   const state = sharedState.state;
