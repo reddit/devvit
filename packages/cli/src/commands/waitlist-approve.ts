@@ -1,4 +1,4 @@
-import { WaitlistStatus } from '@devvit/protos/community';
+import { WaitlistStatus } from '@devvit/protos/community.js';
 import { Args } from '@oclif/core';
 import { getUserId, isCurrentUserEmployee } from '../lib/http/gql.js';
 import { createWaitlistAdminClient } from '../util/clientGenerators.js';

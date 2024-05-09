@@ -4,12 +4,12 @@ import type {
   FullInstallationInfo,
   InstallationInfo,
   MultipleInstallationsResponse,
-} from '@devvit/protos/community';
+} from '@devvit/protos/community.js';
 import {
   GetAllWithInstallLocationRequest,
   GetAllWithInstallerRequest,
   InstallationType,
-} from '@devvit/protos/community';
+} from '@devvit/protos/community.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
 import { createInstallationsClient } from '../../util/clientGenerators.js';

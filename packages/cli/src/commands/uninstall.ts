@@ -1,5 +1,5 @@
 import { UUID } from '@devvit/protos';
-import { GetAllWithInstallLocationRequest, InstallationType } from '@devvit/protos/community';
+import { GetAllWithInstallLocationRequest, InstallationType } from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, ux } from '@oclif/core';
 import { createAppVersionClient, createInstallationsClient } from '../util/clientGenerators.js';

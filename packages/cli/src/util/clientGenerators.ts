@@ -8,7 +8,7 @@ import type {
   InstallationsClient,
   WaitlistAdminClient,
   WaitlistClient,
-} from '@devvit/protos/community';
+} from '@devvit/protos/community.js';
 import {
   AppClientJSON,
   AppVersionClientJSON,
@@ -17,7 +17,7 @@ import {
   InstallationsClientJSON,
   WaitlistAdminClientJSON,
   WaitlistClientJSON,
-} from '@devvit/protos/community';
+} from '@devvit/protos/community.js';
 import { Headers } from 'node-fetch';
 import {
   HEADER_DEVVIT_CANARY,

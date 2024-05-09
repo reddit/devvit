@@ -4,13 +4,13 @@ import type {
   FullAppInfo,
   FullAppVersionInfo,
   OptionalVersionVisibility,
-} from '@devvit/protos/community';
+} from '@devvit/protos/community.js';
 import {
   AppVersionUpdateRequest,
   GetAppBySlugRequest,
   InstallationType,
   VersionVisibility,
-} from '@devvit/protos/community';
+} from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';

@@ -1,5 +1,5 @@
-import type { AppClient, FullAppInfo } from '@devvit/protos/community';
-import { GetAppBySlugRequest } from '@devvit/protos/community';
+import type { AppClient, FullAppInfo } from '@devvit/protos/community.js';
+import { GetAppBySlugRequest } from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 

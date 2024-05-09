@@ -5,7 +5,7 @@ import type {
   Categories,
   MediaSignature,
   UploadNewMediaResponse,
-} from '@devvit/protos/community';
+} from '@devvit/protos/community.js';
 import {
   AppCreationRequest,
   AppVersionCreationRequest,
@@ -14,7 +14,7 @@ import {
   InstallationType,
   UploadNewMediaRequest,
   VersionVisibility,
-} from '@devvit/protos/community';
+} from '@devvit/protos/community.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
   ASSET_DIRNAME,

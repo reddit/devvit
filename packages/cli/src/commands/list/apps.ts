@@ -1,5 +1,5 @@
-import type { AppInfo } from '@devvit/protos/community';
-import { GetAllWithOwnerRequest } from '@devvit/protos/community';
+import type { AppInfo } from '@devvit/protos/community.js';
+import { GetAllWithOwnerRequest } from '@devvit/protos/community.js';
 import { ux } from '@oclif/core';
 import { createAppClient } from '../../util/clientGenerators.js';
 import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
