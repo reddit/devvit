@@ -307,9 +307,11 @@ export default class New extends DevvitCommand {
       const installInstructions = `• ${chalk.cyan(`\`npm install\``)} to install dependencies`;
       welcomeInstructions.push(installInstructions);
     }
+    const uploadInstructions = `• ${chalk.cyan(`\`devvit upload\``)} to upload your app`;
+    welcomeInstructions.push(uploadInstructions);
 
     const playtestInstructions = `• ${chalk.cyan(
-      `\`devvit playtest\``
+      `\`devvit playtest <subreddit>\``
     )} to develop in your test community`;
     welcomeInstructions.push(playtestInstructions);
 
