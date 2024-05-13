@@ -1,9 +1,9 @@
 import type { Metadata, RenderPostRequest, RenderPostResponse } from '@devvit/protos';
 import { CustomPostDefinition } from '@devvit/protos';
-import type { Config } from '@devvit/runtimes/api/Config.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
-import { BlocksReconciler } from './blocks/BlocksReconciler.js';
+import type { Config } from '@devvit/shared-types/Config.js';
 import { Devvit } from '../Devvit.js';
+import { BlocksReconciler } from './blocks/BlocksReconciler.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 
 async function renderPost(

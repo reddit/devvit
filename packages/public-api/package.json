@@ -39,7 +39,6 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@devvit/protos": "0.10.20",
-    "@devvit/runtimes": "0.10.20",
     "@devvit/shared-types": "0.10.20",
     "base64-js": "1.5.1",
     "clone-deep": "4.0.1",

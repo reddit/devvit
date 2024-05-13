@@ -9,7 +9,6 @@ import type {
   UIEvent,
 } from '@devvit/protos';
 import { BlockRenderEventType, BlockType, EffectType } from '@devvit/protos';
-import { getFromMetadata } from '@devvit/runtimes/common/envelope/EnvelopeUtil.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { isValidImageURL } from '@devvit/shared-types/imageUtil.js';
@@ -326,7 +325,7 @@ export class BlocksReconciler implements EffectEmitter {
     const reified = await this.processBlock(element);
     assertNotString(reified);
 
-    if (Devvit.debug.emitSnapshots || getFromMetadata(Header.DebugRenderXML, this.metadata)) {
+    if (Devvit.debug.emitSnapshots || this.metadata[Header.DebugRenderXML]?.values[0]) {
       console.log(indentXML(toXML(reified)));
     }
     if (Devvit.debug.emitState) {

@@ -1,9 +1,9 @@
 import type { Definition, Metadata, MethodDefinition, UIRequest, UIResponse } from '@devvit/protos';
 import { CustomPostDefinition } from '@devvit/protos';
-import type { Config } from '@devvit/runtimes/api/Config.js';
+import type { Config } from '@devvit/shared-types/Config.js';
 import { Devvit } from '../Devvit.js';
-import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 import { BlocksHandler } from './blocks/handler/BlocksHandler.js';
+import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 
 /**
  * Extend me to add new surfaces to Devvit.

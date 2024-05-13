@@ -1,7 +1,7 @@
 import type { HandleUIEventRequest, HandleUIEventResponse, Metadata } from '@devvit/protos';
 import { EffectType, UIEventHandlerDefinition } from '@devvit/protos';
-import type { Config } from '@devvit/runtimes/api/Config.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
+import type { Config } from '@devvit/shared-types/Config.js';
 import cloneDeep from 'clone-deep';
 import isEqual from 'lodash.isequal';
 import { makeAPIClients } from '../../apis/makeAPIClients.js';

@@ -5,8 +5,7 @@
   // .d.ts is the only supported input. api-extractor runs on the output of tsc.
   "mainEntryPointFilePath": "<projectFolder>/dist/index.d.ts",
 
-  // to-do: support @devvit/protos.
-  "bundledPackages": ["@devvit/runtimes", "@devvit/shared-types"],
+  "bundledPackages": ["@devvit/protos", "@devvit/shared-types"],
 
   "newlineKind": "lf",
 
@@ -23,6 +22,13 @@
     },
 
     "tsdocMessageReporting": {
+      "tsdoc-html-tag-missing-greater-than": { "logLevel": "none" },
+      "tsdoc-unnecessary-backslash": { "logLevel": "none" },
+      "tsdoc-malformed-html-name": { "logLevel": "none" },
+      "tsdoc-link-tag-destination-syntax": { "logLevel": "none" },
+      "tsdoc-escape-greater-than": { "logLevel": "none" },
+      "tsdoc-missing-deprecation-message": { "logLevel": "none" },
+      "tsdoc-characters-after-block-tag": { "logLevel": "none" },
       "tsdoc-param-tag-missing-hyphen": { "logLevel": "none" },
       "tsdoc-undefined-tag": { "logLevel": "none" },
       "tsdoc-param-tag-with-invalid-name": { "logLevel": "none" },

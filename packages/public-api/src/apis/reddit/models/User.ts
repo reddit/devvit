@@ -5,7 +5,6 @@ import type {
   UserDataByAccountIdsResponse_UserAccountData,
   User as UserProto,
 } from '@devvit/protos';
-import { getFromMetadata } from '@devvit/runtimes/common/envelope/EnvelopeUtil.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
@@ -375,7 +374,7 @@ export class User {
     metadata: Metadata | undefined
   ): Promise<User | undefined> {
     assertNonNull(metadata);
-    const userId = getFromMetadata(key, metadata);
+    const userId = metadata?.[key]?.values[0];
     return userId ? User.getById(asT2ID(userId), metadata) : Promise.resolve(undefined);
   }
 

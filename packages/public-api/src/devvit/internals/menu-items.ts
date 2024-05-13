@@ -4,8 +4,8 @@ import {
   ContextActionDescription,
   ContextActionResponse,
 } from '@devvit/protos';
-import type { Config } from '@devvit/runtimes/api/Config.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
+import type { Config } from '@devvit/shared-types/Config.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';

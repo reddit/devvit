@@ -5,7 +5,6 @@ import type {
   SubredditAboutResponse_AboutData,
   WrappedRedditObject,
 } from '@devvit/protos';
-import { getFromMetadata } from '@devvit/runtimes/common/envelope/EnvelopeUtil.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
@@ -1125,8 +1124,8 @@ export class Subreddit {
   /** @internal */
   static async getFromMetadata(metadata: Metadata | undefined): Promise<Subreddit> {
     assertNonNull(metadata);
-    const subredditId = getFromMetadata(Header.Subreddit, metadata);
-    assertNonNull(subredditId);
+    const subredditId = metadata?.[Header.Subreddit]?.values[0];
+    assertNonNull<string | undefined>(subredditId);
     return Subreddit.getById(asT5ID(subredditId), metadata);
   }
 

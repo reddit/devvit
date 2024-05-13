@@ -1,7 +1,7 @@
 import type { Metadata } from '@devvit/protos';
-import { RedisClient } from './RedisClient.js';
-import { LocalRedis } from '@devvit/runtimes/plugins/LocalRedis.js';
+import { LocalRedis } from '@devvit/shared-types/test/LocalRedis.js';
 import { Devvit } from '../../devvit/Devvit.js';
+import { RedisClient } from './RedisClient.js';
 
 let localRedis: LocalRedis;
 let client: RedisClient;
