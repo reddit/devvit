@@ -99,7 +99,7 @@ Your `package.json` file will include other fields, and that's to be expected! J
 :::
 
 :::note
-If you are having trouble installing `chrono-node`, check out our [quickstart](../../get-started/quickstart.mdx) to make sure your environment is set up properly.
+If you are having trouble installing `chrono-node`, check out our [quickstart](../../quickstart.mdx) to make sure your environment is set up properly.
 :::
 
 ## Add code

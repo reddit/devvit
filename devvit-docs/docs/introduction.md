@@ -20,4 +20,4 @@ The [Developer Portal](https://developers.reddit.com/) is Reddit’s third-party
 
 ## Get started!
 
-Get your first app running with our [quickstart](./get-started/quickstart.mdx).
+Get your first app running with our [quickstart](./quickstart.mdx).

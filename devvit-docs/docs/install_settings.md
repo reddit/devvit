@@ -95,7 +95,7 @@ Render a textarea for longer form text.
 
 ## Prerequisites
 
-Before you can start adding settings, make sure you’ve completed the [Devvit Quickstart](./get-started/quickstart.mdx) and have a test app up and running.
+Before you can start adding settings, make sure you’ve completed the [Devvit Quickstart](./quickstart.mdx) and have a test app up and running.
 
 ## Configuring settings within your app
 
