@@ -1,20 +1,25 @@
-import { ContextAPIClients, Devvit } from '@devvit/public-api';
-
+import type { ContextAPIClients } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { CategoryProps, SharedCategoryPageProps } from '../../components/CategoryPage.js';
 import { CategoryPage, CategoryPageType } from '../../components/CategoryPage.js';
-import { StackDirectionCategory } from './StackDirectionCategory.js';
-import { StackRoundingCategory } from './StackRoundingCategory.js';
+import { Page } from '../page.js';
 import { StackAlignmentCategory } from './StackAlignmentCategory.js';
+import { StackBorderCategory } from './StackBorderCategory.js';
+import { StackDirectionCategory } from './StackDirectionCategory.js';
 import { StackGapCategory } from './StackGapCategory.js';
 import { StackPaddingCategory } from './StackPaddingCategory.js';
-import { StackBorderCategory } from './StackBorderCategory.js';
 import { StackReverseCategory } from './StackReverseCategory.js';
+import { StackRoundingCategory } from './StackRoundingCategory.js';
 import { StackZStackCategory } from './ZStack/StackZStackCategory.js';
-import { Page } from '../page.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import { StackPaddingGapPage } from './StackPaddingGapPage.js';
 
-export const StacksPage = ({ sharedState, context }: { sharedState: SharedCategoryPageProps,  context: ContextAPIClients }): JSX.Element => {
+export const StacksPage = ({
+  sharedState,
+  context,
+}: {
+  sharedState: SharedCategoryPageProps;
+  context: ContextAPIClients;
+}): JSX.Element => {
   const state = sharedState.state;
   const categories: CategoryProps[] = [
     {
@@ -55,7 +60,7 @@ export const StacksPage = ({ sharedState, context }: { sharedState: SharedCatego
     {
       label: 'ZStack',
       category: 'zstack',
-      content: <StackZStackCategory state={state}/>,
+      content: <StackZStackCategory state={state} />,
     },
   ];
   return (

@@ -1,4 +1,5 @@
-import { ContextAPIClients, Devvit } from '@devvit/public-api';
+import type { ContextAPIClients } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 
 import { BlockGallery } from './components/BlockGallery.js';
 import { GalleryState } from './state/state.js';

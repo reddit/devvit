@@ -8,10 +8,12 @@ type ColumnsProps = {
 export const Columns = ({ count, children }: ColumnsProps): JSX.Element => {
   const rows: JSX.Element[] = [];
 
+  const arr = Array.isArray(children) ? children : [children];
+
   // Divide the children into rows with N (count) children each.
   // Pad the last row if incomplete.
-  for (let i = 0; i < children.length; i += count) {
-    const row = children
+  for (let i = 0; i < arr.length; i += count) {
+    const row = arr
       .slice(i, i + count)
       .map((child) => <vstack width={100.0 / count}>{child}</vstack>);
     const rowHasRoom = (): boolean => row.length < count;

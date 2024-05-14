@@ -1,4 +1,4 @@
-export function sessionId() {
+export function sessionId(): string {
   let id = '';
   const asciiZero = '0'.charCodeAt(0);
   for (let i = 0; i < 4; i++) {

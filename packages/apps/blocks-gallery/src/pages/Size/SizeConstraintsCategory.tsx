@@ -2,7 +2,7 @@ import { Devvit } from '@devvit/public-api';
 import { Bar } from '../../components/Bar.js';
 import { Tile } from '../../components/Tile.js';
 
-export const SizeConstraintsCategory = () => (
+export const SizeConstraintsCategory = (): JSX.Element => (
   <vstack gap={'small'}>
     <Tile label={'Max width: 300px'}>
       <Bar maxWidth={'300px'} />

@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
 import { Columns } from '../../components/Columns.js';
-import { BlockGalleryProps } from '../../components/BlockGallery.js';
+import type { BlockGalleryProps } from '../../components/BlockGallery.js';
 
 export const HomePage = ({ state }: BlockGalleryProps): JSX.Element => {
   const pages: string[][] = [
@@ -14,7 +14,6 @@ export const HomePage = ({ state }: BlockGalleryProps): JSX.Element => {
     ['Icon', 'icon'],
     ['Color', 'color'],
     ['Size', 'size'],
-
   ];
 
   const pageButtons = pages.map(([label, id]) => (

@@ -1,19 +1,27 @@
-import { ContextAPIClients, Devvit } from '@devvit/public-api';
-
+import type { ContextAPIClients } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
+import type { CategoryPageState } from '../../components/CategoryPage.js';
+import { CategoryPage } from '../../components/CategoryPage.js';
 import { StackAlignmentPreview } from './StackAlignmentPreview.js';
-import { CategoryPage, CategoryPageState } from '../../components/CategoryPage.js';
 
-export const StackAlignmentCategory = ({ state, context }: { state: CategoryPageState, context: ContextAPIClients }): JSX.Element => {
+export const StackAlignmentCategory = ({
+  state,
+  context,
+}: {
+  state: CategoryPageState;
+  context: ContextAPIClients;
+}): JSX.Element => {
   const subCategories = [
     ['Horizontal', 'horizontal'],
     ['Vertical', 'vertical'],
     ['Horiz + Vert', 'horizontal vertical'],
   ];
 
-  const [stack, setStack] = context.useState('zstack')
+  const [stack, setStack] = context.useState('zstack');
   const [useLargeChild, setUseLargeChild] = context.useState(false);
-  const [useChildPercentMeasurementUnit, setUseChildPercentMeasurementUnit] = context.useState(false);
-  const [reverse, setReverse] = context.useState(false)
+  const [useChildPercentMeasurementUnit, setUseChildPercentMeasurementUnit] =
+    context.useState(false);
+  const [reverse, setReverse] = context.useState(false);
 
   const nameForm = context.useForm(
     {
@@ -25,11 +33,10 @@ export const StackAlignmentCategory = ({ state, context }: { state: CategoryPage
           required: true,
           defaultValue: [stack],
           options: [
-            { label: "Z stack", value: 'zstack'},
-            { label: "H stack", value: 'hstack'},
-            { label: "V stack", value: 'vstack'},
+            { label: 'Z stack', value: 'zstack' },
+            { label: 'H stack', value: 'hstack' },
+            { label: 'V stack', value: 'vstack' },
           ],
-          
         },
         {
           label: 'Is Stack larger than child?',
@@ -43,9 +50,9 @@ export const StackAlignmentCategory = ({ state, context }: { state: CategoryPage
           name: 'childMeasurement',
           defaultValue: [useChildPercentMeasurementUnit ? 'percent' : 'pixel'],
           options: [
-            { label: "Pixels", value: 'pixel'},
-            { label: "Percent", value: 'percent'},
-          ]
+            { label: 'Pixels', value: 'pixel' },
+            { label: 'Percent', value: 'percent' },
+          ],
         },
         {
           label: 'Is Stack Reversed?',
@@ -53,7 +60,7 @@ export const StackAlignmentCategory = ({ state, context }: { state: CategoryPage
           name: 'reverseStack',
           defaultValue: reverse,
         },
-      ]
+      ],
     },
     (values) => {
       setStack(values.stack[0]);
@@ -63,19 +70,27 @@ export const StackAlignmentCategory = ({ state, context }: { state: CategoryPage
     }
   );
 
-  const configureCategory = () => {
+  const configureCategory = (): void => {
     context.ui.showForm(nameForm);
-  }
+  };
 
-  const childUnit = useChildPercentMeasurementUnit ? "percent" : "pixels";
-  const childSize = useLargeChild ? "large child" : "small child";
-  const reverseString = reverse ? " - reverse" : "";
+  const childUnit = useChildPercentMeasurementUnit ? 'percent' : 'pixels';
+  const childSize = useLargeChild ? 'large child' : 'small child';
+  const reverseString = reverse ? ' - reverse' : '';
   const configuration = `${stack} - ${childSize} - ${childUnit}${reverseString}`;
 
   const content = subCategories.map(([label, subcategory]) => ({
     label,
     category: subcategory,
-    content: <StackAlignmentPreview mode={subcategory} stack={stack} reverse={reverse} isChildPercent={useChildPercentMeasurementUnit} isChildLarge={useLargeChild} />,
+    content: (
+      <StackAlignmentPreview
+        mode={subcategory}
+        stack={stack}
+        reverse={reverse}
+        isChildPercent={useChildPercentMeasurementUnit}
+        isChildLarge={useLargeChild}
+      />
+    ),
   }));
 
   return (

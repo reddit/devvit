@@ -1,4 +1,4 @@
 {
-    "extends": "@devvit/public-api/devvit.tsconfig.json",
-    "exclude": ["index.js"]
+  "extends": "@devvit/public-api/devvit.tsconfig.json",
+  "exclude": ["index.js"]
 }

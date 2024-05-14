@@ -1,5 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-import { CategoryPage, CategoryPageState, CategoryPageType } from '../../components/CategoryPage.js';
+import type { CategoryPageState } from '../../components/CategoryPage.js';
+import { CategoryPage } from '../../components/CategoryPage.js';
 import { StackPaddingGapPreview } from './StackPaddingGapPreview.js';
 
 export enum StackPaddingGapConfiguration {
@@ -7,10 +8,16 @@ export enum StackPaddingGapConfiguration {
   Gap = 1,
   Reverse = 2,
   Constrain = 4,
-  Grow = 8
+  Grow = 8,
 }
 
-export const StackPaddingGapCategory = ({ state, configuration }: { state: CategoryPageState, configuration: number }): JSX.Element => {
+export const StackPaddingGapCategory = ({
+  state,
+  configuration,
+}: {
+  state: CategoryPageState;
+  configuration: number;
+}): JSX.Element => {
   const subCategories = [
     ['HStack', 'h'],
     ['VStack', 'v'],
@@ -20,7 +27,7 @@ export const StackPaddingGapCategory = ({ state, configuration }: { state: Categ
   const content = subCategories.map(([label, subcategory]) => ({
     label,
     category: subcategory,
-    content: <StackPaddingGapPreview mode={subcategory} configuration={configuration}/>,
+    content: <StackPaddingGapPreview mode={subcategory} configuration={configuration} />,
   }));
 
   return (
@@ -33,4 +40,3 @@ export const StackPaddingGapCategory = ({ state, configuration }: { state: Categ
     />
   );
 };
-
