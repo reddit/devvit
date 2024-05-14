@@ -1,14 +1,14 @@
 import type { UIEvent } from '@devvit/protos';
 import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
-import { ContextBuilder } from './ContextBuilder.js';
-import { BlocksTransformer } from '../BlocksTransformer.js';
+import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { BlockElement } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
-import type { Hook, HookSegment, HookParams, Props, BlocksState } from './types.js';
-import { RenderInterruptError } from './types.js';
-import { RenderContext } from './RenderContext.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import { BlocksTransformer } from '../BlocksTransformer.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
+import { ContextBuilder } from './ContextBuilder.js';
+import { RenderContext } from './RenderContext.js';
+import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
+import { RenderInterruptError } from './types.js';
 
 /**
  * This can be a global/singleton because render is synchronous.
@@ -122,6 +122,7 @@ export class BlocksHandler {
 
     const isBlockingSSR = eventsToProcess.some((e) => e.blocking);
 
+    let changed: { [hookID: string]: true };
     let progress:
       | {
           _state: BlocksState;
@@ -160,6 +161,7 @@ export class BlocksHandler {
          */
         if (progress) {
           context._state = progress._state;
+          context._changed = changed!;
           context._effects = progress._effects;
           remaining.forEach((e) => {
             // e.retry = true;
@@ -195,6 +197,7 @@ export class BlocksHandler {
        * If we're going back through this again, we need to capture the progress, and the remaining events.
        */
       if (eventsToProcess.length > 0) {
+        changed = { ...context._changed };
         progress = {
           _state: _structuredClone(context._state),
           _effects: { ...context._effects },
@@ -213,7 +216,7 @@ export class BlocksHandler {
     }
 
     return {
-      state: context._state,
+      state: context._changedState,
       effects: context.effects,
       blocks,
       events: context._requeueEvents,
@@ -261,7 +264,6 @@ export class BlocksHandler {
     // We need to handle events in order, so that the state is updated in the correct order.
     for (const event of batch) {
       this.#loadHooks(context, event);
-      context._state.__generation = Number(context._state.__generation ?? 0) + 1;
       await this.#attemptHook(context, event);
     }
   }

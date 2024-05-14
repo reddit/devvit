@@ -2,7 +2,7 @@ import type { UIEvent } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { RenderContext } from './RenderContext.js';
 
-export type BlocksState = { [key: string]: JSONValue };
+export type BlocksState = { [hookID: string]: JSONValue };
 
 export type Props = { [key: string]: unknown };
 

@@ -91,9 +91,7 @@ exports[`useForm > emits an effect on render 1`] = `
     },
   ],
   "events": [],
-  "state": {
-    "__generation": 1,
-  },
+  "state": {},
 }
 `;
 
@@ -189,7 +187,6 @@ exports[`useForm > test rendering FormSubmittedEvent 1`] = `
   "events": [],
   "state": {
     "App2.useState-0": "Genghis Corgi",
-    "__generation": 2,
   },
 }
 `;

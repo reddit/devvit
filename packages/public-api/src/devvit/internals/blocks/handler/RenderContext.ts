@@ -1,7 +1,7 @@
-import type { Effect, UIRequest, UIEvent } from '@devvit/protos';
+import type { Effect, UIEvent, UIRequest } from '@devvit/protos';
 import type { Devvit } from '../../../Devvit.js';
-import type { BlocksState, HookSegment, Hook, EventHandler, HookRef } from './types.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
+import type { BlocksState, EventHandler, Hook, HookRef, HookSegment } from './types.js';
 
 /**
  * The RenderContext is a class that holds the state of the rendering process.
@@ -14,12 +14,12 @@ import type { EffectEmitter } from '../EffectEmitter.js';
  * to add special cases for new features, but we should strive to work within the existing framework.
  */
 export class RenderContext implements EffectEmitter {
-  _state: BlocksState;
+  #state: BlocksState;
   _segments: (HookSegment & { next: number })[] = [];
   _hooks: { [key: string]: Hook } = {};
   _prevHookId: string = '';
   _effects: { [key: string]: Effect } = {};
-  _changed: { [key: string]: boolean } = {};
+  _changed: { [hookID: string]: true } = {};
   /** Events that will re-enter the dispatcher queue */
   _requeueEvents: UIEvent[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,8 +41,26 @@ export class RenderContext implements EffectEmitter {
   }
 
   constructor(public request: UIRequest) {
-    this._state = request.state ?? {};
+    this.#state = request.state ?? {};
     this._rootProps = request.props ?? {};
+  }
+
+  /** The state delta new to this render. */
+  get _changedState(): BlocksState {
+    const changed: BlocksState = {};
+    for (const key in this._changed) changed[key] = this._state[key];
+    return changed;
+  }
+
+  /** The complete render state. */
+  get _state(): BlocksState {
+    return this.#state;
+  }
+
+  /** Replacing state resets the delta for the next render. */
+  set _state(state: BlocksState) {
+    this._changed = {};
+    this.#state = state;
   }
 
   push(options: HookSegment): void {
