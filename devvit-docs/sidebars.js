@@ -30,9 +30,8 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Examples',
-      link: { type: 'doc', id: 'examples/overview' },
-      items: ['examples/playpens', 'examples/apps', 'examples/tutorials'],
+      label: 'Showcase',
+      items: ['examples/apps', 'examples/playpens', 'examples/tutorials'],
     },
     {
       type: 'category',
