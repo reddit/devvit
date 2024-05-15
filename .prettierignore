@@ -17,3 +17,16 @@ node_modules
 
 # Generated icon files
 /packages/public-api/src/jsx/icons.ts
+
+# Checked-in JS binaries
+devvit-compute-go/internal/generated/*.bundle.json
+devvit-compute-go/internal/v8worker/*.cjs
+devvit-compute-go/internal/v8worker/polyfill_js/generated/
+devvit-compute-go/images/**/dist/*.cjs
+
+# dumb
+devvit-compute-go/internal/v8worker/worker.bootstrap.cjs
+devvit-compute-go/internal/v8worker/worker.echo.cjs
+devvit-compute-go/internal/v8worker/worker.redditapi.cjs
+devvit-compute-go/internal/v8worker/worker.supervisor.cjs
+devvit-compute-go/internal/v8worker/polyfill_js/generated/public-api.iife.js
