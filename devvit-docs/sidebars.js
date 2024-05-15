@@ -72,8 +72,8 @@ const sidebars = {
     {
       type: 'category',
       label: 'Blocks',
-      link: { type: 'doc', id: 'blocks/overview' },
       items: [
+        'blocks/overview',
         'blocks/stacks',
         'blocks/text',
         'blocks/icon',
