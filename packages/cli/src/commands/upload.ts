@@ -264,7 +264,7 @@ export default class Upload extends ProjectCommand {
         this.error(`Please manually change the version back to "0.0.0"`);
       } else {
         version = '0.0.0';
-        await updateDevvitConfig(this.projectRoot, { version });
+        await updateDevvitConfig(this.projectRoot, this.configFile, { version });
       }
     }
 
@@ -285,7 +285,7 @@ export default class Upload extends ProjectCommand {
       ux.action.start('Creating app...');
       // let's eliminate the "slug" field and just update the "name" directly
       const newApp = await this.appClient.Create(appCreationRequest);
-      await updateDevvitConfig(this.projectRoot, {
+      await updateDevvitConfig(this.projectRoot, this.configFile, {
         name: newApp.slug,
         version,
       });
@@ -374,7 +374,7 @@ export default class Upload extends ProjectCommand {
       }
     }
 
-    await updateDevvitConfig(this.projectRoot, {
+    await updateDevvitConfig(this.projectRoot, this.configFile, {
       version: appVersion.toString(),
     });
 
@@ -494,7 +494,7 @@ export default class Upload extends ProjectCommand {
           `Aborting. Make sure to manually set the version field of devvit.yaml to "${latestStoredVersion.toString()}" to match the latest published version already on Reddit.`
         );
       }
-      await updateDevvitConfig(this.projectRoot, {
+      await updateDevvitConfig(this.projectRoot, this.configFile, {
         version: latestStoredVersion.toString(),
       });
     }

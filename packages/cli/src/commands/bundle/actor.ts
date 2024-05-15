@@ -29,7 +29,7 @@ export default class BundleActor extends ProjectCommand {
     const { args } = await this.parse(BundleActor);
 
     const username = await this.#getOwnerUsername();
-    const config = await readDevvitConfig(this.projectRoot);
+    const config = await readDevvitConfig(this.projectRoot, this.configFile);
 
     const actorName = args.name;
 

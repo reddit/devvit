@@ -1,17 +1,18 @@
 import { Empty } from '@devvit/protos';
 import type { T2ID } from '@devvit/shared-types/tid.js';
-import { Command } from '@oclif/core';
+import { Command, Flags } from '@oclif/core';
 import open from 'open';
 import { NodeFSAuthenticationPlugin } from '../../lib/auth/NodeFSAuthenticationPlugin.js';
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { DOT_DEVVIT_DIR_FILENAME } from '../../lib/config.js';
-import { readDevvitConfig } from '../../util/devvitConfig.js';
+import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../../util/devvitConfig.js';
 import { findProjectRoot } from '../../util/project-util.js';
 import { AUTH_CONFIG } from '../auth.js';
 import { createWaitlistClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
 import { readLine } from '../input-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
+import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`
@@ -23,6 +24,32 @@ export const toLowerCaseArgParser = async (input: string): Promise<string> => in
 
 export abstract class DevvitCommand extends Command {
   protected _authSvc: NodeFSAuthenticationPlugin | undefined;
+  #configFile: string | undefined;
+
+  static override baseFlags: FlagInput = {
+    config: Flags.string({
+      name: 'config',
+      char: 'c',
+      description: 'path to devvit config file',
+      default: DEVVIT_CONFIG_FILE,
+    }),
+  };
+
+  public get configFile(): string {
+    return this.#configFile ?? DEVVIT_CONFIG_FILE;
+  }
+
+  protected override async init(): Promise<void> {
+    await super.init();
+    const { flags } = await this.parse({
+      strict: false,
+      flags: DevvitCommand.baseFlags,
+    });
+    this.#configFile = flags.config;
+    if (this.#configFile !== DEVVIT_CONFIG_FILE) {
+      this.log(`Using custom config file: ${this.#configFile}`);
+    }
+  }
 
   get isOauthSvcInitd(): boolean {
     return this._authSvc != null;
@@ -113,11 +140,11 @@ export abstract class DevvitCommand extends Command {
   }
 
   protected async inferAppNameFromProject(): Promise<string> {
-    const projectRoot = await findProjectRoot();
+    const projectRoot = await findProjectRoot(this.configFile);
     if (projectRoot == null) {
       this.error(`You must specify an app name or run this command from within a project.`);
     }
-    const devvitConfig = await readDevvitConfig(projectRoot);
+    const devvitConfig = await readDevvitConfig(projectRoot, this.configFile);
 
     return devvitConfig.name;
   }
@@ -136,11 +163,11 @@ export abstract class DevvitCommand extends Command {
       return appWithVersion;
     }
 
-    const projectRoot = await findProjectRoot();
+    const projectRoot = await findProjectRoot(this.configFile);
     if (projectRoot == null) {
       this.error(`You must specify an app name or run this command from within a project.`);
     }
-    const devvitConfig = await readDevvitConfig(projectRoot);
+    const devvitConfig = await readDevvitConfig(projectRoot, this.configFile);
 
     if (!appWithVersion) {
       // getInfoForSlugString is called after this which will default to latest version so we don't need to return the

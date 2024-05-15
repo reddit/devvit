@@ -7,10 +7,10 @@ import path from 'path';
 import { isFile } from './file-util.js';
 import { dumpJsonToYaml, readYamlToJson } from './files.js';
 
-const DEVVIT_CONFIG_FILE = 'devvit.yaml';
+export const DEVVIT_CONFIG_FILE = 'devvit.yaml';
 
-function getConfigFilepath(projectPath: string): string {
-  return path.join(projectPath, DEVVIT_CONFIG_FILE);
+function getConfigFilepath(projectPath: string, configFile: string): string {
+  return path.join(projectPath, configFile);
 }
 
 export type DevvitConfig = {
@@ -28,8 +28,11 @@ export const DEVVIT_CONFIG_SCHEMA = {
   version: v.string,
 };
 
-export async function readDevvitConfig(projectPath: string): Promise<DevvitConfig> {
-  const configFilePath = getConfigFilepath(projectPath);
+export async function readDevvitConfig(
+  projectPath: string,
+  configFile: string
+): Promise<DevvitConfig> {
+  const configFilePath = getConfigFilepath(projectPath, configFile);
   if (!(await isFile(configFilePath))) {
     throw new Error(`Devvit.yaml does not exist`);
   }
@@ -56,9 +59,10 @@ export async function readDevvitConfig(projectPath: string): Promise<DevvitConfi
 
 export async function updateDevvitConfig(
   projectPath: string,
+  configFile: string,
   updates: Partial<DevvitConfig>
 ): Promise<void> {
-  const config = await readDevvitConfig(projectPath);
+  const config = await readDevvitConfig(projectPath, configFile);
   if (updates.name != null) {
     config.name = updates.name.toLowerCase();
   }
@@ -74,14 +78,15 @@ export async function updateDevvitConfig(
   validateConfig(config as unknown as JSONObject, DEVVIT_CONFIG_SCHEMA);
 
   const newConfigYaml = dumpJsonToYaml(config);
-  await writeFile(getConfigFilepath(projectPath), newConfigYaml);
+  await writeFile(getConfigFilepath(projectPath, configFile), newConfigYaml);
 }
 
 export async function generateDevvitConfig(
   projectPath: string,
+  configFile: string,
   config: DevvitConfig
 ): Promise<void> {
-  const configFilePath = getConfigFilepath(projectPath);
+  const configFilePath = getConfigFilepath(projectPath, configFile);
 
   const oldConfigExists = await isFile(configFilePath);
   const oldConfig: DevvitConfig = oldConfigExists ? await readYamlToJson(configFilePath) : {};

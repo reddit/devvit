@@ -307,7 +307,7 @@ export default class Playtest extends Upload {
     this.#version.bumpVersion(VersionBumpType.Prerelease);
 
     // 2. update devvit yaml:
-    await updateDevvitConfig(this.projectRoot, {
+    await updateDevvitConfig(this.projectRoot, this.configFile, {
       version: this.#version.toString(),
     });
 
