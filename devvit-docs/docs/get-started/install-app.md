@@ -4,7 +4,7 @@ You can install an app into a subreddit you moderate ('everything' permissions) 
 
 ## Install with CLI
 
-Once you’ve uploaded your app, you can install it on a small subreddit that you moderate (less than 50 subscribers) by running the following command from the project folder.
+Once you’ve uploaded your app, you can install it on a small subreddit that you moderate (less than 200 subscribers) by running the following command from the project folder.
 
 ```bash
  $ devvit install <subreddit-name>
@@ -23,5 +23,5 @@ Select a subreddit to install the app.
 ![subreddit selector modal](../assets/app-details-install-modal.png)
 
 :::note
-If the **Install** button is not active, you are not the moderator of an eligible subreddit. Try creating a new test subreddit with fewer than 50 members.
+If the **Install** button is not active, you are not the moderator of an eligible subreddit. Try creating a new test subreddit with fewer than 200 members.
 :::

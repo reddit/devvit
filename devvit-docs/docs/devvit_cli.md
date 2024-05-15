@@ -272,7 +272,7 @@ $ devvit playtest <subreddit> [--verbose]
 
 - `subreddit`
 
-  Name of a test subreddit with less than 50 subscribers that you moderate. The "r/" prefix is optional.
+  Name of a test subreddit with less than 200 subscribers that you moderate. The "r/" prefix is optional.
 
 #### Optional argument
 

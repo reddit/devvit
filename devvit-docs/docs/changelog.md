@@ -194,7 +194,7 @@ With 0.10.7, you can publish your app to the Developer Portal in a private state
 
 **Updated app states and commands**:
 
-1. **Uploaded**: your app is available for use within test subreddits (less than 50 subscribers) you moderate. To do this, run devvit upload from your CLI.
+1. **Uploaded**: your app is available for use within test subreddits (less than 200 subscribers) you moderate. To do this, run devvit upload from your CLI.
 2. **Published**: your app can be installed in any subreddit you moderate, but cannot be installed, viewed, or managed by anyone else. To do this, run devvit publish from your CLI, or select “publish” on the app details page.
 3. **Publicly Listed**: your app can be viewed and installed by anyone else browsing the Developer Portal. **These apps must be pre-approved by our team.** [Submit your app for review here to have your app listed](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform?usp=sf_link).
 
