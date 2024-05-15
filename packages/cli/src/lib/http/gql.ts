@@ -66,7 +66,7 @@ export async function fetchSubredditSubscriberCount(
   if (MY_PORTAL_ENABLED) return 0;
 
   const subredditInfo = await gqlQuery<
-    { subredditInfoByName: { subscribersCount: number } },
+    { subredditInfoByName: { subscribersCount: number } | null },
     { name: string }
   >({
     accessToken: token.accessToken,
@@ -74,6 +74,9 @@ export async function fetchSubredditSubscriberCount(
     name: 'GetSubredditInfoByName',
     variables: { name: subreddit },
   });
+  if (!subredditInfo.data.subredditInfoByName) {
+    throw new Error(`Community '${subreddit}' not found.`);
+  }
   return subredditInfo.data.subredditInfoByName.subscribersCount;
 }
 
