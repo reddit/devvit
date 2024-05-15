@@ -1,83 +1,160 @@
 # Devvit CLI
 
+The Devvit CLI enables you to create, upload, and manage your apps. It's the bridge between your codebase and Reddit.
+
+## devvit create icons
+
+Bundles all `SVG` files in the `/assets` folder into a new file (`src/icons.ts` by default). Enabling you to import local SVG assets in your app code.
+
+#### Usage
+
+```bash
+$ devvit create icons [output-file]
+```
+
+#### Optional Argument
+
+- `output-file`
+
+  Path to the output file. Defaults to `src/icons.ts`.
+
+#### Generating the SVG bundle file
+
+```bash
+$ devvit create icons
+
+$ devvit create icons "src/my-icons.ts"
+```
+
+#### Using the SVG files in app code
+
+```tsx
+import { Devvit } from '@devvit/public-api';
+import Icons from './my-icons.ts';
+
+Devvit.addCustomPostType({
+  name: 'my-custom-post',
+  render: (_context) => {
+    return (
+      <blocks>
+        <image url={Icons['my-image.svg']} imageHeight="32px" imageWidth="32px" />
+      </blocks>
+    );
+  },
+});
+
+export default Devvit;
+```
+
+## devvit help
+
+Display help for devvit
+
+#### Usage
+
+```bash
+$ devvit help
+```
+
 ## devvit install
 
-Install an app or experience from the Apps directory to a subreddit that you moderate. You can specify a version to install or default to the latest version.
+Install an app or experience from the Apps directory to a subreddit that you moderate. You can specify a version to install or default to @latest (the latest version).
 
-**Usage**
+#### Usage
 
-```tsx
-$ devvit install SUBREDDIT [APPWITHVERSION]
+```bash
+$ devvit install <subreddit> [app-name][version]
 ```
 
-**Arguments**
+#### Required Arguments
 
-```tsx
-SUBREDDIT        Name of the installation subreddit. The "r/" prefix is optional.
-APPWITHVERSION   Name of the app and version (defaults to latest).
+- `subreddit`
+
+  Name of the installation subreddit. The "r/" prefix is optional.
+
+#### Optional Arguments
+
+- `app-name`
+
+  Name of the app to install (defaults to current project).
+
+- `version`
+
+  Specify the desired version (defaults to latest).
+
+#### Examples
+
+```bash
+$ devvit install r/mySubreddit
+
+$ devvit install mySubreddit my-app
+
+$ devvit install r/mySubreddit my-app@1.2.3
+
+$ devvit install r/mySubreddit @1.2.3
 ```
 
-**Examples**
+## devvit list apps
 
-```tsx
-$ devvit install <subreddit> [app-name][@version]
+To see a list of apps you've published
 
-$ devvit install r/MyTestSubreddit
+#### Usage
 
-$ devvit install MyOtherTestSubreddit my-app
-
-$ devvit install r/SomeOtherSubreddit my-app@1.2.3
-
-$ devvit install r/AnotherSubreddit @1.2.3
-```
-
-## devvit list
-
-To see a list of apps you've published:
-
-**Usage**
-
-```tsx
+```bash
 $ devvit list apps
 ```
 
-To see a list of all apps currently installed on a specified subreddit (if no subreddit is specified, you'll get a list of all apps installed by you):
+## devvit list installs
 
-**Usage**
+To see a list of all apps currently installed on a specified subreddit.
 
-```tsx
-$ devvit list installs [SUBREDDIT]
+If no subreddit is specified, you'll get a list of all apps installed by you.
+
+#### Usage
+
+```bash
+$ devvit list installs [subreddit]
 ```
 
-**Arguments**
+#### Optional argument
 
-```tsx
-SUBREDDIT     Name of the installation subreddit. The "r/" prefix is optional.
+- `subreddit`
+
+  Name of the subreddit to look up installations for. The "r/" prefix is optional.
+
+#### Examples
+
+```bash
+$ devvit list installs
+
+$ devvit list installs mySubreddit
+
+$ devvit list installs r/mySubreddit
 ```
 
 ## devvit login
 
-Login to Devvit via reddit.com.
+Login to Devvit with your Reddit account in the browser.
 
-**Usage**
+#### Usage
 
-```tsx
+```bash
 $ devvit login [--copy-paste]
 ```
 
-**Flags**
+#### Optional argument
 
-```tsx
---copy-paste   If present, user will copy-paste code from the browser instead of the localhost.
-```
+- `--copy-paste`
+
+  If present, user will copy-paste code from the browser instead of the localhost.
 
 ## devvit logout
 
-Log out of Devvit via reddit.com.
+Logs the current user out of Devvit.
 
-**Usage**
+#### Usage
 
-```tsx
+```bash
 $ devvit logout
 ```
 
@@ -85,157 +162,224 @@ $ devvit logout
 
 Stream logs for an installation within a specified subreddit.
 
-**Usage**
+#### Usage
 
-```tsx
-$ devvit logs SUBREDDIT [APP] [-d <value>] [-j] [-s <value>] [--verbose]
+```bash
+$ devvit logs <subreddit> [app-name] [-d <value>] [-j] [-s <value>] [--verbose]
 ```
 
-**Arguments**
+#### Required arguments
 
-```tsx
-SUBREDDIT  The subreddit name. The "r/" prefix is optional.
-APP        The app name (defaults to working directory app).
+- `subreddit`
+
+  The subreddit name. The "r/" prefix is optional.
+
+- `app-name`
+
+  The app name (defaults to working directory app).
+
+#### Optional arguments
+
+- `-d <value>, --dateformat <value>`
+
+  Specify the format for rendering dates. Defaults to `MMM d HH:mm:ss` (Jan 15 18:30:03). See more about format options [here](https://date-fns.org/v2.29.3/docs/format).
+
+- `-j, --json`
+
+  Output JSON for each log line
+
+- `-s <value>, --since <value>`
+
+  Specify how far back you want the log streaming to start. Defaults to a `0m` (now) if omitted.
+
+  Supported format:
+
+  - `s` seconds
+  - `m` minutes
+  - `h` hours
+  - `d` days
+  - `w` weeks
+
+  For example `15s`, `2w1d`, or `30m`.
+
+- `--verbose`
+
+#### Examples
+
+```bash
+$ devvit logs r/mySubreddit
+
+$ devvit logs mySubreddit my-app
+
+$ devvit logs mySubreddit my-app --since 15s
+
+$ devvit logs mySubreddit my-app --verbose
 ```
 
-**Flags**
+#### Usage
 
-```tsx
--d, --dateformat=<value>
-    [default: MMM d HH:mm:ss] Format for rendering dates. See https://date-fns.org/v2.29.3/docs/format for format options.
-
--j, --json
-    output JSON for each log line
-
--s, --since=<value>
-    [default: 0m] when to start the logs from. example "15s", "2w1d" "30m"
-    Supported format:
-    s: seconds
-    m: minutes
-    h: hours
-    d: days
-    w: weeks
-
---verbose
-
-```
-
-**Examples**
-
-```tsx
-$ devvit logs <subreddit> [app]
-
-$ devvit logs r/myTestSubreddit
-
-$ devvit logs myOtherTestSubreddit my-app
+```bash
+$ devvit help
 ```
 
 ## devvit new
 
 Create a new app.
 
-**Usage**
+#### Usage
 
-```tsx
-$ devvit new [APPNAME] [--here] [-t <value>]
+```bash
+$ devvit new [directory-name] [-t <value>] [--here]
 ```
 
-**Arguments**
+#### Optional arguments
 
-```tsx
-APPNAME   Name of the app. This creates a new directory for your app code. If no name is entered, you will be prompted to choose one.
-```
+- `directory-name`
 
-**Flags**
+  Directory name for your new app project. This creates a new directory for your app code. If no name is entered, you will be prompted to choose one.
 
-```tsx
--t, --template=<value>  Template name or pen URL.
---here                  Flag to generate the project here and not in a subdirectory.
+- `-t <value>, --template <value>`
+
+  Template name or pen URL. If no template is entered, you will be prompted to choose one.
+
+- `--here`
+
+  Generate the project here and not in a subdirectory.
+
+#### Examples
+
+```bash
+$ devvit new
+
+$ devvit new tic-tac-toe
+
+$ devvit new tic-tac-toe --template experience-post
+
+$ devvit new --here
 ```
 
 ## devvit playtest
 
-Install your app to a test subreddit and start a playtest session.
+Installs your app to your test subreddit and starts a playtest session where a new version is installed whenever you save changes to your app code, and logs are continuously streamed. Press `ctrl+c` to end the playtest session. Once ended, the latest installed version will remain unless you revert to a previous version using [`devvit install`](#devvit-install). For more information, see the [playtest page](playtest.md).
 
-**Usage**
+#### Usage
 
-```tsx
-$ devvit playtest SUBREDDIT [--verbose]
+```bash
+$ devvit playtest <subreddit> [--verbose]
 ```
 
-**Arguments**
+#### Required argument
 
-```tsx
-SUBREDDIT  Name of a test subreddit with <50 subscribers that you moderate. The "r/" prefix is optional.
+- `subreddit`
+
+  Name of a test subreddit with less than 50 subscribers that you moderate. The "r/" prefix is optional.
+
+#### Optional argument
+
+- `--verbose`
+
+## devvit settings list
+
+List settings for your app. These settings exist at the global app-scope and are available to all instances of your app.
+
+#### Usage
+
+```bash
+$ devvit settings list
 ```
 
-**Flags**
+## devvit settings set
 
-```tsx
---verbose;
+Create and update settings for your app. These settings will be added at the global app-scope.
+
+#### Usage
+
+```bash
+$ devvit settings set <my-setting>
+```
+
+#### Example
+
+```bash
+$ devvit settings set my-feature-flag
 ```
 
 ## devvit uninstall
 
 Uninstall an app from a specified subreddit.
 
-**Usage**
+#### Usage
 
-```tsx
-$ devvit uninstall SUBREDDIT [APP]
+```bash
+$ devvit uninstall <subreddit> [app-name]
 ```
 
-**Arguments**
+#### Required argument
 
-```tsx
-SUBREDDIT      Name of the subreddit. The "r/" prefix is optional.
-APP            Name of the app (defaults to the working directory).
+- `subreddit`
+
+  Name of the subreddit. The "r/" prefix is optional. Requires moderator permissions in the subreddit.
+
+- `app-name`
+
+  Name of the app (defaults to the working directory app).
+
+#### Examples
+
+```bash
+$ devvit uninstall r/mySubreddit
+
+$ devvit uninstall mySubreddit
+
+$ devvit uninstall mySubreddit my-app
 ```
 
-**Examples**
+## devvit update app
 
-```tsx
-$ devvit uninstall <subreddit> [app]
+Update @devvit project dependencies to the currently installed CLI's version
 
-$ devvit uninstall r/myTestSubreddit
+#### Usage
 
-$ devvit uninstall myOtherTestSubreddit my-app
+```bash
+$ devvit update app
 ```
 
 ## devvit upload
 
-Upload an app to the App directory (app is private and visible only to you).
+Upload an app to the App directory. By default the app is private and visible only to you.
 
-**Usage**
+#### Usage
 
-```tsx
+```bash
 $ devvit upload [--bump major|minor|patch|prerelease] [--copyPaste]
 ```
 
-**Flags**
+#### Optional arguments
 
-```tsx
---bump=<option>  Type of version bump (major|minor|patch|prerelease)
-                  <options: major|minor|patch|prerelease>
---copyPaste      Copy-paste the auth code instead of opening a browser
-```
+- `--bump <option>`
+
+  Type of version bump (major|minor|patch|prerelease)
+
+- `--copyPaste`
+
+  Copy-paste the auth code instead of opening a browser
 
 ## devvit version
 
 Get the version of the locally installed Devvit CLI.
 
-**Usage**
+#### Usage
 
-```tsx
+```bash
 $ devvit version
 ```
 
 ## devvit whoami
 
-Display the currently logged in reddit.com user.
+Display the currently logged in Reddit user.
 
-**Usage**
+#### Usage
 
-```tsx
+```bash
 $ devvit whoami
 ```

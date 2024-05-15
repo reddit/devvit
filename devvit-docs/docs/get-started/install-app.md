@@ -1,6 +1,6 @@
 # Install your app
 
-You can install an app into a subreddit you moderate ('everything' permissions) using either [`devvit install`](../cli/install.md) or through the [Developer Portal](https://developers.reddit.com).
+You can install an app into a subreddit you moderate ('everything' permissions) using either [`devvit install`](../devvit_cli.md) or through the [Developer Portal](https://developers.reddit.com).
 
 ## Install with CLI
 
