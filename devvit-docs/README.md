@@ -38,7 +38,7 @@ You only need to add it immediately before merging the PR.
 
 ### Deployment
 
-For how to merge your PR see [Development lifecycle](#development-lifecycle)
+For how to merge your PR, see [Development lifecycle](#development-lifecycle).
 
 Using SSH:
 

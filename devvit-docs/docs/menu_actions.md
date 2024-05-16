@@ -2,7 +2,7 @@
 
 Add an item to the three dot menu.
 
-You can add custom menu actions to posts and comments using the Devvit.addMenuItem() function.
+You can add custom menu actions to posts and comments using the `Devvit.addMenuItem()` function.
 
 :::note
 On new Reddit, comment menu actions in modqueue are only available in card view.

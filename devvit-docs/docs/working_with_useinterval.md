@@ -1,9 +1,9 @@
 # Working with useInterval
 
-Update live apps in real time.
+Updates live apps in real time.
 
 :::note
-This feature is experimental. There are known issues with interval timing especially when using server side calls, like calling Redis, within the useInterval function. This would result in intervals longer than what a developer specifies.
+This feature is experimental. There are known issues with interval timing especially when using server side calls, like calling Redis within the useInterval function. This would result in intervals longer than what a developer specifies.
 :::
 
 The `useInterval` method lets you build live apps that automatically update in real time. You can use this method to trigger a render of your custom post to do things like add a countdown timer, update a scoreboard with new play information, or set up a clock.
@@ -29,7 +29,7 @@ updateInterval.start();
 - You can only use one active, running `useInterval` per app.
 - The minimum allowed interval time is 1 second.
 - The timing is specific to the app. Timing begins when a user engages with the app, and the time interval triggers a refresh. For example:
-  - If you build a stopwatch and add 1000 ms each time the interval runs, the actual elapsed time would include the time between interval triggers and would be something like 1020 ms.
+  - If you build a stopwatch and add 1000ms each time the interval runs, the actual elapsed time would include the time between interval triggers and would be something like 1020ms.
   - If you build a countdown timer, the time interval trigger subtracts the current time at render, so it will match the elapsed time.
 - An interval runs while the post is visible on screen. If a user navigates away, it is suspended.
 
@@ -37,7 +37,7 @@ updateInterval.start();
 
 The `useInterval` method is different from the scheduler, in a few important ways:
 
-- `useInterval`executes on the client and triggers updates to your app locally (it’s similar to setInterval on the web). It can re-render on the user's device to do things like create animations or refresh the screen.
+- `useInterval` executes on the client and triggers updates to your app locally (it’s similar to `setInterval` on the web). It can re-render on the user's device to do things like create animations or refresh the screen.
 - Scheduler executes on the server and can be used to run background processes.
 
 ## Example clock app

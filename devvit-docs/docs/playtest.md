@@ -23,7 +23,7 @@ If you need help, run `devvit playtest —-help` for additional information.
 
 ## View logs
 
-Playtest continuously streams logs for your app installation. This will show in the output of your terminal where the playtest is running. Check out [logs](./debug.md) to learn more.
+Playtest continuously streams logs from your app installation. This will show in the output of your terminal where the playtest is running. Check out [logs](./debug.md) to learn more.
 
 ## End a playtest
 
@@ -39,7 +39,7 @@ If you want to revert back to the latest non-playtest version of the app, run th
 $ devvit install <subreddit>
 ```
 
-If you want to revert to a different version of your pre-playtest app, you can specify which version using the `install` command. Entering app name is optional if you are running this command from within your project directory.
+If you want to revert to a different version of your pre-playtest app, you can specify which version using the `install` command. Entering an app name is optional if you are running this command from within your project directory.
 
 ```bash
 $ devvit install <subreddit> [@version]
