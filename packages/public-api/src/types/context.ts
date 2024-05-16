@@ -9,7 +9,7 @@ import type { RedisClient } from './redis.js';
 import type { Scheduler } from './scheduler.js';
 import type { SettingsClient } from './settings.js';
 import type { UIClient } from './ui-client.js';
-import type { Dimensions, Metadata } from '@devvit/protos';
+import type { Metadata, UIDimensions } from '@devvit/protos';
 import type { CacheHelper } from '../devvit/internals/cache.js';
 import type { RealtimeClient } from '../apis/realtime/RealtimeClient.js';
 import type { EffectEmitter } from '../devvit/internals/blocks/EffectEmitter.js';
@@ -92,7 +92,7 @@ export type ContextAPIClients = {
    * Information about about a custom post's layout. Will be undefined
    * for non custom post surface areas such as menu items and task schedulers.
    */
-  dimensions?: Dimensions;
+  dimensions?: UIDimensions;
   /** A client for the User Interface API */
   ui: UIClient;
   /**

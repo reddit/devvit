@@ -1,4 +1,4 @@
-import type { Metadata } from '@devvit/protos';
+import type { Metadata, UIEnvironment } from '@devvit/protos';
 import { Devvit } from '../../../Devvit.js';
 import { useState } from './useState.js';
 import { useInterval } from './useInterval.js';
@@ -28,7 +28,11 @@ const UnimplementedProxy: any = new Proxy(
 );
 
 export class ContextBuilder {
-  public buildContext(renderContext: RenderContext, metadata: Metadata): Devvit.Context {
+  public buildContext(
+    renderContext: RenderContext,
+    env: UIEnvironment,
+    metadata: Metadata
+  ): Devvit.Context {
     const modLog = new ModLogClient(metadata);
     const kvStore = new KeyValueStorage(metadata);
     const redis = new RedisClient(metadata);
@@ -57,6 +61,7 @@ export class ContextBuilder {
       useInterval,
       useForm,
       cache,
+      dimensions: env?.dimensions,
     };
     const baseContext = getContextFromMetadata(metadata);
     baseContext.debug.effects = renderContext;
