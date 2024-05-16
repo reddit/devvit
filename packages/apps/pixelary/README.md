@@ -2,6 +2,18 @@
 
 A competitive async MMO pixel drawing and guessing game built on the Reddit Developer Platform.
 
+This app demonstrates how to:
+
+* Use Reddit Blocks to create an interactive post (i.e. a canvas with a clickable color pallate that can be used to draw).
+
+* Use Redis to create a leaderboard.
+
+* Use Devvit forms to capture user input (in this case, guesses as to what the picture is).
+
+* Use useInterval to crete a countdown timer.
+
+* Use assets like GIFs within an interactive post.
+
 ## Prerequisites
 
 Pixelary relies on post flairs. Please enable post flair in mod tools before you install the game.
