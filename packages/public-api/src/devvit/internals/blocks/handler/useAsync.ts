@@ -13,6 +13,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
   #changed: () => void;
 
   constructor(initializer: AsyncUseStateInitializer<S>, params: HookParams) {
+    console.debug('useAsync v1');
     this.state = { data: null, loading: false, error: null };
     this.#hookId = params.hookId;
     this.#initializer = initializer;
@@ -23,6 +24,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
    * After we look at our state, we need to decide if we need to dispatch a request to load the data.
    */
   onLoad(context: RenderContext): void {
+    console.debug('async onLoad ', this.#hookId, this.state);
     if (this.state.data === null && this.state.error === null && this.state.loading === false) {
       this.state.loading = true;
       this.#changed();
@@ -32,6 +34,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
         async: true,
         asyncRequest: { requestId: this.#hookId },
       };
+      console.debug('onLoad requeue');
       context.addToRequeueEvents(requeueEvent);
     }
   }
@@ -61,6 +64,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
         asyncResponse: asyncResponse,
         hook: this.#hookId,
       };
+      console.debug('onReq requeue');
       context.addToRequeueEvents(requeueEvent);
     } else if (event.asyncResponse) {
       const result: UseAsyncResult<S> = {

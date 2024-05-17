@@ -23,8 +23,8 @@ export type BlockGalleryProps = {
 export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
   const page = state.currentPage;
   const pageState = state.pageState(page);
-  const context = state.context
-  const sharedState: SharedCategoryPageProps = {state: pageState}
+  const context = state.context;
+  const sharedState: SharedCategoryPageProps = { state: pageState };
   return (
     <vstack padding="medium" grow>
       {page === Page.HOME && <HomePage state={state} />}

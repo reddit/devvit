@@ -102,10 +102,25 @@ export class RenderContext implements EffectEmitter {
   }
 
   /**
-   * Adds event that will re-enter the dispatcher queue
+   * Adds event that will re-enter the dispatcher queue.
    */
-  addToRequeueEvents(event: UIEvent): void {
-    this._requeueEvents.push(event);
+  addToRequeueEvents(...events: UIEvent[]): void {
+    console.debug('requeueing events', events);
+
+    const grouped = events.reduce(
+      (acc, event) => {
+        if (event.retry) {
+          acc.retry.push(event);
+        } else {
+          acc.normal.push(event);
+        }
+        return acc;
+      },
+      { retry: [], normal: [] } as { retry: UIEvent[]; normal: UIEvent[] }
+    );
+
+    // We need to maintain the order of the events, so we need to add the retry events first
+    this._requeueEvents = [...grouped.retry, ...this._requeueEvents, ...grouped.normal];
   }
 
   get effects(): Effect[] {

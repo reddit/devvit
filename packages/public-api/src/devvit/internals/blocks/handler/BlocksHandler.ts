@@ -9,6 +9,7 @@ import { ContextBuilder } from './ContextBuilder.js';
 import { RenderContext } from './RenderContext.js';
 import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
 import { RenderInterruptError } from './types.js';
+import isEqual from 'lodash.isequal';
 
 /**
  * This can be a global/singleton because render is synchronous.
@@ -96,6 +97,7 @@ export class BlocksHandler {
   _latestRenderContext: RenderContext | null = null;
 
   constructor(root: JSX.ComponentFunction) {
+    console.log('BlocksHandler v1');
     this.#root = root;
     _latestBlocksHandler = this;
   }
@@ -155,6 +157,7 @@ export class BlocksHandler {
           await this.#handleMainQueue(context, ...batch);
         }
       } catch (e) {
+        console.debug('caught in handler', e);
         /**
          * If we have a progress, we can recover from an error by rolling back to the last progress, and then letting the
          * remaining events be reprocessed.
@@ -163,35 +166,40 @@ export class BlocksHandler {
           context._state = progress._state;
           context._changed = changed!;
           context._effects = progress._effects;
-          remaining.forEach((e) => {
-            // e.retry = true;
+
+          const requeueable = remaining.map((e) => {
             const requeueEvent = { ...e };
             requeueEvent.retry = true;
-            context.addToRequeueEvents(requeueEvent);
+            return requeueEvent;
           });
+          context.addToRequeueEvents(...requeueable);
           break;
         } else {
           throw e;
         }
       }
 
+      console.debug('remaining events', context._requeueEvents);
       const remainingRequeueEvents: UIEvent[] = [];
       for (const event of context._requeueEvents) {
         if (!isMainQueue && !event.async) {
+          console.debug('NOT reprocessing event in BlocksHandler, sync mismatch A', event);
           // We're async, this is a main queue event.  We need to send it back to the platform to let
           // the platform synchronize it.
           remainingRequeueEvents.push(event);
           continue;
         }
         if (isMainQueue && event.async && !isBlockingSSR) {
+          console.debug('NOT reprocessing event in BlocksHandler, sync mismatch B', event);
           // We're main queue, and this is an async event.  We're not in SSR mode, so let's prioritize
           // returning control quickly to the platform so we don't block event loops.
           remainingRequeueEvents.push(event);
           continue;
         }
+        console.debug('reprocessing event in BlocksHandler', event);
         eventsToProcess.push(event);
       }
-      context._requeueEvents = remainingRequeueEvents;
+      context._requeueEvents = remainingRequeueEvents; //
 
       /**
        * If we're going back through this again, we need to capture the progress, and the remaining events.
@@ -207,8 +215,29 @@ export class BlocksHandler {
     } // End of while loop
 
     if (isMainQueue) {
+      const stateCopy = _structuredClone(context._state);
+      const eventsCopy = [...context._requeueEvents];
+      const effectsCopy = { ...context._effects };
+
       // Rendering only happens on the main queue.
       const tags = this.#renderRoot(this.#root, context._rootProps ?? {}, context);
+
+      /**
+       * It's technically ok for renderRoot to mutate, but that's only in the context of loadHooks.  This render should
+       * be idempotent, so we're going to enforce that it doesn't mutate state.
+       *
+       * TODO: hide this behind a flag, because it's possibly expensive.
+       */
+      if (!isEqual(context._state, stateCopy)) {
+        console.error('State was mutated during rendering', context._state, stateCopy);
+      }
+      if (!isEqual(context._requeueEvents, eventsCopy)) {
+        console.error('Events were mutated during rendering', context._requeueEvents, eventsCopy);
+      }
+      if (!isEqual(context._effects, effectsCopy)) {
+        console.error('Effects were mutated during rendering', context._effects, effectsCopy);
+      }
+
       if (tags) {
         blocks = await this.#blocksTransformer.createBlocksElementOrThrow(tags);
         blocks = await this.#blocksTransformer.ensureRootBlock(blocks);
@@ -266,6 +295,9 @@ export class BlocksHandler {
       this.#loadHooks(context, event);
       await this.#attemptHook(context, event);
     }
+
+    // TODO: Decide whether this is excessive.  It doesn't hurt anything besides performance.
+    this.#loadHooks(context);
   }
 
   #renderRoot(
@@ -273,6 +305,7 @@ export class BlocksHandler {
     props: Props,
     context: RenderContext
   ): ReifiedBlockElement | undefined {
+    console.debug('renderRoot');
     context._generated = {};
     _activeRenderContext = context;
     this._latestRenderContext = context;
