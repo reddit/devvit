@@ -10,7 +10,7 @@ Dimensions provides a way for you to create responsive custom posts by giving yo
 
 Dimensions are dynamic and update in real time if the device or viewport changes. You can also resize your screen as you develop to see how your posts respond in real time. This is the same post displayed on a phone (left) and a tablet (right):
 
-![dimensions](./assets/dimensions.png)
+![A post that is aware of its size](./assets/custom-posts/custom-posts-dimensions.png)
 
 You can use dimensions to:
 

@@ -4,7 +4,7 @@ What is a custom post?
 
 A custom post creates an interactive experience for your community. A custom post can be something like a fun way to welcome community members, a game, or other creative ways to enhance a subreddit’s experience.
 
-![Custom post poll example 1](./assets/polls_example.png)
+![Custom post poll example 1](./assets/custom-posts/custom-posts-overview.png)
 
 Developer Platform provides UI tools that let you create new content types to engage users. Custom posts provide pre-built visual components for text, images, and buttons that can be easily arranged to create unique, interactive content. Custom posts can be:
 

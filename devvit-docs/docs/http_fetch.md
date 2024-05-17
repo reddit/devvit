@@ -67,4 +67,4 @@ HTTP request to domain: <domain> timed out with error: context deadline exceeded
 
 Any app that uses `fetch` must upload Terms and Conditions and a Privacy Policy. Links to each of these documents must be saved in the app details form.
 
-![app details form](./assets/app_details_form_1.png)
+![App configuration form](./assets/capabilities/http-fetch/http-fetch-legal-links.png)

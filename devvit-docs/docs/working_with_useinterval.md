@@ -8,7 +8,7 @@ This feature is experimental. There are known issues with interval timing especi
 
 The `useInterval` method lets you build live apps that automatically update in real time. You can use this method to trigger a render of your custom post to do things like add a countdown timer, update a scoreboard with new play information, or set up a clock.
 
-![Countdown timer](./assets/useinterval_countdown.png)
+![Countdown timer](./assets/custom-posts/custom-posts-useinterval.png)
 
 ## How it works
 
