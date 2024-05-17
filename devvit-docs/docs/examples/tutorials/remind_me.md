@@ -202,7 +202,7 @@ Devvit.addSchedulerJob({
 
 :::note
 
-You might be a little scared by the `async`, `await` and `Promise` keywords--don't be! These core Javascript concepts just mean this function has to wait for an asynchronous response like the return value of an HTTP request. In this example, the `await` means "don't go to the next line until we get a response from `UserDataByAccountIds`". Check out [this overview](https://javascript.info/promise-basics) to learn more `async`/`await`.
+You might be a little scared by the `async`, `await` and `Promise` keywords--don't be! These core Javascript concepts just mean this function has to wait for an asynchronous response like the return value of an HTTP request. In this example, the `await` means "don't go to the next line until we get a response from the Reddit API". Once the promise is resolved, the code can continue to execute. Check out [this overview](https://javascript.info/promise-basics) to learn more `async`/`await`.
 
 :::
 
