@@ -19,6 +19,17 @@ Installs your app to your test subreddit and starts a playtest session. A new ve
 
 From here, the tutorial should carry you through updating the app! Make sure you are saving each change while playtesting before refreshing your test post.
 
+## Capabilities used
+
+This app uses a number of Devvit capability:
+
+- Custom experiences
+- HTTP Fetch
+- Reddit API client
+- Forms
+- Menu Actions
+- Triggers
+
 ## Learn more
 
 You can learn more in the [documentation](https://developers.reddit.com/docs/).

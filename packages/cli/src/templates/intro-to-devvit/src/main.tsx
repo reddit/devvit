@@ -1,23 +1,25 @@
 // Learn more at developers.reddit.com/docs
 import { Devvit } from '@devvit/public-api';
 import { Weird, defaultColor, startingColors } from './weird.js';
-import { Step, findBorderColor, findText, findUrl } from './setup.js';
+import { Step, findBorderColor, Instructions, findUrl } from './guts/steps.js';
+import { confirmationForm, requestDevvitPostingPermissions } from './guts/share.js';
 
 Devvit.configure({
   redditAPI: true,
+  http: true,
 });
 
 /* Adds a menu item to the subreddit menu.
 The button creates a custom post. */
 Devvit.addMenuItem({
-  label: 'Add my custom post',
+  label: 'Create my custom post',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { reddit, ui } = context;
-    const subreddit = await reddit.getCurrentSubreddit();
-    const username = (await reddit.getCurrentUser())?.username ?? 'User';
-    const newPost = await reddit.submitPost({
+    const subreddit = await context.reddit.getCurrentSubreddit();
+    const user = await context.reddit.getCurrentUser();
+    const username = user?.username ?? 'user';
+    const newPost = await context.reddit.submitPost({
       title: `Hello ${username}`,
       subredditName: subreddit.name,
       // The preview appears while the post loads
@@ -27,8 +29,8 @@ Devvit.addMenuItem({
         </vstack>
       ),
     });
-    ui.showToast({ text: 'Created post!' });
-    ui.navigateTo(newPost.url);
+    context.ui.showToast({ text: 'Created post!' });
+    context.ui.navigateTo(newPost.url);
   },
 });
 
@@ -39,55 +41,72 @@ Devvit.addCustomPostType({
   render: (context) => {
     /* Defines the props and logic for what happens when buttons are clicked.
     Uses the Reddit client to get contextual data like current user username. */
-    const { useState } = context;
-    const [step, setStep] = useState(Step.home);
-    const { reddit } = context;
+    const [step, setStep] = context.useState(Step.Home);
 
-    const [username] = useState(async () => {
-      return (await reddit.getCurrentUser())?.username ?? 'User';
+    /* Grabs the current user's username with the Reddit API Client &
+    handles the case for logged out users. */
+    const [username] = context.useState(async () => {
+      const user = await context.reddit.getCurrentUser();
+      return user?.username ?? 'user';
     });
 
     /*!!!
     Tutorial Variables
     Variables that you'll edit to complete your tutorial!! 
     !!!*/
-    let bodyTextCopy = `Hi ${username}! I'm Doot, your Devvit debugging buddy. Let's make some simple code changes as we playtest this app.`;
-    const customColor = '#FFE338';
+
+    const bodyTextCopy = `Hi ${username}! I'm Doot, your Devvit debugging buddy.\n\nLet's make some simple code changes as we playtest this app.`;
+    const customColor: string = '#FFE338';
     let imgUrl = 'doot.png';
 
     //
-
     let button = <></>;
     let borderColor = customColor;
+    let bodyText = (
+      <text size="large" maxWidth={'50%'} wrap>
+        {bodyTextCopy}
+      </text>
+    );
 
     /*
-    Temporary section start -
-    The section below calls tutorial logic to customize content.
-    You can be delete it the end of the tutorial!
+    [Start] Temporary section -
+    The section below calls tutorial logic to render new instructions.
+    You can delete it the end of the tutorial!
     */
 
     borderColor = findBorderColor(customColor, step);
     imgUrl = findUrl(imgUrl, customColor);
-    bodyTextCopy = findText(step, customColor, imgUrl, bodyTextCopy, username);
+    bodyText = (
+      <Instructions
+        step={step}
+        customColor={customColor}
+        imgUrl={imgUrl}
+        bodyText={bodyText}
+        username={username}
+        bodyTextCopy={bodyTextCopy}
+      >
+        {bodyTextCopy}
+      </Instructions>
+    );
 
-    if (step === Step.home && customColor === '#FFE338') {
+    if (step === Step.Home && customColor === '#FFE338') {
       button = (
-        <button appearance="primary" onPress={() => setStep(() => Step.setup)}>
+        <button appearance="primary" onPress={() => setStep(() => Step.Setup)}>
           Get Started
         </button>
       );
     }
 
     /*
-    Temporary section end -
-    The section above calls tutorial logic to customize content.
-    You can be delete it the end of the tutorial!
+    [End] Temporary section -
+    The section below calls tutorial logic to render new instructions.
+    You can delete it the end of the tutorial!
     */
 
     /* This is for an app easter 🥚 :) */
-    const [isNormal, setIsNormal] = useState(true);
-    const [activeColor, setActiveColor] = useState(defaultColor);
-    const [data, setData] = useState(startingColors);
+    const [isNormal, setIsNormal] = context.useState(true);
+    const [activeColor, setActiveColor] = context.useState(defaultColor);
+    const [data, setData] = context.useState(startingColors);
 
     /* Builds your UI! */
     if (isNormal) {
@@ -104,9 +123,9 @@ Devvit.addCustomPostType({
           >
             <spacer size="small" />
             <image url={imgUrl} description="userimage" imageHeight={'70px'} imageWidth={'70px'} />
-            <text size="large" maxWidth={'50%'} wrap>
-              {bodyTextCopy}
-            </text>
+            <vstack alignment="center" width={'100%'}>
+              {bodyText}
+            </vstack>
             {button}
           </vstack>
           <vstack
@@ -132,6 +151,30 @@ Devvit.addCustomPostType({
           customColor={customColor}
         />
       );
+  },
+});
+
+/* Adds a menu item to the custom post.
+The button pops up a form to share your post to Discord */
+Devvit.addMenuItem({
+  label: 'Share to Devvit',
+  location: 'post',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const post = await context.reddit.getPostById(context.postId!);
+    const postTitle = post.title;
+    const user = await context.reddit.getCurrentUser();
+    const username = user?.username ?? 'user';
+    const content = `Hi, I'm ${username}! Check out my app: ${post.url}`;
+    context.ui.showForm(confirmationForm, { content, postTitle });
+  },
+});
+
+//gives your app posting permissions in r/devvit
+Devvit.addTrigger({
+  event: 'AppInstall', // Event name from above
+  onEvent: async (_, context) => {
+    await requestDevvitPostingPermissions(context);
   },
 });
 

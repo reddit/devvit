@@ -30,7 +30,7 @@ export const startingColors = [
   4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 ];
 
-export const Weird = ({
+export const Weird: Devvit.BlockComponent<WeirdProps> = ({
   activeColor,
   setActiveColor,
   data,
@@ -38,7 +38,7 @@ export const Weird = ({
   isNormal,
   setIsNormal,
   customColor,
-}: WeirdProps): JSX.Element => {
+}) => {
   const ColorSelector = (): JSX.Element => (
     <hstack width="100%" alignment="center">
       {/* nested hstack to negate grow */}
@@ -62,18 +62,20 @@ export const Weird = ({
     </hstack>
   );
 
-  const pixels = data.map((pixel, index) => (
-    <hstack
-      onPress={() => {
-        const newData = data;
-        newData[index] = activeColor;
-        setData(newData);
-      }}
-      height={`${size}px`}
-      width={`${size}px`}
-      backgroundColor={colors[pixel]}
-    />
-  ));
+  const pixels = data.map(
+    (pixel, index): JSX.Element => (
+      <hstack
+        onPress={() => {
+          const newData = data;
+          newData[index] = activeColor;
+          setData(newData);
+        }}
+        height={`${size}px`}
+        width={`${size}px`}
+        backgroundColor={colors[pixel]}
+      />
+    )
+  );
 
   const gridSize = `${resolution * size}px`;
 
