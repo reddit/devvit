@@ -12,7 +12,7 @@ Devvit.configure({
 /* Adds a menu item to the subreddit menu.
 The button creates a custom post. */
 Devvit.addMenuItem({
-  label: 'Create my custom post',
+  label: 'Hello Devvit',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {

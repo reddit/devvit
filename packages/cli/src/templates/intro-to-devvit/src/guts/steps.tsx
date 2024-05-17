@@ -70,6 +70,9 @@ export const Instructions: Devvit.BlockComponent<InstructionsProps> = ({
           <text size="medium" color="#023E8A" weight="bold" selectable={false}>
             customColor
           </text>
+          <text size="medium" color="#33b3a6" weight="bold" selectable={false}>
+            : string
+          </text>
           <hstack width={'4px'} />
           <text size="medium" weight="bold" color="#006400" selectable={false}>
             =
@@ -81,7 +84,7 @@ export const Instructions: Devvit.BlockComponent<InstructionsProps> = ({
         </hstack>
         <hstack padding="small" cornerRadius="small" width="100%" height="100%" grow>
           <text size="medium" alignment="middle center" weight="bold" grow color="transparent">
-            const customColor = "#FFE338"
+            const customColor: string = "#FFE338"
           </text>
         </hstack>
       </zstack>
@@ -105,7 +108,15 @@ export const Instructions: Devvit.BlockComponent<InstructionsProps> = ({
   if (customColor !== '#FFE338') {
     if (imgUrl !== 'doot.png' && imgUrl !== 'downdoot.png') {
       text = (
-        <vstack maxWidth={'50%'} gap="small">
+        <vstack
+          maxWidth={'50%'}
+          gap="small"
+          padding="small"
+          border="thick"
+          borderColor="#F4BB44"
+          backgroundColor="#FFF59d"
+          cornerRadius="small"
+        >
           <text size="medium" wrap>
             1. In main.tsx, find the line that starts with:
           </text>
@@ -152,7 +163,15 @@ export const Instructions: Devvit.BlockComponent<InstructionsProps> = ({
       return text;
     }
     text = (
-      <vstack maxWidth={'50%'} gap="small">
+      <vstack
+        maxWidth={'50%'}
+        gap="small"
+        padding="small"
+        border="thick"
+        borderColor="#F4BB44"
+        backgroundColor="#FFF59d"
+        cornerRadius="small"
+      >
         <text size="medium" wrap>
           1. Add a new image.png file to the "assets" folder
         </text>
