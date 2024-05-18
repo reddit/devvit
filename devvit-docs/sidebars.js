@@ -58,10 +58,10 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Custom posts',
+      label: 'Experiences',
       items: [
-        'custom_posts',
-        'custom_post_project_guide',
+        'experiences',
+        'experience_post',
         'app_image_assets',
         'post_size',
         'dimensions',

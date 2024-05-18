@@ -1,21 +1,6 @@
 # Overview
 
-What is a custom post?
-
-A custom post creates an interactive experience for your community. A custom post can be something like a fun way to welcome community members, a game, or other creative ways to enhance a subreddit’s experience.
-
-![Custom post poll example 1](./assets/custom-posts/custom-posts-overview.png)
-
-Developer Platform provides UI tools that let you create new content types to engage users. Custom posts provide pre-built visual components for text, images, and buttons that can be easily arranged to create unique, interactive content. Custom posts can be:
-
-- Personal: post units can be unique to each user
-- Flexible: create and define how you want posts to look
-- Interactive: engage with posts directly with buttons and forms
-- Stateful and dynamic: create compelling posts that remember the user’s interaction
-
-## How it works
-
-You can add one custom post within your project. After your project is submitted for review and approved, it can be enabled in a subreddit. Once a mod installs the project with a custom post, they can use the custom posts on their subreddits.
+Interactive experiences, like [live scoreboards](/docs/examples/apps.mdx#livescores), [polls](/examples/playpens.mdx#polls), or [games](/docs/examples/apps.mdx#bingo), are pretty simple to build.
 
 ## What’s supported
 
@@ -26,26 +11,31 @@ You can add one custom post within your project. After your project is submitted
 | **Media**     | Uploading image files                 |
 | **Post type** | One custom post type per project      |
 
-## Under the hood
+## Templates
 
-This is how custom posts work.
+Devvit provides two experience post templates:
+
+- `experience-post` to create an experience with blocks.
+- `experience-post-pro` to create an experience with blocks and a folder structure scaffolding.
+
+You can also create your own experience post from scratch.
 
 ### Definitions
 
-Custom posts need a definition for the post type and the post loading state:
+An experience post requires two definitions:
 
-- The `addCustomPostType()` method defines the custom post type.
-- The `submitPost()` method instantiates the post and defines the loading state.
+- `addCustomPostType()` defines the experience post type.
+- `submitPost()` instantiates the post and defines the loading state.
 
 The final post is auto-populated from the post template using `submitPost()`.
 
 ### Parameters
 
-The `.addCustomPostType(customPostType: CustomPostType)` function has these parameters:
+The `.addCustomPostType(customPostType: CustomPostType)` function contains:
 
 - name of the post type
-- description, which is optional
-- render to return the UI for the custom post
+- an optional description
+- render to return the UI for the experience post
 
 :::note
 The UI is wrapped in `<blocks>`. If you don’t include them, `<blocks>` will be automatically added.
@@ -78,9 +68,9 @@ Check out our extensive [Icon Library](blocks/icon)! These can be used in `<butt
 
 The `submitPost(options: SubmitPostOptions)` function has these parameters:
 
-- title for the name of the custom post
+- title for the name of the experience post
 - subredditName to show where the post will be instantiated
-- preview to provide a lightweight UI that shows while the post renders.
+- preview to provide a lightweight UI that shows while the post renders
 
 **Example**
 
@@ -96,9 +86,9 @@ await reddit.submitPost({
 });
 ```
 
-### Post creation flow
+### Experience creation flow
 
-Once the post can be submitted and instantiated, the post needs a place for users to call it for creation. This example uses the subreddit menu.
+Once the experience post has been submitted and instantiated, it needs a place for users to call it for creation. This example uses the subreddit menu.
 
 The `.addMenuItem(menuItem: MenuItem)` function has these parameters:
 
@@ -131,9 +121,8 @@ Devvit.addMenuItem({
 
 ## Next steps
 
-Now that you know what custom posts can do, you can:
+Now that you know what experience posts can do, you can:
 
+- See how easy it is to [build an experience](experience_post.md).
 - Start iterating with code in real time in the [playground](playground.md)
-- Use the [project guide](custom_post_project_guide.md) to learn how to build a custom post.
-
-You can also find components to help you build your custom posts in the Reddit Blocks gallery.
+- Find components to help you build your experiences in the [blocks](/docs/blocks/overview.mdx) gallery.

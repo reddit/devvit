@@ -1,18 +1,18 @@
 # Working with useInterval
 
-Update live apps in real time.
+Update live experiences in real time.
 
 :::note
 This feature is experimental. There are known issues with interval timing especially when using server side calls, like calling Redis, within the useInterval function. This would result in intervals longer than what a developer specifies.
 :::
 
-The `useInterval` method lets you build live apps that automatically update in real time. You can use this method to trigger a render of your custom post to do things like add a countdown timer, update a scoreboard with new play information, or set up a clock.
+The `useInterval` method lets you build live apps that automatically update in real time. You can use this method to trigger a render of your experience post to do things like add a countdown timer, update a scoreboard with new play information, or set up a clock.
 
 ![Countdown timer](./assets/custom-posts/custom-posts-useinterval.png)
 
 ## How it works
 
-The `useInterval` method lets you request that your custom post be re-rendered at a specified interval. Intervals are set in milliseconds, with a 1000ms minimum.
+The `useInterval` method lets you request that your experience be re-rendered at a specified interval. Intervals are set in milliseconds, with a 1000ms minimum.
 
 ```tsx
 const [counter, setCounter] = context.useState(1000);
