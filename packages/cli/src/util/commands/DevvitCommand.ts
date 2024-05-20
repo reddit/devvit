@@ -1,6 +1,8 @@
 import { Empty } from '@devvit/protos';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { Command, Flags } from '@oclif/core';
+import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
+import { parse } from '@oclif/core/lib/parser/index.js';
 import open from 'open';
 import { NodeFSAuthenticationPlugin } from '../../lib/auth/NodeFSAuthenticationPlugin.js';
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
@@ -12,7 +14,6 @@ import { createWaitlistClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
 import { readLine } from '../input-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`
@@ -29,7 +30,6 @@ export abstract class DevvitCommand extends Command {
   static override baseFlags: FlagInput = {
     config: Flags.string({
       name: 'config',
-      char: 'c',
       description: 'path to devvit config file',
       default: DEVVIT_CONFIG_FILE,
     }),
@@ -41,10 +41,23 @@ export abstract class DevvitCommand extends Command {
 
   protected override async init(): Promise<void> {
     await super.init();
-    const { flags } = await this.parse({
+
+    // to-do: avoid subclassing and compose instead. subclasses cause bugs
+    //        because of all the inherited behavior wanted or not, require
+    //        understanding the entire hierarchy top to bottom (and left to
+    //        right for a base class like this), and need crazy hacks like
+    //        below.
+    const baseFlags = Object.keys(DevvitCommand.baseFlags).map((flag) => `--${flag}`);
+    const baseArgv = this.argv.filter(
+      (arg) => !arg.startsWith('--') || baseFlags.some((flag) => arg.startsWith(flag))
+    );
+    // call parse() instead of this.parse() which only knows of
+    // DevvitCommand.baseFlags.
+    const { flags } = await parse(baseArgv, {
       strict: false,
       flags: DevvitCommand.baseFlags,
     });
+
     this.#configFile = flags.config;
     if (this.#configFile !== DEVVIT_CONFIG_FILE) {
       this.log(`Using custom config file: ${this.#configFile}`);
