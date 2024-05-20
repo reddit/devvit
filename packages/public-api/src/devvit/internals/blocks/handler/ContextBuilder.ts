@@ -1,4 +1,4 @@
-import type { Metadata, UIEnvironment } from '@devvit/protos';
+import type { Metadata, UIRequest } from '@devvit/protos';
 import { Devvit } from '../../../Devvit.js';
 import { useState } from './useState.js';
 import { useInterval } from './useInterval.js';
@@ -30,7 +30,7 @@ const UnimplementedProxy: any = new Proxy(
 export class ContextBuilder {
   public buildContext(
     renderContext: RenderContext,
-    env: UIEnvironment,
+    request: UIRequest,
     metadata: Metadata
   ): Devvit.Context {
     const modLog = new ModLogClient(metadata);
@@ -61,9 +61,13 @@ export class ContextBuilder {
       useInterval,
       useForm,
       cache,
-      dimensions: env?.dimensions,
+      dimensions: request.env?.dimensions,
     };
-    const baseContext = getContextFromMetadata(metadata);
+
+    // TODO: Would commentId ever be needed for the blocks handler context?
+    // You'd want something like....
+    // const baseContext = getContextFromMetadata(metadata, request.props?.postId, request.props?.commentId);
+    const baseContext = getContextFromMetadata(metadata, request.props?.postId);
     baseContext.debug.effects = renderContext;
     return { ...baseContext, ...apiClients };
   }

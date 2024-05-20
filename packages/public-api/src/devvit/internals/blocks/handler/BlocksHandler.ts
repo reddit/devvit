@@ -104,7 +104,7 @@ export class BlocksHandler {
 
   async handle(request: UIRequest, metadata?: Metadata): Promise<UIResponse> {
     const context = new RenderContext(request);
-    const devvitContext = this.#contextBuilder.buildContext(context, request.env ?? {}, metadata!);
+    const devvitContext = this.#contextBuilder.buildContext(context, request, metadata!);
     context.devvitContext = devvitContext;
 
     let blocks;
