@@ -41,7 +41,7 @@ Devvit.addMenuItem({
 
 Once the app is installed, the configuration settings are available on the Install Settings page. Moderators add the required input and save the changes to configure the app. Note that these configurations are limited to the subreddit where the app is installed, so your app can be uniquely configured to each subreddit’s specific needs.
 
-![An example showing all input types](./assets/capabilities/app-configurations/app-configurations-all-types.png)
+![An example showing all input types](../assets/capabilities/app-configurations/app-configurations-all-types.png)
 
 ## Input types
 
@@ -59,31 +59,31 @@ There are currently five supported types of input:
 
 Renders an input field that accepts text responses.
 
-![String input](./assets/capabilities/app-configurations/app-configurations-string.png)
+![String input](../assets/capabilities/app-configurations/app-configurations-string.png)
 
 ### Boolean
 
 Renders a switch to toggle on (true) or off (false).
 
-![Boolean input](./assets/capabilities/app-configurations/app-configurations-boolean.png)
+![Boolean input](../assets/capabilities/app-configurations/app-configurations-boolean.png)
 
 ### Number
 
 Renders an input field that accepts text responses.
 
-![Number input](./assets/capabilities/app-configurations/app-configurations-number.png)
+![Number input](../assets/capabilities/app-configurations/app-configurations-number.png)
 
 ### Dropdown
 
 Renders a dropdown menu where moderator can select one or more developer-defined options.
 
-![Select input](./assets/capabilities/app-configurations/app-configurations-select.png)
+![Select input](../assets/capabilities/app-configurations/app-configurations-select.png)
 
 ### Paragraph
 
 Render a textarea for longer form text.
 
-![Paragraph input](./assets/capabilities/app-configurations/app-configurations-paragraph.png)
+![Paragraph input](../assets/capabilities/app-configurations/app-configurations-paragraph.png)
 
 ## Configuring settings within your app
 
@@ -176,7 +176,7 @@ Devvit.addSettings([
 
 ### Input validation
 
-![Input validation](./assets/capabilities/app-configurations/app-configurations-validation.png)
+![Input validation](../assets/capabilities/app-configurations/app-configurations-validation.png)
 
 Devvit app configurations also support input validation. As the app developer, you can set restrictions on what kind of input must be entered in each field.
 
@@ -230,4 +230,4 @@ Devvit.addMenuItem({
 });
 ```
 
-![Settings retrieval](./assets/capabilities/app-configurations/app-configurations-data-toast.png)
+![Settings retrieval](../assets/capabilities/app-configurations/app-configurations-data-toast.png)

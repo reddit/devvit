@@ -102,4 +102,4 @@ export default Devvit;
 
 ## Mod actions
 
-Mod actions are another kind of trigger that are just for mods. These triggers show up in the mod log. Check out the list of available [mod actions](https://developers.reddit.com/docs/mod_actions), and if you don't see an action you want, let us know in [r/devvit modmail](https://reddit.com/message/compose/?to=/r/Devvit).
+Mod actions are another kind of trigger that are just for mods. These triggers show up in the mod log. Check out the list of available [mod actions](/docs/mod_actions.md), and if you don't see an action you want, let us know in [r/devvit modmail](https://reddit.com/message/compose/?to=/r/Devvit).

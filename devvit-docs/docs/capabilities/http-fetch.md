@@ -56,7 +56,7 @@ export default Devvit;
 
 If you see the following error, it means HTTP Fetch requests are hitting the internal timeout limits. To resolve this:
 
-- Use a queue or kick off an async request in your back end. You can use [Scheduler](https://developers.reddit.com/docs/scheduler) to monitor the result.
+- Use a queue or kick off an async request in your back end. You can use [Scheduler](/docs/capabilities/scheduler.md) to monitor the result.
 - Optimize the overall HTTP request latency if you have a self-hosted server.
 
 ```ts
@@ -67,4 +67,4 @@ HTTP request to domain: <domain> timed out with error: context deadline exceeded
 
 Any app that uses `fetch` must upload Terms and Conditions and a Privacy Policy. Links to each of these documents must be saved in the app details form.
 
-![App configuration form](./assets/capabilities/http-fetch/http-fetch-legal-links.png)
+![App configuration form](../assets/capabilities/http-fetch/http-fetch-legal-links.png)

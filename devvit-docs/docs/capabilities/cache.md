@@ -14,7 +14,7 @@ This is probably a better fit for your in-app caching needs than using scheduler
 let component = (context) => {
   let cached = context.cache(
     async () => {
-      let rsp = await fetch('https://soemthing.com');
+      let rsp = await fetch('https://example.com');
       return rsp.body;
     },
     {

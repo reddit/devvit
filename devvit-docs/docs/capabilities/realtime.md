@@ -10,7 +10,7 @@ Realtime provides a set of primitives that lets you build custom posts that are:
 
 - **Live**. Users engaging with the same custom post see each others’ changes without any observable lag.
 - **Event-driven**. Posts render automatically in response to server events.
-- **Synced**. Using realtime with [Redis](redis.md) lets you build persistent community experiences that are backed by high performance data synchronization.
+- **Synced**. Using realtime with [Redis](/docs/capabilities/redis.md) lets you build persistent community experiences that are backed by high performance data synchronization.
 
 ## Create a live custom post
 
@@ -129,35 +129,35 @@ Try the demos with multiple browser windows and see local changes sync across se
 
 ### Mini Place
 
-![mini_place_high](./assets/realtime/mini_place_high.gif)
+![mini_place_high](../assets/realtime/mini_place_high.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1bumd7e/mini_place/)**,
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/mini-place)**
 
 ### Snoo Club
 
-![snoo_club](./assets/realtime/snoo_club.gif)
+![snoo_club](../assets/realtime/snoo_club.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1bunpzv/interactive_snooclub/)**,
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/snooclub)**
 
 ### Synced Progress Bar
 
-![synced_progress_bar](./assets/realtime/synced_progress_bar.gif)
+![synced_progress_bar](../assets/realtime/synced_progress_bar.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1b3ccp9/synced_progress_bar/),**
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/synced-progress-bar)**
 
 ### Devvit Emoji Chat
 
-![devvit_emoji_chat](./assets/realtime/devvit_emoji_chat.gif)
+![devvit_emoji_chat](../assets/realtime/devvit_emoji_chat.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1b15qqp/devvit_chat/),**
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/devvit-emoji-chat)**
 
 ### Server Push
 
-![server_push](./assets/realtime/server_push.gif)
+![server_push](../assets/realtime/server_push.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1bnnc60/server_push/),**
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/server-push)**

@@ -34,7 +34,7 @@ Devvit.configure({
 ```
 
 :::note
-For existing apps, learn how to [migrate the KV store to Redis](migrate_kv_to_redis.md).
+For existing apps, learn how to [migrate the KV store to Redis](/docs/migrate_kv_to_redis.md).
 :::
 
 ## Examples

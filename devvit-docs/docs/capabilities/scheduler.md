@@ -21,7 +21,7 @@ There are two rate limits enforced by the Schedule() method when actions are cre
 
 ## Schedule an action
 
-You can schedule an action to run once at a specific time, like sending a private message in the [Remind Me](https://developers.reddit.com/docs/remind_me_tutorial) tutorial.
+You can schedule an action to run once at a specific time, like sending a private message in the [Remind Me](/docs/showcase/tutorials/remind_me.md) tutorial.
 
 ```typescript
 const REMIND_ME_ACTION_NAME = 'remindme';

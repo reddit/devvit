@@ -8,7 +8,7 @@ You can add custom menu actions to posts and comments using the Devvit.addMenuIt
 On new Reddit, comment menu actions in modqueue are only available in card view.
 :::
 
-![Subreddit menu actions](./assets/capabilities/menu-actions/menu-actions-subreddit.png)
+![Subreddit menu actions](../assets/capabilities/menu-actions/menu-actions-subreddit.png)
 
 ## Supported Contexts
 

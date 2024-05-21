@@ -43,7 +43,7 @@ import { Devvit, MenuItemOnPressEvent, User } from '@devvit/public-api';
 
 Importing this code adds core classes and plugins from the Reddit Developer Platform (`@devvit/public-api`).
 
-5. Add the [Redis plugin](../../redis.md). This plugin allows you to store data in your app that will be there the next time it’s run. You also need to enable access to the Reddit API.
+5. Add the [Redis plugin](/docs/capabilities/redis.md). This plugin allows you to store data in your app that will be there the next time it’s run. You also need to enable access to the Reddit API.
 
 ```typescript
 Devvit.configure({

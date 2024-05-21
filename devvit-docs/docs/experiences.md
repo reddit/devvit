@@ -1,6 +1,6 @@
 # Overview
 
-Interactive experiences, like [live scoreboards](/docs/examples/apps.mdx#livescores), [polls](/examples/playpens.mdx#polls), or [games](/docs/examples/apps.mdx#bingo), are pretty simple to build.
+Interactive experiences, like [live scoreboards](./showcase/apps.mdx#livescores), [polls](./showcase/playgrounds.mdx#polls), or [games](./showcase/apps.mdx#bingo), are pretty simple to build.
 
 ## What’s supported
 

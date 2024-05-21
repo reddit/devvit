@@ -44,7 +44,7 @@ The app account may not have access to the content, so we recommend checking if 
 
 To link your users to an external URL (like a YouTube video), you’ll include this URL. Users will see a confirmation dialog before going to the external URL.
 
-![Confirmation dialog for external links](./assets/capabilities/adding-links/adding-links-external-link-dialog.png)
+![Confirmation dialog for external links](../assets/capabilities/adding-links/adding-links-external-link-dialog.png)
 
 #### Example
 

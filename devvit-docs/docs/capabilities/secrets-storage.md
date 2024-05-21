@@ -16,7 +16,7 @@ There are times when you’ll want to store information in your app that should 
 
 You can use the existing `Devvit.addSettings` DX to define secrets.
 
-```ts
+```tsx
 import { Devvit } from '@devvit/public-api';
 
 Devvit.addSettings([
@@ -40,7 +40,7 @@ Devvit.addSettings([
 
 You will be able to list app-scoped keys via the CLI. Use the `devvit settings` command in a Devvit project.
 
-```ts
+```bash
 devvit settings list
 
 Key               Label            Is this a secret?   Type
@@ -50,7 +50,7 @@ weather-api-key  My weather API key    true            STRING
 
 Once you access the keys, you can assign values to the secret keys. This operation can only be performed by app developers, not mods or installers.
 
-```ts
+```bash
 devvit settings set weather-api-key
 
 🤠 Howdy <username>! settings will be added at the app-scope and will be globally accessible across all subreddit installs. That means more power to you, please use it wisely.
@@ -65,7 +65,7 @@ Successfully added app settings for weather-api-key!
 
 Once you’ve stored the secrets via CLI, your app can access the secrets during invocations.
 
-```ts
+```tsx
 Devvit.configure({
   http: true,
 });
@@ -99,5 +99,5 @@ export default Devvit;
 
 ## Limitations
 
-- At least one app installation is required before you can store secrets via the CLI. You can use Devvit [playtest](./get-started/playtest.md) once with the latest `Devvit.addSettings` config to accomplish this.
+- At least one app installation is required before you can store secrets via the CLI. You can use Devvit [playtest](/docs/get-started/playtest.md) once with the latest `Devvit.addSettings` config to accomplish this.
 - App setting values are currently not surfaced in the CLI.
