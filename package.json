@@ -11,7 +11,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "turbo run build --output-logs=new-only && (test -x ./scripts/copy-js-for-compute-go.sh && ./scripts/copy-js-for-compute-go.sh || true)",
+    "build": "turbo run build --output-logs=new-only",
     "build:all": "yarn build && yarn build:go",
     "build:go": "make -C devvit-compute-go build; make -C devvit-gateway-service/ build; make -C services/snooron-worker-devvit build",
     "bump-version": "node ./scripts/version.mjs",
