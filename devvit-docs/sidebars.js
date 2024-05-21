@@ -31,7 +31,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Showcase',
-      items: ['examples/apps', 'examples/playpens', 'examples/tutorials'],
+      items: ['showcase/apps', 'showcase/playgrounds', 'showcase/tutorials'],
     },
     {
       type: 'category',
