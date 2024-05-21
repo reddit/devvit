@@ -8,6 +8,13 @@ export type CricketLeague = {
 
 // Eventually we can fetch these season IDs, but this will suffice for now (2023-2024 season)
 export function infoForCricketLeague(league: League): CricketLeague {
+  if (league === League.ICCT20) {
+    return {
+      tournamentId: 'sr:tournament:35516',
+      seasonId: 'sr:season:100587',
+      league: League.ICCT20,
+    };
+  }
   if (league === League.IPL) {
     return {
       tournamentId: 'sr:tournament:2472',

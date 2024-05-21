@@ -1,6 +1,7 @@
 import type { GeneralGameScoreInfo } from '../GameEvent.js';
 
 export type CricketMatchScoreInfo = GeneralGameScoreInfo & {
+  leagueName: string;
   isLive: boolean;
   matchTime: string;
   matchNumber?: string;

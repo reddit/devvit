@@ -1,5 +1,5 @@
 import type { Devvit } from '@devvit/public-api';
-import { APIService } from '../Sports.js';
+import { APIService, League } from '../Sports.js';
 import { APIKey } from './APIKeys.js';
 import { EventState } from '../GameEvent.js';
 import type { TeamInfo } from '../GameEvent.js';
@@ -125,6 +125,8 @@ export function cricketMatchInfo(
   const homeStats = getInfoStats(cricketMatch, homeResults);
   const awayStats = getInfoStats(cricketMatch, awayResults);
 
+  const leagueName = getAbbreviatedLeagueName(league);
+
   return {
     event: {
       id: event.id,
@@ -140,6 +142,7 @@ export function cricketMatchInfo(
         period: 0,
       },
     },
+    leagueName: leagueName,
     homeScore: homeResults?.displayScore ?? '0',
     awayScore: awayResults?.displayScore ?? '0',
     service: APIService.SRCricket,
@@ -160,6 +163,16 @@ export function cricketMatchInfo(
     awayInfoStats: awayStats,
     chatUrl: basicCricketMatchInfo?.chatUrl,
   };
+}
+
+export function getAbbreviatedLeagueName(leagueString: string): string {
+  if (leagueString === League.ICCT20) {
+    return 'T20 WC';
+  }
+  if (leagueString === League.IPL) {
+    return 'IPL';
+  }
+  return '';
 }
 
 export function getInfoStats(

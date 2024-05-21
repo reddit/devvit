@@ -32,7 +32,7 @@ export function CricketScoreboard(props: CricketScoreboardProps): JSX.Element {
           is_live: props.scoreInfo.isLive,
           match_time: props.scoreInfo.matchTime,
           match_number: props.scoreInfo.matchNumber,
-          league: props.scoreInfo.event.league.toUpperCase(),
+          league: props.scoreInfo.leagueName,
           location: props.scoreInfo.location,
         })}
         {props.page === ScoreboardPage.SCORE && ScoreComponent(props)}

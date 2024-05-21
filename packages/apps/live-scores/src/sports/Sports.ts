@@ -43,6 +43,7 @@ export enum League {
   CROATIA_HNL = `hr_hnl`,
   NCAAMB = 'ncaamb',
   IPL = 'ipl',
+  ICCT20 = 'icc_t20',
   UEFAEURO = 'uefa_euro',
 }
 
@@ -162,6 +163,10 @@ export function leaguesSupported(service: APIService): { label: string; value: s
   } else if (service === APIService.SRCricket) {
     return [
       {
+        label: getDisplayNameFromLeague(League.ICCT20),
+        value: League.ICCT20,
+      },
+      {
         label: getDisplayNameFromLeague(League.IPL),
         value: League.IPL,
       },
@@ -240,6 +245,9 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'ipl') {
     return League.IPL;
   }
+  if (str.toLowerCase() === 'icc_t20') {
+    return League.ICCT20;
+  }
   if (str.toLowerCase() === 'uefa_euro') {
     return League.UEFAEURO;
   }
@@ -281,6 +289,7 @@ export function getSportFromLeague(league: League): Sport {
     case League.UEFAEURO:
       return Sport.SOCCER;
     case League.IPL:
+    case League.ICCT20:
       return Sport.CRICKET;
     default:
       return Sport.UNKNOWN;
@@ -335,6 +344,8 @@ export function getDisplayNameFromLeague(league: League): string {
       return `NCAA Men's Basketball`;
     case League.IPL:
       return 'Indian Premier League';
+    case League.ICCT20:
+      return 'T20 World Cup 2024';
     default:
       return '';
   }
