@@ -4,6 +4,14 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 To use the latest version of Devvit, follow the [upgrade instructions](https://developers.reddit.com/docs/update-devvit).
 
+## Devvit 0.10.21: @devvit/kit lets you build apps faster
+
+**Release Date: May 22, 2024**
+
+We’re introducing [@devvit/kit](./devvit.kit.md), a helper library that makes it easier to build Devvit apps. The kit includes UI components and general backend patterns that simplify common tasks, including pagination, columns, and toasts. We’ll be adding more to this kit and open-sourcing it soon!
+
+Also in this release, [secrets storage](./capabilities/secrets-storage.md) has been vetted and is no longer considered experimental.
+
 ## Devvit 0.10.20 Experimental faster scheduler and breaking changes
 
 **Release Date: May 7, 2024**

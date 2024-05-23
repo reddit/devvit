@@ -2,10 +2,6 @@
 
 Store sensitive data in your app.
 
-:::note
-This feature is experimental, which means the design not final but it's still available for you to use.
-:::
-
 There are times when you’ll want to store information in your app that should not be visible to users. Secrets are variables that contain sensitive information like API keys, credentials and tokens. Devvit lets you store and access secrets in three steps:
 
 1. Define secrets in the app.
