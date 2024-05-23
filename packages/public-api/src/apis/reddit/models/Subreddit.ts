@@ -278,7 +278,7 @@ export class Subreddit {
   /**
    * @internal
    */
-  constructor(data: SubredditAboutResponse_AboutData, metadata: Metadata | undefined) {
+  constructor(data: Partial<SubredditAboutResponse_AboutData>, metadata: Metadata | undefined) {
     makeGettersEnumerable(this);
 
     assertNonNull(data.id, 'Subreddit id is missing or undefined');
@@ -333,7 +333,7 @@ export class Subreddit {
       spoilersEnabled: data.spoilersEnabled ?? false,
       wikiEnabled: data.wikiEnabled ?? false,
       allowedPostType: asAllowedPostType(data.submissionType),
-      allowedMediaInComments: data.allowedMediaInComments.map(asCommentMediaTypes),
+      allowedMediaInComments: (data.allowedMediaInComments ?? []).map(asCommentMediaTypes),
       bannerBackgroundColor: data.bannerBackgroundColor,
       bannerBackgroundImage: data.bannerBackgroundImage,
       bannerImage: data.bannerImg,
