@@ -28,6 +28,7 @@ An interactive post-type for sports games developed by Reddit! Install the app, 
 ### Cricket
 **Supported Leagues**
 * IPL
+* T20 World Cup
 
 ## Creating a Scoreboard post
 
