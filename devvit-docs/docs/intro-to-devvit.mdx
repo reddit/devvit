@@ -9,29 +9,29 @@ It should take about five minutes.
 
 ## Step 1: Set up your environment
 
-If this is your first devvit project, you'll need to take care of a few things before creating your project. Ensure that you have [Node.js](https://nodejs.org/) (v18.18.2 or higher) installed. Additionally, you'll need to [make a small subreddit](https://mods.reddithelp.com/hc/en-us/articles/360001766991-How-to-create-a-subreddit) for testing, if you don't already have one.
+If this is your first devvit project, you'll need to take care of a few things before creating your project. Ensure that you have [Node.js](https://nodejs.org/en/download/package-manager) (v18.18.2 or higher) installed. Additionally, you'll need to [make a small subreddit](https://mods.reddithelp.com/hc/en-us/articles/360001766991-How-to-create-a-subreddit) for testing, if you don't already have one.
 
 Run the following commands in your terminal to install the [`@devvit`](https://www.npmjs.com/package/devvit) CLI and log in from your Reddit account:
 
 <Tabs>
-<TabItem value="npm" label="npm" default>
-```bash
-npm install -g devvit
-devvit login
-```
-</TabItem>
-<TabItem value="yarn" label="Yarn">
-```bash
-yarn global add devvit
-devvit login
-```
-</TabItem>
-<TabItem value="pnpm" label="pnpm" default>
-```bash
-pnpm install -g devvit
-devvit login
-```
-</TabItem>
+  <TabItem value="npm" label="npm" default>
+    ```
+    bash npm install -g devvit
+    devvit login
+    ```
+  </TabItem>
+  <TabItem value="yarn" label="Yarn">
+    ```
+    bash yarn global add devvit
+    devvit login
+    ```
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm" default>
+    ```
+    bash pnpm install -g devvit
+    devvit login
+    ```
+  </TabItem>
 </Tabs>
 
 ## Step 2: Create a project
@@ -56,7 +56,7 @@ When prompted to chose a template, scroll and select:
 
 ```
 intro-to-devvit
-````
+```
 
 ## Step 5: Upload and build
 
@@ -66,7 +66,7 @@ Run the following commands to get your app up and running:
 cd <app-name>
 devvit upload
 devvit playtest <subreddit-name>
-````
+```
 
 ## Step 6: Open your project
 
@@ -83,7 +83,7 @@ my-project
 ├── package.json
 ├── tsconfig.json
 ├── README.md
-````
+```
 
 You'll be making updates to `main.tsx` and the `assets` folder in this tutorial.
 
@@ -97,7 +97,7 @@ Visit your test subreddit. From the subreddit menu, select "Hello Devvit" and wa
 
 ## Step 8: Playtesting
 
-As you make and save code modifications, playtest will automatically build and deploy the app to your subreddit. Simply refresh the post to view the latest changes.
+As you make and save code modifications, playtest will automatically build and deploy the app to your subreddit. Simply refresh the post to view the latest changes. Press Ctrl + C to exit the playtest.
 
 ![playtest-app-building](./assets/intro-to-devvit-playtesting.png)
 
@@ -107,7 +107,7 @@ From here, the post will guide you through three simple code changes! You can st
 
 When you're happy with your post, considering sharing it with the community. You can see [creations made by other devs here](https://www.reddit.com/r/hello_user/?f=flair_name%3A%22hello%20devvitor%22).
 
-Make sure your subreddit is set to public, and select "Share to Devvit" from the mod menu on the post:
+Make sure your subreddit is set to public, and select "Share with Devvit" from the mod menu on the post:
 
 ![menu_item](./assets/intro-to-devvit-mod-action.png)
 

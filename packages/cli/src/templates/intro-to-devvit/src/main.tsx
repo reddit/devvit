@@ -1,46 +1,29 @@
 // Learn more at developers.reddit.com/docs
 import { Devvit } from '@devvit/public-api';
 import { Weird, defaultColor, startingColors } from './weird.js';
-import { Step, findBorderColor, Instructions, findUrl } from './guts/steps.js';
-import { confirmationForm, requestDevvitPostingPermissions } from './guts/share.js';
+import { Step, findBorderColor, Instructions, findUrl, createPost } from './guts/steps.js';
+import './guts/share.js';
 
 Devvit.configure({
   redditAPI: true,
   http: true,
+  redis: true,
 });
 
-/* Adds a menu item to the subreddit menu.
-The button creates a custom post. */
+/* Adds a menu item to the subreddit menu. */
 Devvit.addMenuItem({
   label: 'Hello Devvit',
   location: 'subreddit',
   forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const subreddit = await context.reddit.getCurrentSubreddit();
-    const user = await context.reddit.getCurrentUser();
-    const username = user?.username ?? 'user';
-    const newPost = await context.reddit.submitPost({
-      title: `Hello ${username}`,
-      subredditName: subreddit.name,
-      // The preview appears while the post loads
-      preview: (
-        <vstack height="100%" width="100%" alignment="middle center">
-          <text size="large">Loading ...</text>
-        </vstack>
-      ),
-    });
-    context.ui.showToast({ text: 'Created post!' });
-    context.ui.navigateTo(newPost.url);
-  },
+  onPress: createPost,
 });
 
-/* Adds a custom post. Describes what happens on render.*/
+/* Adds a custom post.*/
 Devvit.addCustomPostType({
   name: 'Custom Post',
   height: 'regular',
   render: (context) => {
-    /* Defines the props and logic for what happens when buttons are clicked.
-    Uses the Reddit client to get contextual data like current user username. */
+    /* Adds a state variable that moves the tutorial forward when a user gets started*/
     const [step, setStep] = context.useState(Step.Home);
 
     /* Grabs the current user's username with the Reddit API Client &
@@ -63,7 +46,7 @@ Devvit.addCustomPostType({
     let button = <></>;
     let borderColor = customColor;
     let bodyText = (
-      <text size="large" maxWidth={'50%'} wrap>
+      <text size="large" color="black" maxWidth={'50%'} wrap>
         {bodyTextCopy}
       </text>
     );
@@ -84,6 +67,7 @@ Devvit.addCustomPostType({
         bodyText={bodyText}
         username={username}
         bodyTextCopy={bodyTextCopy}
+        context={context}
       >
         {bodyTextCopy}
       </Instructions>
@@ -133,7 +117,9 @@ Devvit.addCustomPostType({
             onPress={() => setIsNormal((isNormal) => !isNormal)}
             width={'100%'}
           >
-            <text size="small">🥚</text>
+            <text color="white" size="small">
+              🥚
+            </text>
           </vstack>
         </zstack>
       );
@@ -151,30 +137,6 @@ Devvit.addCustomPostType({
           customColor={customColor}
         />
       );
-  },
-});
-
-/* Adds a menu item to the custom post.
-The button pops up a form to share your post to Discord */
-Devvit.addMenuItem({
-  label: 'Share to Devvit',
-  location: 'post',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const post = await context.reddit.getPostById(context.postId!);
-    const postTitle = post.title;
-    const user = await context.reddit.getCurrentUser();
-    const username = user?.username ?? 'user';
-    const content = `Hi, I'm ${username}! Check out my app: ${post.url}`;
-    context.ui.showForm(confirmationForm, { content, postTitle });
-  },
-});
-
-//gives your app posting permissions in r/devvit
-Devvit.addTrigger({
-  event: 'AppInstall', // Event name from above
-  onEvent: async (_, context) => {
-    await requestDevvitPostingPermissions(context);
   },
 });
 

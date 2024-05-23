@@ -1,8 +1,24 @@
 import type { TriggerContext } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
 
+/* Adds a menu item to the custom post.
+The button pops up a form to share your post to Discord */
+export const shareButton = Devvit.addMenuItem({
+  label: 'Share with devvit',
+  location: 'post',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const post = await context.reddit.getPostById(context.postId!);
+    const postTitle = post.title;
+    const user = await context.reddit.getCurrentUser();
+    const username = user?.username ?? 'user';
+    const content = `Hi, I'm ${username}! Check out my app: ${post.url}`;
+    context.ui.showForm(confirmationForm, { content, postTitle });
+  },
+});
+
 /*
-Before you share your post to Discord and r/Devvit, this form will pop up.
+Before you share your post to r/hello_user and Discord, this form will pop up.
 It gives you a chance to read and update the message being sent.
 */
 
@@ -11,12 +27,6 @@ export const confirmationForm = Devvit.createForm(
     return {
       fields: [
         {
-          name: 'content',
-          label: 'Discord message',
-          type: 'string',
-          defaultValue: data.content,
-        },
-        {
           name: 'title',
           label: 'r/hello_user post title',
           type: 'string',
@@ -24,55 +34,42 @@ export const confirmationForm = Devvit.createForm(
         },
       ],
       title: 'Share your post',
-      description: 'Share the post with the Devvit community.',
+      description:
+        'Share your work with the community. This will crosspost your creation to the r/hello_user gallery and a devvit discord feed dedicated to posts like these.',
       acceptLabel: 'Share',
     };
   },
   async ({ values }, context) => {
-    const content = values.content;
-    await sendToDiscord(content);
+    const creator = await context.redis.get('hell0_user');
+    const currentUser = await context.reddit.getCurrentUser();
+    if (creator !== currentUser?.username) {
+      context.ui.showToast('You must be the post creator to share this with the community.');
+      return;
+    }
     const post = await context.reddit.getPostById(context.postId!);
-    await post.crosspost({
+    const newPost = await post.crosspost({
       title: values.title,
       subredditName: 'hello_user',
       flairId: '1283585c-13b6-11ef-afb0-76f79bce0fa1',
     });
-    await post.addComment({
-      text: 'This post was made with Devvit! Make your own here: https://developers.reddit.com/docs/intro-to-devvit',
-    });
-    context.ui.navigateTo(`https://www.reddit.com/r/hello_user/new/`);
+    context.ui.navigateTo(`https://www.reddit.com${newPost.permalink}`);
   }
 );
 
-/*
-This function sends your post link to Discord.
-The webhook is linked to a test channel in the Reddit Devs server.
-Eventually, this will send posts to the intros channel.
-*/
-export async function sendToDiscord(content: string): Promise<void> {
-  const webhook =
-    'https://discord.com/api/webhooks/1239759949199048795/OD642VzTX08I9elKTuotU9J_Xd2IOD7QG36NhVRmO2IyigEYWEuhGKUhh2KaNs_xbWd_';
-  const payload = { content: content };
-
-  const response = await fetch(webhook, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    console.error('Error sending data to webhook');
-  }
-}
+//gives your app posting permissions in r/hello_user
+export const installTrigger = Devvit.addTrigger({
+  event: 'AppInstall', // Event name from above
+  onEvent: async (_, context) => {
+    await requestPostingPermissions(context);
+  },
+});
 
 /*
 This sends a modmail to the community the post is shared to.
 A different app monitors modmail for messages with this subject & makes the app account an approved user.
 This is in case the new app account is flagged by automated systems.
 */
-export async function requestDevvitPostingPermissions(context: TriggerContext): Promise<void> {
+export async function requestPostingPermissions(context: TriggerContext): Promise<void> {
   await context.reddit.sendPrivateMessage({
     to: 'hello_user',
     subject: 'e9f7affb6aa5b2ec2eb606ab8407949b',
