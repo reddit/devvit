@@ -29,7 +29,7 @@ export const BlockGallery = ({ state }: BlockGalleryProps): JSX.Element => {
     <vstack padding="medium" grow>
       {page === Page.HOME && <HomePage state={state} />}
       {page === Page.BUTTONS && <ButtonPage state={pageState} />}
-      {page === Page.IMAGES && <ImagePage state={pageState} />}
+      {page === Page.IMAGES && <ImagePage state={pageState} context={context} />}
       {page === Page.SPACERS && <SpacerPage state={pageState} />}
       {page === Page.STACKS && <StacksPage sharedState={sharedState} context={context} />}
       {page === Page.TEXT && <TextPage state={pageState} />}

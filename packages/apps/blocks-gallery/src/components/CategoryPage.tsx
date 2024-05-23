@@ -60,6 +60,7 @@ export type CategoryPageProps = SharedCategoryPageProps & {
   subCategoryPage?: boolean;
   type?: CategoryPageType;
   onConfigureCategory?: () => void;
+  categoryConfigurationDescription?: string;
 };
 
 export type CategoryProps = {
@@ -125,12 +126,28 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
           <></>
         )
       ) : (
-        <hstack alignment="start middle" gap="small">
-          <button onPress={props.state?.goHome} appearance="secondary" size="small" icon="back" />
-          <text selectable={false} size="xlarge" weight="bold" color="neutral-content">
-            {props.title}
-          </text>
-        </hstack>
+        <vstack alignment="start middle" gap="small">
+          <hstack alignment="start middle" gap="small">
+            <button onPress={props.state?.goHome} appearance="secondary" size="small" icon="back" />
+            <text selectable={false} size="xlarge" weight="bold" color="neutral-content">
+              {props.title}
+            </text>
+            {props.onConfigureCategory ? (
+              <button size={'small'} onPress={props.onConfigureCategory}>
+                configure
+              </button>
+            ) : (
+              <></>
+            )}
+          </hstack>
+          {props.categoryConfigurationDescription ? (
+            <text style={'heading'} selectable={false} color="neutral-content-weak" wrap={true}>
+              {props.categoryConfigurationDescription}
+            </text>
+          ) : (
+            <></>
+          )}
+        </vstack>
       )}
 
       <Tabs

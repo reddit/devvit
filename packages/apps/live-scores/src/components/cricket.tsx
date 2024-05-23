@@ -140,14 +140,14 @@ function CricketTeamBlock({
   logo,
   score,
   state,
-  isWinningTeam,
+  isBattingTeam,
   stats,
 }: {
   name: string;
   logo: string;
   score?: string;
   state: EventState;
-  isWinningTeam: boolean;
+  isBattingTeam: boolean;
   stats: CricketScoreInfoStats;
 }): JSX.Element {
   const [firstLine, secondLine] = splitNameInTwoLines(name);
@@ -203,7 +203,7 @@ function CricketTeamBlock({
           ) : null}
         </vstack>
         <spacer size="xsmall" />
-        {isWinningTeam ? (
+        {isBattingTeam ? (
           <icon
             width={'20px'}
             height={'20px'}
@@ -227,7 +227,7 @@ function ScoreComponent(props: CricketScoreboardProps): JSX.Element {
     logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.homeTeam.logo,
     score: scoreInfo.homeScore,
     state: scoreInfo.event.state,
-    isWinningTeam: scoreInfo.winningQualifier === CricketQualifierType.Home,
+    isBattingTeam: scoreInfo.currentBattingQualifier === CricketQualifierType.Home,
     stats: scoreInfo.homeInfoStats,
   });
 
@@ -236,7 +236,7 @@ function ScoreComponent(props: CricketScoreboardProps): JSX.Element {
     logo: leagueAssetPath(scoreInfo.event) + scoreInfo.event.awayTeam.logo,
     score: scoreInfo.awayScore,
     state: scoreInfo.event.state,
-    isWinningTeam: scoreInfo.winningQualifier === CricketQualifierType.Away,
+    isBattingTeam: scoreInfo.currentBattingQualifier === CricketQualifierType.Away,
     stats: scoreInfo.awayInfoStats,
   });
 

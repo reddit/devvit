@@ -7,6 +7,8 @@ import {
   eventState,
   getBattingStats,
   getBowlingStats,
+  getCurrentBattingQualifier,
+  getFirstBattingQualifier,
   getFirstLine,
   getMatchTimeString,
   getSecondLine,
@@ -15,6 +17,7 @@ import {
   getWinningQualifier,
   hasMatchEnded,
   hasMatchStarted,
+  isMatchInAbnormalState,
   ordinalSuffixOf,
 } from '../CricketMatch.js';
 import type {
@@ -184,7 +187,7 @@ test('Get winning qualifier for status home as no winner id and battingResults h
   cricketMatch.sport_event_status.winner_id = undefined;
   const battingResults: BattingResult[] = [
     {
-      battingTeamId: 'home_id',
+      battingTeamId: 'away_id',
       inningNumber: 1,
       oversRemaning: 0,
       oversCompleted: 0,
@@ -241,11 +244,20 @@ test('TeamInfo from cricket competitor ', async () => {
 test('EventState from CricketEventStatusType ', async () => {
   expect(eventState(CricketEventStatusType.CREATED)).toBe(EventState.PRE);
   expect(eventState(CricketEventStatusType.NOT_STARTED)).toBe(EventState.PRE);
+
   expect(eventState(CricketEventStatusType.INPROGRESS)).toBe(EventState.LIVE);
   expect(eventState(CricketEventStatusType.LIVE)).toBe(EventState.LIVE);
+
   expect(eventState(CricketEventStatusType.CLOSED)).toBe(EventState.FINAL);
   expect(eventState(CricketEventStatusType.COMPLETE)).toBe(EventState.FINAL);
-  expect(eventState(CricketEventStatusType.POSTPONED)).toBe(EventState.UNKNOWN);
+  expect(eventState(CricketEventStatusType.SUSPENDED)).toBe(EventState.FINAL);
+  expect(eventState(CricketEventStatusType.ABANDONED)).toBe(EventState.FINAL);
+  expect(eventState(CricketEventStatusType.ENDED)).toBe(EventState.FINAL);
+  expect(eventState(CricketEventStatusType.CANCELLED)).toBe(EventState.FINAL);
+
+  expect(eventState(CricketEventStatusType.DELAYED)).toBe(EventState.DELAYED);
+  expect(eventState(CricketEventStatusType.POSTPONED)).toBe(EventState.DELAYED);
+  expect(eventState(CricketEventStatusType.INTERRUPTED)).toBe(EventState.DELAYED);
 });
 
 /// test splitNameInTwoLines
@@ -500,6 +512,48 @@ test('hasMatchStarted', async () => {
   expect(hasMatchStarted(cricketMatch)).toBe(true);
   cricketMatch.sport_event_status.status = CricketEventStatusType.CLOSED;
   expect(hasMatchStarted(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.ENDED;
+  expect(hasMatchStarted(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.SUSPENDED;
+  expect(hasMatchStarted(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.DELAYED;
+  expect(hasMatchStarted(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.CANCELLED;
+  expect(hasMatchStarted(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.ABANDONED;
+  expect(hasMatchStarted(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.INTERRUPTED;
+  expect(hasMatchStarted(cricketMatch)).toBe(true);
+});
+
+/// test isMatchInAbnormalState
+test('isMatchInAbnormalState', async () => {
+  cricketMatch.sport_event_status.status = CricketEventStatusType.NOT_STARTED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.CREATED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.POSTPONED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.COMPLETE;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.LIVE;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.INPROGRESS;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.CLOSED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.ENDED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.SUSPENDED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.DELAYED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.CANCELLED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.ABANDONED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.INTERRUPTED;
+  expect(isMatchInAbnormalState(cricketMatch)).toBe(true);
 });
 
 /// test hasMatchEnded
@@ -518,6 +572,18 @@ test('hasMatchEnded', async () => {
   expect(hasMatchEnded(cricketMatch)).toBe(true);
   cricketMatch.sport_event_status.status = CricketEventStatusType.CLOSED;
   expect(hasMatchEnded(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.ENDED;
+  expect(hasMatchEnded(cricketMatch)).toBe(true);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.SUSPENDED;
+  expect(hasMatchEnded(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.DELAYED;
+  expect(hasMatchEnded(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.CANCELLED;
+  expect(hasMatchEnded(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.ABANDONED;
+  expect(hasMatchEnded(cricketMatch)).toBe(false);
+  cricketMatch.sport_event_status.status = CricketEventStatusType.INTERRUPTED;
+  expect(hasMatchEnded(cricketMatch)).toBe(false);
 });
 
 /// test getFirstLine
@@ -673,6 +739,264 @@ test('Get first line of bottomBar method if match is ended and it has 1 result',
       currentDate
     )
   ).toBe('home_abbreviation won by 90 runs');
+});
+
+test('Get first line of bottomBar method if match is postponed', async () => {
+  cricketMatch.sport_event_status.status = CricketEventStatusType.POSTPONED;
+  cricketMatch.sport_event.scheduled = '2024-03-22T14:30:00+00:00';
+  const currentDate = new Date('2024-03-21T14:30:00+00:00');
+
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 1,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 8,
+      runs: 199,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '199/8',
+    },
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 2,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 5,
+      runs: 178,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '178/5',
+    },
+  ];
+  expect(
+    getFirstLine(
+      cricketMatch,
+      CricketQualifierType.Home,
+      homeTeam,
+      awayTeam,
+      battingResults,
+      currentDate
+    )
+  ).toBe('Postponed');
+});
+
+test('Get first line of bottomBar method if match is delayed', async () => {
+  cricketMatch.sport_event_status.status = CricketEventStatusType.DELAYED;
+  cricketMatch.sport_event.scheduled = '2024-03-22T14:30:00+00:00';
+  const currentDate = new Date('2024-03-21T14:30:00+00:00');
+
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 1,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 8,
+      runs: 199,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '199/8',
+    },
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 2,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 5,
+      runs: 178,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '178/5',
+    },
+  ];
+  expect(
+    getFirstLine(
+      cricketMatch,
+      CricketQualifierType.Home,
+      homeTeam,
+      awayTeam,
+      battingResults,
+      currentDate
+    )
+  ).toBe('Delayed');
+});
+
+test('Get first line of bottomBar method if match is suspended', async () => {
+  cricketMatch.sport_event_status.status = CricketEventStatusType.SUSPENDED;
+  cricketMatch.sport_event.scheduled = '2024-03-22T14:30:00+00:00';
+  const currentDate = new Date('2024-03-21T14:30:00+00:00');
+
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 1,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 8,
+      runs: 199,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '199/8',
+    },
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 2,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 5,
+      runs: 178,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '178/5',
+    },
+  ];
+  expect(
+    getFirstLine(
+      cricketMatch,
+      CricketQualifierType.Home,
+      homeTeam,
+      awayTeam,
+      battingResults,
+      currentDate
+    )
+  ).toBe('Suspended');
+});
+
+test('Get first line of bottomBar method if match is Interrupted', async () => {
+  cricketMatch.sport_event_status.status = CricketEventStatusType.INTERRUPTED;
+  cricketMatch.sport_event.scheduled = '2024-03-22T14:30:00+00:00';
+  const currentDate = new Date('2024-03-21T14:30:00+00:00');
+
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 1,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 8,
+      runs: 199,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '199/8',
+    },
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 2,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 5,
+      runs: 178,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '178/5',
+    },
+  ];
+  expect(
+    getFirstLine(
+      cricketMatch,
+      CricketQualifierType.Home,
+      homeTeam,
+      awayTeam,
+      battingResults,
+      currentDate
+    )
+  ).toBe('Interrupted');
+});
+
+test('Get first line of bottomBar method if match is Abandoned', async () => {
+  cricketMatch.sport_event_status.status = CricketEventStatusType.ABANDONED;
+  cricketMatch.sport_event.scheduled = '2024-03-22T14:30:00+00:00';
+  const currentDate = new Date('2024-03-21T14:30:00+00:00');
+
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 1,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 8,
+      runs: 199,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '199/8',
+    },
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 2,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 5,
+      runs: 178,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '178/5',
+    },
+  ];
+  expect(
+    getFirstLine(
+      cricketMatch,
+      CricketQualifierType.Home,
+      homeTeam,
+      awayTeam,
+      battingResults,
+      currentDate
+    )
+  ).toBe('Abandoned');
+});
+
+test('Get first line of bottomBar method if match is Cancelled', async () => {
+  cricketMatch.sport_event_status.status = CricketEventStatusType.CANCELLED;
+  cricketMatch.sport_event.scheduled = '2024-03-22T14:30:00+00:00';
+  const currentDate = new Date('2024-03-21T14:30:00+00:00');
+
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 1,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 8,
+      runs: 199,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '199/8',
+    },
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 2,
+      oversRemaning: 0,
+      oversCompleted: 20,
+      ballsRemaning: 0,
+      wicketsLost: 5,
+      runs: 178,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '178/5',
+    },
+  ];
+  expect(
+    getFirstLine(
+      cricketMatch,
+      CricketQualifierType.Home,
+      homeTeam,
+      awayTeam,
+      battingResults,
+      currentDate
+    )
+  ).toBe('Cancelled');
 });
 
 test('Get first line of bottomBar method if match is live and it has 2 results home winning', async () => {
@@ -1143,4 +1467,154 @@ test('Get getBowlingStats for empty innings', async () => {
   cricketMatch.sport_event_status.status = CricketEventStatusType.COMPLETE;
   cricketMatch.statistics.innings = [];
   expect(getBowlingStats(cricketMatch, 'away_id')).toBe(undefined);
+});
+
+test('Get getFirstBattingQualifier away team first inning', async () => {
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 1,
+      oversRemaning: 2,
+      oversCompleted: 19,
+      ballsRemaning: 3,
+      wicketsLost: 1,
+      runs: 90,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '18/1',
+    },
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 2,
+      oversRemaning: 4,
+      oversCompleted: 12,
+      ballsRemaning: 5,
+      wicketsLost: 3,
+      runs: 90,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '20/3',
+    },
+  ];
+  expect(getFirstBattingQualifier(battingResults)).toBe(CricketQualifierType.Away);
+});
+
+test('Get getFirstBattingQualifier home team first inning', async () => {
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 1,
+      oversRemaning: 2,
+      oversCompleted: 19,
+      ballsRemaning: 3,
+      wicketsLost: 1,
+      runs: 90,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '18/1',
+    },
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 0,
+      oversRemaning: 4,
+      oversCompleted: 12,
+      ballsRemaning: 5,
+      wicketsLost: 3,
+      runs: 90,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '20/3',
+    },
+  ];
+  expect(getFirstBattingQualifier(battingResults)).toBe(CricketQualifierType.Home);
+});
+
+test('Get currentBattingQualifier game is not live', async () => {
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 1,
+      oversRemaning: 2,
+      oversCompleted: 19,
+      ballsRemaning: 3,
+      wicketsLost: 1,
+      runs: 90,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '18/1',
+    },
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 0,
+      oversRemaning: 4,
+      oversCompleted: 12,
+      ballsRemaning: 5,
+      wicketsLost: 3,
+      runs: 90,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '20/3',
+    },
+  ];
+  expect(getCurrentBattingQualifier(false, 0, battingResults)).toBe(undefined);
+});
+
+test('Get currentBattingQualifier home team is batting in current inning', async () => {
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 1,
+      oversRemaning: 2,
+      oversCompleted: 19,
+      ballsRemaning: 3,
+      wicketsLost: 1,
+      runs: 90,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '18/1',
+    },
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 0,
+      oversRemaning: 4,
+      oversCompleted: 12,
+      ballsRemaning: 5,
+      wicketsLost: 3,
+      runs: 90,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '20/3',
+    },
+  ];
+  expect(getCurrentBattingQualifier(true, 0, battingResults)).toBe(CricketQualifierType.Home);
+});
+
+test('Get currentBattingQualifier away team is batting in current inning', async () => {
+  const battingResults: BattingResult[] = [
+    {
+      battingTeamId: 'away_id',
+      bowlingTeamId: 'home_id',
+      inningNumber: 1,
+      oversRemaning: 2,
+      oversCompleted: 19,
+      ballsRemaning: 3,
+      wicketsLost: 1,
+      runs: 90,
+      qualifierType: CricketQualifierType.Away,
+      displayScore: '18/1',
+    },
+    {
+      battingTeamId: 'home_id',
+      bowlingTeamId: 'away_id',
+      inningNumber: 0,
+      oversRemaning: 4,
+      oversCompleted: 12,
+      ballsRemaning: 5,
+      wicketsLost: 3,
+      runs: 90,
+      qualifierType: CricketQualifierType.Home,
+      displayScore: '20/3',
+    },
+  ];
+  expect(getCurrentBattingQualifier(true, 1, battingResults)).toBe(CricketQualifierType.Away);
 });

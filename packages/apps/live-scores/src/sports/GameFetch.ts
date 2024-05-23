@@ -156,34 +156,15 @@ export async function fetchSubscriptions(context: Devvit.Context): Promise<{
     const info = results[i];
     await context.kvStore.put(makeKeyForSubscription(sub), JSON.stringify(info));
 
-    /// due to the nature of a cricket match UI, we only want to stop subscribing
-    /// after it has passed a day after the event so the UI can render
-    if (info.event.gameType === 'cricket') {
-      const matchDate = new Date(info.event.date);
-      const todaysDate = new Date();
-      const diff = matchDate.getTime() - todaysDate.getTime();
-      const diffDays = Math.round(diff / (1000 * 3600 * 24));
-
-      /// older than yesterday
-      if (diffDays < -1 && info.event.state === EventState.FINAL) {
-        console.log(`Game ID ${info.event.id} (${info.event.awayTeam.abbreviation} @ \
-          ${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.eventId}.`);
-        await removeSubscription(context.kvStore, JSON.stringify(sub));
-        canceledGameScoreInfos.push(info);
-      } else {
-        activeGameScoreInfos.push(info);
-      }
-      /// treat other sports the same way as before
+    if (info.event.state === EventState.FINAL) {
+      console.log(`Game ID ${info.event.id} (${info.event.awayTeam.abbreviation} @ \
+${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.eventId}.`);
+      await removeSubscription(context.kvStore, JSON.stringify(sub));
+      canceledGameScoreInfos.push(info);
     } else {
-      if (info.event.state === EventState.FINAL) {
-        console.log(`Game ID ${info.event.id} (${info.event.awayTeam.abbreviation} @ \
-  ${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.eventId}.`);
-        await removeSubscription(context.kvStore, JSON.stringify(sub));
-        canceledGameScoreInfos.push(info);
-      } else {
-        activeGameScoreInfos.push(info);
-      }
+      activeGameScoreInfos.push(info);
     }
+
     if (info.event.gameType === 'football') {
       const footballInfo = info as NFLGameScoreInfo;
       if (footballInfo.lastEvent) {
@@ -216,17 +197,9 @@ async function filterSubscriptionsForFetch(
       const lastFetch = info.generatedDate ? new Date(info.generatedDate) : null;
       const closeToGameThreshold = CLOSE_TO_GAME_THRESHOLD_HOURS * MS_TO_HOURS;
       const stalePregameThreshold = STALE_INFO_THRESHOLD_HOURS * MS_TO_HOURS;
-      const isCricketGameSkipException = (): boolean => {
-        // For cricket we will keep the subscription for 24hrs after the game reached FINAL state, but we don't want to keep
-        // fetching every time, so we add this exception check to skip and it should only fetch every hour when game ended.
-        return (
-          (info.event.gameType === 'cricket' && info.event.state !== EventState.FINAL) ||
-          info.event.gameType !== 'cricket'
-        );
-      };
       if (
         lastFetch === null ||
-        (start.getTime() - now.getTime() < closeToGameThreshold && isCricketGameSkipException()) ||
+        start.getTime() - now.getTime() < closeToGameThreshold ||
         now.getTime() - lastFetch.getTime() > stalePregameThreshold
       ) {
         filteredSubs.push(sub);

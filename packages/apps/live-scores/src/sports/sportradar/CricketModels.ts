@@ -6,8 +6,8 @@ export type CricketMatchScoreInfo = GeneralGameScoreInfo & {
   matchTime: string;
   matchNumber?: string;
   location?: string;
-  winningQualifier?: CricketQualifierType;
   firstBattingQualifier: CricketQualifierType;
+  currentBattingQualifier: CricketQualifierType | undefined;
   bottomBarFirstLine: string;
   bottomBarSecondLine?: string;
   homeInfoStats: CricketScoreInfoStats;
@@ -149,13 +149,19 @@ export type CricketPeriodScore = {
 };
 
 export enum CricketEventStatusType {
-  CREATED = `created`,
-  LIVE = `live`,
   NOT_STARTED = `not_started`,
-  INPROGRESS = `inprogress`,
-  CLOSED = `closed`,
-  COMPLETE = `complete`,
+  LIVE = `live`,
   POSTPONED = `postponed`,
+  SUSPENDED = `suspended`,
+  DELAYED = `delayed`,
+  CANCELLED = `cancelled`,
+  ABANDONED = `abandoned`,
+  INTERRUPTED = `interrupted`,
+  ENDED = `ended`,
+  CLOSED = `closed`,
+  CREATED = `created`,
+  INPROGRESS = `inprogress`,
+  COMPLETE = `complete`,
 }
 
 export type BattingResult = {

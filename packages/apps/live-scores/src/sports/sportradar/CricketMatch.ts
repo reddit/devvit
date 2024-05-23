@@ -127,6 +127,12 @@ export function cricketMatchInfo(
 
   const leagueName = getAbbreviatedLeagueName(league);
 
+  const currentBattingQualifier = getCurrentBattingQualifier(
+    isLive,
+    cricketMatch.sport_event_status.current_inning,
+    sortedBattingResults
+  );
+
   return {
     event: {
       id: event.id,
@@ -151,8 +157,8 @@ export function cricketMatchInfo(
     matchTime: matchTime,
     matchNumber: matchNumberString,
     location: cricketMatch.sport_event.venue?.city_name ?? undefined,
-    winningQualifier: winningQualifier,
     firstBattingQualifier: getFirstBattingQualifier(sortedBattingResults),
+    currentBattingQualifier: currentBattingQualifier,
     bottomBarFirstLine: firstLine,
     bottomBarSecondLine: getSecondLine(
       cricketMatch,
@@ -163,6 +169,20 @@ export function cricketMatchInfo(
     awayInfoStats: awayStats,
     chatUrl: basicCricketMatchInfo?.chatUrl,
   };
+}
+
+export function getCurrentBattingQualifier(
+  isLive: boolean,
+  currentInning: number,
+  battingResults: BattingResult[]
+): CricketQualifierType | undefined {
+  if (!isLive) {
+    return undefined;
+  }
+  const battingQualifiers = battingResults.filter((result) => {
+    return result.inningNumber === currentInning;
+  });
+  return battingQualifiers[0].qualifierType;
 }
 
 export function getAbbreviatedLeagueName(leagueString: string): string {
@@ -427,20 +447,24 @@ export function getTeam(
 
 export function eventState(status: CricketEventStatusType): EventState {
   switch (status) {
+    case CricketEventStatusType.NOT_STARTED:
     case CricketEventStatusType.CREATED:
       return EventState.PRE;
-    case CricketEventStatusType.NOT_STARTED:
-      return EventState.PRE;
     case CricketEventStatusType.INPROGRESS:
-      return EventState.LIVE;
     case CricketEventStatusType.LIVE:
       return EventState.LIVE;
     case CricketEventStatusType.CLOSED:
-      return EventState.FINAL;
     case CricketEventStatusType.COMPLETE:
+    case CricketEventStatusType.SUSPENDED:
+    case CricketEventStatusType.ABANDONED:
+    case CricketEventStatusType.CANCELLED:
+    case CricketEventStatusType.ENDED:
       return EventState.FINAL;
+    case CricketEventStatusType.DELAYED:
+    case CricketEventStatusType.POSTPONED:
+    case CricketEventStatusType.INTERRUPTED:
+      return EventState.DELAYED;
   }
-  return EventState.UNKNOWN;
 }
 
 export function cricketCompetitorToTeamInfo(
@@ -534,6 +558,11 @@ export function getFirstLine(
   todaysDate: Date,
   timezone?: string
 ): string {
+  if (isMatchInAbnormalState(cricketMatch)) {
+    const status = cricketMatch.sport_event_status.status;
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
   /// game hasn't started
   if (!hasMatchStarted(cricketMatch)) {
     const matchDate = new Date(cricketMatch.sport_event.scheduled);
@@ -664,7 +693,8 @@ export function getSecondLine(
 export function hasMatchEnded(cricketMatch: CricketMatch): boolean {
   return (
     cricketMatch.sport_event_status.status === CricketEventStatusType.CLOSED ||
-    cricketMatch.sport_event_status.status === CricketEventStatusType.COMPLETE
+    cricketMatch.sport_event_status.status === CricketEventStatusType.COMPLETE ||
+    cricketMatch.sport_event_status.status === CricketEventStatusType.ENDED
   );
 }
 
@@ -672,14 +702,30 @@ export function hasMatchStarted(cricketMatch: CricketMatch): boolean {
   return (
     cricketMatch.sport_event_status.status !== CricketEventStatusType.NOT_STARTED &&
     cricketMatch.sport_event_status.status !== CricketEventStatusType.CREATED &&
-    cricketMatch.sport_event_status.status !== CricketEventStatusType.POSTPONED
+    cricketMatch.sport_event_status.status !== CricketEventStatusType.POSTPONED &&
+    cricketMatch.sport_event_status.status !== CricketEventStatusType.ABANDONED &&
+    cricketMatch.sport_event_status.status !== CricketEventStatusType.CANCELLED &&
+    cricketMatch.sport_event_status.status !== CricketEventStatusType.DELAYED &&
+    cricketMatch.sport_event_status.status !== CricketEventStatusType.SUSPENDED
+  );
+}
+
+export function isMatchInAbnormalState(cricketMatch: CricketMatch): boolean {
+  return (
+    cricketMatch.sport_event_status.status === CricketEventStatusType.ABANDONED ||
+    cricketMatch.sport_event_status.status === CricketEventStatusType.CANCELLED ||
+    cricketMatch.sport_event_status.status === CricketEventStatusType.DELAYED ||
+    cricketMatch.sport_event_status.status === CricketEventStatusType.POSTPONED ||
+    cricketMatch.sport_event_status.status === CricketEventStatusType.SUSPENDED ||
+    cricketMatch.sport_event_status.status === CricketEventStatusType.INTERRUPTED
   );
 }
 
 export function isMatchLive(cricketMatch: CricketMatch): boolean {
   return (
     cricketMatch.sport_event_status.status === CricketEventStatusType.INPROGRESS ||
-    cricketMatch.sport_event_status.status === CricketEventStatusType.LIVE
+    cricketMatch.sport_event_status.status === CricketEventStatusType.LIVE ||
+    cricketMatch.sport_event_status.status === CricketEventStatusType.INTERRUPTED
   );
 }
 
