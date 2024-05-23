@@ -124,3 +124,9 @@
 .dsla-search-wrapper {
   min-width: 10rem;
 }
+
+.language-bash span.token-line::before {
+  content: '$';
+  padding: 0 0.7em 0 0;
+  color: var(--ifm-color-emphasis-400);
+}

@@ -102,7 +102,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-        additionalLanguages: ['json'],
+        additionalLanguages: ['json', 'bash'],
       },
       colorMode: {
         disableSwitch: false,
