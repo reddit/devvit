@@ -8,7 +8,7 @@ To use the latest version of Devvit, follow the [upgrade instructions](https://d
 
 **Release Date: May 22, 2024**
 
-We’re introducing [@devvit/kit](./devvit.kit.md), a helper library that makes it easier to build Devvit apps. The kit includes UI components and general backend patterns that simplify common tasks, including pagination, columns, and toasts. We’ll be adding more to this kit and open-sourcing it soon!
+We’re introducing [@devvit/kit](./devvit_kit.md), a helper library that makes it easier to build Devvit apps. The kit includes UI components and general backend patterns that simplify common tasks, including pagination, columns, and toasts. We’ll be adding more to this kit and open-sourcing it soon!
 
 Also in this release, [secrets storage](./capabilities/secrets-storage.md) has been vetted and is no longer considered experimental.
 

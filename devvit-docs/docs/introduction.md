@@ -23,7 +23,7 @@ Or create an entirely new community around an experience, like [r/pixleary](http
 Building on Devvit is simple and comes with built-in tools to help you succeed:
 
 - [Playground](playground.md) – an interactive code editor with a live preview window that lets you experiment with blocks and try out your ideas.
-- @devvit/kit – a library of UI components and backend patterns you can use to build your apps fast (coming soon!).
+- [@devvit/kit](devvit_kit.md) – a library of UI components and backend patterns you can use to build your apps fast.
 - [Devvit CLI](devvit_cli.md) – the bridge between your codebase and Reddit.
 
 Reddit hosts your code with dedicated Redis-backed storage. The UI toolkit lets you build brand new experiences within posts, add new buttons, and create unique post layouts. Triggers let you listen to and respond to events. You only have to write code once, and it’s available on web, iOS, and Android platforms.

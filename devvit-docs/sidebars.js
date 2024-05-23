@@ -86,7 +86,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Developer tools',
-      items: ['playground', 'playtest', 'debug', 'devvit_cli', 'devvit.kit'],
+      items: ['playground', 'playtest', 'debug', 'devvit_cli', 'devvit_kit'],
     },
     {
       type: 'category',
