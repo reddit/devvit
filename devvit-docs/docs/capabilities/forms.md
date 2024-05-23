@@ -1,108 +1,55 @@
 # Forms
 
-Engage users by building interactive content.
+A form lets your app ask users to input and submit data. Forms can be defined with a simple [form object](#form-object) that takes a [list of fields](#supported-fields-types), and an [onSubmit handler](#on-submit-handler).
 
-There are two ways to add a form to your app, and the method you'll use depends on what you’re doing.
+![A form dialog](../assets/capabilities/forms/forms-dialog.png)
 
-- For custom posts, the useForm method defines a form in a block, and the state is read and updated within the custom post.
-- For menu actions, the createForm method adds a form to a menu option.
+## Using forms
 
-## Supported field types
+There are several ways to add a form to your app, and the method you'll use depends on what you’re doing.
 
-| **Field**   | **Description**                                                    |
-| ----------- | ------------------------------------------------------------------ |
-| `string`    | A single-line text input.                                          |
-| `select`    | A dropdown menu with predefined options.                           |
-| `paragraph` | A multi-line text input for longer responses.                      |
-| `number`    | An input for numerical values.                                     |
-| `boolean`   | A yes/no or true/false type input.                                 |
-| `group`     | A collection of related fields that allows for better readability. |
+- For [experience posts](#experience-posts), use the `context.ui.useForm` hook.
+- For [menu actions](#menu-actions), use the [`devvit.createForm`](/docs/api/public-api/classes/Devvit-1.md#createform) method.
+- For [app configurations](#app-configurations), use the [`devvit.addSettings`](/docs/api/public-api/classes/Devvit-1.md#addsettings) method.
 
-### Simple static forms
+### Experience posts
 
-Forms can be defined with a simple Form object that takes a series of fields and an onSubmit handler.
-
-```tsx
-const myForm = Devvit.createForm({
-fields: [
-	{ name: 'nickname', label: 'Your nickname', type: 'string }
-	// Any number of fields and groups
-]
-}, (values) => {
-	console.log(values.nickname);
-});
-```
-
-### Generated forms
-
-You can also create forms by providing a `FormFunction`. This will allow you to define form fields dynamically.
-
-```tsx
-const myForm = Devvit.createForm(
-  (data) => {
-    // Grab the data, eventually returning form fields
-    const todaysDate = data.todaysDate;
-
-    // Return fields, same as static forms
-    return [
-      {
-        name: 'startDate',
-        label: 'Start Date',
-        type: 'string',
-        defaultValue: todaysDate,
-      },
-    ];
-  },
-  (values) => {
-    // onSubmit handler
-  }
-);
-
-Devvit.addMenuItem({
-  label: 'Show a dynamic form',
-  location: 'post',
-  onPress: async (_, { ui }) => {
-    const date = Date.now();
-    ui.showForm(myForm, { date });
-  },
-});
-```
-
-### Chaining forms
-
-```tsx
-const pickAnimalForm = Devvit.createForm(
-  { fields: [{ name: 'animal', label: 'Dogs or cats?', type: 'select' }] },
-  (values) => {
-    if (animal == 'dog') {
-      ui.showForm(dogForm);
-    } else {
-      ui.showForm(catForm);
-    }
-    // onSubmit handler
-  }
-);
-
-const dogForm = Devvit.createForm({});
-const catForm = Devvit.createForm({});
-```
-
-## Custom post forms
-
-You can use forms to capture user input and display it within a custom post. By using the useForm hook, you’re also able to manipulate state (`useState`) and use the values within blocks. You can try it out in a [play pen](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAasxMGkpYIZGAHNSAT3gUASjG0YBAHj0Y8YY8grPXxgHwUAvFQaFOzExAKWPADWrgI8yMEUUBJo8pHGMGAYMPGJaCTkaOnQOQlgzADcGlo6ehQGRqYuMEXWtqSOXm4ewBQyEFIwMpZdxhUUdBAyEjAjZC5uFMwA2gC6foHAiWxhERTLiSG9-YPDvACCsC4GYPETUzORJdcQt0tlIUd9A0ORAMIAC1cLVK92ms14WCBYBBPHehyo31OkQAkmQpnhXndJuDIkwMVj4WBPoiTr9eABZGAAD3kWI8OMevFgtJucOYHwoq05yVSWEsB2Jn2OPzOPHOMiMGEgZDwdBg1mIWCi2IeEJ4UylMrlOSJJJFyN4f36aD5U1VuMhJrNMnZnK+ZLFAHFiBAKAAVDCvLCgxnq0wQO0Ig3kng2YzGCC+tWRbIRqNBoXcvIFMitQX6pGhy4wF7EgBiYTIUimtoZMd4O2IxdLiczjsiACEIGgYCWZGWwUyeCXW+3bXrhVmxc20FEYDWOxbu73x5OBxzg8PIgBlJU+jDT9Vode5utcsqVapgWgMJgAOggAgEfxSZC4AAViHp3WZCDAABRbIWQWCRCkSJKeAKHoMCEBQhYYFAuRCtkYBCBglhfhQKQwCu6JGB4qGQVAWF4EsACUAR+N+JLaLolC-gqgSoehhifjwPAEVUQohORdRoNIABWtiUDRrZ0UYH6McxCLsZQbAQHQpBMNRKECRhDFMSxYm1JQrZkAAciUAQUB+AD6VFzAsxhEf4JEIiEVHLAADKsumGSULEklZJTLAAjKsBlUaJrFLCpfniZ4E4rtxvG6R+nFSMZ3hmRZfkhFFPFYGQtn2YEUXOS5SW8R5XlRb5JJHpogVqcFZD5lJMlGBFkl0DFbhxUECXsFVLhGGlul1VlJJ1dVMB5R+dWFZ8xUIjIE6hFBD4QBk7mWDhADSMBmD1fSTTs02zTAABMC2kFAy2reNG0HTNGQAMz7VBR1rZtUDnTAF26dhB0fpZelNV+H0hLKZATZYAAGAAkwDWXZHIUAA7gChg8GgFBmMQEgYK10ntQqoMNCY5jLDlKVpasrDEGwFCg-jqUQwA-ID9ouWweBDAI6Y-cKrMkmQb7bkMvEwS5-PLvU9FNGYeNhQTdnJi1-NGZCwvmHzAsksQhCyrUljY00jNoGLUjJZTqxS0rISLtLB4fcwBF0yEyGa+YhHEc1SsaZV6OyR+dsYGYI1FQiPtTQ9207S9rY4e9LUfl9pEC39AMUIDAASQwyMQHig+DRO06zDNMyzZtHOznyc++kSthNKWK8bgtqCAADqsNkPDiPI6jfUY544tkFTNfWwLsvw53lfGyrau6AKhf1qKkSFuEW6RFWcSDlXDpT5SKTyHPzLr1g+7L6Sq88CuqZoJv8PH7vxtG8bptK1fRVWx9yEU5Y+kUw75lOwLGmhXrvEGRT-sSQSDwOeNAAJiBQzDvdR6F1AFLD9ndM6213IhxgGHD60d+ax3VAARRmHoPAOhIB4GyEPXqjMZDMwFL0Yu255jeDuA2CgNd65wwRkjFGFAqLdxQFwkokQqLsjvqNXuyFZaOVgO-eKzsJzaVgN5EocCQjANAeAyBb1oFBzgcwBBx4yJlX6BIMAUIcIRSapgz4KiwEQKgUgua-sxqlQohQbIegIDkDMY7CxiVZElGEspD639O7+LgS7Nq7sRJrRCIY4xAIw4OICvo5xRjXhoChrmGAAgIofQcHQNxyoKAYmMGAWAYAyD+GADwH0ZTcxJDwNeCaPBWDGE4FDHwrMHBSAkGQe8xIdAPlcWgCpMSTEHWYD4d0EBxwUAAI74NHsQ7IDhRBdJ6TodpLVll5PRMqDZJJfKqWcak9J2QsmBHDvzXJ+SoiFLkMU0p5TKnVKlHUhpORmnKAqTwWAAg8ASGguMjpRhqRkB8HIiEYM3IQ2WcC0FQKaSgtdv1Duv8UqWGABTNKzAYUIr2QLBwsK8VKyRe3YAntRaYslswdFbdZJYo6aIQlHT8gQA3J4PAAAvGAXz+gYAyE0igogiUuU6d03pFB+mDIqa49E5Bxk2DceQZZqzenCpCFs65wqDl+WyGQFGxJaUdTshQKmhTdAnMyRQSwKTzUZIEFlU2lsAo0lTBQIQklAKUFPCIDQKAQDygwKkHQCB3LMCAA).
-
-Here’s how to make a simple custom post that says “Hello.”
+This example shows an experience post with a text label and a button that triggers a form. When the form is submitted, the onSubmit handler takes the form input and manipulates state with [`useState`](/docs/working_with_usestate.md). The state update triggers a rerender and the new data is displayed.
 
 ```tsx
 import { Devvit } from '@devvit/public-api';
 
 Devvit.addCustomPostType({
-  name: 'Name',
-  render: ({ useForm, useState, ui }) => {
-    const [name, setName] = useState('Mysterious person');
+  name: 'TemplateName',
+  render: (context) => {
+    const [name, setName] = context.useState('unknown');
+
+    const myForm = context.useForm(
+      {
+        fields: [
+          {
+            type: 'string',
+            name: 'name',
+            label: 'Name',
+          },
+        ],
+      },
+      (values) => {
+        // onSubmit handler
+        setName(values.name);
+      }
+    );
+
     return (
-      <vstack>
-        <text>Hello {name}</text>
+      <vstack gap="medium" height="100%" alignment="middle center">
+        <text>Hello {name}!</text>
+        <button
+          onPress={() => {
+            context.ui.showForm(myForm);
+          }}
+        >
+          Set name
+        </button>
       </vstack>
     );
   },
@@ -111,288 +58,539 @@ Devvit.addCustomPostType({
 export default Devvit;
 ```
 
-Add a button that will change the name state value to whatever the user inputs.
+[Explore example in playground](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIBiB7ATlABASzJgogB4AOMa2MYAxjJgAooDOALiADQiNpUIjZTF0zTMEwARGADdJ2YQF9MAMzQosAcgACAEykzmAemIBXAEYAbbFQC0EYtjUBuADpgXE6bIB0ELVoDCRiyqDCwAKgCepAAUwC6YmJCw8JhqoTACZhDMMABy0DBqbHGYaJQ6aMlRVChg2YTMAJSYALwAfCLF8dVgLJgA2okwbJiMMMx5sAC6LZjddcyegTAAysxZMFFqRmAA1mAoAO5gag3OrnjxszW9UOGoGDNzMPWLo-dQUZ2XsReXl4oUMxaRjJPpfP7xH4Q6GYZiRGDJNQschgADmhXBMMGiMGGN+MPimRMMDMiImBSK+OhckpBMmtIhNMxUUkEDMRhgjCabQ6VMuo3G+RZbI5jE8g1OmLkX0l5z+pWYRjQeE+fIAPJIWBAqDtMKjbM0nCBYFpsEYoEbMAALGDYVFW5iGkAARgADK6AKSWtl2sCwWpOqDYXxmWg0WpkI2tTHxNXzVoACRJZhQIkGcgAhGr9PGY5g1SYjMxmDU8-EanRSoxGM1gFFue0oQTLk8XkZsJ5GFbDu8ord3rLm5g5NK+fFo2PLssxgl8nns4XizUJ9Ds5q1jqV5dB8PKXJZS5noI0MIdIoIEYzMJ3HoHOwQJIyIxsDUEM65EA).
 
-```tsx
-import {Devvit} from '@devvit/public-api'
+### Menu actions
 
-Devvit.addCustomPostType({
-  name: 'Name',
-  render: ({ useForm, useState, ui }) => {
-    const [name, setName] = useState('Mysterious person');
+This example defines a new form and a onSubmit handler called `myForm` using the `devvit.createForm` method. This form is shown via a [menu action](./menu-actions.md) using `context.ui.showForm()`.
 
-	// Form must be defined within the render method
-    const nameForm = useForm({fields: [{ label: 'Name', type: 'string' name: 'name'}]}, (values) => {
-	// Access the state setter here with setName
-      setName(values.name);
-    });
-
-    return (
-      <vstack>
-        <text>Hello {name}</text>
-
-	// Add a button which calls ui.showForm();
-        <button onPress={() => { ui.showForm(nameForm) }}>Change name</button>
-      </vstack>
-    )
-  }
-})
-
-export default Devvit
-```
-
-## Dynamic forms
-
-Forms accept a data argument so you can pass in dynamic data.
-
-Because we allow data as an argument in createForm, you can now create dynamic forms.
-
-```tsx
+```ts
 import { Devvit } from '@devvit/public-api';
 
-const dynamicForm = Devvit.createForm(
-  (data) => {
-    return {
-      fields: [
-        {
-          name: 'when',
-          label: `a string (default: ${data.text})`,
-          type: 'string',
-          defaultValue: data.text,
-        },
-      ],
-      title: 'Rule Form',
-      acceptLabel: 'Send Rule',
-    };
+const myForm = Devvit.createForm(
+  {
+    fields: [
+      {
+        type: 'string',
+        name: 'food',
+        label: 'What is your favorite food?',
+      },
+    ],
   },
-  ({ values }, ctx) => {
-    return ctx.ui.showToast(`You sent ${values.when}`);
+  (event, context) => {
+    // onSubmit handler
+    context.ui.showToast({ text: event.values.food });
   }
 );
 
 Devvit.addMenuItem({
-  label: 'Show a dynamic form',
-  location: 'post',
-  onPress: async (_, { ui }) => {
-    const randomString = Math.random().toString(36).substring(7);
-
-    const formData = {
-      text: randomString,
-    };
-
-    return ui.showForm(dynamicForm, formData);
+  label: 'Show a form',
+  location: 'subreddit',
+  onPress: async (_event, context) => {
+    context.ui.showForm(myForm);
   },
 });
 
 export default Devvit;
 ```
 
+### App configurations
+
+For more details see the [app configurations page](./app-configurations.md).
+
+## Form object
+
+The form object enables you to customize the form container and the [list of form fields](#supported-fields-types) included. The form object is passed along to `context.ui.useForm`, [`devvit.createForm`](/docs/api/public-api/classes/Devvit-1.md#createform), or [`devvit.addSettings`](/docs/api/public-api/classes/Devvit-1.md#addsettings) to create the form.
+
+#### Usage
+
+```tsx
+{
+  title: 'My form',
+  description: 'This is my form. There are many like it, but this one is mine.',
+  fields: [
+    {
+      type: 'string',
+      name: 'food',
+      label: 'What is your favorite food?',
+    },
+    {
+      type: 'string',
+      name: 'drink',
+      label: 'What is your favorite drink?',
+    },
+  ],
+  acceptLabel: 'Submit',
+  cancelLabel: 'Cancel',
+}
+```
+
+#### Supported properties
+
+| Property      | Supported types      | Description                                   |
+| :------------ | :------------------- | :-------------------------------------------- |
+| `title`       | `string` `undefined` | An optional title for the form                |
+| `description` | `string` `undefined` | An optional description for the form          |
+| `fields`      | `FormField[]`        | The fields that will be displayed in the form |
+| `acceptLabel` | `string` `undefined` | An optional label for the submit button       |
+| `cancelLabel` | `string` `undefined` | An optional label for the cancel button       |
+
+## onSubmit handler
+
+When creating a form, you also specify a callback function that is called when the form is submitted. It takes two parameters: `event` and `context`. The `event` parameter contains the results of the form submission, while the `context` parameter represents the current app context of the form submission event.
+
+```ts
+const onSubmitHandler = (event, context) => {
+  context.ui.showToast({ text: event.values.food });
+};
+
+const myForm = Devvit.createForm(
+  {
+    fields: [
+      {
+        type: 'string',
+        name: 'food',
+        label: 'What is your favorite food?',
+      },
+    ],
+  },
+  onSubmitHandler
+);
+```
+
+:::note
+Note: The `context` object is not available in onSubmit handlers within the `useForm` hook. For experience posts, you already have access to the context element via the outer function's scope.
+:::
+
+## Supported fields types
+
+The following field types are supported: [String](#string), [Select](#select), [Paragraph](#paragraph), [Number](#number), [Boolean](#boolean), and [Group](#group).
+
+### String
+
+A single-line text input.
+
+![String input](../assets/capabilities/forms/forms-string.png)
+
+#### Usage
+
+```ts
+{
+  type: 'string',
+  name: 'title',
+  label: 'Tournament title',
+}
+```
+
+#### Properties
+
+| Property       | Supported types                                                                   | Description                                                                                                                                                      |
+| :------------- | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`         | `string`                                                                          | The desired field type.                                                                                                                                          |
+| `name`         | `string`                                                                          | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                                           |
+| `label`        | `string`                                                                          | The label of the field. This will be displayed to the user.                                                                                                      |
+| `helpText`     | `string` `undefined`                                                              | An optional help text that will be displayed below the field.                                                                                                    |
+| `required`     | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
+| `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
+| `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
+| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `placeholder`  | `string` `undefined`                                                              | Placeholder text for display before a value is present.                                                                                                          |
+| `isSecret`     | `boolean` `undefined`                                                             | Makes the form field secret.                                                                                                                                     |
+
+### Select
+
+A dropdown menu with predefined options.
+
+![Select input](../assets/capabilities/forms/forms-select.png)
+
+#### Usage
+
+```ts
+{
+  type: 'select',
+  name: 'interval',
+  label: 'Update the leaderboard',
+  options: [
+    { label: 'Hourly', value: 'hourly' },
+    { label: 'Daily', value: 'daily' },
+    { label: 'Weekly', value: 'weekly' },
+    { label: 'Monthly', value: 'monthly' },
+    { label: 'Yearly', value: 'yearly' },
+  ],
+}
+```
+
+#### Properties
+
+| Property       | Supported types                                                                   | Description                                                                                                                                                      |
+| :------------- | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`         | `string`                                                                          | The desired field type.                                                                                                                                          |
+| `name`         | `string`                                                                          | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                                           |
+| `label`        | `string`                                                                          | The label of the field. This will be displayed to the user.                                                                                                      |
+| `options`      | `FieldConfig_Selection_Item[]`                                                    | The list of options available.                                                                                                                                   |
+| `helpText`     | `string` `undefined`                                                              | An optional help text that will be displayed below the field.                                                                                                    |
+| `required`     | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
+| `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
+| `defaultValue` | ` string[]` `undefined`                                                           | The default value of the field. Note that the default value is wrapped in an array to support multiple selected values.                                          |
+| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `multiSelect`  | `boolean` `undefined`                                                             | Enables users to select more than 1 item from the set.                                                                                                           |
+
+### Paragraph
+
+A multi-line text input for longer responses.
+
+![Paragraph input](../assets/capabilities/forms/forms-paragraph.png)
+
+#### Usage
+
+```ts
+{
+  type: 'paragraph',
+  name: 'description',
+  label: 'Description',
+}
+```
+
+#### Properties
+
+| Property       | Supported types                                                                   | Description                                                                                                                                                      |
+| :------------- | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`         | `string`                                                                          | The desired field type.                                                                                                                                          |
+| `name`         | `string`                                                                          | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                                           |
+| `label`        | `string`                                                                          | The label of the field. This will be displayed to the user.                                                                                                      |
+| `helpText`     | `string` `undefined`                                                              | An optional help text that will be displayed below the field.                                                                                                    |
+| `required`     | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
+| `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
+| `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
+| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `placeholder`  | `string` `undefined`                                                              | Placeholder text for display before a value is present.                                                                                                          |
+| `lineHeight`   | `number` `undefined`                                                              | Sets the field height by number of lines.                                                                                                                        |
+
+### Number
+
+An input for numerical values.
+
+![Number input](../assets/capabilities/forms/forms-number.png)
+
+#### Usage
+
+```ts
+{
+  type: 'number',
+  name: 'tokens',
+  label: 'Token balance',
+}
+```
+
+#### Properties
+
+| Property       | Supported types                                                                   | Description                                                                                                                                                      |
+| :------------- | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`         | `string`                                                                          | The desired field type.                                                                                                                                          |
+| `name`         | `string`                                                                          | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                                           |
+| `label`        | `string`                                                                          | The label of the field. This will be displayed to the user.                                                                                                      |
+| `helpText`     | `string` `undefined`                                                              | An optional help text that will be displayed below the field.                                                                                                    |
+| `required`     | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
+| `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
+| `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
+| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+
+### Boolean
+
+A yes/no or true/false type input.
+
+![Boolean input](../assets/capabilities/forms/forms-boolean.png)
+
+#### Usage
+
+```ts
+{
+  type: 'boolean',
+  name: 'enable',
+  label: 'Enable the event',
+}
+```
+
+#### Properties
+
+| Property       | Supported types                                                                   | Description                                                                                                                                                      |
+| :------------- | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`         | `string`                                                                          | The desired field type.                                                                                                                                          |
+| `name`         | `string`                                                                          | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                                           |
+| `label`        | `string`                                                                          | The label of the field. This will be displayed to the user.                                                                                                      |
+| `helpText`     | `string` `undefined`                                                              | An optional help text that will be displayed below the field.                                                                                                    |
+| `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
+| `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
+| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+
+### Group
+
+A collection of related fields that allows for better readability.
+
+#### Usage
+
+```ts
+{
+  type: 'group',
+  label: 'This is a group of input fields',
+  fields: [
+    {
+      type: 'paragraph',
+      name: 'description',
+      label: 'How would you describe what happened?',
+    },
+    {
+      type: 'number',
+      name: 'score',
+      label: 'How would you rate your meal on a scale from 1 to 10?',
+    },
+  ],
+}
+```
+
+#### Properties
+
+| Property   | Supported types      | Description                                                   |
+| :--------- | :------------------- | :------------------------------------------------------------ |
+| `type`     | `string`             | The desired field type.                                       |
+| `label`    | `string`             | The label of the group that will be displayed to the user.    |
+| `fields`   | `FormField[]`        | The fields that will be displayed in the group.               |
+| `helpText` | `string` `undefined` | An optional help text that will be displayed below the group. |
+
 ## Examples
 
-### Add a form to a menu action
+Below is a collection of common use cases and patterns.
+
+### Dynamic forms
+
+Instead of passing a static Form, you can create a function that returns a Form. This enables us to dynamically determine which fields to show and what default values to populate them with. We can also pass along any data via the `context.ui.showForm` method's optional 2nd argument.
+
+```tsx
+import { Devvit } from '@devvit/public-api';
+
+Devvit.configure({
+  redditAPI: true,
+});
+
+const myForm = Devvit.createForm(
+  (data) => {
+    return {
+      fields: [
+        {
+          type: 'string',
+          name: 'username',
+          label: 'Username',
+          defaultValue: data.username,
+        },
+      ],
+    };
+  },
+  (event, context) => {
+    context.ui.showToast({
+      text: `Hello ${event.values.username}`,
+    });
+  }
+);
+
+Devvit.addMenuItem({
+  label: 'Show a dynamic form',
+  location: 'subreddit',
+  onPress: async (_event, context) => {
+    const user = await context.reddit.getCurrentUser();
+    const username = user?.username;
+    context.ui.showForm(myForm, { username });
+  },
+});
+
+export default Devvit;
+```
+
+### One of everything
+
+This example includes one of each of the [supported field types](#supported-fields-types).
 
 ```tsx
 import { Devvit } from '@devvit/public-api';
 
 const exampleForm = Devvit.createForm(
-  (data) => ({
+  {
+    title: 'My favorites',
+    description: 'Tell us about your favorite food!',
     fields: [
       {
-        name: 'what',
-        label: `What do you want us to call you, ${data.userId}?`,
         type: 'string',
-        helpText: 'Do not include spaces in the name',
+        name: 'food',
+        label: 'What is your favorite food?',
+        helpText: 'Must be edible',
+        required: true,
       },
       {
-        name: 'who',
-        label: 'which person should we bother?',
-        type: 'select',
-        options: [
-          { label: 'me', value: 'me' },
-          { label: 'you', value: 'you' },
-          { label: 'someone else', value: 'someone else' },
-        ],
-      },
-      {
-        label: 'this is a group of options',
+        label: 'About that food',
         type: 'group',
         fields: [
           {
-            name: 'where',
-            label: 'where should we bother them?',
-            type: 'paragraph',
+            type: 'number',
+            name: 'times',
+            label: 'How many times a week do you eat it?',
+            defaultValue: 1,
           },
           {
-            name: 'numexample',
-            label: 'how many tiimes should we call?',
-            type: 'number',
+            type: 'paragraph',
+            name: 'what',
+            label: 'What makes it your favorite?',
+          },
+          {
+            type: 'select',
+            name: 'healthy',
+            label: 'Is it healthy?',
+            options: [
+              { label: 'Yes', value: 'yes' },
+              { label: 'No', value: 'no' },
+              { label: 'Maybe', value: 'maybe' },
+            ],
+            defaultValue: ['maybe'],
           },
         ],
       },
       {
-        name: 'yesno',
-        label: 'is this a yes or a no?',
         type: 'boolean',
+        name: 'again',
+        label: 'Can we ask again?',
       },
     ],
-    title: 'Example Form',
     acceptLabel: 'Submit',
     cancelLabel: 'Cancel',
-  }),
+  },
   (event, context) => {
     console.log(event.values);
-    context.ui.showToast('Thanks for submitting the form!');
+    context.ui.showToast('Thanks!');
   }
 );
 
 Devvit.addMenuItem({
   location: 'subreddit',
-  label: 'Test the form',
-  onPress: (event, context) => {
-    context.ui.showForm(exampleForm, { userId: context.userId });
+  label: 'One of everything form',
+  onPress: (_event, context) => {
+    context.ui.showForm(exampleForm);
   },
 });
 
 export default Devvit;
 ```
 
-### Add a multi-step dynamic form to a custom post
+### Multi-step forms
+
+Add a multi-step dynamic form to an experience post
 
 ```tsx
 import { Devvit } from '@devvit/public-api';
 
-const category: Record<string, string> = {
-  food: 'kind',
-  music: 'genre',
-  sports: 'game',
-};
-
-const categories: Record<string, { label: string; value: string }[]> = {
-  food: [
-    { label: 'American', value: 'american' },
-    { label: 'Chinese', value: 'chinese' },
-    { label: 'Italian', value: 'italian' },
-    { label: 'Mexican', value: 'mexican' },
-  ],
-  music: [
-    { label: 'Alternative Rock', value: 'alternative' },
-    { label: 'Classical', value: 'classical' },
-    { label: 'Goa Trance', value: 'goa' },
-    { label: 'Reggae', value: 'reggae' },
-  ],
-  sports: [
-    { label: 'American Football', value: 'football' },
-    { label: 'Baseball', value: 'baseball' },
-    { label: 'Basketball', value: 'basketball' },
-    { label: 'Soccer', value: 'soccer' },
-  ],
-};
+Devvit.configure({
+  redditAPI: true,
+});
 
 Devvit.addCustomPostType({
   name: 'Multi-step Form',
-  render: ({ useState, useForm, ui }) => {
-    const name = useState('');
-    const subject = useState('');
-    const favorite = useState('');
+  render: (context) => {
+    const [name, setName] = context.useState('');
+    const [food, setFood] = context.useState('');
+    const [drink, setDrink] = context.useState('');
 
-    const setName = (_name: string) => {
-      name[0] = _name;
-      name[1](_name);
-    };
-
-    const setSubject = (sub: string) => {
-      subject[0] = sub;
-      subject[1](sub);
-    };
-
-    const setFavorite = (fav: string) => {
-      favorite[0] = fav;
-      favorite[1](fav);
-    };
-
-    let formPage1: FormKey;
-    let formPage2: FormKey;
-    let formPage3: FormKey;
-    formPage3 = useForm(
-      () => ({
-        title: `${name[0]}, what's your favorite ${category[subject[0]]} of ${subject[0]}?`,
-        fields: [
-          {
-            type: 'select',
-            label: category[subject[0]],
-            name: 'category',
-            options: categories[subject[0]],
-          },
-        ],
-      }),
-      ({ category }) => {
-        setFavorite(category);
-      }
-    );
-    formPage2 = useForm(
-      () => ({
-        title: `Hello, ${name[0]}`,
-        fields: [
-          {
-            type: 'select',
-            label: "What's your favorite subject?",
-            name: 'subject',
-            options: [
-              { label: 'Food', value: 'food' },
-              { label: 'Music', value: 'music' },
-              { label: 'Sports', value: 'sports' },
-            ],
-          },
-        ],
-      }),
-      ({ subject: _subject }) => {
-        setSubject(_subject);
-        ui.showForm(formPage3);
-      }
-    );
-    formPage1 = useForm(
+    const form3 = context.useForm(
       {
-        title: 'Questionnaire',
-        fields: [{ type: 'string', label: "What's your name?", name: 'name' }],
+        fields: [
+          {
+            type: 'string',
+            name: 'drink',
+            label: "What's your favorite drink?",
+            required: true,
+          },
+        ],
       },
-      ({ name: _name }) => {
-        setName(_name);
-        ui.showForm(formPage2);
+      (values) => {
+        setDrink(values.drink);
       }
     );
 
-    const launchForm = () => {
-      ui.showForm(formPage1);
-    };
+    const form2 = context.useForm(
+      {
+        fields: [
+          {
+            type: 'string',
+            name: 'food',
+            label: "What's your favorite food?",
+            required: true,
+          },
+        ],
+      },
+      (values) => {
+        setFood(values.food);
+        context.ui.showForm(form3);
+      }
+    );
 
-    const restart = () => {
+    const form1 = context.useForm(
+      {
+        fields: [
+          {
+            type: 'string',
+            name: 'name',
+            label: "What's your name?",
+            required: true,
+          },
+        ],
+      },
+      (values) => {
+        setName(values.name);
+        context.ui.showForm(form2);
+      }
+    );
+
+    function restart() {
       setName('');
-      setSubject('');
-      setFavorite('');
-      launchForm();
-    };
+      setFood('');
+      setDrink('');
+      context.ui.showForm(form1);
+    }
 
-    const unanswered = (
-      <vstack alignment={'center middle'} grow>
-        <button onPress={launchForm}>Take questionnaire</button>
+    const isAnswered = name && food && drink;
+
+    return (
+      <vstack height="100%" alignment="center middle" gap="none">
+        {isAnswered && (
+          <>
+            <text>Name: {name}</text>
+            <text>Favorite food: {food}</text>
+            <text>Favorite drink: {drink}</text>
+            <spacer size="large" />
+            <button onPress={restart}>Restart</button>
+          </>
+        )}
+        {!isAnswered && <button onPress={restart}>Take questionnaire</button>}
       </vstack>
     );
+  },
+});
 
-    const answered = (
-      <vstack alignment={'center middle'} gap={'medium'}>
-        <text>Name: {name[0]}</text>
-        <text>Favorite subject: {subject[0]}</text>
-        <text>
-          Favorite {category[subject[0]]}: {favorite[0]}
-        </text>
-        <spacer size={'large'} />
-        <button onPress={restart}>Restart</button>
-      </vstack>
-    );
-
-    return favorite[0] ? answered : unanswered;
+Devvit.addMenuItem({
+  location: 'subreddit',
+  label: 'Add post with multi-step form',
+  onPress: async (_event, context) => {
+    const currentSubreddit = await context.reddit.getCurrentSubreddit();
+    await context.reddit.submitPost({
+      title: 'Experience post with multi-step form',
+      subredditName: currentSubreddit.name,
+      preview: (
+        <vstack width="100%" height="100%" alignment="middle center">
+          <text>Loading ...</text>
+        </vstack>
+      ),
+    });
+    context.ui.showToast('Submitted post!');
   },
 });
 
 export default Devvit;
 ```
+
+[Explore example in a playground](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcICyBXANgFwJYFoDOGMADgAQBmA9gE5QlZgkwAeRMVWMYAxjCURQRAAaEHipcEILFH5UMJYCQAiMAG6qs8gL7kqFWgHIAAgBM1GjAHoiKAEZosXHBCJYDAbgA6YbyvWaAOi4KMDIsAHMUKhgACmBvEhJokxNNAEEABQBJeBIMKhQYIW8tAEovHzA-CwCIFIBhFAJ9DIEMABUAT1Y4hJJIWFyDVExcAmISADFqKANihiTOMypcmOCwQiYMUpIAXgA+BT7E9YISAG0BopI8GAwAOWgYAF09knXNjACmmABlDAghBiBgM5WO7xCZ3OlAoJiENzu01hr12EI2zC+P3+gNiILBCxOkPk5xM7DAAGt4bcMEoyeSUWjPt9btigXiKuDTvJKDQAMxvD4Y5kwaY0GLgxLxAmJGVhGBoEx4XLnCUyyWqtWJDDdGBDAhk8JzDWaq5DUn0clG6WamVoCC2eW5TwgADqAAtAQY8CROhQouQIKpqJpeOaKQB+Z3zG026IARxQWGSuXyhWjMcSWnTNue2ZlWdVMVUEDQhTwOwOR2tMuptItRZLZYCYfJ+JtWnB+M5RPIMwATAKQkyfqKoOLq1KM3KFUqLsb1dWbdrWHr8vRDXmM6aSAYYSYrRm1XaHWgna6PRgvT6-VQA0H2IRe7DI8J5zL44nk3kCkU3wXFyQuaqv+NoNqWMDlnshyTjG1JIiYYFNnubYxoKWzfFgAR4G6FAAO6jjEPJQLyKFqh20pdtKXK9jQACMg7ouhI4zOONowTa06Ksqb7sYey66ju+rrgeh6JNuBhXCJonHo6JDOu6nrer6-pXC+m4xh+SYwCYKY-upZH6YB6kgZqiEQRW0HGtSjywGZeABFcpGamhmKYdheEEURfZOZmnYctKZAoNw2AhIsBAQHIMQ7LxiTWU8wKghUNpwRQsIJT5CI0nS6VJc5Q5ComWE4fhLFEbRTnkd2YBnFgeBpNVuFsNpbxXCQABkbVPiY7WdS2-lqtEGBRAwrGagAPKo4VcOSJBujAERuhguzOrRAAMq0AKTOiQJYRGAsAbMtIA8Oit5QFgKRoDA23hC4R1gCE10gPsxrALV9V4I1yQ9SQo0ZmNL0AWqY2fPsNkCcAVxaGNlig2+iQgxi+yTIGwaPnuuTAHu0Ow0j8MkIjWzI6jD6hnSmMtjjcNAzKY14EQEA8LeeBYAAXjAR12lQ4RPSQliA6JCO2CgGAYKFIQZNEeB4LswBSwCchaPsABKEEKxgMPC6LIQC4eMO6zapTkRmwAAITvQ1TXdR1BNa2LDAS1LMty2rEUYEr7QQOSvAJmrWAhJAWmayL9v7Mb42WJNALTQbJAof+ZT+cwsjyGYZAQOg8jVJoFTCCAqhsCzIQILRWhAA).

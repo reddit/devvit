@@ -2,11 +2,13 @@
 
 Include configuration settings in your app.
 
+![An example form with all field types](../assets/capabilities/app-configurations/app-configurations-all-types.png)
+
 Configuration settings let users change the functionality and behavior of an app. Use the following steps to add settings at the global app-scope.
 
 1. Use `Devvit.addSettings` to define the fields with scope as `SettingsScope.App`
 
-```ts
+```tsx
 import { Devvit, SettingScope } from '@devvit/public-api';
 
 Devvit.addSettings([
@@ -21,7 +23,7 @@ Devvit.addSettings([
 
 2. Store the app setting value via CLI. Keep in mind this operation modifies the value across all installations.
 
-```sh
+```bash
 devvit settings set my-feature-flag
 ```
 
@@ -41,8 +43,6 @@ Devvit.addMenuItem({
 
 Once the app is installed, the configuration settings are available on the Install Settings page. Moderators add the required input and save the changes to configure the app. Note that these configurations are limited to the subreddit where the app is installed, so your app can be uniquely configured to each subreddit’s specific needs.
 
-![An example showing all input types](../assets/capabilities/app-configurations/app-configurations-all-types.png)
-
 ## Input types
 
 There are currently five supported types of input:
@@ -53,37 +53,7 @@ There are currently five supported types of input:
 - Dropdown selection or `'select'`
 - Paragraph or `'paragraph'`
 
-## Examples
-
-### String
-
-Renders an input field that accepts text responses.
-
-![String input](../assets/capabilities/app-configurations/app-configurations-string.png)
-
-### Boolean
-
-Renders a switch to toggle on (true) or off (false).
-
-![Boolean input](../assets/capabilities/app-configurations/app-configurations-boolean.png)
-
-### Number
-
-Renders an input field that accepts text responses.
-
-![Number input](../assets/capabilities/app-configurations/app-configurations-number.png)
-
-### Dropdown
-
-Renders a dropdown menu where moderator can select one or more developer-defined options.
-
-![Select input](../assets/capabilities/app-configurations/app-configurations-select.png)
-
-### Paragraph
-
-Render a textarea for longer form text.
-
-![Paragraph input](../assets/capabilities/app-configurations/app-configurations-paragraph.png)
+See the [Forms page](./forms.md) for more detail.
 
 ## Configuring settings within your app
 
@@ -91,13 +61,13 @@ You can use the following code snippets as a guide to adding configuration setti
 
 1. First, make sure this import is at the top of your file.
 
-```ts
+```tsx
 import { Devvit } from '@devvit/public-api';
 ```
 
 2. Use `Devvit.addSettings` to define any input fields you want to add to your settings form. Each field needs to be assigned a type, name, and label. You can provide the dropdown options for selection fields, as well as determine if the user can select more than one option within the dropdown. The label is the only text that will be visible on the form, so use this to communicate what the moderator should enter in each input field.
 
-```ts
+```tsx
 Devvit.addSettings([
   {
     type: 'string',
@@ -182,7 +152,7 @@ Devvit app configurations also support input validation. As the app developer, y
 
 For example, setting a maximum number:
 
-```ts
+```tsx
 onValidate: (event) => {
   if (event.value! > 10) {
     return 'Number too high!';
@@ -192,7 +162,7 @@ onValidate: (event) => {
 
 To use validation, add the `onValidate` handler to the settings field object, like this:
 
-```ts
+```tsx
   {
     type: 'number',
     name: 'number-input',
@@ -209,13 +179,13 @@ After you've written the configuration settings for your app, you can see the in
 
 1. Add the following imports to the top of your file:
 
-```ts
+```tsx
 import { Devvit } from '@devvit/public-api';
 ```
 
 2. Use `Devvit.addMenuItem` to create a menu item that will trigger a toast message containing the form input.
 
-```ts
+```tsx
 Devvit.addMenuItem({
   label: 'Test Action',
   location: Context.SUBREDDIT,
