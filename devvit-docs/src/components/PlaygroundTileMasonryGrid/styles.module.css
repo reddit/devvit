@@ -1,7 +1,7 @@
 .grid {
     display: block;
     columns: 3;
-    column-gap: 16px;
+    column-gap: 24px;
 }
 
 @media (max-width: 1100px) {

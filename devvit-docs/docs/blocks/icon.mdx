@@ -1,5 +1,8 @@
 # Icons
 
+import IconTile from '@site/src/components/IconTile';
+import IconTileGrid from '@site/src/components/IconTileGrid';
+
 import Icon3rdPartyFill from '../assets/icons/icon-3rd-party-fill.svg';
 import Icon3rdPartyOutline from '../assets/icons/icon-3rd-party-outline.svg';
 import IconActivityFill from '../assets/icons/icon-activity-fill.svg';
@@ -1195,67 +1198,6 @@ topics: [
 ]
 };
 
-export const Tile = ({name, children}) => (
-  <div
-    style={{
-      background: 'transparent',
-      width: '150px',
-      borderRadius: '8px',
-      border: '1px solid var(--ifm-toc-border-color)',
-      overflow: 'clip',
-    }}
-  >
-    <ul
-      style={{
-        display: 'flex',
-        gap: '20px',
-        padding: '20px',
-        margin: '0',
-        alignItems: 'center',
-        alignContent: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {children.map((child) => (
-        <li
-          style={{
-            height: '20px',
-            width: '20px',
-            listStyle: 'none',
-            margin: '0',
-          }}
-        >
-          {child}
-        </li>
-      ))}
-    </ul>
-    <p
-      style={{
-        backgroundColor: 'var(--ifm-breadcrumb-item-background-active)',
-        borderTop: '1px solid var(--ifm-toc-border-color)',
-        margin: '0',
-        padding: '12px 16px',
-        height: '100%',
-      }}
-    >
-      {name}
-    </p>
-  </div>
-);
-
-export const Tiles = ({children}) => (
-  <div
-    style={{
-      width: "100%",
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '16px',
-    }}
-  >
-    {children}
-  </div>
-);
-
 The following is a list of icons available for use within Custom Posts. To use, include the `Name` of the icon in either a `<button>` or `<icon>` component.
 
 ```typescript
@@ -1302,171 +1244,171 @@ An `enum` for setting the size of the icon. Possible values:
 
 ### Actions
 
-<Tiles>
+<IconTileGrid>
   {
     icons.actions.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Ads
 
-<Tiles>
+<IconTileGrid>
   {
     icons.ads.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Beta
 
-<Tiles>
+<IconTileGrid>
   {
     icons.beta.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Content
 
-<Tiles>
+<IconTileGrid>
   {
     icons.content.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Formatting
 
-<Tiles>
+<IconTileGrid>
   {
     icons.formatting.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Forms
 
-<Tiles>
+<IconTileGrid>
   {
     icons.forms.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Locations
 
-<Tiles>
+<IconTileGrid>
   {
     icons.locations.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Media controls
 
-<Tiles>
+<IconTileGrid>
   {
     icons.media.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Moderation
 
-<Tiles>
+<IconTileGrid>
   {
     icons.moderation.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Navigation
 
-<Tiles>
+<IconTileGrid>
   {
     icons.navigation.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Ratings
 
-<Tiles>
+<IconTileGrid>
   {
     icons.ratings.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Sorts & Views
 
-<Tiles>
+<IconTileGrid>
   {
     icons.sortsAndViews.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Status
 
-<Tiles>
+<IconTileGrid>
   {
     icons.status.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Topics
 
-<Tiles>
+<IconTileGrid>
   {
     icons.topics.map(({ name, variants }) => (
-      <Tile name={name}>
+      <IconTile name={name}>
         {variants}
-      </Tile>
+      </IconTile>
     )) 
   }
-</Tiles>
+</IconTileGrid>
 
 ### Other
 

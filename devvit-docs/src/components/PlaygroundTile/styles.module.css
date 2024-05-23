@@ -9,7 +9,7 @@
     border-radius: 8px;
     border: 1px solid var(--ifm-color-emphasis-300);
     overflow: clip;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     break-inside: avoid;
     &:hover {
         border: 1px solid var(--ifm-color-primary);
@@ -23,7 +23,6 @@
 }
 
 .footer {
-    background-color: var(--ifm-color-emphasis-100);
     border-top: 1px solid var(--ifm-color-emphasis-300);
     margin: 0;
     padding: 12px 16px;
@@ -35,7 +34,6 @@
 }
 
 .wrapper:hover .footer {
-    background-color: var(--ifm-color-primary-lightest);
     border-top: 1px solid var(--ifm-color-primary);
 }
 
@@ -53,6 +51,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: clip;
+    color: var(--ifm-font-color-base);
 }
 
 .byline {
