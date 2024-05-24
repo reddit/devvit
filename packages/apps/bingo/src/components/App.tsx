@@ -1,5 +1,5 @@
 import { Devvit } from '@devvit/public-api';
-import { getCommentRichtext, shuffleArray } from '../utils/utils.js';
+import { getAllMatches, getCommentRichtext, shuffleArray } from '../utils/utils.js';
 import { getUserTiles, setUserTiles } from '../api/api.js';
 import { Tile } from './Tile.js';
 import { TileDetails } from './TileDetails.js';
@@ -83,10 +83,8 @@ export const App = (context: Devvit.Context): JSX.Element => {
   });
   const [isEasyEyeMode, setIsEasyEyeMode] = context.useState<boolean>(false);
   const [isConfirmationVisible, setIsConfirmationVisible] = context.useState<boolean>(false);
-  // const [isLoading, setIsLoading] = context.useState<boolean>(false);
   const [isSuccessVisible, setIsSuccessVisible] = context.useState<boolean>(false);
   const [latestCommentLink, setLatestCommentLink] = context.useState<string | null>(null);
-  // const [shareLinkTimestamp, setShareLinkTimestamp] = context.useState<number | null>(null);
   const [activeTile, setActiveTile] = context.useState<{
     text: string;
     active: boolean;
@@ -155,21 +153,8 @@ export const App = (context: Devvit.Context): JSX.Element => {
     setLastSyncedTiles(JSON.parse(currentStateStringified));
   }
 
-  // const showSuccessWithArtificialDelay = (): void => {
-  //   if (!shareLinkTimestamp || !latestCommentLink || isSuccessVisible) {
-  //     return;
-  //   }
-  //   if (Date.now() - shareLinkTimestamp < 2000) {
-  //     return;
-  //   }
-  //   setIsLoading(false);
-  //   closeConfirmationModal();
-  //   setIsSuccessVisible(true);
-  // };
-
   const interval = context.useInterval(async () => {
     await syncSelectedOptions();
-    // showSuccessWithArtificialDelay();
   }, 1000);
 
   if (currentUserName) {
@@ -200,7 +185,6 @@ export const App = (context: Devvit.Context): JSX.Element => {
 
   const closeSuccessModal = (): void => {
     setLatestCommentLink(null);
-    // setShareLinkTimestamp(null);
     setIsSuccessVisible(false);
   };
 
@@ -208,17 +192,16 @@ export const App = (context: Devvit.Context): JSX.Element => {
     if (!currentUserName) {
       return;
     }
-    // setIsLoading(true);
     await syncSelectedOptions();
     const visualTiles = tiles.map((tile) => (tile.active ? '🟩' : '🟥'));
 
+    const matches = getAllMatches(tiles);
     //submit the comment to the post as app account
     const comment = await context.reddit.submitComment({
       id: context.postId!,
-      richtext: getCommentRichtext(visualTiles, currentUserName),
+      richtext: getCommentRichtext(visualTiles, matches),
     });
     const link = new URL(comment.permalink, 'https://www.reddit.com').toString();
-    // setShareLinkTimestamp(Date.now());
     setLatestCommentLink(link);
     closeConfirmationModal();
     setIsSuccessVisible(true);
@@ -395,16 +378,3 @@ export const App = (context: Devvit.Context): JSX.Element => {
     </zstack>
   );
 };
-
-function _getFormattedUsername(currentUserName: string | null): string {
-  if (!currentUserName) {
-    return '';
-  }
-  const usernameLength = currentUserName.length;
-  if (usernameLength <= 12) {
-    return currentUserName;
-  }
-  const start = currentUserName.slice(0, 4);
-  const end = currentUserName.slice(usernameLength - 4, usernameLength);
-  return `${start}…${end}`;
-}
