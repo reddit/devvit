@@ -77,7 +77,7 @@ We made [Redis](./capabilities/redis.md) errors more developer-friendly and also
 
 **Release Date: January 18, 2024**
 
-These two previously experimental features have been pressure-tested and are ready to graduate to released status. Check out how to [format text blocks](./blocks/text.mdx) and [add links](./capabilities/adding-links.md) to your custom posts!
+These two previously experimental features have been pressure-tested and are ready to graduate to released status. Check out how to [format text blocks](./blocks/text.mdx) and [add links](./capabilities/adding-links.mdx) to your custom posts!
 
 These features are supported on the web and for Android and iOS Reddit app version 2023.50.0 and above (tap your snoovatar, then tap **Settings** and scroll all the way down to see your app version).
 
@@ -141,7 +141,7 @@ These methods enable additional functionality and get to parity with the kvStore
 
 _**Experimental link navigation**_
 
-Linking to pages on Reddit, as well as off-platform linkouts, is now available with [navigateTo](./capabilities/adding-links.md). For Reddit content, you will be able to use a thing id or the url.
+Linking to pages on Reddit, as well as off-platform linkouts, is now available with [navigateTo](./capabilities/adding-links.mdx). For Reddit content, you will be able to use a thing id or the url.
 
 :::note
 Off-platform linkouts will always include a warning dialogue for end-users to ensure a more secure experience.
