@@ -9,6 +9,7 @@ You can find instructions on how to install and use @devvit/kit [here](https://g
 | Name                                                                                             | Description                                                                                  |
 | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
 | [Columns](https://github.com/reddit/devvit-kit/blob/main/src/columns/readme.md)                  | Provides a simple column layout and optionally lets you specify gap sizing between elements. |
+| [Pixel padding](https://github.com/reddit/devvit-kit/blob/main/src/pixel-padding/readme.md)      | A component that lets you set padding from any side using pixel values.                      |
 | [Items pagination](https://github.com/reddit/devvit-kit/blob/main/src/item-pagination/readme.md) | Enables pagination of data, including a UI for navigating through the elements.              |
 | [Dev toolbar](https://github.com/reddit/devvit-kit/blob/main/src/dev-toolbar/readme.md)          | Adds a toolbar of actions only visible to developers.                                        |
 
