@@ -8,7 +8,7 @@ Devvit apps go through three stages.
 
 | Stage    | Description                                                                                                                                                                    |
 | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Private  | When you are building and testing your app, it’s only visible to you, and it can only be installed by you in small subreddits with fewer than 50 subscribers.                  |
+| Private  | When you are building and testing your app, it’s only visible to you, and it can only be installed by you in small subreddits with fewer than 200 subscribers.                 |
 | Unlisted | After you publish your app, it is still only visible to you in the Apps directory, but you can install it on larger subreddits.                                                |
 | Public   | Once your app review form has been approved by the Developer Platform team, your app is available in the Apps directory and can be installed by mods and admins across Reddit. |
 

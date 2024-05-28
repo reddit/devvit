@@ -20,46 +20,37 @@
     },
     {
       "type": "category",
-      "label": "Examples",
-      "link": {
-        "type": "doc",
-        "id": "examples/overview"
-      },
+      "label": "Showcase",
       "items": [
-        "examples/playpens",
-        "examples/apps",
-        "examples/tutorials"
+        "showcase/apps",
+        "showcase/playgrounds",
+        "showcase/tutorials"
       ]
     },
     {
       "type": "category",
       "label": "Capabilities",
       "items": [
-        "install_settings",
-        "adding_links",
-        "cache",
-        "forms",
-        "media_uploads",
-        "menu_actions",
-        {
-          "label": "Reddit API Client",
-          "type": "doc",
-          "id": "api/redditapi/classes/RedditAPIClient.RedditAPIClient"
-        },
-        "redis",
-        "realtime",
-        "scheduler",
-        "secrets_storage",
-        "event_triggers",
-        "http_fetch"
+        "capabilities/app-configurations",
+        "capabilities/adding-links",
+        "capabilities/cache",
+        "capabilities/forms",
+        "capabilities/image-uploads",
+        "capabilities/menu-actions",
+        "capabilities/redis",
+        "capabilities/realtime",
+        "capabilities/scheduler",
+        "capabilities/secrets-storage",
+        "capabilities/triggers",
+        "capabilities/http-fetch"
       ]
     },
     {
       "type": "category",
-      "label": "Custom posts",
+      "label": "Experiences",
       "items": [
-        "custom_posts",
-        "custom_post_project_guide",
+        "experiences",
+        "experience_post",
         "app_image_assets",
         "post_size",
         "dimensions",
@@ -69,38 +60,36 @@
     },
     {
       "type": "category",
-      "label": "Blocks",
-      "link": {
-        "type": "doc",
-        "id": "blocks/overview"
-      },
-      "items": [
-        "blocks/stacks",
-        "blocks/text",
-        "blocks/icon",
-        "blocks/button",
-        "blocks/image",
-        "blocks/spacer",
-        "blocks/colors"
-      ]
-    },
-    {
-      "type": "category",
       "label": "Developer tools",
       "items": [
         "playground",
         "playtest",
         "debug",
-        "devvit_cli"
+        "devvit_cli",
+        "devvit_kit"
       ]
     },
     {
       "type": "category",
-      "label": "Devvit library",
+      "label": "Reference docs",
       "items": [
         {
+          "type": "category",
+          "label": "Blocks",
+          "items": [
+            "blocks/overview",
+            "blocks/stacks",
+            "blocks/text",
+            "blocks/icon",
+            "blocks/button",
+            "blocks/image",
+            "blocks/spacer",
+            "blocks/colors"
+          ]
+        },
+        {
           "type": "doc",
-          "label": "Devvit Entrypoint",
+          "label": "Devvit library",
           "id": "api/public-api/classes/Devvit-1"
         },
         {
@@ -132,6 +121,11 @@
       ]
     },
     {
+      "type": "doc",
+      "label": "Guidelines",
+      "id": "guidelines"
+    },
+    {
       "type": "category",
       "label": "Resources",
       "items": [
@@ -140,11 +134,6 @@
         "limits",
         "help"
       ]
-    },
-    {
-      "type": "doc",
-      "label": "Guidelines",
-      "id": "guidelines"
     },
     {
       "type": "doc",

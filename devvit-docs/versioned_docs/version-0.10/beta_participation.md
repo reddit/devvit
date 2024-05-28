@@ -3,20 +3,20 @@
 ## Support
 
 - [r/Devvit](https://reddit.com/r/devvit): This subreddit is where we share the latest release notes and updates. The sub is for longer-form discussions, feature requests, and a place to share your ideas and work.
-- [Beta Discord](https://discord.gg/R7yu2wh9Qz): Join our server to get live (but ephemeral) chat support, participate in office hours, and connect with other devs. Message [u/pl00h](https://www.reddit.com/message/compose/?to=pl00h) or [r/devvit modmail](https://reddit.com/message/compose/?to=/r/Devvit) to get dev role permissions.
+- [Beta Discord](https://discord.gg/R7yu2wh9Qz): Join our server to get live (but ephemeral) chat support, participate in office hours, and connect with other devs. Message [u/pl00h](https://www.reddit.com/message/compose/?to=pl00h) to get dev role permissions.
 
-## Wonky Beta stuff
+## Administrative
 
-There are some temporary “rough edges” on the platform right now. We know these may be annoying - we are working on fixes and want to get feedback on the developer experience as quickly
-as possible. A few limitations:
+### Get your app listed
 
-- You will only be able to install your app on “test” subreddits on your own for now, i.e.
-  - subreddits you moderate that have < 10 members
-  - If you would like to publish an app and/or add your app to subreddit that does not meet these criteria, please send us a
-    note via [r/devvit modmail](https://reddit.com/message/compose/?to=/r/Devvit) or message [u/pl00h](https://www.reddit.com/message/compose/?to=pl00h).
-- You need to manually update your app on every subreddit on every new version
-  - We do not yet auto-upgrade installed apps
-- We don’t yet have analytics available (number of users/clicks/etc)
-- Apps will run with the permissions of the installer
-  - Be careful if you have everything permissions to moderate multiple subreddits
-  - Make sure that anyone installing your app on their sub understands what it does
+You can publish your app for personal use at any time (with some caveats). To list your app on our directory, you'll need to [submit our app review form](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform).
+
+We do app review on Tuesdays. After review, our team will notify you and list your app for public access.
+
+### Request a fetch domain
+
+We have an allowlist for the HTTP Fetch plugin. If you have a domain you'd like to use, please [fill out this form](https://docs.google.com/forms/d/e/1FAIpQLSe_Bbs37LQe3Nrgyg6UJgOHQzYnvPRWb0tQSwf3vwKSUJaV8A/viewform).
+
+### Contacting your users
+
+Currently, to contact the users that have installed your app, you'll need to coordinate with our team. This will change in the future, but please reach out to the Developer Platform team to communicate key updates, bugs, etc.

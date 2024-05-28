@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "devvit-docs",
-  "version": "0.10.20",
+  "version": "0.10.21",
   "scripts": {
     "clean": "rm -rf .turbo static/@devvit",
     "clobber": "yarn clean && rm -rf node_modules",
@@ -23,8 +23,8 @@
   },
   "dependencies": {
     "@cmfcmf/docusaurus-search-local": "1.1.0",
-    "@devvit/cli": "0.10.20",
-    "@devvit/protos": "0.10.20",
+    "@devvit/cli": "0.10.21",
+    "@devvit/protos": "0.10.21",
     "@docusaurus/core": "3.1.1",
     "@docusaurus/plugin-content-docs": "3.1.1",
     "@docusaurus/preset-classic": "3.1.1",
@@ -40,7 +40,7 @@
     "redocusaurus": "2.0.0"
   },
   "devDependencies": {
-    "@devvit/eslint-config": "0.10.20",
+    "@devvit/eslint-config": "0.10.21",
     "@docusaurus/module-type-aliases": "3.1.1",
     "typedoc": "0.25.6",
     "typedoc-plugin-markdown": "3.17.1",
