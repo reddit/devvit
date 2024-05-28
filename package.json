@@ -58,7 +58,6 @@
     "devvit-docs",
     "packages/*",
     "packages/apps/**",
-    "packages/build-pack/__tests__/test-lib/templates/devvit-project/**/*",
     "packages/build-pack/src/__tests__/test-actors/**/*",
     "packages/internal-examples/internal-projects/**/!(dev-platform-automod)"
   ],
