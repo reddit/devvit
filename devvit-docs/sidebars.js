@@ -43,11 +43,6 @@ const sidebars = {
         'capabilities/forms',
         'capabilities/image-uploads',
         'capabilities/menu-actions',
-        {
-          label: 'Reddit API Client',
-          type: 'doc',
-          id: 'api/redditapi/classes/RedditAPIClient.RedditAPIClient',
-        },
         'capabilities/redis',
         'capabilities/realtime',
         'capabilities/scheduler',
@@ -71,30 +66,31 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Blocks',
-      items: [
-        'blocks/overview',
-        'blocks/stacks',
-        'blocks/text',
-        'blocks/icon',
-        'blocks/button',
-        'blocks/image',
-        'blocks/spacer',
-        'blocks/colors',
-      ],
-    },
-    {
-      type: 'category',
       label: 'Developer tools',
       items: ['playground', 'playtest', 'debug', 'devvit_cli', 'devvit_kit'],
     },
     {
       type: 'category',
-      label: 'Devvit library',
+      label: 'Reference docs',
       items: [
         {
+          type: 'category',
+          label: 'Blocks',
+          items: [
+            'blocks/overview',
+            'blocks/stacks',
+            'blocks/text',
+            'blocks/icon',
+            'blocks/button',
+            'blocks/image',
+            'blocks/spacer',
+            'blocks/colors',
+          ],
+        },
+
+        {
           type: 'doc',
-          label: 'Devvit Entrypoint',
+          label: 'Devvit library',
           id: 'api/public-api/classes/Devvit-1',
         },
         {
@@ -126,14 +122,14 @@ const sidebars = {
       ],
     },
     {
-      type: 'category',
-      label: 'Resources',
-      items: ['mod_resources', 'beta_participation', 'limits', 'help'],
-    },
-    {
       type: 'doc',
       label: 'Guidelines',
       id: 'guidelines',
+    },
+    {
+      type: 'category',
+      label: 'Resources',
+      items: ['mod_resources', 'beta_participation', 'limits', 'help'],
     },
     {
       type: 'doc',
