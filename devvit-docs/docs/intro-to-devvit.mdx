@@ -36,7 +36,7 @@ Run the following commands in your terminal to install the [`@devvit`](https://w
 
 ## Step 2: Create a project
 
-Once you are logged in, create a new project. Run:
+Once you are logged in, create a new project (aka a new app). Run:
 
 ```
 devvit new
@@ -63,14 +63,20 @@ intro-to-devvit
 Run the following commands to get your app up and running:
 
 ```
-cd <app-name>
+cd <project-name>
 devvit upload
 devvit playtest <subreddit-name>
 ```
 
+Every app you make will have a corresponding project folder on your local machine. Here you are "changing directory"[^1] into the project folder so you can run app-specific devvit commands. Uploading your project from this folder converts it to a private test app on the platform, which you can view from [my apps](https://developers.reddit.com/my/apps).
+
+The "playtest" command is for testing your code - more on that soon.
+
+[^1]: If you're less familiar with the terminal and command line interfaces, check out this [overview with some common commands](https://tutorials.codebar.io/command-line/introduction/tutorial.html).
+
 ## Step 6: Open your project
 
-Open your project from your IDE[^1]. It should look like this:
+Open your project from your IDE[^2]. It should look like this:
 
 ```text
 my-project
@@ -87,7 +93,7 @@ my-project
 
 You'll be making updates to `main.tsx` and the `assets` folder in this tutorial.
 
-[^1]: If you don't have an IDE on your machine, we recommend using [VS Code](https://code.visualstudio.com/).
+[^2]: If you don't have an IDE on your machine, we recommend using [VS Code](https://code.visualstudio.com/).
 
 ## Step 7: Create a post
 

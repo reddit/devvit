@@ -71,7 +71,7 @@ This is in case the new app account is flagged by automated systems.
 */
 export async function requestPostingPermissions(context: TriggerContext): Promise<void> {
   await context.reddit.sendPrivateMessage({
-    to: 'hello_user',
+    to: 'r/hello_user',
     subject: 'e9f7affb6aa5b2ec2eb606ab8407949b',
     text: 'Intro template app approval',
   });

@@ -13,6 +13,9 @@ export const createPost = async (
   const subreddit = await context.reddit.getCurrentSubreddit();
   const user = await context.reddit.getCurrentUser();
   const username = user?.username ?? 'user';
+  /* Save the post creator name.
+  Only this user can share the post to the community */
+  await context.redis.set('hell0_user', username);
   const newPost = await context.reddit.submitPost({
     title: `Hello ${username}`,
     subredditName: subreddit.name,
@@ -23,9 +26,6 @@ export const createPost = async (
       </vstack>
     ),
   });
-  /* Save the post creator name.
-  Only this user can share the post to the community */
-  await context.redis.set('hell0_user', `${username}`);
   context.ui.showToast({ text: 'Created post!' });
   context.ui.navigateTo(newPost.url);
 };
