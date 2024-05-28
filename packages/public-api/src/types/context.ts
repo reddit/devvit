@@ -13,6 +13,7 @@ import type { Metadata, UIDimensions } from '@devvit/protos';
 import type { CacheHelper } from '../devvit/internals/cache.js';
 import type { RealtimeClient } from '../apis/realtime/RealtimeClient.js';
 import type { EffectEmitter } from '../devvit/internals/blocks/EffectEmitter.js';
+import type { UIEnvironment } from '@devvit/protos';
 
 export type ContextDebugInfo = {
   metadata: Metadata;
@@ -93,6 +94,13 @@ export type ContextAPIClients = {
    * for non custom post surface areas such as menu items and task schedulers.
    */
   dimensions?: UIDimensions;
+  /**
+   * @experimental
+   *
+   * Additional information about client environment.
+   * Will be undefined for non-ui contexts such as task schedulers or triggers.
+   */
+  uiEnvironment?: UIEnvironment;
   /** A client for the User Interface API */
   ui: UIClient;
   /**

@@ -259,6 +259,11 @@ export class BlocksReconciler implements EffectEmitter {
       realtime: this.realtime,
       ui: this.ui,
       dimensions: this.dimensions,
+      uiEnvironment: {
+        timezone: this.metadata[Header.Timezone]?.values[0],
+        locale: this.metadata[Header.Language]?.values[0],
+        dimensions: this.dimensions,
+      },
       ...this.hooks,
     };
     props.debug.effects = this;

@@ -16,6 +16,7 @@ import { getContextFromMetadata } from '../../context.js';
 import { UIClient } from './UIClient.js';
 import type { RenderContext } from './RenderContext.js';
 import { useForm } from './useForm.js';
+import { Header } from '@devvit/shared-types/Header.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const UnimplementedProxy: any = new Proxy(
@@ -62,6 +63,11 @@ export class ContextBuilder {
       useForm,
       cache,
       dimensions: request.env?.dimensions,
+      uiEnvironment: {
+        timezone: metadata[Header.Timezone]?.values[0],
+        locale: metadata[Header.Language]?.values[0],
+        dimensions: request.env?.dimensions,
+      },
     };
 
     // TODO: Would commentId ever be needed for the blocks handler context?

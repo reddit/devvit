@@ -84,7 +84,7 @@ export type ScheduledJobEvent = {
 
 export type ScheduledJobHandler = (
   event: ScheduledJobEvent,
-  context: Devvit.Context
+  context: Omit<Devvit.Context, 'ui' | 'dimensions' | 'modLog' | 'uiEnvironment'>
 ) => void | Promise<void>;
 
 export type ScheduledJobType = {

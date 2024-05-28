@@ -13,6 +13,7 @@ import type { MenuItem, MenuItemOnPressEvent } from '../../types/menu-item.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
+import { Header } from '@devvit/shared-types/Header.js';
 
 const getActionId = (index: number): string => {
   return `menuItem.${index}`;
@@ -80,7 +81,13 @@ async function onAction(
       ui: true,
       metadata,
     }),
-    getContextFromMetadata(metadata, postId, commentId)
+    getContextFromMetadata(metadata, postId, commentId),
+    {
+      uiEnvironment: {
+        timezone: metadata[Header.Timezone]?.values[0],
+        locale: metadata[Header.Language]?.values[0],
+      },
+    }
   );
 
   await menuItem.onPress(event, context);

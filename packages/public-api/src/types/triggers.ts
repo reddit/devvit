@@ -70,7 +70,7 @@ export type TriggerEvent =
 
 type TriggerResult = Promise<void> | void;
 
-export type TriggerContext = Omit<Devvit.Context, 'ui' | 'dimensions' | 'modLog'>;
+export type TriggerContext = Omit<Devvit.Context, 'ui' | 'dimensions' | 'modLog' | 'uiEnvironment'>;
 
 export type TriggerOnEventHandler<RequestType> = (
   event: RequestType,
