@@ -1,7 +1,7 @@
 import type { UIEvent } from '@devvit/protos';
 import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
-import type { BlockElement } from '../../../Devvit.js';
+import type { BlockElement, DevvitGlobalScope } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
 import { BlocksTransformer } from '../BlocksTransformer.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
@@ -10,6 +10,8 @@ import { RenderContext } from './RenderContext.js';
 import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
 import { RenderInterruptError } from './types.js';
 import isEqual from 'lodash.isequal';
+import { isAcceptableDataUrl, isRemoteUrl } from '@devvit/shared-types/imageUtil.js';
+import { useAsync } from './useAsync.js';
 
 /**
  * This can be a global/singleton because render is synchronous.
@@ -352,7 +354,7 @@ export class BlocksHandler {
       if (e && typeof e === 'object' && 'props' in e) {
         if (!e.props?.key) {
           e.props = e.props ?? {};
-          e.props.key = i;
+          e.props.key = `${i}`;
         }
       }
       return this.#renderElement(e, context);
@@ -381,8 +383,8 @@ export class BlocksHandler {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  #reifyProps(props: { [key: string]: any }): { [key: string]: string } {
-    const reifiedProps: { [key: string]: string } = {};
+  #reifyProps(props: { [key: string]: any }): { [key: string]: JSONValue } {
+    const reifiedProps: { [key: string]: JSONValue } = {};
     for (const key in props) {
       if (typeof props[key] === 'function') {
         const hook = registerHook(
@@ -399,11 +401,44 @@ export class BlocksHandler {
       } else {
         const value = props[key];
         if (value !== undefined && value !== null) {
-          reifiedProps[key] = value.toString();
+          reifiedProps[key] = key === 'url' ? this.#resolveAsset(value) : value;
         }
       }
     }
     return reifiedProps;
+  }
+
+  /**
+   * Tries to resolve the URL from the provided property
+   *
+   * Example:
+   *   Path relative to project assets:
+   *     doggo.gif => https://i.redd.it/some/path.gif
+   *   Valid URL:
+   *     https://i.redd.it/some/path.gif
+   *   Valid Base64 image:
+   *     data:image/png;base64,....
+   * @param url
+   * @private
+   */
+  #resolveAsset(url: string): string {
+    const resolvedUrl = (globalThis as DevvitGlobalScope).devvit?.config?.assets?.[url];
+    if (resolvedUrl) {
+      // no work to be done, the asset map from the bundle was available and had the mapping
+      return resolvedUrl;
+    }
+
+    // determine if the url can be used as-is
+    if (isRemoteUrl(url) || isAcceptableDataUrl(url)) {
+      return url;
+    }
+
+    // attempt to resolve the final URL with the AssetResolver plugin
+    const { data, loading } = useAsync(async () => {
+      return (await this._latestRenderContext?.devvitContext.assets.getURL(url)) ?? null;
+    });
+
+    return loading ? '' : data ?? '[missing]';
   }
 }
 

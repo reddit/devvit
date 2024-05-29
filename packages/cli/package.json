@@ -43,7 +43,7 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@devvit/build-pack": "0.10.21",
-    "@devvit/play": "0.0.36",
+    "@devvit/play": "0.0.38",
     "@devvit/protos": "0.10.21",
     "@devvit/public-api": "0.10.21",
     "@devvit/runtimes": "0.10.21",

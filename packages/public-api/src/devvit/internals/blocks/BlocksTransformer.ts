@@ -55,6 +55,12 @@ import {
 type DataSet = Record<string, unknown>;
 const DATA_PREFIX = 'data-';
 
+const ACTION_HANDLERS: Set<Devvit.Blocks.ActionHandlers> = new Set(['onPress', 'onMessage']);
+const ACTION_TYPES: Map<Devvit.Blocks.ActionHandlers, BlockActionType> = new Map([
+  ['onPress', BlockActionType.ACTION_CLICK],
+  ['onMessage', BlockActionType.ACTION_WEBVIEW],
+]);
+
 export class BlocksTransformer {
   async createBlocksElementOrThrow({ type, props, children }: ReifiedBlockElement): Promise<Block> {
     const block = await this.createBlocksElement({ type, props, children });
@@ -554,15 +560,16 @@ export class BlocksTransformer {
   makeActions(_type: BlockType, props: { [key: string]: unknown }): BlockAction[] {
     const actions: BlockAction[] = [];
     const dataSet = this.getDataSet(props as DataSet);
-    if (props.onPress) {
-      const id = props.onPress;
-
-      actions.push({
-        type: BlockActionType.ACTION_CLICK,
-        id: id.toString(),
-        data: dataSet,
-      });
-    }
+    ACTION_HANDLERS.forEach((action) => {
+      if (action in props) {
+        const id = props[action]!;
+        actions.push({
+          type: ACTION_TYPES.get(action) ?? BlockActionType.UNRECOGNIZED,
+          id: id.toString(),
+          data: dataSet,
+        });
+      }
+    });
     return actions;
   }
 
@@ -855,7 +862,13 @@ export class BlocksTransformer {
 
   makeWebView(props: Devvit.Blocks.WebViewProps | undefined): Block | undefined {
     return (
-      props && this.makeBlock(BlockType.BLOCK_WEBVIEW, props, { webviewConfig: { url: props.url } })
+      props &&
+      this.makeBlock(BlockType.BLOCK_WEBVIEW, props, {
+        webviewConfig: {
+          url: props.url,
+          state: props.state,
+        },
+      })
     );
   }
 

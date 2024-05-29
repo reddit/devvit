@@ -884,11 +884,24 @@ export namespace Devvit {
       state?: Data;
     };
 
+    export type OnMessageEvent = {
+      type: string;
+      data?: Data;
+    };
+
     export type OnPressEventHandler = (event: OnPressEvent) => void | Promise<void>;
+
+    export type OnWebViewEventHandler = (event: OnMessageEvent) => void | Promise<void>;
 
     export type Actionable = {
       onPress?: OnPressEventHandler | undefined;
     };
+
+    export type WebViewActionable = {
+      onMessage?: OnWebViewEventHandler | undefined;
+    };
+
+    export type ActionHandlers = keyof (Actionable & WebViewActionable);
 
     export type HasElementChildren = {
       children?: Devvit.ElementChildren;
@@ -1001,9 +1014,11 @@ export namespace Devvit {
         direction?: AnimationDirection | undefined;
       };
 
-    export type WebViewProps = BaseProps & {
-      url: string;
-    };
+    export type WebViewProps = BaseProps &
+      WebViewActionable & {
+        url: string;
+        state?: Data;
+      };
   }
 }
 
@@ -1031,3 +1046,11 @@ declare global {
     type ComponentFunction = (props: JSX.Props, context: Devvit.Context) => JSX.Element;
   }
 }
+
+export type DevvitGlobalScope = WindowOrWorkerGlobalScope & {
+  devvit?: {
+    config?: {
+      assets: { readonly [path: string]: string };
+    };
+  };
+};

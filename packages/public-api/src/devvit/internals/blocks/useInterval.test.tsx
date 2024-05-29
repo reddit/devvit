@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest, BlockType } from '@devvit/protos';
+import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 import type { UseIntervalHookState } from '../../../types/hooks.js';
@@ -48,7 +48,7 @@ describe('useInterval', () => {
       },
       BlockRenderRequest.fromPartial({
         type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `${BlockType.BLOCK_BUTTON}.onPress`,
+        id: `button.onPress`,
       }),
       {
         __renderState: {
@@ -82,7 +82,7 @@ describe('useInterval', () => {
       },
       BlockRenderRequest.fromPartial({
         type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `${BlockType.BLOCK_BUTTON}.onPress`,
+        id: `button.onPress`,
       }),
       {
         __renderState: {
@@ -154,7 +154,7 @@ describe('useInterval', () => {
       },
       BlockRenderRequest.fromPartial({
         type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `${BlockType.BLOCK_BUTTON}.onPress`,
+        id: `button.onPress`,
       }),
       {
         __renderState: {
@@ -189,7 +189,7 @@ describe('useInterval', () => {
       },
       BlockRenderRequest.fromPartial({
         type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `${BlockType.BLOCK_BUTTON}.onPress`,
+        id: `button.onPress`,
       }),
       {
         __renderState: {
@@ -219,7 +219,7 @@ describe('useInterval', () => {
       },
       BlockRenderRequest.fromPartial({
         type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `${BlockType.BLOCK_BUTTON}.onPress`,
+        id: `button.onPress`,
       }),
       {
         __renderState: {
@@ -273,7 +273,7 @@ describe('useInterval', () => {
       },
       BlockRenderRequest.fromPartial({
         type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `${BlockType.BLOCK_BUTTON}.onPress`,
+        id: `button.onPress`,
       }),
       {
         __renderState: {

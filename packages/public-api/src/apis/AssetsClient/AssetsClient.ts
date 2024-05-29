@@ -1,5 +1,6 @@
 import type { AssetResolver, Metadata } from '@devvit/protos';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
+import { type DevvitGlobalScope } from '../../devvit/Devvit.js';
 
 export class AssetsClient {
   readonly #metadata: Metadata;
@@ -37,8 +38,7 @@ export class AssetsClient {
 
   async #getURL(assetPath: string): Promise<string> {
     // Try and short circuit using the locally available assets list if possible
-    // @ts-ignore - it doesn't know what globalThis is
-    const localUrl = globalThis?.devvit?.config?.assets?.[assetPath];
+    const localUrl = (globalThis as DevvitGlobalScope).devvit?.config?.assets?.[assetPath];
     if (localUrl) {
       return localUrl;
     }
@@ -60,7 +60,7 @@ export class AssetsClient {
     // Try and short circuit using the locally available assets list if possible, keeping a list
     // of all the paths that we couldn't find locally to ask the backend about
     // @ts-ignore - it doesn't know what globalThis is
-    const localAssets: AssetMap = globalThis?.devvit?.config?.assets;
+    const localAssets: AssetMap = (globalThis as DevvitGlobalScope).devvit?.config?.assets;
     if (localAssets) {
       for (const path of assetPaths) {
         if (localAssets[path]) {

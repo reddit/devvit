@@ -8,7 +8,7 @@ import type {
   RealtimeSubscriptionEvent,
   UIEvent,
 } from '@devvit/protos';
-import { BlockRenderEventType, BlockType, EffectType } from '@devvit/protos';
+import { BlockRenderEventType, EffectType } from '@devvit/protos';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { isValidImageURL } from '@devvit/shared-types/imageUtil.js';
@@ -36,7 +36,7 @@ import type {
 } from '../../../types/index.js';
 import type { KVStore } from '../../../types/kvStore.js';
 import type { RedisClient } from '../../../types/redis.js';
-import type { BlockElement } from '../../Devvit.js';
+import type { BlockElement, DevvitGlobalScope } from '../../Devvit.js';
 import { Devvit } from '../../Devvit.js';
 import type { CacheHelper } from '../cache.js';
 import { getContextFromMetadata } from '../context.js';
@@ -178,7 +178,7 @@ export class BlocksReconciler implements EffectEmitter {
   renderState: RenderState = {};
   currentComponentKey: string[] = [];
   currentHookIndex: number = 0;
-  actions: Map<string, Devvit.Blocks.OnPressEventHandler> = new Map();
+  actions: Map<string, Function> = new Map();
   forms: Map<FormKey, Form | FormFunction> = new Map();
   realtimeChannels: string[] = [];
   realtimeUpdated: boolean = false;
@@ -301,9 +301,9 @@ export class BlocksReconciler implements EffectEmitter {
     await this.transformer.createBlocksElementOrThrow(reified);
 
     if (this.isUserActionRender && this.blockRenderEventId) {
-      const onPress = this.actions.get(this.blockRenderEventId);
-      if (onPress) {
-        await onPress({});
+      const handler = this.actions.get(this.blockRenderEventId);
+      if (handler) {
+        await handler((this.event as BlockRenderRequest).data);
       }
     }
 
@@ -353,13 +353,17 @@ export class BlocksReconciler implements EffectEmitter {
     return out;
   }
 
-  async processProps(props: { [key: string]: unknown }): Promise<void> {
-    if (props.onPress) {
-      const onPress = props.onPress as Devvit.Blocks.OnPressEventHandler;
-      const name = onPress.name;
-      const id = this.makeUniqueActionID(`${BlockType.BLOCK_BUTTON}.${name ?? 'onPress'}`);
-      this.actions.set(id, onPress);
-      props.onPress = id;
+  async processProps(block: BlockElement): Promise<void> {
+    const props = block.props ?? {};
+    const actionHandlers = ['onPress', 'onMessage'];
+    for (const action of actionHandlers) {
+      if (action in props) {
+        const handler = props[action] as Function;
+        const name = handler?.name;
+        const id = this.makeUniqueActionID(`${block.type}.${name ?? action}`);
+        this.actions.set(id, handler);
+        props[action] = id;
+      }
     }
     if (props.url) {
       props.url = await this.getAssetUrl(props.url as string);
@@ -369,8 +373,7 @@ export class BlocksReconciler implements EffectEmitter {
   async getAssetUrl(asset: string): Promise<string> {
     // If this image exactly matches an asset, use the public URL for the asset instead
     let assetUrl: string | undefined = undefined;
-    // @ts-ignore - it doesn't know what globalThis is
-    const assets: AssetMap = globalThis?.devvit?.config?.assets;
+    const assets: AssetMap = (globalThis as DevvitGlobalScope).devvit?.config?.assets;
     if (assets) {
       assetUrl = assets[asset];
     }
@@ -419,7 +422,7 @@ export class BlocksReconciler implements EffectEmitter {
       const children = childrens.flat();
       const collapsedChildren = this.#flatten(children);
 
-      await this.processProps(blockElement.props || {});
+      await this.processProps(blockElement);
 
       const reified: ReifiedBlockElement = {
         type: blockElement.type,
