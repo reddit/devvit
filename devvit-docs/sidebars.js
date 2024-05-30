@@ -26,7 +26,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Getting started',
-      items: ['dev_guide', 'about_devvit'],
+      items: ['dev_guide', 'about_devvit', 'app_lifecycle'],
     },
     {
       type: 'category',

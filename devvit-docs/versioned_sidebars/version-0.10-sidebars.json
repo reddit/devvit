@@ -15,7 +15,8 @@
       "label": "Getting started",
       "items": [
         "dev_guide",
-        "about_devvit"
+        "about_devvit",
+        "app_lifecycle"
       ]
     },
     {

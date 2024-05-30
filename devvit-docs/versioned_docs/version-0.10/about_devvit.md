@@ -2,15 +2,15 @@
 
 Devvit apps are designed to interact with Reddit communities.
 
-## App lifecycle
+## Development stages
 
-Devvit apps go through three stages.
+Devvit apps go through three stages during development. This lets you build and iterate on your app until you're ready to share it with the rest of Reddit.
 
-| Stage    | Description                                                                                                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Private  | When you are building and testing your app, it’s only visible to you, and it can only be installed by you in small subreddits with fewer than 200 subscribers.                 |
-| Unlisted | After you publish your app, it is still only visible to you in the Apps directory, but you can install it on larger subreddits.                                                |
-| Public   | Once your app review form has been approved by the Developer Platform team, your app is available in the Apps directory and can be installed by mods and admins across Reddit. |
+| Stage    | Description                                                                                                                                                                                                                                                                                                    |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Private  | When you are building and testing your app, it’s only visible to you, and it can only be installed by you in small subreddits with fewer than 200 subscribers.                                                                                                                                                 |
+| Unlisted | After you publish your app, it is still only visible to you in the Apps directory, but you can install it on larger subreddits.                                                                                                                                                                                |
+| Public   | Once you submit your [app review form](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform) and it's been approved approved by the Developer Platform team, your app is available in the Apps directory and can be installed by mods and admins across Reddit. |
 
 ## App accounts
 
