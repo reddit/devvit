@@ -1,0 +1,29 @@
+.grid {
+    display: block;
+    columns: 3;
+    column-gap: 24px;
+}
+
+@media (max-width: 1100px) {
+    .grid {
+        columns: 2;
+    }
+}
+
+@media (max-width: 996px) {
+    .grid {
+        columns: 3;
+    }
+}
+
+@media (max-width: 640px) {
+    .grid {
+        columns: 2;
+    }
+}
+
+@media (max-width: 400px) {
+    .grid {
+        columns: 1;
+    }
+}
