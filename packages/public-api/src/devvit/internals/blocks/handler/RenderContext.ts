@@ -1,4 +1,4 @@
-import type { Effect, UIEvent, UIRequest } from '@devvit/protos';
+import type { Effect, Metadata, UIEvent, UIRequest } from '@devvit/protos';
 import type { Devvit } from '../../../Devvit.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
 import type { BlocksState, EventHandler, Hook, HookRef, HookSegment } from './types.js';
@@ -14,6 +14,8 @@ import type { BlocksState, EventHandler, Hook, HookRef, HookSegment } from './ty
  * to add special cases for new features, but we should strive to work within the existing framework.
  */
 export class RenderContext implements EffectEmitter {
+  readonly request: Readonly<UIRequest>;
+  readonly meta: Readonly<Metadata>;
   #state: BlocksState;
   _segments: (HookSegment & { next: number })[] = [];
   _hooks: { [key: string]: Hook } = {};
@@ -40,7 +42,9 @@ export class RenderContext implements EffectEmitter {
     this._devvitContext = context;
   }
 
-  constructor(public request: UIRequest) {
+  constructor(request: UIRequest, meta: Metadata) {
+    this.request = request;
+    this.meta = meta;
     this.#state = request.state ?? {};
     this._rootProps = request.props ?? {};
   }

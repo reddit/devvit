@@ -1,6 +1,7 @@
 import type { UIEvent } from '@devvit/protos';
 import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+import isEqual from 'lodash.isequal';
 import type { BlockElement, DevvitGlobalScope } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
 import { BlocksTransformer } from '../BlocksTransformer.js';
@@ -9,7 +10,6 @@ import { ContextBuilder } from './ContextBuilder.js';
 import { RenderContext } from './RenderContext.js';
 import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
 import { RenderInterruptError } from './types.js';
-import isEqual from 'lodash.isequal';
 import { isAcceptableDataUrl, isRemoteUrl } from '@devvit/shared-types/imageUtil.js';
 import { useAsync } from './useAsync.js';
 
@@ -104,9 +104,9 @@ export class BlocksHandler {
     _latestBlocksHandler = this;
   }
 
-  async handle(request: UIRequest, metadata?: Metadata): Promise<UIResponse> {
-    const context = new RenderContext(request);
-    const devvitContext = this.#contextBuilder.buildContext(context, request, metadata!);
+  async handle(request: UIRequest, metadata: Metadata): Promise<UIResponse> {
+    const context = new RenderContext(request, metadata);
+    const devvitContext = this.#contextBuilder.buildContext(context, request, metadata);
     context.devvitContext = devvitContext;
 
     let blocks;
@@ -279,7 +279,7 @@ export class BlocksHandler {
 
   async #attemptHook(context: RenderContext, event: UIEvent): Promise<void> {
     const hook = context._hooks[event.hook!];
-    if (hook && hook.onUIEvent) {
+    if (hook?.onUIEvent) {
       try {
         await hook.onUIEvent(event, context);
       } catch (e) {

@@ -8,7 +8,9 @@ export type Props = { [key: string]: unknown };
 
 export type HookSegment = {
   /**
-   * This is usually the name of the hook: useState, useAsyncState, etc.
+   * This is usually the name of the hook: useAsync, useAsyncState, useChannel,
+   * useForm, useInterval, useState, etc, the block element, or the component
+   * name (eg, AppToolbar or FooBar).
    */
   namespace?: string;
 
@@ -37,7 +39,16 @@ export type HookSegment = {
 
 export type EventHandler = (event: UIEvent, context: RenderContext) => Promise<void>;
 
+/**
+ * Syncs state between client and server, responds to events, provides user
+ * API, and transitions state across renders.
+ */
 export interface Hook {
+  /**
+   * State to carry across renders. Hook constructor arguments are recreated on
+   * render but state may be passed in the render request and used to prime that
+   * render's hook before onLoad().
+   */
   state: JSONValue;
 
   /**
@@ -53,14 +64,28 @@ export interface Hook {
    * 3. onLoad
    * 4. possible changes to the state
    * 5. state gets serialized.
-   *
-   * @returns
    */
-  onLoad?: (ctx: RenderContext) => void;
+  onLoad?(ctx: RenderContext): void; // to-do: why pass context here and in HookParams?
 }
 
 export type HookRef = { id?: string };
 
-export type HookParams = { hookId: string; changed: () => void; context: RenderContext };
+export type HookParams = {
+  hookId: string;
+  /**
+   * Record state mutation in BlocksHandler. Caller is responsible for filtering
+   * out a nop transition where previous state is equivalent to next as wanted.
+   */
+  changed(): void;
+  context: RenderContext;
+};
 
+/**
+ * Circuit-breaking triggers a {remoteOnly=true, async=false, retry=true} event.
+ * This triggers a {remoteOnly=false, async=true, retry=false} event. In
+ * practice, that has some slight implications for how it flows through the
+ * event loop. If we wanted to, we could change this out, if we fully understand
+ * the semantics. This aligns more with useAsync than circuit-breaking today,
+ * though either is likely just fine.
+ */
 export class RenderInterruptError extends Error {}

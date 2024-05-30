@@ -1,22 +1,23 @@
 import type { Metadata, UIRequest } from '@devvit/protos';
-import { Devvit } from '../../../Devvit.js';
-import { useState } from './useState.js';
-import { useInterval } from './useInterval.js';
-import { ModLogClient } from '../../../../apis/modLog/ModLogClient.js';
+import { Header } from '@devvit/shared-types/Header.js';
+import { AssetsClient } from '../../../../apis/AssetsClient/AssetsClient.js';
 import { KeyValueStorage } from '../../../../apis/key-value-storage/KeyValueStorage.js';
+import { MediaClient } from '../../../../apis/media/MediaClient.js';
+import { ModLogClient } from '../../../../apis/modLog/ModLogClient.js';
+import { RealtimeClient } from '../../../../apis/realtime/RealtimeClient.js';
+import { RedditAPIClient } from '../../../../apis/reddit/RedditAPIClient.js';
 import { RedisClient } from '../../../../apis/redis/RedisClient.js';
 import { SchedulerClient } from '../../../../apis/scheduler/SchedulerClient.js';
-import { RedditAPIClient } from '../../../../apis/reddit/RedditAPIClient.js';
 import { SettingsClient } from '../../../../apis/settings/SettingsClient.js';
-import { MediaClient } from '../../../../apis/media/MediaClient.js';
-import { AssetsClient } from '../../../../apis/AssetsClient/AssetsClient.js';
-import { RealtimeClient } from '../../../../apis/realtime/RealtimeClient.js';
 import type { ContextAPIClients } from '../../../../types/context.js';
+import { Devvit } from '../../../Devvit.js';
 import { getContextFromMetadata } from '../../context.js';
-import { UIClient } from './UIClient.js';
 import type { RenderContext } from './RenderContext.js';
+import { UIClient } from './UIClient.js';
+import { useChannel } from './useChannel.js';
 import { useForm } from './useForm.js';
-import { Header } from '@devvit/shared-types/Header.js';
+import { useInterval } from './useInterval.js';
+import { useState } from './useState.js';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const UnimplementedProxy: any = new Proxy(
@@ -45,7 +46,6 @@ export class ContextBuilder {
     const assets = new AssetsClient(metadata, () => Devvit.assetsPlugin);
     const realtime = new RealtimeClient(metadata);
     const cache = UnimplementedProxy;
-    const useChannel = UnimplementedProxy;
     const apiClients: ContextAPIClients = {
       modLog,
       kvStore,
