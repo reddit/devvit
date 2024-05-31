@@ -12,11 +12,11 @@ Devvit lets you create rich, immersive experiences that seamlessly integrate int
 
 Build interactive experiences that ignite your community:
 
-- [Live scoreboards](/examples/apps#live-scores) that give your community play-by-play updates and a space for shitposting during the game.
-- [Polls](/examples/playpens#polls) to provoke spicy conversations or take the pulse of your community.
-- [Multiplayer games](/examples/apps#bingo) played asynchronously or with other redditors in real time.
+- [Live scoreboards](./showcase/apps#live-scores) that give your community play-by-play updates and a space for shitposting during the game.
+- [Polls](./showcase/playgrounds) to provoke spicy conversations or take the pulse of your community.
+- [Multiplayer games](./showcase/apps#bingo) played asynchronously or with other redditors in real time.
 
-Or create an entirely new community around an experience, like [r/pixleary](https://www.reddit.com/r/Pixelary/), a multiplayer game created just for redditors to draw, guess, and compete for bragging rights.
+Or create an entirely new community around an experience, like [r/Pixelary](https://www.reddit.com/r/Pixelary/), a multiplayer game created just for redditors to draw, guess, and compete for bragging rights.
 
 ## Tools at your fingertips
 
@@ -30,7 +30,7 @@ Reddit hosts your code with dedicated Redis-backed storage. The UI toolkit lets 
 
 ## Community and support
 
-Reddit’s Developer Platform provides a supportive environment where you can collaborate, ask questions, share knowledge, and inspire one another. Join [r/devvit](https://www.reddit.com/r/devitt/) or become a member of our [Discord](https://discord.com/channels/1050224141732687912/1050227353311248404) channel.
+Reddit’s Developer Platform provides a supportive environment where you can collaborate, ask questions, share knowledge, and inspire one another. Join [r/devvit](https://www.reddit.com/r/devvit/) or become a member of our [Discord](https://discord.com/channels/1050224141732687912/1050227353311248404) channel.
 
 ## Get started!
 
