@@ -1,20 +1,10 @@
-# About Devvit apps
+# How apps work
 
 Devvit apps are designed to interact with Reddit communities.
 
-## Development stages
-
-Devvit apps go through three stages during development. This lets you build and iterate on your app until you're ready to share it with the rest of Reddit.
-
-| Stage    | Description                                                                                                                                                                                                                                                                                                    |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Private  | When you are building and testing your app, it’s only visible to you, and it can only be installed by you in small subreddits with fewer than 200 subscribers.                                                                                                                                                 |
-| Unlisted | After you publish your app, it is still only visible to you in the Apps directory, but you can install it on larger subreddits.                                                                                                                                                                                |
-| Public   | Once you submit your [app review form](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform) and it's been approved approved by the Developer Platform team, your app is available in the Apps directory and can be installed by mods and admins across Reddit. |
-
 ## App accounts
 
-An app account is a separate user account just for your app. It is automatically generated when you upload your app.
+When you upload an app, an app account is automatically created. An app account is a separate user account that your app uses to interact with a subreddit.
 
 Once a mod or admin installs your app, the app account appears as a user in the mod list. When the app is executed, the action comes from the app’s user account. This is helpful for tracking posts and comments.
 
@@ -45,3 +35,13 @@ When you update your app, every subreddit that has installed your app has to be 
 3. When a new version of an app is available for a given subreddit, you will see a blue **Update** button next to the app tile. Click the button and follow the prompts to upgrade each community.
 
 ![app update](./assets/app-update.png)
+
+## Development stages
+
+Devvit apps go through three stages during development. This lets you build and iterate on your app until you're ready to share it with the rest of Reddit.
+
+| Stage    | Description                                                                                                                                                                                                                                                                                                    |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Private  | When you are building and testing your app, it’s only visible to you, and it can only be installed by you in small subreddits with fewer than 200 subscribers.                                                                                                                                                 |
+| Unlisted | After you publish your app, it is still only visible to you in the Apps directory, but you can install it on larger subreddits.                                                                                                                                                                                |
+| Public   | Once you submit your [app review form](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform) and it's been approved approved by the Developer Platform team, your app is available in the Apps directory and can be installed by mods and admins across Reddit. |
