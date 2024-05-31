@@ -12,11 +12,12 @@
     },
     {
       "type": "category",
-      "label": "Getting started",
+      "label": "Learn Devvit",
       "items": [
         "dev_guide",
         "about_devvit",
-        "app_lifecycle"
+        "app_lifecycle",
+        "optimize_performance"
       ]
     },
     {

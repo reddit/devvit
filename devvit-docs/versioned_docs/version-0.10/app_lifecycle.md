@@ -16,7 +16,7 @@ Some things can only be executed on the server side, including:
 
 If the API request is encountered when the app code runs on the client, Devvit switches the code execution to the server side.
 
-## State variables
+## Using state variables
 
 Your app relies on state variables to know what to render. The `useState` function declares the variable and contains:
 
@@ -30,13 +30,13 @@ In this example `clickCount` holds the current value, `setClickCount` is the val
 
 State variables are shared between client and server environments, and they persist through a single user session. If a user disconnects or navigates away from the page, the session ends and the state is invalidated.
 
-## Rendering an app
+## Rendering an app for the first time
 
 Each app is rendered separately for each user. For the first render, your application’s code is executed on the server and the calculated layout is sent to the client to display. The initial values of all state variables are calculated and used at this point. All the state variables are initialized one after the other.
 
 At the same time, Devvit sets up the local environment for your app and downloads the app code. As soon as it’s done, the rendering switches to the client side. If a re-render needs to happen before the download is complete, Devvit will send a request to the server to get the new layout.
 
-## Rerendering an app
+## Re-rendering the app
 
 To trigger a UI update, you need to update at least one of the state variables. You can do this by calling the value setter, which can be updated on user action or from an external event.
 
