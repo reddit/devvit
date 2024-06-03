@@ -14,6 +14,7 @@ import { createWaitlistClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
 import { readLine } from '../input-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
+import { sleep } from '../sleep.js';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`
@@ -115,10 +116,15 @@ export abstract class DevvitCommand extends Command {
     if (acceptedTermsVersion < currentTermsVersion) {
       this.log('Please accept our Terms and Conditions before proceeding:');
       this.log(`${termsUrl} (press enter to open, control-c to quit)`);
-      if (await readLine())
-        open(termsUrl).catch((_err) =>
-          this.error('An error occurred when opening Terms and Conditions')
-        );
+      await readLine();
+      try {
+        await open(termsUrl);
+      } catch {
+        this.error('An error occurred when opening Terms and Conditions');
+      }
+      // Waiting is necessary, for some reason, or the browser doesn't open!
+      // See issue: https://github.com/sindresorhus/open/issues/189
+      await sleep(5000);
       process.exit();
     }
   };
