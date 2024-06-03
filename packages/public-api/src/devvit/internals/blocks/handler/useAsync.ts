@@ -2,32 +2,34 @@ import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { AsyncUseStateInitializer, UseAsyncResult } from '../../../../types/hooks.js';
 
 import type { AsyncResponse, UIEvent } from '@devvit/protos';
-import type { Hook, HookParams } from './types.js';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
+import type { Hook, HookParams } from './types.js';
 
 class AsyncHook<S extends JSONValue> implements Hook {
   state: UseAsyncResult<S>;
   #hookId: string;
   #initializer: AsyncUseStateInitializer<S>;
-  #changed: () => void;
+  #invalidate: () => void;
+  #ctx: RenderContext;
 
   constructor(initializer: AsyncUseStateInitializer<S>, params: HookParams) {
     console.debug('useAsync v1');
     this.state = { data: null, loading: false, error: null };
     this.#hookId = params.hookId;
     this.#initializer = initializer;
-    this.#changed = params.changed;
+    this.#invalidate = params.invalidate;
+    this.#ctx = params.context;
   }
 
   /**
    * After we look at our state, we need to decide if we need to dispatch a request to load the data.
    */
-  onLoad(context: RenderContext): void {
+  onStateLoaded(): void {
     console.debug('async onLoad ', this.#hookId, this.state);
     if (this.state.data === null && this.state.error === null && this.state.loading === false) {
       this.state.loading = true;
-      this.#changed();
+      this.#invalidate();
 
       const requeueEvent: UIEvent = {
         hook: this.#hookId,
@@ -35,7 +37,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
         asyncRequest: { requestId: this.#hookId },
       };
       console.debug('onLoad requeue');
-      context.addToRequeueEvents(requeueEvent);
+      this.#ctx.addToRequeueEvents(requeueEvent);
     }
   }
 
@@ -73,7 +75,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
         error: event.asyncResponse.error ?? null,
       };
       this.state = result;
-      this.#changed();
+      this.#invalidate();
     } else {
       throw new Error('Unknown event type');
     }

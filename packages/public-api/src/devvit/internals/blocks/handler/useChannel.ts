@@ -21,13 +21,13 @@ class ChannelHook implements UseChannelResult, Hook {
 
   #context: RenderContext;
   /** Record state in BlocksHandler. */
-  #save: () => void;
+  #invalidate: () => void;
   #opts: Readonly<ChannelOptions>;
 
   constructor(opts: Readonly<ChannelOptions>, params: Readonly<HookParams>) {
     this.#context = params.context;
     this.#opts = opts;
-    this.#save = params.changed;
+    this.#invalidate = params.invalidate;
 
     const appID = params.context.meta[Header.App]?.values[0];
     if (!appID) throw Error('useChannel() missing app ID metadata');
@@ -48,12 +48,12 @@ class ChannelHook implements UseChannelResult, Hook {
     switch (realtime.status) {
       case RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED:
         this.state.connected = true;
-        this.#save();
+        this.#invalidate();
         await this.#opts.onSubscribed?.();
         break;
       case RealtimeSubscriptionStatus.REALTIME_UNSUBSCRIBED:
         this.state.connected = false;
-        this.#save();
+        this.#invalidate();
         await this.#opts.onUnsubscribed?.();
         break;
       default:
@@ -81,13 +81,13 @@ class ChannelHook implements UseChannelResult, Hook {
   subscribe(): void {
     if (this.state.subscribed) return;
     this.state.subscribed = true;
-    this.#save();
+    this.#invalidate();
   }
 
   unsubscribe(): void {
     if (!this.state.subscribed) return;
     this.state.subscribed = false;
-    this.#save();
+    this.#invalidate();
   }
 }
 

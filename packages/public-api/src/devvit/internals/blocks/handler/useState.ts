@@ -20,7 +20,7 @@ export function useState<S extends JSONValue>(
 export function useState<S extends JSONValue>(
   initialState: UseStateInitializer<S>
 ): UseStateResult<S> {
-  const hook = registerHook({ namespace: 'useState' }, ({ changed }) => {
+  const hook = registerHook({ namespace: 'useState' }, ({ invalidate: changed }) => {
     const state = initialState instanceof Function ? initialState() : initialState;
     if (state instanceof Promise) {
       throw new Error('Cannot use async initializer with useState, use useAsyncState instead.');
@@ -37,13 +37,15 @@ export function useState<S extends JSONValue>(
 class AsyncStateHook<S extends JSONValue> implements Hook {
   state: { value: S | null; loading: boolean } = { value: null, loading: false };
   #changed: () => void;
+  #ctx: RenderContext;
   #initializer: AsyncUseStateInitializer<S>;
   #hookId: string;
 
   constructor(initializer: AsyncUseStateInitializer<S>, params: HookParams) {
     this.#initializer = initializer;
     this.#hookId = params.hookId;
-    this.#changed = params.changed;
+    this.#changed = params.invalidate;
+    this.#ctx = params.context;
   }
 
   async onUIEvent(): Promise<void> {
@@ -59,7 +61,7 @@ class AsyncStateHook<S extends JSONValue> implements Hook {
     this.#changed();
   }
 
-  onLoad(renderContext: RenderContext): void {
+  onStateLoaded(): void {
     if (this.state.value === null && !this.state.loading) {
       this.state.loading = true;
       this.#changed();
@@ -67,7 +69,7 @@ class AsyncStateHook<S extends JSONValue> implements Hook {
         asyncRequest: { requestId: this.#hookId },
         hook: this.#hookId,
       };
-      renderContext.addToRequeueEvents(requeueEvent);
+      this.#ctx.addToRequeueEvents(requeueEvent);
       throw new RenderInterruptError();
     }
   }

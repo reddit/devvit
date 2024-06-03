@@ -1,5 +1,6 @@
 import type { UIEvent } from '@devvit/protos';
 import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
+import { isAcceptableDataUrl, isRemoteUrl } from '@devvit/shared-types/imageUtil.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import isEqual from 'lodash.isequal';
 import type { BlockElement, DevvitGlobalScope } from '../../../Devvit.js';
@@ -10,7 +11,6 @@ import { ContextBuilder } from './ContextBuilder.js';
 import { RenderContext } from './RenderContext.js';
 import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
 import { RenderInterruptError } from './types.js';
-import { isAcceptableDataUrl, isRemoteUrl } from '@devvit/shared-types/imageUtil.js';
 import { useAsync } from './useAsync.js';
 
 /**
@@ -63,7 +63,7 @@ export function registerHook<H extends Hook>(
   const context = _activeRenderContext;
   const params: HookParams = {
     hookId,
-    changed: () => {
+    invalidate: () => {
       context._changed[hookId] = true;
       context._state[hookId] = context?._hooks[hookId]?.state;
     },
@@ -76,11 +76,9 @@ export function registerHook<H extends Hook>(
   if (_activeRenderContext._state[hookId] !== undefined) {
     hook.state = _activeRenderContext._state[hookId];
   }
-  if (hook.onLoad) {
-    hook.onLoad(_activeRenderContext);
-  }
+  hook.onStateLoaded?.();
   if (fromNull && hook.state !== undefined && hook.state !== null) {
-    params.changed();
+    params.invalidate();
   }
   return hook;
 }

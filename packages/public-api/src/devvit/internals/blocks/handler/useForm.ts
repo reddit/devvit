@@ -1,15 +1,15 @@
 import type { JSONValue } from '@devvit/shared-types/json.js';
-import { _activeRenderContext, registerHook } from './BlocksHandler.js';
+import { getFormValues } from '../../../../apis/ui/helpers/getFormValues.js';
+import type { Form, FormDefinition, FormFunction, FormKey, FormValues } from '../../../../index.js';
+import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { EventHandler, Hook, HookRef } from './types.js';
-import type { Form, FormDefinition, FormFunction, FormKey, FormValues } from '../../../../index.js';
-import { getFormValues } from '../../../../apis/ui/helpers/getFormValues.js';
 
 class UseFormHook implements Hook, FormDefinition {
   hookId: string;
   state: JSONValue = null;
   onUIEvent?: EventHandler | undefined;
-  onLoad?: ((ctx: RenderContext) => void) | undefined;
+  onStateLoaded?: (() => void) | undefined;
   form: Form | FormFunction;
   onSubmit: (values: FormValues) => void | Promise<void>;
 

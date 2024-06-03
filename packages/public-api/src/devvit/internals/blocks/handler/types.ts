@@ -57,15 +57,16 @@ export interface Hook {
   onUIEvent?: EventHandler;
 
   /**
-   * Lifecycle-wise,
+   * Invoked when hook has been updated with the last saved state. The lifecycle
+   * is:
    *
-   * 1. constructor
-   * 2. state gets copied into the hook
-   * 3. onLoad
-   * 4. possible changes to the state
+   * 1. constructor.
+   * 2. state gets copied into the hook.
+   * 3. onStateLoaded().
+   * 4. possible changes to the state.
    * 5. state gets serialized.
    */
-  onLoad?(ctx: RenderContext): void; // to-do: why pass context here and in HookParams?
+  onStateLoaded?(): void;
 }
 
 export type HookRef = { id?: string };
@@ -75,8 +76,9 @@ export type HookParams = {
   /**
    * Record state mutation in BlocksHandler. Caller is responsible for filtering
    * out a nop transition where previous state is equivalent to next as wanted.
+   * This state will be provided right before Hook.onStateLoaded().
    */
-  changed(): void;
+  invalidate(): void;
   context: RenderContext;
 };
 
