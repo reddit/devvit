@@ -1,4 +1,4 @@
-# The app lifecycle
+# Rendering apps
 
 Before your app is displayed on the screen, it needs to be rendered by Devvit. Understanding this process will help you think about how your code executes and explain its behavior.
 

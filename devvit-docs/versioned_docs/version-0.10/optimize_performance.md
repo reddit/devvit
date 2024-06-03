@@ -29,7 +29,7 @@ render: (context) => {
 
 ```
 
-You can see that the app fetches data about the post, the user, the weather, and the leaderboard stats. In the Devvit [app lifecycle](app_lifecycle.md), the first render happens on the server side, and all four data requests need to be resolved before the app can be rendered for the user.
+You can see that the app fetches data about the post, the user, the weather, and the leaderboard stats. In Devvit, the first [render](rendering_apps.md) happens on the server side, and all four data requests need to be resolved before the app can be rendered for the user.
 
 If each request takes roughly 250 ms, then four requests will take around 1 second to resolve. But, If we make these requests in parallel, it’ll take 250 ms to resolve all four!
 
@@ -81,7 +81,7 @@ const [externalData] = useState(async => {
 
 ### Request overload
 
-The [state](app_lifecycle.md#state-variables) is initialized for each user that sees the app. This means that in a large subreddit, where thousands of users can see the post at the same time, your app would make thousands of requests to the external resource. This can put unnecessary pressure on the external resource or drain your request quota for the resource (if there is one). Some requests are just slow by their nature, so you might want to minimize the amount of duplicate requests to external resources.
+The [state](rendering_apps.md#state-variables) is initialized for each user that sees the app. This means that in a large subreddit, where thousands of users can see the post at the same time, your app would make thousands of requests to the external resource. This can put unnecessary pressure on the external resource or drain your request quota for the resource (if there is one). Some requests are just slow by their nature, so you might want to minimize the amount of duplicate requests to external resources.
 
 This situation gets even worse if you request the data in an interval, like to get a game score or stock market information, because the load repeats on each interval tick.
 

@@ -26,7 +26,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Learn Devvit',
-      items: ['dev_guide', 'about_devvit', 'app_lifecycle', 'optimize_performance'],
+      items: ['dev_guide', 'about_devvit', 'rendering_apps', 'optimize_performance'],
     },
     {
       type: 'category',
