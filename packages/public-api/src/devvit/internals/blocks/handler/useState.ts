@@ -23,7 +23,9 @@ export function useState<S extends JSONValue>(
   const hook = registerHook({ namespace: 'useState' }, ({ invalidate: changed }) => {
     const state = initialState instanceof Function ? initialState() : initialState;
     if (state instanceof Promise) {
-      throw new Error('Cannot use async initializer with useState, use useAsyncState instead.');
+      throw new Error(
+        "Cannot use async initializer with context.useState. Please use useAsyncState instead by importing it: import { Devvit, useAsyncState } from '@devvit/public-api';"
+      );
     }
     const setter = (action: SetStateAction<S>): void => {
       hook.state = action instanceof Function ? action(hook.state) : action;
@@ -62,7 +64,7 @@ class AsyncStateHook<S extends JSONValue> implements Hook {
   }
 
   onStateLoaded(): void {
-    if (this.state.value === null && !this.state.loading) {
+    if (this.state.value === null) {
       this.state.loading = true;
       this.#changed();
       const requeueEvent: UIEvent = {
