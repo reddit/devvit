@@ -59,7 +59,7 @@
     "packages/*",
     "packages/apps/**",
     "packages/build-pack/src/__tests__/test-actors/**/*",
-    "packages/internal-examples/internal-projects/**/!(dev-platform-automod)"
+    "packages/internal-examples/internal-projects/**/*"
   ],
   "resolutions": {
     "chalk": "4.1.2",
