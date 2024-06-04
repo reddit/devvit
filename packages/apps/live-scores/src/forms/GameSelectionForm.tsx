@@ -413,7 +413,7 @@ export const srCricketMatchSelectionForm = Devvit.createForm(
           label: 'Chat Room URL',
           type: 'string',
           required: false,
-          helpText: `Optional chat URL. Leave black for not showing the 'Join the Chat button' in the post unit.`,
+          helpText: `Optional button to specified chat URL. Leave blank to hide the chat button within the post unit.`,
         },
       ],
       title: 'Create Scoreboard Post',
