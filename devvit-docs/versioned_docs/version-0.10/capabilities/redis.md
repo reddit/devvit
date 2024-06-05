@@ -1,8 +1,6 @@
 # Redis
 
-Add a database to store and retrieve data.
-
-The Redis plugin is designed to be fast, scalable and secure, and it supports a subset of the full Redis API, including:
+You can add a database to your app to store and retrieve data. The Redis plugin is designed to be fast, scalable, and secure. It supports a subset of the full Redis API, including:
 
 - [Transactions](#transactions) for things like counting votes atomically in polls
 - [String operations](#strings) for batch writing or incrementing numbers
@@ -10,10 +8,6 @@ The Redis plugin is designed to be fast, scalable and secure, and it supports a 
 - [Hashes](#hash) for managing a collection of key-value pairs
 
 Each app version installed on a subreddit is namespaced, which means Redis data is siloed from other subreddits. Keep in mind that there won’t be a single source of truth for all installations of your app, since each app installation can only access the data that it has stored in the Redis database.
-
-:::note
-Redis is a more robust replacement for the key value store. All apps using the key value store should [migrate to Redis](migrate_kv_to_redis.md).
-:::
 
 ## Limits and Quotas
 
@@ -33,10 +27,6 @@ Devvit.configure({
 });
 ```
 
-:::note
-For existing apps, learn how to [migrate the KV store to Redis](/docs/migrate_kv_to_redis.md).
-:::
-
 ## Examples
 
 ### Menu items
@@ -54,9 +44,9 @@ Devvit.addMenuItem({
 });
 ```
 
-### Custom Posts
+### Experience posts
 
-You can follow this template to create a custom post containing an interactive progress bar backed by Redis.
+You can follow this template to create a experience post containing an interactive progress bar backed by Redis.
 
 ```tsx
 // start from a template
@@ -96,8 +86,7 @@ Not all Redis features are supported. If you would like to request a specific Re
 
 ### Hash
 
-Redis hashes can store upto ~ 4.2 billion key-value pairs. We recommend hash usage for managing collections of key/value pairs
-whenever possible and iterating over it using a combination of `hscan`, `hkeys` and `hgetall` - this will also allow you easily migrate away from using `kvStore.list` method. Please see the [migration guide](migrate_kv_to_redis.md) for more details.
+Redis hashes can store up to ~ 4.2 billion key-value pairs. We recommend using hash for managing collections of key-value pairs whenever possible and iterating over it using a combination of `hscan`, `hkeys` and `hgetall`.
 
 | **Command**                                   | **Action**                                                                      |
 | --------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -125,13 +114,13 @@ whenever possible and iterating over it using a combination of `hscan`, `hkeys` 
 
 ### [Transactions](https://redis.io/topics/transactions)
 
-Redis transactions allow execution of a group of commands in a single isolated step. For example, let’s say you are implementing voting action in a polls app. These three steps need to happen together:
+Redis transactions allow a group of commands to be executed in a single isolated step. For example, to implement voting action in a polls app, these three actions need to happen together:
 
-- Store the selected option for the user
-- Increment the count for selected option
-- Add the user to voted user list
+- Store the selected option for the user.
+- Increment the count for selected option.
+- Add the user to voted user list.
 
-We can sequence all of the above steps in a single transaction using `multi` and `exec` to ensure that either all of the steps happen together or none at all.
+You can sequence all of the above steps in a single transaction using `multi` and `exec` to ensure that either all of the steps happen together or none at all.
 
 | **Command**                                   | **Action**                                                                                            |
 | --------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
