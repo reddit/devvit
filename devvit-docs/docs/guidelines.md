@@ -1,11 +1,43 @@
 # Guidelines
 
-The Reddit Developer Platform gives developers unprecedented ability to customize the core Reddit
-experience. Our guidelines are designed to protect and enhance the redditor user experience.
+Your app must comply with all applicable Reddit policies, which include the Reddit [Developer Terms](https://www.redditinc.com/policies/developer-terms) and [Data API Terms](https://www.redditinc.com/policies/data-api-terms), as well as our [User Agreement](https://www.redditinc.com/policies/), [Privacy Policy](https://www.reddit.com/policies/privacy-policy), [Content Policy](https://www.redditinc.com/policies/content-policy) and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements) (“Reddit Terms & Policies”). Based on these policies, Reddit may review your app prior to hosting it, and/or take enforcement actions ranging from temporary suspension to permanent removal of your app, blocking your access to Reddit's Developer Platform, or suspending your developer account.
 
-## Reddit Policies apply
+## User-generated content
 
-Keep in mind that your app must comply with all applicable Reddit policies, which include the Reddit [Developer Terms](https://www.redditinc.com/policies/developer-terms) and [Data API Terms](https://www.redditinc.com/policies/data-api-terms), as well as our [User Agreement](https://www.redditinc.com/policies/), [Privacy Policy](https://www.reddit.com/policies/privacy-policy), [Content Policy](https://www.redditinc.com/policies/content-policy) and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements) (“Reddit Terms & Policies”). Based on these policies, Reddit may review your app prior to hosting it, and/or take enforcement actions ranging from temporary suspension to permanent removal of your app, blocking your access to Reddit's Developer Platform, or suspending your developer account.
+Apps that accept and display user-generated content (UGC) need to follow Reddit’s broader guidelines around UGC. When an app accepts UGC, it should create a new post or comment with the UGC author clearly identified as the author of the submitted content.
+
+:::note
+New content will be posted as the app account until the app has been approved by the Developer Platform team. After that, submitPost will post on behalf of the UGC author.
+:::
+
+### Live posts
+
+If an app allows users to create UGC by interacting with a live post (for example, a form submission that modifies live content), the app should limit the forms of expression available to prevent potential abuse. Appropriate examples of limited expression include:
+
+- Emojis
+- Predefined dictionaries (like stock ticker symbols or a safe dictionary)
+
+Avoid allowing free-form text input for user interactions with UGC to minimize the risk of abuse.
+
+### Deleting user content
+
+Apps should adhere to the [content deletion policy](#content-deletion-policy), ensure that users have the ability to remove their own content when desired, and that the app complies with any legal requirements related to content removal.
+
+Being able to safely accept UGC is a key criteria during app review. If there are apps that you feel require exceptions to these guidelines please reach out.
+
+## Content deletion policy
+
+You are required to remove any user content that has been deleted from Reddit from your Devvit app. We provide access to post and comment delete events via [triggers](https://developers.reddit.com/docs/event_triggers) to help facilitate this.
+
+On `PostDelete` and `CommentDelete` event triggers, you must delete all content related to the post and/or comment (for example, title, body, embedded URLs, etc.) from your app. This includes data that is in the Redis/KVstore and data sent to an external service. Metadata required for contextualizing related content (for example, post or comment ID, createdAt, etc.) may be retained.
+
+When a user account is deleted, the related user ID (t2\_\*) must be completely removed from your hosted datastores (e.g. Redis) and any external systems. You must also delete all references to the author-identifying information (i.e. the author ID, name, profile URL, avatar image URL, user flair, etc.) from posts and comments created by that account. You may continue to keep posts and comments created by deleted accounts, provided that the posts and comments have not been explicitly deleted.
+
+To best comply with this policy, we recommend deleting any stored user data within 30 days. For any data you are storing in Redis, you can use the [expire function](./capabilities/redis.md#key-expiration) to ensure data gets deleted automatically.
+
+:::note
+Retention of content and data that has been deleted, even if disassociated, de-identified or anonymized, is a violation of our terms and policies.
+:::
 
 ## Devvitquette
 
@@ -41,15 +73,3 @@ Don’t:
 - Request that Redditors share their login credentials or any other personal information to access or complete any action through your app
 - Attempt to publish an app targeting anyone under 13 -- Redditors must all be over the age of 13 to use the platform!
 - Attempt to circumvent any safety or security enforcement measures Reddit may have taken, including against your app
-
-## Content deletion policy
-
-You are required to remove any user content that has been deleted from Reddit from your Devvit app. We provide access to post and comment delete events via [triggers](https://developers.reddit.com/docs/event_triggers) to help facilitate this.
-
-On `PostDelete` and `CommentDelete` event triggers, you must delete all content related to the post and/or comment (for example, title, body, embedded URLs, etc.) from your app. This includes data that is in the Redis/KVstore and data sent to an external service. Metadata required for contextualizing related content (for example, post or comment ID, createdAt, etc.) may be retained.
-
-When a user account is deleted, the related user ID (t2\_\*) must be completely removed from your hosted datastores (e.g. Redis/KVStore) and any external systems. You must also delete all references to the author-identifying information (i.e. the author ID, name, profile URL, avatar image URL, user flair, etc.) from posts and comments created by that account. You may continue to keep posts and comments created by deleted accounts, provided that the posts and comments have not been explicitly deleted.
-
-To best comply with this policy, we strongly recommend routinely deleting any stored user data and content within 48 hours, including in the kvstore/redis.
-
-Note that retention of content and data that has been deleted–-even if disassociated, de-identified or anonymized–-is a violation of our terms and policies.
