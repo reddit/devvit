@@ -16,6 +16,10 @@ $ yarn docs:start
 
 This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
+Note:
+
+- Changes does not appear on snoodev env can only be tested locally
+
 ### Build
 
 ```
