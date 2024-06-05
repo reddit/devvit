@@ -1,16 +1,11 @@
 # Help
 
-To get help, share your work, or report issues or bugs, please make a post in
-[r/devvit](https://reddit.com/r/devvit) and flair your post accordingly:
-![devvit flair](./assets/devvit-flair.png)
+The best place to get help is from one of our communities!
+Our subreddit, [r/devvit](https://reddit.com/r/devvit), is a great place to discuss the platform, ask common questions, or share information about your app. This is also where we share important information and updates.
 
-- **[Bug]** borked tooling, bugs and technical issues you encounter
-- **[Documentation]** for gaps, errors, or inconsistencies in our (evolving) docs
-- **[Feature Request]** for an addition to the experience or tools that would add value and why
-- **[Discussion]** for open-ended conversations about Developer Platform
-- **[Help]** for questions or troubleshooting issues you encounter
-- **[Sharing]** to show off your awesome work!
+For quick troubleshooting or live support we recommend posting in our [Discord server](https://discord.com/invite/R7yu2wh9Qz). The devvit team and expert users (aka the Devvit Ducks 🪿) are usually quick to reply. The server is also where we host office hours.
 
-If you need support on your Devvit project or have questions for the team, you can also [contact us
-via modmail](https://www.reddit.com/message/compose/?to=%2Fr%2FDevvit)! However, posting publicly can
-help other devvitors with the same question or comments.
+We’re always happy to offer more dedicated support in the form of live coding sessions or a private space to iterate on your project. If this is of interest to you, please reach out in one of the communities above.
+Please read the community rules before participating.
+
+To file a feature request or submit a bug, you can use our [public issues tracker](https://github.com/reddit/devvit/issues). We recommend also notifying the team if you are blocked by a lacking feature or bug.

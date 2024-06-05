@@ -30,7 +30,7 @@ Reddit hosts your code with dedicated Redis-backed storage. The UI toolkit lets 
 
 ## Community and support
 
-Reddit’s Developer Platform provides a supportive environment where you can collaborate, ask questions, share knowledge, and inspire one another. Join [r/devvit](https://www.reddit.com/r/devitt/) or become a member of our [Discord](https://discord.com/channels/1050224141732687912/1050227353311248404) channel.
+Reddit’s Developer Platform provides a supportive environment where you can collaborate, ask questions, share knowledge, and inspire one another. Join [r/devvit](https://www.reddit.com/r/devvit/) or become a member of our [Discord](https://discord.com/channels/1050224141732687912/1050227353311248404) channel. Browse example apps in our [public repo](https://github.com/reddit/devvit/tree/main/packages/apps) for project code you can fork and make your own.
 
 ## Get started!
 
