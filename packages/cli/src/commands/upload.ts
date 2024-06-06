@@ -307,6 +307,7 @@ export default class Upload extends ProjectCommand {
 
     this.#event.devplatform.cli_upload_is_initial = true;
     this.#event.devplatform.cli_upload_is_nsfw = isNsfw;
+    this.#event.devplatform.app_name = projectConfig.name;
 
     try {
       ux.action.start('Creating app...');
