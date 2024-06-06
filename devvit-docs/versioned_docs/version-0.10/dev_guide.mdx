@@ -1,7 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Build an app
+# Building an app
 
 This guide shows you how to build, test, and publish an app in 10 easy steps.
 
@@ -95,10 +95,6 @@ To download and install the Devvit CLI, run one of the following commands:
   </TabItem>
 </Tabs>
 
-:::note
-See [npm's official guide](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally) if you have npm permission errors.
-:::
-
 ## 3. Log in
 
 Log in to devvit using the Reddit account that has been allowlisted for the Developer Platform.
@@ -117,6 +113,22 @@ Pick a project name that is six or more characters, all lowercase, using kebab-c
 $ devvit new <my-project>
 ```
 
+## 5. Choose a template
+
+Next you’ll be prompted to select a [template](./templates.mdx). Select `experience-post`.
+
+```text
+$ devvit new my-project
+? Choose a template: (Use arrow keys)
+  app-settings
+  empty
+❯ experience-post
+  experience-post-pro
+  forms
+  image-uploads
+(Move up and down to reveal more choices)
+```
+
 This creates a full directory for your project. The `src/main.tsx` file contains the main code for your app.
 
 ```text
@@ -128,22 +140,6 @@ my-project
 ├── tsconfig.json
 ```
 
-## 5. Choose a template
-
-Next you’ll be prompted to select a template. We recommend `experience-post`. Other options include:
-
-| Template            | Description                                                                 |
-| ------------------- | --------------------------------------------------------------------------- |
-| app-settings        | Create an app with settings the user can configure.                         |
-| empty               | Start with a blank canvas to build your own app.                            |
-| experience-post     | Create an experience using blocks.                                          |
-| experience-post-pro | Create an experience using blocks and include folder structure scaffolding. |
-| forms               | Build an interactive app allows users to add content.                       |
-| image-uploads       | Use an image in your app.                                                   |
-| menu-action         | Add a menu action to a subreddit.                                           |
-| redis               | Add a database to store and retrieve data from your app.                    |
-| triggers            | Set up an app with an event trigger.                                        |
-
 ## 6. Start coding
 
 Navigate to your new folder:
@@ -152,11 +148,12 @@ Navigate to your new folder:
 $ cd <my-project>
 ```
 
-Now you’re ready to start building your app. Check out the capabilities, experience, and blocks sections for inspiration.
+The `main.tsx` file contains the main code for your app. The template you selected has all the code you need to
+create a complete experience post that counts clicks. You can make and save changes or upload the app as is to try it out.
 
 ## 7. Upload your app
 
-When your app is ready to test, upload it to the [Apps](https://developers.reddit.com/) directory. This creates a private version of your app that only you can see.
+To test your app, upload it to the [Apps](https://developers.reddit.com/) directory. This creates a private version of your app that only you can see.
 
 From your project directory, run:
 
@@ -187,7 +184,11 @@ From your project directory, run:
 $ devvit playtest <test-subreddit-name>
 ```
 
-Go to your subreddit to interact with your app. Playtest automatically builds and deploys your app every time you save your code. Just refresh the page to view the latest changes. Check out the developer tools section for more [playtest features](playtest.md).
+Go to your subreddit and select the three-dot menu next to the **Mod Tools** button. Click on the **New experience post** to open
+your app in your feed (you might need to refresh the page).
+
+Playtest automatically builds and deploys your app every time you save your code, so you can edit and save your code to see the results in realtime.
+Refresh the page to view the latest changes. Check out the developer tools section for more [playtest features](playtest.md).
 
 To end the playtest, press Ctrl + c.
 

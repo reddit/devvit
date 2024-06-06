@@ -1,21 +1,7 @@
-import TemplateTile from '@site/src/components/TemplateTile';
-import TemplateTileGrid from '@site/src/components/TemplateTileGrid';
-
-import ImageAppSettings from '@site/docs/assets/custom-posts/templates/template-app-settings.png';
-import ImageEmpty from '@site/docs/assets/custom-posts/templates/template-empty.png';
-import ImageExperiencePost from '@site/docs/assets/custom-posts/templates/template-custom-experience.png';
-import ImageExperiencePostPro from '@site/docs/assets/custom-posts/templates/template-custom-experience-pro.png';
-import ImageForms from '@site/docs/assets/custom-posts/templates/template-forms.png';
-import ImageUploads from '@site/docs/assets/custom-posts/templates/template-image-uploads.png';
-import ImageMenuAction from '@site/docs/assets/custom-posts/templates/template-menu-action.png';
-import ImageRedis from '@site/docs/assets/custom-posts/templates/template-redis.png';
-import ImageTriggers from '@site/docs/assets/custom-posts/templates/template-triggers.png';
-import ImageIntroToDevvit from '@site/docs/assets/custom-posts/templates/template-intro-to-devvit.png';
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Build an app
+# Building an app
 
 This guide shows you how to build, test, and publish an app in 10 easy steps.
 
@@ -99,25 +85,15 @@ To download and install the Devvit CLI, run one of the following commands:
 
 <Tabs>
   <TabItem value="npm" label="npm" default>
-    ```bash
-    $ npm install -g devvit
-    ```
+    ```bash $ npm install -g devvit ```
   </TabItem>
   <TabItem value="yarn" label="Yarn">
-    ```bash
-    $ yarn global add devvit
-    ```
+    ```bash $ yarn global add devvit ```
   </TabItem>
   <TabItem value="pnpm" label="pnpm" default>
-    ```bash
-    $ pnpm add -g devvit
-    ```
+    ```bash $ pnpm add -g devvit ```
   </TabItem>
 </Tabs>
-
-:::note
-See [npm's official guide](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally) if you have npm permission errors.
-:::
 
 ## 3. Log in
 
@@ -137,6 +113,22 @@ Pick a project name that is six or more characters, all lowercase, using kebab-c
 $ devvit new <my-project>
 ```
 
+## 5. Choose a template
+
+Next you’ll be prompted to select a [template](./templates.mdx). Select `experience-post`.
+
+```text
+$ devvit new my-project
+? Choose a template: (Use arrow keys)
+  app-settings
+  empty
+❯ experience-post
+  experience-post-pro
+  forms
+  image-uploads
+(Move up and down to reveal more choices)
+```
+
 This creates a full directory for your project. The `src/main.tsx` file contains the main code for your app.
 
 ```text
@@ -148,74 +140,6 @@ my-project
 ├── tsconfig.json
 ```
 
-## 5. Choose a template
-
-Next you’ll be prompted to select a template. We recommend `experience-post`.
-
-```text
-$ devvit new my-project
-? Choose a template: (Use arrow keys)
-❯ app-settings
-  empty
-  experience-post
-  experience-post-pro
-  forms
-  image-uploads
-  intro-to-devvit
-(Move up and down to reveal more choices)
-```
-
-Here's some other template options:
-
-<TemplateTileGrid>
-  <TemplateTile
-    name="intro-to-devvit"
-    description="The best starting point if this is your first devvit app."
-    image={ImageIntroToDevvit}
-  />
-  <TemplateTile
-    name="app-settings"
-    description="Guides you through creating an app to share."
-    image={ImageAppSettings}
-  />
-  <TemplateTile
-    name="empty"
-    description="Starts with a blank canvas to build your own app."
-    image={ImageEmpty}
-  />
-  <TemplateTile
-    name="experience-post"
-    description="Creates an experience using blocks."
-    image={ImageExperiencePost}
-  />
-  <TemplateTile
-    name="experience-post-pro"
-    description="Creates an experience using blocks and includes folder structure scaffolding."
-    image={ImageExperiencePostPro}
-  />
-  <TemplateTile
-    name="forms"
-    description="Builds an interactive app allows users to add content."
-    image={ImageForms}
-  />
-  <TemplateTile name="image-uploads" description="Use an image in your app." image={ImageUploads} />
-  <TemplateTile
-    name="menu-action"
-    description="Adds a menu action to a subreddit."
-    image={ImageMenuAction}
-  />
-  <TemplateTile
-    name="redis"
-    description="Adds a database to store and retrieve data from your app."
-    image={ImageRedis}
-  />
-  <TemplateTile
-    name="triggers"
-    description="Sets up an app with an event trigger."
-    image={ImageTriggers}
-  />
-</TemplateTileGrid>
-
 ## 6. Start coding
 
 Navigate to your new folder:
@@ -224,11 +148,12 @@ Navigate to your new folder:
 $ cd <my-project>
 ```
 
-Now you’re ready to start building your app. Check out the capabilities, experience, and blocks sections for inspiration.
+The `main.tsx` file contains the main code for your app. The template you selected has all the code you need to
+create a complete experience post that counts clicks. You can make and save changes or upload the app as is to try it out.
 
 ## 7. Upload your app
 
-When your app is ready to test, upload it to the [Apps](https://developers.reddit.com/) directory. This creates a private version of your app that only you can see.
+To test your app, upload it to the [Apps](https://developers.reddit.com/) directory. This creates a private version of your app that only you can see.
 
 From your project directory, run:
 
@@ -259,7 +184,11 @@ From your project directory, run:
 $ devvit playtest <test-subreddit-name>
 ```
 
-Go to your subreddit to interact with your app. Playtest automatically builds and deploys your app every time you save your code. Just refresh the page to view the latest changes. Check out the developer tools section for more [playtest features](playtest.md).
+Go to your subreddit and select the three-dot menu next to the **Mod Tools** button. Click on the **New experience post** to open
+your app in your feed (you might need to refresh the page).
+
+Playtest automatically builds and deploys your app every time you save your code, so you can edit and save your code to see the results in realtime.
+Refresh the page to view the latest changes. Check out the developer tools section for more [playtest features](playtest.md).
 
 To end the playtest, press Ctrl + c.
 

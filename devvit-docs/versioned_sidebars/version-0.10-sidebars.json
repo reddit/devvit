@@ -16,6 +16,7 @@
       "items": [
         "dev_guide",
         "about_devvit",
+        "templates",
         "rendering_apps",
         "optimize_performance"
       ]
