@@ -36,7 +36,7 @@ A new channel can be setup with function handlers containing custom logic to upd
 
 - `onMessage` - called every time a message is received on a channel
 - `onSubscribed` - optional hook to be informed when channel has connected
-- `onUnSubscribed` - optional hook to be informed when channel has disconnected
+- `onUnsubscribed` - optional hook to be informed when channel has disconnected
 
 ```tsx
 // Defined within render function of an experience post
@@ -54,7 +54,7 @@ const channel = useChannel({
   onSubscribed: () => {
     // handle connection setup
   },
-  onUnSubscribed: () => {
+  onUnsubscribed: () => {
     // handle network degradation with fallback scenarios
   },
 });
@@ -152,7 +152,7 @@ Try the demos with multiple browser windows and see local changes sync across se
 
 ![devvit_emoji_chat](../assets/realtime/devvit_emoji_chat.gif)
 
-**[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1b15qqp/devvit_chat/),**
+**[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1bvf6if/emoji_chat/),**
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/devvit-emoji-chat)**
 
 ### Server Push
