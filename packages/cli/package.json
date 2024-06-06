@@ -114,7 +114,10 @@
     "helpClass": "./dist/lib/help",
     "topicSeparator": " ",
     "hooks": {
-      "init": "./dist/lib/hooks/init/check-update.js"
+      "init": [
+        "./dist/lib/hooks/init/check-update.js",
+        "./dist/lib/hooks/init/fire-event.js"
+      ]
     }
   }
 }

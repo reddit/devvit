@@ -47,7 +47,11 @@ import { MY_PORTAL_ENABLED } from '../lib/config.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
 import { Bundler } from '../util/Bundler.js';
 import { getCaptcha } from '../util/captcha.js';
-import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
+import {
+  createAppClient,
+  createAppVersionClient,
+  createEventsClient,
+} from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import type { DevvitConfig } from '../util/devvitConfig.js';
@@ -55,6 +59,7 @@ import { updateDevvitConfig } from '../util/devvitConfig.js';
 import { dirExists } from '../util/files.js';
 import { readPackageJSON } from '../util/package-managers/package-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
+import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -103,6 +108,18 @@ export default class Upload extends ProjectCommand {
 
   readonly appClient = createAppClient(this);
   readonly appVersionClient = createAppVersionClient(this);
+
+  #event = {
+    source: 'devplatform_cli',
+    action: 'ran',
+    noun: 'upload',
+    devplatform: {
+      cli_raw_command_line: 'devvit ' + process.argv.slice(2).join(' '),
+      cli_is_valid_command: true,
+      cli_command: 'upload',
+    } as Record<string, string | boolean | undefined>,
+  };
+  #eventSent = false;
 
   async run(): Promise<void> {
     const token = await this.getAccessTokenAndLoginIfNeeded();
@@ -160,10 +177,15 @@ export default class Upload extends ProjectCommand {
       didVerificationBuild = true;
 
       appInfo = await this.createNewApp(projectConfig, flags.copyPaste, flags.justDoIt);
+    } else if (appInfo) {
+      this.#event.devplatform.cli_upload_is_initial = false;
+      this.#event.devplatform.cli_upload_is_nsfw = appInfo.app?.isNsfw;
+      this.#event.devplatform.app_name = appInfo.app?.name;
     }
 
     // Now, create a new version, probably prompting for the new version number
     const version = await this.getNextVersion(appInfo, flags.bump, !flags.justDoIt);
+    this.#event.devplatform.app_version_number = version.toString();
     ux.action.start(didVerificationBuild ? 'Rebuilding for first upload...' : 'Building...');
     const bundles = await this.bundleActors(username, version.toString(), !flags.disableTypecheck);
     ux.action.stop('✅');
@@ -173,6 +195,8 @@ export default class Upload extends ProjectCommand {
         `${DEVVIT_PORTAL_URL}/apps/${appInfo.app?.slug}`
       )} to view your app!`
     );
+
+    await this.#sendEventIfNotSent();
 
     process.exit();
   }
@@ -280,6 +304,9 @@ export default class Upload extends ProjectCommand {
     if (!MY_PORTAL_ENABLED) {
       appCreationRequest.captcha = await getCaptcha({ copyPaste });
     }
+
+    this.#event.devplatform.cli_upload_is_initial = true;
+    this.#event.devplatform.cli_upload_is_nsfw = isNsfw;
 
     try {
       ux.action.start('Creating app...');
@@ -654,5 +681,21 @@ export default class Upload extends ProjectCommand {
         };
       })
     );
+  }
+
+  async #sendEventIfNotSent(): Promise<void> {
+    if (!this.#eventSent) {
+      this.#eventSent = true;
+      await createEventsClient(this).SendEvent({
+        structValue: this.#event,
+      });
+    }
+  }
+
+  override async catch(err: CommandError): Promise<unknown> {
+    this.#event.devplatform.cli_upload_is_successful = false;
+    this.#event.devplatform.cli_upload_failure_reason = err.message;
+    await this.#sendEventIfNotSent();
+    return super.catch(err);
   }
 }

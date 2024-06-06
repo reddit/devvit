@@ -21,6 +21,8 @@ import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTempl
 import { logInBox } from '../util/ui.js';
 import { exec as _exec } from 'node:child_process';
 import util from 'node:util';
+import { createEventsClient } from '../util/clientGenerators.js';
+import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 const exec = util.promisify(_exec);
 
 const templateResolver = new ProjectTemplateResolver();
@@ -97,6 +99,18 @@ export default class New extends DevvitCommand {
   #createAppParams: CreateAppParams | null = null;
   #createAppFlags: CreateAppFlags | null = null;
 
+  #event = {
+    source: 'devplatform_cli',
+    action: 'ran',
+    noun: 'new_app',
+    devplatform: {
+      cli_raw_command_line: 'devvit ' + process.argv.slice(2).join(' '),
+      cli_is_valid_command: true,
+      cli_command: 'new',
+    } as Record<string, string | boolean | undefined>,
+  };
+  #eventSent = false;
+
   #appNameValidator: NonNullable<Validator> = async (rawAppName: string) => {
     const existingDirNames = new Set(
       readdirSync(process.cwd(), { withFileTypes: true })
@@ -152,6 +166,8 @@ export default class New extends DevvitCommand {
       this.#createAppParams,
       'Expected params to be initialized at this point for app creation'
     );
+    this.#event.devplatform.app_name = this.#createAppParams.appName;
+    this.#event.devplatform.cli_new_app_template = this.#createAppParams.templateName;
 
     // Copy project template
     await this.#copyProjectTemplate();
@@ -187,6 +203,8 @@ export default class New extends DevvitCommand {
     this.#logWelcomeMessage(path.relative(process.cwd(), this.#projectPath), {
       dependenciesInstalled,
     });
+
+    await this.#sendEventIfNotSent();
   }
 
   async #gitInit(): Promise<void> {
@@ -318,5 +336,21 @@ export default class New extends DevvitCommand {
     const msg = welcomeInstructions.join('\n');
 
     logInBox(msg, { style: 'SINGLE', color: chalk.magenta });
+  }
+
+  async #sendEventIfNotSent(): Promise<void> {
+    if (!this.#eventSent) {
+      this.#eventSent = true;
+      await createEventsClient(this).SendEvent({
+        structValue: this.#event,
+      });
+    }
+  }
+
+  override async catch(err: CommandError): Promise<unknown> {
+    this.#event.devplatform.cli_upload_is_successful = false;
+    this.#event.devplatform.cli_upload_failure_reason = err.message;
+    await this.#sendEventIfNotSent();
+    return super.catch(err);
   }
 }

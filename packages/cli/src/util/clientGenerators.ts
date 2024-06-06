@@ -4,6 +4,7 @@ import type {
   AppClient,
   AppVersionClient,
   DevPortalAppSettingsClient,
+  EventsClient,
   FeedbackClient,
   InstallationsClient,
   WaitlistAdminClient,
@@ -13,6 +14,7 @@ import {
   AppClientJSON,
   AppVersionClientJSON,
   DevPortalAppSettingsClientJSON,
+  EventsClientJSON,
   FeedbackClientJSON,
   InstallationsClientJSON,
   WaitlistAdminClientJSON,
@@ -35,6 +37,7 @@ const INSTALLATIONS_PATH = 'installations';
 const FEEDBACK_PATH = 'feedback';
 const WAITLIST_PATH = 'waitlist';
 const APP_SETTINGS_PATH = 'app-settings';
+const EVENTS_PATH = 'events';
 
 export function createAppClient(instance: DevvitCommand): AppClient {
   return new AppClientJSON(
@@ -111,6 +114,17 @@ export function createWaitlistAdminClient(instance: DevvitCommand): WaitlistAdmi
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/admin/${WAITLIST_PATH}`,
       getToken: () => instance.getAccessToken(),
+      headers: getHeaders(),
+    })
+  );
+}
+
+export function createEventsClient(instance?: DevvitCommand): EventsClient {
+  return new EventsClientJSON(
+    NodeFetchRPC({
+      baseUrl: `${DEVVIT_PORTAL_API}/${EVENTS_PATH}`,
+      getToken: async () => instance?.getAccessToken() ?? undefined,
+      isTokenOptional: true,
       headers: getHeaders(),
     })
   );
