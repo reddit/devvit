@@ -26,7 +26,14 @@ const sidebars = {
     {
       type: 'category',
       label: 'Learn Devvit',
-      items: ['dev_guide', 'about_devvit', 'templates', 'rendering_apps', 'optimize_performance'],
+      items: [
+        'dev_guide',
+        'about_devvit',
+        'templates',
+        'rendering_apps',
+        'optimize_performance',
+        'devvit_for_pythonistas',
+      ],
     },
     {
       type: 'category',
