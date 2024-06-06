@@ -6,16 +6,16 @@ Devvit.configure({
 });
 
 // Add a menu item to the subreddit menu
-// for instantiating the new custom post
+// for instantiating the new experience post
 Devvit.addMenuItem({
-  label: 'Add my custom post',
+  label: 'Add my post',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
     const { reddit, ui } = context;
     const subreddit = await reddit.getCurrentSubreddit();
     await reddit.submitPost({
-      title: 'My custom post',
+      title: 'My devvit post',
       subredditName: subreddit.name,
       // The preview appears while the post loads
       preview: (
@@ -28,9 +28,9 @@ Devvit.addMenuItem({
   },
 });
 
-// Add a custom post type definition
+// Add a post type definition
 Devvit.addCustomPostType({
-  name: 'Custom Post',
+  name: 'Devvit Post',
   height: 'regular',
   render: (context) => {
     const { useState } = context;

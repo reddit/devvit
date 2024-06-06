@@ -39,6 +39,11 @@ Devvit.addCustomPostType({
     !!!*/
 
     const bodyTextCopy = `Hi ${username}! I'm Doot, your Devvit debugging buddy.\n\nLet's make some simple code changes as we playtest this app.`;
+    /*
+    Note: make sure to remove {username} from the string above!
+    Otherwise, everyone that looks at your post will see their own username.
+    */
+
     const customColor: string = '#FFE338';
     let imgUrl = 'doot.png';
 
