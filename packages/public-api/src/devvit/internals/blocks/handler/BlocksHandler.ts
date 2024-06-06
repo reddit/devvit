@@ -133,7 +133,9 @@ export class BlocksHandler {
       | undefined;
     let remaining: UIEvent[] = [...eventsToProcess];
 
+    console.debug('starting processing events');
     while (eventsToProcess.length > 0) {
+      console.debug('processing events loop iteration', eventsToProcess.length);
       /**
        * A concurrently executable batch is a set of events that can be executed in parallel.  This either one main queue event,
        * or any number of other queue events.
@@ -184,7 +186,7 @@ export class BlocksHandler {
       for (const event of context._requeueEvents) {
         if (!isMainQueue && !event.async) {
           console.debug('NOT reprocessing event in BlocksHandler, sync mismatch A', event);
-          // We're async, this is a main queue event.  We need to send it back to the platform to let
+          // We're async, this is a main qrueue event.  We need to send it back to the platform to let
           // the platform synchronize it.
           remainingRequeueEvents.push(event);
           continue;
@@ -254,6 +256,7 @@ export class BlocksHandler {
 
   #loadHooks(context: RenderContext, ..._events: UIEvent[]): void {
     // TBD: partial rendering
+    context._hooks = {};
     this.#renderRoot(this.#root, context.request.props ?? {}, context);
   }
 
@@ -292,8 +295,11 @@ export class BlocksHandler {
   async #handleMainQueue(context: RenderContext, ...batch: UIEvent[]): Promise<void> {
     // We need to handle events in order, so that the state is updated in the correct order.
     for (const event of batch) {
+      console.log('handling main queue event', event);
+      console.log('before', context._state);
       this.#loadHooks(context, event);
       await this.#attemptHook(context, event);
+      console.log('after', context._state);
     }
 
     // TODO: Decide whether this is excessive.  It doesn't hurt anything besides performance.
