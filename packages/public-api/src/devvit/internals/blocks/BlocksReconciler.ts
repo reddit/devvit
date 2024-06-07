@@ -9,9 +9,7 @@ import type {
   UIEvent,
 } from '@devvit/protos';
 import { BlockRenderEventType, EffectType } from '@devvit/protos';
-import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import { Header } from '@devvit/shared-types/Header.js';
-import { isValidImageURL } from '@devvit/shared-types/imageUtil.js';
 import type { AssetsClient } from '../../../apis/AssetsClient/AssetsClient.js';
 import { makeAPIClients } from '../../../apis/makeAPIClients.js';
 import type { ModLogClient } from '../../../apis/modLog/ModLogClient.js';
@@ -36,7 +34,7 @@ import type {
 } from '../../../types/index.js';
 import type { KVStore } from '../../../types/kvStore.js';
 import type { RedisClient } from '../../../types/redis.js';
-import type { BlockElement, DevvitGlobalScope } from '../../Devvit.js';
+import type { BlockElement } from '../../Devvit.js';
 import { Devvit } from '../../Devvit.js';
 import type { CacheHelper } from '../cache.js';
 import { getContextFromMetadata } from '../context.js';
@@ -185,7 +183,7 @@ export class BlocksReconciler implements EffectEmitter {
   pendingHooks: (() => Promise<void>)[] = [];
 
   isRendering: boolean = false;
-  transformer: BlocksTransformer = new BlocksTransformer();
+  transformer: BlocksTransformer = new BlocksTransformer(() => this.assets);
 
   effects: Effect[] = [];
 
@@ -298,7 +296,7 @@ export class BlocksReconciler implements EffectEmitter {
 
     const reified = await this.processBlock(blockElement);
     assertNotString(reified);
-    await this.transformer.createBlocksElementOrThrow(reified);
+    this.transformer.createBlocksElementOrThrow(reified);
 
     if (this.isUserActionRender && this.blockRenderEventId) {
       const handler = this.actions.get(this.blockRenderEventId);
@@ -336,7 +334,7 @@ export class BlocksReconciler implements EffectEmitter {
     if (Devvit.debug.emitState) {
       console.log(JSON.stringify(this.state, null, 2));
     }
-    return await this.transformer.createBlocksElementOrThrow(reified);
+    return this.transformer.createBlocksElementOrThrow(reified);
   }
 
   #flatten(arr: ReifiedBlockElementOrLiteral[]): ReifiedBlockElementOrLiteral[] {
@@ -365,40 +363,6 @@ export class BlocksReconciler implements EffectEmitter {
         props[action] = id;
       }
     }
-    if (props.url) {
-      props.url = await this.getAssetUrl(props.url as string);
-    }
-  }
-
-  async getAssetUrl(asset: string): Promise<string> {
-    // If this image exactly matches an asset, use the public URL for the asset instead
-    let assetUrl: string | undefined = undefined;
-    const assets: AssetMap = (globalThis as DevvitGlobalScope).devvit?.config?.assets;
-    if (assets) {
-      assetUrl = assets[asset];
-    }
-    /**
-     * This block triggers a circuit breaker that we bypass if the image is:
-     * 1. An asset that is already hosted on a verified image host
-     * 2. A data url of a valid mimetype
-     */
-    if (!assetUrl && !isValidImageURL(asset)) {
-      // This should not happen if we've set config.assets everywhere correctly, but it's good to
-      // keep it around in case we missed something - instead of crashing & burning, we'll just
-      // see some image flicker instead.
-      console.log('No assets loaded on the config - falling back to plugin');
-
-      try {
-        assetUrl = await this.assets.getURL(asset);
-        if (assets && assetUrl) {
-          // Save resolved URL
-          assets[asset] = assetUrl;
-        }
-      } catch {
-        // nop - this is fine, just means this isn't an asset
-      }
-    }
-    return assetUrl ?? asset;
   }
 
   async processBlock(

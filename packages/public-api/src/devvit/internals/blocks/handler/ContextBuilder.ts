@@ -10,7 +10,7 @@ import { RedisClient } from '../../../../apis/redis/RedisClient.js';
 import { SchedulerClient } from '../../../../apis/scheduler/SchedulerClient.js';
 import { SettingsClient } from '../../../../apis/settings/SettingsClient.js';
 import type { ContextAPIClients } from '../../../../types/context.js';
-import { Devvit } from '../../../Devvit.js';
+import type { Devvit } from '../../../Devvit.js';
 import { getContextFromMetadata } from '../../context.js';
 import type { RenderContext } from './RenderContext.js';
 import { UIClient } from './UIClient.js';
@@ -43,7 +43,7 @@ export class ContextBuilder {
     const settings = new SettingsClient(metadata);
     const ui = new UIClient(renderContext);
     const media = new MediaClient(metadata);
-    const assets = new AssetsClient(metadata, () => Devvit.assetsPlugin);
+    const assets = new AssetsClient();
     const realtime = new RealtimeClient(metadata);
     const cache = UnimplementedProxy;
     const apiClients: ContextAPIClients = {

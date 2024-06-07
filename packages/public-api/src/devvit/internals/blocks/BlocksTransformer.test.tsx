@@ -2,8 +2,8 @@
 /** @jsxFrag Devvit.Fragment */
 
 // This import is NOT unused, don't listen to your IDE
+// noinspection ES6UnusedImports
 import { Devvit } from '../../Devvit.js';
-
 import { describe, expect, test } from 'vitest';
 
 import type { Block } from '@devvit/protos';
@@ -78,14 +78,8 @@ async function render(element: JSX.Element) {
     undefined
   );
 
-  // Patch the assets client to just say we can't find the asset
-  reconciler.assets.getURL = async (_) => {
-    throw new Error('Testing; asset not found');
-  };
-
   return reconciler.renderElement(element);
 }
-
 describe('BlocksTransformer (JSX -> Block)', () => {
   describe('block ids', () => {
     test('block ids are passed through', async () => {
@@ -435,7 +429,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
     test('all properties are properly copied to the object', async () => {
       const ui = await render(
         <image
-          url={'foo'}
+          url={'http:foo'}
           imageWidth={1}
           imageHeight={2}
           description={'bar'}
@@ -446,7 +440,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
 
       commonPropsTestsWithActions(ui);
       const image = ui.config!.imageConfig!;
-      expect(image.url).toEqual('foo');
+      expect(image.url).toEqual('http:foo');
       expect(image.width).toEqual(1);
       expect(image.height).toEqual(2);
       expect(image.description).toEqual('bar');
@@ -560,7 +554,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
       const ui = await render(
         <animation
           type={'lottie'}
-          url={'foo'}
+          url={'http:foo'}
           imageWidth={1}
           imageHeight={2}
           loop={true}
@@ -575,7 +569,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
       commonPropsTestsWithActions(ui);
       const animation = ui.config!.animationConfig!;
       expect(animation.type).toEqual(BlockAnimationType.ANIM_LOTTIE);
-      expect(animation.url).toEqual('foo');
+      expect(animation.url).toEqual('http:foo');
       expect(animation.width).toEqual(1);
       expect(animation.height).toEqual(2);
       expect(animation.loop).toBeTruthy();
@@ -595,11 +589,11 @@ describe('BlocksTransformer (JSX -> Block)', () => {
     });
 
     test('all properties are properly copied to the object', async () => {
-      const ui = await render(<webview url={'foo'} {...commonProps} />);
+      const ui = await render(<webview url={'http:foo'} {...commonProps} />);
 
       commonPropsTests(ui);
       const webview = ui.config!.webviewConfig!;
-      expect(webview.url).toEqual('foo');
+      expect(webview.url).toEqual('http:foo');
     });
   });
 
@@ -725,89 +719,6 @@ describe('BlocksTransformer (JSX -> Block)', () => {
       const img = await render(<image imageWidth={10} imageHeight={10} url={'foo'} />);
       expect(img?.config?.imageConfig?.width).toEqual(10);
       expect(img?.config?.imageConfig?.height).toEqual(10);
-    });
-
-    test('data uri image does not hit the asset manager', async () => {
-      const reconciler = new BlocksReconciler(
-        () => null,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
-        {},
-        {},
-        undefined
-      );
-
-      // Patch the assets client to just say we can't find the asset
-      reconciler.assets.getURL = async (_) => {
-        throw new Error('Testing; asset not found');
-      };
-
-      const getUrlSpy = vi.spyOn(reconciler.assets, 'getURL');
-
-      await reconciler.renderElement(
-        <image
-          imageWidth={100}
-          imageHeight={100}
-          url={'data:image/svg+xml;charset=UTF-8,<svg><circle cx="5" cy="5" r="4" /></svg>'}
-        />
-      );
-
-      expect(getUrlSpy).not.toHaveBeenCalled();
-    });
-
-    test('verified image host image does not hit the asset manager', async () => {
-      const reconciler = new BlocksReconciler(
-        () => null,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
-        {},
-        {},
-        undefined
-      );
-
-      // Patch the assets client to just say we can't find the asset
-      reconciler.assets.getURL = async (_) => {
-        throw new Error('Testing; asset not found');
-      };
-
-      const getUrlSpy = vi.spyOn(reconciler.assets, 'getURL');
-
-      await reconciler.renderElement(
-        <image imageWidth={100} imageHeight={100} url={'https://i.redd.it/theImage'} />
-      );
-
-      expect(getUrlSpy).not.toHaveBeenCalled();
-    });
-
-    test('unverified image hits the asset manager', async () => {
-      const reconciler = new BlocksReconciler(
-        () => null,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
-        {},
-        {},
-        undefined
-      );
-
-      // Patch the assets client to just say we can't find the asset
-      reconciler.assets.getURL = async (_) => {
-        throw new Error('Testing; asset not found');
-      };
-
-      const getUrlSpy = vi.spyOn(reconciler.assets, 'getURL');
-
-      await reconciler.renderElement(
-        <image
-          imageWidth={100}
-          imageHeight={100}
-          url={'https://somerandomimagehost.com/badimage.png'}
-        />
-      );
-
-      expect(getUrlSpy).toHaveBeenCalled();
     });
   });
 });

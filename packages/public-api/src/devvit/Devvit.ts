@@ -37,6 +37,7 @@ import { registerScheduler } from './internals/scheduler.js';
 import { registerTriggers } from './internals/triggers.js';
 import { registerUIEventHandler } from './internals/ui-event-handler.js';
 import { registerUIRequestHandlers } from './internals/ui-request-handler.js';
+import type { AssetMap } from '@devvit/shared-types/Assets.js';
 
 type UseHandler = {
   [name: string]: (args: protos.UnknownMessage | undefined, metadata?: protos.Metadata) => void;
@@ -67,7 +68,6 @@ type PluginType =
   | protos.MediaService
   | protos.PostCollections
   | protos.RedditAPIV2
-  | protos.AssetResolver
   | protos.Realtime;
 
 export class Devvit extends Actor {
@@ -443,6 +443,9 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
+  static #assets: AssetMap = {};
+
+  /** @internal */
   static get redditAPIPlugins(): {
     NewModmail: protos.NewModmail;
     Widgets: protos.Widgets;
@@ -563,17 +566,6 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static get assetsPlugin(): protos.AssetResolver {
-    const assets = this.#pluginClients[protos.AssetResolverDefinition.fullName];
-    if (!assets) {
-      throw new Error(
-        'AssetsService is not available. This should not happen, and indicates a setup problem with the runtime.'
-      );
-    }
-    return assets as protos.AssetResolver;
-  }
-
-  /** @internal */
   static get settingsPlugin(): protos.Settings {
     const settings = this.#pluginClients[protos.SettingsDefinition.fullName];
 
@@ -638,11 +630,15 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
+  static get assets(): AssetMap {
+    return Devvit.#assets;
+  }
+
+  /** @internal */
   constructor(config: Config) {
     super(config);
 
-    // All apps can use the asset resolver without asking.
-    Devvit.#use(protos.AssetResolverDefinition);
+    Devvit.#assets = config.assets ?? {};
 
     for (const fullName in Devvit.#uses) {
       const use = Devvit.#uses[fullName];
@@ -1046,11 +1042,3 @@ declare global {
     type ComponentFunction = (props: JSX.Props, context: Devvit.Context) => JSX.Element;
   }
 }
-
-export type DevvitGlobalScope = WindowOrWorkerGlobalScope & {
-  devvit?: {
-    config?: {
-      assets: { readonly [path: string]: string };
-    };
-  };
-};
