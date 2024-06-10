@@ -5,36 +5,10 @@ import TabItem from '@theme/TabItem';
 
 This tutorial will help you get to know Devvit and help r/Devvit get to know you! When you're done, you'll have a custom introduction post that you can share with the community.
 
-It should take about five minutes.
+It should take about five minutes. This tutorial assumes that you have already installed Devvit following the [Quickstart](https://developers.reddit.com/docs/quickstart).
 
-## Step 1: Set up your environment
 
-If this is your first devvit project, you'll need to take care of a few things before creating your project. Ensure that you have [Node.js](https://nodejs.org/en/download/package-manager) (v18.18.2 or higher) installed. Additionally, you'll need to [make a small subreddit](https://mods.reddithelp.com/hc/en-us/articles/360001766991-How-to-create-a-subreddit) for testing, if you don't already have one.
-
-Run the following commands in your terminal to install the [`@devvit`](https://www.npmjs.com/package/devvit) CLI and log in from your Reddit account:
-
-<Tabs>
-  <TabItem value="npm" label="npm" default>
-    ```
-    bash npm install -g devvit
-    devvit login
-    ```
-  </TabItem>
-  <TabItem value="yarn" label="Yarn">
-    ```
-    bash yarn global add devvit
-    devvit login
-    ```
-  </TabItem>
-  <TabItem value="pnpm" label="pnpm" default>
-    ```
-    bash pnpm install -g devvit
-    devvit login
-    ```
-  </TabItem>
-</Tabs>
-
-## Step 2: Create a project
+## Step 1: Create a project
 
 Once you are logged in, create a new project (aka a new app). Run:
 
@@ -42,7 +16,7 @@ Once you are logged in, create a new project (aka a new app). Run:
 devvit new
 ```
 
-## Step 3: Name your project
+## Step 2: Name your project
 
 For this tutorial, we suggest using:
 
@@ -50,7 +24,7 @@ For this tutorial, we suggest using:
 Hello-[username]
 ```
 
-## Step 4: Select the template
+## Step 3: Select the template
 
 When prompted to chose a template, scroll and select:
 
@@ -58,7 +32,7 @@ When prompted to chose a template, scroll and select:
 intro-to-devvit
 ```
 
-## Step 5: Upload and build
+## Step 4: Upload and build
 
 Run the following commands to get your app up and running:
 
@@ -74,7 +48,7 @@ The "playtest" command is for testing your code - more on that soon.
 
 [^1]: If you're less familiar with the terminal and command line interfaces, check out this [overview with some common commands](https://tutorials.codebar.io/command-line/introduction/tutorial.html).
 
-## Step 6: Open your project
+## Step 5: Open your project
 
 Open your project from your IDE[^2]. It should look like this:
 
@@ -95,13 +69,13 @@ You'll be making updates to `main.tsx` and the `assets` folder in this tutorial.
 
 [^2]: If you don't have an IDE on your machine, we recommend using [VS Code](https://code.visualstudio.com/).
 
-## Step 7: Create a post
+## Step 6: Create a post
 
 Visit your test subreddit. From the subreddit menu, select "Hello Devvit" and wait for your post to load.
 
 ![menu_item](./assets/intro-to-devvit-sub-action.png)
 
-## Step 8: Playtesting
+## Step 7: Playtesting
 
 As you make and save code modifications, playtest will automatically build and deploy the app to your subreddit. Simply refresh the post to view the latest changes. Press Ctrl + C to exit the playtest.
 
@@ -109,7 +83,7 @@ As you make and save code modifications, playtest will automatically build and d
 
 From here, the post will guide you through three simple code changes! You can stop there, but we encourage you to experiment and make the post your own.
 
-## Step 9: Share your post
+## Step 8: Share your post
 
 When you're happy with your post, considering sharing it with the community. You can see [creations made by other devs here](https://www.reddit.com/r/hello_user/?f=flair_name%3A%22hello%20devvitor%22).
 

@@ -12,11 +12,11 @@ Devvit lets you create rich, immersive experiences that seamlessly integrate int
 
 Build interactive experiences that ignite your community:
 
-- [Live scoreboards](/examples/apps#live-scores) that give your community play-by-play updates and a space for shitposting during the game.
-- [Polls](/examples/playpens#polls) to provoke spicy conversations or take the pulse of your community.
-- [Multiplayer games](/examples/apps#bingo) played asynchronously or with other redditors in real time.
+- [Live scoreboards](./showcase/apps#live-scores) that give your community play-by-play updates and a space for shitposting during the game.
+- [Polls](./showcase/playgrounds) to provoke spicy conversations or take the pulse of your community.
+- [Multiplayer games](./showcase/apps#bingo) played asynchronously or with other redditors in real time.
 
-Or create an entirely new community around an experience, like [r/pixleary](https://www.reddit.com/r/Pixelary/), a multiplayer game created just for redditors to draw, guess, and compete for bragging rights.
+Or create an entirely new community around an experience, like [r/Pixelary](https://www.reddit.com/r/Pixelary/), a multiplayer game created just for redditors to draw, guess, and compete for bragging rights.
 
 ## Tools at your fingertips
 

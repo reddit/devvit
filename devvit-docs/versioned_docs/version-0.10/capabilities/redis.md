@@ -46,7 +46,7 @@ Devvit.addMenuItem({
 
 ### Experience posts
 
-You can follow this template to create a experience post containing an interactive progress bar backed by Redis.
+You can follow this template to create an experience post containing an interactive progress bar backed by Redis.
 
 ```tsx
 // start from a template
