@@ -78,7 +78,7 @@ async function render(element: JSX.Element) {
     undefined
   );
 
-  return reconciler.renderElement(element);
+  return reconciler.renderElement({ debug: {} } as Devvit.Context, element);
 }
 describe('BlocksTransformer (JSX -> Block)', () => {
   describe('block ids', () => {

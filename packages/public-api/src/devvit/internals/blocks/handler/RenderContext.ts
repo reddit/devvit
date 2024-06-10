@@ -109,7 +109,7 @@ export class RenderContext implements EffectEmitter {
    * Adds event that will re-enter the dispatcher queue.
    */
   addToRequeueEvents(...events: UIEvent[]): void {
-    console.debug('requeueing events', events);
+    if (this._devvitContext?.debug.blocks) console.debug('[blocks] requeueing events', events);
 
     const grouped = events.reduce(
       (acc, event) => {

@@ -70,25 +70,30 @@ type PluginType =
   | protos.RedditAPIV2
   | protos.Realtime;
 
-export class Devvit extends Actor {
+/**
+ * Home for debug flags, settings, and other information. Any type removals
+ * may cause type errors but not runtime errors.
+ *
+ * **Favor ContextDebugInfo since request-based state is preferred.**
+ */
+type DevvitDebug = {
   /**
-   * Home for debug flags, settings, and other information.
+   * Should debug block rendering in console.log according to the reified JSX/XML output. Example:
+   *
+   *     <hstack><text>hi world</text></hstack>
+   *
    */
-  static debug = {
-    /**
-     * Should debug block rendering in console.log according to the reified JSX/XML output.  Example:
-     *
-     *     <hstack><text>hi world</text></hstack>
-     *
-     */
-    emitSnapshots: false,
+  emitSnapshots?: boolean | undefined;
 
-    /**
-     * Should console.log the state of the app after every event.
-     *
-     */
-    emitState: false,
-  };
+  /**
+   * Should console.log the state of the app after every event.
+   *
+   */
+  emitState?: boolean | undefined;
+};
+
+export class Devvit extends Actor {
+  static debug: DevvitDebug = {};
   static #configuration: Configuration = {};
   static #menuItems: MenuItem[] = [];
   static #customPostType: CustomPostType | undefined;

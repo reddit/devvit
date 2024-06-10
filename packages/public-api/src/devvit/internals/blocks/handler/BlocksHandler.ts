@@ -97,7 +97,7 @@ export class BlocksHandler {
   _latestRenderContext: RenderContext | null = null;
 
   constructor(root: JSX.ComponentFunction) {
-    console.log('BlocksHandler v1');
+    if (this.#debug) console.debug('[blocks] BlocksHandler v1');
     this.#root = root;
     _latestBlocksHandler = this;
   }
@@ -133,9 +133,10 @@ export class BlocksHandler {
       | undefined;
     let remaining: UIEvent[] = [...eventsToProcess];
 
-    console.debug('starting processing events');
+    if (this.#debug) console.debug('[blocks] starting processing events');
     while (eventsToProcess.length > 0) {
-      console.debug('processing events loop iteration', eventsToProcess.length);
+      if (this.#debug)
+        console.debug('[blocks] processing events loop iteration', eventsToProcess.length);
       /**
        * A concurrently executable batch is a set of events that can be executed in parallel.  This either one main queue event,
        * or any number of other queue events.
@@ -159,7 +160,7 @@ export class BlocksHandler {
           await this.#handleMainQueue(context, ...batch);
         }
       } catch (e) {
-        console.debug('caught in handler', e);
+        if (this.#debug) console.debug('[blocks] caught in handler', e);
         /**
          * If we have a progress, we can recover from an error by rolling back to the last progress, and then letting the
          * remaining events be reprocessed.
@@ -181,24 +182,32 @@ export class BlocksHandler {
         }
       }
 
-      console.debug('remaining events', context._requeueEvents);
+      if (this.#debug) console.debug('[blocks] remaining events', context._requeueEvents);
       const remainingRequeueEvents: UIEvent[] = [];
       for (const event of context._requeueEvents) {
         if (!isMainQueue && !event.async) {
-          console.debug('NOT reprocessing event in BlocksHandler, sync mismatch A', event);
+          if (this.#debug)
+            console.debug(
+              '[blocks] NOT reprocessing event in BlocksHandler, sync mismatch A',
+              event
+            );
           // We're async, this is a main qrueue event.  We need to send it back to the platform to let
           // the platform synchronize it.
           remainingRequeueEvents.push(event);
           continue;
         }
         if (isMainQueue && event.async && !isBlockingSSR) {
-          console.debug('NOT reprocessing event in BlocksHandler, sync mismatch B', event);
+          if (this.#debug)
+            console.debug(
+              '[blocks] NOT reprocessing event in BlocksHandler, sync mismatch B',
+              event
+            );
           // We're main queue, and this is an async event.  We're not in SSR mode, so let's prioritize
           // returning control quickly to the platform so we don't block event loops.
           remainingRequeueEvents.push(event);
           continue;
         }
-        console.debug('reprocessing event in BlocksHandler', event);
+        if (this.#debug) console.debug('[blocks] reprocessing event in BlocksHandler', event);
         eventsToProcess.push(event);
       }
       context._requeueEvents = remainingRequeueEvents; //
@@ -231,13 +240,21 @@ export class BlocksHandler {
        * TODO: hide this behind a flag, because it's possibly expensive.
        */
       if (!isEqual(context._state, stateCopy)) {
-        console.error('State was mutated during rendering', context._state, stateCopy);
+        console.error('[blocks] State was mutated during rendering', context._state, stateCopy);
       }
       if (!isEqual(context._requeueEvents, eventsCopy)) {
-        console.error('Events were mutated during rendering', context._requeueEvents, eventsCopy);
+        console.error(
+          '[blocks] Events were mutated during rendering',
+          context._requeueEvents,
+          eventsCopy
+        );
       }
       if (!isEqual(context._effects, effectsCopy)) {
-        console.error('Effects were mutated during rendering', context._effects, effectsCopy);
+        console.error(
+          '[blocks] Effects were mutated during rendering',
+          context._effects,
+          effectsCopy
+        );
       }
 
       if (tags) {
@@ -252,6 +269,10 @@ export class BlocksHandler {
       blocks,
       events: context._requeueEvents,
     };
+  }
+
+  get #debug(): boolean {
+    return !!this._latestRenderContext?.devvitContext.debug.blocks;
   }
 
   #loadHooks(context: RenderContext, ..._events: UIEvent[]): void {
@@ -295,11 +316,11 @@ export class BlocksHandler {
   async #handleMainQueue(context: RenderContext, ...batch: UIEvent[]): Promise<void> {
     // We need to handle events in order, so that the state is updated in the correct order.
     for (const event of batch) {
-      console.log('handling main queue event', event);
-      console.log('before', context._state);
+      if (this.#debug) console.log('[blocks] handling main queue event', event);
+      if (this.#debug) console.log('[blocks] before', context._state);
       this.#loadHooks(context, event);
       await this.#attemptHook(context, event);
-      console.log('after', context._state);
+      if (this.#debug) console.log('[blocks] after', context._state);
     }
 
     // TODO: Decide whether this is excessive.  It doesn't hurt anything besides performance.
@@ -311,7 +332,7 @@ export class BlocksHandler {
     props: Props,
     context: RenderContext
   ): ReifiedBlockElement | undefined {
-    console.debug('renderRoot');
+    if (this.#debug) console.debug('[blocks] renderRoot');
     context._generated = {};
     _activeRenderContext = context;
     this._latestRenderContext = context;

@@ -2,11 +2,11 @@ import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { AsyncUseStateInitializer, UseAsyncResult } from '../../../../types/hooks.js';
 
 import type { AsyncResponse, UIEvent } from '@devvit/protos';
+import { CIRCUIT_BREAKER_MSG } from '@devvit/shared-types/CircuitBreaker.js';
+import isEqual from 'lodash.isequal';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
-import isEqual from 'lodash.isequal';
-import { CIRCUIT_BREAKER_MSG } from '@devvit/shared-types/CircuitBreaker.js';
 export type AsyncOptions = {
   /**
    * The data loader will re-run if the value of `depends` changes.
@@ -21,17 +21,17 @@ export type AsyncOptions = {
 
 class AsyncHook<S extends JSONValue> implements Hook {
   state: UseAsyncResult<S> & { depends: JSONValue };
+  readonly #debug: boolean;
   #hookId: string;
   #initializer: AsyncUseStateInitializer<S>;
   #invalidate: () => void;
   #ctx: RenderContext;
-  #options: AsyncOptions;
   #localDepends: JSONValue;
   #enabled: boolean;
 
   constructor(initializer: AsyncUseStateInitializer<S>, options: AsyncOptions, params: HookParams) {
-    console.debug('useAsync v1', options);
-    this.#options = options;
+    this.#debug = !!params.context.devvitContext.debug.useAsync;
+    if (this.#debug) console.debug('[useAsync] v1', options);
     this.state = { data: null, loading: false, error: null, depends: null };
     this.#hookId = params.hookId;
     this.#initializer = initializer;
@@ -48,8 +48,9 @@ class AsyncHook<S extends JSONValue> implements Hook {
     if (!this.#enabled) {
       return;
     }
-    console.debug('async onLoad ', this.#hookId, this.state);
-    console.debug('async onLoad have ', this.#localDepends, 'and', this.state.depends);
+    if (this.#debug) console.debug('[useAsync] async onLoad ', this.#hookId, this.state);
+    if (this.#debug)
+      console.debug('[useAsync] async onLoad have ', this.#localDepends, 'and', this.state.depends);
     if (
       !isEqual(this.#localDepends, this.state.depends) ||
       (this.state.data === null && this.state.error === null && this.state.loading === false)
@@ -65,7 +66,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
           requestId: this.#hookId + '-' + JSON.stringify(this.state.depends),
         },
       };
-      console.debug('onLoad requeue');
+      if (this.#debug) console.debug('[useAsync] onLoad requeue');
       this.#ctx.addToRequeueEvents(requeueEvent);
     }
   }
@@ -98,7 +99,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
         asyncResponse: asyncResponse,
         hook: this.#hookId,
       };
-      console.debug('onReq requeue');
+      if (this.#debug) console.debug('[useAsync] onReq requeue');
       context.addToRequeueEvents(requeueEvent);
     } else if (event.asyncResponse) {
       const anticipatedRequestId = this.#hookId + '-' + JSON.stringify(this.state.depends);
@@ -111,7 +112,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
         this.state = { ...this.state, ...result };
         this.#invalidate();
       } else {
-        console.debug('onResp skip, stale event');
+        if (this.#debug) console.debug('[useAsync] onResp skip, stale event');
       }
     } else {
       throw new Error('Unknown event type');

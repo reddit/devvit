@@ -241,8 +241,8 @@ export class BlocksReconciler implements EffectEmitter {
   }
 
   // This return type is an absolute mess here. Let this slide.
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  #makeContextProps() {
+
+  #makeContextProps(): Devvit.Context {
     const props: Devvit.Context = {
       ...getContextFromMetadata(this.metadata, this.state.__postData?.thingId),
       modLog: this.modLog,
@@ -288,9 +288,10 @@ export class BlocksReconciler implements EffectEmitter {
   }
 
   async reconcile(): Promise<void> {
+    const ctx = this.#makeContextProps();
     const blockElement: BlockElement = {
       type: this.component,
-      props: this.#makeContextProps(),
+      props: ctx,
       children: [],
     };
 
@@ -314,26 +315,26 @@ export class BlocksReconciler implements EffectEmitter {
   }
 
   async buildBlocksUI(): Promise<Block> {
+    const ctx = this.#makeContextProps();
     const rootBlockElement: BlockElement = {
       type: this.component,
-      props: this.#makeContextProps(),
+      props: ctx,
       children: [],
     };
 
-    const block = await this.renderElement(rootBlockElement);
+    const block = await this.renderElement(ctx, rootBlockElement);
     return this.transformer.ensureRootBlock(block);
   }
 
-  async renderElement(element: JSX.Element): Promise<Block> {
+  async renderElement(ctx: Devvit.Context, element: JSX.Element): Promise<Block> {
     const reified = await this.processBlock(element);
     assertNotString(reified);
 
-    if (Devvit.debug.emitSnapshots || this.metadata[Header.DebugRenderXML]?.values[0]) {
-      console.log(indentXML(toXML(reified)));
-    }
-    if (Devvit.debug.emitState) {
-      console.log(JSON.stringify(this.state, null, 2));
-    }
+    if (Devvit.debug.emitSnapshots || ctx.debug.emitSnapshots)
+      console.debug(indentXML(toXML(reified)));
+    if (Devvit.debug.emitState || ctx.debug.emitState)
+      console.debug(JSON.stringify(this.state, undefined, 2));
+
     return this.transformer.createBlocksElementOrThrow(reified);
   }
 
