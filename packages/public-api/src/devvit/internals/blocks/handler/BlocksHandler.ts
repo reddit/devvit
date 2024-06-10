@@ -411,7 +411,9 @@ export class BlocksHandler {
   #reifyProps(props: { [key: string]: any }): { [key: string]: JSONValue } {
     const reifiedProps: { [key: string]: JSONValue } = {};
     for (const key in props) {
-      if (typeof props[key] === 'function') {
+      if (typeof props[key] === 'undefined') {
+        // skip
+      } else if (typeof props[key] === 'function') {
         const hook = registerHook(
           {
             namespace: key,
