@@ -1,14 +1,27 @@
-# Caching helper
+# Cache helper
 
-Create a short-term cache in your app.
+Cache helper lets you build a more performant app by reducing the number of server side calls for the same data. You can create a short-term cache that stores JSON objects in your Devvit app for a limited amount of time. This is valuable when you have many clients trying to get the same data for example with a stock ticker value or with a sports score.
+
+Under the covers, it's Redis plus a local in-memory write-through cache. This provides a pattern for fetching data without involving a scheduler and allows granular, small TTLs (1 second~). Cache helper lets the app make one request for the data, save the response, and provide this response to all users requesting the same data.
 
 :::note
-This feature is experimental, which means the design not final but it's still available for you to use.
+**Do not cache sensitive information**. Cache helper randomly selects one user to make the real request and saves the response to the cache for others to use. You should only use cache helper for non-personalized fetches, since the same response is available to all users.
 :::
 
-The cache helper will let you cache JSON objects in your devvit apps for a limited amount of time. Under the covers, It's Redis plus a local in-memory write-through cache. This provides a pattern for e.g. fetching data without involving a scheduler, and allows granular, small TTLs (like 1 second).
+## Parameters
 
-This is probably a better fit for your in-app caching needs than using scheduler or interval to fetch!
+| **Parameters** | **Description**                                                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `key`          | This is a string that identifies a cached response. Instead of making a real request, the app gets the cached response with the key you provide. |
+
+Make sure to use different keys for different data. For example, if you’re saving post-specific data, add the postId to the cache key, like this: `post_data_${postId})`. |
+| `ttl` | Time to live is the number of milliseconds the cached response is expected to be relevant.
+
+Once it expires, the cached response will be voided and a real request is made to populate the cache again. You can treat it as a threshold, where ttl of 30000 would mean that a request is done no more than once per 30 seconds. |
+
+## Example
+
+Here’s a way to set up in-app caching instead of using scheduler or interval to fetch.
 
 ```tsx
 let component = (context) => {
@@ -27,9 +40,3 @@ let component = (context) => {
   return <text>yay</text>;
 };
 ```
-
-There are only two properties:
-
-`key` is used to specify a specific item to be cached (i.e. if you have two function calls to cache that share a key, they will return the same value with the same lifetime).
-
-`ttl` specifies "time-to-live", the duration of how long the cached item is retained for.

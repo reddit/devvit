@@ -594,3 +594,29 @@ export default Devvit;
 ```
 
 [Explore example in a playground](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcICyBXANgFwJYFoDOGMADgAQBmA9gE5QlZgkwAeRMVWMYAxjCURQRAAaEHipcEILFH5UMJYCQAiMAG6qs8gL7kqFWgHIAAgBM1GjAHoiKAEZosXHBCJYDAbgA6YbyvWaAOi4KMDIsAHMUKhgACmBvEhJokxNNAEEABQBJeBIMKhQYIW8tAEovHzA-CwCIFIBhFAJ9DIEMABUAT1Y4hJJIWFyDVExcAmISADFqKANihiTOMypcmOCwQiYMUpIAXgA+BT7E9YISAG0BopI8GAwAOWgYAF09knXNjACmmABlDAghBiBgM5WO7xCZ3OlAoJiENzu01hr12EI2zC+P3+gNiILBCxOkPk5xM7DAAGt4bcMEoyeSUWjPt9btigXiKuDTvJKDQAMxvD4Y5kwaY0GLgxLxAmJGVhGBoEx4XLnCUyyWqtWJDDdGBDAhk8JzDWaq5DUn0clG6WamVoCC2eW5TwgADqAAtAQY8CROhQouQIKpqJpeOaKQB+Z3zG026IARxQWGSuXyhWjMcSWnTNue2ZlWdVMVUEDQhTwOwOR2tMuptItRZLZYCYfJ+JtWnB+M5RPIMwATAKQkyfqKoOLq1KM3KFUqLsb1dWbdrWHr8vRDXmM6aSAYYSYrRm1XaHWgna6PRgvT6-VQA0H2IRe7DI8J5zL44nk3kCkU3wXFyQuaqv+NoNqWMDlnshyTjG1JIiYYFNnubYxoKWzfFgAR4G6FAAO6jjEPJQLyKFqh20pdtKXK9jQACMg7ouhI4zOONowTa06Ksqb7sYey66ju+rrgeh6JNuBhXCJonHo6JDOu6nrer6-pXC+m4xh+SYwCYKY-upZH6YB6kgZqiEQRW0HGtSjywGZeABFcpGamhmKYdheEEURfZOZmnYctKZAoNw2AhIsBAQHIMQ7LxiTWU8wKghUNpwRQsIJT5CI0nS6VJc5Q5ComWE4fhLFEbRTnkd2YBnFgeBpNVuFsNpbxXCQABkbVPiY7WdS2-lqtEGBRAwrGagAPKo4VcOSJBujAERuhguzOrRAAMq0AKTOiQJYRGAsAbMtIA8Oit5QFgKRoDA23hC4R1gCE10gPsxrALV9V4I1yQ9SQo0ZmNL0AWqY2fPsNkCcAVxaGNlig2+iQgxi+yTIGwaPnuuTAHu0Ow0j8MkIjWzI6jD6hnSmMtjjcNAzKY14EQEA8LeeBYAAXjAR12lQ4RPSQliA6JCO2CgGAYKFIQZNEeB4LswBSwCchaPsABKEEKxgMPC6LIQC4eMO6zapTkRmwAAITvQ1TXdR1BNa2LDAS1LMty2rEUYEr7QQOSvAJmrWAhJAWmayL9v7Mb42WJNALTQbJAof+ZT+cwsjyGYZAQOg8jVJoFTCCAqhsCzIQILRWhAA).
+
+### Image uploads
+
+Add an image upload input to a form.
+
+```tsx
+import { Devvit } from '@devvit/public-api';
+
+const form = Devvit.createForm(
+  {
+    title: 'Upload an image!',
+    fields: [
+      {
+        name: 'myImage',
+        type: 'image', // This tells the form to expect an image
+        label: 'Image goes here',
+        required: true,
+      },
+    ],
+  },
+  (event, context) => {
+    const imageUrl = event.values.myImage;
+    // Use the mediaUrl to store in redis and display it in an <image> block, or send to external service to modify
+  }
+);
+```
