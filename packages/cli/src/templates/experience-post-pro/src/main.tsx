@@ -8,7 +8,7 @@ Devvit.configure({
 });
 
 Devvit.addCustomPostType({
-  name: 'Hello Blocks',
+  name: 'Hello World',
   height: 'regular',
   render: App,
 });

@@ -18,9 +18,9 @@ Devvit.addMenuItem({
   onPress: createPost,
 });
 
-/* Adds a custom post.*/
+/* Adds an experience. Describes what happens on render.*/
 Devvit.addCustomPostType({
-  name: 'Custom Post',
+  name: 'New Experience',
   height: 'regular',
   render: (context) => {
     /* Adds a state variable that moves the tutorial forward when a user gets started*/

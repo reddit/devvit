@@ -5,8 +5,7 @@ Devvit.configure({
   redditAPI: true,
 });
 
-// Add a menu item to the subreddit menu
-// for instantiating the new experience post
+// Add a menu item to the subreddit menu for instantiating the new experience post
 Devvit.addMenuItem({
   label: 'Add my post',
   location: 'subreddit',
@@ -30,7 +29,7 @@ Devvit.addMenuItem({
 
 // Add a post type definition
 Devvit.addCustomPostType({
-  name: 'Devvit Post',
+  name: 'Experience Post',
   height: 'regular',
   render: (context) => {
     const { useState } = context;

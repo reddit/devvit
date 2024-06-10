@@ -2,7 +2,7 @@ import { Devvit } from '@devvit/public-api';
 import { CreatePreview } from '../../components/Preview.js';
 
 /*
- * Menu action to create an experience post
+Menu action to create an experience post.
  */
 Devvit.addMenuItem({
   label: 'New devvit post',
@@ -13,7 +13,7 @@ Devvit.addMenuItem({
     const post = await context.reddit.submitPost({
       // This will show while your post is loading
       preview: CreatePreview(),
-      title: `${subreddit.name} Hello Devvit Post`,
+      title: `Hello ${subreddit.name}`,
       subredditName: subreddit.name,
     });
 

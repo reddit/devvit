@@ -71,7 +71,7 @@ Devvit.addMenuItem({
         </vstack>
       ),
     });
-    ui.showToast(`Created custom post in r/${currentSubreddit.name}!`);
+    ui.showToast(`Created new post in r/${currentSubreddit.name}!`);
   },
 });
 
