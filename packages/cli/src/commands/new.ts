@@ -21,8 +21,8 @@ import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTempl
 import { logInBox } from '../util/ui.js';
 import { exec as _exec } from 'node:child_process';
 import util from 'node:util';
-import { createEventsClient } from '../util/clientGenerators.js';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
+import { sendEvent } from '../util/metrics.js';
 const exec = util.promisify(_exec);
 
 const templateResolver = new ProjectTemplateResolver();
@@ -341,7 +341,7 @@ export default class New extends DevvitCommand {
   async #sendEventIfNotSent(): Promise<void> {
     if (!this.#eventSent) {
       this.#eventSent = true;
-      await createEventsClient(this).SendEvent({
+      await sendEvent({
         structValue: this.#event,
       });
     }

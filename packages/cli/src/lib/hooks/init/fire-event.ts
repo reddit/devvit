@@ -1,8 +1,13 @@
 import type { Hook } from '@oclif/core';
-import { createEventsClient } from '../../../util/clientGenerators.js';
 import { Value } from '@devvit/protos';
+import { sendEvent } from '../../../util/metrics.js';
 
 const hook: Hook<'init'> = async function (options) {
+  // Don't log metrics events - that kinda defeats the point of the opt-out command
+  if (options.id === 'metrics') {
+    return;
+  }
+
   const isValidCommand = options.id && options.config.commandIDs.includes(options.id);
 
   const event = {
@@ -16,7 +21,7 @@ const hook: Hook<'init'> = async function (options) {
     },
   };
 
-  await createEventsClient().SendEvent(
+  await sendEvent(
     Value.fromPartial({
       structValue: event,
     })

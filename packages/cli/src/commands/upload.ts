@@ -47,11 +47,7 @@ import { MY_PORTAL_ENABLED } from '../lib/config.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
 import { Bundler } from '../util/Bundler.js';
 import { getCaptcha } from '../util/captcha.js';
-import {
-  createAppClient,
-  createAppVersionClient,
-  createEventsClient,
-} from '../util/clientGenerators.js';
+import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import type { DevvitConfig } from '../util/devvitConfig.js';
@@ -60,6 +56,7 @@ import { dirExists } from '../util/files.js';
 import { readPackageJSON } from '../util/package-managers/package-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
+import { sendEvent } from '../util/metrics.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -687,7 +684,7 @@ export default class Upload extends ProjectCommand {
   async #sendEventIfNotSent(): Promise<void> {
     if (!this.#eventSent) {
       this.#eventSent = true;
-      await createEventsClient(this).SendEvent({
+      await sendEvent({
         structValue: this.#event,
       });
     }
