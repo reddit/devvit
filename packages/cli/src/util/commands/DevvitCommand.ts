@@ -105,12 +105,20 @@ export abstract class DevvitCommand extends Command {
     }
   };
 
-  protected checkDevvitTermsAndConditions = async (): Promise<void> => {
-    const waitlistClient = createWaitlistClient(this);
+  readonly waitlistClient = createWaitlistClient(this);
+  protected ensureDeveloperAccountExists = async (): Promise<void> => {
+    try {
+      await this.waitlistClient.EnsureDeveloperAccountExists(Empty.fromPartial({}));
+    } catch (err) {
+      this.error(`Error creating developer account: ${err}`);
+    }
+  };
 
-    const { acceptedTermsVersion, currentTermsVersion } = await waitlistClient.GetCurrentUserStatus(
-      Empty.fromPartial({})
-    );
+  protected checkDevvitTermsAndConditions = async (): Promise<void> => {
+    await this.ensureDeveloperAccountExists();
+
+    const { acceptedTermsVersion, currentTermsVersion } =
+      await this.waitlistClient.GetCurrentUserStatus(Empty.fromPartial({}));
 
     const termsUrl = `${DEVVIT_PORTAL_URL}/terms`;
     if (acceptedTermsVersion < currentTermsVersion) {
