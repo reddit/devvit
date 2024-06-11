@@ -2,7 +2,10 @@ import type { Metadata } from '@devvit/protos';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import pkg from '../../../package.json' assert { type: 'json' };
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
+
+let loggedVersion: boolean = false;
 
 export function getContextFromMetadata(
   metadata: Metadata,
@@ -56,6 +59,12 @@ export function parseDebug(meta: Readonly<Metadata>): ContextDebugInfo {
   // {[key: Lowercase<AppDebug>]: AppDebug}
   const lowerKeyToKey: { [lower: string]: string } = {};
   for (const key in keyset) lowerKeyToKey[key.toLowerCase()] = key;
+
+  // Report package version once if debug mode is set.
+  if (!loggedVersion && meta[Header.Debug]) {
+    loggedVersion = true;
+    console.info(`[api] @devvit/public-api v${pkg.version}`);
+  }
 
   const debug: ContextDebugInfo = { metadata: meta };
   // hack: gRPC-web header values don't split in compute. always join then split

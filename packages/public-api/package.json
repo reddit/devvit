@@ -17,7 +17,7 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "yarn build:icon-types && yarn build:semantic-colors && tsc && cp -a devvit.tsconfig.json dist/ && yarn build:types && yarn build:min && yarn build:unmin",
+    "build": "yarn build:icon-types && yarn build:semantic-colors && tsc && cp -af package.json devvit.tsconfig.json dist/ && yarn build:types && yarn build:min && yarn build:unmin",
     "build:icon-types": "make-icons src/types/icons.ts",
     "build:min": "esbuild   --bundle --sourcemap=linked --target=es2020 --format=esm  --metafile=dist/meta.min.json --outfile=dist/public-api.min.js --external:@devvit/protos --minify src/index.ts",
     "build:semantic-colors": "node scripts/make-semantic-colors.js",
