@@ -4,6 +4,14 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 To use the latest version of Devvit, follow the [upgrade instructions](https://developers.reddit.com/docs/update-devvit).
 
+## Devvit 0.10.22: Adding image uploads to forms and CLI metrics
+
+**Release Date: June 10, 2024**
+
+Devvit 0.10.22 introduces an experimental feature update that lets you add [image uploads](./capabilities/forms.md#image-uploads) to forms. Right now it’s available on web, with Android and iOS support coming soon! We've also added CLI metrics that collect data and let us continually improve the developer experience. To opt out of this, run `devvit metrics off` after upgrading.
+
+This release also moves two features out of the experimental phase: [realtime](./capabilities/realtime.md) and [cache helper](./capabilities/cache.md) are good to go.
+
 ## Devvit 0.10.21: @devvit/kit lets you build apps faster
 
 **Release Date: May 22, 2024**
