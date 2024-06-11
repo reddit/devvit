@@ -2,6 +2,10 @@
 
 The Devvit CLI enables you to create, upload, and manage your apps. It's the bridge between your codebase and Reddit.
 
+:::note
+We collect usage metrics when you use the Devvit CLI. For more information, see [Reddit’s Developer Terms](https://www.redditinc.com/policies/developer-terms) and the [Reddit Privacy Policy](https://www.reddit.com/policies/privacy-policy). You can opt out at any time by using the `devvit metrics off` command.
+:::
+
 ## devvit create icons
 
 Bundles all `SVG` files in the `/assets` folder into a new file (`src/icons.ts` by default). Enabling you to import local SVG assets in your app code.
