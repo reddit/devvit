@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest, BlockType } from '@devvit/protos';
+import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 import { Devvit } from '../../Devvit.js';
@@ -81,7 +81,7 @@ describe('useState', () => {
         },
         BlockRenderRequest.fromPartial({
           type: BlockRenderEventType.RENDER_USER_ACTION,
-          id: `${BlockType.BLOCK_BUTTON}.onPress`,
+          id: `button.onPress`,
         }),
         {
           __renderState: {
@@ -114,7 +114,7 @@ describe('useState', () => {
         },
         BlockRenderRequest.fromPartial({
           type: BlockRenderEventType.RENDER_USER_ACTION,
-          id: `${BlockType.BLOCK_BUTTON}.onPress`,
+          id: `button.onPress`,
         }),
         {
           __renderState: {
@@ -149,7 +149,7 @@ describe('useState', () => {
         },
         BlockRenderRequest.fromPartial({
           type: BlockRenderEventType.RENDER_USER_ACTION,
-          id: `${BlockType.BLOCK_BUTTON}.onPress`,
+          id: `button.onPress`,
         }),
         undefined,
         mockMetadata,
@@ -239,7 +239,7 @@ describe('useState', () => {
       },
       BlockRenderRequest.fromPartial({
         type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `${BlockType.BLOCK_BUTTON}.onPress`,
+        id: `button.onPress`,
       }),
       {
         __renderState: {

@@ -1,7 +1,7 @@
 import type { Context } from './context.js';
+import type { Data } from './data.js';
 import type { Form, FormFunction, FormKey, FormValues } from './form.js';
 import type { ChannelOptions, ChannelStatus } from './realtime.js';
-import type { Data } from './data.js';
 
 export type Dispatch<A> = (value: A) => void;
 export type SetStateAction<S> = S | ((prevState: S) => S);
@@ -76,11 +76,11 @@ export type UseChannelHookState = {
 
 export type UseChannelResult = {
   /** Subscribe to the channel */
-  subscribe: () => void;
+  subscribe(): void;
   /** Unsubscribe from the channel */
-  unsubscribe: () => void;
+  unsubscribe(): void;
   /** Publish a message to the channel */
-  send: (data: Data) => Promise<void>;
+  send(data: Data): Promise<void>;
   /** Current subscription status */
   status: ChannelStatus;
 };

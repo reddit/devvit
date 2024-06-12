@@ -1,7 +1,7 @@
 import type { HandleUIEventRequest, HandleUIEventResponse, Metadata } from '@devvit/protos';
 import { EffectType, UIEventHandlerDefinition } from '@devvit/protos';
-import type { Config } from '@devvit/runtimes/api/Config.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
+import type { Config } from '@devvit/shared-types/Config.js';
 import cloneDeep from 'clone-deep';
 import isEqual from 'lodash.isequal';
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
@@ -13,6 +13,7 @@ import { BlocksReconciler } from './blocks/BlocksReconciler.js';
 import { getContextFromMetadata } from './context.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 import { getMenuItemById } from './menu-items.js';
+import { Header } from '@devvit/shared-types/Header.js';
 
 async function handleUIEvent(
   req: HandleUIEventRequest,
@@ -71,7 +72,13 @@ async function handleUIEvent(
 
     const context: Devvit.Context = Object.assign(
       apiClients,
-      getContextFromMetadata(metadata, postId, commentId)
+      getContextFromMetadata(metadata, postId, commentId),
+      {
+        uiEnvironment: {
+          timezone: metadata[Header.Timezone]?.values[0],
+          locale: metadata[Header.Language]?.values[0],
+        },
+      }
     );
 
     await formDefinition.onSubmit(

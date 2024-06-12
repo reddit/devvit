@@ -1,16 +1,16 @@
 # Dimensions
 
-Create responsive custom posts.
+Create responsive experience posts.
 
 :::note
 This is an experimental capability that may not be available on older mobile app versions.
 :::
 
-Dimensions provides a way for you to create responsive custom posts by giving you the dimensions of the root node as part of the context object. This lets you write responsive interfaces based on the space available within the context object.
+Dimensions provides a way for you to create responsive experiences by giving you the dimensions of the root node as part of the context object. This lets you write responsive interfaces based on the space available within the context object.
 
 Dimensions are dynamic and update in real time if the device or viewport changes. You can also resize your screen as you develop to see how your posts respond in real time. This is the same post displayed on a phone (left) and a tablet (right):
 
-![dimensions](./assets/dimensions.png)
+![A post that is aware of its size](./assets/custom-posts/custom-posts-dimensions.png)
 
 You can use dimensions to:
 
@@ -23,8 +23,8 @@ Dimension information is specified in density-independent pixels. These pixel un
 
 | Dimension | Description                                                                                                                                                                |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Height    | The pixel unit height of the custom post. This is a fixed value that will not change based on the height property provided on `Devvit.addCustomPostType`.                  |
-| Width     | The pixel width of the containing box for your custom post.                                                                                                                |
+| Height    | The pixel unit height of the experience post. This is a fixed value that will not change based on the height property provided on `Devvit.addCustomPostType`.              |
+| Width     | The pixel width of the containing box for your experience post.                                                                                                            |
 | Scale     | The [pixel scale](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio) that determines the resolution for how your custom post renders on the device. |
 
 ## Example

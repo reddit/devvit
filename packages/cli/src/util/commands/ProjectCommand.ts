@@ -7,6 +7,7 @@ export abstract class ProjectCommand extends DevvitCommand {
   #projectRoot: string | undefined;
 
   protected override async init(): Promise<void> {
+    await super.init();
     await this.assertProject();
   }
 
@@ -18,13 +19,13 @@ export abstract class ProjectCommand extends DevvitCommand {
   }
 
   protected async getProjectConfig(): Promise<DevvitConfig> {
-    return readDevvitConfig(this.projectRoot);
+    return readDevvitConfig(this.projectRoot, this.configFile);
   }
 
   // checks that the command is run in a devvit project
   protected async assertProject(): Promise<string> {
     if (this.#projectRoot) return this.#projectRoot;
-    const projectRoot = await findProjectRoot();
+    const projectRoot = await findProjectRoot(this.configFile);
     if (!projectRoot) {
       this.error(
         'Not in devvit project. Make sure that there is a valid devvit.yaml in the root of your project'

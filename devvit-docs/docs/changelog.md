@@ -4,17 +4,53 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 To use the latest version of Devvit, follow the [upgrade instructions](https://developers.reddit.com/docs/update-devvit).
 
+## Devvit 0.10.22: Adding image uploads to forms and CLI metrics
+
+**Release Date: June 10, 2024**
+
+Devvit 0.10.22 introduces an experimental feature update that lets you add [image uploads](./capabilities/forms.md#image-uploads) to forms. Right now it’s available on web, with Android and iOS support coming soon! We've also added CLI metrics that collect data and let us continually improve the developer experience. To opt out of this, run `devvit metrics off` after upgrading.
+
+This release also moves two features out of the experimental phase: [realtime](./capabilities/realtime.md) and [cache helper](./capabilities/cache.md) are good to go.
+
+## Devvit 0.10.21: @devvit/kit lets you build apps faster
+
+**Release Date: May 22, 2024**
+
+We’re introducing [@devvit/kit](./devvit_kit.md), a helper library that makes it easier to build Devvit apps. The kit includes UI components and general backend patterns that simplify common tasks, including pagination, columns, and toasts. We’ll be adding more to this kit and open-sourcing it soon!
+
+Also in this release, [secrets storage](./capabilities/secrets-storage.md) has been vetted and is no longer considered experimental.
+
+## Devvit 0.10.20 Experimental faster scheduler and breaking changes
+
+**Release Date: May 7, 2024**
+
+Devvit 0.10.20 introduces an experimental feature update that lets you [run scheduled jobs faster](./capabilities/scheduler.md#faster-scheduler) by adding seconds to your cron expression.
+
+**Breaking changes**
+
+- Two new moderator permissions were added: `channels` and `chat community`. This is a breaking change, which means:
+
+  - You’ll need to update your app and push a new version.
+  - Every installer needs to update their app to the latest version.
+
+- The `currentUser()` method can be undefined to support logged out users. This change doesn’t impact existing apps, but when you upgrade your app, you’ll need to handle both undefined and normal user object responses from this method.
+
+**Updates**
+
+- Fixed `useInterval` loop reliability on mobile clients.
+- Removed deprecated commands from `devvit help`.
+
 ## Devvit 0.10.19: Dimensions
 
 **Release Date: April 24, 2024**
 
-Devvit 0.10.19 lets you build responsive custom posts that render based on the user’s device. You can now use [dimensions](dimensions.md) within the context object to build a responsive app, and this experimental feature lets you resize your screen as you develop to see how your posts will respond in real time.
+Devvit 0.10.19 lets you build responsive custom posts that render based on the user’s device. You can now use [dimensions](./dimensions.md) within the context object to build a responsive app, and this experimental feature lets you resize your screen as you develop to see how your posts will respond in real time.
 
 ## Devvit 0.10.18: Realtime and menu action filters
 
 **Release Date: April 4, 2024**
 
-Devvit 0.10.18 introduces an experimental feature: [Realtime](realtime.md) to create live, event-driven custom posts. We’ve also added a filter that lets you decide where menu actions show up in custom posts.
+Devvit 0.10.18 introduces an experimental feature: [Realtime](./capabilities/realtime.md) to create live, event-driven custom posts. We’ve also added a filter that lets you decide where menu actions show up in custom posts.
 
 ## Devvit 0.10.16: New look and more on Blocks
 
@@ -34,7 +70,7 @@ Devvit 0.10.15 has updated error messages to clearly communicate loading states,
 Devvit 0.10.14 is a small release that brings more Redis improvements and fixes a few known issues.
 
 **Redis improvements**  
-We made [Redis](redis.md) errors more developer-friendly and also added new methods:
+We made [Redis](./capabilities/redis.md) errors more developer-friendly and also added new methods:
 
 - Sorted Sets: zrank and zincrby
 - Redis Hash: hincrby
@@ -42,14 +78,14 @@ We made [Redis](redis.md) errors more developer-friendly and also added new meth
 **Bug fixes**
 
 - Windows users were unable to use Devvit properly with the last release. This issue has been resolved.
-- The [cache helper](cache.md) now keeps track of local state and no longer causes unnecessary server calls.
+- The [cache helper](./capabilities/cache.md) now keeps track of local state and no longer causes unnecessary server calls.
 - `devvit playtest` and `devvit logs` output is less verbose and easier to understand.
 
 ## Devvit 0.10.13: Text wrapping and adding links (navigateTo)
 
 **Release Date: January 18, 2024**
 
-These two previously experimental features have been pressure-tested and are ready to graduate to released status. Check out how to [format text blocks](blocks/text) and [add links](adding_links.md) to your custom posts!
+These two previously experimental features have been pressure-tested and are ready to graduate to released status. Check out how to [format text blocks](./blocks/text.mdx) and [add links](./capabilities/adding-links.mdx) to your custom posts!
 
 These features are supported on the web and for Android and iOS Reddit app version 2023.50.0 and above (tap your snoovatar, then tap **Settings** and scroll all the way down to see your app version).
 
@@ -86,10 +122,10 @@ setCount((count) => count + 1); // Pass function to be given prior state.
 Devvit 0.10.11 introduces better visibility for the types of permissions your app uses and communicates that information to Reddit users and installers. We are also adding long-awaited features of secrets storage and global app configurations!
 
 **Secrets storage**  
-Developers can now store app variables containing sensitive information (like API keys or credentials) that won’t be visible to users. Learn how to set up [secrets storage](secrets_storage.md).
+Developers can now store app variables containing sensitive information (like API keys or credentials) that won’t be visible to users. Learn how to set up [secrets storage](./capabilities/secrets-storage.md).
 
 **Global app configuration**  
-You can now set app configuration at a global scope. These will not be modifiable by installers and are set via the CLI. See the changes to the [app configuration docs](install_settings.md).
+You can now set app configuration at a global scope. These will not be modifiable by installers and are set via the CLI. See the changes to the [app configuration docs](./capabilities/app-configurations.md).
 
 **App permissions labeling**  
 Your app permissions are now represented in the app details page, the install details page, and the CLI (if you are installing from the CLI) that shows users how the app will handle data once it’s installed. Check out the Devvit APIs associated with each label [here](./get-started/permissions.md).
@@ -104,16 +140,16 @@ Devvit 0.10.10 is a small release with fast follow improvements to our new Redis
 
 _**Redis improvements**_
 
-Based on the feedback from our Redis launch, we’ve included a few more [methods](redis.md) to make working with Redis easier.
+Based on the feedback from our Redis launch, we’ve included a few more [methods](./capabilities/redis.md) to make working with Redis easier.
 
 - Hash: hgetall, hscan, hdel, hkeys
 - Sorted Sets: zscore
 
-These methods enable additional functionality and get to parity with the kvStore’s list functionality. We’ve updated the migration guide [migration guide](migrate_kv_to_redis.md) to reflect these changes.
+These methods enable additional functionality and get to parity with the kvStore’s list functionality. We’ve updated the migration guide [migration guide](./migrate_kv_to_redis.md) to reflect these changes.
 
 _**Experimental link navigation**_
 
-Linking to pages on Reddit, as well as off-platform linkouts, is now available with [navigateTo](adding_links.md). For Reddit content, you will be able to use a thing id or the url.
+Linking to pages on Reddit, as well as off-platform linkouts, is now available with [navigateTo](./capabilities/adding-links.mdx). For Reddit content, you will be able to use a thing id or the url.
 
 :::note
 Off-platform linkouts will always include a warning dialogue for end-users to ensure a more secure experience.
@@ -121,7 +157,7 @@ Off-platform linkouts will always include a warning dialogue for end-users to en
 
 _**Experimental text wrapping**_
 
-Those of you working with our custom post feature will likely have noticed minimal control of text formatting. Our first expansion is the addition of attributes to help with [text wrapping](blocks/text).
+Those of you working with our custom post feature will likely have noticed minimal control of text formatting. Our first expansion is the addition of attributes to help with [text wrapping](./blocks/text.mdx).
 
 #
 
@@ -150,7 +186,7 @@ We are giving you early access to `useInterval`. This allows you to re-render yo
 
 **Release Date: October 24, 2023**
 
-0.10.8 offers more robust storage management with [Redis](https://developers.reddit.com/docs/redis). Up until now, our [key value store plugin](https://developers.reddit.com/docs/kv_store_plugin) has been built using Redis, but has lacked many of the useful features that are available directly via the open source tool, such as:
+0.10.8 offers more robust storage management with [Redis](./capabilities/redis.md). Up until now, our [key value store plugin](https://developers.reddit.com/docs/kv_store_plugin) has been built using Redis, but has lacked many of the useful features that are available directly via the open source tool, such as:
 
 - Transactions (e.g. counting votes atomically in polls)
 - More efficient reads and writes (e.g. batch writing, incrementing numbers)
@@ -174,7 +210,7 @@ With 0.10.7, you can publish your app to the Developer Portal in a private state
 
 **Updated app states and commands**:
 
-1. **Uploaded**: your app is available for use within test subreddits (less than 50 subscribers) you moderate. To do this, run devvit upload from your CLI.
+1. **Uploaded**: your app is available for use within test subreddits (less than 200 subscribers) you moderate. To do this, run devvit upload from your CLI.
 2. **Published**: your app can be installed in any subreddit you moderate, but cannot be installed, viewed, or managed by anyone else. To do this, run devvit publish from your CLI, or select “publish” on the app details page.
 3. **Publicly Listed**: your app can be viewed and installed by anyone else browsing the Developer Portal. **These apps must be pre-approved by our team.** [Submit your app for review here to have your app listed](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform?usp=sf_link).
 
@@ -301,7 +337,7 @@ There are currently four supported types of input:
 - Number
 - Dropdown selection
 
-Read more about [install settings](https://developers.reddit.com/docs/install_settings) and how to add them to your apps.
+Read more about [install settings](./capabilities/app-configurations.md) and how to add them to your apps.
 
 #### Updating to the latest version of Devvit:
 
@@ -322,13 +358,13 @@ npm i @devvit/tsconfig
 
 **Release date: May 11, 2023**
 
-Our long awaited [scheduler](https://developers.reddit.com/docs/scheduler) is finally here! The scheduler can store and execute future actions to your app, like sending a private message at a specified time, tracking upvotes, or scheduling time-outs for user actions. You can:
+Our long awaited [scheduler](./capabilities/scheduler.md) is finally here! The scheduler can store and execute future actions to your app, like sending a private message at a specified time, tracking upvotes, or scheduling time-outs for user actions. You can:
 
 - Schedule an action
 - Schedule a recurring action
 - Cancel an action
 
-Learn more about the Scheduler and how to implement it [here](https://developers.reddit.com/docs/scheduler).
+Learn more about the Scheduler and how to implement it [here](./capabilities/scheduler.md).
 
 _CLI Enhancements_
 

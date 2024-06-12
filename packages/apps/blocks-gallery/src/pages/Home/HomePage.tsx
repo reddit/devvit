@@ -1,13 +1,14 @@
 import { Devvit } from '@devvit/public-api';
 
 import { Columns } from '../../components/Columns.js';
-import { BlockGalleryProps } from '../../components/BlockGallery.js';
+import type { BlockGalleryProps } from '../../components/BlockGallery.js';
 
 export const HomePage = ({ state }: BlockGalleryProps): JSX.Element => {
   const pages: string[][] = [
     ['Button', 'buttons'],
     ['Image', 'images'],
     ['Stack', 'stacks'],
+    ['Stack Padding Gap', 'stacks-padding-gap'],
     ['Spacer', 'spacers'],
     ['Text', 'text'],
     ['Icon', 'icon'],

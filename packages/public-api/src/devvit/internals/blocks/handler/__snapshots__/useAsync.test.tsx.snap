@@ -2,17 +2,21 @@
 
 exports[`when circuit-breaking: false > receiving request 1`] = `
 {
-  "App.useAsync-0": {
+  "App.useAsync-2": {
     "data": null,
+    "depends": 1,
     "error": null,
     "loading": true,
   },
+  "App.useState-0": 1,
+  "App.useState-1": true,
 }
 `;
 
 exports[`when circuit-breaking: false > receiving response 1`] = `
 {
   "data": "hi world!",
+  "depends": 1,
   "error": null,
   "loading": false,
 }
@@ -20,17 +24,21 @@ exports[`when circuit-breaking: false > receiving response 1`] = `
 
 exports[`when circuit-breaking: true > receiving request 1`] = `
 {
-  "App.useAsync-0": {
+  "App.useAsync-2": {
     "data": null,
+    "depends": 1,
     "error": null,
     "loading": true,
   },
+  "App.useState-0": 1,
+  "App.useState-1": true,
 }
 `;
 
 exports[`when circuit-breaking: true > receiving response 1`] = `
 {
   "data": "hi world!",
+  "depends": 1,
   "error": null,
   "loading": false,
 }

@@ -2,41 +2,72 @@ import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { AsyncUseStateInitializer, UseAsyncResult } from '../../../../types/hooks.js';
 
 import type { AsyncResponse, UIEvent } from '@devvit/protos';
-import { EffectType } from '@devvit/protos';
-import type { Hook, HookParams } from './types.js';
+import { CIRCUIT_BREAKER_MSG } from '@devvit/shared-types/CircuitBreaker.js';
+import isEqual from 'lodash.isequal';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
+import type { Hook, HookParams } from './types.js';
+export type AsyncOptions = {
+  /**
+   * The data loader will re-run if the value of `depends` changes.
+   */
+  depends?: JSONValue;
+
+  /**
+   * If `enabled` is false, the data loader will not run.
+   */
+  enabled?: boolean;
+};
 
 class AsyncHook<S extends JSONValue> implements Hook {
-  state: UseAsyncResult<S>;
+  state: UseAsyncResult<S> & { depends: JSONValue };
+  readonly #debug: boolean;
   #hookId: string;
   #initializer: AsyncUseStateInitializer<S>;
-  #changed: () => void;
+  #invalidate: () => void;
+  #ctx: RenderContext;
+  #localDepends: JSONValue;
+  #enabled: boolean;
 
-  constructor(initializer: AsyncUseStateInitializer<S>, params: HookParams) {
-    this.state = { data: null, loading: false, error: null };
+  constructor(initializer: AsyncUseStateInitializer<S>, options: AsyncOptions, params: HookParams) {
+    this.#debug = !!params.context.devvitContext.debug.useAsync;
+    if (this.#debug) console.debug('[useAsync] v1', options);
+    this.state = { data: null, loading: false, error: null, depends: null };
     this.#hookId = params.hookId;
     this.#initializer = initializer;
-    this.#changed = params.changed;
+    this.#invalidate = params.invalidate;
+    this.#ctx = params.context;
+    this.#localDepends = options.depends ?? null;
+    this.#enabled = options.enabled ?? true;
   }
 
   /**
    * After we look at our state, we need to decide if we need to dispatch a request to load the data.
    */
-  onLoad(context: RenderContext): void {
-    if (this.state.data === null && this.state.error === null && this.state.loading === false) {
+  onStateLoaded(): void {
+    if (!this.#enabled) {
+      return;
+    }
+    if (this.#debug) console.debug('[useAsync] async onLoad ', this.#hookId, this.state);
+    if (this.#debug)
+      console.debug('[useAsync] async onLoad have ', this.#localDepends, 'and', this.state.depends);
+    if (
+      !isEqual(this.#localDepends, this.state.depends) ||
+      (this.state.data === null && this.state.error === null && this.state.loading === false)
+    ) {
       this.state.loading = true;
-      this.#changed();
-      context.emitEffect(this.#hookId, {
-        type: EffectType.EFFECT_SEND_EVENT,
-        sendEvent: {
-          event: {
-            asyncRequest: { requestId: this.#hookId },
-            async: true,
-            hook: this.#hookId,
-          },
+      this.state.depends = this.#localDepends;
+      this.#invalidate();
+
+      const requeueEvent: UIEvent = {
+        hook: this.#hookId,
+        async: true,
+        asyncRequest: {
+          requestId: this.#hookId + '-' + JSON.stringify(this.state.depends),
         },
-      });
+      };
+      if (this.#debug) console.debug('[useAsync] onLoad requeue');
+      this.#ctx.addToRequeueEvents(requeueEvent);
     }
   }
 
@@ -55,29 +86,34 @@ class AsyncHook<S extends JSONValue> implements Hook {
         };
       } catch (e) {
         if (e instanceof Error) {
+          if (e.message === CIRCUIT_BREAKER_MSG) {
+            throw e;
+          }
           asyncResponse.error = { message: e.message, details: e.stack ?? '' };
         } else {
           asyncResponse.error = { message: 'Unknown error', details: String(e) };
         }
       }
 
-      context.emitEffect(this.#hookId, {
-        type: EffectType.EFFECT_SEND_EVENT,
-        sendEvent: {
-          event: {
-            asyncResponse,
-            hook: this.#hookId,
-          },
-        },
-      });
-    } else if (event.asyncResponse) {
-      const result: UseAsyncResult<S> = {
-        data: event.asyncResponse.data?.value as S | null,
-        loading: false,
-        error: event.asyncResponse.error ?? null,
+      const requeueEvent: UIEvent = {
+        asyncResponse: asyncResponse,
+        hook: this.#hookId,
       };
-      this.state = result;
-      this.#changed();
+      if (this.#debug) console.debug('[useAsync] onReq requeue');
+      context.addToRequeueEvents(requeueEvent);
+    } else if (event.asyncResponse) {
+      const anticipatedRequestId = this.#hookId + '-' + JSON.stringify(this.state.depends);
+      if (event.asyncResponse.requestId === anticipatedRequestId) {
+        const result = {
+          data: event.asyncResponse.data?.value as S | null,
+          loading: false,
+          error: event.asyncResponse.error ?? null,
+        };
+        this.state = { ...this.state, ...result };
+        this.#invalidate();
+      } else {
+        if (this.#debug) console.debug('[useAsync] onResp skip, stale event');
+      }
     } else {
       throw new Error('Unknown event type');
     }
@@ -91,10 +127,11 @@ class AsyncHook<S extends JSONValue> implements Hook {
  * @returns UseAsyncResult<S>
  */
 export function useAsync<S extends JSONValue>(
-  initializer: AsyncUseStateInitializer<S>
+  initializer: AsyncUseStateInitializer<S>,
+  options: AsyncOptions = {}
 ): UseAsyncResult<S> {
   const hook = registerHook({ namespace: 'useAsync' }, (params) => {
-    return new AsyncHook(initializer, params);
+    return new AsyncHook(initializer, options, params);
   });
 
   return hook.state;

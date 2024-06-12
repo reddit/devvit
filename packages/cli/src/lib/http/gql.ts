@@ -1,7 +1,7 @@
-import type { StoredToken } from '@devvit/protos';
 import type { JSONObject } from '@devvit/shared-types/json.js';
 import fetch from 'node-fetch';
 import { GQL_QUERY_URL } from '../../util/config.js';
+import type { StoredToken } from '../auth/StoredToken.js';
 import { MY_PORTAL_ENABLED } from '../config.js';
 
 // TODO: figure out how to get proper types from graphql.ts in portal
@@ -66,7 +66,7 @@ export async function fetchSubredditSubscriberCount(
   if (MY_PORTAL_ENABLED) return 0;
 
   const subredditInfo = await gqlQuery<
-    { subredditInfoByName: { subscribersCount: number } },
+    { subredditInfoByName: { subscribersCount: number } | null },
     { name: string }
   >({
     accessToken: token.accessToken,
@@ -74,6 +74,9 @@ export async function fetchSubredditSubscriberCount(
     name: 'GetSubredditInfoByName',
     variables: { name: subreddit },
   });
+  if (!subredditInfo.data.subredditInfoByName) {
+    throw new Error(`Community '${subreddit}' not found.`);
+  }
   return subredditInfo.data.subredditInfoByName.subscribersCount;
 }
 

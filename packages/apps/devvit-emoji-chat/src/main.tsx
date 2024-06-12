@@ -13,8 +13,9 @@ Devvit.addCustomPostType({
   name: 'Devvit Chat',
   height: 'tall',
   render: ({ reddit, useChannel, useState, useForm, useInterval, ui }) => {
-    const [me] = useState<UserRecord>(async () => {
+    const [me] = useState<UserRecord | undefined>(async () => {
       const user = await reddit.getCurrentUser();
+      if (!user) return;
       return {
         id: user.id,
         session: sessionId(),
@@ -23,7 +24,7 @@ Devvit.addCustomPostType({
       };
     });
     const [log, setLog] = useState<RealtimeMessage[]>([]);
-    const [userList, setUserList] = useState<Record<string, UserRecord>>({ [me.id]: me });
+    const [userList, setUserList] = useState<Record<string, UserRecord>>(me ? { [me.id]: me } : {});
     const [userLastSeen, setUserLastSeen] = useState<Record<string, number>>({});
 
     const addLog = (msg: RealtimeMessage): void => {
@@ -32,6 +33,7 @@ Devvit.addCustomPostType({
     };
 
     const send = (msg: string) => async () => {
+      if (!me) return;
       const message: ChatMessage = {
         type: MsgType.Message,
         user: me,
@@ -47,7 +49,7 @@ Devvit.addCustomPostType({
         const msg = data as RealtimeMessage;
         const now = Date.now();
 
-        if (msg.user.id === me.id && msg.user.session === me.session) {
+        if (!me || (msg.user.id === me.id && msg.user.session === me.session)) {
           return;
         }
 
@@ -80,7 +82,7 @@ Devvit.addCustomPostType({
     const userTimeout = useInterval(async () => {
       const now = Date.now();
       for (const user of Object.keys(userList)) {
-        if (now - userLastSeen[user] > 5000 && user !== me.id) {
+        if (now - userLastSeen[user] > 5000 && user !== me?.id) {
           addLog({
             type: MsgType.Presence,
             user: userList[user],

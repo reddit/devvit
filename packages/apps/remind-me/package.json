@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "remind-me-app",
-  "version": "0.10.19",
+  "version": "0.10.22",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -9,12 +9,15 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/protos": "0.10.19",
-    "@devvit/public-api": "0.10.19",
+    "@devvit/protos": "0.10.22",
+    "@devvit/public-api": "0.10.22",
     "chrono-node": "2.3.9"
   },
   "devDependencies": {
+    "@devvit/eslint-config": "0.10.22",
+    "@devvit/repo-tools": "0.10.22",
+    "@devvit/tsconfig": "0.10.22",
     "typescript": "5.3.2",
-    "vitest": "0.31.0"
+    "vitest": "1.6.0"
   }
 }

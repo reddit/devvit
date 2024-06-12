@@ -5,14 +5,13 @@ import type {
   UserDataByAccountIdsResponse_UserAccountData,
   User as UserProto,
 } from '@devvit/protos';
-import { getFromMetadata } from '@devvit/runtimes/common/envelope/EnvelopeUtil.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
 import { Devvit } from '../../../devvit/Devvit.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
-import { asModPermissions, formatModeratorPermissions } from '../helpers/permissions.js';
+import { formatModeratorPermissions, validModPermissions } from '../helpers/permissions.js';
 import type { GetCommentsByUserOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { UserFlair } from './Flair.js';
@@ -142,7 +141,7 @@ export class User {
 
     if (data.modPermissions) {
       for (const [subredditName, permissions] of Object.entries(data.modPermissions)) {
-        this.#modPermissionsBySubreddit.set(subredditName, permissions.map(asModPermissions));
+        this.#modPermissionsBySubreddit.set(subredditName, validModPermissions(permissions));
       }
     }
 
@@ -340,15 +339,14 @@ export class User {
   }
 
   /** @internal */
-  static async getById(id: T2ID, metadata: Metadata | undefined): Promise<User> {
+  static async getById(id: T2ID, metadata: Metadata | undefined): Promise<User | undefined> {
     const client = Devvit.redditAPIPlugins.Users;
 
     const response = await client.UserDataByAccountIds({ ids: id }, metadata);
 
     const username = response?.users?.[id]?.name;
-    assertNonNull(username, 'Expected the username in response to be not null');
 
-    return User.getByUsername(username, metadata);
+    return username == null ? undefined : User.getByUsername(username, metadata);
   }
 
   /** @internal */
@@ -375,7 +373,7 @@ export class User {
     metadata: Metadata | undefined
   ): Promise<User | undefined> {
     assertNonNull(metadata);
-    const userId = getFromMetadata(key, metadata);
+    const userId = metadata?.[key]?.values[0];
     return userId ? User.getById(asT2ID(userId), metadata) : Promise.resolve(undefined);
   }
 

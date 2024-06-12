@@ -2,7 +2,7 @@
 
 Specify the height and element sizes.
 
-There are two sets of dimensions that you’ll need to think about when creating a custom post: the height of the post itself and the dimensions of the elements within the post. These dimensions will let you create responsive designs that will render consistently across platforms.
+There are two sets of dimensions that you’ll need to think about when creating an experience post: the height of the post itself and the dimensions of the elements within the post. These dimensions will let you create responsive designs that will render consistently across platforms.
 
 ## Post height
 
@@ -55,7 +55,7 @@ export default Devvit;
 
 ## Min/max height and width
 
-You can also specify the minimum and maximum height and width in your custom post to get the desired layout across platforms. Use `minWidth`, `maxWidth`, `minHeight`, and `maxHeight` to set these parameters.
+You can also specify the minimum and maximum height and width in your experience post to get the desired layout across platforms. Use `minWidth`, `maxWidth`, `minHeight`, and `maxHeight` to set these parameters.
 
 ### [Playground link](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAbaDJgDoIAgQGEJaMlwAKxMwBUAnoRgAKYBooVIseLwBy0GDzIbhQYMGBCGN4A+ljEYGQwAB6UALwAfFTB7qFkEhhgFE5Z7hQAPHRmEFgA1hQA7ngCZAAWKTwAjAAMnYSJPBRQEIkAEjB4AObNZG1dPX0UUlXV45wS4UbEMqRtdjAyW3U8acUlJaXNlTVppQnJFGh4AF4wKWogiYkyEBjjMG9pAGUuDAKAAZb6-Cg2JKUUahUqiW5ka6iC5kJbHAqnMqiCroq7FACUwWYGmYxM0YCSJHIFCEbAgEhklG0Ig0KBAdBgGAecQQ7WYQA)
 

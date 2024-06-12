@@ -1,7 +1,12 @@
+import type { Metadata, UIDimensions, UIEnvironment } from '@devvit/protos';
+import type { AppDebug } from '@devvit/shared-types/Header.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { AssetsClient } from '../apis/AssetsClient/AssetsClient.js';
 import type { ModLogClient } from '../apis/modLog/ModLogClient.js';
+import type { RealtimeClient } from '../apis/realtime/RealtimeClient.js';
 import type { RedditAPIClient } from '../apis/reddit/RedditAPIClient.js';
+import type { EffectEmitter } from '../devvit/internals/blocks/EffectEmitter.js';
+import type { CacheHelper } from '../devvit/internals/cache.js';
 import type { UseChannelHook, UseFormHook, UseIntervalHook, UseStateResult } from './hooks.js';
 import type { KVStore } from './kvStore.js';
 import type { MediaPlugin } from './media.js';
@@ -9,14 +14,26 @@ import type { RedisClient } from './redis.js';
 import type { Scheduler } from './scheduler.js';
 import type { SettingsClient } from './settings.js';
 import type { UIClient } from './ui-client.js';
-import type { Dimensions, Metadata } from '@devvit/protos';
-import type { CacheHelper } from '../devvit/internals/cache.js';
-import type { RealtimeClient } from '../apis/realtime/RealtimeClient.js';
-import type { EffectEmitter } from '../devvit/internals/blocks/EffectEmitter.js';
 
 export type ContextDebugInfo = {
-  metadata: Metadata;
   effects?: EffectEmitter;
+  metadata: Metadata;
+} & {
+  /**
+   * Debug modes enabled by the case-sensitive devvitDebug CSV query parameter.
+   * The parameter is split on commas and passed to devvit-debug metadata.
+   * Missing values default to `'true'`. The convention is to interpret values
+   * as truthy.
+   *
+   * See ContextDebugInfo for app side.
+   *
+   * Any type removals may cause type errors but not runtime errors.
+   *
+   * Prefix mode-specific logging like `[blocks]` or `[useChannel]`. Favor
+   * console.debug() and set Chromium DevTools to verbose log levels.
+   */
+
+  [key in AppDebug]?: string;
 };
 
 export type BaseContext = {
@@ -92,7 +109,14 @@ export type ContextAPIClients = {
    * Information about about a custom post's layout. Will be undefined
    * for non custom post surface areas such as menu items and task schedulers.
    */
-  dimensions?: Dimensions;
+  dimensions?: UIDimensions;
+  /**
+   * @experimental
+   *
+   * Additional information about client environment.
+   * Will be undefined for non-ui contexts such as task schedulers or triggers.
+   */
+  uiEnvironment?: UIEnvironment;
   /** A client for the User Interface API */
   ui: UIClient;
   /**

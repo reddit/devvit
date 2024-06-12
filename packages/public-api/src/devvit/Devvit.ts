@@ -1,7 +1,7 @@
 import * as protos from '@devvit/protos';
-import { Actor } from '@devvit/runtimes/api/Actor.js';
-import type { Config } from '@devvit/runtimes/api/Config.js';
+import { Actor } from '@devvit/shared-types/Actor.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
+import type { Config } from '@devvit/shared-types/Config.js';
 import { assertValidFormFields } from '../apis/ui/helpers/assertValidFormFields.js';
 import type {
   BaseContext,
@@ -37,6 +37,7 @@ import { registerScheduler } from './internals/scheduler.js';
 import { registerTriggers } from './internals/triggers.js';
 import { registerUIEventHandler } from './internals/ui-event-handler.js';
 import { registerUIRequestHandlers } from './internals/ui-request-handler.js';
+import type { AssetMap } from '@devvit/shared-types/Assets.js';
 
 type UseHandler = {
   [name: string]: (args: protos.UnknownMessage | undefined, metadata?: protos.Metadata) => void;
@@ -67,28 +68,32 @@ type PluginType =
   | protos.MediaService
   | protos.PostCollections
   | protos.RedditAPIV2
-  | protos.AssetResolver
   | protos.Realtime;
 
-export class Devvit extends Actor {
+/**
+ * Home for debug flags, settings, and other information. Any type removals
+ * may cause type errors but not runtime errors.
+ *
+ * **Favor ContextDebugInfo since request-based state is preferred.**
+ */
+type DevvitDebug = {
   /**
-   * Home for debug flags, settings, and other information.
+   * Should debug block rendering in console.log according to the reified JSX/XML output. Example:
+   *
+   *     <hstack><text>hi world</text></hstack>
+   *
    */
-  static debug = {
-    /**
-     * Should debug block rendering in console.log according to the reified JSX/XML output.  Example:
-     *
-     *     <hstack><text>hi world</text></hstack>
-     *
-     */
-    emitSnapshots: false,
+  emitSnapshots?: boolean | undefined;
 
-    /**
-     * Should console.log the state of the app after every event.
-     *
-     */
-    emitState: false,
-  };
+  /**
+   * Should console.log the state of the app after every event.
+   *
+   */
+  emitState?: boolean | undefined;
+};
+
+export class Devvit extends Actor {
+  static debug: DevvitDebug = {};
   static #configuration: Configuration = {};
   static #menuItems: MenuItem[] = [];
   static #customPostType: CustomPostType | undefined;
@@ -443,6 +448,12 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
+  static #assets: AssetMap = {};
+
+  /** @internal */
+  static #webviewAssets: AssetMap = {};
+
+  /** @internal */
   static get redditAPIPlugins(): {
     NewModmail: protos.NewModmail;
     Widgets: protos.Widgets;
@@ -563,17 +574,6 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static get assetsPlugin(): protos.AssetResolver {
-    const assets = this.#pluginClients[protos.AssetResolverDefinition.fullName];
-    if (!assets) {
-      throw new Error(
-        'AssetsService is not available. This should not happen, and indicates a setup problem with the runtime.'
-      );
-    }
-    return assets as protos.AssetResolver;
-  }
-
-  /** @internal */
   static get settingsPlugin(): protos.Settings {
     const settings = this.#pluginClients[protos.SettingsDefinition.fullName];
 
@@ -638,11 +638,20 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
+  static get assets(): AssetMap {
+    return Devvit.#assets;
+  }
+
+  /** @internal */
+  static get webviewAssets(): AssetMap {
+    return Devvit.#webviewAssets;
+  }
+
+  /** @internal */
   constructor(config: Config) {
     super(config);
 
-    // All apps can use the asset resolver without asking.
-    Devvit.#use(protos.AssetResolverDefinition);
+    Devvit.#assets = config.assets ?? {};
 
     for (const fullName in Devvit.#uses) {
       const use = Devvit.#uses[fullName];
@@ -681,6 +690,9 @@ export class Devvit extends Actor {
     if (Devvit.#triggerOnEventHandlers.size > 0) {
       registerTriggers(config);
     }
+
+    Devvit.#assets = config.assets ?? {};
+    Devvit.#webviewAssets = config.webviewAssets ?? {};
   }
 }
 
@@ -884,11 +896,24 @@ export namespace Devvit {
       state?: Data;
     };
 
+    export type OnMessageEvent = {
+      type: string;
+      data?: Data;
+    };
+
     export type OnPressEventHandler = (event: OnPressEvent) => void | Promise<void>;
+
+    export type OnWebViewEventHandler = (event: OnMessageEvent) => void | Promise<void>;
 
     export type Actionable = {
       onPress?: OnPressEventHandler | undefined;
     };
+
+    export type WebViewActionable = {
+      onMessage?: OnWebViewEventHandler | undefined;
+    };
+
+    export type ActionHandlers = keyof (Actionable & WebViewActionable);
 
     export type HasElementChildren = {
       children?: Devvit.ElementChildren;
@@ -1001,9 +1026,11 @@ export namespace Devvit {
         direction?: AnimationDirection | undefined;
       };
 
-    export type WebViewProps = BaseProps & {
-      url: string;
-    };
+    export type WebViewProps = BaseProps &
+      WebViewActionable & {
+        url: string;
+        state?: Data;
+      };
   }
 }
 

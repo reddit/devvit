@@ -9,7 +9,7 @@ const Example: BlockComponent<{ width: number; height: number }> = ({ width, hei
   </Tile>
 );
 
-export const SizeAbsoluteCategory = () => (
+export const SizeAbsoluteCategory = (): JSX.Element => (
   <hstack gap={'small'}>
     <vstack gap={'small'}>
       <Example width={20} height={33} />

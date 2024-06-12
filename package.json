@@ -21,6 +21,7 @@
     "clean:nuke": "yarn cache clean --all && git clean -dffx -e .idea -e devvit.iml",
     "clobber": "npx --yes turbo run clobber --output-logs=new-only && rm -rf node_modules",
     "dev": "turbo run dev --output-logs=new-only --parallel",
+    "dev:play": "turbo run dev:build --filter=previews --filter=protos --filter=public-api --filter=runtime-lite --filter=shared-types --filter=ui-renderer --parallel --include-dependencies",
     "docs:build": "yarn workspace devvit-docs docs:build",
     "docs:gen": "yarn workspace devvit-docs gen:all",
     "docs:start": "yarn workspace devvit-docs docs:start",
@@ -57,9 +58,8 @@
     "devvit-docs",
     "packages/*",
     "packages/apps/**",
-    "packages/build-pack/__tests__/test-lib/templates/devvit-project/**/*",
     "packages/build-pack/src/__tests__/test-actors/**/*",
-    "packages/internal-examples/internal-projects/**/!(dev-platform-automod)"
+    "packages/internal-examples/internal-projects/**/*"
   ],
   "resolutions": {
     "chalk": "4.1.2",
@@ -71,7 +71,7 @@
     "strip-ansi@3.0.1/ansi-regex": "3.0.1",
     "http-cache-semantics": "^4.1.1",
     "@xmldom/xmldom": "^0.8.4",
-    "vite": "4.5.1",
+    "vite": "5.2.12",
     "long": "4.0.0"
   },
   "dependencies": {
@@ -92,7 +92,7 @@
     "prettier-package-json": "2.8.0",
     "turbo": "1.6.3",
     "typedoc": "0.25.6",
-    "vitest": "0.31.0"
+    "vitest": "1.6.0"
   },
   "engines": {
     "node": ">=18.18.2"

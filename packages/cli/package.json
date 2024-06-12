@@ -1,6 +1,6 @@
 {
   "name": "@devvit/cli",
-  "version": "0.10.19",
+  "version": "0.10.22",
   "description": "Reddit's Dev Platform CLI Tool",
   "license": "BSD-3-Clause",
   "author": "@reddit/dev-platform",
@@ -42,12 +42,12 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@devvit/build-pack": "0.10.19",
-    "@devvit/play": "0.0.35",
-    "@devvit/protos": "0.10.19",
-    "@devvit/public-api": "0.10.19",
-    "@devvit/runtimes": "0.10.19",
-    "@devvit/shared-types": "0.10.19",
+    "@devvit/build-pack": "0.10.22",
+    "@devvit/play": "0.0.38",
+    "@devvit/protos": "0.10.22",
+    "@devvit/public-api": "0.10.22",
+    "@devvit/runtimes": "0.10.22",
+    "@devvit/shared-types": "0.10.22",
     "@improbable-eng/grpc-web": "0.15.0",
     "@improbable-eng/grpc-web-node-http-transport": "0.15.0",
     "@oclif/core": "2.9.4",
@@ -68,7 +68,7 @@
     "lookpath": "1.2.2",
     "mustache": "4.2.0",
     "node-fetch": "3.3.0",
-    "open": "8.4.0",
+    "open": "10.1.0",
     "ps-node": "^0.1.6",
     "rxjs": "7.8.1",
     "semver": "7.5.0",
@@ -79,9 +79,9 @@
     "ws": "8.11.0"
   },
   "devDependencies": {
-    "@devvit/eslint-config": "0.10.19",
-    "@devvit/repo-tools": "0.10.19",
-    "@devvit/tsconfig": "0.10.19",
+    "@devvit/eslint-config": "0.10.22",
+    "@devvit/repo-tools": "0.10.22",
+    "@devvit/tsconfig": "0.10.22",
     "@types/file-type": "10.9.1",
     "@types/inquirer": "9.0.3",
     "@types/js-yaml": "4.0.5",
@@ -93,11 +93,11 @@
     "chai": "4.3.7",
     "concurrently": "7.5.0",
     "eslint": "8.9.0",
-    "oclif": "3.10.0",
+    "oclif": "3.17.2",
     "shx": "0.3.4",
     "tmp-promise": "3.0.3",
     "typescript": "5.3.2",
-    "vitest": "0.31.0"
+    "vitest": "1.6.0"
   },
   "engines": {
     "node": ">=18.18.2"
@@ -114,7 +114,10 @@
     "helpClass": "./dist/lib/help",
     "topicSeparator": " ",
     "hooks": {
-      "init": "./dist/lib/hooks/init/check-update.js"
+      "init": [
+        "./dist/lib/hooks/init/check-update.js",
+        "./dist/lib/hooks/init/fire-event.js"
+      ]
     }
   }
 }

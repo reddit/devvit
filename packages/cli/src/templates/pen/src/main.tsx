@@ -9,10 +9,10 @@ Devvit.configure({
 });
 
 /*
- * Use a menu action to create a custom post
+ * Use a menu action to create a new post
  */
 Devvit.addMenuItem({
-  label: 'New custom post',
+  label: 'New experience',
   location: 'subreddit',
   /*
    * _ tells Typescript we don't care about the first argument
@@ -24,23 +24,23 @@ Devvit.addMenuItem({
     const subreddit = await reddit.getCurrentSubreddit();
 
     /*
-     * Submits the custom post to the specified subreddit
+     * Submits the post to the specified subreddit
      */
     await reddit.submitPost({
-      // This will show while your custom post is loading
+      // This will show while your post is loading
       preview: (
         <vstack padding="medium" cornerRadius="medium">
           <text style="heading" size="medium">
-            Loading custom post hello world...
+            Loading hello world post...
           </text>
         </vstack>
       ),
-      title: `${subreddit.name} Hello Custom Post`,
+      title: `${subreddit.name} Hello World`,
       subredditName: subreddit.name,
     });
 
     ui.showToast({
-      text: `Successfully created a Hello World custom post!`,
+      text: `Successfully created a Hello World post!`,
       appearance: 'success',
     });
   },

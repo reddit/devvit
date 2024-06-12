@@ -156,34 +156,15 @@ export async function fetchSubscriptions(context: Devvit.Context): Promise<{
     const info = results[i];
     await context.kvStore.put(makeKeyForSubscription(sub), JSON.stringify(info));
 
-    /// due to the nature of a cricket match UI, we only want to stop subscribing
-    /// after it has passed a day after the event so the UI can render
-    if (info.event.gameType === 'cricket') {
-      const matchDate = new Date(info.event.date);
-      const todaysDate = new Date();
-      const diff = matchDate.getTime() - todaysDate.getTime();
-      const diffDays = Math.round(diff / (1000 * 3600 * 24));
-
-      /// older than yesterday
-      if (diffDays < -1 && info.event.state === EventState.FINAL) {
-        console.log(`Game ID ${info.event.id} (${info.event.awayTeam.abbreviation} @ \
-          ${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.eventId}.`);
-        await removeSubscription(context.kvStore, JSON.stringify(sub));
-        canceledGameScoreInfos.push(info);
-      } else {
-        activeGameScoreInfos.push(info);
-      }
-      /// treat other sports the same way as before
+    if (info.event.state === EventState.FINAL) {
+      console.log(`Game ID ${info.event.id} (${info.event.awayTeam.abbreviation} @ \
+${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.eventId}.`);
+      await removeSubscription(context.kvStore, JSON.stringify(sub));
+      canceledGameScoreInfos.push(info);
     } else {
-      if (info.event.state === EventState.FINAL) {
-        console.log(`Game ID ${info.event.id} (${info.event.awayTeam.abbreviation} @ \
-  ${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.eventId}.`);
-        await removeSubscription(context.kvStore, JSON.stringify(sub));
-        canceledGameScoreInfos.push(info);
-      } else {
-        activeGameScoreInfos.push(info);
-      }
+      activeGameScoreInfos.push(info);
     }
+
     if (info.event.gameType === 'football') {
       const footballInfo = info as NFLGameScoreInfo;
       if (footballInfo.lastEvent) {

@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
-import { CategoryPage, CategoryPageState } from '../../components/CategoryPage.js';
+import type { CategoryPageState } from '../../components/CategoryPage.js';
+import { CategoryPage } from '../../components/CategoryPage.js';
 import { ColorPrimitivePreview } from './ColorPrimitivesPreview.js';
 
 export const ColorPrimitivesPage = ({ state }: { state: CategoryPageState }): JSX.Element => {

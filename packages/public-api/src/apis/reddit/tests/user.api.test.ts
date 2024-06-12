@@ -3,7 +3,9 @@ import { describe, expect, test, vi } from 'vitest';
 import { Devvit } from '../../../devvit/Devvit.js';
 import type { RedditAPIClient } from '../RedditAPIClient.js';
 import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
+import type { ModeratorPermission } from '../models/User.js';
 import { User } from '../models/User.js';
+import { MODERATOR_PERMISSIONS } from '../helpers/permissions.js';
 
 describe('User API', () => {
   const subredditName = 'someTestSub';
@@ -54,6 +56,24 @@ describe('User API', () => {
         user: mockUserFliar.user,
         flairText: mockUserFliar.flairText,
       });
+    });
+
+    test('modPermissions() works with new, unknown permissions', async () => {
+      const user = new User(
+        {
+          id: 'someID',
+          name: username,
+          createdUtc: Date.now(),
+          snoovatarSize: [1],
+          modPermissions: { test: [MODERATOR_PERMISSIONS[0], 'something-unknown'] },
+        },
+        api.metadata
+      );
+
+      const understoodPermissions = new Map<string, ModeratorPermission[]>();
+      understoodPermissions.set('test', [MODERATOR_PERMISSIONS[0] as ModeratorPermission]);
+
+      expect(user.modPermissions).toEqual(understoodPermissions);
     });
   });
 });

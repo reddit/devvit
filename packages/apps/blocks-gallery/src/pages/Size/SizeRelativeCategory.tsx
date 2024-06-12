@@ -1,8 +1,7 @@
 import { Devvit } from '@devvit/public-api';
-
+import { Bar } from '../../components/Bar.js';
 import { Tile } from '../../components/Tile.js';
 import BlockComponent = Devvit.BlockComponent;
-import { Bar } from '../../components/Bar.js';
 
 const ExampleWidth: BlockComponent<{ width: number }> = ({ width }) => (
   <Tile label={`Width ${width}%`}>
@@ -14,7 +13,7 @@ const ExampleWidth: BlockComponent<{ width: number }> = ({ width }) => (
   </Tile>
 );
 
-export const SizeRelativeCategory = () => (
+export const SizeRelativeCategory = (): JSX.Element => (
   <>
     <ExampleWidth width={100} />
     <ExampleWidth width={66} />

@@ -6,7 +6,8 @@ import { defer, mergeMap, Observable } from 'rxjs';
 import pkg from '@improbable-eng/grpc-web';
 const { grpc } = pkg;
 
-import type { Rpc, StoredToken } from '@devvit/protos';
+import type { Rpc } from '@devvit/protos';
+import type { StoredToken } from '../lib/auth/StoredToken.js';
 
 import { HEADER_AUTHORIZATION } from '../constants/Headers.js';
 

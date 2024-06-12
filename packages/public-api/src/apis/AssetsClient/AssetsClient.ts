@@ -1,96 +1,96 @@
-import type { AssetResolver, Metadata } from '@devvit/protos';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
+import { Devvit } from '../../devvit/Devvit.js';
+
+export type GetURLOptions = {
+  webview?: boolean | undefined;
+};
 
 export class AssetsClient {
-  readonly #metadata: Metadata;
-  readonly #assetsPluginFetcher: () => AssetResolver;
+  readonly #assetMap: AssetMap = {};
+  readonly #webviewAssetMap: AssetMap = {};
 
-  constructor(metadata: Metadata, assetsPluginFetcher: () => AssetResolver) {
-    this.#metadata = metadata;
-    this.#assetsPluginFetcher = assetsPluginFetcher;
+  constructor() {
+    this.#assetMap = Devvit.assets;
+    this.#webviewAssetMap = Devvit.webviewAssets;
   }
 
   /**
    * Gets the public URLs for an asset.
    * @param assetPath A path, relative to the 'assets/' folder.
+   * @param options
    * @returns The public URL for that asset (https://i.redd.it/<id>.<ext>)
    */
-  async getURL(assetPath: string): Promise<string>;
+  getURL(assetPath: string): string;
+
+  getURL(assetPath: string, options: GetURLOptions | undefined): string;
+
   /**
    * Gets the public URLs for multiple assets.
    * @param assetPaths An array of paths, relative to the 'assets/' folder.
    * @returns A map of each asset path to its public URL (https://i.redd.it/<id>.<ext>)
    */
-  async getURL(assetPaths: string[]): Promise<NonNullable<AssetMap>>;
+  getURL(assetPaths: string[]): AssetMap;
+
+  getURL(assetPaths: string[], options: GetURLOptions | undefined): AssetMap;
   /**
    * Takes one or more asset names, relative to the 'assets/' folder, and returns either the
    * public URL for that one asset, or a map of each asset name to its URL.
    * @param assetPathOrPaths - Either the path you need the public URL for, or an array of paths.
+   * @param options
    * @returns Either the public URL for the one asset you asked for, or a map of assets to their URLs.
    */
-  async getURL(assetPathOrPaths: string | string[]): Promise<string | NonNullable<AssetMap>> {
+  getURL(
+    assetPathOrPaths: string | string[],
+    options?: GetURLOptions | undefined
+  ): string | AssetMap {
     if (typeof assetPathOrPaths === 'string') {
-      return this.#getURL(assetPathOrPaths);
+      return this.#getURL(assetPathOrPaths, options ?? { webview: false });
     }
-    return this.#getURLs(assetPathOrPaths);
+    return this.#getURLs(assetPathOrPaths, options ?? { webview: false });
   }
 
-  async #getURL(assetPath: string): Promise<string> {
-    // Try and short circuit using the locally available assets list if possible
-    // @ts-ignore - it doesn't know what globalThis is
-    const localUrl = globalThis?.devvit?.config?.assets?.[assetPath];
+  #getURL(assetPath: string, options: GetURLOptions): string {
+    // Has the assetPath already been resolved?
+    const localUrl = options.webview ? this.#webviewAssetMap[assetPath] : this.#assetMap[assetPath];
     if (localUrl) {
       return localUrl;
     }
 
-    const response = await this.#assetsPluginFetcher().GetAssetURL(
-      { path: assetPath },
-      this.#metadata
-    );
-    if (!response.found) {
-      throw new Error(`Could not load the URL for asset ${assetPath}`);
+    try {
+      // This will throw an exception if it's an invalid URL such as a relative path
+      new URL(assetPath);
+      // URL is valid
+      return assetPath;
+    } catch {
+      // Not a fully qualified URL, not an asset, return an empty string
+      return '';
     }
-    return response.url!; // If found is true, this must be set
   }
 
-  async #getURLs(assetPaths: string[]): Promise<NonNullable<AssetMap>> {
+  #getURLs(assetPaths: string[], options: GetURLOptions): AssetMap {
     const retval: Record<string, string> = {};
     let missingPaths: string[] = [];
 
     // Try and short circuit using the locally available assets list if possible, keeping a list
     // of all the paths that we couldn't find locally to ask the backend about
-    // @ts-ignore - it doesn't know what globalThis is
-    const localAssets: AssetMap = globalThis?.devvit?.config?.assets;
-    if (localAssets) {
+    const cache = options.webview ? this.#webviewAssetMap : this.#assetMap;
+    if (cache) {
       for (const path of assetPaths) {
-        if (localAssets[path]) {
-          retval[path] = localAssets[path];
+        if (cache[path]) {
+          retval[path] = cache[path];
         } else {
-          missingPaths.push(path);
+          try {
+            new URL(path);
+            retval[path] = path;
+          } catch {
+            // invalid URL, missing from cache
+            missingPaths.push(path);
+          }
         }
       }
     } else {
       // No local assets - everything is missing
       missingPaths = assetPaths;
-    }
-
-    if (missingPaths.length === 0) {
-      // Found everything - don't bother the backend
-      return retval;
-    }
-
-    const response = await this.#assetsPluginFetcher().GetAssetURLs(
-      { paths: missingPaths },
-      this.#metadata
-    );
-    missingPaths = [];
-    for (const [path, result] of Object.entries(response.urls)) {
-      if (result.found) {
-        // This will only contain one value when being used like this, because we don't allow globbing
-        retval[path] = result.paths[0];
-      } else {
-        missingPaths.push(path);
-      }
     }
 
     if (missingPaths.length > 0) {

@@ -54,7 +54,7 @@ exports[`Post API > RedditAPIClient > Post matches JSON snapshot 1`] = `
       "authorName": "Lofi Girl",
       "authorUrl": "https://www.youtube.com/@LofiGirl",
       "height": 200,
-      "html": "<iframe width=\\"267\\" height=\\"200\\" src=\\"https://www.youtube.com/embed/jfKfPfyJRdk?feature=oembed&enablejsapi=1\\" title=\\"lofi hip hop radio 📚 - beats to relax/study to\\"></iframe>",
+      "html": "<iframe width="267" height="200" src="https://www.youtube.com/embed/jfKfPfyJRdk?feature=oembed&enablejsapi=1" title="lofi hip hop radio 📚 - beats to relax/study to"></iframe>",
       "providerName": "YouTube",
       "providerUrl": "https://www.youtube.com/",
       "thumbnailHeight": 360,

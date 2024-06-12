@@ -35,7 +35,7 @@ $ devvit uninstall test-app-one --subreddit r/testsub1
 
 ## Creating a new app
 
-Note: the [quickstart](./get-started/quickstart.mdx) provides a simple guide to creating and publishing your first app. Check it out!
+Note: the [quickstart](./quickstart.mdx) provides a simple guide to creating and publishing your first app. Check it out!
 
 From the folder that you'd like to house your app folder, run the create command:
 

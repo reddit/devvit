@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest, BlockType } from '@devvit/protos';
+import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test, vi } from 'vitest';
 import { Devvit } from '../../Devvit.js';
@@ -73,7 +73,7 @@ describe('BlocksReconciler', () => {
               actions: [
                 {
                   data: {},
-                  id: '3.spy',
+                  id: 'button.spy',
                   type: 0,
                 },
               ],
@@ -133,7 +133,7 @@ describe('BlocksReconciler', () => {
         component,
         BlockRenderRequest.fromPartial({
           type: BlockRenderEventType.RENDER_USER_ACTION,
-          id: `${BlockType.BLOCK_BUTTON}.${callback.name}`,
+          id: `button.${callback.name}`,
         }),
         {},
         mockMetadata,

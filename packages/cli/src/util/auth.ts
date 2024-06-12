@@ -1,6 +1,6 @@
-import type { StoredToken } from '@devvit/protos';
 import { HEADER_USER_AGENT } from '../constants/Headers.js';
 import type { NodeFSAuthenticationPluginConfig } from '../lib/auth/NodeFSAuthenticationPlugin.js';
+import type { StoredToken } from '../lib/auth/StoredToken.js';
 import { REDDIT_DOT_COM } from '../lib/config.js';
 import { DEVVIT_PORTAL_URL } from './config.js';
 

@@ -17,7 +17,7 @@ import {
   OnPostSubmitDefinition,
   OnPostUpdateDefinition,
 } from '@devvit/protos';
-import type { Config } from '@devvit/runtimes/api/Config.js';
+import type { Config } from '@devvit/shared-types/Config.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { makeAPIClients } from '../../apis/makeAPIClients.js';

@@ -8,11 +8,8 @@ import type {
   RealtimeSubscriptionEvent,
   UIEvent,
 } from '@devvit/protos';
-import { BlockRenderEventType, BlockType, EffectType } from '@devvit/protos';
-import { getFromMetadata } from '@devvit/runtimes/common/envelope/EnvelopeUtil.js';
-import type { AssetMap } from '@devvit/shared-types/Assets.js';
+import { BlockRenderEventType, EffectType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
-import { isValidImageURL } from '@devvit/shared-types/imageUtil.js';
 import type { AssetsClient } from '../../../apis/AssetsClient/AssetsClient.js';
 import { makeAPIClients } from '../../../apis/makeAPIClients.js';
 import type { ModLogClient } from '../../../apis/modLog/ModLogClient.js';
@@ -179,14 +176,14 @@ export class BlocksReconciler implements EffectEmitter {
   renderState: RenderState = {};
   currentComponentKey: string[] = [];
   currentHookIndex: number = 0;
-  actions: Map<string, Devvit.Blocks.OnPressEventHandler> = new Map();
+  actions: Map<string, Function> = new Map();
   forms: Map<FormKey, Form | FormFunction> = new Map();
   realtimeChannels: string[] = [];
   realtimeUpdated: boolean = false;
   pendingHooks: (() => Promise<void>)[] = [];
 
   isRendering: boolean = false;
-  transformer: BlocksTransformer = new BlocksTransformer();
+  transformer: BlocksTransformer = new BlocksTransformer(() => this.assets);
 
   effects: Effect[] = [];
 
@@ -244,8 +241,8 @@ export class BlocksReconciler implements EffectEmitter {
   }
 
   // This return type is an absolute mess here. Let this slide.
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  #makeContextProps() {
+
+  #makeContextProps(): Devvit.Context {
     const props: Devvit.Context = {
       ...getContextFromMetadata(this.metadata, this.state.__postData?.thingId),
       modLog: this.modLog,
@@ -260,6 +257,11 @@ export class BlocksReconciler implements EffectEmitter {
       realtime: this.realtime,
       ui: this.ui,
       dimensions: this.dimensions,
+      uiEnvironment: {
+        timezone: this.metadata[Header.Timezone]?.values[0],
+        locale: this.metadata[Header.Language]?.values[0],
+        dimensions: this.dimensions,
+      },
       ...this.hooks,
     };
     props.debug.effects = this;
@@ -286,20 +288,21 @@ export class BlocksReconciler implements EffectEmitter {
   }
 
   async reconcile(): Promise<void> {
+    const ctx = this.#makeContextProps();
     const blockElement: BlockElement = {
       type: this.component,
-      props: this.#makeContextProps(),
+      props: ctx,
       children: [],
     };
 
     const reified = await this.processBlock(blockElement);
     assertNotString(reified);
-    await this.transformer.createBlocksElementOrThrow(reified);
+    this.transformer.createBlocksElementOrThrow(reified);
 
     if (this.isUserActionRender && this.blockRenderEventId) {
-      const onPress = this.actions.get(this.blockRenderEventId);
-      if (onPress) {
-        await onPress({});
+      const handler = this.actions.get(this.blockRenderEventId);
+      if (handler) {
+        await handler((this.event as BlockRenderRequest).data);
       }
     }
 
@@ -312,27 +315,27 @@ export class BlocksReconciler implements EffectEmitter {
   }
 
   async buildBlocksUI(): Promise<Block> {
+    const ctx = this.#makeContextProps();
     const rootBlockElement: BlockElement = {
       type: this.component,
-      props: this.#makeContextProps(),
+      props: ctx,
       children: [],
     };
 
-    const block = await this.renderElement(rootBlockElement);
+    const block = await this.renderElement(ctx, rootBlockElement);
     return this.transformer.ensureRootBlock(block);
   }
 
-  async renderElement(element: JSX.Element): Promise<Block> {
+  async renderElement(ctx: Devvit.Context, element: JSX.Element): Promise<Block> {
     const reified = await this.processBlock(element);
     assertNotString(reified);
 
-    if (Devvit.debug.emitSnapshots || getFromMetadata(Header.DebugRenderXML, this.metadata)) {
-      console.log(indentXML(toXML(reified)));
-    }
-    if (Devvit.debug.emitState) {
-      console.log(JSON.stringify(this.state, null, 2));
-    }
-    return await this.transformer.createBlocksElementOrThrow(reified);
+    if (Devvit.debug.emitSnapshots || ctx.debug.emitSnapshots)
+      console.debug(indentXML(toXML(reified)));
+    if (Devvit.debug.emitState || ctx.debug.emitState)
+      console.debug(JSON.stringify(this.state, undefined, 2));
+
+    return this.transformer.createBlocksElementOrThrow(reified);
   }
 
   #flatten(arr: ReifiedBlockElementOrLiteral[]): ReifiedBlockElementOrLiteral[] {
@@ -349,49 +352,18 @@ export class BlocksReconciler implements EffectEmitter {
     return out;
   }
 
-  async processProps(props: { [key: string]: unknown }): Promise<void> {
-    if (props.onPress) {
-      const onPress = props.onPress as Devvit.Blocks.OnPressEventHandler;
-      const name = onPress.name;
-      const id = this.makeUniqueActionID(`${BlockType.BLOCK_BUTTON}.${name ?? 'onPress'}`);
-      this.actions.set(id, onPress);
-      props.onPress = id;
-    }
-    if (props.url) {
-      props.url = await this.getAssetUrl(props.url as string);
-    }
-  }
-
-  async getAssetUrl(asset: string): Promise<string> {
-    // If this image exactly matches an asset, use the public URL for the asset instead
-    let assetUrl: string | undefined = undefined;
-    // @ts-ignore - it doesn't know what globalThis is
-    const assets: AssetMap = globalThis?.devvit?.config?.assets;
-    if (assets) {
-      assetUrl = assets[asset];
-    }
-    /**
-     * This block triggers a circuit breaker that we bypass if the image is:
-     * 1. An asset that is already hosted on a verified image host
-     * 2. A data url of a valid mimetype
-     */
-    if (!assetUrl && !isValidImageURL(asset)) {
-      // This should not happen if we've set config.assets everywhere correctly, but it's good to
-      // keep it around in case we missed something - instead of crashing & burning, we'll just
-      // see some image flicker instead.
-      console.log('No assets loaded on the config - falling back to plugin');
-
-      try {
-        assetUrl = await this.assets.getURL(asset);
-        if (assets && assetUrl) {
-          // Save resolved URL
-          assets[asset] = assetUrl;
-        }
-      } catch {
-        // nop - this is fine, just means this isn't an asset
+  async processProps(block: BlockElement): Promise<void> {
+    const props = block.props ?? {};
+    const actionHandlers = ['onPress', 'onMessage'];
+    for (const action of actionHandlers) {
+      if (action in props) {
+        const handler = props[action] as Function;
+        const name = handler?.name;
+        const id = this.makeUniqueActionID(`${block.type}.${name ?? action}`);
+        this.actions.set(id, handler);
+        props[action] = id;
       }
     }
-    return assetUrl ?? asset;
   }
 
   async processBlock(
@@ -415,7 +387,7 @@ export class BlocksReconciler implements EffectEmitter {
       const children = childrens.flat();
       const collapsedChildren = this.#flatten(children);
 
-      await this.processProps(blockElement.props || {});
+      await this.processProps(blockElement);
 
       const reified: ReifiedBlockElement = {
         type: blockElement.type,

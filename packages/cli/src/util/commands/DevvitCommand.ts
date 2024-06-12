@@ -1,17 +1,20 @@
-import type { StoredToken } from '@devvit/protos';
 import { Empty } from '@devvit/protos';
 import type { T2ID } from '@devvit/shared-types/tid.js';
-import { Command } from '@oclif/core';
+import { Command, Flags } from '@oclif/core';
+import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
+import { parse } from '@oclif/core/lib/parser/index.js';
 import open from 'open';
 import { NodeFSAuthenticationPlugin } from '../../lib/auth/NodeFSAuthenticationPlugin.js';
+import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { DOT_DEVVIT_DIR_FILENAME } from '../../lib/config.js';
-import { readDevvitConfig } from '../../util/devvitConfig.js';
+import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../../util/devvitConfig.js';
 import { findProjectRoot } from '../../util/project-util.js';
 import { AUTH_CONFIG } from '../auth.js';
 import { createWaitlistClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
 import { readLine } from '../input-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
+import { sleep } from '../sleep.js';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`
@@ -23,6 +26,44 @@ export const toLowerCaseArgParser = async (input: string): Promise<string> => in
 
 export abstract class DevvitCommand extends Command {
   protected _authSvc: NodeFSAuthenticationPlugin | undefined;
+  #configFile: string | undefined;
+
+  static override baseFlags: FlagInput = {
+    config: Flags.string({
+      name: 'config',
+      description: 'path to devvit config file',
+      default: DEVVIT_CONFIG_FILE,
+    }),
+  };
+
+  public get configFile(): string {
+    return this.#configFile ?? DEVVIT_CONFIG_FILE;
+  }
+
+  protected override async init(): Promise<void> {
+    await super.init();
+
+    // to-do: avoid subclassing and compose instead. subclasses cause bugs
+    //        because of all the inherited behavior wanted or not, require
+    //        understanding the entire hierarchy top to bottom (and left to
+    //        right for a base class like this), and need crazy hacks like
+    //        below.
+    const baseFlags = Object.keys(DevvitCommand.baseFlags).map((flag) => `--${flag}`);
+    const baseArgv = this.argv.filter(
+      (arg) => !arg.startsWith('--') || baseFlags.some((flag) => arg.startsWith(flag))
+    );
+    // call parse() instead of this.parse() which only knows of
+    // DevvitCommand.baseFlags.
+    const { flags } = await parse(baseArgv, {
+      strict: false,
+      flags: DevvitCommand.baseFlags,
+    });
+
+    this.#configFile = flags.config;
+    if (this.#configFile !== DEVVIT_CONFIG_FILE) {
+      this.log(`Using custom config file: ${this.#configFile}`);
+    }
+  }
 
   get isOauthSvcInitd(): boolean {
     return this._authSvc != null;
@@ -39,11 +80,8 @@ export abstract class DevvitCommand extends Command {
   }
 
   getAccessTokenAndLoginIfNeeded = async (copyPaste?: boolean): Promise<StoredToken> => {
-    if (copyPaste) {
-      return await this.oauthSvc.loginViaCopyPaste();
-    } else {
-      return (await this.oauthSvc.Authenticate({})).storedToken!;
-    }
+    if (copyPaste) return await this.oauthSvc.loginViaCopyPaste();
+    return await this.oauthSvc.Authenticate();
   };
 
   getAccessToken = async (): Promise<StoredToken | undefined> => {
@@ -67,21 +105,34 @@ export abstract class DevvitCommand extends Command {
     }
   };
 
-  protected checkDevvitTermsAndConditions = async (): Promise<void> => {
-    const waitlistClient = createWaitlistClient(this);
+  readonly waitlistClient = createWaitlistClient(this);
+  protected ensureDeveloperAccountExists = async (): Promise<void> => {
+    try {
+      await this.waitlistClient.EnsureDeveloperAccountExists(Empty.fromPartial({}));
+    } catch (err) {
+      this.error(`Error creating developer account: ${err}`);
+    }
+  };
 
-    const { acceptedTermsVersion, currentTermsVersion } = await waitlistClient.GetCurrentUserStatus(
-      Empty.fromPartial({})
-    );
+  protected checkDevvitTermsAndConditions = async (): Promise<void> => {
+    await this.ensureDeveloperAccountExists();
+
+    const { acceptedTermsVersion, currentTermsVersion } =
+      await this.waitlistClient.GetCurrentUserStatus(Empty.fromPartial({}));
 
     const termsUrl = `${DEVVIT_PORTAL_URL}/terms`;
     if (acceptedTermsVersion < currentTermsVersion) {
       this.log('Please accept our Terms and Conditions before proceeding:');
       this.log(`${termsUrl} (press enter to open, control-c to quit)`);
-      if (await readLine())
-        open(termsUrl).catch((_err) =>
-          this.error('An error occurred when opening Terms and Conditions')
-        );
+      await readLine();
+      try {
+        await open(termsUrl);
+      } catch {
+        this.error('An error occurred when opening Terms and Conditions');
+      }
+      // Waiting is necessary, for some reason, or the browser doesn't open!
+      // See issue: https://github.com/sindresorhus/open/issues/189
+      await sleep(5000);
       process.exit();
     }
   };
@@ -116,11 +167,11 @@ export abstract class DevvitCommand extends Command {
   }
 
   protected async inferAppNameFromProject(): Promise<string> {
-    const projectRoot = await findProjectRoot();
+    const projectRoot = await findProjectRoot(this.configFile);
     if (projectRoot == null) {
       this.error(`You must specify an app name or run this command from within a project.`);
     }
-    const devvitConfig = await readDevvitConfig(projectRoot);
+    const devvitConfig = await readDevvitConfig(projectRoot, this.configFile);
 
     return devvitConfig.name;
   }
@@ -139,11 +190,11 @@ export abstract class DevvitCommand extends Command {
       return appWithVersion;
     }
 
-    const projectRoot = await findProjectRoot();
+    const projectRoot = await findProjectRoot(this.configFile);
     if (projectRoot == null) {
       this.error(`You must specify an app name or run this command from within a project.`);
     }
-    const devvitConfig = await readDevvitConfig(projectRoot);
+    const devvitConfig = await readDevvitConfig(projectRoot, this.configFile);
 
     if (!appWithVersion) {
       // getInfoForSlugString is called after this which will default to latest version so we don't need to return the

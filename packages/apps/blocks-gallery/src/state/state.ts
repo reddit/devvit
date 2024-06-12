@@ -1,4 +1,4 @@
-import { ContextAPIClients, UseStateResult } from '@devvit/public-api';
+import type { ContextAPIClients, UseStateResult } from '@devvit/public-api';
 
 import { Page } from '../pages/page.js';
 import { CategoryPageState } from '../components/CategoryPage.js';
@@ -13,6 +13,7 @@ const PAGES = [
   Page.BUTTONS,
   Page.IMAGES,
   Page.STACKS,
+  Page.STACKPADDINGGAP,
   Page.SPACERS,
   Page.TEXT,
   Page.ICON,
@@ -31,8 +32,10 @@ export class GalleryState {
   readonly _currentPage: UseStateResult<Page>;
   readonly _pageStates: Record<Page, CategoryPageState>;
   readonly showToast: (message: string) => void;
+  readonly _context: ContextAPIClients;
 
   constructor(renderContext: ContextAPIClients) {
+    this._context = renderContext;
     const { useState } = renderContext;
     const goHome = (): void => {
       this.currentPage = Page.HOME;
@@ -61,5 +64,9 @@ export class GalleryState {
 
   pageState(page: Page): CategoryPageState {
     return this._pageStates[page];
+  }
+
+  get context(): ContextAPIClients {
+    return this._context;
   }
 }

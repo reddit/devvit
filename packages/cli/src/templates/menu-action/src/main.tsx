@@ -3,7 +3,7 @@ import { Devvit } from '@devvit/public-api';
 
 Devvit.addMenuItem({
   location: 'post', // location where the menu item appears
-  label: 'Custom Post Action', // text to display in the menu (keep it short!)
+  label: 'Post Action', // text to display in the menu (keep it short!)
   onPress: async (event, context) => {
     const { ui } = context;
     ui.showToast(`Post ID: ${event.targetId}`);
@@ -13,7 +13,7 @@ Devvit.addMenuItem({
 Devvit.addMenuItem({
   location: 'comment',
   forUserType: 'moderator', // limit the action to moderators
-  label: 'Custom Post Action, only for mods!',
+  label: 'Post Action, only for mods!',
   onPress: async (event, context) => {
     const { ui } = context;
     ui.showToast(`Post ID: ${event.targetId}`);

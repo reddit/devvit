@@ -23,7 +23,7 @@ export const wrapText = (
     let word = words[i];
     // Truncate the word if it's longer than the max line length and append '...'.
     if (word.length > maxLineLength) {
-      word = word.substring(0, maxLineLength - 3) + '...';
+      word = word.substring(0, maxLineLength - 3) + '…';
     }
 
     // Check if adding the next word would exceed the max line length.
@@ -40,7 +40,7 @@ export const wrapText = (
     if (lines.length === maxRows - 1) {
       if (i < words.length - 1 || currentLine.length + (currentLine ? 1 : 0) > maxLineLength) {
         // If there are more words left or the current line is full, trim and add '...'.
-        currentLine = currentLine.substring(0, maxLineLength - 3) + '...';
+        currentLine = currentLine.substring(0, maxLineLength - 3) + '…';
         lines.push(currentLine);
         break;
       }
@@ -57,7 +57,7 @@ export const wrapText = (
 
 export const Tile = (props: TileProps): JSX.Element => {
   const { text, active, themeConfig, onPress } = props;
-  const chunkedText = wrapText(text, props.isEasyEyeMode ? 11 : 12, props.isEasyEyeMode ? 3 : 4);
+  const chunkedText = wrapText(text, props.isEasyEyeMode ? 10 : 12, props.isEasyEyeMode ? 3 : 4);
 
   return (
     <hstack

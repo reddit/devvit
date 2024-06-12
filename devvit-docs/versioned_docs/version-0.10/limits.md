@@ -35,11 +35,3 @@ message to the invoker of your app.
     limit of 1 MB for all the arguments passed to that method.
 - App Memory Space Maximum - 256 MB
   - When your App is running, it has access to a total of 256 MB during execution.
-
-## Install location limitations
-
-- Maximum subreddit size - 10 subscribers
-  - Since this feature is still in beta, apps shouldn't be installed in larger subreddits yet.
-- You must have full moderator permissions on the subreddit you're installing in
-  - In the future, there will most likely be a specific "Can install apps" moderator permission.
-    However, until then, you'll need all mod permissions on the sub you want to install an app on.

@@ -51,24 +51,33 @@ import {
   isRgbaColor,
   isRPLColor,
 } from '../helpers/color.js';
+import type { AssetsClient, GetURLOptions } from '../../../apis/AssetsClient/AssetsClient.js';
 
 type DataSet = Record<string, unknown>;
 const DATA_PREFIX = 'data-';
 
+const ACTION_HANDLERS: Set<Devvit.Blocks.ActionHandlers> = new Set(['onPress', 'onMessage']);
+const ACTION_TYPES: Map<Devvit.Blocks.ActionHandlers, BlockActionType> = new Map([
+  ['onPress', BlockActionType.ACTION_CLICK],
+  ['onMessage', BlockActionType.ACTION_WEBVIEW],
+]);
+
 export class BlocksTransformer {
-  async createBlocksElementOrThrow({ type, props, children }: ReifiedBlockElement): Promise<Block> {
-    const block = await this.createBlocksElement({ type, props, children });
+  readonly #assetsClient: () => AssetsClient | undefined;
+
+  constructor(getAssetsClient: () => AssetsClient | undefined = () => undefined) {
+    this.#assetsClient = getAssetsClient;
+  }
+
+  createBlocksElementOrThrow({ type, props, children }: ReifiedBlockElement): Block {
+    const block = this.createBlocksElement({ type, props, children });
     if (!block) {
       throw new Error(`Could not create block of type ${type}`);
     }
     return block;
   }
 
-  async createBlocksElement({
-    type,
-    props,
-    children,
-  }: ReifiedBlockElement): Promise<Block | undefined> {
+  createBlocksElement({ type, props, children }: ReifiedBlockElement): Block | undefined {
     switch (type) {
       case 'blocks':
         return this.makeRoot(props, ...children);
@@ -83,7 +92,7 @@ export class BlocksTransformer {
       case 'button':
         return this.makeButton(props, ...children);
       case 'image':
-        return await this.makeImage(props as Devvit.Blocks.ImageProps);
+        return this.makeImage(props as Devvit.Blocks.ImageProps);
       case 'spacer':
         return this.makeSpacer(props);
       case 'icon':
@@ -93,7 +102,7 @@ export class BlocksTransformer {
       case 'fullsnoo':
         return this.makeFullSnoo(props as Devvit.Blocks.FullSnooProps);
       case 'animation':
-        return await this.makeAnimation(props as Devvit.Blocks.AnimationProps);
+        return this.makeAnimation(props as Devvit.Blocks.AnimationProps);
       case 'webview':
         return this.makeWebView(props as Devvit.Blocks.WebViewProps);
       case '__fragment':
@@ -554,15 +563,16 @@ export class BlocksTransformer {
   makeActions(_type: BlockType, props: { [key: string]: unknown }): BlockAction[] {
     const actions: BlockAction[] = [];
     const dataSet = this.getDataSet(props as DataSet);
-    if (props.onPress) {
-      const id = props.onPress;
-
-      actions.push({
-        type: BlockActionType.ACTION_CLICK,
-        id: id.toString(),
-        data: dataSet,
-      });
-    }
+    ACTION_HANDLERS.forEach((action) => {
+      if (action in props) {
+        const id = props[action]!;
+        actions.push({
+          type: ACTION_TYPES.get(action) ?? BlockActionType.UNRECOGNIZED,
+          id: id.toString(),
+          data: dataSet,
+        });
+      }
+    });
     return actions;
   }
 
@@ -590,15 +600,10 @@ export class BlocksTransformer {
     return getHexFromNamedHTMLColor('red');
   }
 
-  async childrenToBlocks(children: ReifiedBlockElementOrLiteral[]): Promise<Block[]> {
-    const promises = children.map((child) => {
-      if (typeof child === 'string') {
-        return undefined;
-      }
-      return this.createBlocksElement(child);
-    });
-    const out = await Promise.all(promises);
-    return out.filter((b) => b !== undefined) as Block[];
+  childrenToBlocks(children: ReifiedBlockElementOrLiteral[]): Block[] {
+    return children.flatMap(
+      (child) => (typeof child !== 'string' ? this.createBlocksElement(child) : undefined) ?? []
+    );
   }
 
   getThemedColors(
@@ -642,18 +647,23 @@ export class BlocksTransformer {
     return input;
   }
 
+  resolveAssetUrl(url: string, options?: GetURLOptions): string {
+    // try and resolve the URL but allow the client to decide if unknown URLs are allowed
+    return this.#assetsClient()?.getURL(url, options) ?? url;
+  }
+
   childrenToString(children: ReifiedBlockElementOrLiteral[]): string {
     return children.map((c) => c.toString()).join('');
   }
 
-  async makeRoot(
+  makeRoot(
     props: Devvit.Blocks.BaseProps | undefined,
     ...children: ReifiedBlockElementOrLiteral[]
-  ): Promise<Block> {
-    return this.wrapRoot(props, await this.childrenToBlocks(children));
+  ): Block {
+    return this.wrapRoot(props, this.childrenToBlocks(children));
   }
 
-  async wrapRoot(props: Devvit.Blocks.BaseProps | undefined, children: Block[]): Promise<Block> {
+  wrapRoot(props: Devvit.Blocks.BaseProps | undefined, children: Block[]): Block {
     return this.makeBlock(
       BlockType.BLOCK_ROOT,
       {},
@@ -670,11 +680,11 @@ export class BlocksTransformer {
     );
   }
 
-  async makeStackBlock(
+  makeStackBlock(
     direction: BlockStackDirection,
     props: Devvit.Blocks.StackProps | undefined,
     children: ReifiedBlockElementOrLiteral[]
-  ): Promise<Block> {
+  ): Block {
     const backgroundColors = this.getThemedColors(
       props?.backgroundColor,
       props?.lightBackgroundColor,
@@ -691,7 +701,7 @@ export class BlocksTransformer {
           props?.lightBorderColor,
           props?.darkBorderColor
         ),
-        children: await this.childrenToBlocks(children),
+        children: this.childrenToBlocks(children),
         cornerRadius: this.makeBlockRadius(props?.cornerRadius),
         direction: direction,
         gap: this.makeBlockGap(props?.gap),
@@ -701,24 +711,24 @@ export class BlocksTransformer {
     });
   }
 
-  async makeHStack(
+  makeHStack(
     props: Devvit.Blocks.StackProps | undefined,
     ...children: ReifiedBlockElementOrLiteral[]
-  ): Promise<Block> {
+  ): Block {
     return this.makeStackBlock(BlockStackDirection.STACK_HORIZONTAL, props, children);
   }
 
-  async makeVStack(
+  makeVStack(
     props: Devvit.Blocks.StackProps | undefined,
     ...children: ReifiedBlockElementOrLiteral[]
-  ): Promise<Block> {
+  ): Block {
     return this.makeStackBlock(BlockStackDirection.STACK_VERTICAL, props, children);
   }
 
-  async makeZStack(
+  makeZStack(
     props: Devvit.Blocks.StackProps | undefined,
     ...children: ReifiedBlockElementOrLiteral[]
-  ): Promise<Block> {
+  ): Block {
     return this.makeStackBlock(BlockStackDirection.STACK_DEPTH, props, children);
   }
 
@@ -768,14 +778,14 @@ export class BlocksTransformer {
     });
   }
 
-  async makeImage(props: Devvit.Blocks.ImageProps | undefined): Promise<Block | undefined> {
+  makeImage(props: Devvit.Blocks.ImageProps | undefined): Block | undefined {
     return (
       props &&
       this.makeBlock(BlockType.BLOCK_IMAGE, props, {
         imageConfig: {
           description: props?.description,
           resizeMode: this.makeBlockImageResizeMode(props.resizeMode),
-          url: props.url,
+          url: this.resolveAssetUrl(props.url),
           width: this.parsePixels(props.imageWidth),
           height: this.parsePixels(props.imageHeight),
         },
@@ -834,13 +844,13 @@ export class BlocksTransformer {
     );
   }
 
-  async makeAnimation(props: Devvit.Blocks.AnimationProps | undefined): Promise<Block | undefined> {
+  makeAnimation(props: Devvit.Blocks.AnimationProps | undefined): Block | undefined {
     return (
       props &&
       this.makeBlock(BlockType.BLOCK_ANIMATION, props, {
         animationConfig: {
           type: this.makeBlockAnimationType(props.type),
-          url: props.url,
+          url: this.resolveAssetUrl(props.url),
           loop: props.loop,
           loopMode: this.makeBlockLoopMode(props.loopMode),
           autoplay: props.autoplay,
@@ -855,7 +865,13 @@ export class BlocksTransformer {
 
   makeWebView(props: Devvit.Blocks.WebViewProps | undefined): Block | undefined {
     return (
-      props && this.makeBlock(BlockType.BLOCK_WEBVIEW, props, { webviewConfig: { url: props.url } })
+      props &&
+      this.makeBlock(BlockType.BLOCK_WEBVIEW, props, {
+        webviewConfig: {
+          url: this.resolveAssetUrl(props.url, { webview: true }),
+          state: props.state,
+        },
+      })
     );
   }
 
@@ -876,7 +892,7 @@ export class BlocksTransformer {
     };
   }
 
-  async ensureRootBlock(b: Block): Promise<Block> {
+  ensureRootBlock(b: Block): Block {
     const block = b as Block;
 
     if ((block as Block).type === BlockType.BLOCK_ROOT) {
@@ -886,7 +902,7 @@ export class BlocksTransformer {
       return block;
     }
 
-    const root = await this.wrapRoot(undefined, [block]);
+    const root = this.wrapRoot(undefined, [block]);
 
     if (!root) {
       throw new Error('Could not create root block');

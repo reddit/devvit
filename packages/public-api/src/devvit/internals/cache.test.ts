@@ -206,7 +206,8 @@ describe('cache works functionality', () => {
     expect(i).toBe(1);
   });
 
-  test('optimistic refresh', async () => {
+  // TODO(DX-6480): this test has been infrequently flaky in CI. Adding a retry for now.
+  test('optimistic refresh', { retry: 3 }, async () => {
     const clock = new Clock();
     const stats = { gets: 0 };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

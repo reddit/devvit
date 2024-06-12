@@ -5,7 +5,6 @@ import { makeUseFormHook } from '../devvit/internals/blocks/useForm.js';
 import { makeUseIntervalHook } from '../devvit/internals/blocks/useInterval.js';
 import { makeUseStateHook } from '../devvit/internals/blocks/useState.js';
 import type { ContextAPIClients } from '../index.js';
-import { Devvit } from '../index.js';
 import { AssetsClient } from './AssetsClient/AssetsClient.js';
 import { KeyValueStorage } from './key-value-storage/KeyValueStorage.js';
 import { MediaClient } from './media/MediaClient.js';
@@ -40,7 +39,7 @@ export function makeAPIClients({
   const settings = new SettingsClient(metadata);
   const uiClient = ui ? new UIClient(reconciler) : undefined;
   const media = new MediaClient(metadata);
-  const assets = new AssetsClient(metadata, () => Devvit.assetsPlugin);
+  const assets = new AssetsClient();
   const realtime = new RealtimeClient(metadata);
   const useState = hooks && reconciler ? makeUseStateHook(reconciler) : undefined;
   const useInterval = hooks && reconciler ? makeUseIntervalHook(reconciler) : undefined;

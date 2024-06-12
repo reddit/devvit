@@ -1,6 +1,6 @@
 import type { UseStateResult } from '@devvit/public-api';
-import { Columns } from '../components/Columns.js';
 import { Devvit } from '@devvit/public-api';
+import { Columns } from '../components/Columns.js';
 import type { StatefulProps } from '../state/state.js';
 import { Tabs } from './Tabs.js';
 
@@ -50,7 +50,7 @@ export type SharedCategoryPageProps = {
 export enum CategoryPageType {
   Tabs,
   Buttons,
-};
+}
 
 export type CategoryPageProps = SharedCategoryPageProps & {
   title?: string;
@@ -59,6 +59,8 @@ export type CategoryPageProps = SharedCategoryPageProps & {
   onCategoryChanged: (category: string) => void;
   subCategoryPage?: boolean;
   type?: CategoryPageType;
+  onConfigureCategory?: () => void;
+  categoryConfigurationDescription?: string;
 };
 
 export type CategoryProps = {
@@ -68,35 +70,42 @@ export type CategoryProps = {
 };
 
 export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
-  const selectedCategory = props.activeCategory
+  const selectedCategory = props.activeCategory;
   const activeCategory = selectedCategory || props.categories[0].category;
-  const matchCategory = (categoryProp: CategoryProps) => {
+  const matchCategory = (categoryProp: CategoryProps): boolean => {
     return categoryProp.category === activeCategory;
-   };
+  };
   const activeCategoryIndex = Math.max(props.categories.findIndex(matchCategory), 0);
-  const tabCategories = props.categories.slice(Math.max(activeCategoryIndex - 1, 0), Math.min(activeCategoryIndex + 2, props.categories.length));
-  const backTabOnPress = () => {
-    const backCategoryIndex = Math.max(activeCategoryIndex - 1, 0)
+  const tabCategories = props.categories.slice(
+    Math.max(activeCategoryIndex - 1, 0),
+    Math.min(activeCategoryIndex + 2, props.categories.length)
+  );
+  const backTabOnPress = (): void => {
+    const backCategoryIndex = Math.max(activeCategoryIndex - 1, 0);
     const backCategory = props.categories[backCategoryIndex].category;
-    props.onCategoryChanged(backCategory)
+    props.onCategoryChanged(backCategory);
   };
-  const forwardTabOnPress = () => {
-    const forwardCategoryIndex = Math.min(activeCategoryIndex + 1, props.categories.length - 1)
+  const forwardTabOnPress = (): void => {
+    const forwardCategoryIndex = Math.min(activeCategoryIndex + 1, props.categories.length - 1);
     const forwardCategory = props.categories[forwardCategoryIndex].category;
-    props.onCategoryChanged(forwardCategory)
+    props.onCategoryChanged(forwardCategory);
   };
 
-  const backTabIcon = <icon
-    name={'back'}
-    color={activeCategoryIndex == 0 ? 'lightgray' : 'black'}
-    onPress={backTabOnPress}
-  />;
+  const backTabIcon = (
+    <icon
+      name={'back'}
+      color={activeCategoryIndex === 0 ? 'lightgray' : 'black'}
+      onPress={backTabOnPress}
+    />
+  );
 
-  const forwardTabIcon = <icon
-    name={'forward'}
-    color={activeCategoryIndex == props.categories.length-1 ? 'lightgray' : 'black'}
-    onPress={forwardTabOnPress}
-  />;
+  const forwardTabIcon = (
+    <icon
+      name={'forward'}
+      color={activeCategoryIndex === props.categories.length - 1 ? 'lightgray' : 'black'}
+      onPress={forwardTabOnPress}
+    />
+  );
 
   const pageType = props.type || CategoryPageType.Tabs;
 
@@ -104,14 +113,41 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
     <vstack gap="small" grow>
       {/* Header */}
       {props.subCategoryPage ? (
-        <></>
+        props.onConfigureCategory ? (
+          <hstack gap={'medium'} alignment={'start middle'}>
+            <button size={'small'} onPress={props.onConfigureCategory}>
+              configure
+            </button>
+            <text style={'heading'} selectable={false} color="neutral-content-weak">
+              {props.title}
+            </text>
+          </hstack>
+        ) : (
+          <></>
+        )
       ) : (
-        <hstack alignment="start middle" gap="small">
-          <button onPress={props.state?.goHome} appearance="secondary" size="small" icon="back" />
-          <text selectable={false} size="xlarge" weight="bold" color="neutral-content">
-            {props.title}
-          </text>
-        </hstack>
+        <vstack alignment="start middle" gap="small">
+          <hstack alignment="start middle" gap="small">
+            <button onPress={props.state?.goHome} appearance="secondary" size="small" icon="back" />
+            <text selectable={false} size="xlarge" weight="bold" color="neutral-content">
+              {props.title}
+            </text>
+            {props.onConfigureCategory ? (
+              <button size={'small'} onPress={props.onConfigureCategory}>
+                configure
+              </button>
+            ) : (
+              <></>
+            )}
+          </hstack>
+          {props.categoryConfigurationDescription ? (
+            <text style={'heading'} selectable={false} color="neutral-content-weak" wrap={true}>
+              {props.categoryConfigurationDescription}
+            </text>
+          ) : (
+            <></>
+          )}
+        </vstack>
       )}
 
       <Tabs
@@ -143,12 +179,11 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
     </button>
   ));
 
-  const buttonsPageBackImpl = () => {
-    if (selectedCategory == null || selectedCategory.length == 0) {
-      console.log(`HERE!!! selected category: ${selectedCategory} home set: ${props.state?.goHome != null}`)
+  const buttonsPageBackImpl = (): void => {
+    if (selectedCategory == null || selectedCategory.length === 0) {
       props.state?.goHome();
     } else {
-      props.onCategoryChanged("");
+      props.onCategoryChanged('');
     }
   };
 
@@ -164,16 +199,15 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
             {props.title}
           </text>
         </hstack>
-      )}  
+      )}
 
-      { (selectedCategory == null || selectedCategory.length == 0) ? (
-            <Columns count={2}>{categoryPageButtons}</Columns>
-        ) : (
-          <text style={'heading'} selectable={false} color="neutral-content-weak">
-            {selectedCategory}
-          </text>
-        )
-      }
+      {selectedCategory == null || selectedCategory.length === 0 ? (
+        <Columns count={2}>{categoryPageButtons}</Columns>
+      ) : (
+        <text style={'heading'} selectable={false} color="neutral-content-weak">
+          {selectedCategory}
+        </text>
+      )}
 
       {
         // Only show content if category selected
@@ -182,5 +216,5 @@ export const CategoryPage = (props: CategoryPageProps): JSX.Element => {
     </vstack>
   );
 
-  return (pageType === CategoryPageType.Tabs) ? tabsPage : buttonsPage;
+  return pageType === CategoryPageType.Tabs ? tabsPage : buttonsPage;
 };

@@ -21,6 +21,8 @@ import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTempl
 import { logInBox } from '../util/ui.js';
 import { exec as _exec } from 'node:child_process';
 import util from 'node:util';
+import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
+import { sendEvent } from '../util/metrics.js';
 const exec = util.promisify(_exec);
 
 const templateResolver = new ProjectTemplateResolver();
@@ -97,6 +99,18 @@ export default class New extends DevvitCommand {
   #createAppParams: CreateAppParams | null = null;
   #createAppFlags: CreateAppFlags | null = null;
 
+  #event = {
+    source: 'devplatform_cli',
+    action: 'ran',
+    noun: 'new_app',
+    devplatform: {
+      cli_raw_command_line: 'devvit ' + process.argv.slice(2).join(' '),
+      cli_is_valid_command: true,
+      cli_command: 'new',
+    } as Record<string, string | boolean | undefined>,
+  };
+  #eventSent = false;
+
   #appNameValidator: NonNullable<Validator> = async (rawAppName: string) => {
     const existingDirNames = new Set(
       readdirSync(process.cwd(), { withFileTypes: true })
@@ -152,12 +166,14 @@ export default class New extends DevvitCommand {
       this.#createAppParams,
       'Expected params to be initialized at this point for app creation'
     );
+    this.#event.devplatform.app_name = this.#createAppParams.appName;
+    this.#event.devplatform.cli_new_app_template = this.#createAppParams.templateName;
 
     // Copy project template
     await this.#copyProjectTemplate();
 
     // Make devvit.yaml (we put in the app name as is without a unique suffix)
-    await generateDevvitConfig(this.#projectPath, {
+    await generateDevvitConfig(this.#projectPath, this.configFile, {
       name: this.#createAppParams.appName,
       version: DevvitVersion.fromString('0.0.0').toString(),
     });
@@ -187,6 +203,8 @@ export default class New extends DevvitCommand {
     this.#logWelcomeMessage(path.relative(process.cwd(), this.#projectPath), {
       dependenciesInstalled,
     });
+
+    await this.#sendEventIfNotSent();
   }
 
   async #gitInit(): Promise<void> {
@@ -307,14 +325,32 @@ export default class New extends DevvitCommand {
       const installInstructions = `• ${chalk.cyan(`\`npm install\``)} to install dependencies`;
       welcomeInstructions.push(installInstructions);
     }
+    const uploadInstructions = `• ${chalk.cyan(`\`devvit upload\``)} to upload your app`;
+    welcomeInstructions.push(uploadInstructions);
 
     const playtestInstructions = `• ${chalk.cyan(
-      `\`devvit playtest\``
+      `\`devvit playtest <subreddit>\``
     )} to develop in your test community`;
     welcomeInstructions.push(playtestInstructions);
 
     const msg = welcomeInstructions.join('\n');
 
     logInBox(msg, { style: 'SINGLE', color: chalk.magenta });
+  }
+
+  async #sendEventIfNotSent(): Promise<void> {
+    if (!this.#eventSent) {
+      this.#eventSent = true;
+      await sendEvent({
+        structValue: this.#event,
+      });
+    }
+  }
+
+  override async catch(err: CommandError): Promise<unknown> {
+    this.#event.devplatform.cli_upload_is_successful = false;
+    this.#event.devplatform.cli_upload_failure_reason = err.message;
+    await this.#sendEventIfNotSent();
+    return super.catch(err);
   }
 }

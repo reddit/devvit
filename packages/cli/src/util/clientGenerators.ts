@@ -1,23 +1,25 @@
+import type { RemoteLogConsumer } from '@devvit/protos';
+import { RemoteLogConsumerClientImpl } from '@devvit/protos';
 import type {
   AppClient,
   AppVersionClient,
+  DevPortalAppSettingsClient,
+  EventsClient,
   FeedbackClient,
   InstallationsClient,
-  RemoteLogConsumer,
-  WaitlistClient,
-  DevPortalAppSettingsClient,
   WaitlistAdminClient,
-} from '@devvit/protos';
+  WaitlistClient,
+} from '@devvit/protos/community.js';
 import {
   AppClientJSON,
   AppVersionClientJSON,
+  DevPortalAppSettingsClientJSON,
+  EventsClientJSON,
   FeedbackClientJSON,
   InstallationsClientJSON,
-  RemoteLogConsumerClientImpl,
-  WaitlistClientJSON,
-  DevPortalAppSettingsClientJSON,
   WaitlistAdminClientJSON,
-} from '@devvit/protos';
+  WaitlistClientJSON,
+} from '@devvit/protos/community.js';
 import { Headers } from 'node-fetch';
 import {
   HEADER_DEVVIT_CANARY,
@@ -35,6 +37,7 @@ const INSTALLATIONS_PATH = 'installations';
 const FEEDBACK_PATH = 'feedback';
 const WAITLIST_PATH = 'waitlist';
 const APP_SETTINGS_PATH = 'app-settings';
+const EVENTS_PATH = 'events';
 
 export function createAppClient(instance: DevvitCommand): AppClient {
   return new AppClientJSON(
@@ -111,6 +114,17 @@ export function createWaitlistAdminClient(instance: DevvitCommand): WaitlistAdmi
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/admin/${WAITLIST_PATH}`,
       getToken: () => instance.getAccessToken(),
+      headers: getHeaders(),
+    })
+  );
+}
+
+export function createEventsClient(instance?: DevvitCommand): EventsClient {
+  return new EventsClientJSON(
+    NodeFetchRPC({
+      baseUrl: `${DEVVIT_PORTAL_API}/${EVENTS_PATH}`,
+      getToken: async () => instance?.getAccessToken() ?? undefined,
+      isTokenOptional: true,
       headers: getHeaders(),
     })
   );

@@ -8,14 +8,14 @@ Devvit.configure({
   realtime: true,
 });
 
-interface UserData {
+type UserData = {
   id: string;
   username: string;
-  snoovatarUrl: string | undefined;
+  snoovatarUrl: string | null;
   message?: string;
   x: number;
   y: number;
-}
+};
 
 type UserRecord = {
   id: string;
@@ -38,10 +38,10 @@ type RealtimeMessage = {
 };
 
 type PostData = {
-  users: items;
+  users: Items;
 };
 
-type items = {
+type Items = {
   [key: string]: UserData;
 };
 
@@ -55,8 +55,9 @@ function sessionId(): string {
 }
 
 const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId }) => {
-  const [me] = useState<UserRecord>(async () => {
+  const [me] = useState<UserRecord | undefined>(async () => {
     const user = await reddit.getCurrentUser();
+    if (!user) return;
     return {
       id: user.id,
       name: user.username,
@@ -67,13 +68,14 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId 
 
   const [postData, setPostData] = useState<PostData>(async () => {
     const currentUser = await reddit.getCurrentUser();
+    if (!currentUser) return { users: {} };
     const userData = {
       id: currentUser.id,
       username: currentUser.username,
-      snoovatarUrl: await currentUser.getSnoovatarUrl(),
+      snoovatarUrl: (await currentUser.getSnoovatarUrl()) ?? null,
       ...getRandomPosition(),
     };
-    const users = {} as items;
+    const users = {} as Items;
     users[currentUser.id] = userData;
     return { users: users };
   });
@@ -126,6 +128,7 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId 
     };
 
     setPostData(postData);
+    if (!me) return;
     const payload: Payload = {
       location: { x: x, y: y },
       user: me,

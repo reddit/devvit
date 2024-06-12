@@ -1,4 +1,5 @@
-import { Devvit, IconName } from '@devvit/public-api';
+import type { IconName } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 
 import { Columns } from '../../components/Columns.js';
 import { Tile } from '../../components/Tile.js';

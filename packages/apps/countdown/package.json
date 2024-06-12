@@ -1,22 +1,22 @@
 {
   "private": true,
   "name": "ci-countdown",
-  "version": "0.10.19",
+  "version": "0.10.22",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
     "test": "vitest run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.19",
-    "@devvit/shared-types": "0.10.19",
+    "@devvit/public-api": "0.10.22",
+    "@devvit/shared-types": "0.10.22",
     "moment-timezone": "0.5.43",
     "tldts": "^6.0.14"
   },
   "devDependencies": {
-    "@devvit/eslint-config": "0.10.19",
-    "@devvit/tsconfig": "0.10.19",
+    "@devvit/eslint-config": "0.10.22",
+    "@devvit/tsconfig": "0.10.22",
     "typescript": "5.3.2",
-    "vitest": "0.31.0"
+    "vitest": "1.6.0"
   }
 }

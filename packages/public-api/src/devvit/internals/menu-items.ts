@@ -4,8 +4,8 @@ import {
   ContextActionDescription,
   ContextActionResponse,
 } from '@devvit/protos';
-import type { Config } from '@devvit/runtimes/api/Config.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
+import type { Config } from '@devvit/shared-types/Config.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';
@@ -13,6 +13,7 @@ import type { MenuItem, MenuItemOnPressEvent } from '../../types/menu-item.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
+import { Header } from '@devvit/shared-types/Header.js';
 
 const getActionId = (index: number): string => {
   return `menuItem.${index}`;
@@ -80,7 +81,13 @@ async function onAction(
       ui: true,
       metadata,
     }),
-    getContextFromMetadata(metadata, postId, commentId)
+    getContextFromMetadata(metadata, postId, commentId),
+    {
+      uiEnvironment: {
+        timezone: metadata[Header.Timezone]?.values[0],
+        locale: metadata[Header.Language]?.values[0],
+      },
+    }
   );
 
   await menuItem.onPress(event, context);

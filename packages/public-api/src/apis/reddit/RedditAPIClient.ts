@@ -41,9 +41,9 @@ import type {
   SubmitPostOptions,
   UpdatePageSettingsOptions,
   UpdateWikiPageOptions,
+  Vault,
   WikiPageRevision,
   WikiPageSettings,
-  Vault,
 } from './models/index.js';
 import {
   AboutLocations,
@@ -283,7 +283,7 @@ export class RedditAPIClient {
    * const user = await reddit.getUserById('t2_1qjpg');
    * ```
    */
-  getUserById(id: string): Promise<User> {
+  getUserById(id: string): Promise<User | undefined> {
     return User.getById(asTID<T2ID>(id), this.#metadata);
   }
 

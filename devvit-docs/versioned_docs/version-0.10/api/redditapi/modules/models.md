@@ -943,11 +943,11 @@ An individual Removal Reason object.
 
 #### Type declaration
 
-| Name      | Type     | Description                                                            |
-| :-------- | :------- | :--------------------------------------------------------------------- |
-| `subject` | `string` | The subject of the message.                                            |
-| `text`    | `string` | The body of the message in markdown text format.                       |
-| `to`      | `string` | The username of the recipient of the message. (without the leading u/) |
+| Name      | Type     | Description                                                                              |
+| :-------- | :------- | :--------------------------------------------------------------------------------------- |
+| `subject` | `string` | The subject of the message.                                                              |
+| `text`    | `string` | The body of the message in markdown text format.                                         |
+| `to`      | `string` | Recipient username (without the leading u/), or /r/name for that subreddit's moderators. |
 
 ---
 

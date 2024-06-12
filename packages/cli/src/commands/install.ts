@@ -1,12 +1,15 @@
-import type { FullInstallationInfo } from '@devvit/protos';
+import { UUID } from '@devvit/protos';
+import type {
+  FullInstallationInfo,
+  MultipleInstallationsResponse,
+} from '@devvit/protos/community.js';
 import {
   GetAllWithInstallLocationRequest,
   InstallationCreationRequest,
   InstallationType,
   InstallationUpgradeRequest,
   NutritionCategory,
-  UUID,
-} from '@devvit/protos';
+} from '@devvit/protos/community.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
 import os from 'node:os';
@@ -17,6 +20,7 @@ import {
 } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
+import { TwirpError } from 'twirp-ts/build/twirp/errors.js';
 
 export default class Install extends DevvitCommand {
   static override description =
@@ -130,12 +134,22 @@ export default class Install extends DevvitCommand {
     subreddit: string;
     appId: string;
   }): Promise<FullInstallationInfo | undefined> {
-    const existingInstalls = await this.#installationsClient.GetAllWithInstallLocation(
-      GetAllWithInstallLocationRequest.fromPartial({
-        type: InstallationType.SUBREDDIT,
-        location: subreddit,
-      })
-    );
+    let existingInstalls: MultipleInstallationsResponse = { installations: [] };
+    try {
+      existingInstalls = await this.#installationsClient.GetAllWithInstallLocation(
+        GetAllWithInstallLocationRequest.fromPartial({
+          type: InstallationType.SUBREDDIT,
+          location: subreddit,
+        })
+      );
+    } catch (error) {
+      if (error instanceof TwirpError) {
+        if (error.code === 'not_found') {
+          this.error(`Community '${subreddit}' not found.`);
+        }
+      }
+      throw error;
+    }
 
     const fullInstallInfoList = await Promise.all(
       existingInstalls.installations.map((install) => {

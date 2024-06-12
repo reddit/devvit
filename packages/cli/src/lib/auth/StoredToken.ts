@@ -1,4 +1,3 @@
-import type { StoredToken as StoredTokenProto } from '@devvit/protos';
 import { isObject } from '@devvit/shared-types/isObject.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { R2OAuthGrant } from '../http/oauth.js';
@@ -19,13 +18,13 @@ type StoredTokenJSON = {
   readonly tokenType: string;
 };
 
-export class StoredToken implements Required<StoredTokenProto> {
+export class StoredToken {
   /** Grant must be recent for the expiration to be accurate. */
   static fromGrant(grant: R2OAuthGrant): StoredToken {
     return new StoredToken({
       accessToken: grant.access_token,
       refreshToken: grant.refresh_token,
-      expiresAt: new Date(Date.now() + grant.expires_in * 1000),
+      expiresAt: Date.now() + grant.expires_in * 1000,
       scope: grant.scope,
       tokenType: grant.token_type,
     });
@@ -48,13 +47,7 @@ export class StoredToken implements Required<StoredTokenProto> {
   }
 
   static fromJSON(token: StoredTokenJSON): StoredToken {
-    return new StoredToken({
-      accessToken: token.accessToken,
-      refreshToken: token.refreshToken,
-      expiresAt: new Date(token.expiresAt),
-      scope: token.scope,
-      tokenType: token.tokenType,
-    });
+    return new StoredToken(token);
   }
 
   readonly refreshToken: string;
@@ -63,10 +56,10 @@ export class StoredToken implements Required<StoredTokenProto> {
   readonly scope: string;
   readonly tokenType: string;
 
-  constructor(token: Readonly<Required<StoredTokenProto>>) {
+  constructor(token: StoredTokenJSON) {
     this.refreshToken = token.refreshToken;
     this.accessToken = token.accessToken;
-    this.expiresAt = token.expiresAt!;
+    this.expiresAt = new Date(token.expiresAt);
     this.scope = token.scope;
     this.tokenType = token.tokenType;
   }

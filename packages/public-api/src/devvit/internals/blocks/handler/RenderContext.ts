@@ -1,7 +1,7 @@
-import type { Effect, UIRequest, UIEvent } from '@devvit/protos';
+import type { Effect, Metadata, UIEvent, UIRequest } from '@devvit/protos';
 import type { Devvit } from '../../../Devvit.js';
-import type { BlocksState, HookSegment, Hook, EventHandler, HookRef } from './types.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
+import type { BlocksState, EventHandler, Hook, HookRef, HookSegment } from './types.js';
 
 /**
  * The RenderContext is a class that holds the state of the rendering process.
@@ -14,12 +14,16 @@ import type { EffectEmitter } from '../EffectEmitter.js';
  * to add special cases for new features, but we should strive to work within the existing framework.
  */
 export class RenderContext implements EffectEmitter {
-  _state: BlocksState;
+  readonly request: Readonly<UIRequest>;
+  readonly meta: Readonly<Metadata>;
+  #state: BlocksState;
   _segments: (HookSegment & { next: number })[] = [];
   _hooks: { [key: string]: Hook } = {};
   _prevHookId: string = '';
   _effects: { [key: string]: Effect } = {};
-  _changed: { [key: string]: boolean } = {};
+  _changed: { [hookID: string]: true } = {};
+  /** Events that will re-enter the dispatcher queue */
+  _requeueEvents: UIEvent[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _rootProps: { [key: string]: any } = {};
   _generated: { [key: string]: boolean } = {};
@@ -38,9 +42,29 @@ export class RenderContext implements EffectEmitter {
     this._devvitContext = context;
   }
 
-  constructor(public request: UIRequest) {
-    this._state = request.state ?? {};
+  constructor(request: UIRequest, meta: Metadata) {
+    this.request = request;
+    this.meta = meta;
+    this.#state = request.state ?? {};
     this._rootProps = request.props ?? {};
+  }
+
+  /** The state delta new to this render. */
+  get _changedState(): BlocksState {
+    const changed: BlocksState = {};
+    for (const key in this._changed) changed[key] = this._state[key];
+    return changed;
+  }
+
+  /** The complete render state. */
+  get _state(): BlocksState {
+    return this.#state;
+  }
+
+  /** Replacing state resets the delta for the next render. */
+  set _state(state: BlocksState) {
+    this._changed = {};
+    this.#state = state;
   }
 
   push(options: HookSegment): void {
@@ -79,6 +103,28 @@ export class RenderContext implements EffectEmitter {
 
   emitEffect(dedupeKey: string, effect: Effect): void {
     this._effects[dedupeKey] = effect;
+  }
+
+  /**
+   * Adds event that will re-enter the dispatcher queue.
+   */
+  addToRequeueEvents(...events: UIEvent[]): void {
+    if (this._devvitContext?.debug.blocks) console.debug('[blocks] requeueing events', events);
+
+    const grouped = events.reduce(
+      (acc, event) => {
+        if (event.retry) {
+          acc.retry.push(event);
+        } else {
+          acc.normal.push(event);
+        }
+        return acc;
+      },
+      { retry: [], normal: [] } as { retry: UIEvent[]; normal: UIEvent[] }
+    );
+
+    // We need to maintain the order of the events, so we need to add the retry events first
+    this._requeueEvents = [...grouped.retry, ...this._requeueEvents, ...grouped.normal];
   }
 
   get effects(): Effect[] {

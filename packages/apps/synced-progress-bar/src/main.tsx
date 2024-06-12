@@ -44,8 +44,9 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, redis, reddit, 
 
   const mySession = sessionId();
 
-  const [me] = useState<UserRecord>(async () => {
+  const [me] = useState<UserRecord | undefined>(async () => {
     const user = await reddit.getCurrentUser();
+    if (!user) return;
     return {
       id: user.id,
       name: user.username,
@@ -74,7 +75,7 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, redis, reddit, 
       </vstack>
       <hstack gap="medium" width={100}>
         <button
-          disabled={progressChannel.status !== ChannelStatus.Connected}
+          disabled={!me || progressChannel.status !== ChannelStatus.Connected}
           icon="subtract-fill"
           width={50}
           onPress={async () => {
@@ -82,7 +83,7 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, redis, reddit, 
             const newProgress = Math.max(progress - 10, 0);
             const payload: Payload = {
               progress: newProgress,
-              user: me,
+              user: me!,
             };
             const message: RealtimeMessage = {
               payload: payload,
@@ -94,7 +95,7 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, redis, reddit, 
           }}
         />
         <button
-          disabled={progressChannel.status !== ChannelStatus.Connected}
+          disabled={!me || progressChannel.status !== ChannelStatus.Connected}
           icon="add-fill"
           width={50}
           onPress={async () => {
@@ -102,7 +103,7 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, redis, reddit, 
             const newProgress = Math.min(progress + 10, 100);
             const payload: Payload = {
               progress: newProgress,
-              user: me,
+              user: me!,
             };
             const message: RealtimeMessage = {
               payload: payload,

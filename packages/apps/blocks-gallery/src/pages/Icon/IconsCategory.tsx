@@ -1,8 +1,10 @@
-import { Devvit, IconName } from '@devvit/public-api';
+import type { IconName } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 
 import { Columns } from '../../components/Columns.js';
 import { Tile } from '../../components/Tile.js';
-import { CategoryPage, SharedCategoryPageProps } from '../../components/CategoryPage.js';
+import type { SharedCategoryPageProps } from '../../components/CategoryPage.js';
+import { CategoryPage } from '../../components/CategoryPage.js';
 
 function getIcons(type: string = ''): JSX.Element[] {
   const iconNames = ['bot', 'topic-programming', 'original', 'karma'];

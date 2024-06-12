@@ -1,7 +1,7 @@
-import { TwirpError, TwirpErrorCode } from 'twirp-ts/build/twirp/errors.js';
-import type { HeadersInit, BodyInit, RequestInit, Response } from 'node-fetch';
+import type { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import fetch, { Headers } from 'node-fetch';
-import type { StoredToken } from '@devvit/protos';
+import { TwirpError, TwirpErrorCode } from 'twirp-ts/build/twirp/errors.js';
+import type { StoredToken } from '../lib/auth/StoredToken.js';
 
 export enum ContentType {
   Json = 'application/json',
@@ -20,6 +20,7 @@ export type Rpc = {
 export type FetchRPCOptions = Omit<RequestInit, 'body' | 'method'> & {
   baseUrl: string;
   getToken: () => Promise<StoredToken | undefined>;
+  isTokenOptional?: boolean;
 };
 
 export const NodeFetchRPC: (options: FetchRPCOptions) => Rpc = (options) => {
@@ -30,11 +31,14 @@ export const NodeFetchRPC: (options: FetchRPCOptions) => Rpc = (options) => {
       if (options.getToken) {
         const token = await options.getToken();
         if (!token) {
-          console.error(`Expected token to be present for rpc ${service} ${method}`);
-          throw new TwirpError(TwirpErrorCode.Unauthenticated, 'UNAUTHORIZED');
+          if (!options.isTokenOptional) {
+            console.error(`Expected token to be present for rpc ${service} ${method}`);
+            throw new TwirpError(TwirpErrorCode.Unauthenticated, 'UNAUTHORIZED');
+          }
+          // If the token is optional, we don't throw an error, and just send the request with no auth
+        } else {
+          headers.set('authorization', `bearer ${token.accessToken}`);
         }
-
-        headers.set('authorization', `bearer ${token.accessToken}`);
       }
 
       const response = await fetch(`${options.baseUrl}/${service}/${method}`, {

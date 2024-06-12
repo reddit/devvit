@@ -1,5 +1,5 @@
-import type { AppClient, AppVersionInfo, FullAppInfo } from '@devvit/protos';
-import { GetAppBySlugRequest } from '@devvit/protos';
+import type { AppClient, AppVersionInfo } from '@devvit/protos/community.js';
+import { GetAppBySlugRequest, type FullAppInfo } from '@devvit/protos/community.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 
 export async function getInfoForSlugString(

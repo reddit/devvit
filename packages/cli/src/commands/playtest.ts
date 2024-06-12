@@ -1,17 +1,15 @@
-import type { AppVersionInfo, Bundle, FullAppInfo, FullInstallationInfo } from '@devvit/protos';
+import type { Bundle } from '@devvit/protos';
+import { ActorSpec, DependencySpec, RemoteLogType, Severity, UUID } from '@devvit/protos';
+import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
 import {
-  ActorSpec,
   BuildStatus,
-  DependencySpec,
   GetAllWithInstallLocationRequest,
   InstallationCreationRequest,
   InstallationType,
   InstallationUpgradeRequest,
-  RemoteLogType,
-  Severity,
-  UUID,
   VersionVisibility,
-} from '@devvit/protos';
+  type FullAppInfo,
+} from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import {
@@ -309,7 +307,7 @@ export default class Playtest extends Upload {
     this.#version.bumpVersion(VersionBumpType.Prerelease);
 
     // 2. update devvit yaml:
-    await updateDevvitConfig(this.projectRoot, {
+    await updateDevvitConfig(this.projectRoot, this.configFile, {
       version: this.#version.toString(),
     });
 

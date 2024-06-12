@@ -1,20 +1,15 @@
-import {
-  EffectType,
-  type Effect,
-  type Metadata,
-  type UIEvent,
-  type UIRequest,
-  type UIResponse,
-} from '@devvit/protos';
-import { ContextBuilder } from './ContextBuilder.js';
-import { BlocksTransformer } from '../BlocksTransformer.js';
+import type { UIEvent } from '@devvit/protos';
+import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
+import type { JSONValue } from '@devvit/shared-types/json.js';
+import isEqual from 'lodash.isequal';
 import type { BlockElement } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
-import type { Hook, HookSegment, HookParams, Props, BlocksState } from './types.js';
-import { RenderInterruptError } from './types.js';
-import { RenderContext } from './RenderContext.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import { BlocksTransformer } from '../BlocksTransformer.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
+import { ContextBuilder } from './ContextBuilder.js';
+import { RenderContext } from './RenderContext.js';
+import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
+import { RenderInterruptError } from './types.js';
 
 /**
  * This can be a global/singleton because render is synchronous.
@@ -66,7 +61,7 @@ export function registerHook<H extends Hook>(
   const context = _activeRenderContext;
   const params: HookParams = {
     hookId,
-    changed: () => {
+    invalidate: () => {
       context._changed[hookId] = true;
       context._state[hookId] = context?._hooks[hookId]?.state;
     },
@@ -79,11 +74,9 @@ export function registerHook<H extends Hook>(
   if (_activeRenderContext._state[hookId] !== undefined) {
     hook.state = _activeRenderContext._state[hookId];
   }
-  if (hook.onLoad) {
-    hook.onLoad(_activeRenderContext);
-  }
+  hook.onStateLoaded?.();
   if (fromNull && hook.state !== undefined && hook.state !== null) {
-    params.changed();
+    params.invalidate();
   }
   return hook;
 }
@@ -98,17 +91,20 @@ export let _latestBlocksHandler: BlocksHandler | null = null;
 export class BlocksHandler {
   #root: JSX.ComponentFunction;
   #contextBuilder: ContextBuilder = new ContextBuilder();
-  #blocksTransformer: BlocksTransformer = new BlocksTransformer();
+  #blocksTransformer: BlocksTransformer = new BlocksTransformer(
+    () => this._latestRenderContext?.devvitContext?.assets
+  );
   _latestRenderContext: RenderContext | null = null;
 
   constructor(root: JSX.ComponentFunction) {
+    if (this.#debug) console.debug('[blocks] BlocksHandler v1');
     this.#root = root;
     _latestBlocksHandler = this;
   }
 
-  async handle(request: UIRequest, metadata?: Metadata): Promise<UIResponse> {
-    const context = new RenderContext(request);
-    const devvitContext = this.#contextBuilder.buildContext(context, metadata!);
+  async handle(request: UIRequest, metadata: Metadata): Promise<UIResponse> {
+    const context = new RenderContext(request, metadata);
+    const devvitContext = this.#contextBuilder.buildContext(context, request, metadata);
     context.devvitContext = devvitContext;
 
     let blocks;
@@ -128,6 +124,7 @@ export class BlocksHandler {
 
     const isBlockingSSR = eventsToProcess.some((e) => e.blocking);
 
+    let changed: { [hookID: string]: true };
     let progress:
       | {
           _state: BlocksState;
@@ -136,7 +133,10 @@ export class BlocksHandler {
       | undefined;
     let remaining: UIEvent[] = [...eventsToProcess];
 
+    if (this.#debug) console.debug('[blocks] starting processing events');
     while (eventsToProcess.length > 0) {
+      if (this.#debug)
+        console.debug('[blocks] processing events loop iteration', eventsToProcess.length);
       /**
        * A concurrently executable batch is a set of events that can be executed in parallel.  This either one main queue event,
        * or any number of other queue events.
@@ -160,57 +160,63 @@ export class BlocksHandler {
           await this.#handleMainQueue(context, ...batch);
         }
       } catch (e) {
+        if (this.#debug) console.debug('[blocks] caught in handler', e);
         /**
          * If we have a progress, we can recover from an error by rolling back to the last progress, and then letting the
          * remaining events be reprocessed.
          */
         if (progress) {
           context._state = progress._state;
+          context._changed = changed!;
           context._effects = progress._effects;
-          remaining.forEach((e, i) => {
-            const effect: Effect = {
-              type: EffectType.EFFECT_SEND_EVENT,
-              sendEvent: {
-                event: e,
-                jumpsQueue: true,
-              },
-            };
-            context.emitEffect(`remaining-${i}`, effect);
+
+          const requeueable = remaining.map((e) => {
+            const requeueEvent = { ...e };
+            requeueEvent.retry = true;
+            return requeueEvent;
           });
+          context.addToRequeueEvents(...requeueable);
           break;
         } else {
           throw e;
         }
       }
 
-      /**
-       * If we have any SendEventEffects, we can push them back on the queue to process them locally
-       */
-      for (const [key, effect] of Object.entries(context._effects)) {
-        if (effect.sendEvent?.event) {
-          if (!isMainQueue && !effect.sendEvent?.event?.async) {
-            // We're async, this is a main queue event.  We need to send it back to the platform to let
-            // the platform synchronize it.
-            break;
-          }
-
-          if (isMainQueue && effect.sendEvent?.event?.async && !isBlockingSSR) {
-            // We're main queue, and this is an async event.  We're not in SSR mode, so let's prioritize
-            // returning control quickly to the platform so we don't block event loops.
-            break;
-          }
-
-          //Ok, we can handle this event locally.
-          const event = effect.sendEvent.event;
-          eventsToProcess.push(event);
-          delete context._effects[key];
+      if (this.#debug) console.debug('[blocks] remaining events', context._requeueEvents);
+      const remainingRequeueEvents: UIEvent[] = [];
+      for (const event of context._requeueEvents) {
+        if (!isMainQueue && !event.async) {
+          if (this.#debug)
+            console.debug(
+              '[blocks] NOT reprocessing event in BlocksHandler, sync mismatch A',
+              event
+            );
+          // We're async, this is a main qrueue event.  We need to send it back to the platform to let
+          // the platform synchronize it.
+          remainingRequeueEvents.push(event);
+          continue;
         }
+        if (isMainQueue && event.async && !isBlockingSSR) {
+          if (this.#debug)
+            console.debug(
+              '[blocks] NOT reprocessing event in BlocksHandler, sync mismatch B',
+              event
+            );
+          // We're main queue, and this is an async event.  We're not in SSR mode, so let's prioritize
+          // returning control quickly to the platform so we don't block event loops.
+          remainingRequeueEvents.push(event);
+          continue;
+        }
+        if (this.#debug) console.debug('[blocks] reprocessing event in BlocksHandler', event);
+        eventsToProcess.push(event);
       }
+      context._requeueEvents = remainingRequeueEvents; //
 
       /**
        * If we're going back through this again, we need to capture the progress, and the remaining events.
        */
       if (eventsToProcess.length > 0) {
+        changed = { ...context._changed };
         progress = {
           _state: _structuredClone(context._state),
           _effects: { ...context._effects },
@@ -220,23 +226,58 @@ export class BlocksHandler {
     } // End of while loop
 
     if (isMainQueue) {
+      const stateCopy = _structuredClone(context._state);
+      const eventsCopy = [...context._requeueEvents];
+      const effectsCopy = { ...context._effects };
+
       // Rendering only happens on the main queue.
       const tags = this.#renderRoot(this.#root, context._rootProps ?? {}, context);
+
+      /**
+       * It's technically ok for renderRoot to mutate, but that's only in the context of loadHooks.  This render should
+       * be idempotent, so we're going to enforce that it doesn't mutate state.
+       *
+       * TODO: hide this behind a flag, because it's possibly expensive.
+       */
+      if (!isEqual(context._state, stateCopy)) {
+        console.error('[blocks] State was mutated during rendering', context._state, stateCopy);
+      }
+      if (!isEqual(context._requeueEvents, eventsCopy)) {
+        console.error(
+          '[blocks] Events were mutated during rendering',
+          context._requeueEvents,
+          eventsCopy
+        );
+      }
+      if (!isEqual(context._effects, effectsCopy)) {
+        console.error(
+          '[blocks] Effects were mutated during rendering',
+          context._effects,
+          effectsCopy
+        );
+      }
+
       if (tags) {
-        blocks = await this.#blocksTransformer.createBlocksElementOrThrow(tags);
-        blocks = await this.#blocksTransformer.ensureRootBlock(blocks);
+        blocks = this.#blocksTransformer.createBlocksElementOrThrow(tags);
+        blocks = this.#blocksTransformer.ensureRootBlock(blocks);
       }
     }
 
     return {
-      state: context._state,
+      state: context._changedState,
       effects: context.effects,
       blocks,
+      events: context._requeueEvents,
     };
+  }
+
+  get #debug(): boolean {
+    return !!this._latestRenderContext?.devvitContext.debug.blocks;
   }
 
   #loadHooks(context: RenderContext, ..._events: UIEvent[]): void {
     // TBD: partial rendering
+    context._hooks = {};
     this.#renderRoot(this.#root, context.request.props ?? {}, context);
   }
 
@@ -260,7 +301,7 @@ export class BlocksHandler {
 
   async #attemptHook(context: RenderContext, event: UIEvent): Promise<void> {
     const hook = context._hooks[event.hook!];
-    if (hook && hook.onUIEvent) {
+    if (hook?.onUIEvent) {
       try {
         await hook.onUIEvent(event, context);
       } catch (e) {
@@ -275,10 +316,15 @@ export class BlocksHandler {
   async #handleMainQueue(context: RenderContext, ...batch: UIEvent[]): Promise<void> {
     // We need to handle events in order, so that the state is updated in the correct order.
     for (const event of batch) {
+      if (this.#debug) console.log('[blocks] handling main queue event', event);
+      if (this.#debug) console.log('[blocks] before', context._state);
       this.#loadHooks(context, event);
-      context._state.__generation = Number(context._state.__generation ?? 0) + 1;
       await this.#attemptHook(context, event);
+      if (this.#debug) console.log('[blocks] after', context._state);
     }
+
+    // TODO: Decide whether this is excessive.  It doesn't hurt anything besides performance.
+    this.#loadHooks(context);
   }
 
   #renderRoot(
@@ -286,6 +332,7 @@ export class BlocksHandler {
     props: Props,
     context: RenderContext
   ): ReifiedBlockElement | undefined {
+    if (this.#debug) console.debug('[blocks] renderRoot');
     context._generated = {};
     _activeRenderContext = context;
     this._latestRenderContext = context;
@@ -332,7 +379,7 @@ export class BlocksHandler {
       if (e && typeof e === 'object' && 'props' in e) {
         if (!e.props?.key) {
           e.props = e.props ?? {};
-          e.props.key = i;
+          e.props.key = `${i}`;
         }
       }
       return this.#renderElement(e, context);
@@ -361,10 +408,12 @@ export class BlocksHandler {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  #reifyProps(props: { [key: string]: any }): { [key: string]: string } {
-    const reifiedProps: { [key: string]: string } = {};
+  #reifyProps(props: { [key: string]: any }): { [key: string]: JSONValue } {
+    const reifiedProps: { [key: string]: JSONValue } = {};
     for (const key in props) {
-      if (typeof props[key] === 'function') {
+      if (typeof props[key] === 'undefined') {
+        // skip
+      } else if (typeof props[key] === 'function') {
         const hook = registerHook(
           {
             namespace: key,
@@ -377,9 +426,10 @@ export class BlocksHandler {
           props[key].captureHookRef();
         }
       } else {
-        const value = props[key];
+        // push value through the JSON parser to filter incompatible types
+        const value = JSON.parse(JSON.stringify(props[key]));
         if (value !== undefined && value !== null) {
-          reifiedProps[key] = value.toString();
+          reifiedProps[key] = value;
         }
       }
     }

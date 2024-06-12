@@ -11,7 +11,7 @@ import type { Subreddit } from './Subreddit.js';
 import type { User } from './User.js';
 
 export type SendPrivateMessageOptions = {
-  /** The username of the recipient of the message. (without the leading u/) */
+  /** Recipient username (without the leading u/), or /r/name for that subreddit's moderators. */
   to: string;
   /** The subject of the message. */
   subject: string;

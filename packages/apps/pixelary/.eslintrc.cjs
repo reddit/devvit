@@ -8,5 +8,4 @@ module.exports = {
     ...base.parserOptions,
     project: path.join(__dirname, 'tsconfig.json'),
   },
-  ignorePatterns: [...base.ignorePatterns, 'esbuild.preview.mjs'],
 };

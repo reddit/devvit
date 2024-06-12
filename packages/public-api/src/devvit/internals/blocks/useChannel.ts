@@ -1,6 +1,5 @@
 import type { RealtimeSubscriptionEvent } from '@devvit/protos';
 import { RealtimeSubscriptionStatus } from '@devvit/protos';
-import { getFromMetadata } from '@devvit/runtimes/common/envelope/EnvelopeUtil.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Data } from '../../../types/data.js';
@@ -20,11 +19,14 @@ export function makeUseChannelHook(reconciler: BlocksReconciler): UseChannelHook
     const currentState = reconciler.getCurrentComponentState<UseChannelHookState>();
     const previousState = reconciler.getPreviousComponentState<UseChannelHookState>();
 
-    const appId = getFromMetadata(Header.App, reconciler.metadata);
-    assertNonNull(appId, 'useChannel - app is missing from Context');
+    const appId = reconciler.metadata[Header.App]?.values[0];
+    assertNonNull<string | undefined>(appId, 'useChannel - app is missing from Context');
 
-    const installationId = getFromMetadata(Header.Installation, reconciler.metadata);
-    assertNonNull(installationId, 'useChannel - installation is missing from Context');
+    const installationId = reconciler.metadata[Header.Installation]?.values[0];
+    assertNonNull<string | undefined>(
+      installationId,
+      'useChannel - installation is missing from Context'
+    );
 
     async function send(data: Data): Promise<void> {
       const name = currentState[hookIndex].channel;

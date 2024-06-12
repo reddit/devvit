@@ -1,8 +1,8 @@
-import { DevvitCommand } from '../util/commands/DevvitCommand.js';
+import { WaitlistStatus } from '@devvit/protos/community.js';
 import { Args } from '@oclif/core';
-import { createWaitlistAdminClient } from '../util/clientGenerators.js';
-import { WaitlistStatus } from '@devvit/protos';
 import { getUserId, isCurrentUserEmployee } from '../lib/http/gql.js';
+import { createWaitlistAdminClient } from '../util/clientGenerators.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 
 export default class WaitlistApprove extends DevvitCommand {
   static override description = 'Approve a user from the waitlist, adding them first if necessary.';

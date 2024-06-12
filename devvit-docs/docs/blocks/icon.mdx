@@ -1,3 +1,8 @@
+# Icons
+
+import IconTile from '@site/src/components/IconTile';
+import IconTileGrid from '@site/src/components/IconTileGrid';
+
 import Icon3rdPartyFill from '../assets/icons/icon-3rd-party-fill.svg';
 import Icon3rdPartyOutline from '../assets/icons/icon-3rd-party-outline.svg';
 import IconActivityFill from '../assets/icons/icon-activity-fill.svg';
@@ -789,7 +794,409 @@ import IconWorldOutline from '../assets/icons/icon-world-outline.svg';
 import AttributeOnPress from './attributes/_onPress.md';
 import AttributeColor from './attributes/_color.md';
 
-# Icons
+
+export const icons = {
+  actions: [
+  { name: 'add', variants: [<IconAddOutline />, <IconAddFill />] },
+  { name: 'add-to-feed', variants: [<IconAddToFeedOutline />, <IconAddToFeedFill />] },
+  { name: 'award', variants: [<IconAwardOutline />, <IconAwardFill />] },
+  { name: 'backup', variants: [<IconBackupOutline />, <IconBackupFill />] },
+  { name: 'browse', variants: [<IconBrowseOutline />, <IconBrowseFill />] },
+  { name: 'chat-new', variants: [<IconChatNewOutline />, <IconChatNewFill />] },
+  { name: 'clear', variants: [<IconClearOutline />, <IconClearFill />] },
+  { name: 'comment', variants: [<IconCommentOutline />, <IconCommentFill />] },
+  { name: 'customize', variants: [<IconCustomizeOutline />, <IconCustomizeFill />] },
+  { name: 'delete', variants: [<IconDeleteOutline />, <IconDeleteFill />] },
+  { name: 'download', variants: [<IconDownloadOutline />, <IconDownloadFill />] },
+  { name: 'downvote', variants: [<IconDownvoteOutline />, <IconDownvoteFill />] },
+  { name: 'duplicate', variants: [<IconDuplicateOutline />, <IconDuplicateFill />] },
+  { name: 'edit', variants: [<IconEditOutline />, <IconEditFill />] },
+  { name: 'heart', variants: [<IconHeartOutline />, <IconHeartFill />] },
+  { name: 'hide', variants: [<IconHideOutline />, <IconHideFill />] },
+  { name: 'invite', variants: [<IconInviteOutline />, <IconInviteFill />] },
+  { name: 'join', variants: [<IconJoinOutline />, <IconJoinFill />] },
+  { name: 'joined', variants: [<IconJoinedOutline />, <IconJoinedFill />] },
+  { name: 'leave', variants: [<IconLeaveOutline />, <IconLeaveFill />] },
+  { name: 'logout', variants: [<IconLogoutOutline />, <IconLogoutFill />] },
+  { name: 'mark-read', variants: [<IconMarkReadOutline />, <IconMarkReadFill />] },
+  { name: 'message', variants: [<IconMessageOutline />, <IconMessageFill />] },
+  { name: 'notification', variants: [<IconNotificationOutline />, <IconNotificationFill />] },
+  { name: 'notification-frequent', variants: [<IconNotificationFrequentOutline />, <IconNotificationFrequentFill />] },
+  { name: 'notification-off', variants: [<IconNotificationOffOutline />, <IconNotificationOffFill />] },
+  { name: 'peace', variants: [<IconPeaceOutline />, <IconPeaceFill />] },
+  { name: 'raise-hand', variants: [<IconRaiseHandOutline />, <IconRaiseHandFill />] },
+  { name: 'recovery-phrase', variants: [<IconRecoveryPhraseOutline />, <IconRecoveryPhraseFill />] },
+  { name: 'reply', variants: [<IconReplyOutline />, <IconReplyFill />] },
+  { name: 'report', variants: [<IconReportOutline />, <IconReportFill />] },
+  { name: 'save', variants: [<IconSaveOutline />, <IconSaveFill />] },
+  { name: 'search', variants: [<IconSearchOutline />, <IconSearchFill />] },
+  { name: 'send', variants: [<IconSendOutline />, <IconSendFill />] },
+  { name: 'share-android', variants: [<IconShareAndroidOutline />, <IconShareAndroidFill />] },
+  { name: 'share', variants: [<IconShareOutline />, <IconShareFill />] },
+  { name: 'share-ios', variants: [<IconShareIosOutline />, <IconShareIosFill />] },
+  { name: 'show', variants: [<IconShowOutline />, <IconShowFill />] },
+  { name: 'star', variants: [<IconStarOutline />, <IconStarFill />] },
+  { name: 'subtract', variants: [<IconSubtractOutline />, <IconSubtractFill />] },
+  { name: 'tag', variants: [<IconTagOutline />, <IconTagFill />] },
+  { name: 'translate', variants: [<IconTranslateOutline />, <IconTranslateFill />] },
+  { name: 'translation-off', variants: [<IconTranslationOffOutline />, <IconTranslationOffFill />] },
+  { name: 'unheart', variants: [<IconUnheartOutline />, <IconUnheartFill />] },
+  { name: 'unstar', variants: [<IconUnstarOutline />, <IconUnstarFill />] },
+  { name: 'upload', variants: [<IconUploadOutline />, <IconUploadFill />] },
+  { name: 'upvote', variants: [<IconUpvoteOutline />, <IconUpvoteFill />] }
+],
+ads: [
+  { name: '3rd-party', variants: [<Icon3rdPartyOutline />, <Icon3rdPartyFill />] },
+  { name: 'ads', variants: [<IconAdsOutline />, <IconAdsFill />] },
+  { name: 'audience', variants: [<IconAudienceOutline />, <IconAudienceFill />] },
+  { name: 'brand-awareness', variants: [<IconBrandAwarenessOutline />, <IconBrandAwarenessFill />] },
+  { name: 'campaign', variants: [<IconCampaignOutline />, <IconCampaignFill />] },
+  { name: 'client-list', variants: [<IconClientListOutline />, <IconClientListFill />] },
+  { name: 'conversion', variants: [<IconConversionOutline />, <IconConversionFill />] },
+  { name: 'copy-clipboard', variants: [<IconCopyClipboardOutline />, <IconCopyClipboardFill />] },
+  { name: 'dashboard', variants: [<IconDashboardOutline />, <IconDashboardFill />] },
+  { name: 'funnel', variants: [<IconFunnelOutline />, <IconFunnelFill />] },
+  { name: 'save-view', variants: [<IconSaveViewOutline />, <IconSaveViewFill />] },
+  { name: 'spreadsheet', variants: [<IconSpreadsheetOutline />, <IconSpreadsheetFill />] }
+],
+beta: [
+  { name: 'beta-binoculars', variants: [<IconBetaBinocularsOutline />, <IconBetaBinocularsFill />] },
+  { name: 'beta-caret-updown', variants: [<IconBetaCaretUpdownOutline />, <IconBetaCaretUpdownFill />] },
+  { name: 'beta-latest', variants: [<IconBetaLatestOutline />, <IconBetaLatestFill />] },
+  { name: 'beta-planet', variants: [<IconBetaPlanetOutline />, <IconBetaPlanetFill />] },
+  { name: 'beta-talk-add', variants: [<IconBetaTalkAddOutline />, <IconBetaTalkAddFill />] },
+  { name: 'beta-telescope', variants: [<IconBetaTelescopeOutline />, <IconBetaTelescopeFill />] },
+  { name: 'communities', variants: [<IconCommunitiesOutline />, <IconCommunitiesFill />] },
+  { name: 'share-new', variants: [<IconShareNewOutline />, <IconShareNewFill />] }
+],
+content: [
+  { name: 'browser', variants: [<IconBrowserOutline />, <IconBrowserFill />] },
+  { name: 'camera', variants: [<IconCameraOutline />, <IconCameraFill />] },
+  { name: 'collection', variants: [<IconCollectionOutline />, <IconCollectionFill />] },
+  { name: 'embed', variants: [<IconEmbedOutline />, <IconEmbedFill />] },
+  { name: 'end-live-chat', variants: [<IconEndLiveChatOutline />, <IconEndLiveChatFill />] },
+  { name: 'gif-post', variants: [<IconGifPostOutline />, <IconGifPostFill />] },
+  { name: 'image-post', variants: [<IconImagePostOutline />, <IconImagePostFill />] },
+  { name: 'link-post', variants: [<IconLinkPostOutline />, <IconLinkPostFill />] },
+  { name: 'live-chat', variants: [<IconLiveChatOutline />, <IconLiveChatFill />] },
+  { name: 'media-gallery', variants: [<IconMediaGalleryOutline />, <IconMediaGalleryFill />] },
+  { name: 'pending-posts', variants: [<IconPendingPostsOutline />, <IconPendingPostsFill />] },
+  { name: 'poll-post', variants: [<IconPollPostOutline />, <IconPollPostFill />] },
+  { name: 'random', variants: [<IconRandomOutline />, <IconRandomFill />] },
+  { name: 'text-post', variants: [<IconTextPostOutline />, <IconTextPostFill />] },
+  { name: 'video-camera', variants: [<IconVideoCameraOutline />, <IconVideoCameraFill />] },
+  { name: 'video-live', variants: [<IconVideoLiveOutline />, <IconVideoLiveFill />] },
+  { name: 'video-post', variants: [<IconVideoPostOutline />, <IconVideoPostFill />] }
+],
+formatting: [
+  { name: 'add-emoji', variants: [<IconAddEmojiOutline />, <IconAddEmojiFill />] },
+  { name: 'add-media', variants: [<IconAddMediaOutline />, <IconAddMediaFill />] },
+  { name: 'align-center', variants: [<IconAlignCenterOutline />, <IconAlignCenterFill />] },
+  { name: 'align-left', variants: [<IconAlignLeftOutline />, <IconAlignLeftFill />] },
+  { name: 'align-right', variants: [<IconAlignRightOutline />, <IconAlignRightFill />] },
+  { name: 'attach', variants: [<IconAttachOutline />, <IconAttachFill />] },
+  { name: 'bold', variants: [<IconBoldOutline />, <IconBoldFill />] },
+  { name: 'code-block', variants: [<IconCodeBlockOutline />, <IconCodeBlockFill />] },
+  { name: 'code-inline', variants: [<IconCodeInlineOutline />, <IconCodeInlineFill />] },
+  { name: 'emoji', variants: [<IconEmojiOutline />, <IconEmojiFill />] },
+  { name: 'format', variants: [<IconFormatOutline />, <IconFormatFill />] },
+  { name: 'hashtag', variants: [<IconHashtagOutline />, <IconHashtagFill />] },
+  { name: 'italic', variants: [<IconItalicOutline />, <IconItalicFill />] },
+  { name: 'keyboard', variants: [<IconKeyboardOutline />, <IconKeyboardFill />] },
+  { name: 'link', variants: [<IconLinkOutline />, <IconLinkFill />] },
+  { name: 'list-bulleted', variants: [<IconListBulletedOutline />, <IconListBulletedFill />] },
+  { name: 'list-numbered', variants: [<IconListNumberedOutline />, <IconListNumberedFill />] },
+  { name: 'macro', variants: [<IconMacroOutline />, <IconMacroFill />] },
+  { name: 'quote', variants: [<IconQuoteOutline />, <IconQuoteFill />] },
+  { name: 'r-slash', variants: [<IconRSlashOutline />, <IconRSlashFill />] },
+  { name: 'rich-text', variants: [<IconRichTextOutline />, <IconRichTextFill />] },
+  { name: 'strikethrough', variants: [<IconStrikethroughOutline />, <IconStrikethroughFill />] },
+  { name: 'superscript', variants: [<IconSuperscriptOutline />, <IconSuperscriptFill />] },
+  { name: 'table', variants: [<IconTableOutline />, <IconTableFill />] },
+  { name: 'text-size', variants: [<IconTextSizeOutline />, <IconTextSizeFill />] },
+  { name: 'u-slash', variants: [<IconUSlashOutline />, <IconUSlashFill />] },
+  { name: 'webhook', variants: [<IconWebhookOutline />, <IconWebhookFill />] }
+],
+forms: [
+  { name: 'caret-down', variants: [<IconCaretDownOutline />, <IconCaretDownFill />] },
+  { name: 'caret-left', variants: [<IconCaretLeftOutline />, <IconCaretLeftFill />] },
+  { name: 'caret-right', variants: [<IconCaretRightOutline />, <IconCaretRightFill />] },
+  { name: 'caret-up', variants: [<IconCaretUpOutline />, <IconCaretUpFill />] },
+  { name: 'checkbox-dismiss', variants: [<IconCheckboxDismissOutline />, <IconCheckboxDismissFill />] },
+  { name: 'checkbox', variants: [<IconCheckboxOutline />, <IconCheckboxFill />] },
+  { name: 'checkmark', variants: [<IconCheckmarkOutline />, <IconCheckmarkFill />] },
+  { name: 'payment', variants: [<IconPaymentOutline />, <IconPaymentFill />] },
+  { name: 'radio-button', variants: [<IconRadioButtonOutline />, <IconRadioButtonFill />] },
+  { name: 'toggle', variants: [<IconToggleOutline />, <IconToggleFill />] }
+],
+locations: [
+  { name: 'all', variants: [<IconAllOutline />, <IconAllFill />] },
+  { name: 'chat', variants: [<IconChatOutline />, <IconChatFill />] },
+  { name: 'chat-group', variants: [<IconChatGroupOutline />, <IconChatGroupFill />] },
+  { name: 'chat-private', variants: [<IconChatPrivateOutline />, <IconChatPrivateFill />] },
+  { name: 'chrome', variants: [<IconChromeOutline />, <IconChromeFill />] },
+  { name: 'comments', variants: [<IconCommentsOutline />, <IconCommentsFill />] },
+  { name: 'community', variants: [<IconCommunityOutline />, <IconCommunityFill />] },
+  { name: 'custom-feed', variants: [<IconCustomFeedOutline />, <IconCustomFeedFill />] },
+  { name: 'discover', variants: [<IconDiscoverOutline />, <IconDiscoverFill />] },
+  { name: 'feed-video', variants: [<IconFeedVideoOutline />, <IconFeedVideoFill />] },
+  { name: 'history', variants: [<IconHistoryOutline />, <IconHistoryFill />] },
+  { name: 'home', variants: [<IconHomeOutline />, <IconHomeFill />] },
+  { name: 'inbox', variants: [<IconInboxOutline />, <IconInboxFill />] },
+  { name: 'marketplace', variants: [<IconMarketplaceOutline />, <IconMarketplaceFill />] },
+  { name: 'popular', variants: [<IconPopularOutline />, <IconPopularFill />] },
+  { name: 'posts', variants: [<IconPostsOutline />, <IconPostsFill />] },
+  { name: 'predictions', variants: [<IconPredictionsOutline />, <IconPredictionsFill />] },
+  { name: 'profile', variants: [<IconProfileOutline />, <IconProfileFill />] },
+  { name: 'rpan', variants: [<IconRpanOutline />, <IconRpanFill />] },
+  { name: 'safari', variants: [<IconSafariOutline />, <IconSafariFill />] },
+  { name: 'saved', variants: [<IconSavedOutline />, <IconSavedFill />] },
+  { name: 'settings', variants: [<IconSettingsOutline />, <IconSettingsFill />] },
+  { name: 'tools', variants: [<IconToolsOutline />, <IconToolsFill />] },
+  { name: 'topic', variants: [<IconTopicOutline />, <IconTopicFill />] },
+  { name: 'vault', variants: [<IconVaultOutline />, <IconVaultFill />] },
+  { name: 'video-feed', variants: [<IconVideoFeedOutline />, <IconVideoFeedFill />] },
+  { name: 'wallet', variants: [<IconWalletOutline />, <IconWalletFill />] },
+  { name: 'wiki', variants: [<IconWikiOutline />, <IconWikiFill />] },
+  { name: 'world', variants: [<IconWorldOutline />, <IconWorldFill />] }
+],
+media: [
+  { name: 'aspect-ratio', variants: [<IconAspectRatioOutline />, <IconAspectRatioFill />] },
+  { name: 'aspect-rectangle', variants: [<IconAspectRectangleOutline />, <IconAspectRectangleFill />] },
+  { name: 'audio', variants: [<IconAudioOutline />, <IconAudioFill />] },
+  { name: 'bounce', variants: [<IconBounceOutline />, <IconBounceFill />] },
+  { name: 'closed-captioning', variants: [<IconClosedCaptioningOutline />, <IconClosedCaptioningFill />] },
+  { name: 'crop', variants: [<IconCropOutline />, <IconCropFill />] },
+  { name: 'effect', variants: [<IconEffectOutline />, <IconEffectFill />] },
+  { name: 'loop', variants: [<IconLoopOutline />, <IconLoopFill />] },
+  { name: 'mask', variants: [<IconMaskOutline />, <IconMaskFill />] },
+  { name: 'meme', variants: [<IconMemeOutline />, <IconMemeFill />] },
+  { name: 'mic', variants: [<IconMicOutline />, <IconMicFill />] },
+  { name: 'mic-mute', variants: [<IconMicMuteOutline />, <IconMicMuteFill />] },
+  { name: 'music', variants: [<IconMusicOutline />, <IconMusicFill />] },
+  { name: 'mute', variants: [<IconMuteOutline />, <IconMuteFill />] },
+  { name: 'pause', variants: [<IconPauseOutline />, <IconPauseFill />] },
+  { name: 'play', variants: [<IconPlayOutline />, <IconPlayFill />] },
+  { name: 'reverse', variants: [<IconReverseOutline />, <IconReverseFill />] },
+  { name: 'rotate', variants: [<IconRotateOutline />, <IconRotateFill />] },
+  { name: 'rotate-image', variants: [<IconRotateImageOutline />, <IconRotateImageFill />] },
+  { name: 'skipback10', variants: [<IconSkipback10Outline />, <IconSkipback10Fill />] },
+  { name: 'skipforward10', variants: [<IconSkipforward10Outline />, <IconSkipforward10Fill />] },
+  { name: 'sticker', variants: [<IconStickerOutline />, <IconStickerFill />] },
+  { name: 'swap-camera', variants: [<IconSwapCameraOutline />, <IconSwapCameraFill />] },
+  { name: 'text', variants: [<IconTextOutline />, <IconTextFill />] },
+  { name: 'trim', variants: [<IconTrimOutline />, <IconTrimFill />] },
+  { name: 'video-thread', variants: [<IconVideoThreadOutline />, <IconVideoThreadFill />] },
+  { name: 'video-transcription', variants: [<IconVideoTranscriptionOutline />, <IconVideoTranscriptionFill />] },
+  { name: 'volume', variants: [<IconVolumeOutline />, <IconVolumeFill />] },
+  { name: 'volume-mute', variants: [ <IconVolumeMuteFill />] }
+],
+moderation: [
+  { name: 'admin', variants: [<IconAdminOutline />, <IconAdminFill />] },
+  { name: 'approve', variants: [<IconApproveOutline />, <IconApproveFill />] },
+  { name: 'automod', variants: [<IconAutomodOutline />, <IconAutomodFill />] },
+  { name: 'ban', variants: [<IconBanOutline />, <IconBanFill />] },
+  { name: 'block', variants: [<IconBlockOutline />, <IconBlockFill />] },
+  { name: 'confidence', variants: [<IconConfidenceOutline />, <IconConfidenceFill />] },
+  { name: 'crowd-control', variants: [<IconCrowdControlOutline />, <IconCrowdControlFill />] },
+  { name: 'distinguish', variants: [<IconDistinguishOutline />, <IconDistinguishFill />] },
+  { name: 'ignore-reports', variants: [<IconIgnoreReportsOutline />, <IconIgnoreReportsFill />] },
+  { name: 'kick', variants: [<IconKickOutline />, <IconKickFill />] },
+  { name: 'lock', variants: [<IconLockOutline />, <IconLockFill />] },
+  { name: 'mod', variants: [<IconModOutline />, <IconModFill />] },
+  { name: 'mod-mail', variants: [<IconModMailOutline />, <IconModMailFill />] },
+  { name: 'mod-mode', variants: [<IconModModeOutline />, <IconModModeFill />] },
+  { name: 'mod-mute', variants: [<IconModMuteOutline />, <IconModMuteFill />] },
+  { name: 'mod-overflow', variants: [<IconModOverflowOutline />, <IconModOverflowFill />] },
+  { name: 'mod-queue', variants: [<IconModQueueOutline />, <IconModQueueFill />] },
+  { name: 'mod-unmute', variants: [<IconModUnmuteOutline />, <IconModUnmuteFill />] },
+  { name: 'pin', variants: [<IconPinOutline />, <IconPinFill />] },
+  { name: 'removal-reasons', variants: [<IconRemovalReasonsOutline />, <IconRemovalReasonsFill />] },
+  { name: 'remove', variants: [<IconRemoveOutline />, <IconRemoveFill />] },
+  { name: 'rules', variants: [<IconRulesOutline />, <IconRulesFill />] },
+  { name: 'severity', variants: [<IconSeverityOutline />, <IconSeverityFill />] },
+  { name: 'spam', variants: [<IconSpamOutline />, <IconSpamFill />] },
+  { name: 'unban', variants: [<IconUnbanOutline />, <IconUnbanFill />] },
+  { name: 'unlock', variants: [<IconUnlockOutline />, <IconUnlockFill />] },
+  { name: 'unmod', variants: [<IconUnmodOutline />, <IconUnmodFill />] },
+  { name: 'unpin', variants: [<IconUnpinOutline />, <IconUnpinFill />] },
+  { name: 'user-note', variants: [<IconUserNoteOutline />, <IconUserNoteFill />] },
+  { name: 'wiki-ban', variants: [<IconWikiBanOutline />, <IconWikiBanFill />] },
+  { name: 'wiki-unban', variants: [<IconWikiUnbanOutline />, <IconWikiUnbanFill />] }
+],
+navigation: [
+  { name: 'back', variants: [<IconBackOutline />, <IconBackFill />] },
+  { name: 'close', variants: [<IconCloseOutline />, <IconCloseFill />] },
+  { name: 'collapse-left', variants: [<IconCollapseLeftOutline />, <IconCollapseLeftFill />] },
+  { name: 'collapse-right', variants: [<IconCollapseRightOutline />, <IconCollapseRightFill />] },
+  { name: 'dismiss-all', variants: [<IconDismissAllOutline />, <IconDismissAllFill />] },
+  { name: 'down', variants: [<IconDownOutline />, <IconDownFill />] },
+  { name: 'down-arrow', variants: [<IconDownArrowOutline />] },
+  { name: 'drag', variants: [<IconDragOutline />] },
+  { name: 'expand-left', variants: [<IconExpandLeftOutline />, <IconExpandLeftFill />] },
+  { name: 'expand-right', variants: [<IconExpandRightOutline />, <IconExpandRightFill />] },
+  { name: 'external', variants: [<IconExternalOutline />, <IconExternalFill />] },
+  { name: 'filter', variants: [<IconFilterOutline />, <IconFilterFill />] },
+  { name: 'forward', variants: [<IconForwardOutline />, <IconForwardFill />] },
+  { name: 'help', variants: [<IconHelpOutline />, <IconHelpFill />] },
+  { name: 'info', variants: [<IconInfoOutline />, <IconInfoFill />] },
+  { name: 'jump-down', variants: [<IconJumpDownOutline />, <IconJumpDownFill />] },
+  { name: 'jump-up', variants: [<IconJumpUpOutline />, <IconJumpUpFill />] },
+  { name: 'left', variants: [<IconLeftOutline />, <IconLeftFill />] },
+  { name: 'load', variants: [<IconLoadOutline />] },
+  { name: 'menu', variants: [<IconMenuOutline />, <IconMenuFill />] },
+  { name: 'overflow-caret', variants: [<IconOverflowCaretOutline />, <IconOverflowCaretFill />] },
+  { name: 'overflow-horizontal', variants: [<IconOverflowHorizontalOutline />, <IconOverflowHorizontalFill />] },
+  { name: 'overflow-vertical', variants: [<IconOverflowVerticalOutline />, <IconOverflowVerticalFill />] },
+  { name: 'qr-code', variants: [<IconQrCodeOutline />, <IconQrCodeFill />] },
+  { name: 'refresh', variants: [<IconRefreshOutline />, <IconRefreshFill />] },
+  { name: 'right', variants: [<IconRightOutline />, <IconRightFill />] },
+  { name: 'side-menu', variants: [<IconSideMenuOutline />, <IconSideMenuFill />] },
+  { name: 'sort', variants: [<IconSortOutline />, <IconSortFill />] },
+  { name: 'sort-az', variants: [<IconSortAzOutline />, <IconSortAzFill />] },
+  { name: 'sort-price', variants: [<IconSortPriceOutline />, <IconSortPriceFill />] },
+  { name: 'sort-za', variants: [<IconSortZaOutline />, <IconSortZaFill />] },
+  { name: 'swipe-back', variants: [<IconSwipeBackOutline />, <IconSwipeBackFill />] },
+  { name: 'swipe-down', variants: [<IconSwipeDownOutline />, <IconSwipeDownFill />] },
+  { name: 'swipe', variants: [<IconSwipeOutline />, <IconSwipeFill />] },
+  { name: 'swipe-up', variants: [<IconSwipeUpOutline />, <IconSwipeUpFill />] },
+  { name: 'tap', variants: [<IconTapOutline />, <IconTapFill />] },
+  { name: 'undo', variants: [<IconUndoOutline />, <IconUndoFill />] },
+  { name: 'up-arrow', variants: [<IconUpArrowOutline />, <IconUpArrowFill />] },
+  { name: 'up', variants: [<IconUpOutline />, <IconUpFill />] }
+],
+ratings: [
+  { name: 'drugs', variants: [<IconDrugsOutline />, <IconDrugsFill />] },
+  { name: 'ratings-everyone', variants: [<IconRatingsEveryoneOutline />, <IconRatingsEveryoneFill />] },
+  { name: 'ratings-mature', variants: [<IconRatingsMatureOutline />, <IconRatingsMatureFill />] },
+  { name: 'ratings-nsfw', variants: [<IconRatingsNsfwOutline />, <IconRatingsNsfwFill />] },
+  { name: 'ratings-violence', variants: [<IconRatingsViolenceOutline />, <IconRatingsViolenceFill />] }
+],
+sortsAndViews: [
+  { name: 'best', variants: [<IconBestOutline />, <IconBestFill />] },
+  { name: 'contest', variants: [<IconContestOutline />, <IconContestFill />] },
+  { name: 'controversial', variants: [<IconControversialOutline />, <IconControversialFill />] },
+  { name: 'hot', variants: [<IconHotOutline />, <IconHotFill />] },
+  { name: 'live', variants: [<IconLiveOutline />, <IconLiveFill />] },
+  { name: 'new', variants: [<IconNewOutline />, <IconNewFill />] },
+  { name: 'qa', variants: [<IconQaOutline />, <IconQaFill />] },
+  { name: 'rising', variants: [<IconRisingOutline />, <IconRisingFill />] },
+  { name: 'top', variants: [<IconTopOutline />, <IconTopFill />] },
+  { name: 'view-card', variants: [<IconViewCardOutline />, <IconViewCardFill />] },
+  { name: 'view-classic', variants: [<IconViewClassicOutline />, <IconViewClassicFill />] },
+  { name: 'view-compact', variants: [<IconViewCompactOutline />, <IconViewCompactFill />] },
+  { name: 'view-grid', variants: [<IconViewGridOutline />, <IconViewGridFill />] }
+],
+status: [
+  { name: 'activity', variants: [<IconActivityOutline />, <IconActivityFill />] },
+  { name: 'appearance', variants: [<IconAppearanceOutline />, <IconAppearanceFill />] },
+  { name: 'archived', variants: [<IconArchivedOutline />, <IconArchivedFill />] },
+  { name: 'author', variants: [<IconAuthorOutline />, <IconAuthorFill />] },
+  { name: 'avatar-style', variants: [<IconAvatarStyleOutline />, <IconAvatarStyleFill />] },
+  { name: 'blockchain', variants: [<IconBlockchainOutline />, <IconBlockchainFill />] },
+  { name: 'bot', variants: [<IconBotOutline />, <IconBotFill />] },
+  { name: 'cake', variants: [<IconCakeOutline />, <IconCakeFill />] },
+  { name: 'calendar', variants: [<IconCalendarOutline />, <IconCalendarFill />] },
+  { name: 'coins', variants: [<IconCoinsOutline />, <IconCoinsFill />] },
+  { name: 'collectible-expressions', variants: [<IconCollectibleExpressionsOutline />, <IconCollectibleExpressionsFill />] },
+  { name: 'crosspost', variants: [<IconCrosspostOutline />, <IconCrosspostFill />] },
+  { name: 'day', variants: [<IconDayOutline />, <IconDayFill />] },
+  { name: 'downvotes', variants: [<IconDownvotesOutline />, <IconDownvotesFill />] },
+  { name: 'error', variants: [<IconErrorOutline />, <IconErrorFill />] },
+  { name: 'karma', variants: [<IconKarmaOutline />, <IconKarmaFill />] },
+  { name: 'language', variants: [<IconLanguageOutline />, <IconLanguageFill />] },
+  { name: 'location', variants: [<IconLocationOutline />, <IconLocationFill />] },
+  { name: 'night', variants: [<IconNightOutline />, <IconNightFill />] },
+  { name: 'nsfw', variants: [<IconNsfwOutline />, <IconNsfwFill />] },
+  { name: 'nsfw-language', variants: [<IconNsfwLanguageOutline />, <IconNsfwLanguageFill />] },
+  { name: 'nsfw-violence', variants: [<IconNsfwViolenceOutline />, <IconNsfwViolenceFill />] },
+  { name: 'official', variants: [<IconOfficialOutline />, <IconOfficialFill />] },
+  { name: 'original', variants: [<IconOriginalOutline />, <IconOriginalFill />] },
+  { name: 'phone', variants: [<IconPhoneOutline />, <IconPhoneFill />] },
+  { name: 'powerup', variants: [<IconPowerupOutline />, <IconPowerupFill />] },
+  { name: 'premium', variants: [<IconPremiumOutline />, <IconPremiumFill />] },
+  { name: 'privacy', variants: [<IconPrivacyOutline />, <IconPrivacyFill />] },
+  { name: 'quarantined', variants: [<IconQuarantinedOutline />, <IconQuarantinedFill />] },
+  { name: 'self', variants: [<IconSelfOutline />, <IconSelfFill />] },
+  { name: 'spoiler', variants: [<IconSpoilerOutline />, <IconSpoilerFill />] },
+  { name: 'sponsored', variants: [<IconSponsoredOutline />, <IconSponsoredFill />] },
+  { name: 'statistics', variants: [<IconStatisticsOutline />, <IconStatisticsFill />] },
+  { name: 'status-live', variants: [<IconStatusLiveOutline />, <IconStatusLiveFill />] },
+  { name: 'unverified', variants: [<IconUnverifiedOutline />, <IconUnverifiedFill />] },
+  { name: 'upvotes', variants: [<IconUpvotesOutline />, <IconUpvotesFill />] },
+  { name: 'user', variants: [<IconUserOutline />, <IconUserFill />] },
+  { name: 'users', variants: [<IconUsersOutline />, <IconUsersFill />] },
+  { name: 'verified', variants: [<IconVerifiedOutline />, <IconVerifiedFill />] },
+  { name: 'views', variants: [<IconViewsOutline />, <IconViewsFill />] },
+  { name: 'warning', variants: [<IconWarningOutline />, <IconWarningFill />] },
+  { name: 'whale', variants: [<IconWhaleOutline />, <IconWhaleFill />] }
+],
+topics: [
+  { name: 'topic-activism', variants: [<IconTopicActivismOutline />, <IconTopicActivismFill />] },
+  { name: 'topic-addictionsupport', variants: [<IconTopicAddictionsupportOutline />, <IconTopicAddictionsupportFill />] },
+  { name: 'topic-advice', variants: [<IconTopicAdviceOutline />, <IconTopicAdviceFill />] },
+  { name: 'topic-animals', variants: [<IconTopicAnimalsOutline />, <IconTopicAnimalsFill />] },
+  { name: 'topic-anime', variants: [<IconTopicAnimeOutline />, <IconTopicAnimeFill />] },
+  { name: 'topic-art', variants: [<IconTopicArtOutline />, <IconTopicArtFill />] },
+  { name: 'topic-beauty', variants: [<IconTopicBeautyOutline />, <IconTopicBeautyFill />] },
+  { name: 'topic-business', variants: [<IconTopicBusinessOutline />, <IconTopicBusinessFill />] },
+  { name: 'topic-careers', variants: [<IconTopicCareersOutline />, <IconTopicCareersFill />] },
+  { name: 'topic-cars', variants: [<IconTopicCarsOutline />, <IconTopicCarsFill />] },
+  { name: 'topic-celebrity', variants: [<IconTopicCelebrityOutline />, <IconTopicCelebrityFill />] },
+  { name: 'topic-craftsdiy', variants: [<IconTopicCraftsdiyOutline />, <IconTopicCraftsdiyFill />] },
+  { name: 'topic-crypto', variants: [<IconTopicCryptoOutline />, <IconTopicCryptoFill />] },
+  { name: 'topic-culture', variants: [<IconTopicCultureOutline />, <IconTopicCultureFill />] },
+  { name: 'topic-diy', variants: [<IconTopicDiyOutline />, <IconTopicDiyFill />] },
+  { name: 'topic-entertainment', variants: [<IconTopicEntertainmentOutline />, <IconTopicEntertainmentFill />] },
+  { name: 'topic-ethics', variants: [<IconTopicEthicsOutline />, <IconTopicEthicsFill />] },
+  { name: 'topic-family', variants: [<IconTopicFamilyOutline />, <IconTopicFamilyFill />] },
+  { name: 'topic-fashion', variants: [<IconTopicFashionOutline />, <IconTopicFashionFill />] },
+  { name: 'topic-fitness', variants: [<IconTopicFitnessOutline />, <IconTopicFitnessFill />] },
+  { name: 'topic-food', variants: [<IconTopicFoodOutline />, <IconTopicFoodFill />] },
+  { name: 'topic-funny', variants: [<IconTopicFunnyOutline />, <IconTopicFunnyFill />] },
+  { name: 'topic-gender', variants: [<IconTopicGenderOutline />, <IconTopicGenderFill />] },
+  { name: 'topic-health', variants: [<IconTopicHealthOutline />, <IconTopicHealthFill />] },
+  { name: 'topic-help', variants: [<IconTopicHelpOutline />, <IconTopicHelpFill />] },
+  { name: 'topic-history', variants: [<IconTopicHistoryOutline />, <IconTopicHistoryFill />] },
+  { name: 'topic-hobbies', variants: [<IconTopicHobbiesOutline />, <IconTopicHobbiesFill />] },
+  { name: 'topic-homegarden', variants: [<IconTopicHomegardenOutline />, <IconTopicHomegardenFill />] },
+  { name: 'topic-internet', variants: [<IconTopicInternetOutline />, <IconTopicInternetFill />] },
+  { name: 'topic-law', variants: [<IconTopicLawOutline />, <IconTopicLawFill />] },
+  { name: 'topic-learning', variants: [<IconTopicLearningOutline />, <IconTopicLearningFill />] },
+  { name: 'topic-lifestyle', variants: [<IconTopicLifestyleOutline />, <IconTopicLifestyleFill />] },
+  { name: 'topic-marketplace', variants: [<IconTopicMarketplaceOutline />, <IconTopicMarketplaceFill />] },
+  { name: 'topic-mature', variants: [<IconTopicMatureOutline />, <IconTopicMatureFill />] },
+  { name: 'topic-mensfashion', variants: [<IconTopicMensfashionOutline />, <IconTopicMensfashionFill />] },
+  { name: 'topic-menshealth', variants: [<IconTopicMenshealthOutline />, <IconTopicMenshealthFill />] },
+  { name: 'topic-meta', variants: [<IconTopicMetaOutline />, <IconTopicMetaFill />] },
+  { name: 'topic-military', variants: [<IconTopicMilitaryOutline />, <IconTopicMilitaryFill />] },
+  { name: 'topic-movies', variants: [<IconTopicMoviesOutline />, <IconTopicMoviesFill />] },
+  { name: 'topic-music', variants: [<IconTopicMusicOutline />, <IconTopicMusicFill />] },
+  { name: 'topic-news', variants: [<IconTopicNewsOutline />, <IconTopicNewsFill />] },
+  { name: 'topic-other', variants: [<IconTopicOtherOutline />, <IconTopicOtherFill />] },
+  { name: 'topic-outdoors', variants: [<IconTopicOutdoorsOutline />, <IconTopicOutdoorsFill />] },
+  { name: 'topic-pets', variants: [<IconTopicPetsOutline />, <IconTopicPetsFill />] },
+  { name: 'topic-photography', variants: [<IconTopicPhotographyOutline />, <IconTopicPhotographyFill />] },
+  { name: 'topic-places', variants: [<IconTopicPlacesOutline />, <IconTopicPlacesFill />] },
+  { name: 'topic-podcasts', variants: [<IconTopicPodcastsOutline />, <IconTopicPodcastsFill />] },
+  { name: 'topic-politics', variants: [<IconTopicPoliticsOutline />, <IconTopicPoliticsFill />] },
+  { name: 'topic-programming', variants: [<IconTopicProgrammingOutline />, <IconTopicProgrammingFill />] },
+  { name: 'topic-reading', variants: [<IconTopicReadingOutline />, <IconTopicReadingFill />] },
+  { name: 'topic-religion', variants: [<IconTopicReligionOutline />, <IconTopicReligionFill />] },
+  { name: 'topic-science', variants: [<IconTopicScienceOutline />, <IconTopicScienceFill />] },
+  { name: 'topic-sexorientation', variants: [<IconTopicSexorientationOutline />, <IconTopicSexorientationFill />] },
+  { name: 'topic-sports', variants: [<IconTopicSportsOutline />, <IconTopicSportsFill />] },
+  { name: 'topic-style', variants: [<IconTopicStyleOutline />, <IconTopicStyleFill />] },
+  { name: 'topic-tabletop', variants: [<IconTopicTabletopOutline />, <IconTopicTabletopFill />] },
+  { name: 'topic-technology', variants: [<IconTopicTechnologyOutline />, <IconTopicTechnologyFill />] },
+  { name: 'topic-television', variants: [<IconTopicTelevisionOutline />, <IconTopicTelevisionFill />] },
+  { name: 'topic-traumasupport', variants: [<IconTopicTraumasupportOutline />, <IconTopicTraumasupportFill />] },
+  { name: 'topic-travel', variants: [<IconTopicTravelOutline />, <IconTopicTravelFill />] },
+  { name: 'topic-videogaming', variants: [<IconTopicVideogamingOutline />, <IconTopicVideogamingFill />] },
+  { name: 'topic-womensfashion', variants: [<IconTopicWomensfashionOutline />, <IconTopicWomensfashionFill />] },
+  { name: 'topic-womenshealth', variants: [<IconTopicWomenshealthOutline />, <IconTopicWomenshealthFill />] }
+]
+};
 
 The following is a list of icons available for use within Custom Posts. To use, include the `Name` of the icon in either a `<button>` or `<icon>` component.
 
@@ -837,819 +1244,176 @@ An `enum` for setting the size of the icon. Possible values:
 
 ### Actions
 
-| Name                          |                Icon                 |
-| :---------------------------- | :---------------------------------: |
-| add-outline                   |         <IconAddOutline />          |
-| add-fill                      |           <IconAddFill />           |
-| add-to-feed-outline           |      <IconAddToFeedOutline />       |
-| add-to-feed-fill              |        <IconAddToFeedFill />        |
-| award-outline                 |        <IconAwardOutline />         |
-| award-fill                    |          <IconAwardFill />          |
-| backup-outline                |        <IconBackupOutline />        |
-| backup-fill                   |         <IconBackupFill />          |
-| browse-outline                |        <IconBrowseOutline />        |
-| browse-fill                   |         <IconBrowseFill />          |
-| chat-new-outline              |       <IconChatNewOutline />        |
-| chat-new-fill                 |         <IconChatNewFill />         |
-| clear-outline                 |        <IconClearOutline />         |
-| clear-fill                    |          <IconClearFill />          |
-| comment-outline               |       <IconCommentOutline />        |
-| comment-fill                  |         <IconCommentFill />         |
-| customize-outline             |      <IconCustomizeOutline />       |
-| customize-fill                |        <IconCustomizeFill />        |
-| delete-outline                |        <IconDeleteOutline />        |
-| delete-fill                   |         <IconDeleteFill />          |
-| download-outline              |       <IconDownloadOutline />       |
-| download-fill                 |        <IconDownloadFill />         |
-| downvote-outline              |       <IconDownvoteOutline />       |
-| downvote-fill                 |        <IconDownvoteFill />         |
-| duplicate-outline             |      <IconDuplicateOutline />       |
-| duplicate-fill                |        <IconDuplicateFill />        |
-| edit-outline                  |         <IconEditOutline />         |
-| edit-fill                     |          <IconEditFill />           |
-| heart-outline                 |        <IconHeartOutline />         |
-| heart-fill                    |          <IconHeartFill />          |
-| hide-outline                  |         <IconHideOutline />         |
-| hide-fill                     |          <IconHideFill />           |
-| invite-outline                |        <IconInviteOutline />        |
-| invite-fill                   |         <IconInviteFill />          |
-| join-outline                  |         <IconJoinOutline />         |
-| join-fill                     |          <IconJoinFill />           |
-| joined-outline                |        <IconJoinedOutline />        |
-| joined-fill                   |         <IconJoinedFill />          |
-| leave-outline                 |        <IconLeaveOutline />         |
-| leave-fill                    |          <IconLeaveFill />          |
-| logout-outline                |        <IconLogoutOutline />        |
-| logout-fill                   |         <IconLogoutFill />          |
-| mark-read-outline             |       <IconMarkReadOutline />       |
-| mark-read-fill                |        <IconMarkReadFill />         |
-| message-outline               |       <IconMessageOutline />        |
-| message-fill                  |         <IconMessageFill />         |
-| notification-outline          |     <IconNotificationOutline />     |
-| notification-fill             |      <IconNotificationFill />       |
-| notification-frequent-outline | <IconNotificationFrequentOutline /> |
-| notification-frequent-fill    |  <IconNotificationFrequentFill />   |
-| notification-off-outline      |   <IconNotificationOffOutline />    |
-| notification-off-fill         |     <IconNotificationOffFill />     |
-| peace-outline                 |        <IconPeaceOutline />         |
-| peace-fill                    |          <IconPeaceFill />          |
-| raise-hand-outline            |      <IconRaiseHandOutline />       |
-| raise-hand-fill               |        <IconRaiseHandFill />        |
-| recovery-phrase-outline       |    <IconRecoveryPhraseOutline />    |
-| recovery-phrase-fill          |     <IconRecoveryPhraseFill />      |
-| reply-outline                 |        <IconReplyOutline />         |
-| reply-fill                    |          <IconReplyFill />          |
-| report-outline                |        <IconReportOutline />        |
-| report-fill                   |         <IconReportFill />          |
-| save-outline                  |         <IconSaveOutline />         |
-| save-fill                     |          <IconSaveFill />           |
-| search-outline                |        <IconSearchOutline />        |
-| search-fill                   |         <IconSearchFill />          |
-| send-outline                  |         <IconSendOutline />         |
-| send-fill                     |          <IconSendFill />           |
-| share-android-outline         |     <IconShareAndroidOutline />     |
-| share-android-fill            |      <IconShareAndroidFill />       |
-| share-outline                 |        <IconShareOutline />         |
-| share-fill                    |          <IconShareFill />          |
-| share-ios-outline             |       <IconShareIosOutline />       |
-| share-ios-fill                |        <IconShareIosFill />         |
-| show-outline                  |         <IconShowOutline />         |
-| show-fill                     |          <IconShowFill />           |
-| star-outline                  |         <IconStarOutline />         |
-| star-fill                     |          <IconStarFill />           |
-| subtract-outline              |       <IconSubtractOutline />       |
-| subtract-fill                 |        <IconSubtractFill />         |
-| tag-outline                   |         <IconTagOutline />          |
-| tag-fill                      |           <IconTagFill />           |
-| translate-outline             |      <IconTranslateOutline />       |
-| translate-fill                |        <IconTranslateFill />        |
-| translation-off-outline       |    <IconTranslationOffOutline />    |
-| translation-off-fill          |     <IconTranslationOffFill />      |
-| unheart-outline               |       <IconUnheartOutline />        |
-| unheart-fill                  |         <IconUnheartFill />         |
-| unstar-outline                |        <IconUnstarOutline />        |
-| unstar-fill                   |         <IconUnstarFill />          |
-| upload-outline                |        <IconUploadOutline />        |
-| upload-fill                   |         <IconUploadFill />          |
-| upvote-outline                |        <IconUpvoteOutline />        |
-| upvote-fill                   |         <IconUpvoteFill />          |
+<IconTileGrid>
+  {
+    icons.actions.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Ads
 
-| Name                    |             Icon              |
-| :---------------------- | :---------------------------: |
-| 3rd-party-outline       |    <Icon3rdPartyOutline />    |
-| 3rd-party-fill          |     <Icon3rdPartyFill />      |
-| ads-outline             |      <IconAdsOutline />       |
-| ads-fill                |        <IconAdsFill />        |
-| audience-outline        |    <IconAudienceOutline />    |
-| audience-fill           |     <IconAudienceFill />      |
-| brand-awareness-outline | <IconBrandAwarenessOutline /> |
-| brand-awareness-fill    |  <IconBrandAwarenessFill />   |
-| campaign-outline        |    <IconCampaignOutline />    |
-| campaign-fill           |     <IconCampaignFill />      |
-| client-list-outline     |   <IconClientListOutline />   |
-| client-list-fill        |    <IconClientListFill />     |
-| conversion-outline      |   <IconConversionOutline />   |
-| conversion-fill         |    <IconConversionFill />     |
-| copy-clipboard-outline  | <IconCopyClipboardOutline />  |
-| copy-clipboard-fill     |   <IconCopyClipboardFill />   |
-| dashboard-outline       |   <IconDashboardOutline />    |
-| dashboard-fill          |     <IconDashboardFill />     |
-| funnel-outline          |     <IconFunnelOutline />     |
-| funnel-fill             |      <IconFunnelFill />       |
-| save-view-outline       |    <IconSaveViewOutline />    |
-| save-view-fill          |     <IconSaveViewFill />      |
-| spreadsheet-outline     |  <IconSpreadsheetOutline />   |
-| spreadsheet-fill        |    <IconSpreadsheetFill />    |
+<IconTileGrid>
+  {
+    icons.ads.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Beta
 
-| Name                      |              Icon              |
-| :------------------------ | :----------------------------: |
-| beta-binoculars-outline   | <IconBetaBinocularsOutline />  |
-| beta-binoculars-fill      |   <IconBetaBinocularsFill />   |
-| beta-caret-updown-outline | <IconBetaCaretUpdownOutline /> |
-| beta-caret-updown-fill    |  <IconBetaCaretUpdownFill />   |
-| beta-latest-outline       |   <IconBetaLatestOutline />    |
-| beta-latest-fill          |     <IconBetaLatestFill />     |
-| beta-planet-outline       |   <IconBetaPlanetOutline />    |
-| beta-planet-fill          |     <IconBetaPlanetFill />     |
-| beta-talk-add-outline     |   <IconBetaTalkAddOutline />   |
-| beta-talk-add-fill        |    <IconBetaTalkAddFill />     |
-| beta-telescope-outline    |  <IconBetaTelescopeOutline />  |
-| beta-telescope-fill       |   <IconBetaTelescopeFill />    |
-| communities-outline       |   <IconCommunitiesOutline />   |
-| communities-fill          |    <IconCommunitiesFill />     |
-| share-new-outline         |    <IconShareNewOutline />     |
-| share-new-fill            |      <IconShareNewFill />      |
+<IconTileGrid>
+  {
+    icons.beta.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Content
 
-| Name                  |            Icon             |
-| :-------------------- | :-------------------------: |
-| browser-outline       |   <IconBrowserOutline />    |
-| browser-fill          |     <IconBrowserFill />     |
-| camera-outline        |    <IconCameraOutline />    |
-| camera-fill           |     <IconCameraFill />      |
-| collection-outline    |  <IconCollectionOutline />  |
-| collection-fill       |   <IconCollectionFill />    |
-| embed-outline         |    <IconEmbedOutline />     |
-| embed-fill            |      <IconEmbedFill />      |
-| end-live-chat-outline | <IconEndLiveChatOutline />  |
-| end-live-chat-fill    |   <IconEndLiveChatFill />   |
-| gif-post-outline      |   <IconGifPostOutline />    |
-| gif-post-fill         |     <IconGifPostFill />     |
-| image-post-outline    |  <IconImagePostOutline />   |
-| image-post-fill       |    <IconImagePostFill />    |
-| link-post-outline     |   <IconLinkPostOutline />   |
-| link-post-fill        |    <IconLinkPostFill />     |
-| live-chat-outline     |   <IconLiveChatOutline />   |
-| live-chat-fill        |    <IconLiveChatFill />     |
-| media-gallery-outline | <IconMediaGalleryOutline /> |
-| media-gallery-fill    |  <IconMediaGalleryFill />   |
-| pending-posts-outline | <IconPendingPostsOutline /> |
-| pending-posts-fill    |  <IconPendingPostsFill />   |
-| poll-post-outline     |   <IconPollPostOutline />   |
-| poll-post-fill        |    <IconPollPostFill />     |
-| random-outline        |    <IconRandomOutline />    |
-| random-fill           |     <IconRandomFill />      |
-| text-post-outline     |   <IconTextPostOutline />   |
-| text-post-fill        |    <IconTextPostFill />     |
-| video-camera-outline  | <IconVideoCameraOutline />  |
-| video-camera-fill     |   <IconVideoCameraFill />   |
-| video-live-outline    |  <IconVideoLiveOutline />   |
-| video-live-fill       |    <IconVideoLiveFill />    |
-| video-post-outline    |  <IconVideoPostOutline />   |
-| video-post-fill       |    <IconVideoPostFill />    |
+<IconTileGrid>
+  {
+    icons.content.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Formatting
 
-| Name                  |             Icon             |
-| :-------------------- | :--------------------------: |
-| add-emoji-outline     |   <IconAddEmojiOutline />    |
-| add-emoji-fill        |     <IconAddEmojiFill />     |
-| add-media-outline     |   <IconAddMediaOutline />    |
-| add-media-fill        |     <IconAddMediaFill />     |
-| align-center-outline  |  <IconAlignCenterOutline />  |
-| align-center-fill     |   <IconAlignCenterFill />    |
-| align-left-outline    |   <IconAlignLeftOutline />   |
-| align-left-fill       |    <IconAlignLeftFill />     |
-| align-right-outline   |  <IconAlignRightOutline />   |
-| align-right-fill      |    <IconAlignRightFill />    |
-| attach-outline        |    <IconAttachOutline />     |
-| attach-fill           |      <IconAttachFill />      |
-| bold-outline          |     <IconBoldOutline />      |
-| bold-fill             |       <IconBoldFill />       |
-| code-block-outline    |   <IconCodeBlockOutline />   |
-| code-block-fill       |    <IconCodeBlockFill />     |
-| code-inline-outline   |  <IconCodeInlineOutline />   |
-| code-inline-fill      |    <IconCodeInlineFill />    |
-| emoji-outline         |     <IconEmojiOutline />     |
-| emoji-fill            |      <IconEmojiFill />       |
-| format-outline        |    <IconFormatOutline />     |
-| format-fill           |      <IconFormatFill />      |
-| hashtag-outline       |    <IconHashtagOutline />    |
-| hashtag-fill          |     <IconHashtagFill />      |
-| italic-outline        |    <IconItalicOutline />     |
-| italic-fill           |      <IconItalicFill />      |
-| keyboard-outline      |   <IconKeyboardOutline />    |
-| keyboard-fill         |     <IconKeyboardFill />     |
-| link-outline          |     <IconLinkOutline />      |
-| link-fill             |       <IconLinkFill />       |
-| list-bulleted-outline | <IconListBulletedOutline />  |
-| list-bulleted-fill    |   <IconListBulletedFill />   |
-| list-numbered-outline | <IconListNumberedOutline />  |
-| list-numbered-fill    |   <IconListNumberedFill />   |
-| macro-outline         |     <IconMacroOutline />     |
-| macro-fill            |      <IconMacroFill />       |
-| quote-outline         |     <IconQuoteOutline />     |
-| quote-fill            |      <IconQuoteFill />       |
-| r-slash-outline       |    <IconRSlashOutline />     |
-| r-slash-fill          |      <IconRSlashFill />      |
-| rich-text-outline     |   <IconRichTextOutline />    |
-| rich-text-fill        |     <IconRichTextFill />     |
-| strikethrough-outline | <IconStrikethroughOutline /> |
-| strikethrough-fill    |  <IconStrikethroughFill />   |
-| superscript-outline   |  <IconSuperscriptOutline />  |
-| superscript-fill      |   <IconSuperscriptFill />    |
-| table-outline         |     <IconTableOutline />     |
-| table-fill            |      <IconTableFill />       |
-| text-size-outline     |   <IconTextSizeOutline />    |
-| text-size-fill        |     <IconTextSizeFill />     |
-| u-slash-outline       |    <IconUSlashOutline />     |
-| u-slash-fill          |      <IconUSlashFill />      |
-| webhook-outline       |    <IconWebhookOutline />    |
-| webhook-fill          |     <IconWebhookFill />      |
+<IconTileGrid>
+  {
+    icons.formatting.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Forms
 
-| Name                     |              Icon              |
-| :----------------------- | :----------------------------: |
-| caret-down-outline       |    <IconCaretDownOutline />    |
-| caret-down-fill          |     <IconCaretDownFill />      |
-| caret-left-outline       |    <IconCaretLeftOutline />    |
-| caret-left-fill          |     <IconCaretLeftFill />      |
-| caret-right-outline      |   <IconCaretRightOutline />    |
-| caret-right-fill         |     <IconCaretRightFill />     |
-| caret-up-outline         |     <IconCaretUpOutline />     |
-| caret-up-fill            |      <IconCaretUpFill />       |
-| checkbox-dismiss-outline | <IconCheckboxDismissOutline /> |
-| checkbox-dismiss-fill    |  <IconCheckboxDismissFill />   |
-| checkbox-outline         |    <IconCheckboxOutline />     |
-| checkbox-fill            |      <IconCheckboxFill />      |
-| checkmark-outline        |    <IconCheckmarkOutline />    |
-| checkmark-fill           |     <IconCheckmarkFill />      |
-| payment-outline          |     <IconPaymentOutline />     |
-| payment-fill             |      <IconPaymentFill />       |
-| radio-button-outline     |   <IconRadioButtonOutline />   |
-| radio-button-fill        |    <IconRadioButtonFill />     |
-| toggle-outline           |     <IconToggleOutline />      |
-| toggle-fill              |       <IconToggleFill />       |
+<IconTileGrid>
+  {
+    icons.forms.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Locations
 
-| Name                 |            Icon            |
-| :------------------- | :------------------------: |
-| all-outline          |     <IconAllOutline />     |
-| all-fill             |      <IconAllFill />       |
-| chat-outline         |    <IconChatOutline />     |
-| chat-fill            |      <IconChatFill />      |
-| chat-group-outline   |  <IconChatGroupOutline />  |
-| chat-group-fill      |   <IconChatGroupFill />    |
-| chat-private-outline | <IconChatPrivateOutline /> |
-| chat-private-fill    |  <IconChatPrivateFill />   |
-| chrome-outline       |   <IconChromeOutline />    |
-| chrome-fill          |     <IconChromeFill />     |
-| comments-outline     |  <IconCommentsOutline />   |
-| comments-fill        |    <IconCommentsFill />    |
-| community-outline    |  <IconCommunityOutline />  |
-| community-fill       |   <IconCommunityFill />    |
-| custom-feed-outline  | <IconCustomFeedOutline />  |
-| custom-feed-fill     |   <IconCustomFeedFill />   |
-| discover-outline     |  <IconDiscoverOutline />   |
-| discover-fill        |    <IconDiscoverFill />    |
-| feed-video-outline   |  <IconFeedVideoOutline />  |
-| feed-video-fill      |   <IconFeedVideoFill />    |
-| history-outline      |   <IconHistoryOutline />   |
-| history-fill         |    <IconHistoryFill />     |
-| home-outline         |    <IconHomeOutline />     |
-| home-fill            |      <IconHomeFill />      |
-| inbox-outline        |    <IconInboxOutline />    |
-| inbox-fill           |     <IconInboxFill />      |
-| marketplace-outline  | <IconMarketplaceOutline /> |
-| marketplace-fill     |  <IconMarketplaceFill />   |
-| popular-outline      |   <IconPopularOutline />   |
-| popular-fill         |    <IconPopularFill />     |
-| posts-outline        |    <IconPostsOutline />    |
-| posts-fill           |     <IconPostsFill />      |
-| predictions-outline  | <IconPredictionsOutline /> |
-| predictions-fill     |  <IconPredictionsFill />   |
-| profile-outline      |   <IconProfileOutline />   |
-| profile-fill         |    <IconProfileFill />     |
-| rpan-outline         |    <IconRpanOutline />     |
-| rpan-fill            |      <IconRpanFill />      |
-| safari-outline       |   <IconSafariOutline />    |
-| safari-fill          |     <IconSafariFill />     |
-| saved-outline        |    <IconSavedOutline />    |
-| saved-fill           |     <IconSavedFill />      |
-| settings-outline     |  <IconSettingsOutline />   |
-| settings-fill        |    <IconSettingsFill />    |
-| tools-outline        |    <IconToolsOutline />    |
-| tools-fill           |     <IconToolsFill />      |
-| topic-outline        |    <IconTopicOutline />    |
-| topic-fill           |     <IconTopicFill />      |
-| vault-outline        |    <IconVaultOutline />    |
-| vault-fill           |     <IconVaultFill />      |
-| video-feed-outline   |  <IconVideoFeedOutline />  |
-| video-feed-fill      |   <IconVideoFeedFill />    |
-| wallet-outline       |   <IconWalletOutline />    |
-| wallet-fill          |     <IconWalletFill />     |
-| wiki-outline         |    <IconWikiOutline />     |
-| wiki-fill            |      <IconWikiFill />      |
-| world-outline        |    <IconWorldOutline />    |
-| world-fill           |     <IconWorldFill />      |
+<IconTileGrid>
+  {
+    icons.locations.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Media controls
 
-| Name                        |               Icon                |
-| :-------------------------- | :-------------------------------: |
-| aspect-ratio-outline        |    <IconAspectRatioOutline />     |
-| aspect-ratio-fill           |      <IconAspectRatioFill />      |
-| aspect-rectangle-outline    |  <IconAspectRectangleOutline />   |
-| aspect-rectangle-fill       |    <IconAspectRectangleFill />    |
-| audio-outline               |       <IconAudioOutline />        |
-| audio-fill                  |         <IconAudioFill />         |
-| bounce-outline              |       <IconBounceOutline />       |
-| bounce-fill                 |        <IconBounceFill />         |
-| closed-captioning-outline   |  <IconClosedCaptioningOutline />  |
-| closed-captioning-fill      |   <IconClosedCaptioningFill />    |
-| crop-outline                |        <IconCropOutline />        |
-| crop-fill                   |         <IconCropFill />          |
-| effect-outline              |       <IconEffectOutline />       |
-| effect-fill                 |        <IconEffectFill />         |
-| loop-outline                |        <IconLoopOutline />        |
-| loop-fill                   |         <IconLoopFill />          |
-| mask-outline                |        <IconMaskOutline />        |
-| mask-fill                   |         <IconMaskFill />          |
-| meme-outline                |        <IconMemeOutline />        |
-| meme-fill                   |         <IconMemeFill />          |
-| mic-outline                 |        <IconMicOutline />         |
-| mic-fill                    |          <IconMicFill />          |
-| mic-mute-outline            |      <IconMicMuteOutline />       |
-| mic-mute-fill               |        <IconMicMuteFill />        |
-| music-outline               |       <IconMusicOutline />        |
-| music-fill                  |         <IconMusicFill />         |
-| mute-outline                |        <IconMuteOutline />        |
-| mute-fill                   |         <IconMuteFill />          |
-| pause-outline               |       <IconPauseOutline />        |
-| pause-fill                  |         <IconPauseFill />         |
-| play-outline                |        <IconPlayOutline />        |
-| play-fill                   |         <IconPlayFill />          |
-| reverse-outline             |      <IconReverseOutline />       |
-| reverse-fill                |        <IconReverseFill />        |
-| rotate-outline              |       <IconRotateOutline />       |
-| rotate-fill                 |        <IconRotateFill />         |
-| rotate-image-outline        |    <IconRotateImageOutline />     |
-| rotate-image-fill           |      <IconRotateImageFill />      |
-| skipback10-outline          |     <IconSkipback10Outline />     |
-| skipback10-fill             |      <IconSkipback10Fill />       |
-| skipforward10-outline       |   <IconSkipforward10Outline />    |
-| skipforward10-fill          |     <IconSkipforward10Fill />     |
-| sticker-outline             |      <IconStickerOutline />       |
-| sticker-fill                |        <IconStickerFill />        |
-| swap-camera-outline         |     <IconSwapCameraOutline />     |
-| swap-camera-fill            |      <IconSwapCameraFill />       |
-| text-outline                |        <IconTextOutline />        |
-| text-fill                   |         <IconTextFill />          |
-| trim-outline                |        <IconTrimOutline />        |
-| trim-fill                   |         <IconTrimFill />          |
-| video-thread-outline        |    <IconVideoThreadOutline />     |
-| video-thread-fill           |      <IconVideoThreadFill />      |
-| video-transcription-outline | <IconVideoTranscriptionOutline /> |
-| video-transcription-fill    |  <IconVideoTranscriptionFill />   |
-| volume-outline              |       <IconVolumeOutline />       |
-| volume-fill                 |        <IconVolumeFill />         |
-| volume-mute-fill            |      <IconVolumeMuteFill />       |
+<IconTileGrid>
+  {
+    icons.media.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Moderation
 
-| Name                    |             Icon              |
-| :---------------------- | :---------------------------: |
-| admin-outline           |     <IconAdminOutline />      |
-| admin-fill              |       <IconAdminFill />       |
-| approve-outline         |    <IconApproveOutline />     |
-| approve-fill            |      <IconApproveFill />      |
-| automod-outline         |    <IconAutomodOutline />     |
-| automod-fill            |      <IconAutomodFill />      |
-| ban-outline             |      <IconBanOutline />       |
-| ban-fill                |        <IconBanFill />        |
-| block-outline           |     <IconBlockOutline />      |
-| block-fill              |       <IconBlockFill />       |
-| confidence-outline      |   <IconConfidenceOutline />   |
-| confidence-fill         |    <IconConfidenceFill />     |
-| crowd-control-outline   |  <IconCrowdControlOutline />  |
-| crowd-control-fill      |   <IconCrowdControlFill />    |
-| distinguish-outline     |  <IconDistinguishOutline />   |
-| distinguish-fill        |    <IconDistinguishFill />    |
-| ignore-reports-outline  | <IconIgnoreReportsOutline />  |
-| ignore-reports-fill     |   <IconIgnoreReportsFill />   |
-| kick-outline            |      <IconKickOutline />      |
-| kick-fill               |       <IconKickFill />        |
-| lock-outline            |      <IconLockOutline />      |
-| lock-fill               |       <IconLockFill />        |
-| mod-outline             |      <IconModOutline />       |
-| mod-fill                |        <IconModFill />        |
-| mod-mail-outline        |    <IconModMailOutline />     |
-| mod-mail-fill           |      <IconModMailFill />      |
-| mod-mode-outline        |    <IconModModeOutline />     |
-| mod-mode-fill           |      <IconModModeFill />      |
-| mod-mute-outline        |    <IconModMuteOutline />     |
-| mod-mute-fill           |      <IconModMuteFill />      |
-| mod-overflow-outline    |  <IconModOverflowOutline />   |
-| mod-overflow-fill       |    <IconModOverflowFill />    |
-| mod-queue-outline       |    <IconModQueueOutline />    |
-| mod-queue-fill          |     <IconModQueueFill />      |
-| mod-unmute-outline      |   <IconModUnmuteOutline />    |
-| mod-unmute-fill         |     <IconModUnmuteFill />     |
-| pin-outline             |      <IconPinOutline />       |
-| pin-fill                |        <IconPinFill />        |
-| removal-reasons-outline | <IconRemovalReasonsOutline /> |
-| removal-reasons-fill    |  <IconRemovalReasonsFill />   |
-| remove-outline          |     <IconRemoveOutline />     |
-| remove-fill             |      <IconRemoveFill />       |
-| rules-outline           |     <IconRulesOutline />      |
-| rules-fill              |       <IconRulesFill />       |
-| severity-outline        |    <IconSeverityOutline />    |
-| severity-fill           |     <IconSeverityFill />      |
-| spam-outline            |      <IconSpamOutline />      |
-| spam-fill               |       <IconSpamFill />        |
-| unban-outline           |     <IconUnbanOutline />      |
-| unban-fill              |       <IconUnbanFill />       |
-| unlock-outline          |     <IconUnlockOutline />     |
-| unlock-fill             |      <IconUnlockFill />       |
-| unmod-outline           |     <IconUnmodOutline />      |
-| unmod-fill              |       <IconUnmodFill />       |
-| unpin-outline           |     <IconUnpinOutline />      |
-| unpin-fill              |       <IconUnpinFill />       |
-| user-note-outline       |    <IconUserNoteOutline />    |
-| user-note-fill          |     <IconUserNoteFill />      |
-| wiki-ban-outline        |    <IconWikiBanOutline />     |
-| wiki-ban-fill           |      <IconWikiBanFill />      |
-| wiki-unban-outline      |   <IconWikiUnbanOutline />    |
-| wiki-unban-fill         |     <IconWikiUnbanFill />     |
+<IconTileGrid>
+  {
+    icons.moderation.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Navigation
 
-| Name                        |               Icon                |
-| :-------------------------- | :-------------------------------: |
-| back-outline                |        <IconBackOutline />        |
-| back-fill                   |         <IconBackFill />          |
-| close-outline               |       <IconCloseOutline />        |
-| close-fill                  |         <IconCloseFill />         |
-| collapse-left-outline       |    <IconCollapseLeftOutline />    |
-| collapse-left-fill          |     <IconCollapseLeftFill />      |
-| collapse-right-outline      |   <IconCollapseRightOutline />    |
-| collapse-right-fill         |     <IconCollapseRightFill />     |
-| dismiss-all-outline         |     <IconDismissAllOutline />     |
-| dismiss-all-fill            |      <IconDismissAllFill />       |
-| down-outline                |        <IconDownOutline />        |
-| down-fill                   |         <IconDownFill />          |
-| down-arrow-outline          |     <IconDownArrowOutline />      |
-| drag-outline                |        <IconDragOutline />        |
-| expand-left-outline         |     <IconExpandLeftOutline />     |
-| expand-left-fill            |      <IconExpandLeftFill />       |
-| expand-right-outline        |    <IconExpandRightOutline />     |
-| expand-right-fill           |      <IconExpandRightFill />      |
-| external-outline            |      <IconExternalOutline />      |
-| external-fill               |       <IconExternalFill />        |
-| filter-outline              |       <IconFilterOutline />       |
-| filter-fill                 |        <IconFilterFill />         |
-| forward-outline             |      <IconForwardOutline />       |
-| forward-fill                |        <IconForwardFill />        |
-| help-outline                |        <IconHelpOutline />        |
-| help-fill                   |         <IconHelpFill />          |
-| info-outline                |        <IconInfoOutline />        |
-| info-fill                   |         <IconInfoFill />          |
-| jump-down-outline           |      <IconJumpDownOutline />      |
-| jump-down-fill              |       <IconJumpDownFill />        |
-| jump-up-outline             |       <IconJumpUpOutline />       |
-| jump-up-fill                |        <IconJumpUpFill />         |
-| left-outline                |        <IconLeftOutline />        |
-| left-fill                   |         <IconLeftFill />          |
-| load-outline                |        <IconLoadOutline />        |
-| menu-outline                |        <IconMenuOutline />        |
-| menu-fill                   |         <IconMenuFill />          |
-| overflow-caret-outline      |   <IconOverflowCaretOutline />    |
-| overflow-caret-fill         |     <IconOverflowCaretFill />     |
-| overflow-horizontal-outline | <IconOverflowHorizontalOutline /> |
-| overflow-horizontal-fill    |  <IconOverflowHorizontalFill />   |
-| overflow-vertical-outline   |  <IconOverflowVerticalOutline />  |
-| overflow-vertical-fill      |   <IconOverflowVerticalFill />    |
-| qr-code-outline             |       <IconQrCodeOutline />       |
-| qr-code-fill                |        <IconQrCodeFill />         |
-| refresh-outline             |      <IconRefreshOutline />       |
-| refresh-fill                |        <IconRefreshFill />        |
-| right-outline               |       <IconRightOutline />        |
-| right-fill                  |         <IconRightFill />         |
-| side-menu-outline           |      <IconSideMenuOutline />      |
-| side-menu-fill              |       <IconSideMenuFill />        |
-| sort-outline                |        <IconSortOutline />        |
-| sort-fill                   |         <IconSortFill />          |
-| sort-az-outline             |       <IconSortAzOutline />       |
-| sort-az-fill                |        <IconSortAzFill />         |
-| sort-price-outline          |     <IconSortPriceOutline />      |
-| sort-price-fill             |       <IconSortPriceFill />       |
-| sort-za-outline             |       <IconSortZaOutline />       |
-| sort-za-fill                |        <IconSortZaFill />         |
-| swipe-back-outline          |     <IconSwipeBackOutline />      |
-| swipe-back-fill             |       <IconSwipeBackFill />       |
-| swipe-down-outline          |     <IconSwipeDownOutline />      |
-| swipe-down-fill             |       <IconSwipeDownFill />       |
-| swipe-outline               |       <IconSwipeOutline />        |
-| swipe-fill                  |         <IconSwipeFill />         |
-| swipe-up-outline            |      <IconSwipeUpOutline />       |
-| swipe-up-fill               |        <IconSwipeUpFill />        |
-| tap-outline                 |        <IconTapOutline />         |
-| tap-fill                    |          <IconTapFill />          |
-| undo-outline                |        <IconUndoOutline />        |
-| undo-fill                   |         <IconUndoFill />          |
-| up-arrow-outline            |      <IconUpArrowOutline />       |
-| up-arrow-fill               |        <IconUpArrowFill />        |
-| up-outline                  |         <IconUpOutline />         |
-| up-fill                     |          <IconUpFill />           |
+<IconTileGrid>
+  {
+    icons.navigation.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Ratings
 
-| Name                     |              Icon              |
-| :----------------------- | :----------------------------: |
-| drugs-outline            |      <IconDrugsOutline />      |
-| drugs-fill               |       <IconDrugsFill />        |
-| ratings-everyone-outline | <IconRatingsEveryoneOutline /> |
-| ratings-everyone-fill    |  <IconRatingsEveryoneFill />   |
-| ratings-mature-outline   |  <IconRatingsMatureOutline />  |
-| ratings-mature-fill      |   <IconRatingsMatureFill />    |
-| ratings-nsfw-outline     |   <IconRatingsNsfwOutline />   |
-| ratings-nsfw-fill        |    <IconRatingsNsfwFill />     |
-| ratings-violence-outline | <IconRatingsViolenceOutline /> |
-| ratings-violence-fill    |  <IconRatingsViolenceFill />   |
+<IconTileGrid>
+  {
+    icons.ratings.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Sorts & Views
 
-| Name                  |             Icon             |
-| :-------------------- | :--------------------------: |
-| best-outline          |     <IconBestOutline />      |
-| best-fill             |       <IconBestFill />       |
-| contest-outline       |    <IconContestOutline />    |
-| contest-fill          |     <IconContestFill />      |
-| controversial-outline | <IconControversialOutline /> |
-| controversial-fill    |  <IconControversialFill />   |
-| hot-outline           |      <IconHotOutline />      |
-| hot-fill              |       <IconHotFill />        |
-| live-outline          |     <IconLiveOutline />      |
-| live-fill             |       <IconLiveFill />       |
-| new-outline           |      <IconNewOutline />      |
-| new-fill              |       <IconNewFill />        |
-| qa-outline            |      <IconQaOutline />       |
-| qa-fill               |        <IconQaFill />        |
-| rising-outline        |    <IconRisingOutline />     |
-| rising-fill           |      <IconRisingFill />      |
-| top-outline           |      <IconTopOutline />      |
-| top-fill              |       <IconTopFill />        |
-| view-card-outline     |   <IconViewCardOutline />    |
-| view-card-fill        |     <IconViewCardFill />     |
-| view-classic-outline  |  <IconViewClassicOutline />  |
-| view-classic-fill     |   <IconViewClassicFill />    |
-| view-compact-outline  |  <IconViewCompactOutline />  |
-| view-compact-fill     |   <IconViewCompactFill />    |
-| view-grid-outline     |   <IconViewGridOutline />    |
-| view-grid-fill        |     <IconViewGridFill />     |
+<IconTileGrid>
+  {
+    icons.sortsAndViews.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Status
 
-| Name                            |                 Icon                  |
-| :------------------------------ | :-----------------------------------: |
-| activity-outline                |        <IconActivityOutline />        |
-| activity-fill                   |         <IconActivityFill />          |
-| appearance-outline              |       <IconAppearanceOutline />       |
-| appearance-fill                 |        <IconAppearanceFill />         |
-| archived-outline                |        <IconArchivedOutline />        |
-| archived-fill                   |         <IconArchivedFill />          |
-| author-outline                  |         <IconAuthorOutline />         |
-| author-fill                     |          <IconAuthorFill />           |
-| avatar-style-outline            |      <IconAvatarStyleOutline />       |
-| avatar-style-fill               |        <IconAvatarStyleFill />        |
-| blockchain-outline              |       <IconBlockchainOutline />       |
-| blockchain-fill                 |        <IconBlockchainFill />         |
-| bot-outline                     |          <IconBotOutline />           |
-| bot-fill                        |            <IconBotFill />            |
-| cake-outline                    |          <IconCakeOutline />          |
-| cake-fill                       |           <IconCakeFill />            |
-| calendar-outline                |        <IconCalendarOutline />        |
-| calendar-fill                   |         <IconCalendarFill />          |
-| coins-outline                   |         <IconCoinsOutline />          |
-| coins-fill                      |           <IconCoinsFill />           |
-| collectible-expressions-outline | <IconCollectibleExpressionsOutline /> |
-| collectible-expressions-fill    |  <IconCollectibleExpressionsFill />   |
-| crosspost-outline               |       <IconCrosspostOutline />        |
-| crosspost-fill                  |         <IconCrosspostFill />         |
-| day-outline                     |          <IconDayOutline />           |
-| day-fill                        |            <IconDayFill />            |
-| downvotes-outline               |       <IconDownvotesOutline />        |
-| downvotes-fill                  |         <IconDownvotesFill />         |
-| error-outline                   |         <IconErrorOutline />          |
-| error-fill                      |           <IconErrorFill />           |
-| karma-outline                   |         <IconKarmaOutline />          |
-| karma-fill                      |           <IconKarmaFill />           |
-| language-outline                |        <IconLanguageOutline />        |
-| language-fill                   |         <IconLanguageFill />          |
-| location-outline                |        <IconLocationOutline />        |
-| location-fill                   |         <IconLocationFill />          |
-| night-outline                   |         <IconNightOutline />          |
-| night-fill                      |           <IconNightFill />           |
-| nsfw-outline                    |          <IconNsfwOutline />          |
-| nsfw-fill                       |           <IconNsfwFill />            |
-| nsfw-language-outline           |      <IconNsfwLanguageOutline />      |
-| nsfw-language-fill              |       <IconNsfwLanguageFill />        |
-| nsfw-violence-outline           |      <IconNsfwViolenceOutline />      |
-| nsfw-violence-fill              |       <IconNsfwViolenceFill />        |
-| official-outline                |        <IconOfficialOutline />        |
-| official-fill                   |         <IconOfficialFill />          |
-| original-outline                |        <IconOriginalOutline />        |
-| original-fill                   |         <IconOriginalFill />          |
-| phone-outline                   |         <IconPhoneOutline />          |
-| phone-fill                      |           <IconPhoneFill />           |
-| powerup-outline                 |        <IconPowerupOutline />         |
-| powerup-fill                    |          <IconPowerupFill />          |
-| premium-outline                 |        <IconPremiumOutline />         |
-| premium-fill                    |          <IconPremiumFill />          |
-| privacy-outline                 |        <IconPrivacyOutline />         |
-| privacy-fill                    |          <IconPrivacyFill />          |
-| quarantined-outline             |      <IconQuarantinedOutline />       |
-| quarantined-fill                |        <IconQuarantinedFill />        |
-| self-outline                    |          <IconSelfOutline />          |
-| self-fill                       |           <IconSelfFill />            |
-| spoiler-outline                 |        <IconSpoilerOutline />         |
-| spoiler-fill                    |          <IconSpoilerFill />          |
-| sponsored-outline               |       <IconSponsoredOutline />        |
-| sponsored-fill                  |         <IconSponsoredFill />         |
-| statistics-outline              |       <IconStatisticsOutline />       |
-| statistics-fill                 |        <IconStatisticsFill />         |
-| status-live-outline             |       <IconStatusLiveOutline />       |
-| status-live-fill                |        <IconStatusLiveFill />         |
-| unverified-outline              |       <IconUnverifiedOutline />       |
-| unverified-fill                 |        <IconUnverifiedFill />         |
-| upvotes-outline                 |        <IconUpvotesOutline />         |
-| upvotes-fill                    |          <IconUpvotesFill />          |
-| user-outline                    |          <IconUserOutline />          |
-| user-fill                       |           <IconUserFill />            |
-| users-outline                   |         <IconUsersOutline />          |
-| users-fill                      |           <IconUsersFill />           |
-| verified-outline                |        <IconVerifiedOutline />        |
-| verified-fill                   |         <IconVerifiedFill />          |
-| views-outline                   |         <IconViewsOutline />          |
-| views-fill                      |           <IconViewsFill />           |
-| warning-outline                 |        <IconWarningOutline />         |
-| warning-fill                    |          <IconWarningFill />          |
-| whale-outline                   |         <IconWhaleOutline />          |
-| whale-fill                      |           <IconWhaleFill />           |
+<IconTileGrid>
+  {
+    icons.status.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Topics
 
-| Name                           |                 Icon                 |
-| :----------------------------- | :----------------------------------: |
-| topic-activism-outline         |     <IconTopicActivismOutline />     |
-| topic-activism-fill            |      <IconTopicActivismFill />       |
-| topic-addictionsupport-outline | <IconTopicAddictionsupportOutline /> |
-| topic-addictionsupport-fill    |  <IconTopicAddictionsupportFill />   |
-| topic-advice-outline           |      <IconTopicAdviceOutline />      |
-| topic-advice-fill              |       <IconTopicAdviceFill />        |
-| topic-animals-outline          |     <IconTopicAnimalsOutline />      |
-| topic-animals-fill             |       <IconTopicAnimalsFill />       |
-| topic-anime-outline            |      <IconTopicAnimeOutline />       |
-| topic-anime-fill               |        <IconTopicAnimeFill />        |
-| topic-art-outline              |       <IconTopicArtOutline />        |
-| topic-art-fill                 |         <IconTopicArtFill />         |
-| topic-beauty-outline           |      <IconTopicBeautyOutline />      |
-| topic-beauty-fill              |       <IconTopicBeautyFill />        |
-| topic-business-outline         |     <IconTopicBusinessOutline />     |
-| topic-business-fill            |      <IconTopicBusinessFill />       |
-| topic-careers-outline          |     <IconTopicCareersOutline />      |
-| topic-careers-fill             |       <IconTopicCareersFill />       |
-| topic-cars-outline             |       <IconTopicCarsOutline />       |
-| topic-cars-fill                |        <IconTopicCarsFill />         |
-| topic-celebrity-outline        |    <IconTopicCelebrityOutline />     |
-| topic-celebrity-fill           |      <IconTopicCelebrityFill />      |
-| topic-craftsdiy-outline        |    <IconTopicCraftsdiyOutline />     |
-| topic-craftsdiy-fill           |      <IconTopicCraftsdiyFill />      |
-| topic-crypto-outline           |      <IconTopicCryptoOutline />      |
-| topic-crypto-fill              |       <IconTopicCryptoFill />        |
-| topic-culture-outline          |     <IconTopicCultureOutline />      |
-| topic-culture-fill             |       <IconTopicCultureFill />       |
-| topic-diy-outline              |       <IconTopicDiyOutline />        |
-| topic-diy-fill                 |         <IconTopicDiyFill />         |
-| topic-entertainment-outline    |  <IconTopicEntertainmentOutline />   |
-| topic-entertainment-fill       |    <IconTopicEntertainmentFill />    |
-| topic-ethics-outline           |      <IconTopicEthicsOutline />      |
-| topic-ethics-fill              |       <IconTopicEthicsFill />        |
-| topic-family-outline           |      <IconTopicFamilyOutline />      |
-| topic-family-fill              |       <IconTopicFamilyFill />        |
-| topic-fashion-outline          |     <IconTopicFashionOutline />      |
-| topic-fashion-fill             |       <IconTopicFashionFill />       |
-| topic-fitness-outline          |     <IconTopicFitnessOutline />      |
-| topic-fitness-fill             |       <IconTopicFitnessFill />       |
-| topic-food-outline             |       <IconTopicFoodOutline />       |
-| topic-food-fill                |        <IconTopicFoodFill />         |
-| topic-funny-outline            |      <IconTopicFunnyOutline />       |
-| topic-funny-fill               |        <IconTopicFunnyFill />        |
-| topic-gender-outline           |      <IconTopicGenderOutline />      |
-| topic-gender-fill              |       <IconTopicGenderFill />        |
-| topic-health-outline           |      <IconTopicHealthOutline />      |
-| topic-health-fill              |       <IconTopicHealthFill />        |
-| topic-help-outline             |       <IconTopicHelpOutline />       |
-| topic-help-fill                |        <IconTopicHelpFill />         |
-| topic-history-outline          |     <IconTopicHistoryOutline />      |
-| topic-history-fill             |       <IconTopicHistoryFill />       |
-| topic-hobbies-outline          |     <IconTopicHobbiesOutline />      |
-| topic-hobbies-fill             |       <IconTopicHobbiesFill />       |
-| topic-homegarden-outline       |    <IconTopicHomegardenOutline />    |
-| topic-homegarden-fill          |     <IconTopicHomegardenFill />      |
-| topic-internet-outline         |     <IconTopicInternetOutline />     |
-| topic-internet-fill            |      <IconTopicInternetFill />       |
-| topic-law-outline              |       <IconTopicLawOutline />        |
-| topic-law-fill                 |         <IconTopicLawFill />         |
-| topic-learning-outline         |     <IconTopicLearningOutline />     |
-| topic-learning-fill            |      <IconTopicLearningFill />       |
-| topic-lifestyle-outline        |    <IconTopicLifestyleOutline />     |
-| topic-lifestyle-fill           |      <IconTopicLifestyleFill />      |
-| topic-marketplace-outline      |   <IconTopicMarketplaceOutline />    |
-| topic-marketplace-fill         |     <IconTopicMarketplaceFill />     |
-| topic-mature-outline           |      <IconTopicMatureOutline />      |
-| topic-mature-fill              |       <IconTopicMatureFill />        |
-| topic-mensfashion-outline      |   <IconTopicMensfashionOutline />    |
-| topic-mensfashion-fill         |     <IconTopicMensfashionFill />     |
-| topic-menshealth-outline       |    <IconTopicMenshealthOutline />    |
-| topic-menshealth-fill          |     <IconTopicMenshealthFill />      |
-| topic-meta-outline             |       <IconTopicMetaOutline />       |
-| topic-meta-fill                |        <IconTopicMetaFill />         |
-| topic-military-outline         |     <IconTopicMilitaryOutline />     |
-| topic-military-fill            |      <IconTopicMilitaryFill />       |
-| topic-movies-outline           |      <IconTopicMoviesOutline />      |
-| topic-movies-fill              |       <IconTopicMoviesFill />        |
-| topic-music-outline            |      <IconTopicMusicOutline />       |
-| topic-music-fill               |        <IconTopicMusicFill />        |
-| topic-news-outline             |       <IconTopicNewsOutline />       |
-| topic-news-fill                |        <IconTopicNewsFill />         |
-| topic-other-outline            |      <IconTopicOtherOutline />       |
-| topic-other-fill               |        <IconTopicOtherFill />        |
-| topic-outdoors-outline         |     <IconTopicOutdoorsOutline />     |
-| topic-outdoors-fill            |      <IconTopicOutdoorsFill />       |
-| topic-pets-outline             |       <IconTopicPetsOutline />       |
-| topic-pets-fill                |        <IconTopicPetsFill />         |
-| topic-photography-outline      |   <IconTopicPhotographyOutline />    |
-| topic-photography-fill         |     <IconTopicPhotographyFill />     |
-| topic-places-outline           |      <IconTopicPlacesOutline />      |
-| topic-places-fill              |       <IconTopicPlacesFill />        |
-| topic-podcasts-outline         |     <IconTopicPodcastsOutline />     |
-| topic-podcasts-fill            |      <IconTopicPodcastsFill />       |
-| topic-politics-outline         |     <IconTopicPoliticsOutline />     |
-| topic-politics-fill            |      <IconTopicPoliticsFill />       |
-| topic-programming-outline      |   <IconTopicProgrammingOutline />    |
-| topic-programming-fill         |     <IconTopicProgrammingFill />     |
-| topic-reading-outline          |     <IconTopicReadingOutline />      |
-| topic-reading-fill             |       <IconTopicReadingFill />       |
-| topic-religion-outline         |     <IconTopicReligionOutline />     |
-| topic-religion-fill            |      <IconTopicReligionFill />       |
-| topic-science-outline          |     <IconTopicScienceOutline />      |
-| topic-science-fill             |       <IconTopicScienceFill />       |
-| topic-sexorientation-outline   |  <IconTopicSexorientationOutline />  |
-| topic-sexorientation-fill      |   <IconTopicSexorientationFill />    |
-| topic-sports-outline           |      <IconTopicSportsOutline />      |
-| topic-sports-fill              |       <IconTopicSportsFill />        |
-| topic-style-outline            |      <IconTopicStyleOutline />       |
-| topic-style-fill               |        <IconTopicStyleFill />        |
-| topic-tabletop-outline         |     <IconTopicTabletopOutline />     |
-| topic-tabletop-fill            |      <IconTopicTabletopFill />       |
-| topic-technology-outline       |    <IconTopicTechnologyOutline />    |
-| topic-technology-fill          |     <IconTopicTechnologyFill />      |
-| topic-television-outline       |    <IconTopicTelevisionOutline />    |
-| topic-television-fill          |     <IconTopicTelevisionFill />      |
-| topic-traumasupport-outline    |  <IconTopicTraumasupportOutline />   |
-| topic-traumasupport-fill       |    <IconTopicTraumasupportFill />    |
-| topic-travel-outline           |      <IconTopicTravelOutline />      |
-| topic-travel-fill              |       <IconTopicTravelFill />        |
-| topic-videogaming-outline      |   <IconTopicVideogamingOutline />    |
-| topic-videogaming-fill         |     <IconTopicVideogamingFill />     |
-| topic-womensfashion-outline    |  <IconTopicWomensfashionOutline />   |
-| topic-womensfashion-fill       |    <IconTopicWomensfashionFill />    |
-| topic-womenshealth-outline     |   <IconTopicWomenshealthOutline />   |
-| topic-womenshealth-fill        |    <IconTopicWomenshealthFill />     |
+<IconTileGrid>
+  {
+    icons.topics.map(({ name, variants }) => (
+      <IconTile name={name}>
+        {variants}
+      </IconTile>
+    )) 
+  }
+</IconTileGrid>
 
 ### Other
 
 | Name                          |                Icon                |
 | :---------------------------- | :--------------------------------: |
-| basketball-color-24           |     <IconBasketballColor24 />      |
 | basketball-fill-24            |      <IconBasketballFill24 />      |
 | basketball-outline-24         |    <IconBasketballOutline24 />     |
 | cricket-fill-outline-24       |    <IconCricketFillOutline24 />    |
@@ -1658,8 +1422,5 @@ An `enum` for setting the size of the icon. Possible values:
 | football-outline-24           |     <IconFootballOutline24 />      |
 | hockey-fill-24                |        <IconHockeyFill24 />        |
 | hockey-outline-24             |      <IconHockeyOutline24 />       |
-| india-independence-24-color   |  <IconIndiaIndependence24Color />  |
-| india-independence-color      |   <IconIndiaIndependenceColor />   |
-| india-independence-outline-24 | <IconIndiaIndependenceOutline24 /> |
 | valentines-day-fill-24        |    <IconValentinesDayFill24 />     |
 | valentines-day-outline-24     |   <IconValentinesDayOutline24 />   |

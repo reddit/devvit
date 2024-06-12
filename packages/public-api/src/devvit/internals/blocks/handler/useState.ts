@@ -1,4 +1,4 @@
-import { EffectType } from '@devvit/protos';
+import type { UIEvent } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import type {
   AsyncUseStateInitializer,
@@ -20,10 +20,12 @@ export function useState<S extends JSONValue>(
 export function useState<S extends JSONValue>(
   initialState: UseStateInitializer<S>
 ): UseStateResult<S> {
-  const hook = registerHook({ namespace: 'useState' }, ({ changed }) => {
+  const hook = registerHook({ namespace: 'useState' }, ({ invalidate: changed }) => {
     const state = initialState instanceof Function ? initialState() : initialState;
     if (state instanceof Promise) {
-      throw new Error('Cannot use async initializer with useState, use useAsyncState instead.');
+      throw new Error(
+        "Cannot use async initializer with context.useState. Please use useAsyncState instead by importing it: import { Devvit, useAsyncState } from '@devvit/public-api';"
+      );
     }
     const setter = (action: SetStateAction<S>): void => {
       hook.state = action instanceof Function ? action(hook.state) : action;
@@ -37,13 +39,15 @@ export function useState<S extends JSONValue>(
 class AsyncStateHook<S extends JSONValue> implements Hook {
   state: { value: S | null; loading: boolean } = { value: null, loading: false };
   #changed: () => void;
+  #ctx: RenderContext;
   #initializer: AsyncUseStateInitializer<S>;
   #hookId: string;
 
   constructor(initializer: AsyncUseStateInitializer<S>, params: HookParams) {
     this.#initializer = initializer;
     this.#hookId = params.hookId;
-    this.#changed = params.changed;
+    this.#changed = params.invalidate;
+    this.#ctx = params.context;
   }
 
   async onUIEvent(): Promise<void> {
@@ -59,15 +63,15 @@ class AsyncStateHook<S extends JSONValue> implements Hook {
     this.#changed();
   }
 
-  onLoad(renderContext: RenderContext): void {
-    if (this.state.value === null && !this.state.loading) {
+  onStateLoaded(): void {
+    if (this.state.value === null) {
       this.state.loading = true;
       this.#changed();
-      renderContext.emitEffect(this.#hookId, {
-        type: EffectType.EFFECT_SEND_EVENT,
-        // This is on the main queue, because it blocks app load.
-        sendEvent: { event: { asyncRequest: { requestId: this.#hookId }, hook: this.#hookId } },
-      });
+      const requeueEvent: UIEvent = {
+        asyncRequest: { requestId: this.#hookId },
+        hook: this.#hookId,
+      };
+      this.#ctx.addToRequeueEvents(requeueEvent);
       throw new RenderInterruptError();
     }
   }
