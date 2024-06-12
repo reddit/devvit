@@ -339,15 +339,14 @@ export class User {
   }
 
   /** @internal */
-  static async getById(id: T2ID, metadata: Metadata | undefined): Promise<User> {
+  static async getById(id: T2ID, metadata: Metadata | undefined): Promise<User | undefined> {
     const client = Devvit.redditAPIPlugins.Users;
 
     const response = await client.UserDataByAccountIds({ ids: id }, metadata);
 
     const username = response?.users?.[id]?.name;
-    assertNonNull(username, 'Expected the username in response to be not null');
 
-    return User.getByUsername(username, metadata);
+    return username == null ? undefined : User.getByUsername(username, metadata);
   }
 
   /** @internal */
