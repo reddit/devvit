@@ -8,8 +8,12 @@ A `string` for defining the text alignment within the text block, both verticall
 - `middle`
 - `bottom`
 
+Note: If vertical alignment is not used in a `hstack`, then the content will stretch vertically.
+
 #### Horizontal alignment
 
 - `start`: The default if the attribute is not used.
 - `center`
 - `end`
+
+Note: If horizontal alignment is not used in a `vstack`, then the content will stretch horizontally.
