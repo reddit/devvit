@@ -19,43 +19,50 @@ export type AsyncOptions = {
   enabled?: boolean;
 };
 
+type LoadState = 'initial' | 'loading' | 'loaded' | 'error' | 'disabled';
+
+type AsyncState<S extends JSONValue> = {
+  depends: JSONValue;
+  load_state: LoadState;
+  data: S | null;
+  error: { message: string; details: string } | null;
+};
+
 class AsyncHook<S extends JSONValue> implements Hook {
-  state: UseAsyncResult<S> & { depends: JSONValue };
+  state: AsyncState<S>;
   readonly #debug: boolean;
   #hookId: string;
   #initializer: AsyncUseStateInitializer<S>;
   #invalidate: () => void;
   #ctx: RenderContext;
   #localDepends: JSONValue;
-  #enabled: boolean;
 
   constructor(initializer: AsyncUseStateInitializer<S>, options: AsyncOptions, params: HookParams) {
     this.#debug = !!params.context.devvitContext.debug.useAsync;
     if (this.#debug) console.debug('[useAsync] v1', options);
-    this.state = { data: null, loading: false, error: null, depends: null };
+    this.state = { data: null, load_state: 'initial', error: null, depends: null };
     this.#hookId = params.hookId;
     this.#initializer = initializer;
     this.#invalidate = params.invalidate;
     this.#ctx = params.context;
     this.#localDepends = options.depends ?? null;
-    this.#enabled = options.enabled ?? true;
+    if (!(options.enabled ?? true)) {
+      this.state.load_state = 'disabled';
+    }
   }
 
   /**
    * After we look at our state, we need to decide if we need to dispatch a request to load the data.
    */
   onStateLoaded(): void {
-    if (!this.#enabled) {
+    if (this.state.load_state === 'disabled') {
       return;
     }
     if (this.#debug) console.debug('[useAsync] async onLoad ', this.#hookId, this.state);
     if (this.#debug)
       console.debug('[useAsync] async onLoad have ', this.#localDepends, 'and', this.state.depends);
-    if (
-      !isEqual(this.#localDepends, this.state.depends) ||
-      (this.state.data === null && this.state.error === null && this.state.loading === false)
-    ) {
-      this.state.loading = true;
+    if (!isEqual(this.#localDepends, this.state.depends) || this.state.load_state === 'initial') {
+      this.state.load_state = 'loading';
       this.state.depends = this.#localDepends;
       this.#invalidate();
 
@@ -104,12 +111,12 @@ class AsyncHook<S extends JSONValue> implements Hook {
     } else if (event.asyncResponse) {
       const anticipatedRequestId = this.#hookId + '-' + JSON.stringify(this.state.depends);
       if (event.asyncResponse.requestId === anticipatedRequestId) {
-        const result = {
+        this.state = {
+          ...this.state,
           data: event.asyncResponse.data?.value as S | null,
-          loading: false,
           error: event.asyncResponse.error ?? null,
+          load_state: event.asyncResponse.error ? 'error' : 'loaded',
         };
-        this.state = { ...this.state, ...result };
         this.#invalidate();
       } else {
         if (this.#debug) console.debug('[useAsync] onResp skip, stale event');
@@ -134,5 +141,9 @@ export function useAsync<S extends JSONValue>(
     return new AsyncHook(initializer, options, params);
   });
 
-  return hook.state;
+  return {
+    data: hook.state.data,
+    error: hook.state.error,
+    loading: hook.state.load_state === 'loading',
+  };
 }

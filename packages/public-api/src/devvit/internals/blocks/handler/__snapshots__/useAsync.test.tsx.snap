@@ -1,12 +1,21 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`regressions > loading null doesnt loop 3`] = `
+{
+  "data": null,
+  "depends": 1,
+  "error": null,
+  "load_state": "loaded",
+}
+`;
+
 exports[`when circuit-breaking: false > receiving request 1`] = `
 {
   "App.useAsync-2": {
     "data": null,
     "depends": 1,
     "error": null,
-    "loading": true,
+    "load_state": "loading",
   },
   "App.useState-0": 1,
   "App.useState-1": true,
@@ -18,7 +27,7 @@ exports[`when circuit-breaking: false > receiving response 1`] = `
   "data": "hi world!",
   "depends": 1,
   "error": null,
-  "loading": false,
+  "load_state": "loaded",
 }
 `;
 
@@ -28,7 +37,7 @@ exports[`when circuit-breaking: true > receiving request 1`] = `
     "data": null,
     "depends": 1,
     "error": null,
-    "loading": true,
+    "load_state": "loading",
   },
   "App.useState-0": 1,
   "App.useState-1": true,
@@ -40,6 +49,6 @@ exports[`when circuit-breaking: true > receiving response 1`] = `
   "data": "hi world!",
   "depends": 1,
   "error": null,
-  "loading": false,
+  "load_state": "loaded",
 }
 `;

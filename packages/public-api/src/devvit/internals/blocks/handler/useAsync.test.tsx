@@ -35,6 +35,14 @@ const App: Devvit.BlockComponent = () => {
   );
 };
 
+const NullApp: Devvit.BlockComponent = () => {
+  const { data, error, loading } = captureHookRef(
+    useAsync(async () => null, { depends: 1 }),
+    asyncRef
+  );
+  return <text>{loading ? 'loading' : data || (error ?? 'none').toString()}</text>;
+};
+
 const asyncRequestEvent = (ref: HookRef, depends: JSONValue = 1): UIEvent => {
   return {
     asyncRequest: { requestId: (ref.id ?? '') + '-' + JSON.stringify(depends) },
@@ -54,6 +62,50 @@ const asyncResponseEvent = (ref: HookRef, depends: JSONValue = 1): UIEvent => {
   };
 };
 describe('regressions', () => {
+  test('loading null doesnt loop', async () => {
+    shouldThrow = true;
+    const handler = new BlocksHandler(NullApp);
+
+    let response = await handler.handle(EmptyRequest, mockMetadata);
+    expect(JSON.stringify(response.blocks)).toContain('loading');
+    expect(response.state).toMatchInlineSnapshot(`
+      {
+        "NullApp.useAsync-0": {
+          "data": null,
+          "depends": 1,
+          "error": null,
+          "load_state": "loading",
+        },
+      }
+    `);
+    const event = {
+      asyncResponse: {
+        requestId: (asyncRef.id ?? '') + '-1',
+        data: { value: null },
+        error: undefined,
+      },
+      hook: asyncRef.id,
+    };
+
+    const request: UIRequest = { events: [event], state: response.state };
+    response = await handler.handle(request, mockMetadata);
+
+    expect(response.state).toMatchInlineSnapshot(`
+      {
+        "NullApp.useAsync-0": {
+          "data": null,
+          "depends": 1,
+          "error": null,
+          "load_state": "loaded",
+        },
+      }
+    `);
+    expect(findHookState(asyncRef)).toMatchSnapshot();
+    expect(JSON.stringify(response.blocks)).toContain('none');
+    expect(response.effects.length).toEqual(0);
+    expect(response.events.length).toEqual(0);
+  });
+
   test('enabled doesnt do anything', async () => {
     const handler = new BlocksHandler(App);
     const request: UIRequest = structuredClone(EmptyRequest);
@@ -102,7 +154,7 @@ describe('regressions', () => {
             "details": "some details",
             "message": "some other error",
           },
-          "loading": false,
+          "load_state": "error",
         },
       }
     `);
@@ -135,7 +187,7 @@ describe('invalidation', () => {
           "data": null,
           "depends": 1,
           "error": null,
-          "loading": true,
+          "load_state": "loading",
         },
         "App.useState-0": 1,
         "App.useState-1": true,
@@ -180,7 +232,7 @@ describe('invalidation', () => {
           "data": "hi world!",
           "depends": 1,
           "error": null,
-          "loading": false,
+          "load_state": "loaded",
         },
       }
     `);
