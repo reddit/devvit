@@ -51,7 +51,7 @@ import {
   isRgbaColor,
   isRPLColor,
 } from '../helpers/color.js';
-import type { AssetsClient } from '../../../apis/AssetsClient/AssetsClient.js';
+import type { AssetsClient, GetURLOptions } from '../../../apis/AssetsClient/AssetsClient.js';
 
 type DataSet = Record<string, unknown>;
 const DATA_PREFIX = 'data-';
@@ -647,9 +647,9 @@ export class BlocksTransformer {
     return input;
   }
 
-  resolveAssetUrl(url: string): string {
+  resolveAssetUrl(url: string, options?: GetURLOptions): string {
     // try and resolve the URL but allow the client to decide if unknown URLs are allowed
-    return this.#assetsClient()?.getURL(url) ?? url;
+    return this.#assetsClient()?.getURL(url, options) ?? url;
   }
 
   childrenToString(children: ReifiedBlockElementOrLiteral[]): string {
@@ -868,7 +868,7 @@ export class BlocksTransformer {
       props &&
       this.makeBlock(BlockType.BLOCK_WEBVIEW, props, {
         webviewConfig: {
-          url: this.resolveAssetUrl(props.url),
+          url: this.resolveAssetUrl(props.url, { webview: true }),
           state: props.state,
         },
       })

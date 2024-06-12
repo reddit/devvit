@@ -451,6 +451,9 @@ export class Devvit extends Actor {
   static #assets: AssetMap = {};
 
   /** @internal */
+  static #webviewAssets: AssetMap = {};
+
+  /** @internal */
   static get redditAPIPlugins(): {
     NewModmail: protos.NewModmail;
     Widgets: protos.Widgets;
@@ -640,6 +643,11 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
+  static get webviewAssets(): AssetMap {
+    return Devvit.#webviewAssets;
+  }
+
+  /** @internal */
   constructor(config: Config) {
     super(config);
 
@@ -682,6 +690,9 @@ export class Devvit extends Actor {
     if (Devvit.#triggerOnEventHandlers.size > 0) {
       registerTriggers(config);
     }
+
+    Devvit.#assets = config.assets ?? {};
+    Devvit.#webviewAssets = config.webviewAssets ?? {};
   }
 }
 

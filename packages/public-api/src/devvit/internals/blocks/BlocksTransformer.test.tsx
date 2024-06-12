@@ -39,6 +39,8 @@ import {
 import { BlocksReconciler } from './BlocksReconciler.js';
 import { BlocksTransformer } from './BlocksTransformer.js';
 
+const VALID_URL = 'https://i.redd.it/theImage';
+
 const commonProps = {
   width: 25,
   height: 50,
@@ -420,7 +422,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
 
   describe('<image>', () => {
     test('outputs a valid object', async () => {
-      const ui = await render(<image url={'foo'} imageWidth={0} imageHeight={0} />);
+      const ui = await render(<image url={VALID_URL} imageWidth={0} imageHeight={0} />);
 
       expect(ui.type).toEqual(BlockType.BLOCK_IMAGE);
       expect(ui.config?.imageConfig).not.toBeUndefined();
@@ -543,7 +545,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
   describe('<animation>', () => {
     test('outputs a valid object', async () => {
       const ui = await render(
-        <animation type={'lottie'} url={'foo'} imageWidth={1} imageHeight={2} />
+        <animation type={'lottie'} url={VALID_URL} imageWidth={1} imageHeight={2} />
       );
 
       expect(ui.type === BlockType.BLOCK_ANIMATION);
@@ -582,7 +584,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
 
   describe('<webview>', () => {
     test('outputs a valid object', async () => {
-      const ui = await render(<webview url={'foo'} />);
+      const ui = await render(<webview url={VALID_URL} />);
 
       expect(ui.type === BlockType.BLOCK_WEBVIEW);
       expect(ui.config?.webviewConfig).not.toBeUndefined();
@@ -710,13 +712,13 @@ describe('BlocksTransformer (JSX -> Block)', () => {
     });
 
     test('image width and height can be defined as a string', async () => {
-      const img = await render(<image imageWidth={'10px'} imageHeight={'10px'} url={'foo'} />);
+      const img = await render(<image imageWidth={'10px'} imageHeight={'10px'} url={VALID_URL} />);
       expect(img?.config?.imageConfig?.width).toEqual(10);
       expect(img?.config?.imageConfig?.height).toEqual(10);
     });
 
     test('image width and height can be defined as a number', async () => {
-      const img = await render(<image imageWidth={10} imageHeight={10} url={'foo'} />);
+      const img = await render(<image imageWidth={10} imageHeight={10} url={VALID_URL} />);
       expect(img?.config?.imageConfig?.width).toEqual(10);
       expect(img?.config?.imageConfig?.height).toEqual(10);
     });

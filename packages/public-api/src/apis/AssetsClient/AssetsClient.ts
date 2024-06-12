@@ -1,19 +1,28 @@
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import { Devvit } from '../../devvit/Devvit.js';
 
+export type GetURLOptions = {
+  webview?: boolean | undefined;
+};
+
 export class AssetsClient {
   readonly #assetMap: AssetMap = {};
+  readonly #webviewAssetMap: AssetMap = {};
 
   constructor() {
     this.#assetMap = Devvit.assets;
+    this.#webviewAssetMap = Devvit.webviewAssets;
   }
 
   /**
    * Gets the public URLs for an asset.
    * @param assetPath A path, relative to the 'assets/' folder.
+   * @param options
    * @returns The public URL for that asset (https://i.redd.it/<id>.<ext>)
    */
   getURL(assetPath: string): string;
+
+  getURL(assetPath: string, options: GetURLOptions | undefined): string;
 
   /**
    * Gets the public URLs for multiple assets.
@@ -22,22 +31,27 @@ export class AssetsClient {
    */
   getURL(assetPaths: string[]): AssetMap;
 
+  getURL(assetPaths: string[], options: GetURLOptions | undefined): AssetMap;
   /**
    * Takes one or more asset names, relative to the 'assets/' folder, and returns either the
    * public URL for that one asset, or a map of each asset name to its URL.
    * @param assetPathOrPaths - Either the path you need the public URL for, or an array of paths.
+   * @param options
    * @returns Either the public URL for the one asset you asked for, or a map of assets to their URLs.
    */
-  getURL(assetPathOrPaths: string | string[]): string | AssetMap {
+  getURL(
+    assetPathOrPaths: string | string[],
+    options?: GetURLOptions | undefined
+  ): string | AssetMap {
     if (typeof assetPathOrPaths === 'string') {
-      return this.#getURL(assetPathOrPaths);
+      return this.#getURL(assetPathOrPaths, options ?? { webview: false });
     }
-    return this.#getURLs(assetPathOrPaths);
+    return this.#getURLs(assetPathOrPaths, options ?? { webview: false });
   }
 
-  #getURL(assetPath: string): string {
+  #getURL(assetPath: string, options: GetURLOptions): string {
     // Has the assetPath already been resolved?
-    const localUrl = this.#assetMap[assetPath];
+    const localUrl = options.webview ? this.#webviewAssetMap[assetPath] : this.#assetMap[assetPath];
     if (localUrl) {
       return localUrl;
     }
@@ -53,18 +67,25 @@ export class AssetsClient {
     }
   }
 
-  #getURLs(assetPaths: string[]): AssetMap {
+  #getURLs(assetPaths: string[], options: GetURLOptions): AssetMap {
     const retval: Record<string, string> = {};
     let missingPaths: string[] = [];
 
     // Try and short circuit using the locally available assets list if possible, keeping a list
     // of all the paths that we couldn't find locally to ask the backend about
-    if (this.#assetMap) {
+    const cache = options.webview ? this.#webviewAssetMap : this.#assetMap;
+    if (cache) {
       for (const path of assetPaths) {
-        if (this.#assetMap[path]) {
-          retval[path] = this.#assetMap[path];
+        if (cache[path]) {
+          retval[path] = cache[path];
         } else {
-          missingPaths.push(path);
+          try {
+            new URL(path);
+            retval[path] = path;
+          } catch {
+            // invalid URL, missing from cache
+            missingPaths.push(path);
+          }
         }
       }
     } else {

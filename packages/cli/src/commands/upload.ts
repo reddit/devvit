@@ -15,6 +15,7 @@ import {
   UploadNewMediaRequest,
   VersionVisibility,
 } from '@devvit/protos/community.js';
+import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
   ASSET_DIRNAME,
@@ -22,6 +23,7 @@ import {
   MAX_ASSET_GIF_SIZE,
   MAX_ASSET_NON_GIF_SIZE,
   prettyPrintSize,
+  WEBVIEW_ASSET_DIRNAME,
 } from '@devvit/shared-types/Assets.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
@@ -57,6 +59,7 @@ import { readPackageJSON } from '../util/package-managers/package-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import { sendEvent } from '../util/metrics.js';
+import type { MediaSignatureStatus } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -429,11 +432,14 @@ export default class Upload extends ProjectCommand {
     }
 
     // Sync and upload assets
-    const assetNamesToIDs = await this.#syncAssets();
+    const { assetMap, webViewAssetMap } = await this.#syncAssets(
+      appInfo.app?.isWebviewEnabled === true
+    );
 
     // Dump these in the assets fields of the bundles
     for (const bundle of bundles) {
-      bundle.assetIds = assetNamesToIDs;
+      bundle.assetIds = assetMap ?? {};
+      bundle.webviewAssetIds = webViewAssetMap ?? {};
     }
 
     // Actually create the app version
@@ -531,124 +537,61 @@ export default class Upload extends ProjectCommand {
    * Checks if there are any new assets to upload, and if there are, uploads them.
    * Returns a map of asset names to their asset IDs.
    * Can throw an exception if the app's assets exceed our limits.
+   *
+   * If present, WebView assets will also be synced but will not be included in
+   * the asset map.
    */
-  async #syncAssets(): Promise<Record<string, string>> {
-    const assetNamesToIDs: Record<string, string> = {};
-    const config = await this.getProjectConfig();
-    const appAssets = await this.#getAssets();
+  async #syncAssets(isWebViewEnabled: boolean = false): Promise<{
+    assetMap?: AssetMap;
+    webViewAssetMap?: AssetMap;
+  }> {
+    const regularAssets = await this.#getAssets(ASSET_DIRNAME, ALLOWED_ASSET_EXTENSIONS);
+    let webViewAssets = await this.#getAssets(WEBVIEW_ASSET_DIRNAME);
+
+    if (!isWebViewEnabled && webViewAssets.length > 0) {
+      ux.warn('WebView is not enabled for this app. Skipping webview assets.');
+      webViewAssets = [];
+    }
 
     // Return early if no assets
-    if (appAssets.length === 0) {
+    if (regularAssets.length + webViewAssets.length === 0) {
       return {};
     }
 
     // Do some rough client-side asset verification - it'll be more robust on
     // the server side of things, but let's help "honest" users out early
-    const appAssetsTotalSize = appAssets.reduce((sum, a) => sum + a.size, 0);
-    if (appAssetsTotalSize > MAX_ASSET_FOLDER_SIZE_BYTES) {
+    const totalSize =
+      regularAssets.reduce((sum, a) => sum + a.size, 0) +
+      webViewAssets.reduce((sum, a) => sum + a.size, 0);
+
+    if (totalSize > MAX_ASSET_FOLDER_SIZE_BYTES) {
       this.error(
         `Your assets folder is too big - you've got ${prettyPrintSize(
-          appAssetsTotalSize
+          totalSize
         )} of assets, which is more than the ${prettyPrintSize(
           MAX_ASSET_FOLDER_SIZE_BYTES
         )} total allowed.`
       );
     }
-    for (const asset of appAssets) {
-      if (asset.filePath.endsWith('.gif') && asset.size > MAX_ASSET_GIF_SIZE) {
-        this.error(
-          `Asset ${asset.filePath} is too large - gifs can't be more than ${prettyPrintSize(
-            MAX_ASSET_GIF_SIZE
-          )}.`
-        );
-      }
-      if (asset.size > MAX_ASSET_NON_GIF_SIZE) {
-        this.error(
-          `Asset ${asset.filePath} is too large - images can't be more than ${prettyPrintSize(
-            MAX_ASSET_NON_GIF_SIZE
-          )}.`
-        );
-      }
-    }
 
-    ux.action.start(`Checking for new assets to upload...`);
+    // regular assets go to Media Service
+    const assetMap = await this.#processRegularAssets(regularAssets);
+    // webroot assets go to webview storage
+    const webViewAssetMap = await this.#processWebViewAssets(webViewAssets);
 
-    // Check if this media exists or not
-    const res = await this.appClient.CheckIfMediaExists({
-      id: undefined,
-      slug: config.name,
-      signatures: appAssets.map((a) => ({
-        size: a.size,
-        hash: a.hash,
-        filePath: a.filePath,
-      })),
-    });
-
-    // For everything that already exists, add relevant entries to the return map
-    res.statuses
-      .filter((status) => !status.isNew)
-      .forEach((status) => {
-        assetNamesToIDs[status.filePath] = status.existingMediaId!;
-      });
-
-    // For everything that's new, we'll need to upload them
-    const filesNeedingNewUpload = res.statuses
-      .filter((status) => status.isNew)
-      .map((status) => {
-        const asset = appAssets.find((asset) => asset.filePath === status.filePath);
-        if (!asset) {
-          throw new Error(
-            `Backend returned new asset with path ${status.filePath} that we don't know about..?`
-          );
-        }
-        return asset;
-      });
-
-    ux.action.stop(
-      `Found ${filesNeedingNewUpload.length} new asset${
-        filesNeedingNewUpload.length === 1 ? '' : 's'
-      }.`
-    );
-
-    if (filesNeedingNewUpload.length === 0) {
-      // Nothing to upload - return early
-      return assetNamesToIDs;
-    }
-
-    // Upload everything, giving back pairs of the assets & their upload response
-    ux.action.start(`Uploading new assets...`);
-    const uploadResults = await Promise.all(
-      filesNeedingNewUpload.map(async (f) => {
-        return [
-          f,
-          await this.appClient.UploadNewMedia(
-            UploadNewMediaRequest.fromPartial({
-              slug: config.name,
-              size: f.size,
-              hash: f.hash,
-              contents: f.contents,
-            })
-          ),
-        ] as [MediaSignatureWithContents, UploadNewMediaResponse];
-      })
-    );
-    ux.action.stop(`New assets uploaded.`);
-
-    // Update our asset name to ID map with the new uploads
-    for (const [asset, resp] of uploadResults) {
-      assetNamesToIDs[asset.filePath] = resp.assetId;
-    }
-
-    return assetNamesToIDs;
+    return { assetMap, webViewAssetMap };
   }
 
-  async #getAssets(): Promise<MediaSignatureWithContents[]> {
-    if (!(await dirExists(path.join(this.projectRoot, ASSET_DIRNAME)))) {
+  async #getAssets(
+    folder: string,
+    allowedExtensions: string[] = []
+  ): Promise<MediaSignatureWithContents[]> {
+    if (!(await dirExists(path.join(this.projectRoot, folder)))) {
       // Return early if there isn't an assets directory
       return [];
     }
 
-    const assetsPath = path.join(this.projectRoot, ASSET_DIRNAME);
+    const assetsPath = path.join(this.projectRoot, folder);
     const assetsGlob = path
       .join(assetsPath, '**', '*')
       // Note: tiny-glob *always* uses `/` as its path separator, even on Windows, so we need to
@@ -659,9 +602,8 @@ export default class Upload extends ProjectCommand {
         filesOnly: true,
         absolute: true,
       })
-    ).filter((asset) =>
-      // Do a quick filter to get rid of any non-image-looking assets
-      ALLOWED_ASSET_EXTENSIONS.includes(path.extname(asset))
+    ).filter(
+      (asset) => allowedExtensions.length === 0 || allowedExtensions.includes(path.extname(asset))
     );
     return await Promise.all(
       assets.map(async (asset) => {
@@ -695,5 +637,163 @@ export default class Upload extends ProjectCommand {
     this.#event.devplatform.cli_upload_failure_reason = err.message;
     await this.#sendEventIfNotSent();
     return super.catch(err);
+  }
+
+  async #processRegularAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
+    // Verify asset file sizes are within limits
+    for (const asset of assets) {
+      if (asset.filePath.endsWith('.gif') && asset.size > MAX_ASSET_GIF_SIZE) {
+        this.error(
+          `Asset ${asset.filePath} is too large - gifs can't be more than ${prettyPrintSize(
+            MAX_ASSET_GIF_SIZE
+          )}.`
+        );
+      }
+      if (asset.size > MAX_ASSET_NON_GIF_SIZE) {
+        this.error(
+          `Asset ${asset.filePath} is too large - images can't be more than ${prettyPrintSize(
+            MAX_ASSET_NON_GIF_SIZE
+          )}.`
+        );
+      }
+    }
+
+    ux.action.start(`Checking for new assets to upload...`);
+
+    const assetMap = await this.#uploadNewAssets(assets);
+
+    ux.action.stop(`Found ${assets.length} new asset${assets.length === 1 ? '' : 's'}.`);
+
+    return assetMap;
+  }
+
+  async #processWebViewAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
+    // early out to avoid logging if empty
+    if (assets.length === 0) {
+      return {};
+    }
+
+    ux.action.start(`Checking for new webview assets to upload...`);
+
+    const assetMap = await this.#uploadNewAssets(assets, true);
+
+    ux.action.stop(`Found ${assets.length} new webview asset${assets.length === 1 ? '' : 's'}.`);
+
+    // only return the html files for the webview assets
+    return Object.keys(assetMap).reduce<AssetMap>((map, assetPath) => {
+      if (assetPath.match(/\.htm(l)?$/)) {
+        map[assetPath] = assetMap[assetPath];
+      }
+      return map;
+    }, {});
+  }
+
+  async #getAssetStatuses(assets: MediaSignatureWithContents[]): Promise<MediaSignatureStatus[]> {
+    const config = await this.getProjectConfig();
+    const res = await this.appClient.CheckIfMediaExists({
+      id: undefined,
+      slug: config.name,
+      signatures: assets.map((a) => ({
+        size: a.size,
+        hash: a.hash,
+        filePath: a.filePath,
+      })),
+    });
+    return res.statuses;
+  }
+
+  async #uploadNewAssets(
+    assets: MediaSignatureWithContents[],
+    webViewAsset: boolean = false
+  ): Promise<AssetMap> {
+    const webViewMsg = webViewAsset ? 'webview ' : '';
+
+    const config = await this.getProjectConfig();
+    const statuses = await this.#getAssetStatuses(assets);
+    ux.action.start(`Checking for new ${webViewMsg}assets`);
+    const [newAssets, existingAssets] = await this.#findNewAssets(assets, statuses);
+
+    const assetMap: AssetMap = existingAssets;
+
+    if (newAssets.length === 0) {
+      ux.action.stop(`None found!`);
+      return assetMap;
+    }
+
+    // Upload everything, giving back pairs of the assets & their upload response
+    ux.action.start(`Uploading new ${webViewMsg}assets...`);
+    let uploadResults: [MediaSignatureWithContents, UploadNewMediaResponse][];
+    try {
+      uploadResults = await Promise.all(
+        newAssets.map(async (f) => {
+          return [
+            f,
+            await this.appClient.UploadNewMedia(
+              UploadNewMediaRequest.fromPartial({
+                slug: config.name,
+                size: f.size,
+                hash: f.hash,
+                contents: f.contents,
+                webviewAsset: webViewAsset,
+                filePath: f.filePath,
+              })
+            ),
+          ] as [MediaSignatureWithContents, UploadNewMediaResponse];
+        })
+      );
+    } catch (e) {
+      const error = e as Error;
+      const msg = `Failed to upload ${webViewMsg}assets. (${error.message})`;
+      if (webViewAsset) {
+        // don't fail on webview uploads in case we just don't have the feature enabled
+        ux.action.stop(msg);
+        return {};
+      } else {
+        // otherwise exit
+        ux.error(msg, { exit: 1 });
+      }
+    }
+
+    ux.action.stop(`New ${webViewMsg}assets uploaded.`);
+
+    return assets.reduce<{ [asset: string]: string }>((map, asset) => {
+      const assetId =
+        statuses.find((status) => status.filePath === asset.filePath)?.existingMediaId ??
+        uploadResults.find(([result]) => result.filePath === asset.filePath)?.[1].assetId;
+      if (assetId) {
+        map[asset.filePath] = assetId;
+      }
+      return map;
+    }, assetMap);
+  }
+
+  async #findNewAssets(
+    assets: MediaSignatureWithContents[],
+    statuses: MediaSignatureStatus[]
+  ): Promise<[MediaSignatureWithContents[], AssetMap]> {
+    // ensure everything is accounted for
+    const newAssets: MediaSignatureWithContents[] = [];
+    const existingAssets: AssetMap = {};
+    statuses.forEach((status) => {
+      const asset = assets.find((asset) => asset.filePath === status.filePath);
+      if (!asset) {
+        throw new Error(
+          `Backend returned new asset with path ${status.filePath} that we don't know about..?`
+        );
+      }
+      if (status.isNew) {
+        newAssets.push(asset);
+      } else {
+        if (status.existingMediaId) {
+          existingAssets[asset.filePath] = status.existingMediaId;
+        } else {
+          throw new Error(
+            `Backend doesn't have an ID for ${status.filePath} but says it isn't new..?`
+          );
+        }
+      }
+    });
+
+    return [newAssets, existingAssets];
   }
 }
