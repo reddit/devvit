@@ -2,8 +2,8 @@ import type { Metadata } from '@devvit/protos';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import pkg from '../../../package.json' assert { type: 'json' };
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
+import pkg from '../../version.json' assert { type: 'json' };
 
 let loggedVersion: boolean = false;
 
