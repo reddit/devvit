@@ -18,7 +18,7 @@ export class RenderContext implements EffectEmitter {
   readonly meta: Readonly<Metadata>;
   #state: BlocksState;
   _segments: (HookSegment & { next: number })[] = [];
-  _hooks: { [key: string]: Hook } = {};
+  _hooks: { [hookID: string]: Hook } = {};
   _prevHookId: string = '';
   _effects: { [key: string]: Effect } = {};
   _changed: { [hookID: string]: true } = {};
@@ -56,6 +56,10 @@ export class RenderContext implements EffectEmitter {
     return changed;
   }
 
+  get hooks(): { readonly [hookID: string]: Hook } {
+    return this._hooks;
+  }
+
   /** The complete render state. */
   get _state(): BlocksState {
     return this.#state;
@@ -86,7 +90,7 @@ export class RenderContext implements EffectEmitter {
   getHook(ref: HookRef): Hook {
     return this._hooks[ref.id!];
   }
-
+  /** Catches events with no active handler and routes to the corresponding hook to detach/unsubscribe/etc **/
   static addGlobalUndeliveredEventHandler(id: string, handler: EventHandler): void {
     RenderContext._staticUndeliveredHandlers[id] = handler;
   }

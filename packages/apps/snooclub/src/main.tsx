@@ -1,5 +1,7 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useAsync, useChannel, useState } from '@devvit/public-api';
 import { ChannelStatus } from '@devvit/public-api/types/realtime.js';
+import { ConnectionStatus } from './ui/connection-status.js';
+import { Dpad } from './ui/dpad.js';
 const defaultSnoovatarUrl = 'https://www.redditstatic.com/shreddit/assets/thinking-snoo.png';
 
 Devvit.configure({
@@ -54,10 +56,12 @@ function sessionId(): string {
   return id;
 }
 
-const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId }) => {
-  const [me] = useState<UserRecord | undefined>(async () => {
+const App: Devvit.CustomPostComponent = ({ reddit, userId }) => {
+  const [postData, setPostData] = useState<PostData>({ users: {} });
+
+  const { data: me } = useAsync<UserRecord | null>(async () => {
     const user = await reddit.getCurrentUser();
-    if (!user) return;
+    if (!user) return null;
     return {
       id: user.id,
       name: user.username,
@@ -66,7 +70,7 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId 
 
   const mySession = sessionId();
 
-  const [postData, setPostData] = useState<PostData>(async () => {
+  useAsync(async () => {
     const currentUser = await reddit.getCurrentUser();
     if (!currentUser) return { users: {} };
     const userData = {
@@ -77,13 +81,14 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId 
     };
     const users = {} as Items;
     users[currentUser.id] = userData;
-    return { users: users };
+    setPostData({ users });
+    return null;
   });
 
   const channel = useChannel({
     name: 'locations',
-    onMessage: (data) => {
-      const msg = data as RealtimeMessage;
+    onMessage: (data: RealtimeMessage) => {
+      const msg = data;
       if (msg.session === mySession) {
         return;
       }
@@ -97,7 +102,6 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId 
       };
       setPostData(postData);
     },
-    onSubscribed: async () => {},
   });
   channel.subscribe();
 
@@ -140,26 +144,6 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId 
     await channel.send(message);
   };
 
-  let statusLight: string;
-  switch (channel.status) {
-    case ChannelStatus.Connecting:
-      statusLight = '🟡';
-      break;
-    case ChannelStatus.Connected:
-      statusLight = '🟢';
-      break;
-    case ChannelStatus.Disconnecting:
-      statusLight = '🟠';
-      break;
-    case ChannelStatus.Disconnected:
-      statusLight = '🔴';
-      break;
-    case ChannelStatus.Unknown:
-    default:
-      statusLight = '⚪';
-      break;
-  }
-
   const users = Object.values(postData.users)
     .sort((a, b) => a.y - b.y)
     .map((user) => {
@@ -169,63 +153,11 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, reddit, userId 
   return (
     <blocks height="tall">
       <zstack>
-        <vstack alignment="end">
-          <hstack height="50px" alignment="center">
-            <spacer size="medium" />
-            <text size="medium" weight="bold">
-              Connected: {statusLight}
-            </text>
-          </hstack>
-        </vstack>
+        <ConnectionStatus status={channel.status} />
         {users}
         <vstack>
           <Padding offset={0} extraPadding={10} />
-          <hstack padding="large" gap="large">
-            <vstack
-              alignment="center"
-              backgroundColor="rgba(0,0,0,0.8)"
-              cornerRadius="full"
-              padding="small"
-            >
-              <hstack>
-                <button
-                  disabled={channel.status !== ChannelStatus.Connected}
-                  size="small"
-                  onPress={async () => {
-                    await updatePosition(0, -1);
-                  }}
-                >
-                  ↑
-                </button>
-              </hstack>
-              <hstack>
-                <button
-                  disabled={channel.status !== ChannelStatus.Connected}
-                  size="small"
-                  onPress={async () => await updatePosition(-1, 0)}
-                >
-                  ←
-                </button>
-                <spacer size="large" />
-                <button
-                  disabled={channel.status !== ChannelStatus.Connected}
-                  size="small"
-                  onPress={async () => await updatePosition(1, 0)}
-                >
-                  →
-                </button>
-              </hstack>
-              <hstack>
-                <button
-                  disabled={channel.status !== ChannelStatus.Connected}
-                  size="small"
-                  onPress={async () => await updatePosition(0, 1)}
-                >
-                  ↓
-                </button>
-              </hstack>
-            </vstack>
-          </hstack>
+          <Dpad disabled={channel.status !== ChannelStatus.Connected} onPress={updatePosition} />
         </vstack>
       </zstack>
     </blocks>

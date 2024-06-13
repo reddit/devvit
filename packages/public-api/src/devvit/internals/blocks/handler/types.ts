@@ -8,9 +8,15 @@ export type Props = { [key: string]: unknown };
 
 export type HookSegment = {
   /**
-   * This is usually the name of the hook: useAsync, useAsyncState, useChannel,
-   * useForm, useInterval, useState, etc, the block element, or the component
-   * name (eg, AppToolbar or FooBar).
+   * This is usually the name of the hook: useAsync, useAsyncState,
+   * useChannel:channelName, useForm, useInterval, useState, the block element,
+   * or the component name (eg, AppToolbar or FooBar).
+   *
+   * Namespaces can be used to encode additional data such as logically shared
+   * instances that would otherwise have to be gathered from Hook instances.
+   *
+   * Dashes (-) and dots (.) delimit hook IDs so don't use those in your
+   * namespace.
    */
   namespace?: string;
 
@@ -43,7 +49,7 @@ export type EventHandler = (event: UIEvent, context: RenderContext) => Promise<v
  * Syncs state between client and server, responds to events, provides user
  * API, and transitions state across renders.
  */
-export interface Hook {
+export type Hook = {
   /**
    * State to carry across renders. Hook constructor arguments are recreated on
    * render but state may be passed in the render request and used to prime that
@@ -67,7 +73,7 @@ export interface Hook {
    * 5. state gets serialized.
    */
   onStateLoaded?(): void;
-}
+};
 
 export type HookRef = { id?: string };
 

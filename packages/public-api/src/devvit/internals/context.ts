@@ -51,10 +51,10 @@ export function parseDebug(meta: Readonly<Metadata>): ContextDebugInfo {
     blocks: undefined,
     emitSnapshots: undefined,
     emitState: undefined,
+    realtime: undefined,
     runtime: undefined,
     surface: undefined,
     useAsync: undefined,
-    useChannel: undefined,
   };
   // {[key: Lowercase<AppDebug>]: AppDebug}
   const lowerKeyToKey: { [lower: string]: string } = {};
