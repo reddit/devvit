@@ -374,15 +374,25 @@ export class BlocksReconciler implements EffectEmitter {
     const blockElement = element as BlockElement;
     // Intrinsic elements
     if (typeof blockElement.type === 'string') {
-      const childrens = await Promise.all(
-        blockElement.children.flatMap(async (child, i) => {
-          if (child === undefined || child === null) return [];
-          return await this.processBlock(child, idGenerator, [
+      const childrens: ReifiedBlockElementOrLiteral[] = [];
+
+      /**
+       * Resist the urge to clean this up with flatMap. We need to await each processBlock _in order_.
+       *
+       * Number of times this has caused a major headache: 3
+       *
+       * Please increment the counter above if you had to revert this.
+       */
+      for (let i = 0; i < blockElement.children.length; i++) {
+        const child = blockElement.children[i];
+        if (child === undefined || child === null) continue;
+        childrens.push(
+          await this.processBlock(child, idGenerator, [
             ...path,
             `${blockElement.type as string}.${i}`,
-          ]);
-        })
-      );
+          ])
+        );
+      }
 
       const children = childrens.flat();
       const collapsedChildren = this.#flatten(children);
@@ -437,6 +447,12 @@ export class BlocksReconciler implements EffectEmitter {
       // Ensure that the number of hooks are same from the previous render.
       if (!this.isInitialRender) {
         const previousState = this.getPreviousComponentState();
+        /**
+         * Note: This relies on the magic of {0: "a", 1: "b"} => ["a", "b"] and back under many circumstances.
+         * It is too magic, but as this component is complicated and deprecated, it is not worth fixing.
+         *
+         * In fact previousState is an array.  This is confusing.
+         */
         const prevHookCount = Object.keys(previousState).length;
         if (prevHookCount !== this.currentHookIndex) {
           throw new Error(
@@ -500,7 +516,6 @@ export class BlocksReconciler implements EffectEmitter {
     if (!componentKey) {
       throw new Error('Current component key is missing');
     }
-
     return this.renderState[componentKey] as { [hookIndex: number]: S };
   }
 
@@ -626,6 +641,10 @@ export class BlocksReconciler implements EffectEmitter {
     // {"0": "one", "2": "three"} (length: 2; fails consistency check, see line 251)
     // After:
     // ["one", undefined, "three"] (length: 3)
+    /**
+     * Note: This relies on the magic of {0: "a", 1: "b"} => ["a", "b"] and back under many circumstances.
+     * It is too magic, but as this component is complicated and deprecated, it is not worth fixing.
+     */
     for (const key of Object.keys(this.renderState)) {
       this.renderState[key] = Object.values(this.renderState[key]);
     }

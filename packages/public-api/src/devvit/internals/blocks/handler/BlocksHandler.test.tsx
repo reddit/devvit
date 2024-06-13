@@ -63,7 +63,31 @@ const MultiCounter = (): JSX.Element => {
   );
 };
 
+const stateARef: HookRef = {};
+const stateBRef: HookRef = {};
+const ComponentA = (): JSX.Element => {
+  const [_count, setCount] = captureHookRef(useState(0), stateARef);
+  return <button onPress={() => setCount((c) => ++c)}>A</button>;
+};
+
+const ComponentB = (): JSX.Element => {
+  const [_count, setCount] = captureHookRef(useState(0), stateBRef);
+  return <button onPress={() => setCount((c) => ++c)}>B</button>;
+};
+
+const ConditionalComponent = (): JSX.Element => {
+  const [choice, _setChoice] = captureHookRef(useState('a'), counter1Ref);
+  return <hstack>{choice === 'a' ? <ComponentA /> : <ComponentB />}</hstack>;
+};
+
 describe('BlocksHandler', () => {
+  describe('regressions', () => {
+    test('conditional components should not throw (bonus test)', async () => {
+      const handler = new BlocksHandler(ConditionalComponent);
+      await handler.handle(EmptyRequest, mockMetadata);
+    });
+  });
+
   describe('transformation', () => {
     test('should inject a root element', async () => {
       const callback = vi.fn();

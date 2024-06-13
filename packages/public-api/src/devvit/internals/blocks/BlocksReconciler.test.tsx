@@ -7,7 +7,50 @@ import { describe, expect, test, vi } from 'vitest';
 import { Devvit } from '../../Devvit.js';
 import { BlocksReconciler } from './BlocksReconciler.js';
 
+const Inner: JSX.ComponentFunction = (_props, context) => {
+  const [_count, _setCount] = context.useState(1);
+  return <text>Inner1</text>;
+};
+
+const Outer: JSX.ComponentFunction = (_props, _context) => {
+  return (
+    <blocks>
+      <Inner />
+      <Inner />
+    </blocks>
+  );
+};
+
 describe('BlocksReconciler', () => {
+  describe('regression', () => {
+    test('concurrency bug regression', async () => {
+      let reconciler = new BlocksReconciler(
+        Outer,
+        BlockRenderRequest.fromPartial({
+          type: BlockRenderEventType.RENDER_INITIAL,
+        }),
+        undefined,
+        mockMetadata,
+        undefined
+      );
+
+      await reconciler.render();
+
+      const lastState = reconciler.state;
+      reconciler = new BlocksReconciler(
+        Outer,
+        BlockRenderRequest.fromPartial({
+          type: BlockRenderEventType.RENDER_EFFECT_EVENT,
+        }),
+        lastState,
+        mockMetadata,
+        undefined
+      );
+
+      await reconciler.render();
+    });
+  });
+
   describe('function components', () => {
     test('should pass children', async () => {
       const Box = ({ children }: Devvit.Blocks.HasElementChildren): JSX.Element => {
@@ -47,6 +90,95 @@ describe('BlocksReconciler', () => {
       expect(output).toEqual(expected);
     });
   });
+
+  test('should pass children, double-boxed', async () => {
+    const Box = ({ children }: Devvit.Blocks.HasElementChildren): JSX.Element => {
+      return <hstack>{children}</hstack>;
+    };
+    const boxed = (): JSX.Element => (
+      <Box>
+        <Box>
+          <text>hi world</text>
+        </Box>
+      </Box>
+    );
+    const expectedComponent = (): JSX.Element => (
+      <hstack>
+        <hstack>
+          <text>hi world</text>
+        </hstack>
+      </hstack>
+    );
+    const reconciler = new BlocksReconciler(
+      boxed,
+      BlockRenderRequest.fromPartial({
+        type: BlockRenderEventType.RENDER_INITIAL,
+      }),
+      undefined,
+      mockMetadata,
+      undefined
+    );
+    const output = await reconciler.render();
+
+    const flatReconciler = new BlocksReconciler(
+      expectedComponent,
+      BlockRenderRequest.fromPartial({
+        type: BlockRenderEventType.RENDER_INITIAL,
+      }),
+      undefined,
+      mockMetadata,
+      undefined
+    );
+    const expected = await flatReconciler.render();
+    expect(output).toEqual(expected);
+  });
+
+  test('should pass children, triple-boxed', async () => {
+    const Box = ({ children }: Devvit.Blocks.HasElementChildren): JSX.Element => {
+      return <hstack>{children}</hstack>;
+    };
+    const boxed = (): JSX.Element => (
+      <Box>
+        <vstack>
+          <Box>
+            <text>hi world</text>
+          </Box>
+        </vstack>
+      </Box>
+    );
+    const expectedComponent = (): JSX.Element => (
+      <hstack>
+        <vstack>
+          <hstack>
+            <text>hi world</text>
+          </hstack>
+        </vstack>
+      </hstack>
+    );
+    const reconciler = new BlocksReconciler(
+      boxed,
+      BlockRenderRequest.fromPartial({
+        type: BlockRenderEventType.RENDER_INITIAL,
+      }),
+      undefined,
+      mockMetadata,
+      undefined
+    );
+    const output = await reconciler.render();
+
+    const flatReconciler = new BlocksReconciler(
+      expectedComponent,
+      BlockRenderRequest.fromPartial({
+        type: BlockRenderEventType.RENDER_INITIAL,
+      }),
+      undefined,
+      mockMetadata,
+      undefined
+    );
+    const expected = await flatReconciler.render();
+    expect(output).toEqual(expected);
+  });
+
   test('async component can render', async () => {
     const callback = vi.fn();
     const component: JSX.ComponentFunction = async () => {
