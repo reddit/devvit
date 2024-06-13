@@ -38,6 +38,7 @@ import type {
   SendPrivateMessageOptions,
   SetPostFlairOptions,
   SetUserFlairOptions,
+  SubredditLeaderboard,
   SubmitPostOptions,
   UpdatePageSettingsOptions,
   UpdateWikiPageOptions,
@@ -62,6 +63,7 @@ import {
   getModerationLog,
   getVaultByAddress,
   getVaultByUserId,
+  getSubredditLeaderboard,
 } from './models/index.js';
 
 type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;
@@ -1594,5 +1596,16 @@ export class RedditAPIClient {
    */
   getVaultByUserId(userId: string): Promise<Vault> {
     return getVaultByUserId(asTID<T2ID>(userId), this.#metadata);
+  }
+
+  /**
+   * Returns a leaderboard for a given subreddit ID.
+   *
+   * @param subredditId ID of the subreddit for which the leaderboard is being queried.
+   *
+   * @returns {SubredditLeaderboard} Leaderboard for the given subreddit.
+   */
+  getSubredditLeaderboard(subredditId: string): Promise<SubredditLeaderboard> {
+    return getSubredditLeaderboard(subredditId, this.#metadata);
   }
 }

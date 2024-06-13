@@ -39,6 +39,7 @@ import type {
   ModeratorPermission,
 } from './User.js';
 import { User } from './User.js';
+import { GraphQL } from '../graphql/GraphQL.js';
 
 type GetModerationLogOptions = Omit<_GetModerationLogOptions, 'subredditName'>;
 type GetUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'subredditName' | 'type'>;
@@ -253,6 +254,24 @@ export type SubredditSettings = {
    * HTTP URL to the subreddit
    */
   url: string;
+};
+
+export type SubredditLeaderboardSummaryRow = {
+  title: string;
+  key: string;
+  value: number;
+};
+
+export type SubredditLeaderboardSummary = {
+  data: SubredditLeaderboardSummaryRow[];
+};
+
+/**
+ * An individual Leaderboard object.
+ */
+export type SubredditLeaderboard = {
+  id: string;
+  summary: SubredditLeaderboardSummary;
 };
 
 /**
@@ -1160,6 +1179,31 @@ export class Subreddit {
 
     return new Subreddit(response.data, metadata);
   }
+}
+
+export async function getSubredditLeaderboard(
+  subredditId: string,
+  metadata: Metadata | undefined
+): Promise<SubredditLeaderboard> {
+  const operationName = 'GetSubredditLeaderboard';
+  const persistedQueryHash = '18ead70c46b6446d45ecd8b679b16d9a929a933d6ef25d8262a459cb18b72848';
+  const response = await GraphQL.query(
+    operationName,
+    persistedQueryHash,
+    { subredditId },
+    metadata
+  );
+
+  if (!response.data?.subredditInfoByID?.subreddit?.leaderboard.summary) {
+    throw new Error('subreddit leaderboard summary not found');
+  }
+
+  const leaderboard = response.data?.subredditInfoByID?.subreddit?.leaderboard;
+
+  return {
+    id: leaderboard.id,
+    summary: leaderboard.summary,
+  };
 }
 
 function asSubredditType(type?: string): SubredditType {
