@@ -24,6 +24,8 @@ export default class Login extends DevvitCommand {
     const token = await this.getAccessTokenAndLoginIfNeeded(copyPaste);
     const username = await this.getUserDisplayName(token);
 
-    this.log(`Logged in as ${username}`);
+    this.log(
+      `Logged in as ${username}\n\n\`devvit new\` to create a new project\n\`devvit --help\` for more commands\n`
+    );
   }
 }
