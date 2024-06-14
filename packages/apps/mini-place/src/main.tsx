@@ -1,10 +1,5 @@
 import { Devvit } from '@devvit/public-api';
 
-Devvit.configure({
-  realtime: true,
-  redditAPI: true,
-});
-
 const colors = [
   '#FFFFFF',
   '#000000',
@@ -29,6 +24,7 @@ type Payload = {
 type RealtimeMessage = {
   payload: Payload;
   session: string;
+  postId: string;
 };
 
 function sessionId(): string {
@@ -40,13 +36,35 @@ function sessionId(): string {
   return id;
 }
 
+// Data structure for the canvas in Redis
+//
+// {t3_aaaaaa :
+//   "0" : "0",
+//   "1" : "0",
+//   "2" : "5"
+// }
+//
+
 Devvit.addCustomPostType({
   name: 'Name',
   render: (context) => {
-    const { useState, useChannel } = context;
+    const { useState, useChannel, redis, postId } = context;
     const mySession = sessionId();
+    const myPostId = postId ?? 'defaultPostId';
     const [activeColor, setActiveColor] = useState(defaultColor);
-    const [data, setData] = useState(blankCanvas);
+    const [data, setData] = useState(async () => {
+      const canvasData = await redis.hgetall(myPostId);
+      if (canvasData) {
+        const canvasArray = new Array(resolution * resolution).fill(0);
+        for (const key in canvasData) {
+          const index = parseInt(key);
+          const color = parseInt(canvasData[key]);
+          canvasArray[index] = color;
+        }
+        return canvasArray;
+      }
+      return blankCanvas;
+    });
 
     function updateCanvas(index: number, color: number): void {
       const newData = data;
@@ -57,20 +75,15 @@ Devvit.addCustomPostType({
     const channel = useChannel({
       name: 'events',
       onMessage: (data) => {
-        const msg = data as RealtimeMessage;
-        if (msg.session === mySession) {
-          // Ignore my updates b/c they have already been rendered
+        if (data.session === mySession || data.postId !== myPostId) {
+          //Ignore my updates b/c they have already been rendered
           return;
         }
-        const payload = msg.payload;
+        const payload = data.payload;
         updateCanvas(payload.index, payload.color);
-      },
-      onSubscribed: () => {
-        // handle connection setup
       },
     });
 
-    // subscribe to the channel to receive messages
     channel.subscribe();
 
     const ColorSelector = (): JSX.Element => (
@@ -100,15 +113,10 @@ Devvit.addCustomPostType({
       <hstack
         onPress={async () => {
           updateCanvas(index, activeColor);
-          const payload: Payload = {
-            index: index,
-            color: activeColor,
-          };
-          const message: RealtimeMessage = {
-            payload: payload,
-            session: mySession,
-          };
+          const payload: Payload = { index, color: activeColor };
+          const message: RealtimeMessage = { payload, session: mySession, postId: myPostId };
           await channel.send(message);
+          await redis.hset(myPostId, { [index.toString()]: activeColor.toString() });
         }}
         height={`${size}px`}
         width={`${size}px`}
@@ -145,8 +153,21 @@ Devvit.addCustomPostType({
   },
 });
 
+// Define what packages you want to use here
+// Others include:
+// kvStore: a simple key value store for persisting data across sessions within this installation
+// media: used for importing and posting images
+Devvit.configure({
+  redditAPI: true, // context.reddit will now be available
+  realtime: true,
+  redis: true,
+});
+
+/*
+ * Use a menu action to create a custom post
+ */
 Devvit.addMenuItem({
-  label: 'Create a Mini-Place',
+  label: 'New Mini Place',
   location: 'subreddit',
   /*
    * _ tells Typescript we don't care about the first argument
@@ -165,7 +186,7 @@ Devvit.addMenuItem({
       preview: (
         <vstack padding="medium" cornerRadius="medium">
           <text style="heading" size="medium">
-            Loading place...
+            Loading custom post hello world...
           </text>
         </vstack>
       ),
@@ -174,7 +195,7 @@ Devvit.addMenuItem({
     });
 
     ui.showToast({
-      text: `Successfully created a Place!`,
+      text: `Successfully created a Mini Place!`,
       appearance: 'success',
     });
   },
