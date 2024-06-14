@@ -327,6 +327,8 @@ export class Post {
     width: number;
   };
   #approved: boolean;
+  #approvedAtUtc: number;
+  #bannedAtUtc: number;
   #spam: boolean;
   #stickied: boolean;
   #removed: boolean;
@@ -398,6 +400,8 @@ export class Post {
     }
 
     this.#approved = data.approved ?? false;
+    this.#approvedAtUtc = data.approvedAtUtc ?? 0;
+    this.#bannedAtUtc = data.bannedAtUtc ?? 0;
     this.#removed = data.removed ?? false;
     this.#removedBy = data.removedBy;
     this.#removedByCategory = data.removedByCategory;
@@ -512,6 +516,14 @@ export class Post {
 
   get approved(): boolean {
     return this.#approved;
+  }
+
+  get approvedAtUtc(): number {
+    return this.#approvedAtUtc;
+  }
+
+  get bannedAtUtc(): number {
+    return this.#bannedAtUtc;
   }
 
   get spam(): boolean {

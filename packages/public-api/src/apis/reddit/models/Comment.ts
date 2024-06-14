@@ -78,6 +78,8 @@ export class Comment {
   #subredditName: string;
   #replies: Listing<Comment>;
   #approved: boolean;
+  #approvedAtUtc: number;
+  #bannedAtUtc: number;
   #edited: boolean;
   #locked: boolean;
   #removed: boolean;
@@ -123,6 +125,8 @@ export class Comment {
     this.#removed = data.removed ?? false;
     this.#stickied = data.stickied ?? false;
     this.#approved = data.approved ?? false;
+    this.#approvedAtUtc = data.approvedAtUtc ?? 0;
+    this.#bannedAtUtc = data.bannedAtUtc ?? 0;
     this.#spam = data.spam ?? false;
     this.#distinguishedBy = data.distinguished;
     this.#numReports = data.numReports ?? 0;
@@ -212,6 +216,14 @@ export class Comment {
 
   get approved(): boolean {
     return this.#approved;
+  }
+
+  get approvedAtUtc(): number {
+    return this.#approvedAtUtc;
+  }
+
+  get bannedAtUtc(): number {
+    return this.#bannedAtUtc;
   }
 
   get spam(): boolean {
