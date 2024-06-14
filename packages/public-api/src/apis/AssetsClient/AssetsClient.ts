@@ -58,7 +58,9 @@ export class AssetsClient {
 
     try {
       // This will throw an exception if it's an invalid URL such as a relative path
-      new URL(assetPath);
+      // NOTE: substring is here to only check up until the data segment if this is a data URL so we don't waste time needlessly parsing data.
+      //       Technically this will lose the last character if this isn't a data URL but we're just validating structure.
+      new URL(assetPath.slice(0, assetPath.indexOf(',')));
       // URL is valid
       return assetPath;
     } catch {
@@ -80,7 +82,8 @@ export class AssetsClient {
           retval[path] = cache[path];
         } else {
           try {
-            new URL(path);
+            // see note in #getURL()
+            new URL(path.slice(0, path.indexOf(',')));
             retval[path] = path;
           } catch {
             // invalid URL, missing from cache
