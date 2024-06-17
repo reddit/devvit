@@ -7,7 +7,7 @@ import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../Block
 import { BlocksTransformer } from '../BlocksTransformer.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
 import { ContextBuilder } from './ContextBuilder.js';
-import { RenderContext } from './RenderContext.js';
+import { _isTombstone, RenderContext } from './RenderContext.js';
 import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
 import { RenderInterruptError } from './types.js';
 
@@ -67,11 +67,13 @@ export function registerHook<H extends Hook>(
     },
     context: _activeRenderContext,
   };
-  const fromNull = _activeRenderContext._state[hookId] === undefined;
+  const fromNull =
+    _activeRenderContext._state[hookId] === undefined ||
+    _isTombstone(_activeRenderContext._state[hookId]);
   _activeRenderContext._hooks[hookId] = _activeRenderContext._hooks[hookId] ?? initializer(params);
   const hook: H = _activeRenderContext._hooks[hookId] as H;
 
-  if (_activeRenderContext._state[hookId] !== undefined) {
+  if (!fromNull) {
     hook.state = _activeRenderContext._state[hookId];
   }
   hook.onStateLoaded?.();

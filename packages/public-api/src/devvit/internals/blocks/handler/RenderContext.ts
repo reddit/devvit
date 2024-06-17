@@ -4,6 +4,19 @@ import type { EffectEmitter } from '../EffectEmitter.js';
 import type { BlocksState, EventHandler, Hook, HookRef, HookSegment } from './types.js';
 
 /**
+ * @internal
+ *
+ * Tombstone is a special object that indicates that a hook has been unmounted, and
+ * therefore can be removed from the state.
+ * */
+export type Tombstone = { __deleted: true };
+
+/** @internal */
+export function _isTombstone(value: unknown): boolean {
+  return typeof value === 'object' && value !== null && '__deleted' in value;
+}
+
+/**
  * The RenderContext is a class that holds the state of the rendering process.
  *
  * There are many properties that start with an underscore, which is a convention we use to
@@ -53,6 +66,14 @@ export class RenderContext implements EffectEmitter {
   get _changedState(): BlocksState {
     const changed: BlocksState = {};
     for (const key in this._changed) changed[key] = this._state[key];
+    const unmounted = new Set(Object.keys(this._state));
+    Object.keys(this._hooks).forEach((key) => {
+      unmounted.delete(key);
+    });
+    unmounted.forEach((key) => {
+      const t: Tombstone = { __deleted: true };
+      this._state[key] = changed[key] = t;
+    });
     return changed;
   }
 
@@ -68,6 +89,7 @@ export class RenderContext implements EffectEmitter {
   /** Replacing state resets the delta for the next render. */
   set _state(state: BlocksState) {
     this._changed = {};
+    this._hooks = {};
     this.#state = state;
   }
 

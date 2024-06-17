@@ -1,8 +1,8 @@
 import type { UIEvent } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
-import type { RenderContext } from './RenderContext.js';
+import type { RenderContext, Tombstone } from './RenderContext.js';
 
-export type BlocksState = { [hookID: string]: JSONValue };
+export type BlocksState = { [hookID: string]: JSONValue | Tombstone };
 
 export type Props = { [key: string]: unknown };
 
@@ -55,7 +55,7 @@ export type Hook = {
    * render but state may be passed in the render request and used to prime that
    * render's hook before onLoad().
    */
-  state: JSONValue;
+  state: JSONValue | Tombstone;
 
   /**
    * What event callbacks want to hit.

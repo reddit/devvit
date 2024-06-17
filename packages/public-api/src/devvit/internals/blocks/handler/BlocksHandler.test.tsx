@@ -65,19 +65,27 @@ const MultiCounter = (): JSX.Element => {
 
 const stateARef: HookRef = {};
 const stateBRef: HookRef = {};
+const pressARef: HookRef = {};
+const pressBRef: HookRef = {};
+const toggleRef: HookRef = {};
 const ComponentA = (): JSX.Element => {
   const [_count, setCount] = captureHookRef(useState(0), stateARef);
-  return <button onPress={() => setCount((c) => ++c)}>A</button>;
+  return <button onPress={captureHookRef(() => setCount((c) => ++c), pressARef)}>A</button>;
 };
 
 const ComponentB = (): JSX.Element => {
   const [_count, setCount] = captureHookRef(useState(0), stateBRef);
-  return <button onPress={() => setCount((c) => ++c)}>B</button>;
+  return <button onPress={captureHookRef(() => setCount((c) => ++c), pressBRef)}>B</button>;
 };
 
 const ConditionalComponent = (): JSX.Element => {
-  const [choice, _setChoice] = captureHookRef(useState('a'), counter1Ref);
-  return <hstack>{choice === 'a' ? <ComponentA /> : <ComponentB />}</hstack>;
+  const [choice, setChoice] = captureHookRef(useState(true), counter1Ref);
+  return (
+    <hstack>
+      <button onPress={captureHookRef(() => setChoice(!choice), toggleRef)}>toggle</button>
+      {choice ? <ComponentA /> : <ComponentB />}
+    </hstack>
+  );
 };
 
 describe('BlocksHandler', () => {
@@ -85,6 +93,30 @@ describe('BlocksHandler', () => {
     test('conditional components should not throw (bonus test)', async () => {
       const handler = new BlocksHandler(ConditionalComponent);
       await handler.handle(EmptyRequest, mockMetadata);
+    });
+
+    test('remounting should reset', async () => {
+      const handler = new BlocksHandler(ConditionalComponent);
+      async function press(ref: HookRef): Promise<void> {
+        const req = generatePressRequest(ref);
+        await handler.handle(req, mockMetadata);
+      }
+      await handler.handle(EmptyRequest, mockMetadata);
+      expect(findHookState(stateARef)).toEqual(0);
+      await press(pressARef);
+      expect(findHookState(stateARef)).toEqual(1);
+      await press(toggleRef);
+      expect(getLatestBlocksState()).toMatchInlineSnapshot(`
+        {
+          "ConditionalComponent.hstack.ComponentA-1.useState-0": {
+            "__deleted": true,
+          },
+          "ConditionalComponent.hstack.ComponentB-1.useState-0": 0,
+          "ConditionalComponent.useState-0": false,
+        }
+      `);
+      await press(toggleRef);
+      expect(findHookState(stateARef)).toEqual(0);
     });
   });
 
