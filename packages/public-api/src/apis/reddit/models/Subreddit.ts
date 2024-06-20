@@ -1190,7 +1190,7 @@ export async function getSubredditLeaderboard(
   const response = await GraphQL.query(
     operationName,
     persistedQueryHash,
-    { subredditId },
+    { id: subredditId },
     metadata
   );
 
