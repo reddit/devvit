@@ -1,5 +1,5 @@
-import type { Data } from './data.js';
 import type { Devvit } from '../devvit/Devvit.js';
+import type { Data } from './data.js';
 
 export type ScheduledJob = {
   /** ID of the scheduled job. Use this with scheduler.cancelJob to cancel the job. */
@@ -84,8 +84,10 @@ export type ScheduledJobEvent = {
 
 export type ScheduledJobHandler = (
   event: ScheduledJobEvent,
-  context: Omit<Devvit.Context, 'ui' | 'dimensions' | 'modLog' | 'uiEnvironment'>
+  context: JobContext
 ) => void | Promise<void>;
+
+export type JobContext = Omit<Devvit.Context, 'ui' | 'dimensions' | 'modLog' | 'uiEnvironment'>;
 
 export type ScheduledJobType = {
   /** The name of the scheduled job type */
