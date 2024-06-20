@@ -126,8 +126,6 @@ const UPDATE_ACTIONS: UpdateAction[] = [
   },
 ];
 
-const DEVVIT_PACKAGE_PREFIX = '@devvit/';
-
 export type VersionUpgradeResult =
   | {
       success: false;
@@ -276,7 +274,7 @@ function overwriteDependencies(
   dependencies: { [packageName: string]: string }
 ): void {
   const devvitDependencies = Object.entries(dependencies).filter(([depName]) =>
-    depName.startsWith(DEVVIT_PACKAGE_PREFIX)
+    isDevvitDependency(depName)
   );
 
   for (const [depName, version] of devvitDependencies) {
@@ -315,7 +313,7 @@ function makeDepsSubtree(
 ): Tree {
   const tree = ux.tree();
   for (const [dep, v] of Object.entries(dependencies)) {
-    if (dep.startsWith(DEVVIT_PACKAGE_PREFIX)) {
+    if (isDevvitDependency(dep)) {
       if (v === devvitVersion.version) {
         return tree;
       }
@@ -334,4 +332,13 @@ function makeDepsSubtree(
     }
   }
   return tree;
+}
+
+function isDevvitDependency(dependencyName: string): boolean {
+  // @devvit/kit has an independent release cycle as a fully open-source package
+  // We don't care about its version, npm will alert the user if there is a missmatch
+  if (dependencyName === '@devvit/kit') {
+    return false;
+  }
+  return dependencyName.startsWith('@devvit/');
 }
