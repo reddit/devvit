@@ -43,8 +43,29 @@ export class AuthTokenStore implements Disposable {
     return path.join(this.#dotDevvitDir, 'token');
   }
 
+  static getUserDataDir(): string | null {
+    const platform = os.platform();
+    const homeDir = os.homedir();
+
+    switch (platform) {
+      case 'win32':
+          return process.env.LOCALAPPDATA || path.join(homeDir, 'AppData', 'Local');
+      case 'darwin':
+          return path.join(homeDir, 'Library', 'Application Support');
+      case 'linux':
+          return process.env.XDG_DATA_HOME || path.join(homeDir, '.local', 'share');
+      default:
+          return null;
+    }
+  }
+
   constructor(dotDevvitDir: string = path.join(os.homedir(), '.devvit')) {
-    this.#dotDevvitDir = dotDevvitDir;
+    let userDataDir = AuthTokenStore.getUserDataDir();
+    if (userDataDir) {
+      this.#dotDevvitDir = path.join(userDataDir, "devvit");
+    } else {
+      this.#dotDevvitDir = dotDevvitDir;
+    }
   }
 
   async readFSToken(): Promise<TokenInfo | undefined> {
