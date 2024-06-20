@@ -15,6 +15,7 @@ import type { BlocksReconciler } from './BlocksReconciler.js';
 
 export function makeUseChannelHook(reconciler: BlocksReconciler): UseChannelHook {
   function useChannel(options: ChannelOptions): UseChannelResult {
+    const debug = false;
     const hookIndex = reconciler.currentHookIndex;
     const currentState = reconciler.getCurrentComponentState<UseChannelHookState>();
     const previousState = reconciler.getPreviousComponentState<UseChannelHookState>();
@@ -29,6 +30,7 @@ export function makeUseChannelHook(reconciler: BlocksReconciler): UseChannelHook
     );
 
     async function send(data: Data): Promise<void> {
+      if (debug) console.debug('[realtime] sends', data);
       const name = currentState[hookIndex].channel;
       if (currentState[hookIndex].active) {
         if (currentState[hookIndex].connected) {
@@ -43,6 +45,7 @@ export function makeUseChannelHook(reconciler: BlocksReconciler): UseChannelHook
 
     function subscribe(): void {
       if (!currentState[hookIndex].active) {
+        if (debug) console.debug('[realtime] subscribe');
         const name = currentState[hookIndex].channel;
         currentState[hookIndex].active = true;
 
@@ -52,6 +55,7 @@ export function makeUseChannelHook(reconciler: BlocksReconciler): UseChannelHook
 
     function unsubscribe(): void {
       if (currentState[hookIndex].active) {
+        if (debug) console.debug('[realtime] unsubscribe');
         const name = currentState[hookIndex].channel;
         currentState[hookIndex].active = false;
 
@@ -64,14 +68,17 @@ export function makeUseChannelHook(reconciler: BlocksReconciler): UseChannelHook
         let result;
         switch (event.status) {
           case RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED:
+            if (debug) console.debug('[realtime] onSubscribed()');
             currentState[hookIndex].connected = true;
             result = options.onSubscribed?.();
             break;
           case RealtimeSubscriptionStatus.REALTIME_UNSUBSCRIBED:
+            if (debug) console.debug('[realtime] onUnsubscribed()');
             currentState[hookIndex].connected = false;
             result = options.onUnsubscribed?.();
             break;
           default:
+            if (debug) console.debug('[realtime] receives', event.event?.data);
             result = options.onMessage(event.event?.data ?? {});
             break;
         }
