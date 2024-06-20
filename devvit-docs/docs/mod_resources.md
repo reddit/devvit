@@ -50,7 +50,7 @@ Go to the [Apps](https://developers.reddit.com/apps) directory and select an app
 
 Each installation of an app has its own data storage. This means that the data used by the app cannot interact with or share data with other communities, or with other apps . If the app you are installing uses external web services, the app will come with a separate privacy agreement with the developer.
 
-If you uninstall an app from a subreddit, your subreddit-specific data storage instance will be deleted. Be sure you want to remove an app and all its data before you uninstall an app.
+If you uninstall an app from a subreddit, your app history will be lost. Be sure you want to remove an app before clicking "uninstall," because you won't be able to retrieve the data or settings if you reinstall the app at a later date.
 
 ### App review
 

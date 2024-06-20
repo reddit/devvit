@@ -6,6 +6,8 @@ slug: /
 
 Meet Devvit: Reddit’s Developer Platform that lets you build powerful apps and experiences to enhance the communities you love.
 
+<iframe width="xxx" height="xxx" src="https://www.youtube.com/embed/BHtTIInycgg" title="Getting started with Reddit&#39;s Developer Platform" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Bring your imagination to life
 
 Devvit lets you create rich, immersive experiences that seamlessly integrate into Reddit’s ecosystem.
@@ -32,10 +34,8 @@ Reddit hosts your code with dedicated Redis-backed storage. The UI toolkit lets 
 
 Reddit’s Developer Platform provides a supportive environment where you can collaborate, ask questions, share knowledge, and inspire one another. Join [r/devvit](https://www.reddit.com/r/devvit/) or become a member of our [Discord](https://discord.com/channels/1050224141732687912/1050227353311248404) channel. Browse example apps in our [public repo](https://github.com/reddit/devvit/tree/main/packages/apps) for project code you can fork and make your own.
 
-## Get started!
+## Ready to explore?
 
-If you’re code-savvy, go straight to the [quickstart](quickstart.mdx).
-
-For more context, check out how to [build an app](dev_guide.mdx). This guide walks you through setting up your environment and building your first app in 10 easy steps.
+If you're a dev, checkout the [quickstart](quickstart.mdx).
 
 If you’re a mod, here’s [everything you need to know](mod_resources.md) about adding apps to your community.
