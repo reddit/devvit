@@ -1194,11 +1194,10 @@ export async function getSubredditLeaderboard(
     metadata
   );
 
-  if (!response.data?.subredditInfoByID?.subreddit?.leaderboard.summary) {
-    throw new Error('subreddit leaderboard summary not found');
-  }
+  const leaderboard = response.data?.subredditInfoById?.leaderboard;
 
-  const leaderboard = response.data?.subredditInfoByID?.subreddit?.leaderboard;
+  if (!leaderboard) throw new Error('subreddit leaderboard not found');
+  if (!leaderboard.summary) throw new Error('subreddit leaderboard summary not found');
 
   return {
     id: leaderboard.id,
