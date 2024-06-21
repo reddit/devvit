@@ -30,6 +30,7 @@ const sidebars = {
         'dev_guide',
         'about_devvit',
         'templates',
+        'publishing',
         'rendering_apps',
         'optimize_performance',
         'devvit_for_pythonistas',

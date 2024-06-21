@@ -12,7 +12,7 @@ A relative {props.dimension} is valid if it meets one of the following rules:
 - Parent block must have a defined {props.dimension} or infer its {props.dimension} from an ancestor.
 - Parent block must stretch {(props.dimension == "width") && (widthStretch)}{(props.dimension != "width") && (heightStretch)}
   (see [alignment](../blocks/stacks#alignment)).
-- Parent block must grow [grow](../blocks/stacks#grow) {(props.dimension == "width") && (widthGrow)}{(props.dimension != "width") && (heightGrow)}.
+- Parent block must [grow](../blocks/stacks#grow) {(props.dimension == "width") && (widthGrow)}{(props.dimension != "width") && (heightGrow)}.
 
 :::note
 Relative {props.dimension} can only grow or stretch in a constrained dimension. The nearest ancestor without a definition will break
