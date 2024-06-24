@@ -36,20 +36,6 @@ function _structuredClone<T extends JSONValue>(obj: T): T {
 }
 
 /**
- * See [HookSegment](./types.ts) for more information.
- */
-export function assertValidNamespace(input: string): void {
-  const regex = /[-.]/;
-  const valid = input !== '' && !regex.test(input);
-
-  if (!valid) {
-    throw new Error(
-      `Hook with namespace '${input}' is invalid. Hook namespaces cannot be empty string or contain dashes/dots because they are used as delimiters internally. Please update the hook namespace and try again.`
-    );
-  }
-}
-
-/**
  * This is the recommended low-level interface for creating hooks like useState or useAsync.
  *
  * Practically, this initializes your hook if it doesn't already exist, and makes sure
@@ -66,12 +52,11 @@ export function registerHook<H extends Hook>(
 ): H {
   if (!_activeRenderContext) {
     throw new Error(
-      "Hooks can only be declared at the top of a component.  You cannot declare hooks outside of components or inside of event handlers.  It's almost always a mistake to declare hooks inside of loops or conditionals."
+      "Hooks can only be declared at the top of a component.  You cannot declare hooks outside\
+    of components or inside of event handlers.  It's almost always a mistake to declare hooks inside of loops or\
+    conditionals."
     );
   }
-
-  assertValidNamespace(options.namespace);
-
   const hookId = _activeRenderContext.nextHookId(options);
   const context = _activeRenderContext;
   const params: HookParams = {
@@ -208,7 +193,7 @@ export class BlocksHandler {
               '[blocks] NOT reprocessing event in BlocksHandler, sync mismatch A',
               event
             );
-          // We're async, this is a main queue event.  We need to send it back to the platform to let
+          // We're async, this is a main qrueue event.  We need to send it back to the platform to let
           // the platform synchronize it.
           remainingRequeueEvents.push(event);
           continue;
@@ -317,19 +302,6 @@ export class BlocksHandler {
   }
 
   async #attemptHook(context: RenderContext, event: UIEvent): Promise<void> {
-    // I added this warning here as an alert for al weary travelers that there is a non-null
-    // assertion below that will wake a dragon! In RenderPostRequest land you need to add the
-    // hook field to all events otherwise they won't work. Since everything is optional you
-    // don't get type help so at least you'll get a warning at runtime.
-    //
-    // Unclear on if we can throw here or not so fell back to this.
-    if (!event.hook) {
-      console.warn(
-        `Received an event in #attemptHook that does not have an associated hook. This will cause the event to be undelivered and may cause bugs. Make sure that event passes a hook field. Event:`,
-        { event }
-      );
-    }
-
     const hook = context._hooks[event.hook!];
     if (hook?.onUIEvent) {
       try {
@@ -394,9 +366,7 @@ export class BlocksHandler {
     props: Props,
     context: RenderContext
   ): ReifiedBlockElementOrLiteral[] {
-    // Anonymous functions don't have a name
-    // use || instead of ?? due to empty string
-    context.push({ namespace: component.name || 'anonymous', ...props });
+    context.push({ namespace: component.name, ...props });
     try {
       const element = component(props, context.devvitContext);
       return this.#renderElement(element, context);

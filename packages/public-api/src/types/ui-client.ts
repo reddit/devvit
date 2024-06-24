@@ -1,4 +1,4 @@
-import type { FormKey } from '@devvit/shared-types/useForm.js';
+import type { FormKey } from './form.js';
 import type { Data } from './data.js';
 import type { Toast } from './toast.js';
 import type { Comment, Post, Subreddit, User } from '../apis/reddit/models/index.js';

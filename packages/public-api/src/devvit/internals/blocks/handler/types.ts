@@ -18,7 +18,7 @@ export type HookSegment = {
    * Dashes (-) and dots (.) delimit hook IDs so don't use those in your
    * namespace.
    */
-  namespace: string;
+  namespace?: string;
 
   /**
    * If the ordering is known, you can provide it here.  Else, the key will be a

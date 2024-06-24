@@ -1,6 +1,5 @@
 import { getFormValues } from '../../../apis/ui/helpers/getFormValues.js';
-import type { FormKey } from '@devvit/shared-types/useForm.js';
-import type { Form, FormFunction, FormValues } from '../../../types/form.js';
+import type { Form, FormFunction, FormKey, FormValues } from '../../../types/form.js';
 import type { UseFormHook, UseFormHookState } from '../../../types/hooks.js';
 import { Hook } from '../../../types/hooks.js';
 import type { BlocksReconciler } from './BlocksReconciler.js';
