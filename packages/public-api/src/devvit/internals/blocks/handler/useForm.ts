@@ -1,6 +1,8 @@
 import type { JSONValue } from '@devvit/shared-types/json.js';
+import type { FormKey } from '@devvit/shared-types/useForm.js';
+import { formKeyToHookId } from '@devvit/shared-types/useForm.js';
 import { getFormValues } from '../../../../apis/ui/helpers/getFormValues.js';
-import type { Form, FormDefinition, FormFunction, FormKey, FormValues } from '../../../../index.js';
+import type { Form, FormDefinition, FormFunction, FormValues } from '../../../../index.js';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { EventHandler, Hook, HookRef } from './types.js';
@@ -44,12 +46,7 @@ export function hookRefToFormKey(hookRef: HookRef): FormKey {
   return `form.hook.${hookRef.id}.0`;
 }
 
-export function formKeyToHookRef(formKey: FormKey): HookRef {
-  // extract the hook id from the form key with a regex
-  return { id: formKey.match(/form\.hook\.(.+)\.0/)![1] };
-}
-
 export function getFormDefinition(renderContext: RenderContext, formKey: FormKey): FormValues {
-  const hookId = formKeyToHookRef(formKey);
-  return renderContext.getHook(hookId) as UseFormHook;
+  const hookId = formKeyToHookId(formKey);
+  return renderContext.getHook({ id: hookId }) as UseFormHook;
 }

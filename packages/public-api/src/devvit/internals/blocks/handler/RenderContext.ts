@@ -166,7 +166,7 @@ export class RenderContext implements EffectEmitter {
       const builder = [];
       /**
        * We need to build the hook id from the segments in reverse order, because an explicit id
-       * overrrides parent path info.
+       * overrides parent path info.
        */
       for (let i = this._segments.length - 1; i >= 0; i--) {
         const segment = this._segments[i];

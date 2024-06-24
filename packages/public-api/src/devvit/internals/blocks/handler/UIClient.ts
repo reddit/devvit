@@ -1,7 +1,7 @@
 import type { Toast as ToastProto } from '@devvit/protos';
 import { EffectType, Form, ToastAppearance } from '@devvit/protos';
+import type { FormKey } from '@devvit/shared-types/useForm.js';
 import type { Data } from '../../../../types/data.js';
-import type { FormKey } from '../../../../types/form.js';
 import type { Toast } from '../../../../types/toast.js';
 import type { UIClient as _UIClient } from '../../../../types/ui-client.js';
 import { assertValidFormFields } from '../../../../apis/ui/helpers/assertValidFormFields.js';

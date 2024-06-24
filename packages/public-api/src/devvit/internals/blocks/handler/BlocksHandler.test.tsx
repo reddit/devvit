@@ -4,7 +4,7 @@
 import { BlockType, type UIRequest } from '@devvit/protos';
 import { describe, expect, test, vi } from 'vitest';
 import { Devvit } from '../../../Devvit.js';
-import { BlocksHandler } from './BlocksHandler.js';
+import { BlocksHandler, assertValidNamespace } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
 import {
   EmptyRequest,
@@ -234,6 +234,24 @@ describe('BlocksHandler', () => {
           'boxed.Box.hstack.button-kk.onPress',
           'something.onPress',
         ])
+      );
+    });
+    test('should handle anonymous functions', async () => {
+      const handler: BlocksHandler = new BlocksHandler(() => {
+        const [_counter, _setCounter] = useState(0);
+        return (
+          <hstack>
+            <button key="kk" onPress={() => {}}>
+              hi world
+            </button>
+          </hstack>
+        );
+      });
+      const request = EmptyRequest;
+      await handler.handle(request, mockMetadata);
+
+      expect(new Set(Object.keys(handler._latestRenderContext?._generated ?? {}))).toEqual(
+        new Set(['anonymous.hstack.button-kk.onPress', 'anonymous.useState-0'])
       );
     });
   });
@@ -492,6 +510,16 @@ describe('BlocksHandler', () => {
 
       const handler: BlocksHandler = new BlocksHandler(component);
       await handler.handle(request, mockMetadata);
+    });
+  });
+
+  describe('assertValidNamespace', () => {
+    it.each([['useState', 'use', 'use_state']])('%s should pass', (test) => {
+      expect(assertValidNamespace(test)).toBeUndefined();
+    });
+
+    it.each([['', 'use-state', 'use.state']])('%s should throw', (test) => {
+      expect(() => assertValidNamespace(test)).toThrowError();
     });
   });
 });

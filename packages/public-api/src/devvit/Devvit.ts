@@ -1,5 +1,6 @@
 import * as protos from '@devvit/protos';
 import { Actor } from '@devvit/shared-types/Actor.js';
+import type { FormKey } from '@devvit/shared-types/useForm.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { assertValidFormFields } from '../apis/ui/helpers/assertValidFormFields.js';
@@ -12,7 +13,6 @@ import type {
   Form,
   FormDefinition,
   FormFunction,
-  FormKey,
   FormOnSubmitEventHandler,
   IconName,
   MenuItem,
