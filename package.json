@@ -25,6 +25,7 @@
     "docs:build": "yarn workspace devvit-docs docs:build",
     "docs:gen": "yarn workspace devvit-docs gen:all",
     "docs:start": "yarn workspace devvit-docs docs:start",
+    "docs:update-versioned": "node ./devvit-docs/scripts/update-versioned.mjs",
     "docs:verify": "yarn workspace devvit-docs gen:verify",
     "husky:install": "which husky > /dev/null && husky install || echo 'husky not installed, skipping'",
     "postinstall": "yarn husky:install",

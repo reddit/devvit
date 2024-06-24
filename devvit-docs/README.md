@@ -40,20 +40,17 @@ Now you can merge your PR.
 Important: do not use `[CI SKIP]` when you `git commit` since your PR will be stuck in pending state.
 You only need to add it immediately before merging the PR.
 
-### Deployment
+### Update the versioned docs
 
-For how to merge your PR see [Development lifecycle](#development-lifecycle)
-
-Using SSH:
+If you want to update the versioned docs _without_ doing an [NPM package update](../docs/publishing.md), create a new branch, run the `docs:update-versioned` task like so, from the repo root:
 
 ```
-$ USE_SSH=true yarn deploy
+git checkout main
+git pull                                # Pull down the latest repository updates
+git submodule update --init --recursive # Make sure submodules are in the right state
+git checkout -b update-versioned-docs   # Start a new branch
+yarn docs:update-versioned              # Update the versioned docs for the current version
+git push origin update-versioned-docs   # Push the branch to start a PR.
 ```
 
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+Then follow the link printed out to create a pull request.
