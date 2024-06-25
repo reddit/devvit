@@ -8,6 +8,7 @@ import type {
   RealtimeSubscriptionEvent,
   UIEvent,
 } from '@devvit/protos';
+import type { FormKey } from '@devvit/shared-types/useForm.js';
 import { BlockRenderEventType, EffectType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { AssetsClient } from '../../../apis/AssetsClient/AssetsClient.js';
@@ -20,7 +21,6 @@ import type {
   Data,
   Form,
   FormFunction,
-  FormKey,
   MediaPlugin,
   Scheduler,
   SettingsClient,

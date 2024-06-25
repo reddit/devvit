@@ -1,6 +1,7 @@
+import type { FormKey } from '@devvit/shared-types/useForm.js';
 import type { Context } from './context.js';
 import type { Data } from './data.js';
-import type { Form, FormFunction, FormKey, FormValues } from './form.js';
+import type { Form, FormFunction, FormValues } from './form.js';
 import type { ChannelOptions, ChannelStatus } from './realtime.js';
 
 export type Dispatch<A> = (value: A) => void;
