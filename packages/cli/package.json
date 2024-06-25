@@ -80,7 +80,6 @@
   },
   "devDependencies": {
     "@devvit/eslint-config": "0.10.22",
-    "@devvit/repo-tools": "0.10.22",
     "@devvit/tsconfig": "0.10.22",
     "@types/file-type": "10.9.1",
     "@types/inquirer": "9.0.3",
