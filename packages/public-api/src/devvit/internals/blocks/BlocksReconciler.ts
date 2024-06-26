@@ -8,9 +8,10 @@ import type {
   RealtimeSubscriptionEvent,
   UIEvent,
 } from '@devvit/protos';
-import type { FormKey } from '@devvit/shared-types/useForm.js';
 import { BlockRenderEventType, EffectType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
+import type { JSONObject, PartialJSONObject } from '@devvit/shared-types/json.js';
+import type { FormKey } from '@devvit/shared-types/useForm.js';
 import type { AssetsClient } from '../../../apis/AssetsClient/AssetsClient.js';
 import { makeAPIClients } from '../../../apis/makeAPIClients.js';
 import type { ModLogClient } from '../../../apis/modLog/ModLogClient.js';
@@ -18,7 +19,6 @@ import type { RealtimeClient } from '../../../apis/realtime/RealtimeClient.js';
 import type { RedditAPIClient } from '../../../apis/reddit/RedditAPIClient.js';
 import { getEffectsFromUIClient } from '../../../apis/ui/helpers/getEffectsFromUIClient.js';
 import type {
-  Data,
   Form,
   FormFunction,
   MediaPlugin,
@@ -52,10 +52,12 @@ export type ReifiedBlockElement = {
 
 export type ReifiedBlockElementOrLiteral = ReifiedBlockElement | string;
 
+/** Serializable. */
 type ComponentState = {
-  [hookIndex: number]: UseIntervalHookState | UseFormHookState | unknown;
+  [hookIndex: number]: UseIntervalHookState | UseFormHookState | JSONObject;
 };
 
+/** Serializable. */
 type RenderState = {
   [componentKey: string]: ComponentState;
 };
@@ -190,7 +192,7 @@ export class BlocksReconciler implements EffectEmitter {
   constructor(
     component: JSX.ComponentFunction,
     event: BlockRenderRequest | UIEvent | undefined,
-    state: Data | undefined,
+    state: PartialJSONObject | undefined,
     metadata: Metadata,
     dimensions: Dimensions | undefined
   ) {
