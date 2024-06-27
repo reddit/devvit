@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { PageProps } from '../types/page.js';
 import { Pin } from '../components/Pin/Pin.js';
+import type { PageProps } from '../types/page.js';
 
-export const PinDetailPage = (props: PageProps) => {
+export const PinDetailPage = (props: PageProps): JSX.Element => {
   const {
     params,
     pinPost,

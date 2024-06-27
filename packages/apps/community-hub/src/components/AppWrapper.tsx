@@ -2,11 +2,15 @@ import { Devvit } from '@devvit/public-api';
 
 type BorderComponentProps = {
   showBorder: boolean;
-  children: any;
+  children: JSX.Element | JSX.Element[];
   borderColor: { light: string; dark: string | null };
 };
 
-const BorderComponent = ({ showBorder, borderColor, children }: BorderComponentProps) => {
+const BorderComponent = ({
+  showBorder,
+  borderColor,
+  children,
+}: BorderComponentProps): JSX.Element => {
   if (showBorder === false) return children;
 
   return (
@@ -26,7 +30,7 @@ const BorderComponent = ({ showBorder, borderColor, children }: BorderComponentP
 
 type AppWrapperProps = BorderComponentProps;
 
-export const AppWrapper = ({ showBorder, borderColor, children }: AppWrapperProps) => {
+export const AppWrapper = ({ showBorder, borderColor, children }: AppWrapperProps): JSX.Element => {
   return (
     <BorderComponent showBorder={showBorder} borderColor={borderColor}>
       <vstack

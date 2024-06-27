@@ -4,18 +4,18 @@ import { makeUseChannelHook } from '../devvit/internals/blocks/useChannel.js';
 import { makeUseFormHook } from '../devvit/internals/blocks/useForm.js';
 import { makeUseIntervalHook } from '../devvit/internals/blocks/useInterval.js';
 import { makeUseStateHook } from '../devvit/internals/blocks/useState.js';
+import { makeCache } from '../devvit/internals/cache.js';
 import type { ContextAPIClients } from '../index.js';
 import { AssetsClient } from './AssetsClient/AssetsClient.js';
 import { KeyValueStorage } from './key-value-storage/KeyValueStorage.js';
 import { MediaClient } from './media/MediaClient.js';
 import { ModLogClient } from './modLog/ModLogClient.js';
+import { RealtimeClient } from './realtime/RealtimeClient.js';
 import { RedditAPIClient } from './reddit/RedditAPIClient.js';
 import { RedisClient } from './redis/RedisClient.js';
 import { SchedulerClient } from './scheduler/SchedulerClient.js';
 import { SettingsClient } from './settings/SettingsClient.js';
 import { UIClient } from './ui/UIClient.js';
-import { makeCache } from '../devvit/internals/cache.js';
-import { RealtimeClient } from './realtime/RealtimeClient.js';
 
 export type MakeAPIClientsOptions = {
   metadata: Metadata;
@@ -57,12 +57,10 @@ export function makeAPIClients({
     assets,
     realtime,
     get useForm() {
-      return (
-        useForm ??
+      return (useForm ??
         (() => {
           throw new Error('useForm() is unavailable');
-        })
-      );
+        })) as ContextAPIClients['useForm'];
     },
     get cache() {
       return (

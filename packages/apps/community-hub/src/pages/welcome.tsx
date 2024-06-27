@@ -1,14 +1,14 @@
 import { Devvit } from '@devvit/public-api';
-import { PageProps } from '../types/page.js';
-import { chunk, isEven, standardizeUsername } from '../util.js';
 import { PinToggler } from '../components/PinToggler.js';
+import type { PageProps } from '../types/page.js';
+import { standardizeUsername } from '../util.js';
 
 type StepProps = Pick<PageProps, 'pinPost' | 'pinPostMethods' | 'context'> & {
   onPreviousPressed: () => void;
   onNextPressed: () => void;
 };
 
-const Step1 = ({ onNextPressed, pinPost, pinPostMethods: { updatePinPost } }: StepProps) => {
+const Step1 = ({ onNextPressed }: StepProps): JSX.Element => {
   return (
     <vstack padding="small">
       <text color="black white" size="large" alignment="top center" weight="bold">
@@ -35,24 +35,22 @@ const Step2 = ({
   pinPost,
   context,
   pinPostMethods: { updatePinPost },
-}: StepProps) => {
+}: StepProps): JSX.Element => {
   const { useForm } = context;
 
   const colorForm = useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'light',
-            label: `Color`,
-            type: 'string',
-            defaultValue: pinPost.primaryColor.light,
-            required: true,
-          },
-        ],
-        title: 'Update the Post Color',
-        acceptLabel: 'Update',
-      };
+    {
+      fields: [
+        {
+          name: 'light',
+          label: `Color`,
+          type: 'string',
+          defaultValue: pinPost.primaryColor.light,
+          required: true,
+        },
+      ],
+      title: 'Update the Post Color',
+      acceptLabel: 'Update',
     },
     async (data) => {
       await updatePinPost({
@@ -66,28 +64,26 @@ const Step2 = ({
   );
 
   const addOwnerForm = useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'newOwner',
-            label: `Add user`,
-            type: 'string',
-            required: true,
-          },
-        ],
-        title: 'Add additional post owners',
-        acceptLabel: 'Submit',
-      };
+    {
+      fields: [
+        {
+          name: 'newOwner',
+          label: `Add user`,
+          type: 'string',
+          required: true,
+        },
+      ],
+      title: 'Add additional post owners',
+      acceptLabel: 'Submit',
     },
     async (data) => {
-      const { reddit, postId } = context;
+      const { reddit } = context;
 
       const subname = await (await reddit.getSubredditById(context.subredditId!)).name;
 
       const submittedUserName = data.newOwner as string;
 
-      let newOwner = standardizeUsername(submittedUserName);
+      const newOwner = standardizeUsername(submittedUserName);
 
       if (pinPost.owners.includes(newOwner)) {
         context.ui.showToast(`${newOwner} is already an owner!`);
@@ -108,19 +104,17 @@ const Step2 = ({
   );
 
   const imageForm = useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'featuredImage',
-            label: `URL`,
-            type: 'string',
-            defaultValue: 'Must Reddit image link i.e. https://i.redd.it/0ujuzl4ki7yb1.png',
-          },
-        ],
-        title: 'Update the home image',
-        acceptLabel: 'Update',
-      };
+    {
+      fields: [
+        {
+          name: 'featuredImage',
+          label: `URL`,
+          type: 'string',
+          defaultValue: 'Must Reddit image link i.e. https://i.redd.it/0ujuzl4ki7yb1.png',
+        },
+      ],
+      title: 'Update the home image',
+      acceptLabel: 'Update',
     },
     async (data) => {
       await updatePinPost({
@@ -187,14 +181,14 @@ const Step3 = ({
   context,
   pinPostMethods: { updatePinPost },
   onNextPressed,
-}: StepProps) => {
+}: StepProps): JSX.Element => {
   const { useState } = context;
   // Extra abstraction to avoid requests on every update
   const [pins, setPins] = useState(() => {
     return [...pinPost.pins];
   });
 
-  const togglePin = (pinId: string) => {
+  const togglePin = (pinId: string): void => {
     setPins((x) => {
       return x.map((pin) => {
         if (pin.id === pinId) {
@@ -237,7 +231,7 @@ const Step3 = ({
   );
 };
 
-const Step4 = ({ pinPost, pinPostMethods: { updatePinPost }, onNextPressed }: StepProps) => {
+const Step4 = ({ pinPostMethods: { updatePinPost }, onNextPressed }: StepProps): JSX.Element => {
   return (
     <vstack padding="small" width={100} height={100}>
       <text color="black white" size="large" alignment="top center" weight="bold">
@@ -271,17 +265,23 @@ const Step4 = ({ pinPost, pinPostMethods: { updatePinPost }, onNextPressed }: St
   );
 };
 
-const IsNotOwner = () => {
+const IsNotOwner = (): JSX.Element => {
   return <text color="black white">Post is getting ready for launch...</text>;
 };
 
-export const WelcomePage = ({ context, navigate, pinPost, pinPostMethods, isOwner }: PageProps) => {
+export const WelcomePage = ({
+  context,
+  navigate,
+  pinPost,
+  pinPostMethods,
+  isOwner,
+}: PageProps): JSX.Element => {
   const { useState } = context;
   const [step, setStep] = useState(1);
 
   if (pinPost.status !== 'draft') {
     navigate('welcome');
-    return;
+    return null;
   }
 
   if (!isOwner) {
@@ -334,4 +334,6 @@ export const WelcomePage = ({ context, navigate, pinPost, pinPostMethods, isOwne
       />
     );
   }
+
+  return null;
 };

@@ -53,14 +53,13 @@ const App: Devvit.CustomPostComponent = ({ useState, useChannel, redis, reddit, 
     };
   });
 
-  const progressChannel = useChannel({
+  const progressChannel = useChannel<RealtimeMessage>({
     name: 'progress_state',
-    onMessage: (message) => {
-      const data = message as RealtimeMessage;
-      if (message.session === mySession) {
+    onMessage: (msg) => {
+      if (msg.session === mySession) {
         return;
       }
-      setProgress(data.payload.progress);
+      setProgress(msg.payload.progress);
     },
     onSubscribed: async () => {},
   });

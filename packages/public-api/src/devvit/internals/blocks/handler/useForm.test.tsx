@@ -1,16 +1,16 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
+import { EffectType, FormFieldType, UIEvent } from '@devvit/protos';
 import { describe, expect, test } from 'vitest';
+import { Devvit } from '../../../Devvit.js';
+import { BlocksHandler } from './BlocksHandler.js';
+import { useUI } from './UIClient.js';
+import { captureHookRef } from './refs.js';
+import { EmptyRequest, generatePressRequest, mockMetadata } from './test-helpers.js';
+import type { HookRef } from './types.js';
 import { hookRefToFormKey, useForm } from './useForm.js';
 import { useState } from './useState.js';
-import { useUI } from './UIClient.js';
-import { Devvit } from '../../../Devvit.js';
-import { EffectType, UIEvent, FormFieldType } from '@devvit/protos';
-import { BlocksHandler } from './BlocksHandler.js';
-import { EmptyRequest, generatePressRequest, mockMetadata } from './test-helpers.js';
-import { captureHookRef } from './refs.js';
-import type { HookRef } from './types.js';
 
 const buttonRef: HookRef = {};
 const formRef: HookRef = {};
@@ -93,8 +93,9 @@ describe('useForm', () => {
             fields: [
               {
                 type: 'string',
-                name: 'name2',
+                name: 'name',
                 label: 'Name',
+                required: true,
               },
             ],
           },

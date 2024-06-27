@@ -7,9 +7,16 @@ import type { RealtimeClient } from '../apis/realtime/RealtimeClient.js';
 import type { RedditAPIClient } from '../apis/reddit/RedditAPIClient.js';
 import type { EffectEmitter } from '../devvit/internals/blocks/EffectEmitter.js';
 import type { CacheHelper } from '../devvit/internals/cache.js';
-import type { UseChannelHook, UseFormHook, UseIntervalHook, UseStateResult } from './hooks.js';
+import type { Form, FormFunction, FormKey } from './form.js';
+import type {
+  FormToFormValues,
+  UseChannelResult,
+  UseIntervalHook,
+  UseStateResult,
+} from './hooks.js';
 import type { KVStore } from './kvStore.js';
 import type { MediaPlugin } from './media.js';
+import type { ChannelOptions } from './realtime.js';
 import type { RedisClient } from './redis.js';
 import type { Scheduler } from './scheduler.js';
 import type { SettingsClient } from './settings.js';
@@ -145,12 +152,17 @@ export type ContextAPIClients = {
    * A hook for managing a form between Block renders.
    * This is only available within a Block Component.
    */
-  useForm: UseFormHook;
+  useForm: <const T extends Form | FormFunction = Form | FormFunction>(
+    form: T,
+    onSubmit: (values: FormToFormValues<T>) => void | Promise<void>
+  ) => FormKey;
   /**
    * A hook hor managing a realtime pubsub channel between Block renders.
    * This is only available within a Block Component.
    */
-  useChannel: UseChannelHook;
+  useChannel: <Message extends JSONValue = JSONValue>(
+    options: ChannelOptions<Message>
+  ) => UseChannelResult<Message>;
 };
 
 /** The current app context of the event or render */

@@ -1,19 +1,21 @@
 import * as protos from '@devvit/protos';
 import { Actor } from '@devvit/shared-types/Actor.js';
-import type { FormKey } from '@devvit/shared-types/useForm.js';
+import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
+import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
+import type { FormKey } from '@devvit/shared-types/useForm.js';
 import { assertValidFormFields } from '../apis/ui/helpers/assertValidFormFields.js';
 import type {
   BaseContext,
   Configuration,
   ContextAPIClients,
   CustomPostType,
-  Data,
   Form,
   FormDefinition,
   FormFunction,
   FormOnSubmitEventHandler,
+  FormToFormValues,
   IconName,
   MenuItem,
   MultiTriggerDefinition,
@@ -37,7 +39,6 @@ import { registerScheduler } from './internals/scheduler.js';
 import { registerTriggers } from './internals/triggers.js';
 import { registerUIEventHandler } from './internals/ui-event-handler.js';
 import { registerUIRequestHandlers } from './internals/ui-request-handler.js';
-import type { AssetMap } from '@devvit/shared-types/Assets.js';
 
 type UseHandler = {
   [name: string]: (args: protos.UnknownMessage | undefined, metadata?: protos.Metadata) => void;
@@ -222,12 +223,15 @@ export class Devvit extends Actor {
    * @param onSubmit - The function to call when the form is submitted.
    * @returns A unique key for the form that can used with `ui.showForm`.
    */
-  static createForm(form: Form | FormFunction, onSubmit: FormOnSubmitEventHandler): FormKey {
+  static createForm<const T extends Form | FormFunction>(
+    form: T,
+    onSubmit: FormOnSubmitEventHandler<FormToFormValues<T>>
+  ): FormKey {
     const formKey: FormKey = `form.${this.#formDefintions.size}`;
     this.#formDefintions.set(formKey, {
       form,
       onSubmit,
-    });
+    } as FormDefinition);
     return formKey;
   }
 
@@ -263,7 +267,7 @@ export class Devvit extends Actor {
    * });
    * ```
    */
-  static addSchedulerJob(job: ScheduledJobType): void {
+  static addSchedulerJob<T extends JSONObject | undefined>(job: ScheduledJobType<T>): void {
     if (!this.#pluginClients[protos.SchedulerDefinition.fullName]) {
       this.#use(protos.SchedulerDefinition);
     }
@@ -272,7 +276,10 @@ export class Devvit extends Actor {
       throw new Error(`Job ${job.name} is already defined`);
     }
 
-    this.#scheduledJobHandlers.set(job.name, job.onRun);
+    this.#scheduledJobHandlers.set(
+      job.name,
+      job.onRun as ScheduledJobHandler<JSONObject | undefined>
+    );
   }
 
   /**
@@ -579,7 +586,7 @@ export class Devvit extends Actor {
 
     if (!settings) {
       throw new Error(
-        'Settings is not enabled. You can enable it by passing `settings: true` to `Devvit.configure`'
+        'Settings must first be configured with `Devvit.addSettings()` before they can be accessed'
       );
     }
 
@@ -893,12 +900,12 @@ export namespace Devvit {
     };
 
     export type OnPressEvent = {
-      state?: Data;
+      state?: JSONObject;
     };
 
     export type OnMessageEvent = {
       type: string;
-      data?: Data;
+      data?: JSONValue;
     };
 
     export type OnPressEventHandler = (event: OnPressEvent) => void | Promise<void>;
@@ -1029,7 +1036,7 @@ export namespace Devvit {
     export type WebViewProps = BaseProps &
       WebViewActionable & {
         url: string;
-        state?: Data;
+        state?: JSONObject;
       };
   }
 }

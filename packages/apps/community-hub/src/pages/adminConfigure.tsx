@@ -1,21 +1,22 @@
 import { Devvit } from '@devvit/public-api';
-import { PageProps } from '../types/page.js';
-import { PinToggler } from '../components/PinToggler.js';
 import { Page } from '../components/Page.js';
+import type { Pin } from '../components/Pin/common.js';
+import { PinToggler } from '../components/PinToggler.js';
+import type { PageProps } from '../types/page.js';
 
 export const AdminConfigurePage = ({
   navigate,
   pinPost,
   context,
   pinPostMethods: { updatePinPost },
-}: PageProps) => {
+}: PageProps): JSX.Element => {
   const { useState } = context;
   // Extra abstraction to avoid requests on every update
   const [pins, setPins] = useState(() => {
     return [...pinPost.pins];
   });
 
-  const togglePin = (pinId: string) => {
+  const togglePin = (pinId: string): Pin | undefined => {
     setPins((x) => {
       return x.map((pin) => {
         if (pin.id === pinId) {

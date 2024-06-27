@@ -1,6 +1,9 @@
-import { ALL_ICON_NAMES, ParagraphField, StringField, SelectField } from '@devvit/public-api';
-import { boolean, z } from 'zod';
-import { Devvit } from '@devvit/public-api';
+import type { Devvit, ParagraphField, SelectField, StringField } from '@devvit/public-api';
+import { ALL_ICON_NAMES } from '@devvit/public-api';
+import { z } from 'zod';
+
+export type PinPostInstance = z.input<(typeof Schema)['pinPostInstance']>;
+export type Config = z.input<typeof Schema.configSchema>;
 
 const color = z
   .object({

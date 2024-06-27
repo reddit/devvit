@@ -1,11 +1,12 @@
-import { Devvit, FormField } from '@devvit/public-api';
-import { PageProps } from '../types/page.js';
-import { PinButton } from '../components/Pin/Pin.js';
-import { chunk, deepClone } from '../util.js';
-import { Schema } from '../api/Schema.js';
-import { z } from 'zod';
+import type { FormField } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { dset } from 'dset';
+import type { z } from 'zod';
+import type { Schema } from '../api/Schema.js';
 import { Page } from '../components/Page.js';
+import { PinButton } from '../components/Pin/Pin.js';
+import type { PageProps } from '../types/page.js';
+import { chunk, deepClone } from '../util.js';
 
 export default Devvit;
 export const HomePage = async ({
@@ -13,84 +14,33 @@ export const HomePage = async ({
   context,
   pinPost,
   isOwner,
-  isRMC,
   currentUserUsername,
   pinPostMethods: { updatePinPost, updatePinPostPin },
-}: PageProps) => {
-  const { useState, reddit } = context;
+}: PageProps): Promise<JSX.Element> => {
+  const { useState } = context;
   // Only living here instead of at PinButton due to bug:
   // https://reddit.atlassian.net/browse/DX-4508
   const [formPin, setFormPin] = useState<z.infer<(typeof Schema)['formPin']> | null>(null);
   const enabledPins = pinPost.pins.filter((x) => x.enabled);
 
   const editHomePage = context.useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'header',
-            label: `H1`,
-            type: 'string',
-            defaultValue: `${pinPost.header}`,
-          },
-        ],
-        title: 'Edit Page',
-        acceptLabel: 'Save',
-      };
+    {
+      fields: [
+        {
+          name: 'header',
+          label: `H1`,
+          type: 'string',
+          defaultValue: `${pinPost.header}`,
+        },
+      ],
+      title: 'Edit Page',
+      acceptLabel: 'Save',
     },
     async (data) => {
       await updatePinPost({
         header: data.header,
       });
       context.ui.showToast(`Your page has been updated!`);
-    }
-  );
-
-  //contact mod form
-  const contactMods = context.useForm(
-    (data) => {
-      return {
-        fields: [
-          {
-            name: 'subject',
-            label: `Subject`,
-            type: 'string',
-          },
-          {
-            name: 'message',
-            label: `Message`,
-            type: 'paragraph',
-          },
-          {
-            name: 'from',
-            label: `From`,
-            type: 'string',
-            defaultValue: `${data.userName}`,
-            disabled: true,
-          },
-        ],
-        title: 'Contact the mods',
-        acceptLabel: 'Send',
-      };
-    },
-    async (data) => {
-      const { reddit } = context;
-      if (!data.userName) {
-        context.ui.showToast('You must be logged in to take this action');
-        return;
-      }
-      const subName = await (await reddit.getSubredditById(context.subredditId)).name;
-      const subject = data.subject || '';
-      const message = data.message || '';
-      const from = data.userName;
-      await reddit.sendPrivateMessage({
-        subject: subject,
-        text: `
-  From: ${from}
-  ${message}`,
-        to: subName,
-      });
-      context.ui.showToast(`Message sent to the mods!`);
     }
   );
 
@@ -121,7 +71,7 @@ export const HomePage = async ({
               },
             ],
           },
-          ...(formPin.items.map((item, index) => {
+          ...formPin.items.map<FormField>((item, index) => {
             return {
               label: `Question ${index + 1}`,
               type: 'group',
@@ -150,9 +100,9 @@ export const HomePage = async ({
                 },
               ],
             };
-          }) as FormField[]),
+          }),
         ],
-      };
+      } as const;
     },
     async (data) => {
       if (!formPin) {
@@ -163,7 +113,7 @@ export const HomePage = async ({
       Object.entries(data).forEach(([key, value]) => {
         const path = key.split('.');
         // Select returns an array not an item, even with multiselect is off
-        dset(newFormPin, path, key.endsWith('.type') ? value[0] : value);
+        dset(newFormPin, path, key.endsWith('.type') ? (value as string[])[0] : value);
       });
 
       // This checks against the schema in case we incorrectly set an object key
@@ -229,19 +179,17 @@ ${value}`;
   );
 
   const ownerChoiceForm = context.useForm(
-    () => {
-      return {
-        title: 'Edit or preview',
-        fields: [
-          {
-            name: 'editMode',
-            label: `Edit the form?`,
-            type: 'boolean',
-            defaultValue: false,
-          },
-        ],
-        acceptLabel: 'Next',
-      };
+    {
+      title: 'Edit or preview',
+      fields: [
+        {
+          name: 'editMode',
+          label: `Edit the form?`,
+          type: 'boolean',
+          defaultValue: false,
+        },
+      ],
+      acceptLabel: 'Next',
     },
     (data) => {
       if (data.editMode) {

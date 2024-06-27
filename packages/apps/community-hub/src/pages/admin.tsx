@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { feedbackAccount } from '../constants.js';
-import { PageProps } from '../types/page.js';
-import { standardizeUsername } from '../util.js';
 import { Page } from '../components/Page.js';
+import { feedbackAccount } from '../constants.js';
+import type { PageProps } from '../types/page.js';
+import { standardizeUsername } from '../util.js';
 
 export const AdminPage = ({
   context,
@@ -10,23 +10,21 @@ export const AdminPage = ({
   pinPostMethods: { updatePinPost, clonePost },
   navigate,
   currentUserUsername,
-}: PageProps) => {
+}: PageProps): JSX.Element => {
   const { useForm } = context;
 
   const colorForm = useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'light',
-            label: `Color`,
-            type: 'string',
-            defaultValue: pinPost.primaryColor.light,
-          },
-        ],
-        title: 'Update the Post Color',
-        acceptLabel: 'Update',
-      };
+    {
+      fields: [
+        {
+          name: 'light',
+          label: `Color`,
+          type: 'string',
+          defaultValue: pinPost.primaryColor.light,
+        },
+      ],
+      title: 'Update the Post Color',
+      acceptLabel: 'Update',
     },
     async (data) => {
       await updatePinPost({
@@ -40,23 +38,21 @@ export const AdminPage = ({
   );
 
   const modifyOwnerForm = context.useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'nameAdd',
-            label: `Add user`,
-            type: 'string',
-          },
-          {
-            name: 'nameRemove',
-            label: `Remove user`,
-            type: 'string',
-          },
-        ],
-        title: 'Who can manage this post?',
-        acceptLabel: 'Submit',
-      };
+    {
+      fields: [
+        {
+          name: 'nameAdd',
+          label: `Add user`,
+          type: 'string',
+        },
+        {
+          name: 'nameRemove',
+          label: `Remove user`,
+          type: 'string',
+        },
+      ],
+      title: 'Who can manage this post?',
+      acceptLabel: 'Submit',
     },
     async (data) => {
       const { reddit } = context;
@@ -100,19 +96,17 @@ export const AdminPage = ({
   );
 
   const imageForm = context.useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'url',
-            label: `URL`,
-            type: 'string',
-            defaultValue: 'Must Reddit image link i.e. https://i.redd.it/0ujuzl4ki7yb1.png',
-          },
-        ],
-        title: 'Update the home image',
-        acceptLabel: 'Update',
-      };
+    {
+      fields: [
+        {
+          name: 'url',
+          label: `URL`,
+          type: 'string',
+          defaultValue: 'Must Reddit image link i.e. https://i.redd.it/0ujuzl4ki7yb1.png',
+        },
+      ],
+      title: 'Update the home image',
+      acceptLabel: 'Update',
     },
     async (data) => {
       await updatePinPost({
@@ -124,23 +118,21 @@ export const AdminPage = ({
 
   //clone form
   const cloneConfirm = context.useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'confirm',
-            label: `Write "CLONE" to confirm`,
-            type: 'string',
-          },
-          {
-            name: 'title',
-            label: `Title`,
-            type: 'string',
-          },
-        ],
-        title: 'Duplicate your post',
-        acceptLabel: 'Clone',
-      };
+    {
+      fields: [
+        {
+          name: 'confirm',
+          label: `Write "CLONE" to confirm`,
+          type: 'string',
+        },
+        {
+          name: 'title',
+          label: `Title`,
+          type: 'string',
+        },
+      ],
+      title: 'Duplicate your post',
+      acceptLabel: 'Clone',
     },
     async (data) => {
       const { ui } = context;
@@ -159,18 +151,16 @@ export const AdminPage = ({
   );
 
   const deleteConfirm = context.useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'confirm',
-            label: `Write "DELETE" to confirm`,
-            type: 'string',
-          },
-        ],
-        title: 'Are you sure you want to delete this post?',
-        acceptLabel: 'Delete',
-      };
+    {
+      fields: [
+        {
+          name: 'confirm',
+          label: `Write "DELETE" to confirm`,
+          type: 'string',
+        },
+      ],
+      title: 'Are you sure you want to delete this post?',
+      acceptLabel: 'Delete',
     },
     async (data) => {
       const { reddit, ui } = context;
@@ -194,19 +184,17 @@ export const AdminPage = ({
   );
 
   const feedbackForm = context.useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'feedback',
-            label: `Feedback`,
-            defaultValue: 'Add your feedback or request. Please note, feedback is not anonymous.',
-            type: 'paragraph',
-          },
-        ],
-        title: 'Community Hub Feedback',
-        acceptLabel: 'Send to Developer',
-      };
+    {
+      fields: [
+        {
+          name: 'feedback',
+          label: `Feedback`,
+          defaultValue: 'Add your feedback or request. Please note, feedback is not anonymous.',
+          type: 'paragraph',
+        },
+      ],
+      title: 'Community Hub Feedback',
+      acceptLabel: 'Send to Developer',
     },
     async (data) => {
       const { reddit, ui } = context;

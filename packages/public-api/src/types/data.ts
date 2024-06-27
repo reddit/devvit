@@ -1,2 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Data = { [key: string]: any };
+import type { JSONObject } from '@devvit/shared-types/json.js';
+
+/** @deprecated Use JSONObject instead. */
+export type Data = JSONObject;

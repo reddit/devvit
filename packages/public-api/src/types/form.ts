@@ -7,29 +7,30 @@ import type {
   FieldConfig_String,
 } from '@devvit/protos';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { Data } from './data.js';
-import type { Devvit } from '../devvit/Devvit.js';
+import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
+import type { Devvit } from '../devvit/Devvit.js';
+import type { FormToFormValues } from './index.js';
 
 export type { FormKey };
 
-export type FormValues = Data;
+export type FormValues = JSONObject;
 
-export type FormOnSubmitEvent = {
+export type FormOnSubmitEvent<T extends Partial<JSONObject>> = {
   /** The form values that were submitted */
-  values: FormValues;
+  values: T;
 };
 
-export type FormOnSubmitEventHandler = (
+export type FormOnSubmitEventHandler<Data extends Partial<JSONObject>> = (
   /** The event object containing the results of the form submission */
-  event: FormOnSubmitEvent,
+  event: FormOnSubmitEvent<Data>,
   /** The current app context of the form submission event */
   context: Devvit.Context
 ) => void | Promise<void>;
 
 export type Form = {
   /** The fields that will be displayed in the form */
-  fields: FormField[];
+  fields: readonly FormField[];
   /** An optional title for the form */
   title?: string;
   /** An optional description for the form */
@@ -57,29 +58,38 @@ export type Form = {
  * });
  * ```
  * */
-export type FormFunction = (data: Data) => Form;
+export type FormFunction<T extends JSONObject = JSONObject> = (data: T) => Form;
 
-export type FormDefinition = {
+export type FormDefinition<T extends Form | FormFunction = Form | FormFunction> = {
   /** A form or a function that returns a form */
-  form: Form | FormFunction;
+  form: T;
   /** A callback that will be invoked when the form is submitted */
-  onSubmit: FormOnSubmitEventHandler;
+  onSubmit: FormOnSubmitEventHandler<FormToFormValues<T>>;
 };
 
 export type BaseField<ValueType> = {
-  /** The name of the field. This will be used as the key in the `values` object when the form is submitted */
+  /**
+   * The name of the field. This will be used as the key in the `values` object
+   * when the form is submitted.
+   */
   name: string;
   /** The label of the field. This will be displayed to the user */
   label: string;
   /** An optional help text that will be displayed below the field */
   helpText?: string | undefined;
-  /** If true the field will be required and the user will not be able to submit the form without filling it in */
+  /**
+   * If true the field will be required and the user will not be able to submit
+   * the form without filling it in.
+   */
   required?: boolean | undefined;
   /** If true the field will be disabled */
   disabled?: boolean | undefined;
   /** The default value of the field */
   defaultValue?: ValueType | undefined;
-  /** This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. */
+  /**
+   * This indicates whether the field (setting) is an app level or install level
+   * setting. App setting values can be used by any installation.
+   */
   scope?: SettingScopeType | undefined;
 };
 
@@ -150,9 +160,10 @@ export type FormFieldGroup = {
   /** The label of the group that will be displayed to the user */
   label: string;
   /** The fields that will be displayed in the group */
-  fields: FormField[];
+  fields: readonly FormField[];
   /** An optional help text that will be displayed below the group */
   helpText?: string | undefined;
+  required?: never;
 };
 
 export type FormField =

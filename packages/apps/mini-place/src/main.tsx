@@ -72,14 +72,14 @@ Devvit.addCustomPostType({
       setData(newData);
     }
 
-    const channel = useChannel({
+    const channel = useChannel<RealtimeMessage>({
       name: 'events',
-      onMessage: (data) => {
-        if (data.session === mySession || data.postId !== myPostId) {
+      onMessage: (msg) => {
+        if (msg.session === mySession || msg.postId !== myPostId) {
           //Ignore my updates b/c they have already been rendered
           return;
         }
-        const payload = data.payload;
+        const payload = msg.payload;
         updateCanvas(payload.index, payload.color);
       },
     });

@@ -30,14 +30,14 @@ export const confirmationForm = Devvit.createForm(
           name: 'title',
           label: 'r/hello_user post title',
           type: 'string',
-          defaultValue: data.postTitle,
+          defaultValue: data.postTitle as string,
         },
       ],
       title: 'Share your post',
       description:
         'Share your work with the community. This will crosspost your creation to the r/hello_user gallery and a devvit discord feed dedicated to posts like these.',
       acceptLabel: 'Share',
-    };
+    } as const;
   },
   async ({ values }, context) => {
     const creator = await context.redis.get('hell0_user');

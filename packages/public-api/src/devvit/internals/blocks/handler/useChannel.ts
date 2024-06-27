@@ -1,6 +1,6 @@
 import { EffectType, RealtimeSubscriptionStatus, type UIEvent } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
-import type { Data } from '../../../../types/data.js';
+import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { UseChannelResult } from '../../../../types/hooks.js';
 import type { ChannelOptions } from '../../../../types/realtime.js';
 import { ChannelStatus } from '../../../../types/realtime.js';
@@ -8,7 +8,7 @@ import { registerHook } from './BlocksHandler.js';
 import { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
 
-const useChannelList: { [hookId: string]: ChannelHook } = {};
+const useChannelList: { [hookId: string]: ChannelHook<JSONValue> } = {};
 
 /** Unsubscribe and delete hooks with no active event handlers **/
 RenderContext.addGlobalUndeliveredEventHandler('useChannel', async (event) => {
@@ -26,16 +26,16 @@ type ChannelHookState = {
   subscribed: boolean;
 } & Hook['state'];
 
-class ChannelHook implements UseChannelResult, Hook {
+class ChannelHook<Message extends JSONValue> implements UseChannelResult<Message>, Hook {
   state: ChannelHookState;
 
   readonly #context: RenderContext;
   readonly #debug: boolean;
   /** Record state in BlocksHandler. */
   readonly #invalidate: () => void;
-  readonly #opts: Readonly<ChannelOptions>;
+  readonly #opts: Readonly<ChannelOptions<Message>>;
 
-  constructor(opts: Readonly<ChannelOptions>, params: Readonly<HookParams>) {
+  constructor(opts: Readonly<ChannelOptions<Message>>, params: Readonly<HookParams>) {
     this.#context = params.context;
     this.#debug = !!params.context._devvitContext?.debug.realtime;
     this.#opts = opts;
@@ -50,7 +50,7 @@ class ChannelHook implements UseChannelResult, Hook {
     const channel = `${appID}:${installID}:${opts.name}`;
     const duplicate = Object.values(this.#context.hooks)
       .filter((hook) => hook instanceof ChannelHook)
-      .some((hook) => (hook as ChannelHook).state.channel === channel);
+      .some((hook) => (hook as ChannelHook<Message>).state.channel === channel);
     if (duplicate) throw Error('useChannel error: channel names must be unique');
 
     this.state = {
@@ -58,7 +58,7 @@ class ChannelHook implements UseChannelResult, Hook {
       connected: false,
       subscribed: false,
     };
-    useChannelList[this.state.channel] = this;
+    useChannelList[this.state.channel] = this as ChannelHook<JSONValue>;
   }
 
   async onUIEvent(ev: UIEvent): Promise<void> {
@@ -88,14 +88,13 @@ class ChannelHook implements UseChannelResult, Hook {
     }
   }
 
-  async send(data: Data): Promise<void> {
-    if (this.#debug)
-      console.debug(`[realtime] send message: ${JSON.stringify(data, undefined, 2)}`);
+  async send(msg: Message): Promise<void> {
+    if (this.#debug) console.debug(`[realtime] send message: ${JSON.stringify(msg, undefined, 2)}`);
     if (!this.state.subscribed || !this.state.connected) {
       console.debug(`send failed; ${this.state.channel} channel not connected`);
       throw Error(`useChannel error: send failed; ${this.state.channel} channel not connected`);
     }
-    await this.#context.devvitContext.realtime.send(this.state.channel, data);
+    await this.#context.devvitContext.realtime.send(this.state.channel, msg);
   }
 
   get status(): ChannelStatus {
@@ -124,7 +123,7 @@ class ChannelHook implements UseChannelResult, Hook {
   #emitSubscribed(): void {
     const channels = Object.values(this.#context.hooks)
       .filter((hook) => hook instanceof ChannelHook && hook.state.subscribed)
-      .map((hook) => (hook as ChannelHook).state.channel);
+      .map((hook) => (hook as ChannelHook<Message>).state.channel);
     this.#context.emitEffect(`useChannel`, {
       type: EffectType.EFFECT_REALTIME_SUB,
       realtimeSubscriptions: { subscriptionIds: channels },
@@ -132,7 +131,9 @@ class ChannelHook implements UseChannelResult, Hook {
   }
 }
 
-export function useChannel(opts: Readonly<ChannelOptions>): UseChannelResult {
+export function useChannel<Message extends JSONValue>(
+  opts: Readonly<ChannelOptions<Message>>
+): UseChannelResult<Message> {
   // encode channel name in the hook ID. this would enable sharing channels
   // across useChannel() calls and across components more easily but is
   // currently unused.
@@ -140,6 +141,6 @@ export function useChannel(opts: Readonly<ChannelOptions>): UseChannelResult {
     throw Error('useChannel error: channel names must be nonempty and alphanumeric');
   const namespace = `useChannel:${opts.name}`;
   return registerHook({ namespace }, (params) => {
-    return new ChannelHook(opts, params);
+    return new ChannelHook<Message>(opts, params);
   });
 }

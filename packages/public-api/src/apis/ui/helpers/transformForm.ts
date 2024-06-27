@@ -10,7 +10,7 @@ import type {
   StringField,
 } from '../../../types/form.js';
 
-export function transformFormFields(fields: FormField[]): FormFieldProto[] {
+export function transformFormFields(fields: readonly FormField[]): FormFieldProto[] {
   return fields.map((field) => {
     switch (field.type) {
       case 'string':

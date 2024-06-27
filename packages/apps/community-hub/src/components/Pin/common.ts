@@ -1,6 +1,6 @@
-import { z } from 'zod';
-import { PageProps } from '../../types/page.js';
-import { Schema } from '../../api/Schema.js';
+import type { z } from 'zod';
+import type { Schema } from '../../api/Schema.js';
+import type { PageProps } from '../../types/page.js';
 
 export type Pin = z.infer<(typeof Schema)['pin']>;
 

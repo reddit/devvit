@@ -1,10 +1,10 @@
 import { Devvit } from '@devvit/public-api';
 
-import { Schema } from '../../api/Schema.js';
-import { CommonPinProps } from './common.js';
-import { z } from 'zod';
+import type { z } from 'zod';
+import type { Schema } from '../../api/Schema.js';
 import { formatUrl, randomId } from '../../util.js';
 import { Page } from '../Page.js';
+import type { CommonPinProps } from './common.js';
 
 type WikiPin = z.infer<(typeof Schema)['wikiPin']>;
 
@@ -17,52 +17,48 @@ export const WikiPin = ({
   pinPost: {
     primaryColor: { light },
   },
-}: CommonPinProps & { pin: WikiPin }) => {
+}: CommonPinProps & { pin: WikiPin }): JSX.Element => {
   const editWikiForm = context.useForm(
-    () => {
-      return {
-        fields: [
-          {
-            name: 'pinTitle',
-            label: `Homepage Button Text`,
-            type: 'string',
-            defaultValue: pin.pinTitle,
-          },
-          {
-            name: 'header',
-            label: `H1`,
-            type: 'string',
-            defaultValue: pin.header,
-          },
-          {
-            name: 'subheader',
-            label: `H2`,
-            type: 'string',
-            defaultValue: pin.subheader,
-          },
-        ],
-        title: 'Edit Events Page',
-        acceptLabel: 'Save',
-      };
+    {
+      fields: [
+        {
+          name: 'pinTitle',
+          label: `Homepage Button Text`,
+          type: 'string',
+          defaultValue: pin.pinTitle,
+        },
+        {
+          name: 'header',
+          label: `H1`,
+          type: 'string',
+          defaultValue: pin.header,
+        },
+        {
+          name: 'subheader',
+          label: `H2`,
+          type: 'string',
+          defaultValue: pin.subheader,
+        },
+      ],
+      title: 'Edit Events Page',
+      acceptLabel: 'Save',
     },
     async (data) => {
-      updatePinPostPin(pin.id, data);
+      await updatePinPostPin(pin.id, data);
       context.ui.showToast(`Your page has been updated!`);
     }
   );
 
   const wikiItemForm = context.useForm(
-    () => {
-      return {
-        fields: [
-          { name: 'title', label: `Title`, type: 'string' },
-          { name: 'description', label: `Description`, type: 'string' },
-          { name: 'url', label: `Url`, type: 'string' },
-          { name: 'pinIcon', label: `Icon`, type: 'string' },
-        ],
-        title: 'Add Item',
-        acceptLabel: 'Add',
-      };
+    {
+      fields: [
+        { name: 'title', label: `Title`, type: 'string' },
+        { name: 'description', label: `Description`, type: 'string' },
+        { name: 'url', label: `Url`, type: 'string' },
+        { name: 'pinIcon', label: `Icon`, type: 'string' },
+      ],
+      title: 'Add Item',
+      acceptLabel: 'Add',
     },
     async (data) => {
       // TODO: This should really be on the Schema with `.max(10)`
@@ -122,7 +118,7 @@ export const WikiPin = ({
         ],
         title: 'Edit Item',
         acceptLabel: 'Save',
-      };
+      } as const;
     },
     async (data) => {
       await updatePinPostPin(pin.id, {
@@ -144,7 +140,7 @@ export const WikiPin = ({
     }
   );
 
-  const removeItem = async (itemId: string) => {
+  const removeItem = async (itemId: string): Promise<void> => {
     await updatePinPostPin(pin.id, {
       type: 'wiki',
       items: pin.items.filter((item) => item.id !== itemId),
@@ -207,7 +203,7 @@ export const WikiPin = ({
                     {' '}
                     {firstRow.title}
                   </button>
-                ) : undefined}
+                ) : null}
                 <spacer size="small" />
                 <vstack></vstack>
                 <spacer size="small" />
@@ -246,7 +242,7 @@ export const WikiPin = ({
                   >
                     {secondRow.title}
                   </button>
-                ) : undefined}
+                ) : null}
                 <spacer size="small" />
                 <vstack></vstack>
                 <spacer size="small" />
@@ -285,7 +281,7 @@ export const WikiPin = ({
                   >
                     {thirdRow.title}
                   </button>
-                ) : undefined}
+                ) : null}
                 <spacer size="small" />
                 <vstack></vstack>
                 <spacer size="small" />

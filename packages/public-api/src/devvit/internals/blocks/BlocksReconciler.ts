@@ -245,7 +245,8 @@ export class BlocksReconciler implements EffectEmitter {
   // This return type is an absolute mess here. Let this slide.
 
   #makeContextProps(): Devvit.Context {
-    const props: Devvit.Context = {
+    // skip typechecks for useForm which is templatized.
+    const props: Omit<Devvit.Context, 'useForm'> = {
       ...getContextFromMetadata(this.metadata, this.state.__postData?.thingId),
       modLog: this.modLog,
       reddit: this.reddit,
@@ -267,7 +268,7 @@ export class BlocksReconciler implements EffectEmitter {
       ...this.hooks,
     };
     props.debug.effects = this;
-    return props;
+    return props as Devvit.Context;
   }
 
   async render(): Promise<Block> {

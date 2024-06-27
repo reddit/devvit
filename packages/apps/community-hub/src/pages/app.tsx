@@ -1,18 +1,21 @@
-import { Context, Devvit } from '@devvit/public-api';
-import { HomePage } from './home.js';
-import { Route, RouteParams } from '../types/page.js';
-import { AdminConfigurePage } from './adminConfigure.js';
-import { FrequentlyAskedQuestionsPage } from './frequentlyAskedQuestions.js';
-import { WelcomePage } from './welcome.js';
-import { PinDetailPage } from './pinDetail.js';
-import { AdminPage } from './admin.js';
-import { adminUserNames } from '../constants.js';
+import type { Context } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { PinPost } from '../api/PinPost.js';
 import { AppWrapper } from '../components/AppWrapper.js';
+import { adminUserNames } from '../constants.js';
+import type { PageProps, Route, RouteParams } from '../types/page.js';
+import { AdminPage } from './admin.js';
+import { AdminConfigurePage } from './adminConfigure.js';
+import { FrequentlyAskedQuestionsPage } from './frequentlyAskedQuestions.js';
+import { HomePage } from './home.js';
+import { PinDetailPage } from './pinDetail.js';
+import { WelcomePage } from './welcome.js';
 
-const getPageForRoute = (route: Route) => {
+const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
     case 'home':
+      // to-do: this should not be async.
+      // @ts-expect-error
       return HomePage;
     case 'admin':
       return AdminPage;
@@ -30,7 +33,7 @@ const getPageForRoute = (route: Route) => {
 };
 
 export const App: Devvit.CustomPostComponent = async (context: Context) => {
-  const { useState, postId, userId, reddit } = context;
+  const { useState, postId, reddit } = context;
 
   if (!postId) {
     throw new Error(`Cannot find post id from context?`);
@@ -38,9 +41,7 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
 
   const [pinPost, setPinPost] = useState(async () => {
     const svc = new PinPost(postId, context);
-    const pinPost = await svc.getPinPost();
-
-    return pinPost;
+    return await svc.getPinPost();
   });
 
   const [[route, routeParams], setRouteConfig] = useState<[Route, RouteParams]>(async () => {
@@ -52,13 +53,17 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
   });
   const [currentUserUsername] = useState(async () => {
     const user = await reddit.getCurrentUser();
-    return user.username;
+    return user?.username;
   });
-  const isOwner = pinPost.owners.includes(currentUserUsername);
+  const isOwner = currentUserUsername ? pinPost.owners.includes(currentUserUsername) : false;
 
   //special feature for RMC to retrieve call subscribers
   let isRMCAdmin = false;
-  if (adminUserNames.includes(currentUserUsername) && context.subredditId === 't5_2fe60r') {
+  if (
+    currentUserUsername &&
+    adminUserNames.includes(currentUserUsername) &&
+    context.subredditId === 't5_2fe60r'
+  ) {
     isRMCAdmin = true;
   }
 
@@ -68,7 +73,7 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
     isRMC = true;
   }
 
-  const navigate = (route: Route, params: RouteParams = {}) => {
+  const navigate = (route: Route, params: RouteParams = {}): void => {
     setRouteConfig([route, params]);
   };
 
@@ -87,8 +92,7 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
 
   const clonePost: PinPost['clonePost'] = async (...args) => {
     const svc = new PinPost(postId, context);
-    const clone = await svc.clonePost(...args);
-    return clone;
+    return await svc.clonePost(...args);
   };
 
   const Page = getPageForRoute(route);
@@ -104,7 +108,7 @@ export const App: Devvit.CustomPostComponent = async (context: Context) => {
         isOwner={isOwner}
         isRMCAdmin={isRMCAdmin}
         isRMC={isRMC}
-        currentUserUsername={currentUserUsername}
+        currentUserUsername={currentUserUsername ?? ''}
         pinPostMethods={{
           updatePinPost,
           updatePinPostPin,

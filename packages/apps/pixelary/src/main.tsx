@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { Pixelary } from './components/Pixelary.js';
 import { LoadingState } from './components/LoadingState.js';
+import { Pixelary } from './components/Pixelary.js';
 import { Service } from './service/Service.js';
+import type { JobData } from './types/job-data.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -134,12 +135,12 @@ Devvit.addMenuItem({
     const service = new Service(redis);
     const postData = await service.getPostData(event.targetId, userId!);
 
-    if (!postData) {
+    if (!postData || !context.postId) {
       ui.showToast('No post data found');
       return;
     }
 
-    await scheduler.runJob({
+    await scheduler.runJob<JobData>({
       name: 'PostExpiration',
       data: {
         postId: context.postId,
@@ -154,7 +155,7 @@ Devvit.addMenuItem({
 });
 
 // Do the following when a drawing post expires
-Devvit.addSchedulerJob({
+Devvit.addSchedulerJob<JobData>({
   name: 'PostExpiration',
   onRun: async (event, context) => {
     const { reddit, redis } = context;

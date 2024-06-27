@@ -1,6 +1,6 @@
-import { Context, Devvit } from '@devvit/public-api';
-import { App } from './pages/app.js';
+import { Devvit } from '@devvit/public-api';
 import { PinPost } from './api/PinPost.js';
+import { App } from './pages/app.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -17,7 +17,7 @@ Devvit.addMenuItem({
     const subName = currentSubreddit.name;
     const user = await reddit.getUserById(userId!);
 
-    context.ui.showForm(createPost, { subName, username: user.username });
+    if (user) context.ui.showForm(createPost, { subName, username: user.username });
   },
 });
 
@@ -48,7 +48,7 @@ const createPost = Devvit.createForm(
       ],
       title: 'Create Hub',
       acceptLabel: 'Create',
-    };
+    } as const;
   },
   async ({ values }, context) => {
     const { reddit } = context;

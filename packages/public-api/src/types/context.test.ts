@@ -1,53 +1,26 @@
-/** @jsx Devvit.createElement */
-/** @jsxFrag Devvit.Fragment */
-
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
-import { Devvit } from './Devvit.js';
+import type { ContextAPIClients } from './context.js';
 
-const Box: Devvit.BlockComponent = ({ children }) => {
-  return (
-    <hstack>
-      <button onPress={() => console.log('hi')}>hi</button>
-      {children ?? null}
-    </hstack>
-  );
-};
-const Boxed: Devvit.BlockComponent = () => {
-  return (
-    <Box>
-      <vstack>
-        <text>hi world!</text>
-      </vstack>
-    </Box>
-  );
-};
-
-describe('components type system', () => {
-  test('should not bork out', async () => {
-    <Boxed />;
-  });
-});
-
-describe('createForm() typing is intuitive', () => {
-  const D = { createForm(): void {} } as unknown as typeof Devvit;
+describe('useForm() typing is intuitive', () => {
+  const ctx = { useForm() {} } as unknown as ContextAPIClients;
 
   test('no fields', () =>
-    D.createForm({ fields: [] }, (data) => {
+    ctx.useForm({ fields: [] }, (data) => {
       data satisfies JSONObject;
     }));
 
   test('one field', () =>
-    D.createForm(
+    ctx.useForm(
       {
         fields: [{ label: 'bool label', type: 'boolean', name: 'boolVal' }],
       },
       (data) => {
-        data.values.boolVal satisfies boolean;
+        data.boolVal satisfies boolean;
       }
     ));
 
   test('default fields', () =>
-    D.createForm(
+    ctx.useForm(
       {
         fields: [
           { label: 'bool label', type: 'boolean', name: 'boolVal', defaultValue: true },
@@ -69,16 +42,16 @@ describe('createForm() typing is intuitive', () => {
         ],
       },
       (data) => {
-        data.values.boolVal satisfies boolean;
-        data.values.numVal satisfies number;
-        data.values.paragraphVal satisfies string;
-        data.values.selectVal satisfies string[];
-        data.values.strVal satisfies string;
+        data.boolVal satisfies boolean;
+        data.numVal satisfies number;
+        data.paragraphVal satisfies string;
+        data.selectVal satisfies string[];
+        data.strVal satisfies string;
       }
     ));
 
   test('required fields', () =>
-    D.createForm(
+    ctx.useForm(
       {
         fields: [
           { label: 'image label', type: 'image', name: 'imageVal', required: true },
@@ -95,16 +68,16 @@ describe('createForm() typing is intuitive', () => {
         ],
       },
       (data) => {
-        data.values.imageVal satisfies string;
-        data.values.numVal satisfies number;
-        data.values.paragraphVal satisfies string;
-        data.values.selectVal satisfies string[];
-        data.values.strVal satisfies string;
+        data.imageVal satisfies string;
+        data.numVal satisfies number;
+        data.paragraphVal satisfies string;
+        data.selectVal satisfies string[];
+        data.strVal satisfies string;
       }
     ));
 
   test('all fields', () =>
-    D.createForm(
+    ctx.useForm(
       {
         fields: [
           { label: 'bool label', type: 'boolean', name: 'boolVal' },
@@ -126,29 +99,29 @@ describe('createForm() typing is intuitive', () => {
         ],
       },
       (data) => {
-        data.values.boolVal satisfies boolean;
-        data.values.subBoolVal satisfies boolean;
-        data.values.imageVal satisfies string | undefined;
-        data.values.numVal satisfies number | undefined;
-        data.values.paragraphVal satisfies string | undefined;
-        data.values.selectVal satisfies string[];
-        data.values.strVal satisfies string | undefined;
+        data.boolVal satisfies boolean;
+        data.subBoolVal satisfies boolean;
+        data.imageVal satisfies string | undefined;
+        data.numVal satisfies number | undefined;
+        data.paragraphVal satisfies string | undefined;
+        data.selectVal satisfies string[];
+        data.strVal satisfies string | undefined;
       }
     ));
 
   test('parameterless function', () =>
-    D.createForm(
+    ctx.useForm(
       () =>
         ({
           fields: [{ label: 'string label', type: 'string', name: 'strVal' }],
         } as const),
       (data) => {
-        data.values.strVal satisfies string | undefined;
+        data.strVal satisfies string | undefined;
       }
     ));
 
   test('parameter function', () =>
-    D.createForm(
+    ctx.useForm(
       (data) =>
         ({
           fields: [
@@ -156,7 +129,7 @@ describe('createForm() typing is intuitive', () => {
           ],
         } as const),
       (data) => {
-        data.values.strVal satisfies string | undefined;
+        data.strVal satisfies string | undefined;
       }
     ));
 
@@ -165,8 +138,8 @@ describe('createForm() typing is intuitive', () => {
       ({
         fields: [{ label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' }],
       } as const);
-    D.createForm(local, (data) => {
-      data.values.strVal satisfies string | undefined;
+    ctx.useForm(local, (data) => {
+      data.strVal satisfies string | undefined;
     });
   });
 });

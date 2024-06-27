@@ -1,11 +1,12 @@
 import { Devvit } from '@devvit/public-api';
-import { z } from 'zod';
-import { richTextBody } from '../api/Schema.js';
+import type { z } from 'zod';
+import type { richTextBody } from '../api/Schema.js';
 
-export const TextRenderer = ({ body }: { body: z.infer<typeof richTextBody> }) => {
+export const TextRenderer = ({ body }: { body: z.infer<typeof richTextBody> }): JSX.Element => {
   return (
     <vstack>
       {body.map((node) => {
+        // eslint-disable-next-line sonarjs/no-small-switch
         switch (node.type) {
           case 'paragraph':
             return (

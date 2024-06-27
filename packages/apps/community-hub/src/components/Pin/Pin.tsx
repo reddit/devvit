@@ -1,11 +1,11 @@
-import { Devvit, FormKey } from '@devvit/public-api';
-import { z } from 'zod';
-import { Schema } from '../../api/Schema.js';
-import { PageProps } from '../../types/page.js';
-import { CommonPinProps, Pin as PinType } from './common.js';
+import { Devvit } from '@devvit/public-api';
+import type { z } from 'zod';
+import type { Schema } from '../../api/Schema.js';
+import type { PageProps } from '../../types/page.js';
 import { EventsPin } from './EventsPin.js';
-import { WikiPin } from './WikiPin.js';
 import { FlairPin } from './FlairPin.js';
+import { WikiPin } from './WikiPin.js';
+import type { CommonPinProps, Pin as PinType } from './common.js';
 
 type PinButtonProps = {
   pin: PinType;
@@ -22,7 +22,7 @@ export const PinButton = ({
   context,
   currentUserUsername,
   onClickForm,
-}: PinButtonProps) => {
+}: PinButtonProps): JSX.Element => {
   return (
     <hstack>
       <button
@@ -51,11 +51,15 @@ export const PinButton = ({
   );
 };
 
-const PagePin = ({ pin }: CommonPinProps & { pin: z.infer<(typeof Schema)['pagePin']> }) => {
+const PagePin = ({
+  pin,
+}: CommonPinProps & { pin: z.infer<(typeof Schema)['pagePin']> }): JSX.Element => {
   return <hstack>pin detail</hstack>;
 };
 
-const FormPin = ({ pin }: CommonPinProps & { pin: z.infer<(typeof Schema)['formPin']> }) => {
+const FormPin = ({
+  pin,
+}: CommonPinProps & { pin: z.infer<(typeof Schema)['formPin']> }): JSX.Element => {
   return <hstack>pin detail</hstack>;
 };
 
@@ -64,7 +68,7 @@ export const Pin = ({
   ...rest
 }: CommonPinProps & {
   pin: PinType;
-}) => {
+}): JSX.Element => {
   const { type } = pin;
 
   switch (type) {

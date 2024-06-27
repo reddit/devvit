@@ -1,7 +1,7 @@
+import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
-import type { Data } from './data.js';
-import type { Toast } from './toast.js';
 import type { Comment, Post, Subreddit, User } from '../apis/reddit/models/index.js';
+import type { Toast } from './toast.js';
 
 /**
  * The UI client lets your app interact with the Reddit frontend.
@@ -11,7 +11,7 @@ import type { Comment, Post, Subreddit, User } from '../apis/reddit/models/index
  */
 export type UIClient = {
   /** Open a form in a modal */
-  showForm(formKey: FormKey, data?: Data | undefined): void;
+  showForm(formKey: FormKey, data?: JSONObject | undefined): void;
   /** Show a message in a toast. */
   showToast(text: string): void;
   showToast(toast: Toast): void;

@@ -1,12 +1,13 @@
 import type { Metadata } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import type { JSONObject } from '@devvit/shared-types/json.js';
 import { Devvit } from '../../devvit/Devvit.js';
 import type {
-  Scheduler,
   ScheduledCronJob,
+  ScheduledCronJobOptions,
   ScheduledJob,
   ScheduledJobOptions,
-  ScheduledCronJobOptions,
+  Scheduler,
 } from '../../types/scheduler.js';
 
 export class SchedulerClient implements Scheduler {
@@ -63,7 +64,7 @@ export class SchedulerClient implements Scheduler {
           id: action.id,
           name: action.request.action.type,
           runAt: action.request.when,
-          data: action.request.action.data,
+          data: action.request.action.data as JSONObject | undefined,
         };
       }
 
@@ -71,7 +72,7 @@ export class SchedulerClient implements Scheduler {
         id: action.id,
         name: action.request.action.type,
         cron: action.request.cron ?? '',
-        data: action.request.action,
+        data: action.request.action as unknown as JSONObject | undefined,
       };
     });
   }

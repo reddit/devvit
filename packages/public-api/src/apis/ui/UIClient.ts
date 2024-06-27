@@ -1,14 +1,14 @@
 import type { Effect, Toast as ToastProto } from '@devvit/protos';
 import { EffectType, Form, ToastAppearance } from '@devvit/protos';
+import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 import { Devvit } from '../../devvit/Devvit.js';
 import type { BlocksReconciler } from '../../devvit/internals/blocks/BlocksReconciler.js';
-import type { Data } from '../../types/data.js';
 import type { Toast } from '../../types/toast.js';
 import type { UIClient as _UIClient } from '../../types/ui-client.js';
+import type { Comment, Post, Subreddit, User } from '../reddit/models/index.js';
 import { assertValidFormFields } from './helpers/assertValidFormFields.js';
 import { transformFormFields } from './helpers/transformForm.js';
-import type { Comment, Post, Subreddit, User } from '../reddit/models/index.js';
 
 export class UIClient implements _UIClient {
   #effects: Effect[] = [];
@@ -19,7 +19,7 @@ export class UIClient implements _UIClient {
     this.#reconciler = reconciler;
   }
 
-  showForm(formKey: FormKey, data?: Data | undefined): void {
+  showForm(formKey: FormKey, data?: JSONObject | undefined): void {
     let formDefinition = Devvit.formDefinitions.get(formKey);
 
     if (!formDefinition && this.#reconciler) {

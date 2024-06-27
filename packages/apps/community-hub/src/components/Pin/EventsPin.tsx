@@ -1,10 +1,10 @@
-import { Context, Devvit } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 
-import { Schema } from '../../api/Schema.js';
-import { CommonPinProps } from './common.js';
-import { z } from 'zod';
-import { formatUrl, randomId } from '../../util.js';
+import type { z } from 'zod';
+import type { Schema } from '../../api/Schema.js';
+import { randomId } from '../../util.js';
 import { Page } from '../Page.js';
+import type { CommonPinProps } from './common.js';
 
 type EventsPin = z.infer<(typeof Schema)['eventsPin']>;
 
@@ -19,7 +19,7 @@ export const EventsPin = ({
   pinPost: {
     primaryColor: { light },
   },
-}: CommonPinProps & { pin: EventsPin }) => {
+}: CommonPinProps & { pin: EventsPin }): JSX.Element => {
   const editEventsPage = context.useForm(
     () => {
       return {
@@ -45,10 +45,10 @@ export const EventsPin = ({
         ],
         title: 'Edit Events Page',
         acceptLabel: 'Save',
-      };
+      } as const;
     },
     async (data) => {
-      updatePinPostPin(pin.id, data);
+      await updatePinPostPin(pin.id, data);
       context.ui.showToast(`Your page has been updated! Refresh.`);
     }
   );
@@ -57,13 +57,14 @@ export const EventsPin = ({
     () => {
       return {
         fields: [
-          { name: 'title', label: `Event Title`, type: 'string' },
-          { name: 'startDate', label: `Date`, type: 'string' },
+          { name: 'title', label: `Event Title`, type: 'string', required: true },
+          { name: 'startDate', label: `Date`, type: 'string', required: true }, // to-do: use defaultValue to now instead of required.
           {
             name: 'startTime',
             label: `Time`,
             type: 'string',
-            placeholder: 'xx:xx pm/am ET',
+            placeholder: 'xx:xx pm/am ET', // to-do: use defaultValue to now instead of required.
+            required: true,
           },
           {
             name: 'url',
@@ -74,7 +75,7 @@ export const EventsPin = ({
         ],
         title: 'Add Event',
         acceptLabel: 'Add',
-      };
+      } as const;
     },
     async (data) => {
       if (pin.events.length > 9) {
@@ -90,7 +91,7 @@ export const EventsPin = ({
             id: randomId(),
             enableReminders: true,
             description: '',
-            url: data.url,
+            url: data.url ?? null,
             startDate: data.startDate,
             startTime: data.startTime,
             title: data.title,
@@ -142,7 +143,7 @@ export const EventsPin = ({
         ],
         title: 'Edit Event',
         acceptLabel: 'Save Event',
-      };
+      } as const;
     },
     async (data) => {
       await updatePinPostPin(pin.id, {
@@ -164,7 +165,7 @@ export const EventsPin = ({
     }
   );
 
-  const removeEvent = async (eventId: string) => {
+  const removeEvent = async (eventId: string): Promise<void> => {
     await updatePinPostPin(pin.id, {
       type: 'events',
       events: pin.events.filter((event) => event.id !== eventId),
@@ -173,7 +174,7 @@ export const EventsPin = ({
     context.ui.showToast('Event successfully removed!');
   };
 
-  const eventSubscribe = async (eventId: string, subscribers: string[]) => {
+  const eventSubscribe = async (eventId: string, subscribers: string[]): Promise<void> => {
     const subs = new Set([...subscribers]);
     if (subs.has(currentUserUsername)) {
       subs.delete(currentUserUsername);
@@ -226,12 +227,12 @@ export const EventsPin = ({
         ],
         title: 'Send Event Notification',
         acceptLabel: 'Send',
-      };
+      } as const;
     },
     async (data) => {
       const { reddit } = context;
       let subs: string[] = [];
-      const cE = pin.events.map((event) => {
+      pin.events.forEach((event) => {
         if (event.id === data.id) {
           subs = event.subscribers;
         }
@@ -268,9 +269,10 @@ export const EventsPin = ({
     context.ui.showForm(editEventsPage);
   };
 
-  async function sendRMCSignUps(title: string, subscribers: string[]) {
+  async function sendRMCSignUps(title: string, subscribers: string[]): Promise<void> {
     const { reddit } = context;
-    const admin = await (await reddit.getCurrentUser()).username;
+    const admin = await (await reddit.getCurrentUser())?.username;
+    if (!admin) return;
     const text = `${subscribers.map((i) => {
       `* ${i}  
 `;
@@ -327,7 +329,7 @@ export const EventsPin = ({
                     }
                   }}
                 />
-              ) : undefined}
+              ) : null}
               <spacer size="small" />
               <vstack>
                 <spacer size="small" />

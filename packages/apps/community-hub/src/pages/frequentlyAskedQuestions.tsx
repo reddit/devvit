@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
-import { PageProps } from '../types/page.js';
+import type { PageProps } from '../types/page.js';
 
-export const FrequentlyAskedQuestionsPage = (props: PageProps) => {
+export const FrequentlyAskedQuestionsPage = (props: PageProps): JSX.Element => {
   return (
     <hstack>
       <text color="black white">faqs page</text>

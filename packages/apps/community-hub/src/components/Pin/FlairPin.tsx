@@ -1,11 +1,9 @@
 import { Devvit } from '@devvit/public-api';
 
-import { Schema } from '../../api/Schema.js';
-import { CommonPinProps } from './common.js';
-import { z } from 'zod';
-import { TextRenderer } from '../TextRenderer.js';
+import type { z } from 'zod';
+import type { Schema } from '../../api/Schema.js';
 import { Page } from '../Page.js';
-import { formatUrl } from '../../util.js';
+import type { CommonPinProps } from './common.js';
 
 type FlairPin = z.infer<(typeof Schema)['flairPin']>;
 
@@ -19,12 +17,12 @@ export const FlairPin = ({
   pinPost: {
     primaryColor: { light },
   },
-}: CommonPinProps & { pin: FlairPin }) => {
+}: CommonPinProps & { pin: FlairPin }): JSX.Element => {
   const editFlairPage = context.useForm(
     () => {
-      const body1 = pin.body?.[0]?.children?.[0]?.text ?? '';
-      const body2 = pin.body?.[1]?.children?.[0]?.text ?? '';
-      const body3 = pin.body?.[2]?.children?.[0]?.text ?? '';
+      // const body1 = pin.body?.[0]?.children?.[0]?.text ?? '';
+      // const body2 = pin.body?.[1]?.children?.[0]?.text ?? '';
+      // const body3 = pin.body?.[2]?.children?.[0]?.text ?? '';
 
       return {
         fields: [
@@ -56,7 +54,7 @@ export const FlairPin = ({
             name: 'url',
             label: `Flair URL`,
             type: 'string',
-            defaultValue: pin.url,
+            defaultValue: pin.url ?? undefined,
           },
           // {
           //   name: "body1",
@@ -79,10 +77,10 @@ export const FlairPin = ({
         ],
         title: 'Edit Flair Page',
         acceptLabel: 'Save',
-      };
+      } as const;
     },
     async (data) => {
-      const body: FlairPin['body'] = [];
+      // const body: FlairPin['body'] = [];
       // if (data.body1) {
       //   body.push({
       //     type: "paragraph",
@@ -135,7 +133,7 @@ export const FlairPin = ({
         ],
         title: 'Add Your Flair',
         acceptLabel: 'Save',
-      };
+      } as const;
     },
     async (data) => {
       const { reddit } = context;

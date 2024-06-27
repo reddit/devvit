@@ -1,5 +1,5 @@
 import type { Metadata } from '@devvit/protos';
-import type { Data } from '../../types/index.js';
+import type { JSONValue } from '@devvit/shared-types/json.js';
 import { Devvit } from '../../devvit/Devvit.js';
 
 export class RealtimeClient {
@@ -9,7 +9,7 @@ export class RealtimeClient {
     this.#metadata = metadata;
   }
 
-  async send(channel: string, data: Data): Promise<void> {
-    await Devvit.realtimePlugin.Send({ channel, data }, this.#metadata);
+  async send(channel: string, msg: JSONValue): Promise<void> {
+    await Devvit.realtimePlugin.Send({ channel, data: msg }, this.#metadata);
   }
 }

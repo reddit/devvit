@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
-import { chunk, isEven } from '../util.js';
-import { Schema } from '../api/Schema.js';
-import { z } from 'zod';
+import type { z } from 'zod';
+import type { Schema } from '../api/Schema.js';
+import { chunk } from '../util.js';
 
 export const PinToggler = ({
   pins,
@@ -9,14 +9,14 @@ export const PinToggler = ({
 }: {
   pins: z.infer<(typeof Schema)['pin']>[];
   onPinPress: (pins: z.infer<(typeof Schema)['pin']>) => void;
-}) => {
-  const isPinEnabled = (pinId: string) => {
+}): JSX.Element => {
+  const isPinEnabled = (pinId: string): boolean => {
     return pins.some((x) => x.id === pinId && x.enabled);
   };
 
   return (
     <hstack alignment="center">
-      {chunk(pins, Math.ceil(pins.length / 2)).map((chunk, index) => {
+      {chunk(pins, Math.ceil(pins.length / 2)).map((chunk) => {
         return (
           <vstack alignment="top start">
             {chunk.map((pin) => {

@@ -1,7 +1,18 @@
+import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 import type { Context } from './context.js';
-import type { Data } from './data.js';
-import type { Form, FormFunction, FormValues } from './form.js';
+import type {
+  BooleanField,
+  Form,
+  FormField,
+  FormFieldGroup,
+  FormFunction,
+  ImageField,
+  NumberField,
+  ParagraphField,
+  SelectField,
+  StringField,
+} from './form.js';
 import type { ChannelOptions, ChannelStatus } from './realtime.js';
 
 export type Dispatch<A> = (value: A) => void;
@@ -35,10 +46,48 @@ export type UseFormHookState = {
 };
 
 /** A hook that returns a form key that can be used in the `ui.showForm` */
-export type UseFormHook = (
-  form: Form | FormFunction,
-  onSubmit: (values: FormValues) => void | Promise<void>
+export type UseFormHook<T extends Form | FormFunction = Form | FormFunction> = (
+  form: T,
+  onSubmit: (values: FormToFormValues<T>) => void | Promise<void>
 ) => FormKey;
+
+export type FormToFormValues<T extends Form | FormFunction = Form | FormFunction> =
+  FormFieldsToFormValues<(T extends FormFunction ? ReturnType<T> : T)['fields']>;
+
+/**
+ * Input is a FormField[], output is a
+ * {fieldNameA: fieldTypeA, fieldNameB: fieldTypeB}.
+ */
+type FormFieldsToFormValues<T extends readonly FormField[]> = T extends readonly [
+  infer Field extends FormField,
+  ...infer Rest extends FormField[]
+]
+  ? FormFieldToFormValue<Field> & FormFieldsToFormValues<Rest>
+  : JSONObject; // possibly empty but more likely couldn't infer.
+
+/** Input is a FormField, output is a {fieldName: fieldType}. */
+type FormFieldToFormValue<T extends FormField> = T extends BooleanField
+  ? { [_ in T['name']]: boolean }
+  : T extends ImageField | ParagraphField | StringField
+  ? FormFieldToRequiredFormValue<T, string>
+  : T extends NumberField
+  ? FormFieldToRequiredFormValue<T, number>
+  : T extends SelectField
+  ? { [_ in T['name']]: string[] }
+  : T extends FormFieldGroup
+  ? FormFieldsToFormValues<T['fields']>
+  : never;
+
+/**
+ * Input is a FormField, output is a {fieldName: fieldType} or
+ * {fieldName?: fieldType}.
+ */
+type FormFieldToRequiredFormValue<
+  T extends ImageField | ParagraphField | StringField | NumberField,
+  V
+> = T extends { required: true } | { defaultValue: boolean | number | string }
+  ? { [_ in T['name']]: V }
+  : { [_ in T['name']]?: V };
 
 /** An object that contains functions to start and stop the interval created by the `useInterval` hook */
 export type UseIntervalResult = {
@@ -64,7 +113,9 @@ export type UseIntervalHookState = {
   type: Hook;
 };
 
-export type UseChannelHook = (options: ChannelOptions) => UseChannelResult;
+export type UseChannelHook<Message extends JSONValue = JSONValue> = (
+  options: ChannelOptions<Message>
+) => UseChannelResult<Message>;
 
 /** @internal */
 export type UseChannelHookState = {
@@ -75,13 +126,13 @@ export type UseChannelHookState = {
   type: Hook;
 };
 
-export type UseChannelResult = {
+export type UseChannelResult<Message extends JSONValue = JSONValue> = {
   /** Subscribe to the channel */
   subscribe(): void;
   /** Unsubscribe from the channel */
   unsubscribe(): void;
   /** Publish a message to the channel */
-  send(data: Data): Promise<void>;
+  send(msg: Message): Promise<void>;
   /** Current subscription status */
   status: ChannelStatus;
 };

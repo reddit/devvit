@@ -1,4 +1,4 @@
-import type { Data } from './data.js';
+import type { JSONValue } from '@devvit/shared-types/json.js';
 
 export enum ChannelStatus {
   Unknown,
@@ -8,11 +8,11 @@ export enum ChannelStatus {
   Disconnected,
 }
 
-export type ChannelOptions = {
+export type ChannelOptions<Message extends JSONValue = JSONValue> = {
   /** Name of the channel */
   name: string;
   /** Called every time a message is received on this channel */
-  onMessage(data: Data): void | undefined;
+  onMessage(msg: Message): void | undefined;
   /** Optional hook to be informed when the channel has connected */
   onSubscribed?: (() => void | Promise<void>) | undefined;
   /** Optional hook to be informed when the channel has disconnected */

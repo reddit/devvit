@@ -1,7 +1,6 @@
 import type { FormFieldValue } from '@devvit/protos';
 import { FormFieldType } from '@devvit/protos';
 import type { FormValues } from '../../../types/form.js';
-import type { Data } from '../../../types/index.js';
 
 export function flattenFormFieldValue(
   value: FormFieldValue
@@ -25,9 +24,10 @@ export function flattenFormFieldValue(
   }
 }
 
-export function getFormValues(results: { [key: string]: FormFieldValue }): Data {
+export function getFormValues(results: { [key: string]: FormFieldValue }): FormValues {
   return Object.keys(results).reduce((acc, key) => {
-    acc[key] = flattenFormFieldValue(results[key]);
+    const val = flattenFormFieldValue(results[key]);
+    if (val !== undefined) acc[key] = val;
     return acc;
   }, {} as FormValues);
 }

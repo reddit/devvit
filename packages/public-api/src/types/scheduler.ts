@@ -1,5 +1,5 @@
+import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { Devvit } from '../devvit/Devvit.js';
-import type { Data } from './data.js';
 
 export type ScheduledJob = {
   /** ID of the scheduled job. Use this with scheduler.cancelJob to cancel the job. */
@@ -7,7 +7,7 @@ export type ScheduledJob = {
   /** The name of the scheduled job type */
   name: string;
   /** Additional data passed in by the scheduler client */
-  data: Data | undefined;
+  data: JSONObject | undefined;
   /** The Date of when this job should run */
   runAt: Date;
 };
@@ -18,25 +18,25 @@ export type ScheduledCronJob = {
   /** The name of the scheduled job type */
   name: string;
   /** Additional data passed in by the scheduler client */
-  data: Data | undefined;
+  data?: JSONObject | undefined;
   /** The cron string of when this job should run */
   cron: string;
 };
 
-export type ScheduledJobOptions = {
+export type ScheduledJobOptions<T extends JSONObject | undefined = JSONObject | undefined> = {
   /** The name of the scheduled job type */
   name: string;
   /** Additional data passed in by the scheduler client */
-  data?: Data | undefined;
+  data?: T;
   /** The Date of when this job should run */
   runAt: Date;
 };
 
-export type ScheduledCronJobOptions = {
+export type ScheduledCronJobOptions<T extends JSONObject | undefined = JSONObject | undefined> = {
   /** The name of the scheduled job type */
   name: string;
   /** Additional data passed in by the scheduler client */
-  data?: Data | undefined;
+  data?: T;
   /** The cron string of when this job should run */
   cron: string;
 };
@@ -46,7 +46,9 @@ export type ScheduledCronJobOptions = {
  * @param job The job to schedule
  * @returns {} The id of the scheduled job
  */
-export type RunJob = (job: ScheduledJobOptions | ScheduledCronJobOptions) => Promise<string>;
+export type RunJob<Data extends JSONObject | undefined> = (
+  job: ScheduledJobOptions<Data> | ScheduledCronJobOptions<Data>
+) => Promise<string>;
 /**
  * Cancel a scheduled job
  * @param jobId The id of the job to cancel
@@ -63,7 +65,9 @@ export type Scheduler = {
    * @param job The job to schedule
    * @returns {} The id of the scheduled job
    */
-  runJob: RunJob;
+  runJob: <Data extends JSONObject | undefined>(
+    job: ScheduledJobOptions<Data> | ScheduledCronJobOptions<Data>
+  ) => Promise<string>;
   /**
    * Cancel a scheduled job
    * @param jobId The id of the job to cancel
@@ -75,23 +79,23 @@ export type Scheduler = {
   listJobs: () => Promise<(ScheduledJob | ScheduledCronJob)[]>;
 };
 
-export type ScheduledJobEvent = {
+export type ScheduledJobEvent<T extends JSONObject | undefined> = {
   /** The name of the scheduled job */
   name: string;
   /** Additional data passed in by the scheduler client */
-  data?: Data | undefined;
+  data: T;
 };
 
-export type ScheduledJobHandler = (
-  event: ScheduledJobEvent,
+export type ScheduledJobHandler<Data extends JSONObject | undefined = JSONObject | undefined> = (
+  event: ScheduledJobEvent<Data>,
   context: JobContext
 ) => void | Promise<void>;
 
 export type JobContext = Omit<Devvit.Context, 'ui' | 'dimensions' | 'modLog' | 'uiEnvironment'>;
 
-export type ScheduledJobType = {
+export type ScheduledJobType<Data extends JSONObject | undefined> = {
   /** The name of the scheduled job type */
   name: string;
   /** The function that will be called when the job is scheduled to run */
-  onRun: ScheduledJobHandler;
+  onRun: ScheduledJobHandler<Data>;
 };

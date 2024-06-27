@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
-import { z } from 'zod';
-import { Schema } from '../api/Schema.js';
-import { PageProps } from '../types/page.js';
+import type { z } from 'zod';
+import type { Schema } from '../api/Schema.js';
+import type { PageProps } from '../types/page.js';
 
 type Pin = z.infer<(typeof Schema)['pin']>;
 
@@ -9,7 +9,13 @@ type CommonPinProps = {
   updatePinPostPin: PageProps['pinPostMethods']['updatePinPostPin'];
 };
 
-export const PinButton = ({ pin, navigate }: { pin: Pin; navigate: PageProps['navigate'] }) => {
+export const PinButton = ({
+  pin,
+  navigate,
+}: {
+  pin: Pin;
+  navigate: PageProps['navigate'];
+}): JSX.Element => {
   return (
     <button
       onPress={() => {
@@ -28,23 +34,33 @@ export const PinButton = ({ pin, navigate }: { pin: Pin; navigate: PageProps['na
   );
 };
 
-const PagePin = ({ pin }: CommonPinProps & { pin: z.infer<(typeof Schema)['pagePin']> }) => {
+const PagePin = ({
+  pin,
+}: CommonPinProps & { pin: z.infer<(typeof Schema)['pagePin']> }): JSX.Element => {
   return <hstack>pin detail</hstack>;
 };
 
-const EventsPin = ({ pin }: CommonPinProps & { pin: z.infer<(typeof Schema)['eventsPin']> }) => {
+const EventsPin = ({
+  pin,
+}: CommonPinProps & { pin: z.infer<(typeof Schema)['eventsPin']> }): JSX.Element => {
   return <hstack>pin detail</hstack>;
 };
 
-const FormPin = ({ pin }: CommonPinProps & { pin: z.infer<(typeof Schema)['formPin']> }) => {
+const FormPin = ({
+  pin,
+}: CommonPinProps & { pin: z.infer<(typeof Schema)['formPin']> }): JSX.Element => {
   return <hstack>pin detail</hstack>;
 };
 
-const FlairPin = ({ pin }: CommonPinProps & { pin: z.infer<(typeof Schema)['flairPin']> }) => {
+const FlairPin = ({
+  pin,
+}: CommonPinProps & { pin: z.infer<(typeof Schema)['flairPin']> }): JSX.Element => {
   return <hstack>pin detail</hstack>;
 };
 
-const WikiPin = ({ pin }: CommonPinProps & { pin: z.infer<(typeof Schema)['wikiPin']> }) => {
+const WikiPin = ({
+  pin,
+}: CommonPinProps & { pin: z.infer<(typeof Schema)['wikiPin']> }): JSX.Element => {
   return <hstack>pin detail</hstack>;
 };
 
@@ -53,7 +69,7 @@ export const Pin = ({
   updatePinPostPin,
 }: CommonPinProps & {
   pin: Pin;
-}) => {
+}): JSX.Element => {
   const { type } = pin;
 
   switch (type) {

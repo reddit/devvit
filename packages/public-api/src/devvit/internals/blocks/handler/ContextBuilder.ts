@@ -60,7 +60,7 @@ export class ContextBuilder {
       useState,
       useChannel,
       useInterval,
-      useForm,
+      useForm: useForm as ContextAPIClients['useForm'],
       cache,
       dimensions: request.env?.dimensions,
       uiEnvironment: {

@@ -1,5 +1,6 @@
-import { Context, Devvit } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 import { Redis } from './Redis.js';
+import type { PinPostInstance } from './Schema.js';
 
 export class PinPost {
   context: Devvit.Context;
@@ -10,12 +11,14 @@ export class PinPost {
     this.postId = postId;
   }
 
-  async getPinPost() {
+  async getPinPost(): Promise<PinPostInstance> {
     const rdx = new Redis(this.context.redis);
     return rdx.pinPostGet(this.postId);
   }
 
-  async updatePinPost(params: Parameters<Redis['pinPostUpdate']>[1]['params']) {
+  async updatePinPost(
+    params: Parameters<Redis['pinPostUpdate']>[1]['params']
+  ): Promise<PinPostInstance> {
     const rdx = new Redis(this.context.redis);
     return rdx.pinPostUpdate(this.postId, { params });
   }
@@ -23,7 +26,7 @@ export class PinPost {
   async updatePinPostPin(
     pinId: string,
     params: Parameters<Redis['pinPostPinUpdate']>[2]['params']
-  ) {
+  ): Promise<PinPostInstance> {
     const rdx = new Redis(this.context.redis);
     return rdx.pinPostPinUpdate(this.postId, pinId, { params });
   }
@@ -42,7 +45,7 @@ export class PinPost {
     title: string;
     url: string;
     header: string;
-  }) {
+  }): Promise<void> {
     const rdx = new Redis(this.context.redis);
 
     await rdx.pinPostCreate(this.postId, {
@@ -184,11 +187,11 @@ export class PinPost {
     });
   }
 
-  async clonePost(title: string) {
+  async clonePost(title: string): Promise<PinPostInstance> {
     const { reddit, ui } = this.context;
     const currentSubreddit = await reddit.getCurrentSubreddit();
     const currentUser = await reddit.getCurrentUser();
-    const cloneCreator = currentUser.username;
+    const cloneCreator = currentUser?.username;
     const subredditName = currentSubreddit.name;
     const pinPost = await this.getPinPost();
     const cloneCreated = new Date().toISOString();
@@ -205,7 +208,7 @@ export class PinPost {
     const newPinParams = {
       ...pinPost,
       createdAt: cloneCreated,
-      createdBy: cloneCreator,
+      createdBy: cloneCreator ?? '',
       url: post.url,
       title,
     };

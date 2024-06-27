@@ -5,7 +5,7 @@ import { SettingScope } from '../../../types/form.js';
  * Make sure that the form fields have unique names.
  */
 export function assertValidFormFields(
-  fields: FormField[],
+  fields: readonly FormField[],
   seenNames: Set<string> = new Set()
 ): void {
   for (const field of fields) {
@@ -26,7 +26,7 @@ export function assertValidFormFields(
   assertAppSecretsOnly(fields);
 }
 
-export function assertAppSecretsOnly(fields: FormField[]): void {
+export function assertAppSecretsOnly(fields: readonly FormField[]): void {
   for (const field of fields) {
     if (field.type === 'string' && field.isSecret && field.scope !== SettingScope.App) {
       throw `Invalid setting: only app settings can be secrets. Add "scope: SettingScope.App" to field "${field.name}"`;

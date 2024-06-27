@@ -5,8 +5,14 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
-    "test": "npm run test:unit",
-    "test:unit": "vitest --run --passWithNoTests"
+    "clean": "rm -rf .turbo coverage dist",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "test": "yarn test:unit && yarn test:types && yarn lint",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run --passWithNoTests",
+    "test:unit-with-coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
     "@devvit/public-api": "0.10.22",

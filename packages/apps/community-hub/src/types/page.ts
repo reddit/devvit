@@ -1,7 +1,7 @@
-import { Devvit } from '@devvit/public-api';
-import { z } from 'zod';
-import { Schema } from '../api/Schema.js';
-import { PinPost } from '../api/PinPost.js';
+import type { Devvit } from '@devvit/public-api';
+import type { z } from 'zod';
+import type { PinPost } from '../api/PinPost.js';
+import type { Schema } from '../api/Schema.js';
 
 export type Route =
   | 'welcome'

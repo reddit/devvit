@@ -43,10 +43,9 @@ Devvit.addCustomPostType({
       await channel.send(message);
     };
 
-    const channel = useChannel({
+    const channel = useChannel<RealtimeMessage>({
       name: 'chat',
-      onMessage: (data) => {
-        const msg = data as RealtimeMessage;
+      onMessage: (msg) => {
         const now = Date.now();
 
         if (!me || (msg.user.id === me.id && msg.user.session === me.session)) {
@@ -70,6 +69,7 @@ Devvit.addCustomPostType({
         }
       },
       onSubscribed: async () => {
+        if (!me) return;
         await channel.send({
           type: MsgType.Presence,
           user: me,
@@ -94,6 +94,7 @@ Devvit.addCustomPostType({
           setUserList(userList);
         }
       }
+      if (!me) return;
       await channel.send({
         type: MsgType.Presence,
         user: me,

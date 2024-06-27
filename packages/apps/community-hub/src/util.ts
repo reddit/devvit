@@ -1,28 +1,26 @@
-import { Context } from '@devvit/public-api';
-
 /**
  * Note that if there is a remainder it'll be added to the last array.
  *
  * That means you may need .reverse() on the output.
  */
-export const chunk = (arr: any[], size: number) =>
-  Array.from({ length: Math.ceil(arr.length / size) }, (_: any, i: number) =>
+export const chunk = <T extends unknown>(arr: T[], size: number): T[][] =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (_: unknown, i: number) =>
     arr.slice(i * size, i * size + size)
   );
 
-export const isEven = (n: number) => {
-  return n % 2 == 0;
+export const isEven = (n: number): boolean => {
+  return n % 2 === 0;
 };
 
-export const isOdd = (n: number) => {
-  return Math.abs(n % 2) == 1;
+export const isOdd = (n: number): boolean => {
+  return Math.abs(n % 2) === 1;
 };
 
-export const randomId = () => {
+export const randomId = (): string => {
   return Math.floor(Math.random() * Date.now()).toString();
 };
 
-export const standardizeUsername = (username: string) => {
+export const standardizeUsername = (username: string): string => {
   let newU = username.toLowerCase().trim();
   if (newU.startsWith('u/')) {
     newU = newU.replace(`u/`, ``);
@@ -30,7 +28,7 @@ export const standardizeUsername = (username: string) => {
   return newU;
 };
 
-export const formatUrl = (url: string | null | undefined) => {
+export const formatUrl = (url: string | null | undefined): string | null => {
   let newUrl = url;
   if (!newUrl) return null;
 

@@ -1,14 +1,14 @@
 import type { Toast as ToastProto } from '@devvit/protos';
 import { EffectType, Form, ToastAppearance } from '@devvit/protos';
+import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
-import type { Data } from '../../../../types/data.js';
-import type { Toast } from '../../../../types/toast.js';
-import type { UIClient as _UIClient } from '../../../../types/ui-client.js';
+import type { Comment, Post, Subreddit, User } from '../../../../apis/reddit/models/index.js';
 import { assertValidFormFields } from '../../../../apis/ui/helpers/assertValidFormFields.js';
 import { transformFormFields } from '../../../../apis/ui/helpers/transformForm.js';
-import type { Comment, Post, Subreddit, User } from '../../../../apis/reddit/models/index.js';
-import type { RenderContext } from './RenderContext.js';
+import type { Toast } from '../../../../types/toast.js';
+import type { UIClient as _UIClient } from '../../../../types/ui-client.js';
 import { _activeRenderContext } from './BlocksHandler.js';
+import type { RenderContext } from './RenderContext.js';
 import { getFormDefinition } from './useForm.js';
 
 export function useUI(): _UIClient {
@@ -26,7 +26,7 @@ export class UIClient implements _UIClient {
     this.#renderContext = renderContext;
   }
 
-  showForm(formKey: FormKey, data?: Data | undefined): void {
+  showForm(formKey: FormKey, data?: JSONObject | undefined): void {
     const formDefinition = getFormDefinition(this.#renderContext, formKey);
 
     if (!formDefinition) {

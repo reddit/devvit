@@ -1,10 +1,10 @@
-import { Devvit } from '@devvit/public-api';
-import { TxClientLike } from '@devvit/public-api/apis/redis/RedisClient.js';
-import { z } from 'zod';
+import type { Devvit } from '@devvit/public-api';
+import type { TxClient } from '@devvit/public-api/apis/redis/RedisClient.js';
+import type { Config, PinPostInstance } from './Schema.js';
 import { Schema } from './Schema.js';
 
 type CreateUpdateUpsertContext = {
-  txn?: TxClientLike;
+  txn?: TxClient;
   /**
    * Used for createdAt/updatedAt if applicable
    */
@@ -12,10 +12,10 @@ type CreateUpdateUpsertContext = {
 };
 
 export class Redis {
-  private redis: Devvit.Context['redis'];
+  #redis: Devvit.Context['redis'];
 
   constructor(redis: Devvit.Context['redis']) {
-    this.redis = redis;
+    this.#redis = redis;
   }
 
   static keys = {
@@ -30,8 +30,8 @@ export class Redis {
     },
   };
 
-  async configGet() {
-    const maybeState = await this.redis.get(Redis.keys.config());
+  async configGet(): Promise<Config> {
+    const maybeState = await this.#redis.get(Redis.keys.config());
 
     if (!maybeState) {
       throw new Error(`Could not find config!`);
@@ -40,11 +40,12 @@ export class Redis {
     return Schema.configSchema.parseAsync(maybeState);
   }
 
+  // to-do: upsert should probably return a value.
   async configUpsert(
-    params: z.input<typeof Schema.configSchema>,
+    params: Config,
     { context }: { context?: CreateUpdateUpsertContext } = {}
-  ) {
-    const client = context?.txn ?? this.redis;
+  ): Promise<void> {
+    const client = context?.txn ?? this.#redis;
 
     const oldConfig = await this.configGet().catch(() => {
       return null;
@@ -55,16 +56,16 @@ export class Redis {
 
       const parsedParams = Schema.configSchema.parse(params);
 
-      client.set(Redis.keys.config(), JSON.stringify(parsedParams));
+      await client.set(Redis.keys.config(), JSON.stringify(parsedParams));
     } else {
       const parsedParams = Schema.configSchema.parse(params);
 
-      client.set(Redis.keys.config(), JSON.stringify({ ...oldConfig, ...parsedParams }));
+      await client.set(Redis.keys.config(), JSON.stringify({ ...oldConfig, ...parsedParams }));
     }
   }
 
-  async pinPostGet(id: string) {
-    const data = await this.redis.get(Redis.keys.pinPostInstance(id));
+  async pinPostGet(id: string): Promise<PinPostInstance> {
+    const data = await this.#redis.get(Redis.keys.pinPostInstance(id));
 
     if (!data) {
       throw new Error(`Cannot find PinPostInstance for id: ${id}!`);
@@ -79,12 +80,12 @@ export class Redis {
       params,
       context,
     }: {
-      params: z.input<(typeof Schema)['pinPostInstance']>;
+      params: PinPostInstance;
       context?: CreateUpdateUpsertContext;
     }
-  ) {
-    const client = context?.txn ?? this.redis;
-    const data = await this.redis.get(Redis.keys.pinPostInstance(id));
+  ): Promise<PinPostInstance> {
+    const client = context?.txn ?? this.#redis;
+    const data = await this.#redis.get(Redis.keys.pinPostInstance(id));
 
     if (data) {
       throw new Error(`Cannot create because pin post instance already exists for id: ${id}`);
@@ -106,12 +107,12 @@ export class Redis {
       params,
       context,
     }: {
-      params: Partial<z.input<(typeof Schema)['pinPostInstance']>>;
+      params: Partial<PinPostInstance>;
       context?: CreateUpdateUpsertContext;
     }
-  ) {
-    const client = context?.txn ?? this.redis;
-    const data = await this.redis.get(Redis.keys.pinPostInstance(id));
+  ): Promise<PinPostInstance> {
+    const client = context?.txn ?? this.#redis;
+    const data = await this.#redis.get(Redis.keys.pinPostInstance(id));
 
     if (!data) {
       throw new Error(`Cannot find pin post instance for id: ${id}`);
@@ -134,12 +135,12 @@ export class Redis {
       params,
       context,
     }: {
-      params: Partial<z.input<(typeof Schema)['pinPostInstance']>['pins'][number]>;
+      params: Partial<PinPostInstance['pins'][number]>;
       context?: CreateUpdateUpsertContext;
     }
-  ) {
-    const client = context?.txn ?? this.redis;
-    const data = await this.redis.get(Redis.keys.pinPostInstance(id));
+  ): Promise<PinPostInstance> {
+    const client = context?.txn ?? this.#redis;
+    const data = await this.#redis.get(Redis.keys.pinPostInstance(id));
 
     if (!data) {
       throw new Error(`Cannot find pin post instance for id: ${id}`);
@@ -149,7 +150,7 @@ export class Redis {
 
     const newPins = pinPost.pins.map((pin) => {
       // We don't want to allow people to update the id or type!
-      const { id, type, ...paramsWithoutId } = params;
+      const { id: _, type, ...paramsWithoutId } = params;
 
       if (pin.id === pinId) {
         if (type && pin.type !== type) {
