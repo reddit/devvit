@@ -1,5 +1,5 @@
-import type { PlaytestSubscriberMessage } from '@devvit/protos';
-import { PlaytestProviderMessage } from '@devvit/protos';
+import type { PlaytestSubscriberMessage } from '@devvit/protos/types/devvit/cli/playtest.js';
+import { PlaytestProviderMessage } from '@devvit/protos/types/devvit/cli/playtest.js';
 import type { ErrorEvent, MessageEvent, VerifyClientCallbackSync, WebSocket } from 'ws';
 import { WebSocketServer } from 'ws';
 import type { AppLogConfig } from '../util/app-logs/app-log-util.js';
