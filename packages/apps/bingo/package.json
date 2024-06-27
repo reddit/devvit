@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "bingo",
-  "version": "0.10.23-dev",
+  "version": "0.10.22",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -9,11 +9,11 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.23-dev",
+    "@devvit/public-api": "0.10.22",
     "tldts": "^6.0.14"
   },
   "devDependencies": {
-    "@devvit/eslint-config": "0.10.23-dev",
+    "@devvit/eslint-config": "0.10.22",
     "typescript": "5.3.2",
     "vitest": "1.6.0"
   }
