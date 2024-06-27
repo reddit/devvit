@@ -137,7 +137,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Resources',
-      items: ['mod_resources', 'beta_participation', 'limits', 'help'],
+      items: ['mod_resources', 'beta_participation', 'limits', 'help', 'reddit_developer_funds'],
     },
     {
       type: 'doc',
