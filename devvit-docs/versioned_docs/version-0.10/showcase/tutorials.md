@@ -1,5 +1,15 @@
 # Tutorials
 
+## [Intro to Devvit](./tutorials/intro-to-devvit.mdx)
+
+This interactive tutorial will help you get to know Devvit and help [r/Devvit](https://www.reddit.com/r/Devvit/) get to know you! You'll learn how to work with templates, run a playtest, and create an experience post on Reddit. When you're done, you'll have your own introduction post that you can share with the community.
+
+**Capabilities used:**
+
+- [Templates](../templates.mdx)
+- [Experiences](../experiences.md)
+- [Playtest](../playtest.md)
+
 ## [Remind me](./tutorials/remind_me.md)
 
 Learn how to implement a Remind Me Later feature on Reddit using scheduler and the Reddit API client. The tutorial covers creating scheduled jobs, displaying custom input forms, and leveraging the chrono-node library to interpret user-inputted timeframes like "in two weeks." Users can set reminders from the overflow menu of a post, and the Remind Me app automatically sends private messages containing post links at the scheduled times, enhancing user engagement.
