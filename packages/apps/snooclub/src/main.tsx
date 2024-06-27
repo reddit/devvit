@@ -1,7 +1,9 @@
 import { Devvit, useAsync, useChannel, useState } from '@devvit/public-api';
 import { ChannelStatus } from '@devvit/public-api/types/realtime.js';
+import type { T2ID } from '@devvit/shared-types/tid.js';
 import { ConnectionStatus } from './ui/connection-status.js';
 import { Dpad } from './ui/dpad.js';
+
 const defaultSnoovatarUrl = 'https://www.redditstatic.com/shreddit/assets/thinking-snoo.png';
 
 Devvit.configure({
@@ -10,44 +12,26 @@ Devvit.configure({
   realtime: true,
 });
 
-type UserData = {
-  id: string;
-  username: string;
-  snoovatarUrl: string | null;
+type User = {
+  t2: T2ID;
+  name: string;
+  snoovatarURL: string | null;
   message?: string;
   x: number;
   y: number;
 };
 
-type UserRecord = {
-  id: string;
+type Message = {
   name: string;
-};
-
-type Location = {
+  session: string;
+  t2: T2ID;
   x: number;
   y: number;
 };
 
-type Payload = {
-  location: Location;
-  user: UserRecord;
-};
+type World = { [t2: T2ID]: User };
 
-type RealtimeMessage = {
-  payload: Payload;
-  session: string;
-};
-
-type PostData = {
-  users: Items;
-};
-
-type Items = {
-  [key: string]: UserData;
-};
-
-function sessionId(): string {
+function SessionID(): string {
   let id = '';
   const asciiZero = '0'.charCodeAt(0);
   for (let i = 0; i < 4; i++) {
@@ -56,62 +40,57 @@ function sessionId(): string {
   return id;
 }
 
-const App: Devvit.CustomPostComponent = ({ reddit, userId }) => {
-  const [postData, setPostData] = useState<PostData>({ users: {} });
-
-  const { data: me } = useAsync<UserRecord | null>(async () => {
-    const user = await reddit.getCurrentUser();
+const App: Devvit.CustomPostComponent = (ctx) => {
+  const [session] = useState(SessionID());
+  const { data: user } = useAsync(async () => {
+    const user = await ctx.reddit.getCurrentUser();
     if (!user) return null;
     return {
-      id: user.id,
       name: user.username,
+      t2: user.id,
+      snoovatarURL: (await user.getSnoovatarUrl()) ?? null,
     };
   });
 
-  const mySession = sessionId();
+  const [world, setWorld] = useState<World>({});
 
-  useAsync(async () => {
-    const currentUser = await reddit.getCurrentUser();
-    if (!currentUser) return { users: {} };
-    const userData = {
-      id: currentUser.id,
-      username: currentUser.username,
-      snoovatarUrl: (await currentUser.getSnoovatarUrl()) ?? null,
-      ...getRandomPosition(),
-    };
-    const users = {} as Items;
-    users[currentUser.id] = userData;
-    setPostData({ users });
-    return null;
-  });
+  if (user && !world[user.t2])
+    setWorld((prev) => ({
+      ...prev,
+      [user.t2]: {
+        t2: user.t2,
+        name: user.name,
+        snoovatarURL: user.snoovatarURL,
+        ...getRandomPosition(),
+      },
+    }));
 
-  const channel = useChannel({
+  const channel = useChannel<Message>({
     name: 'locations',
-    onMessage: (data: RealtimeMessage) => {
-      const msg = data;
-      if (msg.session === mySession) {
-        return;
-      }
-      const payload = msg.payload;
-      const x = payload.location.x;
-      const y = payload.location.y;
-      postData.users[payload.user.id] = {
-        ...postData.users[payload.user.id],
-        x,
-        y,
-      };
-      setPostData(postData);
+    onMessage: (msg) => {
+      const local = msg.session === session;
+      if (ctx.debug.realtime)
+        console.debug(
+          `[realtime] ${user?.name ?? 'unknown'}@${msg.session} ${local ? 'ignored' : 'received'}`,
+          msg
+        );
+      if (local) return;
+
+      setWorld((prev) => ({
+        ...prev,
+        [msg.t2]: { ...prev![msg.t2], x: msg.x, y: msg.y },
+      }));
     },
   });
   channel.subscribe();
 
   const updatePosition = async (xOffset: number, yOffset: number): Promise<void> => {
-    if (!userId) {
+    if (!user || !world[user.t2]) {
       return;
     }
 
-    let x = postData.users[userId].x + xOffset;
-    let y = postData.users[userId].y + yOffset;
+    let x = world[user.t2].x + xOffset;
+    let y = world[user.t2].y + yOffset;
 
     if (x < 0) {
       x = 0;
@@ -125,29 +104,18 @@ const App: Devvit.CustomPostComponent = ({ reddit, userId }) => {
       y = 9;
     }
 
-    postData.users[userId] = {
-      ...postData.users[userId],
-      x,
-      y,
-    };
+    setWorld((prev) => ({ ...prev, [user.t2]: { ...prev![user.t2], x, y } }));
 
-    setPostData(postData);
-    if (!me) return;
-    const payload: Payload = {
-      location: { x: x, y: y },
-      user: me,
-    };
-    const message: RealtimeMessage = {
-      payload: payload,
-      session: mySession,
-    };
-    await channel.send(message);
+    const msg = { name: user.name, session: session, t2: user.t2, x, y };
+    if (ctx.debug.realtime)
+      console.debug(`[realtime] ${user?.name ?? 'unknown'}@${msg.session} sends`, msg);
+    await channel.send(msg);
   };
 
-  const users = Object.values(postData.users)
+  const users = Object.values(world)
     .sort((a, b) => a.y - b.y)
     .map((user) => {
-      return <Snoo user={user} x={user.x} y={user.y} isCurrentUser={user.id === userId} />;
+      return <Snoo user={user} x={user.x} y={user.y} isCurrentUser={user.t2 === ctx.userId} />;
     });
 
   return (
@@ -165,12 +133,14 @@ const App: Devvit.CustomPostComponent = ({ reddit, userId }) => {
 };
 
 interface SnooProps {
-  user: UserData;
+  user: User;
+  // to-do: remove? User has x and y.
   x: number;
   y: number;
   isCurrentUser?: boolean;
 }
 
+// to-do: extract component.
 const Snoo = ({ user, x, y, isCurrentUser }: SnooProps): JSX.Element => {
   return (
     <vstack>
@@ -195,14 +165,14 @@ const Snoo = ({ user, x, y, isCurrentUser }: SnooProps): JSX.Element => {
               <Padding offset={0} extraPadding={1} />
             </vstack>
           )}
-          <image url={user.snoovatarUrl ?? defaultSnoovatarUrl} imageHeight={100} imageWidth={80} />
+          <image url={user.snoovatarURL ?? defaultSnoovatarUrl} imageHeight={100} imageWidth={80} />
           <vstack
             backgroundColor={isCurrentUser ? '#A50016' : '#ACACAC'}
             padding="xsmall"
             cornerRadius="small"
           >
             <text color={isCurrentUser ? 'white' : 'black'} size="xsmall">
-              u/{user.username}
+              u/{user.name}
             </text>
           </vstack>
         </vstack>

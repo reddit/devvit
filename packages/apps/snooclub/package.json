@@ -15,7 +15,8 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/public-api": "0.10.22"
+    "@devvit/public-api": "0.10.22",
+    "@devvit/shared-types": "0.10.22"
   },
   "devDependencies": {
     "@devvit/eslint-config": "0.10.22",

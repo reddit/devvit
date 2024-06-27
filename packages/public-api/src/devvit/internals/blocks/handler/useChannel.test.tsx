@@ -46,7 +46,7 @@ test('channels must be unique', async () => {
 
   const handler = new BlocksHandler(Component);
   await expect(handler.handle({ events: [] }, meta)).rejects.toThrow(
-    'useChannel error: channel names must be unique'
+    'Hook id useChannel:Channel already used'
   );
 });
 
@@ -62,7 +62,7 @@ test('initial state is unsubscribed', async () => {
   expect(rsp.effects).toMatchInlineSnapshot(`[]`);
   expect(rsp.state).toMatchInlineSnapshot(`
     {
-      "Component.useChannel:Channel-0": {
+      "useChannel:Channel": {
         "channel": "app:install:Channel",
         "connected": false,
         "subscribed": false,
@@ -95,7 +95,7 @@ test('subscribe sets channel to subscribed', async () => {
   `);
   expect(rsp.state).toMatchInlineSnapshot(`
     {
-      "Component.useChannel:Channel-0": {
+      "useChannel:Channel": {
         "channel": "app:install:Channel",
         "connected": false,
         "subscribed": true,
@@ -140,7 +140,7 @@ test('unsubscribe in an event does nothing if subscribing in render loop', async
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
           "subscribed": true,
@@ -165,7 +165,7 @@ test('unsubscribe in an event does nothing if subscribing in render loop', async
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
           "subscribed": true,
@@ -201,7 +201,7 @@ test('resubscribe is ignored', async () => {
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
           "subscribed": true,
@@ -246,7 +246,7 @@ test('un/subscribe from an event sets channel to un/subscribed', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
           "subscribed": false,
@@ -271,7 +271,7 @@ test('un/subscribe from an event sets channel to un/subscribed', async () => {
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
           "subscribed": true,
@@ -294,7 +294,7 @@ test('un/subscribe from an event sets channel to un/subscribed', async () => {
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
           "subscribed": false,
@@ -336,7 +336,7 @@ test('un/subscribe event invokes callback', async () => {
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
           "subscribed": true,
@@ -366,7 +366,7 @@ test('un/subscribe event invokes callback', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": true,
           "subscribed": true,
@@ -396,7 +396,7 @@ test('un/subscribe event invokes callback', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:Channel-0": {
+        "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
           "subscribed": true,
@@ -513,7 +513,7 @@ test('two channels', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:ChannelA-0": {
+        "useChannel:ChannelA": {
           "channel": "app:install:ChannelA",
           "connected": true,
           "subscribed": true,
@@ -547,7 +547,7 @@ test('two channels', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:ChannelB-1": {
+        "useChannel:ChannelB": {
           "channel": "app:install:ChannelB",
           "connected": true,
           "subscribed": true,
@@ -633,7 +633,7 @@ test('two channels', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:ChannelA-0": {
+        "useChannel:ChannelA": {
           "channel": "app:install:ChannelA",
           "connected": false,
           "subscribed": true,
@@ -667,7 +667,7 @@ test('two channels', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
-        "Component.useChannel:ChannelB-1": {
+        "useChannel:ChannelB": {
           "channel": "app:install:ChannelB",
           "connected": false,
           "subscribed": true,
