@@ -5,8 +5,6 @@ import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
 import pkg from '../../version.json' assert { type: 'json' };
 
-let loggedVersion: boolean = false;
-
 export function getContextFromMetadata(
   metadata: Metadata,
   postId?: string,
@@ -60,27 +58,28 @@ export function parseDebug(meta: Readonly<Metadata>): ContextDebugInfo {
   const lowerKeyToKey: { [lower: string]: string } = {};
   for (const key in keyset) lowerKeyToKey[key.toLowerCase()] = key;
 
-  // Report package version once if debug mode is set.
-  if (!loggedVersion && meta[Header.Debug]) {
-    loggedVersion = true;
-    console.info(`[api] @devvit/public-api v${pkg.version}`);
-  }
-
-  const debug: ContextDebugInfo = { metadata: meta };
+  const debug: { [key in AppDebug]?: string } = {};
   // hack: gRPC-web header values don't split in compute. always join then split
   //       for parity in both local and remote runtimes.
   for (const kv of (meta[Header.Debug]?.values ?? []).join().split(',')) {
-    let [key, val] = kv.split('=');
-    if (!key) continue;
+    let [k, v] = kv.split('=');
+    if (!k) continue;
 
-    key = key.trim();
-    val = val?.trim();
+    k = k.trim();
+    v = v?.trim();
 
-    if (key.toLowerCase() in lowerKeyToKey) key = lowerKeyToKey[key.toLowerCase()];
-    else console.warn(`[api] unknown devvit-debug header "${key}"`);
+    if (k.toLowerCase() in lowerKeyToKey) k = lowerKeyToKey[k.toLowerCase()];
 
-    debug[key as AppDebug] ??= val || `${true}`;
-    console.info(`[api] set devvit-debug ${key}=${debug[key as AppDebug]}`);
+    debug[k as AppDebug] ??= v || `${true}`;
   }
-  return debug;
+
+  // @devvit/public-api v1.2.3 emitSnapshots=true foo=bar
+  if (meta[Header.Debug])
+    console.info(
+      `[api] @devvit/public-api v${pkg.version} ${Object.entries(debug)
+        .map(([k, v]) => `${k}=${v}`)
+        .join(' ')}`
+    );
+
+  return { ...debug, metadata: meta };
 }

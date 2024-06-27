@@ -39,7 +39,7 @@
     "renovate": "yarn build || true && yarn build:go && yarn renovate:go",
     "renovate:go": "make -C devvit-compute-go protos; make -C devvit-gateway-service protos; make -C devvit-compute-go fmt; make -C devvit-gateway-service fmt; make -C services/snooron-worker-devvit fmt; cd go-common && go mod tidy",
     "renovate:js": "cd devvit-dev-portal; yarn",
-    "renovate:tidy": "cd go-common; go mod tidy; cd ../devvit-compute-go; go mod tidy; cd ../devvit-gateway-service; go mod tidy; cd ../data-api-service; go mod tidy; cd ../services/snooron-worker-devvit; go mod tidy; cd ../..",
+    "renovate:tidy": "cd go-common; go mod tidy; cd ../devvit-compute-go; go mod tidy; cd ../devvit-gateway-service; go mod tidy; cd ../services/snooron-worker-devvit; go mod tidy; cd ../..",
     "reset": "yarn cache clean --all && git clean -dffx && git restore .",
     "test": "turbo run test --output-logs=new-only",
     "test:all": "yarn test:types && yarn lint && yarn test:unit-with-coverage && yarn test:go",
