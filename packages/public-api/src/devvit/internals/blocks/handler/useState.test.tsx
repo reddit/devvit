@@ -9,7 +9,7 @@ import { BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
 import { EmptyRequest, findHookState, generatePressRequest, mockMetadata } from './test-helpers.js';
 import type { HookRef } from './types.js';
-import { useAsyncState, useState } from './useState.js';
+import { useState } from './useState.js';
 
 const syncLegacyComponent: Devvit.BlockComponent = (
   _props: JSX.Props,
@@ -70,7 +70,7 @@ const multiComponent: Devvit.BlockComponent = () => {
 };
 
 const asyncComponent: Devvit.BlockComponent = () => {
-  const [state] = useAsyncState(async () => {
+  const [state] = useState(async () => {
     return 'hello world';
   });
   return <text>{state}!!</text>;
@@ -112,17 +112,9 @@ describe('useState', () => {
       }
     );
 
-    test('async deprecation displays message', async () => {
+    test('async deprecation works again', async () => {
       const handler = new BlocksHandler(deprecatedComponent);
-      let yay = false;
-      try {
-        await handler.handle(EmptyRequest, mockMetadata);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-        expect(e.message).toContain('useAsyncState instead');
-        yay = true;
-      }
-      expect(yay).toBeTruthy();
+      await handler.handle(EmptyRequest, mockMetadata);
     });
 
     test('async initializer resolves', async () => {
@@ -150,16 +142,16 @@ describe('state setter', () => {
   test('updates the value given a new value', async () => {
     const handler = new BlocksHandler(counterComponent);
     await handler.handle(EmptyRequest, mockMetadata);
-    expect(findHookState(counterRef)).toEqual(0);
+    expect(findHookState(counterRef)).toEqual({ value: 0 });
     let req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual(1);
+    expect(findHookState(counterRef)).toEqual({ value: 1 });
     req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual(2);
+    expect(findHookState(counterRef)).toEqual({ value: 2 });
     req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual(3);
+    expect(findHookState(counterRef)).toEqual({ value: 3 });
   });
 
   test('can be used multiple times in a component', async () => {
@@ -181,12 +173,12 @@ describe('state setter', () => {
   test('handles void or undefined values properly', async () => {
     const handler = new BlocksHandler(conditionalComponent);
     await handler.handle(EmptyRequest, mockMetadata);
-    expect(findHookState(counterRef)).toEqual(0);
+    expect(findHookState(counterRef)).toEqual({ value: 0 });
     for (let i = 0; i < 15; i++) {
       const req = generatePressRequest(counterButtonRef);
       await handler.handle(req, mockMetadata);
     }
-    expect(findHookState(counterRef)).toEqual(0);
+    expect(findHookState(counterRef)).toEqual({ value: 0 });
   });
 
   test('typing is intuitive', () => {
@@ -222,19 +214,12 @@ describe('state setter', () => {
       useState(Promise.resolve(null));
       // @ts-expect-error
       useState(() => Promise.resolve(undefined));
-      // @ts-expect-error
       useState(() => Promise.resolve('abc'));
-      // @ts-expect-error
       useState(() => Promise.resolve(1));
-      // @ts-expect-error
       useState(() => Promise.resolve(false));
-      // @ts-expect-error
       useState(() => Promise.resolve(null));
-      // @ts-expect-error
       useState(() => Promise.resolve([]));
-      // @ts-expect-error
       useState(() => Promise.resolve({}));
-      // @ts-expect-error
       useState(() => Promise.resolve(foo));
       // @ts-expect-error
       useState(new (class {})());

@@ -109,7 +109,7 @@ describe('regressions', () => {
   test('enabled doesnt do anything', async () => {
     const handler = new BlocksHandler(App);
     const request: UIRequest = structuredClone(EmptyRequest);
-    request.state = { 'App.useState-1': false };
+    request.state = { 'App.useState-1': { value: false } };
     const response = await handler.handle(request, mockMetadata);
     expect(response.events).toEqual([]);
   });
@@ -129,7 +129,7 @@ describe('regressions', () => {
       state: response.state,
     };
     response = await handler.handle(request, mockMetadata);
-    expect(response.state!['App.useState-0']).toEqual(2);
+    expect(response.state!['App.useState-0'].value).toEqual(2);
     expect(response.events).toEqual([asyncRequestEvent(asyncRef, 2)]);
   });
 
@@ -189,8 +189,12 @@ describe('invalidation', () => {
           "error": null,
           "load_state": "loading",
         },
-        "App.useState-0": 1,
-        "App.useState-1": true,
+        "App.useState-0": {
+          "value": 1,
+        },
+        "App.useState-1": {
+          "value": true,
+        },
       }
     `);
     const initialState = response.state;
@@ -202,7 +206,7 @@ describe('invalidation', () => {
 
     //ID changed, new event emitted
     const altered = { ...initialState };
-    altered['App.useState-0'] = 'other';
+    altered['App.useState-0'] = { value: 'other' };
     request = { events: [], state: altered };
     response = await handler.handle(request, mockMetadata);
     expect(response.events).toEqual([asyncRequestEvent(asyncRef, 'other')]);

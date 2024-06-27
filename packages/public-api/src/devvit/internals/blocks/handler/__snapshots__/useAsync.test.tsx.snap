@@ -17,8 +17,12 @@ exports[`when circuit-breaking: false > receiving request 1`] = `
     "error": null,
     "load_state": "loading",
   },
-  "App.useState-0": 1,
-  "App.useState-1": true,
+  "App.useState-0": {
+    "value": 1,
+  },
+  "App.useState-1": {
+    "value": true,
+  },
 }
 `;
 
@@ -39,8 +43,12 @@ exports[`when circuit-breaking: true > receiving request 1`] = `
     "error": null,
     "load_state": "loading",
   },
-  "App.useState-0": 1,
-  "App.useState-1": true,
+  "App.useState-0": {
+    "value": 1,
+  },
+  "App.useState-1": {
+    "value": true,
+  },
 }
 `;
 

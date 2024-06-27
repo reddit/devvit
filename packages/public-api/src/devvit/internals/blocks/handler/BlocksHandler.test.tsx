@@ -9,7 +9,7 @@ import { captureHookRef } from './refs.js';
 import {
   EmptyRequest,
   findHookId,
-  findHookState,
+  findHookValue,
   generatePressRequest,
   getLatestBlocksState,
   mockMetadata,
@@ -102,21 +102,25 @@ describe('BlocksHandler', () => {
         await handler.handle(req, mockMetadata);
       }
       await handler.handle(EmptyRequest, mockMetadata);
-      expect(findHookState(stateARef)).toEqual(0);
+      expect(findHookValue(stateARef)).toEqual(0);
       await press(pressARef);
-      expect(findHookState(stateARef)).toEqual(1);
+      expect(findHookValue(stateARef)).toEqual(1);
       await press(toggleRef);
       expect(getLatestBlocksState()).toMatchInlineSnapshot(`
         {
           "ConditionalComponent.hstack.ComponentA-1.useState-0": {
             "__deleted": true,
           },
-          "ConditionalComponent.hstack.ComponentB-1.useState-0": 0,
-          "ConditionalComponent.useState-0": false,
+          "ConditionalComponent.hstack.ComponentB-1.useState-0": {
+            "value": 0,
+          },
+          "ConditionalComponent.useState-0": {
+            "value": false,
+          },
         }
       `);
       await press(toggleRef);
-      expect(findHookState(stateARef)).toEqual(0);
+      expect(findHookValue(stateARef)).toEqual(0);
     });
   });
 
@@ -155,20 +159,20 @@ describe('BlocksHandler', () => {
     test('should be able to batch events and make progress', async () => {
       const handler = new BlocksHandler(SuccessFail);
       await handler.handle(EmptyRequest, mockMetadata);
-      expect(findHookState(counter1Ref)).toEqual(0);
+      expect(findHookValue(counter1Ref)).toEqual(0);
       const req = generatePressRequest(positiveRef);
       req.events.push(structuredClone(req.events[0]));
       req.events.push(structuredClone(req.events[0]));
       req.events.push(structuredClone(req.events[0]));
       req.events.push(structuredClone(req.events[0]));
       await handler.handle(req, mockMetadata);
-      expect(findHookState(counter1Ref)).toEqual(5);
+      expect(findHookValue(counter1Ref)).toEqual(5);
     });
 
     test('should be able to make partial progress', async () => {
       const handler = new BlocksHandler(SuccessFail);
       await handler.handle(EmptyRequest, mockMetadata);
-      expect(findHookState(counter1Ref)).toEqual(0);
+      expect(findHookValue(counter1Ref)).toEqual(0);
       let req = generatePressRequest(negativeRef);
       const nay = req.events[0];
       req = generatePressRequest(positiveRef);
@@ -180,7 +184,7 @@ describe('BlocksHandler', () => {
       // yay, yay, yay, NAY, yay
       // 3 successes, one fail, one deferred success
       const response = await handler.handle(req, mockMetadata);
-      expect(findHookState(counter1Ref)).toEqual(3);
+      expect(findHookValue(counter1Ref)).toEqual(3);
       expect(response.events.length).toEqual(2);
       expect(response.events[0].hook).toEqual(nay.hook);
       expect(response.events[0].retry).toEqual(true);
@@ -191,7 +195,7 @@ describe('BlocksHandler', () => {
     test('should fail if the first event fails', async () => {
       const handler = new BlocksHandler(SuccessFail);
       await handler.handle(EmptyRequest, mockMetadata);
-      expect(findHookState(counter1Ref)).toEqual(0);
+      expect(findHookValue(counter1Ref)).toEqual(0);
       let req = generatePressRequest(negativeRef);
       const nay = req.events[0];
       req = generatePressRequest(positiveRef);
@@ -263,20 +267,20 @@ describe('BlocksHandler', () => {
       {
         // initial.
         const rsp = await handler.handle(EmptyRequest, mockMetadata);
-        expect(rsp.state![findHookId(counter1Ref)]).toBe(0);
-        expect(rsp.state![findHookId(counter2Ref)]).toBe(0);
-        expect(findHookState(counter1Ref)).toBe(0);
-        expect(findHookState(counter2Ref)).toBe(0);
+        expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 0 });
+        expect(rsp.state![findHookId(counter2Ref)]).toEqual({ value: 0 });
+        expect(findHookValue(counter1Ref)).toBe(0);
+        expect(findHookValue(counter2Ref)).toBe(0);
       }
 
       {
         // press button1.
         const req = generatePressRequest(positiveRef);
         const rsp = await handler.handle(req, mockMetadata);
-        expect(rsp.state![findHookId(counter1Ref)]).toBe(1);
+        expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 1 });
         expect(rsp.state![findHookId(counter2Ref)]).toBe(undefined);
-        expect(findHookState(counter1Ref)).toBe(1);
-        expect(findHookState(counter2Ref)).toBe(0);
+        expect(findHookValue(counter1Ref)).toBe(1);
+        expect(findHookValue(counter2Ref)).toBe(0);
       }
 
       {
@@ -284,9 +288,9 @@ describe('BlocksHandler', () => {
         const req = generatePressRequest(negativeRef);
         const rsp = await handler.handle(req, mockMetadata);
         expect(rsp.state![findHookId(counter1Ref)]).toBe(undefined);
-        expect(rsp.state![findHookId(counter2Ref)]).toBe(-1);
-        expect(findHookState(counter1Ref)).toBe(1);
-        expect(findHookState(counter2Ref)).toBe(-1);
+        expect(rsp.state![findHookId(counter2Ref)]).toEqual({ value: -1 });
+        expect(findHookValue(counter1Ref)).toBe(1);
+        expect(findHookValue(counter2Ref)).toBe(-1);
       }
 
       {
@@ -295,15 +299,15 @@ describe('BlocksHandler', () => {
         const rsp = await handler.handle(req, mockMetadata);
         expect(rsp.state![findHookId(counter1Ref)]).toBe(undefined);
         expect(rsp.state![findHookId(counter2Ref)]).toBe(undefined);
-        expect(findHookState(counter1Ref)).toBe(1);
-        expect(findHookState(counter2Ref)).toBe(-1);
+        expect(findHookValue(counter1Ref)).toBe(1);
+        expect(findHookValue(counter2Ref)).toBe(-1);
       }
     });
 
     test('partial progress responses should only contain state changed', async () => {
       const handler = new BlocksHandler(SuccessFail);
       await handler.handle(EmptyRequest, mockMetadata);
-      expect(findHookState(counter1Ref)).toEqual(0);
+      expect(findHookValue(counter1Ref)).toEqual(0);
       let req = generatePressRequest(negativeRef);
       const nay = req.events[0];
       req = generatePressRequest(positiveRef);
@@ -321,8 +325,8 @@ describe('BlocksHandler', () => {
       expect(rsp.events[1].hook).toBe(req.events[0].hook);
       expect(rsp.events[1].retry).toBe(true);
 
-      expect(rsp.state![findHookId(counter1Ref)]).toBe(3);
-      expect(findHookState(counter1Ref)).toBe(3);
+      expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 3 });
+      expect(findHookValue(counter1Ref)).toBe(3);
     });
   });
 

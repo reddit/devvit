@@ -2,17 +2,23 @@
 
 exports[`state setter > can be used multiple times in a component 1`] = `
 {
-  "multiComponent.useState-0": 0,
-  "multiComponent.useState-1": "bar",
+  "multiComponent.useState-0": {
+    "value": 0,
+  },
+  "multiComponent.useState-1": {
+    "value": "bar",
+  },
   "multiComponent.useState-2": {
-    "hello": "world",
+    "value": {
+      "hello": "world",
+    },
   },
 }
 `;
 
 exports[`useState > initial state > async initializer resolves 1`] = `
 {
-  "asyncComponent.useAsyncState-0": {
+  "asyncComponent.useState-0": {
     "loading": true,
     "value": null,
   },
@@ -22,7 +28,9 @@ exports[`useState > initial state > async initializer resolves 1`] = `
 exports[`useState > initial state > uses the given initial state 1`] = `
 {
   "syncImportComponent.useState-0": {
-    "foo": "bar",
+    "value": {
+      "foo": "bar",
+    },
   },
 }
 `;
@@ -30,7 +38,9 @@ exports[`useState > initial state > uses the given initial state 1`] = `
 exports[`useState > initial state > uses the given initial state 2`] = `
 {
   "syncLegacyComponent.useState-0": {
-    "foo": "bar",
+    "value": {
+      "foo": "bar",
+    },
   },
 }
 `;

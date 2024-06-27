@@ -186,7 +186,9 @@ exports[`useForm > test rendering FormSubmittedEvent 1`] = `
   "effects": [],
   "events": [],
   "state": {
-    "App2.useState-0": "Genghis Corgi",
+    "App2.useState-0": {
+      "value": "Genghis Corgi",
+    },
   },
 }
 `;

@@ -11,8 +11,8 @@ export type StateSetter<S> = Dispatch<SetStateAction<S>>;
 /** A tuple containing the current state and a function to update it */
 export type UseStateResult<S> = [S, StateSetter<S>];
 export type UseStateHook = Context['useState'];
-export type UseStateInitializer<S> = S | (() => S);
 export type AsyncUseStateInitializer<S> = () => Promise<S>;
+export type UseStateInitializer<S> = S | (() => S) | AsyncUseStateInitializer<S>;
 export type AsyncError = { message: string; details: string | null };
 export type UseAsyncResult<S> = { data: S | null; loading: boolean; error: AsyncError | null };
 
