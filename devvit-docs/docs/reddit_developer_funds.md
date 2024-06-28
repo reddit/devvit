@@ -1,6 +1,6 @@
 # Reddit Developer Funds
 
-The Reddit Developer Funds is a rewards program for adventurous devs who build successful [experiences](https://developers.reddit.com/docs/experiences) and mod tools on Reddit.
+[Sign up today!](https://forms.gle/u3txmj1G78kD9mG27) Reddit Developer Funds is a rewards program for adventurous devs who build successful [experiences](https://developers.reddit.com/docs/experiences) and mod tools on Reddit.
 
 ## What we’re looking for
 
