@@ -76,6 +76,7 @@ describe('regressions', () => {
           "error": null,
           "load_state": "loading",
         },
+        "__cache": {},
       }
     `);
     const event = {
@@ -98,6 +99,7 @@ describe('regressions', () => {
           "error": null,
           "load_state": "loaded",
         },
+        "__cache": {},
       }
     `);
     expect(findHookState(asyncRef)).toMatchSnapshot();
@@ -156,6 +158,7 @@ describe('regressions', () => {
           },
           "load_state": "error",
         },
+        "__cache": {},
       }
     `);
     expect(response.events.length).toEqual(0);
@@ -195,6 +198,7 @@ describe('invalidation', () => {
         "App.useState-1": {
           "value": true,
         },
+        "__cache": {},
       }
     `);
     const initialState = response.state;
@@ -225,7 +229,7 @@ describe('invalidation', () => {
 
     request = { events: [asyncResponseEvent(asyncRef, 'unknown')], state: initialState };
     response = await handler.handle(request, mockMetadata);
-    expect(response.state).toEqual({}); // nothing changes
+    expect(response.state).toEqual({ __cache: {} }); // nothing changes
 
     // This one is actually matched up.
     request = { events: [asyncResponseEvent(asyncRef)], state: initialState };
@@ -238,6 +242,7 @@ describe('invalidation', () => {
           "error": null,
           "load_state": "loaded",
         },
+        "__cache": {},
       }
     `);
   });

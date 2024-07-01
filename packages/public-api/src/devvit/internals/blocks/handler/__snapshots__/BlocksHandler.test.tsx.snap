@@ -46,7 +46,9 @@ exports[`BlocksHandler > actions handler > should not call the action handler on
   },
   "effects": [],
   "events": [],
-  "state": {},
+  "state": {
+    "__cache": {},
+  },
 }
 `;
 
@@ -115,7 +117,9 @@ exports[`BlocksHandler > function components > should pass children 1`] = `
   },
   "effects": [],
   "events": [],
-  "state": {},
+  "state": {
+    "__cache": {},
+  },
 }
 `;
 
@@ -163,6 +167,8 @@ exports[`BlocksHandler > transformation > should inject a root element 1`] = `
   },
   "effects": [],
   "events": [],
-  "state": {},
+  "state": {
+    "__cache": {},
+  },
 }
 `;

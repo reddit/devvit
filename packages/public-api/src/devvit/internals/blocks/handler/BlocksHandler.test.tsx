@@ -117,6 +117,7 @@ describe('BlocksHandler', () => {
           "ConditionalComponent.useState-0": {
             "value": false,
           },
+          "__cache": {},
         }
       `);
       await press(toggleRef);

@@ -23,6 +23,7 @@ exports[`when circuit-breaking: false > receiving request 1`] = `
   "App.useState-1": {
     "value": true,
   },
+  "__cache": {},
 }
 `;
 
@@ -49,6 +50,7 @@ exports[`when circuit-breaking: true > receiving request 1`] = `
   "App.useState-1": {
     "value": true,
   },
+  "__cache": {},
 }
 `;
 

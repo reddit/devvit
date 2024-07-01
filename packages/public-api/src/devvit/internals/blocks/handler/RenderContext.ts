@@ -58,22 +58,34 @@ export class RenderContext implements EffectEmitter {
   constructor(request: UIRequest, meta: Metadata) {
     this.request = request;
     this.meta = meta;
-    this.#state = request.state ?? {};
+    this.#state = request.state ?? {
+      __cache: {},
+    };
     this._rootProps = request.props ?? {};
   }
 
   /** The state delta new to this render. */
   get _changedState(): BlocksState {
-    const changed: BlocksState = {};
+    const changed: BlocksState = {
+      __cache: this.#state.__cache ?? {},
+    };
     for (const key in this._changed) changed[key] = this._state[key];
     const unmounted = new Set(Object.keys(this._state));
     Object.keys(this._hooks).forEach((key) => {
+      if (key === '__cache') {
+        return;
+      }
       unmounted.delete(key);
     });
     unmounted.forEach((key) => {
+      if (key === '__cache') {
+        return;
+      }
+
       const t: Tombstone = { __deleted: true };
       this._state[key] = changed[key] = t;
     });
+
     return changed;
   }
 

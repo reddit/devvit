@@ -18,16 +18,7 @@ import { useChannel } from './useChannel.js';
 import { useForm } from './useForm.js';
 import { useInterval } from './useInterval.js';
 import { useState } from './useState.js';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const UnimplementedProxy: any = new Proxy(
-  {},
-  {
-    get: function (_target, prop, _receiver) {
-      throw new Error(`Unimplemented API: ${String(prop)}`);
-    },
-  }
-);
+import { makeCache } from './cache.js';
 
 export class ContextBuilder {
   public buildContext(
@@ -45,7 +36,7 @@ export class ContextBuilder {
     const media = new MediaClient(metadata);
     const assets = new AssetsClient();
     const realtime = new RealtimeClient(metadata);
-    const cache = UnimplementedProxy;
+    const cache = makeCache(redis, renderContext._state);
     const apiClients: ContextAPIClients = {
       modLog,
       kvStore,

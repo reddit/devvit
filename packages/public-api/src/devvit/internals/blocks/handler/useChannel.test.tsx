@@ -62,6 +62,7 @@ test('initial state is unsubscribed', async () => {
   expect(rsp.effects).toMatchInlineSnapshot(`[]`);
   expect(rsp.state).toMatchInlineSnapshot(`
     {
+      "__cache": {},
       "useChannel:Channel": {
         "channel": "app:install:Channel",
         "connected": false,
@@ -95,6 +96,7 @@ test('subscribe sets channel to subscribed', async () => {
   `);
   expect(rsp.state).toMatchInlineSnapshot(`
     {
+      "__cache": {},
       "useChannel:Channel": {
         "channel": "app:install:Channel",
         "connected": false,
@@ -140,6 +142,7 @@ test('unsubscribe in an event does nothing if subscribing in render loop', async
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
@@ -165,6 +168,7 @@ test('unsubscribe in an event does nothing if subscribing in render loop', async
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
@@ -201,6 +205,7 @@ test('resubscribe is ignored', async () => {
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
@@ -213,7 +218,11 @@ test('resubscribe is ignored', async () => {
   {
     const rsp = await handler.handle({ events: [], state: getLatestBlocksState() }, meta);
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
-    expect(rsp.state).toMatchInlineSnapshot(`{}`);
+    expect(rsp.state).toMatchInlineSnapshot(`
+      {
+        "__cache": {},
+      }
+    `);
   }
 });
 
@@ -246,6 +255,7 @@ test('un/subscribe from an event sets channel to un/subscribed', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
@@ -271,6 +281,7 @@ test('un/subscribe from an event sets channel to un/subscribed', async () => {
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
@@ -294,6 +305,7 @@ test('un/subscribe from an event sets channel to un/subscribed', async () => {
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
@@ -336,6 +348,7 @@ test('un/subscribe event invokes callback', async () => {
     `);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
@@ -366,6 +379,7 @@ test('un/subscribe event invokes callback', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": true,
@@ -396,6 +410,7 @@ test('un/subscribe event invokes callback', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:Channel": {
           "channel": "app:install:Channel",
           "connected": false,
@@ -451,7 +466,11 @@ test('message event invokes callback', async () => {
     meta
   );
   expect(rsp.effects).toMatchInlineSnapshot(`[]`);
-  expect(rsp.state).toMatchInlineSnapshot(`{}`);
+  expect(rsp.state).toMatchInlineSnapshot(`
+    {
+      "__cache": {},
+    }
+  `);
   expect(onMessage).toBeCalledTimes(1);
   expect(onMessage).toBeCalledWith('data');
 });
@@ -513,6 +532,7 @@ test('two channels', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:ChannelA": {
           "channel": "app:install:ChannelA",
           "connected": true,
@@ -547,6 +567,7 @@ test('two channels', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:ChannelB": {
           "channel": "app:install:ChannelB",
           "connected": true,
@@ -578,7 +599,11 @@ test('two channels', async () => {
       meta
     );
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
-    expect(rsp.state).toMatchInlineSnapshot('{}');
+    expect(rsp.state).toMatchInlineSnapshot(`
+      {
+        "__cache": {},
+      }
+    `);
     expect(onMessageA).toBeCalledTimes(1);
     expect(onMessageA).toBeCalledWith('a');
     expect(onSubscribedA).toBeCalledTimes(1);
@@ -604,7 +629,11 @@ test('two channels', async () => {
       meta
     );
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
-    expect(rsp.state).toMatchInlineSnapshot('{}');
+    expect(rsp.state).toMatchInlineSnapshot(`
+      {
+        "__cache": {},
+      }
+    `);
     expect(onMessageA).toBeCalledTimes(1);
     expect(onSubscribedA).toBeCalledTimes(1);
     expect(onUnsubscribedA).toBeCalledTimes(0);
@@ -633,6 +662,7 @@ test('two channels', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:ChannelA": {
           "channel": "app:install:ChannelA",
           "connected": false,
@@ -667,6 +697,7 @@ test('two channels', async () => {
     expect(rsp.effects).toMatchInlineSnapshot(`[]`);
     expect(rsp.state).toMatchInlineSnapshot(`
       {
+        "__cache": {},
         "useChannel:ChannelB": {
           "channel": "app:install:ChannelB",
           "connected": false,

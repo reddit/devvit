@@ -2,6 +2,7 @@
 
 exports[`useInterval > initial state is stopped 1`] = `
 {
+  "__cache": {},
   "component.useInterval-2": {
     "duration": {
       "nanos": 0,
@@ -29,6 +30,7 @@ exports[`useInterval > initial state is stopped 1`] = `
 
 exports[`useInterval > you can start inside the render 1`] = `
 {
+  "__cache": {},
   "startInRender.useInterval-0": {
     "duration": {
       "nanos": 0,
