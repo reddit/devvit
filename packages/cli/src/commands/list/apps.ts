@@ -3,14 +3,15 @@ import { GetAllWithOwnerRequest } from '@devvit/protos/community.js';
 import { ux } from '@oclif/core';
 import { createAppClient } from '../../util/clientGenerators.js';
 import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
+import { getAccessTokenAndLoginIfNeeded } from '../../util/auth.js';
 
 export default class ListApps extends DevvitCommand {
   static override description = 'List all apps that you have published';
 
-  readonly #appService = createAppClient(this);
+  readonly #appService = createAppClient();
 
   async run(): Promise<void> {
-    const token = await this.getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded();
     const t2_id = await this.getUserT2Id(token);
 
     ux.action.start('Fetching');

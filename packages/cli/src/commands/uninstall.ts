@@ -4,6 +4,7 @@ import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, ux } from '@oclif/core';
 import { createAppVersionClient, createInstallationsClient } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
+import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 
 type UninstallParseResult = {
   args: {
@@ -35,15 +36,15 @@ export default class Uninstall extends DevvitCommand {
     }),
   };
 
-  readonly #installationsClient = createInstallationsClient(this);
-  readonly #appVersionClient = createAppVersionClient(this);
+  readonly #installationsClient = createInstallationsClient();
+  readonly #appVersionClient = createAppVersionClient();
 
   async run(): Promise<void> {
     const { args }: UninstallParseResult = await this.parse(Uninstall);
 
     const appName = args.app || (await this.inferAppNameFromProject());
 
-    await this.getAccessTokenAndLoginIfNeeded();
+    await getAccessTokenAndLoginIfNeeded();
 
     ux.action.start(
       `Finding installation of the app "${appName}" in ${

@@ -34,6 +34,7 @@ import { createInstallationsClient, createRemoteLoggerClient } from '../util/cli
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
+import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 
 export default class Playtest extends Upload {
   static override description =
@@ -78,7 +79,7 @@ export default class Playtest extends Upload {
     }),
   };
 
-  readonly #installationsClient = createInstallationsClient(this);
+  readonly #installationsClient = createInstallationsClient();
   #appLogSub?: Subscription;
   readonly #bundler: Bundler = new Bundler(true);
   #existingInstallInfo?: FullInstallationInfo | undefined;
@@ -145,7 +146,7 @@ export default class Playtest extends Upload {
       this.#server.open();
     }
 
-    const token = await this.getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
     await this.checkDevvitTermsAndConditions();
 
@@ -243,7 +244,7 @@ export default class Playtest extends Upload {
     subreddit: string,
     verbose: boolean
   ): Subscription {
-    const client = createRemoteLoggerClient(this);
+    const client = createRemoteLoggerClient();
     const subredditAppName = { appName, subreddit };
     const now = new Date();
 

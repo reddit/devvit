@@ -8,6 +8,7 @@ import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { distDirFilename } from '../../util/config.js';
 import { readDevvitConfig } from '../../util/devvitConfig.js';
+import { getAccessToken } from '../../util/auth.js';
 
 export default class BundleActor extends ProjectCommand {
   static override description = 'Bundle an actor into bundle.json';
@@ -55,7 +56,7 @@ export default class BundleActor extends ProjectCommand {
     let username = '';
 
     try {
-      const token = await this.getAccessToken();
+      const token = await getAccessToken();
       if (token) {
         username = await this.getUserDisplayName(token);
       }

@@ -60,6 +60,7 @@ import { handleTwirpError } from '../util/twirp-error-handler.js';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import { sendEvent } from '../util/metrics.js';
 import type { MediaSignatureStatus } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
+import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -106,8 +107,8 @@ export default class Upload extends ProjectCommand {
     }),
   };
 
-  readonly appClient = createAppClient(this);
-  readonly appVersionClient = createAppVersionClient(this);
+  readonly appClient = createAppClient();
+  readonly appVersionClient = createAppVersionClient();
 
   #event = {
     source: 'devplatform_cli',
@@ -122,7 +123,7 @@ export default class Upload extends ProjectCommand {
   #eventSent = false;
 
   async run(): Promise<void> {
-    const token = await this.getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
 
     await this.checkDevvitTermsAndConditions();

@@ -21,6 +21,7 @@ import {
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
 import { TwirpError } from 'twirp-ts/build/twirp/errors.js';
+import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 
 export default class Install extends DevvitCommand {
   static override description =
@@ -49,9 +50,9 @@ export default class Install extends DevvitCommand {
     }),
   };
 
-  readonly #appClient = createAppClient(this);
-  readonly #appVersionClient = createAppVersionClient(this);
-  readonly #installationsClient = createInstallationsClient(this);
+  readonly #appClient = createAppClient();
+  readonly #appVersionClient = createAppVersionClient();
+  readonly #installationsClient = createInstallationsClient();
 
   async run(): Promise<void> {
     const { args } = await this.parse(Install);
@@ -61,7 +62,7 @@ export default class Install extends DevvitCommand {
     await this.checkIfUserLoggedIn();
     await this.checkDevvitTermsAndConditions();
 
-    const token = await this.getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded();
     const userT2Id = await this.getUserT2Id(token);
 
     const { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);

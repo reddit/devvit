@@ -1,7 +1,10 @@
 import { HEADER_USER_AGENT } from '../constants/Headers.js';
-import type { NodeFSAuthenticationPluginConfig } from '../lib/auth/NodeFSAuthenticationPlugin.js';
+import {
+  NodeFSAuthenticationPlugin,
+  type NodeFSAuthenticationPluginConfig,
+} from '../lib/auth/NodeFSAuthenticationPlugin.js';
 import type { StoredToken } from '../lib/auth/StoredToken.js';
-import { REDDIT_DOT_COM } from '../lib/config.js';
+import { DOT_DEVVIT_DIR_FILENAME, REDDIT_DOT_COM } from '../lib/config.js';
 import { DEVVIT_PORTAL_URL } from './config.js';
 
 const PORT = 65010; // Has to match exactly to our oauth app settings
@@ -41,3 +44,43 @@ export const AUTH_CONFIG: NodeFSAuthenticationPluginConfig['auth'] = {
   scopes: '*',
   tokenDuration: TOKEN_DURATION,
 };
+
+let _authSvc: NodeFSAuthenticationPlugin | undefined;
+
+export function getOAuthSvc(): NodeFSAuthenticationPlugin {
+  if (!_authSvc) {
+    return new NodeFSAuthenticationPlugin({
+      dotDevvitDir: DOT_DEVVIT_DIR_FILENAME,
+      auth: AUTH_CONFIG,
+    });
+  }
+  return _authSvc;
+}
+
+export async function getAccessToken(): Promise<StoredToken | undefined> {
+  try {
+    const tokenInfo = await getOAuthSvc().authTokenStore.readFSToken();
+    if (!tokenInfo || !tokenInfo.token.hasScopes(AUTH_CONFIG.scopes)) {
+      return undefined;
+    }
+    if (tokenInfo.token.isFresh()) {
+      return tokenInfo.token;
+    }
+    return (
+      await getOAuthSvc().refreshStoredToken(
+        tokenInfo.token.refreshToken,
+        Boolean(tokenInfo.copyPaste)
+      )
+    ).token;
+  } catch {
+    // probably logged out
+    return;
+  }
+}
+
+export async function getAccessTokenAndLoginIfNeeded(copyPaste?: boolean): Promise<StoredToken> {
+  if (copyPaste) {
+    return await getOAuthSvc().loginViaCopyPaste();
+  }
+  return await getOAuthSvc().Authenticate();
+}

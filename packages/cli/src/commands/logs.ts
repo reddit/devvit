@@ -107,7 +107,7 @@ export default class Logs extends DevvitCommand {
     // Call DevPortal to ensure the installation is valid and to convert
     // the subreddit name to a t5_ id.
     // TODO: move this conversion/check into Gateway
-    const installationClient = createInstallationsClient(this);
+    const installationClient = createInstallationsClient();
     const result = await installationClient.GetByAppNameAndInstallLocation(
       GetByAppNameAndInstallLocationRequest.fromPartial({
         slug: appName,
@@ -151,7 +151,7 @@ export default class Logs extends DevvitCommand {
     subredditAppName: RemoteLogSubredditAppNameFilter,
     flags: CommandFlags<typeof Logs>
   ): Subscription {
-    const client = createRemoteLoggerClient(this);
+    const client = createRemoteLoggerClient();
 
     const logs = client.Tail(
       RemoteLogQuery.fromPartial({

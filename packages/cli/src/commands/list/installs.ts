@@ -14,6 +14,7 @@ import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
 import { createInstallationsClient } from '../../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
+import { getAccessTokenAndLoginIfNeeded } from '../../util/auth.js';
 
 enum SearchType {
   MINE,
@@ -33,7 +34,7 @@ export default class ListInstalls extends DevvitCommand {
     }),
   };
 
-  readonly #installationsClient = createInstallationsClient(this);
+  readonly #installationsClient = createInstallationsClient();
 
   async run(): Promise<void> {
     const { args } = await this.parse(ListInstalls);
@@ -52,7 +53,7 @@ export default class ListInstalls extends DevvitCommand {
   }
 
   async #fetchInstalls(subreddit?: string): Promise<MultipleInstallationsResponse> {
-    const token = await this.getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded();
 
     if (subreddit != null) {
       // ask about installations in given subreddit

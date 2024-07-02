@@ -4,17 +4,15 @@ import { Command, Flags } from '@oclif/core';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import { parse } from '@oclif/core/lib/parser/index.js';
 import open from 'open';
-import { NodeFSAuthenticationPlugin } from '../../lib/auth/NodeFSAuthenticationPlugin.js';
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
-import { DOT_DEVVIT_DIR_FILENAME } from '../../lib/config.js';
 import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../../util/devvitConfig.js';
 import { findProjectRoot } from '../../util/project-util.js';
-import { AUTH_CONFIG } from '../auth.js';
 import { createWaitlistClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
 import { readLine } from '../input-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 import { sleep } from '../sleep.js';
+import { getAccessToken } from '../auth.js';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`
@@ -25,7 +23,6 @@ import { sleep } from '../sleep.js';
 export const toLowerCaseArgParser = async (input: string): Promise<string> => input.toLowerCase();
 
 export abstract class DevvitCommand extends Command {
-  protected _authSvc: NodeFSAuthenticationPlugin | undefined;
   #configFile: string | undefined;
 
   static override baseFlags: FlagInput = {
@@ -65,47 +62,7 @@ export abstract class DevvitCommand extends Command {
     }
   }
 
-  get isOauthSvcInitd(): boolean {
-    return this._authSvc != null;
-  }
-
-  get oauthSvc(): NodeFSAuthenticationPlugin {
-    if (!this._authSvc) {
-      this._authSvc = new NodeFSAuthenticationPlugin({
-        dotDevvitDir: DOT_DEVVIT_DIR_FILENAME,
-        auth: AUTH_CONFIG,
-      });
-    }
-    return this._authSvc;
-  }
-
-  getAccessTokenAndLoginIfNeeded = async (copyPaste?: boolean): Promise<StoredToken> => {
-    if (copyPaste) return await this.oauthSvc.loginViaCopyPaste();
-    return await this.oauthSvc.Authenticate();
-  };
-
-  getAccessToken = async (): Promise<StoredToken | undefined> => {
-    try {
-      const tokenInfo = await this.oauthSvc.authTokenStore.readFSToken();
-      if (!tokenInfo || !tokenInfo.token.hasScopes(AUTH_CONFIG.scopes)) {
-        return undefined;
-      }
-      if (tokenInfo.token.isFresh()) {
-        return tokenInfo.token;
-      }
-      return (
-        await this.oauthSvc.refreshStoredToken(
-          tokenInfo.token.refreshToken,
-          Boolean(tokenInfo.copyPaste)
-        )
-      ).token;
-    } catch {
-      // probably logged out
-      return;
-    }
-  };
-
-  readonly waitlistClient = createWaitlistClient(this);
+  readonly waitlistClient = createWaitlistClient();
   protected ensureDeveloperAccountExists = async (): Promise<void> => {
     try {
       await this.waitlistClient.EnsureDeveloperAccountExists(Empty.fromPartial({}));
@@ -138,7 +95,7 @@ export abstract class DevvitCommand extends Command {
   };
 
   protected async checkIfUserLoggedIn(): Promise<void> {
-    const token = await this.getAccessToken();
+    const token = await getAccessToken();
     if (!token) {
       this.error('Not currently logged in. Try `devvit login` first');
     }

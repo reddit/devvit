@@ -1,5 +1,6 @@
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { Flags } from '@oclif/core';
+import { getAccessToken } from '../util/auth.js';
 
 export default class Whoami extends DevvitCommand {
   static override description = 'Display the currently logged in reddit.com user';
@@ -15,7 +16,7 @@ export default class Whoami extends DevvitCommand {
   async run(): Promise<void> {
     const { flags } = await this.parse(Whoami);
 
-    const token = await this.getAccessToken();
+    const token = await getAccessToken();
     if (!token) {
       this.error('Not currently logged in. Try `devvit login` first');
     }

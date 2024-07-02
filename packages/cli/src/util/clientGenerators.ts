@@ -26,10 +26,10 @@ import {
   HEADER_DEVVIT_CLI,
   HEADER_USER_AGENT,
 } from '../constants/Headers.js';
-import type { DevvitCommand } from './commands/DevvitCommand.js';
 import { DEVVIT_GATEWAY_URL, DEVVIT_PORTAL_API } from './config.js';
 import { GrpcWebRpc } from './grpc-web-rpc.js';
 import { NodeFetchRPC } from './node-fetch-twirp-rpc.js';
+import { getAccessToken } from './auth.js';
 
 const APP_PATH = 'app';
 const APP_VERSION_PATH = 'appVersion';
@@ -39,91 +39,91 @@ const WAITLIST_PATH = 'waitlist';
 const APP_SETTINGS_PATH = 'app-settings';
 const EVENTS_PATH = 'events';
 
-export function createAppClient(instance: DevvitCommand): AppClient {
+export function createAppClient(): AppClient {
   return new AppClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/${APP_PATH}`,
-      getToken: () => instance.getAccessToken(),
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
 }
 
-export function createAppVersionClient(instance: DevvitCommand): AppVersionClient {
+export function createAppVersionClient(): AppVersionClient {
   return new AppVersionClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/${APP_VERSION_PATH}`,
-      getToken: () => instance.getAccessToken(),
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
 }
 
-export function createAppSettingsClient(instance: DevvitCommand): DevPortalAppSettingsClient {
+export function createAppSettingsClient(): DevPortalAppSettingsClient {
   return new DevPortalAppSettingsClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/${APP_SETTINGS_PATH}`,
-      getToken: () => instance.getAccessToken(),
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
 }
 
-export function createInstallationsClient(instance: DevvitCommand): InstallationsClient {
+export function createInstallationsClient(): InstallationsClient {
   return new InstallationsClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/${INSTALLATIONS_PATH}`,
-      getToken: () => instance.getAccessToken(),
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
 }
 
-export function createFeedbackClient(instance: DevvitCommand): FeedbackClient {
+export function createFeedbackClient(): FeedbackClient {
   return new FeedbackClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/${FEEDBACK_PATH}`,
-      getToken: () => instance.getAccessToken(),
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
 }
 
-export function createRemoteLoggerClient(instance: DevvitCommand): RemoteLogConsumer {
+export function createRemoteLoggerClient(): RemoteLogConsumer {
   return new RemoteLogConsumerClientImpl(
     new GrpcWebRpc({
       baseUrl: DEVVIT_GATEWAY_URL,
-      getToken: () => instance.getAccessToken(),
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
 }
 
-export function createWaitlistClient(instance: DevvitCommand): WaitlistClient {
+export function createWaitlistClient(): WaitlistClient {
   return new WaitlistClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/${WAITLIST_PATH}`,
-      getToken: () => instance.getAccessToken(),
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
 }
 
-export function createWaitlistAdminClient(instance: DevvitCommand): WaitlistAdminClient {
+export function createWaitlistAdminClient(): WaitlistAdminClient {
   return new WaitlistAdminClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/admin/${WAITLIST_PATH}`,
-      getToken: () => instance.getAccessToken(),
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
 }
 
-export function createEventsClient(instance?: DevvitCommand): EventsClient {
+export function createEventsClient(): EventsClient {
   return new EventsClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/${EVENTS_PATH}`,
-      getToken: async () => instance?.getAccessToken() ?? undefined,
+      getToken: getAccessToken,
       isTokenOptional: true,
       headers: getHeaders(),
     })

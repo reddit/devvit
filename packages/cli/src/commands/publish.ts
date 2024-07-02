@@ -42,8 +42,8 @@ export default class Publish extends ProjectCommand {
     }),
   };
 
-  readonly #appClient = createAppClient(this);
-  readonly #appVersionClient = createAppVersionClient(this);
+  readonly #appClient = createAppClient();
+  readonly #appVersionClient = createAppVersionClient();
 
   async run(): Promise<void> {
     const { args } = await this.parse(Publish);

@@ -32,7 +32,7 @@ export default class CreateApp extends DevvitCommand {
     }),
   };
 
-  readonly #appClient = createAppClient(this);
+  readonly #appClient = createAppClient();
 
   override async run(): Promise<void> {
     const {

@@ -1,5 +1,6 @@
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { Flags } from '@oclif/core';
+import { getAccessTokenAndLoginIfNeeded, getOAuthSvc } from '../util/auth.js';
 
 export default class Login extends DevvitCommand {
   static override description = 'Log in to Devvit via reddit.com';
@@ -19,9 +20,9 @@ export default class Login extends DevvitCommand {
     } = await this.parse(Login);
 
     // Clearing a local token before attempting to login (in case the token has expired, for example)
-    await this.oauthSvc.Logout({});
+    await getOAuthSvc().Logout({});
 
-    const token = await this.getAccessTokenAndLoginIfNeeded(copyPaste);
+    const token = await getAccessTokenAndLoginIfNeeded(copyPaste);
     const username = await this.getUserDisplayName(token);
 
     this.log(

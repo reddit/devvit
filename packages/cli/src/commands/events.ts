@@ -68,7 +68,7 @@ export default class Events extends DevvitCommand {
     await this.checkIfUserLoggedIn();
 
     const { args, flags } = await this.parse(Events);
-    const loggerClient = createRemoteLoggerClient(this);
+    const loggerClient = createRemoteLoggerClient();
 
     const appName = args.app || (await this.inferAppNameFromProject());
 

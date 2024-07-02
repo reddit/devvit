@@ -11,8 +11,8 @@ import { getAppBySlug } from '../../util/utils.js';
 export default class SetAppSettings extends ProjectCommand {
   static override description =
     'Create and update settings for your app. These settings will be added at the global app-scope.';
-  readonly #appSettingsService = createAppSettingsClient(this);
-  readonly #appService = createAppClient(this);
+  readonly #appSettingsService = createAppSettingsClient();
+  readonly #appService = createAppClient();
 
   static override args = {
     settingsKey: Args.string({

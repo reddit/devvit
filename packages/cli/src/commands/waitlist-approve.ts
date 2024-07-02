@@ -3,6 +3,7 @@ import { Args } from '@oclif/core';
 import { getUserId, isCurrentUserEmployee } from '../lib/http/gql.js';
 import { createWaitlistAdminClient } from '../util/clientGenerators.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
+import { getAccessToken } from '../util/auth.js';
 
 export default class WaitlistApprove extends DevvitCommand {
   static override description = 'Approve a user from the waitlist, adding them first if necessary.';
@@ -19,7 +20,7 @@ export default class WaitlistApprove extends DevvitCommand {
   async run(): Promise<void> {
     const { args } = await this.parse(WaitlistApprove);
 
-    const token = await this.getAccessToken();
+    const token = await getAccessToken();
     if (!token) {
       this.error('Not currently logged in. Try `devvit login` first');
     }
@@ -28,7 +29,7 @@ export default class WaitlistApprove extends DevvitCommand {
       this.error('You must be an employee to approve users');
     }
 
-    const waitlistAdmin = createWaitlistAdminClient(this);
+    const waitlistAdmin = createWaitlistAdminClient();
 
     const waitlistSignups = await waitlistAdmin.GetSubmissions({
       username: args.username,
