@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "ci-live-scores",
-  "version": "0.10.23-dev",
+  "version": "0.11.0-dev",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -15,13 +15,13 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.10.23-dev",
-    "@devvit/public-api": "0.10.23-dev",
+    "@devvit/protos": "0.11.0-dev",
+    "@devvit/public-api": "0.11.0-dev",
     "base64-js": "1.5.1"
   },
   "devDependencies": {
-    "@devvit/eslint-config": "0.10.23-dev",
-    "@devvit/tsconfig": "0.10.23-dev",
+    "@devvit/eslint-config": "0.11.0-dev",
+    "@devvit/tsconfig": "0.11.0-dev",
     "typescript": "5.3.2",
     "vitest": "1.6.0"
   }
