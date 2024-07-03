@@ -375,15 +375,28 @@ export class BlocksHandler {
     this._latestRenderContext = context;
     try {
       const roots = this.#render(component, props, context);
+
       if (roots.length !== 1) {
-        throw new Error('only one root');
-      }
-      const root = roots[0];
-      if (typeof root === 'string') {
         throw new Error(
-          'There must be a root tag.  Try wrapping your app in a <text></text>, <vstack> or other tag.'
+          `There can only be one root element, received: ${roots.length}. Please wrap these elements in a <vstack></vstack> or <hstack></hstack> to continue. Fragments cannot be used as a root element.`
         );
       }
+      const root = roots[0];
+
+      // By the time it gets to this point the promise has been serialized.
+      // That's why the check is not root instanceof Promise
+      if (root === '[object Promise]') {
+        throw new Error(
+          `Root elements cannot be asynchronous. To use data from an async endpoint, please use "const [data] = context.useState(async () => {/** your async code */})".`
+        );
+      }
+
+      if (typeof root === 'string') {
+        throw new Error(
+          `The root element must return a valid block, not a string. Try wrapping the element in a <text>your content</text> tag to continue.`
+        );
+      }
+
       return root;
     } catch (e) {
       if (e instanceof RenderInterruptError) {
@@ -429,8 +442,13 @@ export class BlocksHandler {
     if (Array.isArray(element)) {
       return this.#renderList(element, context);
     } else if (isBlockElement(element)) {
+      // This means the element is a fragment
       if (element.type === undefined) {
-        return this.#renderList(element.children, context);
+        context.push({ namespace: 'fragment', ...element.props });
+        // Since it's a fragment, don't reifyProps because you can't have props on a fragment
+        const children = this.#renderList(element.children, context);
+        context.pop();
+        return children;
       } else if (typeof element.type === 'function') {
         const propsWithChildren = { ...element.props, children: element.children };
         return this.#render(element.type, propsWithChildren, context);

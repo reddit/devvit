@@ -259,6 +259,52 @@ describe('BlocksHandler', () => {
         new Set(['anonymous.hstack.button-kk.onPress', 'anonymous.useState-0'])
       );
     });
+
+    test('should handle fragments', async () => {
+      const handler: BlocksHandler = new BlocksHandler(() => {
+        const [_counter, _setCounter] = useState(0);
+        return (
+          <hstack>
+            <>
+              <button key="kk" onPress={() => {}}>
+                hi world
+              </button>
+            </>
+          </hstack>
+        );
+      });
+      const request = EmptyRequest;
+      await handler.handle(request, mockMetadata);
+
+      expect(new Set(Object.keys(handler._latestRenderContext?._generated ?? {}))).toEqual(
+        new Set(['anonymous.hstack.fragment-0.button-kk.onPress', 'anonymous.useState-0'])
+      );
+    });
+
+    test('should handle mapped fragments', async () => {
+      const handler: BlocksHandler = new BlocksHandler(() => {
+        const [_counter, _setCounter] = useState(0);
+        return (
+          <hstack>
+            {[1, 2].map((count) => (
+              <>
+                <button onPress={() => _setCounter((x) => x + count)}>{count}</button>
+              </>
+            ))}
+          </hstack>
+        );
+      });
+      const request = EmptyRequest;
+      await handler.handle(request, mockMetadata);
+
+      expect(new Set(Object.keys(handler._latestRenderContext?._generated ?? {}))).toEqual(
+        new Set([
+          'anonymous.hstack.fragment-0.button-0.onPress',
+          'anonymous.hstack.fragment-1.button-0.onPress',
+          'anonymous.useState-0',
+        ])
+      );
+    });
   });
 
   describe('Context.#state', () => {
@@ -398,7 +444,10 @@ describe('BlocksHandler', () => {
         const req = generatePressRequest(funnyRef);
         await handler.handle(req, mockMetadata);
         expect(Object.keys(handler._latestRenderContext?._generated ?? {}).sort()).toEqual(
-          ['component.hstack.button-one.onPress', 'component.hstack.button-two.onPress'].sort()
+          [
+            'component.hstack.fragment-0.button-one.onPress',
+            'component.hstack.fragment-0.button-two.onPress',
+          ].sort()
         );
         expect(which).toBe(1);
       }
