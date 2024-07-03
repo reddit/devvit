@@ -49,6 +49,13 @@ export function assertValidNamespace(input: string): void {
   }
 }
 
+function shouldFireAttemptHookWarning(event: UIEvent): boolean {
+  // These do not require a hook param to be handled
+  if (event.blocking || event.resize) return false;
+
+  return !event.hook;
+}
+
 /**
  * This is the recommended low-level interface for creating hooks like useState or useAsync.
  *
@@ -323,7 +330,7 @@ export class BlocksHandler {
     // don't get type help so at least you'll get a warning at runtime.
     //
     // Unclear on if we can throw here or not so fell back to this.
-    if (!event.hook) {
+    if (shouldFireAttemptHookWarning(event)) {
       console.warn(
         `Received an event in #attemptHook that does not have an associated hook. This will cause the event to be undelivered and may cause bugs. Make sure that event passes a hook field. Event:`,
         { event }
