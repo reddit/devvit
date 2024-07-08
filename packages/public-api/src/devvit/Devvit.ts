@@ -95,16 +95,20 @@ type DevvitDebug = {
 
 export class Devvit extends Actor {
   static debug: DevvitDebug = {};
-  static #configuration: Configuration = {};
-  static #menuItems: MenuItem[] = [];
-  static #customPostType: CustomPostType | undefined;
-  static #formDefintions: Map<FormKey, FormDefinition> = new Map();
-  static #scheduledJobHandlers: Map<string, ScheduledJobHandler> = new Map();
-  static #installationSettings: SettingsFormField[] | undefined;
-  static #appSettings: SettingsFormField[] | undefined;
 
-  static #triggerOnEventHandlers: Map<TriggerEvent, TriggerOnEventHandler<OnTriggerRequest>[]> =
-    new Map();
+  static #appSettings: SettingsFormField[] | undefined;
+  static #assets: AssetMap = {};
+  static #config: Configuration = {};
+  static #customPostType: CustomPostType | undefined;
+  static readonly #formDefinitions: Map<FormKey, FormDefinition> = new Map();
+  static #installationSettings: SettingsFormField[] | undefined;
+  static readonly #menuItems: MenuItem[] = [];
+  static readonly #scheduledJobHandlers: Map<string, ScheduledJobHandler> = new Map();
+  static readonly #triggerOnEventHandlers: Map<
+    TriggerEvent,
+    TriggerOnEventHandler<OnTriggerRequest>[]
+  > = new Map();
+  static #webviewAssets: AssetMap = {};
 
   /**
    * To use certain APIs and features of Devvit, you must enable them using this function.
@@ -124,7 +128,7 @@ export class Devvit extends Actor {
    * ```
    */
   static configure(config: Configuration): void {
-    this.#configuration = config;
+    this.#config = config;
 
     if (pluginIsEnabled(config.http)) {
       this.#use(protos.HTTPDefinition);
@@ -227,8 +231,8 @@ export class Devvit extends Actor {
     form: T,
     onSubmit: FormOnSubmitEventHandler<FormToFormValues<T>>
   ): FormKey {
-    const formKey: FormKey = `form.${this.#formDefintions.size}`;
-    this.#formDefintions.set(formKey, {
+    const formKey: FormKey = `form.${this.#formDefinitions.size}`;
+    this.#formDefinitions.set(formKey, {
       form,
       onSubmit,
     } as FormDefinition);
@@ -455,12 +459,6 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static #assets: AssetMap = {};
-
-  /** @internal */
-  static #webviewAssets: AssetMap = {};
-
-  /** @internal */
   static get redditAPIPlugins(): {
     NewModmail: protos.NewModmail;
     Widgets: protos.Widgets;
@@ -476,7 +474,7 @@ export class Devvit extends Actor {
     Subreddits: protos.Subreddits;
     PostCollections: protos.PostCollections;
   } {
-    if (!pluginIsEnabled(this.#configuration.redditAPI)) {
+    if (!pluginIsEnabled(this.#config.redditAPI)) {
       throw new Error(
         'Reddit API is not enabled. You can enable it by passing `redditAPI: true` to `Devvit.configure`.'
       );
@@ -618,7 +616,7 @@ export class Devvit extends Actor {
 
   /** @internal */
   static get formDefinitions(): Map<FormKey, FormDefinition> {
-    return this.#formDefintions;
+    return this.#formDefinitions;
   }
 
   /** @internal */
@@ -646,12 +644,12 @@ export class Devvit extends Actor {
 
   /** @internal */
   static get assets(): AssetMap {
-    return Devvit.#assets;
+    return this.#assets;
   }
 
   /** @internal */
   static get webviewAssets(): AssetMap {
-    return Devvit.#webviewAssets;
+    return this.#webviewAssets;
   }
 
   /** @internal */
@@ -682,7 +680,7 @@ export class Devvit extends Actor {
       registerUIRequestHandlers(config);
     }
 
-    if (Devvit.#customPostType || Devvit.#formDefintions.size > 0) {
+    if (Devvit.#customPostType || Devvit.#formDefinitions.size > 0) {
       registerUIEventHandler(config);
     }
 
