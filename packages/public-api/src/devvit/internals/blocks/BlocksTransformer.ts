@@ -5,9 +5,9 @@ import type {
   BlockBorder,
   BlockColor,
   BlockConfig,
-  BlockSize,
   BlockSizes,
-  BlockSizes_Dimension_Value,
+  Dimensions,
+  UIDimensions,
 } from '@devvit/protos';
 import {
   BlockActionType,
@@ -27,7 +27,6 @@ import {
   BlockImageResizeMode,
   BlockPadding,
   BlockRadius,
-  BlockSizeUnit,
   BlockSpacerShape,
   BlockSpacerSize,
   BlockStackDirection,
@@ -52,6 +51,12 @@ import {
   isRPLColor,
 } from '../helpers/color.js';
 import type { AssetsClient, GetURLOptions } from '../../../apis/AssetsClient/AssetsClient.js';
+import { calculateMaxDimensions, makeDimensionValue } from './transformContext.js';
+
+export type TransformContext = {
+  /** The maximum size a block may take up per dimension (height/width), in pixels */
+  maxDimensions: Dimensions | UIDimensions;
+};
 
 type DataSet = Record<string, unknown>;
 const DATA_PREFIX = 'data-';
@@ -69,42 +74,48 @@ export class BlocksTransformer {
     this.#assetsClient = getAssetsClient;
   }
 
-  createBlocksElementOrThrow({ type, props, children }: ReifiedBlockElement): Block {
-    const block = this.createBlocksElement({ type, props, children });
+  createBlocksElementOrThrow(
+    { type, props, children }: ReifiedBlockElement,
+    transformContext: TransformContext
+  ): Block {
+    const block = this.createBlocksElement({ type, props, children }, transformContext);
     if (!block) {
       throw new Error(`Could not create block of type ${type}`);
     }
     return block;
   }
 
-  createBlocksElement({ type, props, children }: ReifiedBlockElement): Block | undefined {
+  createBlocksElement(
+    { type, props, children }: ReifiedBlockElement,
+    transformContext: TransformContext
+  ): Block | undefined {
     switch (type) {
       case 'blocks':
-        return this.makeRoot(props, ...children);
+        return this.makeRoot(props, transformContext, ...children);
       case 'hstack':
-        return this.makeHStack(props, ...children);
+        return this.makeHStack(props, transformContext, ...children);
       case 'vstack':
-        return this.makeVStack(props, ...children);
+        return this.makeVStack(props, transformContext, ...children);
       case 'zstack':
-        return this.makeZStack(props, ...children);
+        return this.makeZStack(props, transformContext, ...children);
       case 'text':
-        return this.makeText(props, ...children);
+        return this.makeText(props, transformContext, ...children);
       case 'button':
-        return this.makeButton(props, ...children);
+        return this.makeButton(props, transformContext, ...children);
       case 'image':
-        return this.makeImage(props as Devvit.Blocks.ImageProps);
+        return this.makeImage(props as Devvit.Blocks.ImageProps, transformContext);
       case 'spacer':
-        return this.makeSpacer(props);
+        return this.makeSpacer(props, transformContext);
       case 'icon':
-        return this.makeIcon(props as Devvit.Blocks.IconProps);
+        return this.makeIcon(props as Devvit.Blocks.IconProps, transformContext);
       case 'avatar':
-        return this.makeAvatar(props as Devvit.Blocks.AvatarProps);
+        return this.makeAvatar(props as Devvit.Blocks.AvatarProps, transformContext);
       case 'fullsnoo':
-        return this.makeFullSnoo(props as Devvit.Blocks.FullSnooProps);
+        return this.makeFullSnoo(props as Devvit.Blocks.FullSnooProps, transformContext);
       case 'animation':
-        return this.makeAnimation(props as Devvit.Blocks.AnimationProps);
+        return this.makeAnimation(props as Devvit.Blocks.AnimationProps, transformContext);
       case 'webview':
-        return this.makeWebView(props as Devvit.Blocks.WebViewProps);
+        return this.makeWebView(props as Devvit.Blocks.WebViewProps, transformContext);
       case '__fragment':
         throw new Error("root fragment is not supported - use 'blocks' instead");
     }
@@ -487,22 +498,10 @@ export class BlocksTransformer {
     return undefined;
   }
 
-  makeBlockSize(props: Devvit.Blocks.BaseProps | undefined): BlockSize | undefined {
-    if (props && (props.width != null || props.height != null || props.grow)) {
-      const { value: width, unit: widthUnit } = this.parseSize(props.width) ?? {};
-      const { value: height, unit: heightUnit } = this.parseSize(props.height) ?? {};
-      return {
-        width,
-        widthUnit,
-        height,
-        heightUnit,
-        grow: props.grow,
-      };
-    }
-    return undefined;
-  }
-
-  makeBlockSizes(props: Devvit.Blocks.BaseProps | undefined): BlockSizes | undefined {
+  makeBlockSizes(
+    props: Devvit.Blocks.BaseProps | undefined,
+    maxDimensions: Dimensions | UIDimensions
+  ): BlockSizes | undefined {
     if (props) {
       const hasWidth = props.width != null || props.minWidth != null || props.maxWidth != null;
       const hasHeight = props.height != null || props.minHeight != null || props.maxHeight != null;
@@ -510,16 +509,16 @@ export class BlocksTransformer {
         return {
           width: hasWidth
             ? {
-                value: this.parseSize(props.width),
-                min: this.parseSize(props.minWidth),
-                max: this.parseSize(props.maxWidth),
+                value: makeDimensionValue(props.width, maxDimensions.width),
+                min: makeDimensionValue(props.minWidth, maxDimensions.width),
+                max: makeDimensionValue(props.maxWidth, maxDimensions.width),
               }
             : undefined,
           height: hasHeight
             ? {
-                value: this.parseSize(props.height),
-                min: this.parseSize(props.minHeight),
-                max: this.parseSize(props.maxHeight),
+                value: makeDimensionValue(props.height, maxDimensions.height),
+                min: makeDimensionValue(props.minHeight, maxDimensions.height),
+                max: makeDimensionValue(props.maxHeight, maxDimensions.height),
               }
             : undefined,
           grow: props.grow,
@@ -527,28 +526,6 @@ export class BlocksTransformer {
       }
     }
     return undefined;
-  }
-
-  parseSize(size: Devvit.Blocks.SizeString | undefined): BlockSizes_Dimension_Value | undefined {
-    if (size == null) return undefined;
-    if (typeof size === 'number') {
-      return { value: size as number, unit: BlockSizeUnit.SIZE_UNIT_PERCENT };
-    }
-
-    // Regex:
-    // Group 1: Digits with optional decimal trailer
-    // Group 2: Optional suffix: 'px' or '%' (defaults to %)
-    // eslint-disable-next-line security/detect-unsafe-regex
-    const parts = size.match(/^(\d+(?:\.\d+)?)(px|%)?$/);
-    if (parts == null) {
-      return undefined;
-    }
-    let unit = BlockSizeUnit.SIZE_UNIT_PERCENT;
-    if (parts?.at(2) === 'px') {
-      unit = BlockSizeUnit.SIZE_UNIT_PIXELS;
-    }
-    const value = Number.parseFloat(parts[1]);
-    return { value, unit };
   }
 
   getDataSet(props: DataSet): DataSet {
@@ -600,9 +577,15 @@ export class BlocksTransformer {
     return getHexFromNamedHTMLColor('red');
   }
 
-  childrenToBlocks(children: ReifiedBlockElementOrLiteral[]): Block[] {
+  childrenToBlocks(
+    children: ReifiedBlockElementOrLiteral[],
+    transformContext: TransformContext
+  ): Block[] {
     return children.flatMap(
-      (child) => (typeof child !== 'string' ? this.createBlocksElement(child) : undefined) ?? []
+      (child) =>
+        (typeof child !== 'string'
+          ? this.createBlocksElement(child, transformContext)
+          : undefined) ?? []
     );
   }
 
@@ -658,31 +641,37 @@ export class BlocksTransformer {
 
   makeRoot(
     props: Devvit.Blocks.BaseProps | undefined,
+    transformContext: TransformContext,
     ...children: ReifiedBlockElementOrLiteral[]
   ): Block {
-    return this.wrapRoot(props, this.childrenToBlocks(children));
+    return this.wrapRoot(
+      props,
+      transformContext,
+      this.childrenToBlocks(children, transformContext)
+    );
   }
 
-  wrapRoot(props: Devvit.Blocks.BaseProps | undefined, children: Block[]): Block {
-    return this.makeBlock(
-      BlockType.BLOCK_ROOT,
-      {},
-      {
-        rootConfig: {
-          children: children,
-          height: this.makeRootHeight(
-            Devvit.customPostType?.height ??
-              (props as unknown as Devvit.Blocks.RootProps)?.height ??
-              'regular'
-          ),
-        },
-      }
-    );
+  wrapRoot(
+    props: Devvit.Blocks.BaseProps | undefined,
+    transformContext: TransformContext,
+    children: Block[]
+  ): Block {
+    return this.makeBlock(BlockType.BLOCK_ROOT, {}, transformContext, {
+      rootConfig: {
+        children: children,
+        height: this.makeRootHeight(
+          Devvit.customPostType?.height ??
+            (props as unknown as Devvit.Blocks.RootProps)?.height ??
+            'regular'
+        ),
+      },
+    });
   }
 
   makeStackBlock(
     direction: BlockStackDirection,
     props: Devvit.Blocks.StackProps | undefined,
+    transformContext: TransformContext,
     children: ReifiedBlockElementOrLiteral[]
   ): Block {
     const backgroundColors = this.getThemedColors(
@@ -690,7 +679,13 @@ export class BlocksTransformer {
       props?.lightBackgroundColor,
       props?.darkBackgroundColor
     );
-    return this.makeBlock(BlockType.BLOCK_STACK, props, {
+    const childrenMaxDimensions = calculateMaxDimensions(
+      props,
+      transformContext.maxDimensions,
+      direction,
+      children.length
+    );
+    return this.makeBlock(BlockType.BLOCK_STACK, props, transformContext, {
       stackConfig: {
         alignment: this.makeBlockAlignment(props?.alignment),
         backgroundColor: backgroundColors?.light,
@@ -701,7 +696,10 @@ export class BlocksTransformer {
           props?.lightBorderColor,
           props?.darkBorderColor
         ),
-        children: this.childrenToBlocks(children),
+        children: this.childrenToBlocks(children, {
+          ...transformContext,
+          maxDimensions: childrenMaxDimensions,
+        }),
         cornerRadius: this.makeBlockRadius(props?.cornerRadius),
         direction: direction,
         gap: this.makeBlockGap(props?.gap),
@@ -713,31 +711,45 @@ export class BlocksTransformer {
 
   makeHStack(
     props: Devvit.Blocks.StackProps | undefined,
+    transformContext: TransformContext,
     ...children: ReifiedBlockElementOrLiteral[]
   ): Block {
-    return this.makeStackBlock(BlockStackDirection.STACK_HORIZONTAL, props, children);
+    return this.makeStackBlock(
+      BlockStackDirection.STACK_HORIZONTAL,
+      props,
+      transformContext,
+      children
+    );
   }
 
   makeVStack(
     props: Devvit.Blocks.StackProps | undefined,
+    transformContext: TransformContext,
     ...children: ReifiedBlockElementOrLiteral[]
   ): Block {
-    return this.makeStackBlock(BlockStackDirection.STACK_VERTICAL, props, children);
+    return this.makeStackBlock(
+      BlockStackDirection.STACK_VERTICAL,
+      props,
+      transformContext,
+      children
+    );
   }
 
   makeZStack(
     props: Devvit.Blocks.StackProps | undefined,
+    transformContext: TransformContext,
     ...children: ReifiedBlockElementOrLiteral[]
   ): Block {
-    return this.makeStackBlock(BlockStackDirection.STACK_DEPTH, props, children);
+    return this.makeStackBlock(BlockStackDirection.STACK_DEPTH, props, transformContext, children);
   }
 
   makeText(
     props: Devvit.Blocks.TextProps | undefined,
+    transformContext: TransformContext,
     ...children: ReifiedBlockElementOrLiteral[]
   ): Block {
     const colors = this.getThemedColors(props?.color, props?.lightColor, props?.darkColor);
-    return this.makeBlock(BlockType.BLOCK_TEXT, props, {
+    return this.makeBlock(BlockType.BLOCK_TEXT, props, transformContext, {
       textConfig: {
         alignment: this.makeBlockAlignment(props?.alignment),
         color: colors?.light,
@@ -756,6 +768,7 @@ export class BlocksTransformer {
 
   makeButton(
     props: Devvit.Blocks.ButtonProps | undefined,
+    transformContext: TransformContext,
     ...children: ReifiedBlockElementOrLiteral[]
   ): Block {
     const textColors = this.getThemedColors(
@@ -763,7 +776,7 @@ export class BlocksTransformer {
       props?.lightTextColor,
       props?.darkTextColor
     );
-    return this.makeBlock(BlockType.BLOCK_BUTTON, props, {
+    return this.makeBlock(BlockType.BLOCK_BUTTON, props, transformContext, {
       buttonConfig: {
         buttonAppearance: this.makeBlockButtonAppearance(props?.appearance),
         // not available in all platforms yet
@@ -778,10 +791,13 @@ export class BlocksTransformer {
     });
   }
 
-  makeImage(props: Devvit.Blocks.ImageProps | undefined): Block | undefined {
+  makeImage(
+    props: Devvit.Blocks.ImageProps | undefined,
+    transformContext: TransformContext
+  ): Block | undefined {
     return (
       props &&
-      this.makeBlock(BlockType.BLOCK_IMAGE, props, {
+      this.makeBlock(BlockType.BLOCK_IMAGE, props, transformContext, {
         imageConfig: {
           description: props?.description,
           resizeMode: this.makeBlockImageResizeMode(props.resizeMode),
@@ -793,8 +809,11 @@ export class BlocksTransformer {
     );
   }
 
-  makeSpacer(props: Devvit.Blocks.SpacerProps | undefined): Block {
-    return this.makeBlock(BlockType.BLOCK_SPACER, props, {
+  makeSpacer(
+    props: Devvit.Blocks.SpacerProps | undefined,
+    transformContext: TransformContext
+  ): Block {
+    return this.makeBlock(BlockType.BLOCK_SPACER, props, transformContext, {
       spacerConfig: {
         size: this.makeBlockSpacerSize(props?.size),
         shape: this.makeBlockSpacerShape(props?.shape),
@@ -802,11 +821,14 @@ export class BlocksTransformer {
     });
   }
 
-  makeIcon(props: Devvit.Blocks.IconProps | undefined): Block | undefined {
+  makeIcon(
+    props: Devvit.Blocks.IconProps | undefined,
+    transformContext: TransformContext
+  ): Block | undefined {
     const colors = this.getThemedColors(props?.color, props?.lightColor, props?.darkColor);
     return (
       props &&
-      this.makeBlock(BlockType.BLOCK_ICON, props, {
+      this.makeBlock(BlockType.BLOCK_ICON, props, transformContext, {
         iconConfig: {
           icon: props.name,
           color: colors?.light,
@@ -817,10 +839,13 @@ export class BlocksTransformer {
     );
   }
 
-  makeAvatar(props: Devvit.Blocks.AvatarProps | undefined): Block | undefined {
+  makeAvatar(
+    props: Devvit.Blocks.AvatarProps | undefined,
+    transformContext: TransformContext
+  ): Block | undefined {
     return (
       props &&
-      this.makeBlock(BlockType.BLOCK_AVATAR, props, {
+      this.makeBlock(BlockType.BLOCK_AVATAR, props, transformContext, {
         avatarConfig: {
           thingId: props.thingId,
           size: this.makeBlockAvatarSize(props.size),
@@ -831,10 +856,13 @@ export class BlocksTransformer {
     );
   }
 
-  makeFullSnoo(props: Devvit.Blocks.FullSnooProps | undefined): Block | undefined {
+  makeFullSnoo(
+    props: Devvit.Blocks.FullSnooProps | undefined,
+    transformContext: TransformContext
+  ): Block | undefined {
     return (
       props &&
-      this.makeBlock(BlockType.BLOCK_FULLSNOO, props, {
+      this.makeBlock(BlockType.BLOCK_FULLSNOO, props, transformContext, {
         fullsnooConfig: {
           userId: props.userId,
           facing: this.makeBlockAvatarFacing(props.facing),
@@ -844,10 +872,13 @@ export class BlocksTransformer {
     );
   }
 
-  makeAnimation(props: Devvit.Blocks.AnimationProps | undefined): Block | undefined {
+  makeAnimation(
+    props: Devvit.Blocks.AnimationProps | undefined,
+    transformContext: TransformContext
+  ): Block | undefined {
     return (
       props &&
-      this.makeBlock(BlockType.BLOCK_ANIMATION, props, {
+      this.makeBlock(BlockType.BLOCK_ANIMATION, props, transformContext, {
         animationConfig: {
           type: this.makeBlockAnimationType(props.type),
           url: this.resolveAssetUrl(props.url),
@@ -863,10 +894,13 @@ export class BlocksTransformer {
     );
   }
 
-  makeWebView(props: Devvit.Blocks.WebViewProps | undefined): Block | undefined {
+  makeWebView(
+    props: Devvit.Blocks.WebViewProps | undefined,
+    transformContext: TransformContext
+  ): Block | undefined {
     return (
       props &&
-      this.makeBlock(BlockType.BLOCK_WEBVIEW, props, {
+      this.makeBlock(BlockType.BLOCK_WEBVIEW, props, transformContext, {
         webviewConfig: {
           url: this.resolveAssetUrl(props.url, { webview: true }),
           state: props.state,
@@ -878,13 +912,12 @@ export class BlocksTransformer {
   makeBlock(
     type: BlockType,
     props: Devvit.Blocks.BaseProps | undefined,
+    transformContext: TransformContext,
     config?: BlockConfig | undefined
   ): Block {
     return {
       type,
-      // TODO: remove once clients have all updated to handle sizes
-      size: this.makeBlockSize(props),
-      sizes: this.makeBlockSizes(props),
+      sizes: this.makeBlockSizes(props, transformContext.maxDimensions),
       config: config,
       actions: (props && this.makeActions(type, props)) ?? [],
       id: props?.id,
@@ -892,7 +925,7 @@ export class BlocksTransformer {
     };
   }
 
-  ensureRootBlock(b: Block): Block {
+  ensureRootBlock(b: Block, transformContext: TransformContext): Block {
     const block = b as Block;
 
     if ((block as Block).type === BlockType.BLOCK_ROOT) {
@@ -902,7 +935,7 @@ export class BlocksTransformer {
       return block;
     }
 
-    const root = this.wrapRoot(undefined, [block]);
+    const root = this.wrapRoot(undefined, transformContext, [block]);
 
     if (!root) {
       throw new Error('Could not create root block');

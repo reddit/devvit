@@ -27,6 +27,7 @@ import {
   BlockRadius,
   BlockRenderEventType,
   BlockRenderRequest,
+  BlockSizeUnit,
   BlockSpacerSize,
   BlockStackDirection,
   BlockTextOutline,
@@ -54,10 +55,11 @@ const commonPropsWithActions = {
 };
 
 const commonPropsTests = (ui: Block): void => {
-  expect(ui.size).not.toBeUndefined();
-  expect(ui.size?.width).toEqual(25);
-  expect(ui.size?.height).toEqual(50);
-  expect(ui.size?.grow).toBeTruthy();
+  expect(ui.sizes).toBeDefined();
+  // percent values will be converted to px
+  expect(ui.sizes?.width).toEqual({ value: { unit: 1, value: 72 } });
+  expect(ui.sizes?.height).toEqual({ value: { unit: 1, value: 160 } });
+  expect(ui.sizes?.grow).toBeTruthy();
 };
 
 const commonPropsTestsWithActions = (ui: Block): void => {
@@ -721,6 +723,107 @@ describe('BlocksTransformer (JSX -> Block)', () => {
       const img = await render(<image imageWidth={10} imageHeight={10} url={VALID_URL} />);
       expect(img?.config?.imageConfig?.width).toEqual(10);
       expect(img?.config?.imageConfig?.height).toEqual(10);
+    });
+  });
+
+  describe('makeBlockSizes', () => {
+    test('returns height and width pixels equal to max when values are 100% (without unit specified)', () => {
+      const transformer = new BlocksTransformer();
+      const blockSizes = transformer.makeBlockSizes(
+        { width: 100, height: 100 },
+        { width: 200, height: 200, scale: 1 }
+      );
+      expect(blockSizes?.height).toEqual({
+        max: undefined,
+        min: undefined,
+        value: {
+          unit: BlockSizeUnit.SIZE_UNIT_PIXELS,
+          value: 200,
+        },
+      });
+      expect(blockSizes?.width).toEqual({
+        max: undefined,
+        min: undefined,
+        value: {
+          unit: BlockSizeUnit.SIZE_UNIT_PIXELS,
+          value: 200,
+        },
+      });
+    });
+    test('returns height and width pixels equal to max when values are 100% (unit specified)', () => {
+      const transformer = new BlocksTransformer();
+      const blockSizes = transformer.makeBlockSizes(
+        { width: '100%', height: '100%' },
+        { width: 200, height: 200, scale: 1 }
+      );
+      expect(blockSizes?.height).toEqual({
+        max: undefined,
+        min: undefined,
+        value: {
+          unit: BlockSizeUnit.SIZE_UNIT_PIXELS,
+          value: 200,
+        },
+      });
+      expect(blockSizes?.width).toEqual({
+        max: undefined,
+        min: undefined,
+        value: {
+          unit: BlockSizeUnit.SIZE_UNIT_PIXELS,
+          value: 200,
+        },
+      });
+    });
+    test('returns unchanged height and width when already using pixels', () => {
+      const transformer = new BlocksTransformer();
+      const blockSizes = transformer.makeBlockSizes(
+        { width: '100px', height: '100px' },
+        { width: 200, height: 200, scale: 1 }
+      );
+      expect(blockSizes?.height).toEqual({
+        max: undefined,
+        min: undefined,
+        value: {
+          unit: BlockSizeUnit.SIZE_UNIT_PIXELS,
+          value: 100,
+        },
+      });
+      expect(blockSizes?.width).toEqual({
+        max: undefined,
+        min: undefined,
+        value: {
+          unit: BlockSizeUnit.SIZE_UNIT_PIXELS,
+          value: 100,
+        },
+      });
+    });
+    test('returns correct px values when maxHeight, minHeight, maxWidth, and minWidth are specified', () => {
+      const transformer = new BlocksTransformer();
+      const blockSizes = transformer.makeBlockSizes(
+        { minHeight: '50%', minWidth: '20%', maxHeight: '100%', maxWidth: '80%' },
+        { width: 200, height: 200, scale: 1 }
+      );
+      expect(blockSizes?.height).toEqual({
+        max: {
+          unit: 1,
+          value: 200,
+        },
+        min: {
+          unit: 1,
+          value: 100,
+        },
+        value: undefined,
+      });
+      expect(blockSizes?.width).toEqual({
+        max: {
+          unit: 1,
+          value: 160,
+        },
+        min: {
+          unit: 1,
+          value: 40,
+        },
+        value: undefined,
+      });
     });
   });
 });
