@@ -1,5 +1,4 @@
 import type { Hook } from '@oclif/core';
-import { Value } from '@devvit/protos';
 import { sendEvent } from '../../../util/metrics.js';
 
 const hook: Hook<'init'> = async function (options) {
@@ -21,11 +20,7 @@ const hook: Hook<'init'> = async function (options) {
     },
   };
 
-  await sendEvent(
-    Value.fromPartial({
-      structValue: event,
-    })
-  );
+  await sendEvent(event);
 };
 
 export default hook;

@@ -627,9 +627,7 @@ export default class Upload extends ProjectCommand {
   async #sendEventIfNotSent(): Promise<void> {
     if (!this.#eventSent) {
       this.#eventSent = true;
-      await sendEvent({
-        structValue: this.#event,
-      });
+      await sendEvent(this.#event);
     }
   }
 

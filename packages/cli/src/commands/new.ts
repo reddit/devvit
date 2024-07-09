@@ -23,6 +23,7 @@ import { exec as _exec } from 'node:child_process';
 import util from 'node:util';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import { sendEvent } from '../util/metrics.js';
+
 const exec = util.promisify(_exec);
 
 const templateResolver = new ProjectTemplateResolver();
@@ -341,9 +342,7 @@ export default class New extends DevvitCommand {
   async #sendEventIfNotSent(): Promise<void> {
     if (!this.#eventSent) {
       this.#eventSent = true;
-      await sendEvent({
-        structValue: this.#event,
-      });
+      await sendEvent(this.#event);
     }
   }
 
