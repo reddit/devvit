@@ -16,6 +16,8 @@ import {
   OnPostReportDefinition,
   OnPostSubmitDefinition,
   OnPostUpdateDefinition,
+  OnPostNsfwUpdateDefinition,
+  OnPostSpoilerUpdateDefinition,
 } from '@devvit/protos';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
@@ -165,6 +167,21 @@ export function registerTriggers(config: Config): void {
           createCombinedHandler('ModMail', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
+      case 'PostNsfwUpdate':
+        config.provides(OnPostNsfwUpdateDefinition);
+        extendDevvitPrototype(
+          'OnPostNsfwUpdate',
+          createCombinedHandler('PostNsfwUpdate', Devvit.triggerOnEventHandlers.get(event))
+        );
+        break;
+      case 'PostSpoilerUpdate':
+        config.provides(OnPostSpoilerUpdateDefinition);
+        extendDevvitPrototype(
+          'OnPostSpoilerUpdate',
+          createCombinedHandler('PostSpoilerUpdate', Devvit.triggerOnEventHandlers.get(event))
+        );
+        break;
+
       default:
         throw new Error(`Unknown trigger event: ${event}`);
     }

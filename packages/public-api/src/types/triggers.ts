@@ -31,6 +31,10 @@ export type AppUpgrade = 'AppUpgrade';
 export type ModActionTrigger = 'ModAction';
 /** The event name for when a mod mail is sent/received */
 export type ModMailTrigger = 'ModMail';
+/** The event name for when a post is marked/unmarked as nsfw*/
+export type PostNsfwUpdate = 'PostNsfwUpdate';
+/** The event name for when a post is marked/unmarked as spoiler*/
+export type PostSpoilerUpdate = 'PostSpoilerUpdate';
 
 /** Maps a TriggerEvent to a Protobuf message and type. */
 export type TriggerEventType = {
@@ -49,6 +53,8 @@ export type TriggerEventType = {
   AppUpgrade: { type: 'AppUpgrade' } & protos.AppUpgrade;
   ModAction: { type: 'ModAction' } & protos.ModAction;
   ModMail: { type: 'ModMail' } & protos.ModMail;
+  PostNsfwUpdate: { type: 'PostNsfwUpdate' } & protos.PostNsfwUpdate;
+  PostSpoilerUpdate: { type: 'PostSpoilerUpdate' } & protos.PostSpoilerUpdate;
 };
 
 export type TriggerEvent =
@@ -66,7 +72,9 @@ export type TriggerEvent =
   | AppInstall
   | AppUpgrade
   | ModActionTrigger
-  | ModMailTrigger;
+  | ModMailTrigger
+  | PostNsfwUpdate
+  | PostSpoilerUpdate;
 
 type TriggerResult = Promise<void> | void;
 
@@ -152,6 +160,16 @@ export type ModMailDefinition = {
   onEvent: TriggerOnEventHandler<protos.ModMail>;
 };
 
+export type PostNsfwUpdateDefinition = {
+  event: PostNsfwUpdate;
+  onEvent: TriggerOnEventHandler<protos.PostNsfwUpdate>;
+};
+
+export type PostSpoilerUpdateDefinition = {
+  event: PostSpoilerUpdate;
+  onEvent: TriggerOnEventHandler<protos.PostSpoilerUpdate>;
+};
+
 export type MultiTriggerDefinition<Event extends TriggerEvent> = {
   events: readonly Event[];
   onEvent: TriggerOnEventHandler<TriggerEventType[Event]>;
@@ -172,7 +190,9 @@ export type TriggerDefinition =
   | AppInstallDefinition
   | AppUpgradeDefinition
   | ModActionDefinition
-  | ModMailDefinition;
+  | ModMailDefinition
+  | PostSpoilerUpdateDefinition
+  | PostNsfwUpdateDefinition;
 
 export type OnTriggerRequest =
   | protos.PostFlairUpdate
@@ -189,4 +209,6 @@ export type OnTriggerRequest =
   | protos.AppInstall
   | protos.AppUpgrade
   | protos.ModAction
-  | protos.ModMail;
+  | protos.ModMail
+  | protos.PostNsfwUpdate
+  | protos.PostSpoilerUpdate;
