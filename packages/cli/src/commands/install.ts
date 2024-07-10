@@ -194,4 +194,5 @@ const nutritionCategoryToString: Readonly<Record<NutritionCategory, string>> = {
   [NutritionCategory.SCHEDULER]: 'Schedule itself for later execution.',
   [NutritionCategory.UI]: 'Appear in subreddit, post, and comment menu entries, and custom posts.',
   [NutritionCategory.UNRECOGNIZED]: 'Use unknown permissions.',
+  [NutritionCategory.WEBVIEW]: 'Embed webapps to display rich content.',
 };
