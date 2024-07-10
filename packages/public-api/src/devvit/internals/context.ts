@@ -13,14 +13,17 @@ export function getContextFromMetadata(
   const subredditId = metadata[Header.Subreddit]?.values[0];
   assertNonNull<string | undefined>(subredditId, 'subreddit is missing from Context');
 
+  // devvit-app-user is only available in the remote runtime.
   const appAccountId = metadata[Header.AppUser]?.values[0];
-  assertNonNull<string | undefined>(appAccountId, 'appAccountId is missing from Context');
 
   const userId = metadata[Header.User]?.values[0];
   const debug = parseDebug(metadata);
 
   return {
-    appAccountId,
+    get appAccountId() {
+      assertNonNull<string | undefined>(appAccountId, 'appAccountId is missing from Context');
+      return appAccountId;
+    },
     subredditId,
     userId,
     postId,
