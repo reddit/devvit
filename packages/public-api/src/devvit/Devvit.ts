@@ -657,6 +657,7 @@ export class Devvit extends Actor {
     super(config);
 
     Devvit.#assets = config.assets ?? {};
+    Devvit.#webviewAssets = config.webviewAssets ?? {};
 
     for (const fullName in Devvit.#uses) {
       const use = Devvit.#uses[fullName];
@@ -695,9 +696,6 @@ export class Devvit extends Actor {
     if (Devvit.#triggerOnEventHandlers.size > 0) {
       registerTriggers(config);
     }
-
-    Devvit.#assets = config.assets ?? {};
-    Devvit.#webviewAssets = config.webviewAssets ?? {};
   }
 }
 
