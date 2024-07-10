@@ -6,7 +6,7 @@ export default class Metrics extends DevvitCommand {
   static override description = 'Display the currently logged in reddit.com user';
 
   static override args = {
-    appName: Args.string({
+    status: Args.string({
       description: 'Do you want to turn on or off metrics collection?',
       required: true,
       options: ['on', 'off'],
@@ -16,7 +16,7 @@ export default class Metrics extends DevvitCommand {
   async run(): Promise<void> {
     const { args } = await this.parse(Metrics);
 
-    if (args.appName === 'on') {
+    if (args.status === 'on') {
       await optInMetrics();
       this.log('Metrics are now enabled');
     } else {

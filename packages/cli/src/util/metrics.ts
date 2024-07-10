@@ -49,8 +49,16 @@ export async function getTelemetrySessionId(): Promise<string> {
   return sessionId;
 }
 
-export async function sendEvent(event: Value['structValue']): Promise<void> {
-  const shouldTrack = await isMetricsEnabled();
+/**
+ * Track telemetry event
+ * @param event event object
+ * @param force boolean, used to track `devvit metrics on`
+ */
+export async function sendEvent(
+  event: Value['structValue'],
+  force: boolean = false
+): Promise<void> {
+  const shouldTrack = force || (await isMetricsEnabled());
   if (!shouldTrack) {
     return;
   }
