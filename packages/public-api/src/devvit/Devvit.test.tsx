@@ -22,6 +22,32 @@ const Boxed: Devvit.BlockComponent = () => {
   );
 };
 
+describe('configure', () => {
+  test('should throw error if no config is provided', () => {
+    expect(() => Devvit.realtimePlugin).toThrowError(/realtime is not enabled/i);
+  });
+
+  test('should configure plugins', () => {
+    Devvit.configure({
+      realtime: true,
+    });
+
+    expect(() => Devvit.realtimePlugin).toBeDefined();
+  });
+
+  test('should configure additional plugins without overriding previous configs', () => {
+    Devvit.configure({
+      payments: true,
+    });
+
+    Devvit.configure({
+      redditAPI: true,
+    });
+
+    expect(() => Devvit.paymentsPlugin).toBeDefined();
+  });
+});
+
 describe('components type system', () => {
   test('should not bork out', async () => {
     <Boxed />;

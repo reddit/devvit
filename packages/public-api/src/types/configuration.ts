@@ -18,4 +18,9 @@ export type Configuration = {
   modLog?: PluginSettings | boolean;
   /** Allows your app to use the Realtime Plugin */
   realtime?: PluginSettings | boolean;
+  /**
+   * Allows your app to use the Payments Plugin
+   * @internal
+   */
+  payments?: boolean;
 };

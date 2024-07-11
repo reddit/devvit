@@ -1,4 +1,6 @@
 import * as protos from '@devvit/protos';
+import type { PaymentsService } from '@devvit/protos/payments.js';
+import { PaymentsServiceDefinition } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
@@ -69,7 +71,8 @@ type PluginType =
   | protos.MediaService
   | protos.PostCollections
   | protos.RedditAPIV2
-  | protos.Realtime;
+  | protos.Realtime
+  | PaymentsService;
 
 /**
  * Home for debug flags, settings, and other information. Any type removals
@@ -128,7 +131,7 @@ export class Devvit extends Actor {
    * ```
    */
   static configure(config: Configuration): void {
-    this.#config = config;
+    this.#config = { ...this.#config, ...config };
 
     if (pluginIsEnabled(config.http)) {
       this.#use(protos.HTTPDefinition);
@@ -168,6 +171,10 @@ export class Devvit extends Actor {
 
     if (pluginIsEnabled(config.realtime)) {
       this.#use(protos.RealtimeDefinition);
+    }
+
+    if (pluginIsEnabled(config.payments)) {
+      this.#use(PaymentsServiceDefinition);
     }
   }
 
@@ -602,6 +609,19 @@ export class Devvit extends Actor {
     }
 
     return realtime as protos.Realtime;
+  }
+
+  /** @internal */
+  static get paymentsPlugin(): PaymentsService {
+    const payments = this.#pluginClients[PaymentsServiceDefinition.fullName];
+
+    if (!payments) {
+      throw new Error(
+        'Payments is not enabled. You can enable it by passing `payments: true` to `Devvit.configure`'
+      );
+    }
+
+    return payments as PaymentsService;
   }
 
   /** @internal */
