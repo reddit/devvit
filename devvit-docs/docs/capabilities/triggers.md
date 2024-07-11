@@ -25,6 +25,8 @@ Event triggers let your app automatically respond to a user’s action. For exam
 - PostCreate
 - PostDelete
 - PostFlairUpdate
+- PostNsfwUpdate
+- PostSpoilerUpdate
 - PostReport
 - PostSubmit
 - PostUpdate
