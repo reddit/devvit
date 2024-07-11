@@ -3,7 +3,7 @@ import { readFile, access } from 'node:fs/promises';
 import { ACTOR_SRC_DIR } from '@devvit/shared-types/constants.js';
 import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { type Product } from '@devvit/shared-types/payments/Product.js';
-import { validateProductsJson } from '@devvit/payments/lib/validator.js';
+import { validateProductsJson } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
 
 const PRODUCTS_JSON_FILE = 'products.json';
 
