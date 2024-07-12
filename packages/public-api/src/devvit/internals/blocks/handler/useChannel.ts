@@ -132,8 +132,10 @@ class ChannelHook<Message extends JSONValue> implements UseChannelResult<Message
 export function useChannel<Message extends JSONValue>(
   opts: Readonly<ChannelOptions<Message>>
 ): UseChannelResult<Message> {
-  if (!opts.name || /[^a-zA-Z0-9]/.test(opts.name))
-    throw Error('useChannel error: channel names must be nonempty and alphanumeric');
+  if (!opts.name || /[^a-zA-Z0-9_]/.test(opts.name))
+    throw Error(
+      `useChannel error: The name "${opts.name}" you provided for the hook is invalid. Valid names can only contain letters, numbers, and underscores (_).`
+    );
 
   // allow RealtimeEffectHandler to compute hook ID. maintain compatibility with
   // realtimeChannelToHookID().

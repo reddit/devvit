@@ -32,7 +32,7 @@ for (const channel of ['', 'Channel.', 'Channel-']) {
 
     const handler = new BlocksHandler(Component);
     await expect(handler.handle({ events: [] }, meta)).rejects.toThrow(
-      'useChannel error: channel names must be nonempty and alphanumeric'
+      `useChannel error: The name "${channel}" you provided for the hook is invalid. Valid names can only contain letters, numbers, and underscores (_).`
     );
   });
 }
