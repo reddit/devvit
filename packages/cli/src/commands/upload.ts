@@ -94,6 +94,12 @@ export default class Upload extends ProjectCommand {
       required: false,
       hidden: true,
     }),
+    ignoreOutdated: Flags.boolean({
+      name: 'ignoreOutdated',
+      description: 'Skip CLI version check. The apps that you upload may not work as expected',
+      required: false,
+      hidden: false,
+    }),
     disableTypecheck: Flags.boolean({
       char: 't',
       description: 'Disable typechecking before uploading',

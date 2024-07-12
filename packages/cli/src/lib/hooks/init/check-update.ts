@@ -1,6 +1,5 @@
 import type { Hook } from '@oclif/core';
 import { ux } from '@oclif/core';
-import inquirer from 'inquirer';
 import fetch from 'node-fetch';
 import type { SemVer } from 'semver';
 import semver from 'semver';
@@ -11,44 +10,44 @@ const NPM_REGISTRY_DIST_TAGS_URL = 'https://registry.npmjs.org/-/package/@devvit
 
 const COMMANDS_TO_CHECK_UPDATES = [UploadCommand.id];
 
+// Check updates before command execution
 const hook: Hook<'init'> = async function (options) {
-  // Check updates
-  if (COMMANDS_TO_CHECK_UPDATES.includes(options.id ?? '')) {
-    let latest;
-    try {
-      ux.action.start('Checking for updates...');
-      latest = await fetchLatestPublishedVersion();
-      ux.action.stop('✅');
-    } catch (e) {
-      this.warn(
-        'There was an error checking for devvit updates. The command will proceed, but you may be using an outdated version.'
-      );
-      // don't want to block the user if they are offline
-      return;
-    }
+  // Only check version for specified commands
+  if (!COMMANDS_TO_CHECK_UPDATES.includes(options.id ?? '')) {
+    return;
+  }
 
-    const current = semver.parse(options.config.version) ?? semver.parse('0.0.0')!;
+  // Ignore version check if --ignoreOutdated is applied
+  const canBypassVersionCheck = options.argv.includes(
+    `--${UploadCommand.flags.ignoreOutdated.name}`
+  );
+  if (canBypassVersionCheck) {
+    return;
+  }
 
-    if (shouldEnforceUpdate(latest, current)) {
-      this.warn(
-        `The version of devvit you are using is out of date. The apps that you upload may not work as expected. Please run \`npm i -g devvit\` to update.`
-      );
-      const { proceed } = await inquirer.prompt<{ proceed: boolean }>([
-        {
-          name: 'proceed',
-          message: 'Do you want to proceed without upgrading devvit?',
-          type: 'confirm',
-          default: false,
-        },
-      ]);
-      if (!proceed) {
-        this.error('Please run `npm i -g devvit` to update.');
-      }
-    } else if (shouldWarnUpdate(latest, current)) {
-      this.warn(
-        `A new version of devvit is available: ${latest}. You can run \`npm i -g devvit\` to update.`
-      );
-    }
+  let latest: SemVer;
+  try {
+    ux.action.start('Checking for updates...');
+    latest = await fetchLatestPublishedVersion();
+    ux.action.stop('✅');
+  } catch (e) {
+    this.warn(
+      'There was an error checking for devvit updates. The command will proceed, but you may be using an outdated version.'
+    );
+    // don't want to block the user if they are offline
+    return;
+  }
+
+  const current = semver.parse(options.config.version) ?? semver.parse('0.0.0')!;
+
+  if (shouldEnforceUpdate(latest, current)) {
+    this.error(
+      `The version of devvit you are using is out of date. The apps that you upload may not work as expected.\nPlease run \`npm i -g devvit\` to update.`
+    );
+  } else if (shouldWarnUpdate(latest, current)) {
+    this.warn(
+      `A new version of devvit is available: ${latest}. You can run \`npm i -g devvit\` to update.`
+    );
   }
 };
 
@@ -76,6 +75,7 @@ export function shouldEnforceUpdate(latest: SemVer, current: SemVer): boolean {
     includePrerelease: true,
   });
 }
+
 // endregion
 
 export default hook;
