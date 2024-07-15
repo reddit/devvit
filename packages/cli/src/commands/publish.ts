@@ -16,7 +16,11 @@ import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
 import chalk from 'chalk';
 import open from 'open';
-import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
+import {
+  createAppClient,
+  createAppVersionClient,
+  createAppPublishRequestClient,
+} from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
@@ -44,6 +48,7 @@ export default class Publish extends ProjectCommand {
 
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();
+  readonly #appPRClient = createAppPublishRequestClient();
 
   async run(): Promise<void> {
     const { args } = await this.parse(Publish);
@@ -55,6 +60,13 @@ export default class Publish extends ProjectCommand {
     ux.action.start(`Finding ${appWithVersion}...`);
     const { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);
     ux.action.stop(`✅`);
+
+    const devvitVersion = new DevvitVersion(
+      appVersion.majorVersion,
+      appVersion.minorVersion,
+      appVersion.patchVersion,
+      appVersion.prereleaseVersion
+    );
 
     if (!appInfo.app) {
       this.error('There was an error retrieving the app info.');
@@ -70,9 +82,11 @@ export default class Publish extends ProjectCommand {
 
     const appCreatesCustomPost = await this.#checkIfAppCreatesCustomPost(bundle);
     if (appCreatesCustomPost) {
-      this.error(
-        'Custom post apps need to be approved before they can be published. Please use the app review form to submit your app.'
+      this.log(
+        "Custom post apps need to be approved before they can be published, so I'll submit your app for review!"
       );
+      await this.#submitForReview(appVersion.id, devvitVersion);
+      return;
     }
 
     const appUsesFetch = await this.#checkIfAppUsesFetch(bundle);
@@ -82,14 +96,7 @@ export default class Publish extends ProjectCommand {
       await this.checkAppVersionTermsAndConditions(appInfo.app, appDetailsUrl);
     }
 
-    const devvitVersion = new DevvitVersion(
-      appVersion.majorVersion,
-      appVersion.minorVersion,
-      appVersion.patchVersion,
-      appVersion.prereleaseVersion
-    );
-
-    if (appVersion.visibility === VersionVisibility.UNLISTED) {
+    if (appVersion.visibility !== VersionVisibility.PRIVATE) {
       this.log(
         `Version "${devvitVersion}" has already been published.\n\n✨ Visit ${chalk.cyan.bold(
           `${appDetailsUrl}`
@@ -120,6 +127,8 @@ export default class Publish extends ProjectCommand {
     try {
       const appVersionInfo = await this.#appVersionClient.Update(appVersionUpdateRequest);
       ux.action.stop(`Success! ✅`);
+
+      await this.#submitForReview(appVersionId, devvitVersion);
 
       return appVersionInfo;
     } catch (error) {
@@ -168,4 +177,18 @@ export default class Publish extends ProjectCommand {
       process.exit();
     }
   };
+
+  async #submitForReview(appVersionId: string, devvitVersion: DevvitVersion): Promise<void> {
+    ux.action.start(`Submitting version "${devvitVersion.toString()}" for review...`);
+    try {
+      await this.#appPRClient.Submit({ appVersionId });
+      ux.action.stop(`Success! ✅ You'll receive a DM when your app has been reviewed.`);
+      return;
+    } catch (err) {
+      if (err && typeof err === 'object' && 'code' in err && err.code === 'already_exists') {
+        this.error('This version has already been submitted for review.');
+      }
+      this.error(StringUtil.caughtToString(err));
+    }
+  }
 }

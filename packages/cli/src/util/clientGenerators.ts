@@ -30,6 +30,8 @@ import { DEVVIT_GATEWAY_URL, DEVVIT_PORTAL_API } from './config.js';
 import { GrpcWebRpc } from './grpc-web-rpc.js';
 import { NodeFetchRPC } from './node-fetch-twirp-rpc.js';
 import { getAccessToken } from './auth.js';
+import type { DevPortalAppPublishRequestClient } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
+import { DevPortalAppPublishRequestClientJSON } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 
 const APP_PATH = 'app';
 const APP_VERSION_PATH = 'appVersion';
@@ -38,6 +40,7 @@ const FEEDBACK_PATH = 'feedback';
 const WAITLIST_PATH = 'waitlist';
 const APP_SETTINGS_PATH = 'app-settings';
 const EVENTS_PATH = 'events';
+const PUBLISH_REQUEST_PATH = 'app-publish-request';
 
 export function createAppClient(): AppClient {
   return new AppClientJSON(
@@ -125,6 +128,16 @@ export function createEventsClient(): EventsClient {
       baseUrl: `${DEVVIT_PORTAL_API}/${EVENTS_PATH}`,
       getToken: getAccessToken,
       isTokenOptional: true,
+      headers: getHeaders(),
+    })
+  );
+}
+
+export function createAppPublishRequestClient(): DevPortalAppPublishRequestClient {
+  return new DevPortalAppPublishRequestClientJSON(
+    NodeFetchRPC({
+      baseUrl: `${DEVVIT_PORTAL_API}/${PUBLISH_REQUEST_PATH}`,
+      getToken: getAccessToken,
       headers: getHeaders(),
     })
   );
