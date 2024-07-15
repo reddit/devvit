@@ -12,11 +12,6 @@ export type AsyncOptions = {
    * The data loader will re-run if the value of `depends` changes.
    */
   depends?: JSONValue;
-
-  /**
-   * If `enabled` is false, the data loader will not run.
-   */
-  enabled?: boolean;
 };
 
 type LoadState = 'initial' | 'loading' | 'loaded' | 'error' | 'disabled';
@@ -46,9 +41,6 @@ class AsyncHook<S extends JSONValue> implements Hook {
     this.#invalidate = params.invalidate;
     this.#ctx = params.context;
     this.#localDepends = options.depends ?? null;
-    if (!(options.enabled ?? true)) {
-      this.state.load_state = 'disabled';
-    }
   }
 
   /**

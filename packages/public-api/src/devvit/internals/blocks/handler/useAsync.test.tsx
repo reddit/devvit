@@ -25,8 +25,7 @@ const buttonRef: HookRef = {};
 
 const App: Devvit.BlockComponent = () => {
   const [depends, setDepends] = useState(1);
-  const [enabled, _] = useState(true);
-  const { data, error, loading } = captureHookRef(useAsync(loader, { depends, enabled }), asyncRef);
+  const { data, error, loading } = captureHookRef(useAsync(loader, { depends }), asyncRef);
   return (
     <hstack>
       <text>{loading ? 'loading' : data || (error ?? 'none').toString()}</text>
@@ -108,14 +107,6 @@ describe('regressions', () => {
     expect(response.events.length).toEqual(0);
   });
 
-  test('enabled doesnt do anything', async () => {
-    const handler = new BlocksHandler(App);
-    const request: UIRequest = structuredClone(EmptyRequest);
-    request.state = { 'App.useState-1': { value: false } };
-    const response = await handler.handle(request, mockMetadata);
-    expect(response.events).toEqual([]);
-  });
-
   test('event-driven state changes are reflected', async () => {
     const handler = new BlocksHandler(App);
     let request: UIRequest = EmptyRequest;
@@ -149,7 +140,7 @@ describe('regressions', () => {
     response = await handler.handle(request, mockMetadata);
     expect(response.state).toMatchInlineSnapshot(`
       {
-        "App.useAsync-2": {
+        "App.useAsync-1": {
           "data": undefined,
           "depends": 1,
           "error": {
@@ -186,7 +177,7 @@ describe('invalidation', () => {
     let response = await handler.handle(request, mockMetadata);
     expect(response.state).toMatchInlineSnapshot(`
       {
-        "App.useAsync-2": {
+        "App.useAsync-1": {
           "data": null,
           "depends": 1,
           "error": null,
@@ -194,9 +185,6 @@ describe('invalidation', () => {
         },
         "App.useState-0": {
           "value": 1,
-        },
-        "App.useState-1": {
-          "value": true,
         },
         "__cache": {},
       }
@@ -236,7 +224,7 @@ describe('invalidation', () => {
     response = await handler.handle(request, mockMetadata);
     expect(response.state).toMatchInlineSnapshot(`
       {
-        "App.useAsync-2": {
+        "App.useAsync-1": {
           "data": "hi world!",
           "depends": 1,
           "error": null,

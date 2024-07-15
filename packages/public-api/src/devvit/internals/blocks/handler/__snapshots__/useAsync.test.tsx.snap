@@ -11,7 +11,7 @@ exports[`regressions > loading null doesnt loop 3`] = `
 
 exports[`when circuit-breaking: false > receiving request 1`] = `
 {
-  "App.useAsync-2": {
+  "App.useAsync-1": {
     "data": null,
     "depends": 1,
     "error": null,
@@ -19,9 +19,6 @@ exports[`when circuit-breaking: false > receiving request 1`] = `
   },
   "App.useState-0": {
     "value": 1,
-  },
-  "App.useState-1": {
-    "value": true,
   },
   "__cache": {},
 }
@@ -38,7 +35,7 @@ exports[`when circuit-breaking: false > receiving response 1`] = `
 
 exports[`when circuit-breaking: true > receiving request 1`] = `
 {
-  "App.useAsync-2": {
+  "App.useAsync-1": {
     "data": null,
     "depends": 1,
     "error": null,
@@ -46,9 +43,6 @@ exports[`when circuit-breaking: true > receiving request 1`] = `
   },
   "App.useState-0": {
     "value": 1,
-  },
-  "App.useState-1": {
-    "value": true,
   },
   "__cache": {},
 }
