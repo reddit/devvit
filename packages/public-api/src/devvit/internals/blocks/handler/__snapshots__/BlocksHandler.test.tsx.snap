@@ -30,56 +30,6 @@ exports[`BlocksHandler > actions handler > should not call the action handler on
             },
             "id": undefined,
             "key": undefined,
-            "size": undefined,
-            "sizes": undefined,
-            "type": 3,
-          },
-        ],
-        "height": 320,
-      },
-    },
-    "id": undefined,
-    "key": undefined,
-    "size": undefined,
-    "sizes": undefined,
-    "type": 0,
-  },
-  "effects": [],
-  "events": [],
-  "state": {
-    "__cache": {},
-  },
-}
-`;
-
-exports[`BlocksHandler > actions handler > should not call the action handler on initial render 2`] = `
-{
-  "blocks": {
-    "actions": [],
-    "config": {
-      "rootConfig": {
-        "children": [
-          {
-            "actions": [
-              {
-                "data": {},
-                "id": "component.button.onPress",
-                "type": 0,
-              },
-            ],
-            "config": {
-              "buttonConfig": {
-                "buttonAppearance": undefined,
-                "buttonSize": undefined,
-                "disabled": undefined,
-                "icon": undefined,
-                "text": "Click me",
-                "textColor": undefined,
-                "textColors": undefined,
-              },
-            },
-            "id": undefined,
-            "key": undefined,
             "sizes": undefined,
             "type": 3,
           },
@@ -101,77 +51,6 @@ exports[`BlocksHandler > actions handler > should not call the action handler on
 `;
 
 exports[`BlocksHandler > function components > should pass children 1`] = `
-{
-  "blocks": {
-    "actions": [],
-    "config": {
-      "rootConfig": {
-        "children": [
-          {
-            "actions": [],
-            "config": {
-              "stackConfig": {
-                "alignment": undefined,
-                "backgroundColor": undefined,
-                "backgroundColors": undefined,
-                "border": undefined,
-                "children": [
-                  {
-                    "actions": [],
-                    "config": {
-                      "textConfig": {
-                        "alignment": undefined,
-                        "color": undefined,
-                        "colors": undefined,
-                        "outline": undefined,
-                        "overflow": 1,
-                        "selectable": undefined,
-                        "size": undefined,
-                        "style": undefined,
-                        "text": "hi world",
-                        "weight": undefined,
-                        "wrap": undefined,
-                      },
-                    },
-                    "id": undefined,
-                    "key": "0",
-                    "size": undefined,
-                    "sizes": undefined,
-                    "type": 2,
-                  },
-                ],
-                "cornerRadius": undefined,
-                "direction": 0,
-                "gap": undefined,
-                "padding": undefined,
-                "reverse": undefined,
-              },
-            },
-            "id": undefined,
-            "key": undefined,
-            "size": undefined,
-            "sizes": undefined,
-            "type": 1,
-          },
-        ],
-        "height": 320,
-      },
-    },
-    "id": undefined,
-    "key": undefined,
-    "size": undefined,
-    "sizes": undefined,
-    "type": 0,
-  },
-  "effects": [],
-  "events": [],
-  "state": {
-    "__cache": {},
-  },
-}
-`;
-
-exports[`BlocksHandler > function components > should pass children 2`] = `
 {
   "blocks": {
     "actions": [],
@@ -240,56 +119,6 @@ exports[`BlocksHandler > function components > should pass children 2`] = `
 `;
 
 exports[`BlocksHandler > transformation > should inject a root element 1`] = `
-{
-  "blocks": {
-    "actions": [],
-    "config": {
-      "rootConfig": {
-        "children": [
-          {
-            "actions": [
-              {
-                "data": {},
-                "id": "component.button.onPress",
-                "type": 0,
-              },
-            ],
-            "config": {
-              "buttonConfig": {
-                "buttonAppearance": undefined,
-                "buttonSize": undefined,
-                "disabled": undefined,
-                "icon": undefined,
-                "text": "Click me",
-                "textColor": undefined,
-                "textColors": undefined,
-              },
-            },
-            "id": undefined,
-            "key": undefined,
-            "size": undefined,
-            "sizes": undefined,
-            "type": 3,
-          },
-        ],
-        "height": 320,
-      },
-    },
-    "id": undefined,
-    "key": undefined,
-    "size": undefined,
-    "sizes": undefined,
-    "type": 0,
-  },
-  "effects": [],
-  "events": [],
-  "state": {
-    "__cache": {},
-  },
-}
-`;
-
-exports[`BlocksHandler > transformation > should inject a root element 2`] = `
 {
   "blocks": {
     "actions": [],
