@@ -16,6 +16,7 @@ import {
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
+import { PaymentProcessorDefinition } from '@devvit/protos/payments.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
   ASSET_DIRNAME,
@@ -447,6 +448,17 @@ export default class Upload extends ProjectCommand {
     for (const bundle of bundles) {
       bundle.assetIds = assetMap ?? {};
       bundle.webviewAssetIds = webViewAssetMap ?? {};
+
+      // check that if products were detected, that we are providing the `PaymentsProcessor` actor
+      const hasProducts = bundle.paymentsConfig?.products != null;
+      const providesPaymentProcessor = bundle.dependencies?.provides.find(
+        (prv) => prv.definition?.fullName === PaymentProcessorDefinition.fullName
+      );
+      if (hasProducts && !providesPaymentProcessor) {
+        this.error(
+          'You have a `products.json` with products, but your app does not handle payment processing of those products. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation to enable the payments feature.'
+        );
+      }
     }
 
     // Actually create the app version
