@@ -450,7 +450,7 @@ export default class Upload extends ProjectCommand {
       bundle.webviewAssetIds = webViewAssetMap ?? {};
 
       // check that if products were detected, that we are providing the `PaymentsProcessor` actor
-      const hasProducts = bundle.paymentsConfig?.products != null;
+      const hasProducts = Object.values(bundle.paymentsConfig?.products ?? {}).length > 0;
       const providesPaymentProcessor = bundle.dependencies?.provides.find(
         (prv) => prv.definition?.fullName === PaymentProcessorDefinition.fullName
       );

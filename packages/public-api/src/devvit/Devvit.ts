@@ -113,6 +113,8 @@ export class Devvit extends Actor {
   > = new Map();
   static #webviewAssets: AssetMap = {};
 
+  static #additionallyProvides: protos.Definition[] = [];
+
   /**
    * To use certain APIs and features of Devvit, you must enable them using this function.
    *
@@ -426,6 +428,15 @@ export class Devvit extends Actor {
     return Devvit;
   }
 
+  /**
+   * @internal
+   * utility static method to register additional actor types without exposing an explicit
+   * registration hook such as `addTrigger` or `addMenuItem`
+   */
+  static provide(def: protos.Definition): void {
+    this.#additionallyProvides.push(def);
+  }
+
   /** @internal */
   static #uses: {
     [fullName: protos.Definition['fullName']]: {
@@ -715,6 +726,10 @@ export class Devvit extends Actor {
 
     if (Devvit.#triggerOnEventHandlers.size > 0) {
       registerTriggers(config);
+    }
+
+    for (const provides of Devvit.#additionallyProvides) {
+      config.provides(provides);
     }
   }
 }
