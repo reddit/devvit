@@ -19,6 +19,11 @@ export type TxClientLike = {
    * @arg {} keys - given keys to be watched
    */
   watch(...keys: string[]): Promise<TxClientLike>;
+  /**
+   * Flushes all the previously watched keys for a transaction.
+   * If you call EXEC or DISCARD, there's no need to manually call UNWATCH.
+   * https://redis.io/commands/unwatch/
+   */
   unwatch(): Promise<TxClientLike>;
   /**
    * Get the value of key. If the key does not exist the special value nil is returned.
