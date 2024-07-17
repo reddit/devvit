@@ -5,12 +5,14 @@ const { themes } = require('prism-react-renderer');
 const lightCodeTheme = themes.github;
 const darkCodeTheme = themes.dracula;
 
+const baseUrl = process.env.DOCUSAURUS_BASE_URL ?? '/';
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Reddit for Developers',
   tagline: 'An app for anything',
   url: 'https://developers.reddit.com',
-  baseUrl: process.env.DOCUSAURUS_BASE_URL ?? '/',
+  baseUrl,
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/orangered_icon_devvit_fill.svg',
@@ -30,6 +32,9 @@ const config = {
       'data-project-logo':
         'https://upload.wikimedia.org/wikipedia/en/thumb/b/bd/Reddit_Logo_Icon.svg/1200px-Reddit_Logo_Icon.svg.png',
       async: true,
+    },
+    {
+      src: `${baseUrl}events.js`,
     },
   ],
 
