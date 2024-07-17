@@ -1,14 +1,12 @@
-window.sendV2Event = async (event) => {
+window.sendV2Event = (event) => {
   const EVENT_ENDPOINT = '/api/events/devvit.dev_portal.Events/SendEvent';
 
-  let csrfToken = undefined;
-  try {
-    // cookieStore exists, I swear! And if it doesn't, we're in a try/catch anyways.
-    // eslint-disable-next-line no-undef
-    csrfToken = (await cookieStore.get('csrf_token')).value;
-  } catch {
-    // No csrf token found; continue with undefined
-  }
+  // I hate it but this is the official way to get a cookie from JavaScript
+  // https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie#example_2_get_a_sample_cookie_named_test2
+  const csrfToken = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('csrf_token='))
+    ?.split('=')[1];
 
   void fetch(EVENT_ENDPOINT, {
     method: 'POST',
