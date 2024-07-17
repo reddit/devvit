@@ -1,10 +1,20 @@
-window.sendV2Event = function (event) {
+window.sendV2Event = async (event) => {
   const EVENT_ENDPOINT = '/api/events/devvit.dev_portal.Events/SendEvent';
+
+  let csrfToken = undefined;
+  try {
+    // cookieStore exists, I swear! And if it doesn't, we're in a try/catch anyways.
+    // eslint-disable-next-line no-undef
+    csrfToken = (await cookieStore.get('csrf_token')).value;
+  } catch {
+    // No csrf token found; continue with undefined
+  }
 
   void fetch(EVENT_ENDPOINT, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-Csrftoken': csrfToken,
     },
     body: JSON.stringify({
       structValue: event,
