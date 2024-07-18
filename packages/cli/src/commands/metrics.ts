@@ -3,7 +3,7 @@ import { Args } from '@oclif/core';
 import { optInMetrics, optOutMetrics } from '../util/metrics.js';
 
 export default class Metrics extends DevvitCommand {
-  static override description = 'Display the currently logged in reddit.com user';
+  static override description = 'Turn CLI metrics collection on or off';
 
   static override args = {
     status: Args.string({
