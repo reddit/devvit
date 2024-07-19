@@ -863,7 +863,7 @@ export class Post {
     this.#ignoringReports = false;
   }
 
-  async getAuthor(): Promise<User> {
+  async getAuthor(): Promise<User | undefined> {
     return User.getByUsername(this.#authorName, this.#metadata);
   }
 

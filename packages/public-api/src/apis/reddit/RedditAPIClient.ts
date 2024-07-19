@@ -38,8 +38,8 @@ import type {
   SendPrivateMessageOptions,
   SetPostFlairOptions,
   SetUserFlairOptions,
-  SubredditLeaderboard,
   SubmitPostOptions,
+  SubredditLeaderboard,
   UpdatePageSettingsOptions,
   UpdateWikiPageOptions,
   Vault,
@@ -61,9 +61,9 @@ import {
   Widget,
   WikiPage,
   getModerationLog,
+  getSubredditLeaderboard,
   getVaultByAddress,
   getVaultByUserId,
-  getSubredditLeaderboard,
 } from './models/index.js';
 
 type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;
@@ -305,13 +305,17 @@ export class RedditAPIClient {
    * Gets a {@link User} object by username
    *
    * @param username - The username of the user omitting the u/. e.g. 'devvit'
-   * @returns A Promise that resolves to a User object.
+   * @returns A Promise that resolves to a User object or undefined if user is
+   *          not found (user doesn't exist, account suspended, etc).
    * @example
    * ```ts
    * const user = await reddit.getUserByUsername('devvit');
+   * if (user) {
+   *   console.log(user)
+   * }
    * ```
    */
-  getUserByUsername(username: string): Promise<User> {
+  getUserByUsername(username: string): Promise<User | undefined> {
     return User.getByUsername(username, this.#metadata);
   }
 

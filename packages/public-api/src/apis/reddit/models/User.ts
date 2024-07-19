@@ -350,21 +350,14 @@ export class User {
   }
 
   /** @internal */
-  static async getByUsername(username: string, metadata: Metadata | undefined): Promise<User> {
+  static async getByUsername(
+    username: string,
+    metadata: Metadata | undefined
+  ): Promise<User | undefined> {
     const client = Devvit.redditAPIPlugins.Users;
-
-    const response = await client.UserAbout(
-      {
-        username,
-      },
-      metadata
-    );
-
-    if (!response.data?.id) {
-      throw new Error('failed to get user');
-    }
-
-    return new User(response.data, metadata);
+    const response = await client.UserAbout({ username }, metadata);
+    // suspended accounts 404.
+    if (response.data?.id) return new User(response.data, metadata);
   }
 
   /** @internal */
