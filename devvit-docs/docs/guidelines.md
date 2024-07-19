@@ -39,6 +39,37 @@ To best comply with this policy, we recommend deleting any stored user data with
 Retention of content and data that has been deleted, even if disassociated, de-identified or anonymized, is a violation of our terms and policies.
 :::
 
+## Using externernal sites or services in Devvit Apps
+
+If your app links to any third-party site that may collect redditor personal data or that facilitates financial transactions, you are solely responsible for verifying the legitimacy and security of the third-party site(s) and should ensure that they are in compliance with all applicable laws. For example, you should ensure that:
+
+- a charitable organization collecting donations is registered as a 501(c)(3) organization (or local equivalent) and provides necessary tax receipts;
+- a site collecting personal data provides a privacy policy that clearly discloses what data is collected, how the data is used, and how the data is shared.
+
+Additionally, to the extent that you intend to include links to such third-party sites, you must provide your own terms of service and privacy policy.
+
+## Using Large Language Models in Devvit Apps
+
+Your Devvit apps can use approved Large Language Models (“LLMs”) via fetch functionality, provided your app adheres to the following guidelines as well as all applicable Reddit terms and policies, including our [Developer Terms](https://www.redditinc.com/policies/developer-terms) and [Developer Data Protection Addendum](https://www.redditinc.com/policies/developer-dpa), as well as our [User Agreement](https://www.redditinc.com/policies/), [Privacy Policy](https://www.reddit.com/policies/privacy-policy), [Content Policy](https://www.redditinc.com/policies/content-policy), [Public Content Policy](https://support.reddithelp.com/hc/en-us/articles/26410290525844-Public-Content-Policy), and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements) (collectively, “Reddit Rules”). Your app:
+
+- Provides significant and unique benefits to redditors and Reddit communities;
+- Uses one of the approved LLMs listed below;
+- Does not use Reddit data to create, improve, modify, train, or fine-tune any generative AI, LLM, ML, or NLP models (collectively, “Model Training”);
+- Does not provide access to or otherwise enable any third party to use Reddit data for Model Training;
+- Includes terms of services and a privacy policy for handling Reddit data; and
+- Adheres to all other rate limits and guidelines as outlined in our [Developer Terms](https://www.redditinc.com/policies/developer-terms) and other Reddit Rules.
+
+### Approved LLMs:
+
+Below are the only LLMs approved by Reddit for use:
+
+- Google LLMs (e.g., Gemini)
+- OpenAI LLMs (e.g., ChatGPT)
+
+For the avoidance of doubt, self-hosted and other LLMs (e.g. Llama, Mistral) are not approved for use at this time.
+
+Reddit reserves the right to update these guidelines, including our list of approved LLMs, at any time and at our discretion. As always, it is your responsibility to ensure your app is compliant with the Reddit Rules and our latest guidelines.
+
 ## Devvitquette
 
 Do:
