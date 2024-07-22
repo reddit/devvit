@@ -157,7 +157,7 @@ export type ContextAPIClients = {
     onSubmit: (values: FormToFormValues<T>) => void | Promise<void>
   ) => FormKey;
   /**
-   * A hook hor managing a realtime pubsub channel between Block renders.
+   * A hook for managing a realtime pubsub channel between Block renders.
    * This is only available within a Block Component.
    */
   useChannel: <Message extends JSONValue = JSONValue>(
