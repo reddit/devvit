@@ -1,11 +1,9 @@
 import type { UIEvent } from '@devvit/protos';
 import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
-import { DEFAULT_DIMENSIONS } from '@devvit/shared-types/dimensions.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import isEqual from 'lodash.isequal';
 import type { BlockElement } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
-import type { TransformContext } from '../BlocksTransformer.js';
 import { BlocksTransformer } from '../BlocksTransformer.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
 import { ContextBuilder } from './ContextBuilder.js';
@@ -284,9 +282,8 @@ export class BlocksHandler {
       }
 
       if (tags) {
-        const transformContext = this.#makeTransformContext(context);
-        blocks = this.#blocksTransformer.createBlocksElementOrThrow(tags, transformContext);
-        blocks = this.#blocksTransformer.ensureRootBlock(blocks, transformContext);
+        blocks = this.#blocksTransformer.createBlocksElementOrThrow(tags);
+        blocks = this.#blocksTransformer.ensureRootBlock(blocks);
       }
     }
 
@@ -365,10 +362,6 @@ export class BlocksHandler {
 
     // TODO: Decide whether this is excessive.  It doesn't hurt anything besides performance.
     this.#loadHooks(context);
-  }
-
-  #makeTransformContext(context: RenderContext): TransformContext {
-    return { maxDimensions: context.devvitContext.dimensions ?? DEFAULT_DIMENSIONS };
   }
 
   #renderRoot(

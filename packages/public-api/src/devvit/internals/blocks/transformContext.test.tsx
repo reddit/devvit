@@ -1,113 +1,79 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-// This import is NOT unused, don't listen to your IDE
-// noinspection ES6UnusedImports
-import { describe, expect, test } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { makeStackDimensionsDetails } from './transformContext.js';
+import { BlockHorizontalAlignment, BlockVerticalAlignment } from '@devvit/protos';
 
-import { BlockStackDirection } from '@devvit/protos';
-import { calculateMaxDimensions } from './transformContext.js';
-
-describe('calculateMaxDimensions', () => {
-  const defaultMaxDimensions = {
-    height: 500,
-    width: 400,
-    scale: 1,
-    fontScale: 1,
-  };
-
-  test('returns the existing context when no props', () => {
-    const maxDimensions = calculateMaxDimensions(
-      undefined,
-      defaultMaxDimensions,
-      BlockStackDirection.STACK_HORIZONTAL,
-      0
-    );
-    expect(maxDimensions).toStrictEqual(defaultMaxDimensions);
-  });
-
-  test('returns updated height when height set in props', () => {
-    const maxDimensions = calculateMaxDimensions(
-      { height: 50, width: 50 },
-      defaultMaxDimensions,
-      BlockStackDirection.STACK_HORIZONTAL,
-      2
-    );
-    expect(maxDimensions).toStrictEqual({
-      ...defaultMaxDimensions,
-      height: 250,
-      width: 200,
+describe('transform context', () => {
+  describe('makeStackDimensionsDetails', () => {
+    const blockSizesDefault = {
+      grow: undefined,
+      height: undefined,
+      width: { max: undefined, min: undefined, value: { value: 50, unit: 0 } },
+    };
+    it('should return hasHeight true, hasWidth true when width and height are set on block', () => {
+      const result = makeStackDimensionsDetails(
+        { width: '50%', height: '50%' },
+        {
+          hasHeight: true,
+          hasWidth: true,
+          direction: 0,
+          alignment: undefined,
+        },
+        blockSizesDefault
+      );
+      expect(result).toStrictEqual({ hasHeight: true, hasWidth: true });
     });
-  });
-
-  test('returns updated height when border set in props', () => {
-    const maxDimensions = calculateMaxDimensions(
-      { border: 'thick' },
-      defaultMaxDimensions,
-      BlockStackDirection.STACK_HORIZONTAL,
-      2
-    );
-    expect(maxDimensions).toStrictEqual({
-      ...defaultMaxDimensions,
-      height: 496,
-      width: 396,
+    it('should return hasHeight false, hasWidth true when only width is set on block', () => {
+      const result = makeStackDimensionsDetails(
+        { width: '50%' },
+        {
+          hasHeight: false,
+          hasWidth: true,
+          direction: 0,
+          alignment: undefined,
+        },
+        blockSizesDefault
+      );
+      expect(result).toStrictEqual({ hasHeight: false, hasWidth: true });
     });
-  });
-
-  test('returns updated height when height with hstack gap offsets when set in props', () => {
-    const maxDimensions = calculateMaxDimensions(
-      { height: 50, width: 50, gap: 'small' },
-      defaultMaxDimensions,
-      BlockStackDirection.STACK_HORIZONTAL,
-      2
-    );
-    expect(maxDimensions).toStrictEqual({
-      ...defaultMaxDimensions,
-      height: 250,
-      width: 192,
+    it('should return hasHeight true when width is not set, but hstack parent is stretching', () => {
+      const result = makeStackDimensionsDetails(
+        {},
+        {
+          hasHeight: true,
+          hasWidth: true,
+          direction: 0,
+          alignment: undefined,
+        },
+        {
+          grow: undefined,
+          height: undefined,
+          width: undefined,
+        }
+      );
+      expect(result).toStrictEqual({ hasHeight: true, hasWidth: false });
     });
-  });
-
-  test('returns updated height when height with vstack gap offsets when set in props', () => {
-    const maxDimensions = calculateMaxDimensions(
-      { height: 50, width: 50, gap: 'small' },
-      defaultMaxDimensions,
-      BlockStackDirection.STACK_VERTICAL,
-      2
-    );
-    expect(maxDimensions).toStrictEqual({
-      ...defaultMaxDimensions,
-      height: 242,
-      width: 200,
-    });
-  });
-
-  test('returns updated height when height with padding offsets when set in props', () => {
-    const maxDimensions = calculateMaxDimensions(
-      { height: 50, width: 50, padding: 'small' },
-      defaultMaxDimensions,
-      BlockStackDirection.STACK_HORIZONTAL,
-      2
-    );
-    expect(maxDimensions).toStrictEqual({
-      ...defaultMaxDimensions,
-      height: 234,
-      width: 184,
-    });
-  });
-
-  test('returns updated height when height with padding offsets when set in props and font scale is not default', () => {
-    const highFontScaleDimensions = { height: 500, width: 400, scale: 1, fontScale: 2 };
-    const context = calculateMaxDimensions(
-      { height: 50, width: 50, padding: 'small' },
-      highFontScaleDimensions,
-      BlockStackDirection.STACK_HORIZONTAL,
-      2
-    );
-    expect(context).toEqual({
-      ...highFontScaleDimensions,
-      height: 218,
-      width: 168,
+    it('should return hasHeight false when width is not set, but hstack parent has alignment', () => {
+      const result = makeStackDimensionsDetails(
+        {},
+        {
+          hasHeight: true,
+          hasWidth: true,
+          direction: 0,
+          alignment: {
+            horizontal: BlockHorizontalAlignment.ALIGN_CENTER,
+            vertical: BlockVerticalAlignment.ALIGN_MIDDLE,
+          },
+        },
+        {
+          grow: undefined,
+          height: undefined,
+          width: undefined,
+        }
+      );
+      expect(result).toStrictEqual({ hasHeight: false, hasWidth: false });
     });
   });
 });

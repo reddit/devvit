@@ -1,154 +1,139 @@
-import type { BlockSizes_Dimension_Value, Dimensions, UIDimensions } from '@devvit/protos';
-import { BlockSizeUnit, BlockStackDirection } from '@devvit/protos';
+import type { BlockAlignment, BlockSizes } from '@devvit/protos';
+import { BlockStackDirection } from '@devvit/protos';
 import type { Devvit } from '../../Devvit.js';
 
-// eslint-disable-next-line security/detect-unsafe-regex
-const SIZE_UNIT_REGEX = /^(\d+(?:\.\d+)?)(px|%)?$/;
-
-export const makeDimensionValue = (
-  size: Devvit.Blocks.SizeString | undefined,
-  maxDimension: number
-): BlockSizes_Dimension_Value | undefined => {
-  if (size == null) return undefined;
-  const pxValue = stackDimensionToPx(size, maxDimension);
-  return pxValue != null ? { value: pxValue, unit: BlockSizeUnit.SIZE_UNIT_PIXELS } : undefined;
+export const ROOT_STACK_TRANSFORM_CONTEXT: TransformContext = {
+  stackParentLayout: {
+    hasHeight: true,
+    hasWidth: true,
+    direction: BlockStackDirection.UNRECOGNIZED,
+    alignment: undefined,
+  },
 };
 
-export const calculateMaxDimensions = (
+export interface TransformContext {
+  stackParentLayout?: StackParentLayout;
+}
+
+export interface StackParentLayout {
+  hasHeight: boolean;
+  hasWidth: boolean;
+  direction: BlockStackDirection;
+  alignment: BlockAlignment | undefined;
+}
+
+enum ExpandDirection {
+  NONE,
+  HORIZONTAL,
+  VERTICAL,
+}
+
+export interface BlockGrowStretchDirection {
+  growDirection: ExpandDirection;
+  stretchDirection: ExpandDirection;
+}
+
+export interface BlockDimensionsDetails {
+  hasHeight: boolean;
+  hasWidth: boolean;
+}
+
+/*
+  Determine if a block has height and/or width based on its sizing, and its parent grow/stretch direction.
+*/
+export function makeStackDimensionsDetails(
   props: Devvit.Blocks.StackProps | undefined,
-  parentMaxDimensions: Dimensions | UIDimensions,
-  stackDirection: BlockStackDirection,
-  childrenCount: number
-): UIDimensions => {
-  if (!props) return parentMaxDimensions;
+  stackParentLayout: StackParentLayout | undefined,
+  blockSizes: BlockSizes | undefined
+): BlockDimensionsDetails {
+  if (!stackParentLayout) return { hasHeight: false, hasWidth: false };
 
-  const paddingOffset = stackPaddingToPx(props.padding, parentMaxDimensions.fontScale) * 2;
-  const borderOffset = stackBorderToPx(props.border, props.borderColor) * 2;
-  const gapSize = stackGapToPx(props.gap);
+  const { growDirection, stretchDirection } = makeBlockGrowStretchDetails(
+    props?.grow,
+    stackParentLayout.direction,
+    stackParentLayout.alignment
+  );
 
-  // Calculate height
-  let childMaxHeight = parentMaxDimensions.height;
-  const hasHeightDefined =
-    props.height != null || props.minHeight != null || props.maxHeight != null;
-  if (hasHeightDefined) {
-    childMaxHeight = getMaxForDimension(
-      props.height,
-      props.minHeight,
-      props.maxHeight,
-      parentMaxDimensions.height
+  const hasHeight =
+    blockSizes?.height?.value?.value ||
+    blockSizes?.height?.min?.value ||
+    isExpandingOnConstrainedRespectiveAxis(
+      ExpandDirection.VERTICAL,
+      growDirection,
+      stretchDirection,
+      stackParentLayout.hasHeight
     );
-  }
-  let heightOffset = paddingOffset + borderOffset;
-  if (stackDirection === BlockStackDirection.STACK_VERTICAL && gapSize && childrenCount > 0) {
-    heightOffset = heightOffset + gapSize * (childrenCount - 1);
+
+  const hasWidth =
+    blockSizes?.width?.value?.value ||
+    blockSizes?.width?.min?.value ||
+    isExpandingOnConstrainedRespectiveAxis(
+      ExpandDirection.HORIZONTAL,
+      growDirection,
+      stretchDirection,
+      stackParentLayout.hasWidth
+    );
+
+  return {
+    hasHeight: Boolean(hasHeight),
+    hasWidth: Boolean(hasWidth),
+  };
+}
+
+/*
+  Determine if the parent is growing or stretching on the defined axis.
+  If true, tells us that the child may have height/width, even if its parent is not explicitly set.
+*/
+function isExpandingOnConstrainedRespectiveAxis(
+  axis: ExpandDirection,
+  growDirection: ExpandDirection,
+  stretchDirection: ExpandDirection,
+  parentHasDimensionSet: boolean
+): boolean {
+  return (
+    (growDirection === axis && parentHasDimensionSet) ||
+    (stretchDirection === axis && parentHasDimensionSet)
+  );
+}
+
+/*
+  Determine the grow/stretch direction of a block based on its parent stack direction and alignment.
+*/
+function makeBlockGrowStretchDetails(
+  isGrowing: boolean | undefined,
+  parentStackDirection: BlockStackDirection,
+  parentAlignment: BlockAlignment | undefined
+): BlockGrowStretchDirection {
+  const parentIsVerticalOrRoot =
+    parentStackDirection === BlockStackDirection.STACK_VERTICAL ||
+    parentStackDirection === BlockStackDirection.UNRECOGNIZED;
+  const parentIsHoritzontal = parentStackDirection === BlockStackDirection.STACK_HORIZONTAL;
+
+  let growDirection = ExpandDirection.NONE;
+  if (parentIsHoritzontal && isGrowing) {
+    growDirection = ExpandDirection.HORIZONTAL;
+  } else if (parentIsVerticalOrRoot && isGrowing) {
+    growDirection = ExpandDirection.VERTICAL;
   }
 
-  // Calculate width
-  let childMaxWidth = parentMaxDimensions.width;
-  const hasWidthDefined = props.width != null || props.minWidth != null || props.maxWidth != null;
-  if (hasWidthDefined) {
-    childMaxWidth = getMaxForDimension(
-      props.width,
-      props.minWidth,
-      props.maxWidth,
-      parentMaxDimensions.width
-    );
-  }
-  let widthOffset = paddingOffset + borderOffset;
-  if (stackDirection === BlockStackDirection.STACK_HORIZONTAL && gapSize && childrenCount > 0) {
-    widthOffset = widthOffset + gapSize * (childrenCount - 1);
+  const hnone = parentAlignment === undefined || parentAlignment.horizontal === undefined;
+  const vnone = parentAlignment === undefined || parentAlignment.vertical === undefined;
+
+  const isStretching = parentIsHoritzontal
+    ? Boolean(vnone)
+    : parentIsVerticalOrRoot
+    ? Boolean(hnone)
+    : false;
+
+  let stretchDirection = ExpandDirection.NONE;
+  if (parentIsHoritzontal && isStretching) {
+    stretchDirection = ExpandDirection.VERTICAL;
+  } else if (parentIsVerticalOrRoot && isStretching) {
+    stretchDirection = ExpandDirection.HORIZONTAL;
   }
 
   return {
-    ...parentMaxDimensions,
-    height: childMaxHeight - heightOffset,
-    width: childMaxWidth - widthOffset,
+    growDirection,
+    stretchDirection,
   };
-};
-
-/* As a result of DX-6656, all percent dimension values will be converted to px values. */
-const stackDimensionToPx = (
-  value: Devvit.Blocks.SizeString | undefined,
-  maxDimension: number
-): number | undefined => {
-  if (value == null) return undefined;
-
-  if (typeof value === 'number') {
-    return (maxDimension * value) / 100;
-  } else {
-    const parts = value.match(SIZE_UNIT_REGEX);
-
-    if (parts == null) return undefined;
-
-    const dimensions = Number.parseFloat(parts[1]);
-    if (parts?.at(2) === '%') {
-      return (maxDimension * dimensions) / 100;
-    }
-    return dimensions;
-  }
-};
-
-const stackPaddingToPx = (
-  padding: Devvit.Blocks.ContainerPadding | undefined,
-  fontScale: number = 1 // fontScale is web only and refers to window browser font scaling, default to 1
-): number => {
-  switch (padding) {
-    case 'xsmall':
-      return 4 * fontScale;
-    case 'small':
-      return 8 * fontScale;
-    case 'medium':
-      return 16 * fontScale;
-    case 'large':
-      return 32 * fontScale;
-    default:
-      return 0;
-  }
-};
-
-const stackGapToPx = (gap: Devvit.Blocks.ContainerGap | undefined): number => {
-  switch (gap) {
-    case 'small':
-      return 8;
-    case 'medium':
-      return 16;
-    case 'large':
-      return 32;
-  }
-  return 0;
-};
-
-const stackBorderToPx = (
-  borderWidth: Devvit.Blocks.ContainerBorderWidth | undefined,
-  color: string | undefined
-): number => {
-  if (!borderWidth && !color) return 0;
-
-  switch (borderWidth) {
-    case 'none':
-      return 0;
-    case 'thin':
-      return 1;
-    case 'thick':
-      return 2;
-    default:
-      // Default to a thin border when a color was set, but no borderWidth.
-      return 1;
-  }
-};
-
-const getMaxForDimension = (
-  value: Devvit.Blocks.SizeString | undefined,
-  min: Devvit.Blocks.SizeString | undefined,
-  max: Devvit.Blocks.SizeString | undefined,
-  maxDimension: number
-): number => {
-  const pxValue = stackDimensionToPx(value, maxDimension) || 0;
-  const pxMin = stackDimensionToPx(min, maxDimension) || 0;
-  const pxMax = stackDimensionToPx(max, maxDimension) || 0;
-
-  const upperBound = Math.min(pxMax, pxValue);
-  const lowerBound = Math.max(pxMin, pxValue);
-
-  return Math.max(upperBound, lowerBound);
-};
+}

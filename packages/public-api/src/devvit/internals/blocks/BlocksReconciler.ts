@@ -9,7 +9,6 @@ import type {
   UIEvent,
 } from '@devvit/protos';
 import { BlockRenderEventType, EffectType } from '@devvit/protos';
-import { DEFAULT_DIMENSIONS } from '@devvit/shared-types/dimensions.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { JSONObject, PartialJSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
@@ -41,7 +40,6 @@ import type { CacheHelper } from '../cache.js';
 import { getContextFromMetadata } from '../context.js';
 import { makeUniqueIdGenerator } from '../helpers/makeUniqueIdGenerator.js';
 import type { LocalCache } from '../promise_cache.js';
-import type { TransformContext } from './BlocksTransformer.js';
 import { BlocksTransformer } from './BlocksTransformer.js';
 import type { EffectEmitter } from './EffectEmitter.js';
 
@@ -292,10 +290,6 @@ export class BlocksReconciler implements EffectEmitter {
     return uniqueId;
   }
 
-  makeTransformContext(ctx: Devvit.Context): TransformContext {
-    return { maxDimensions: ctx.dimensions ?? DEFAULT_DIMENSIONS };
-  }
-
   async reconcile(): Promise<void> {
     const ctx = this.#makeContextProps();
     const blockElement: BlockElement = {
@@ -307,8 +301,7 @@ export class BlocksReconciler implements EffectEmitter {
     const reified = await this.processBlock(blockElement);
     assertNotString(reified);
 
-    const transformContext = this.makeTransformContext(ctx);
-    this.transformer.createBlocksElementOrThrow(reified, transformContext);
+    this.transformer.createBlocksElementOrThrow(reified);
 
     if (this.isUserActionRender && this.blockRenderEventId) {
       const handler = this.actions.get(this.blockRenderEventId);
@@ -334,8 +327,7 @@ export class BlocksReconciler implements EffectEmitter {
     };
 
     const block = await this.renderElement(ctx, rootBlockElement);
-    const transformContext = this.makeTransformContext(ctx);
-    return this.transformer.ensureRootBlock(block, transformContext);
+    return this.transformer.ensureRootBlock(block);
   }
 
   async renderElement(ctx: Devvit.Context, element: JSX.Element): Promise<Block> {
@@ -347,8 +339,7 @@ export class BlocksReconciler implements EffectEmitter {
     if (Devvit.debug.emitState || ctx.debug.emitState)
       console.debug(JSON.stringify(this.state, undefined, 2));
 
-    const transformContext = this.makeTransformContext(ctx);
-    return this.transformer.createBlocksElementOrThrow(reified, transformContext);
+    return this.transformer.createBlocksElementOrThrow(reified);
   }
 
   #flatten(arr: ReifiedBlockElementOrLiteral[]): ReifiedBlockElementOrLiteral[] {

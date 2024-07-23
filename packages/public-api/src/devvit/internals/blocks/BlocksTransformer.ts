@@ -5,9 +5,6 @@ import type {
   BlockBorder,
   BlockColor,
   BlockConfig,
-  BlockSizes,
-  Dimensions,
-  UIDimensions,
 } from '@devvit/protos';
 import {
   BlockActionType,
@@ -51,12 +48,9 @@ import {
   isRPLColor,
 } from '../helpers/color.js';
 import type { AssetsClient, GetURLOptions } from '../../../apis/AssetsClient/AssetsClient.js';
-import { calculateMaxDimensions, makeDimensionValue } from './transformContext.js';
-
-export type TransformContext = {
-  /** The maximum size a block may take up per dimension (height/width), in pixels */
-  maxDimensions: Dimensions | UIDimensions;
-};
+import type { TransformContext } from './transformContext.js';
+import { makeStackDimensionsDetails, ROOT_STACK_TRANSFORM_CONTEXT } from './transformContext.js';
+import { makeBlockSizes } from './transformerUtils.js';
 
 type DataSet = Record<string, unknown>;
 const DATA_PREFIX = 'data-';
@@ -74,11 +68,8 @@ export class BlocksTransformer {
     this.#assetsClient = getAssetsClient;
   }
 
-  createBlocksElementOrThrow(
-    { type, props, children }: ReifiedBlockElement,
-    transformContext: TransformContext
-  ): Block {
-    const block = this.createBlocksElement({ type, props, children }, transformContext);
+  createBlocksElementOrThrow({ type, props, children }: ReifiedBlockElement): Block {
+    const block = this.createBlocksElement({ type, props, children }, ROOT_STACK_TRANSFORM_CONTEXT);
     if (!block) {
       throw new Error(`Could not create block of type ${type}`);
     }
@@ -91,7 +82,7 @@ export class BlocksTransformer {
   ): Block | undefined {
     switch (type) {
       case 'blocks':
-        return this.makeRoot(props, transformContext, ...children);
+        return this.makeRoot(props, ...children);
       case 'hstack':
         return this.makeHStack(props, transformContext, ...children);
       case 'vstack':
@@ -498,36 +489,6 @@ export class BlocksTransformer {
     return undefined;
   }
 
-  makeBlockSizes(
-    props: Devvit.Blocks.BaseProps | undefined,
-    maxDimensions: Dimensions | UIDimensions
-  ): BlockSizes | undefined {
-    if (props) {
-      const hasWidth = props.width != null || props.minWidth != null || props.maxWidth != null;
-      const hasHeight = props.height != null || props.minHeight != null || props.maxHeight != null;
-      if (hasWidth || hasHeight || props.grow != null) {
-        return {
-          width: hasWidth
-            ? {
-                value: makeDimensionValue(props.width, maxDimensions.width),
-                min: makeDimensionValue(props.minWidth, maxDimensions.width),
-                max: makeDimensionValue(props.maxWidth, maxDimensions.width),
-              }
-            : undefined,
-          height: hasHeight
-            ? {
-                value: makeDimensionValue(props.height, maxDimensions.height),
-                min: makeDimensionValue(props.minHeight, maxDimensions.height),
-                max: makeDimensionValue(props.maxHeight, maxDimensions.height),
-              }
-            : undefined,
-          grow: props.grow,
-        };
-      }
-    }
-    return undefined;
-  }
-
   getDataSet(props: DataSet): DataSet {
     return Object.keys(props)
       .filter((key) => key.startsWith(DATA_PREFIX))
@@ -641,31 +602,27 @@ export class BlocksTransformer {
 
   makeRoot(
     props: Devvit.Blocks.BaseProps | undefined,
-    transformContext: TransformContext,
     ...children: ReifiedBlockElementOrLiteral[]
   ): Block {
-    return this.wrapRoot(
-      props,
-      transformContext,
-      this.childrenToBlocks(children, transformContext)
-    );
+    return this.wrapRoot(props, this.childrenToBlocks(children, ROOT_STACK_TRANSFORM_CONTEXT));
   }
 
-  wrapRoot(
-    props: Devvit.Blocks.BaseProps | undefined,
-    transformContext: TransformContext,
-    children: Block[]
-  ): Block {
-    return this.makeBlock(BlockType.BLOCK_ROOT, {}, transformContext, {
-      rootConfig: {
-        children: children,
-        height: this.makeRootHeight(
-          Devvit.customPostType?.height ??
-            (props as unknown as Devvit.Blocks.RootProps)?.height ??
-            'regular'
-        ),
-      },
-    });
+  wrapRoot(props: Devvit.Blocks.BaseProps | undefined, children: Block[]): Block {
+    return this.makeBlock(
+      BlockType.BLOCK_ROOT,
+      {},
+      {},
+      {
+        rootConfig: {
+          children: children,
+          height: this.makeRootHeight(
+            Devvit.customPostType?.height ??
+              (props as unknown as Devvit.Blocks.RootProps)?.height ??
+              'regular'
+          ),
+        },
+      }
+    );
   }
 
   makeStackBlock(
@@ -679,15 +636,18 @@ export class BlocksTransformer {
       props?.lightBackgroundColor,
       props?.darkBackgroundColor
     );
-    const childrenMaxDimensions = calculateMaxDimensions(
+    const alignment = this.makeBlockAlignment(props?.alignment);
+    const blockSizes = makeBlockSizes(props, transformContext);
+
+    const blockDimensionsDetails = makeStackDimensionsDetails(
       props,
-      transformContext.maxDimensions,
-      direction,
-      children.length
+      transformContext.stackParentLayout,
+      blockSizes
     );
+
     return this.makeBlock(BlockType.BLOCK_STACK, props, transformContext, {
       stackConfig: {
-        alignment: this.makeBlockAlignment(props?.alignment),
+        alignment,
         backgroundColor: backgroundColors?.light,
         backgroundColors,
         border: this.makeBlockBorder(
@@ -697,8 +657,7 @@ export class BlocksTransformer {
           props?.darkBorderColor
         ),
         children: this.childrenToBlocks(children, {
-          ...transformContext,
-          maxDimensions: childrenMaxDimensions,
+          stackParentLayout: { ...blockDimensionsDetails, direction, alignment },
         }),
         cornerRadius: this.makeBlockRadius(props?.cornerRadius),
         direction: direction,
@@ -917,7 +876,7 @@ export class BlocksTransformer {
   ): Block {
     return {
       type,
-      sizes: this.makeBlockSizes(props, transformContext.maxDimensions),
+      sizes: makeBlockSizes(props, transformContext),
       config: config,
       actions: (props && this.makeActions(type, props)) ?? [],
       id: props?.id,
@@ -925,7 +884,7 @@ export class BlocksTransformer {
     };
   }
 
-  ensureRootBlock(b: Block, transformContext: TransformContext): Block {
+  ensureRootBlock(b: Block): Block {
     const block = b as Block;
 
     if ((block as Block).type === BlockType.BLOCK_ROOT) {
@@ -935,7 +894,7 @@ export class BlocksTransformer {
       return block;
     }
 
-    const root = this.wrapRoot(undefined, transformContext, [block]);
+    const root = this.wrapRoot(undefined, [block]);
 
     if (!root) {
       throw new Error('Could not create root block');
