@@ -39,7 +39,7 @@ To best comply with this policy, we recommend deleting any stored user data with
 Retention of content and data that has been deleted, even if disassociated, de-identified or anonymized, is a violation of our terms and policies.
 :::
 
-## Using externernal sites or services in Devvit Apps
+## Using external sites or services in Devvit Apps
 
 If your app links to any third-party site that may collect redditor personal data or that facilitates financial transactions, you are solely responsible for verifying the legitimacy and security of the third-party site(s) and should ensure that they are in compliance with all applicable laws. For example, you should ensure that:
 
