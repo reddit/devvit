@@ -35,10 +35,7 @@ This example shows a custom post that specifies dimensions.
 Devvit.addCustomPostType({
   name: 'Dimensions app',
   render: (context) => {
-    const {
-      dimensions: { height, width, scale },
-    } = context;
-    return width < 300 ? <SmallApp /> : <BigApp />;
+    return context.dimensions?.width < 300 ? <SmallApp /> : <BigApp />;
   },
 });
 ```
@@ -48,11 +45,13 @@ This example shows that dimensions always references the root element, even if i
 ```tsx
 export const MyHeader: Devvit.BlockComponent = (props, context) => {
   // Dimensions reflect the custom post, not the Header component
-  const {
-    dimensions: { height, width, scale },
-  } = context;
+  const dimensions = context.dimensions;
   return (
-    <vstack width={width < 500 ? '300px' : '500px'} height="20px" backgroundColor="blue">
+    <vstack
+      width={context.dimensions?.width < 500 ? '300px' : '500px'}
+      height="20px"
+      backgroundColor="blue"
+    >
       <text>Header</text>
     </vstack>
   );

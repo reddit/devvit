@@ -76,11 +76,10 @@ function getKeyForAuthor(author: User) {
 ```typescript
 async function getThing(event: MenuItemOnPressEvent, context: Devvit.Context) {
   const { location, targetId } = event;
-  const { reddit } = context;
   if (location === 'post') {
-    return await reddit.getPostById(targetId);
+    return await context.reddit.getPostById(targetId);
   } else if (location === 'comment') {
-    return await reddit.getCommentById(targetId);
+    return await context.reddit.getCommentById(targetId);
   }
   throw 'Cannot find a post or comment with that ID';
 }
@@ -92,9 +91,8 @@ async function getThing(event: MenuItemOnPressEvent, context: Devvit.Context) {
 
 ```typescript
 async function getAuthor(event: MenuItemOnPressEvent, context: Devvit.Context) {
-  const { reddit } = context;
   const thing = await getThing(event, context);
-  return await reddit.getUserById(thing.authorId!);
+  return await context.reddit.getUserById(thing.authorId!);
 }
 ```
 
@@ -110,9 +108,8 @@ This function determines if the author currently has any strikes.
 
 ```typescript
 async function getAuthorStrikes(author: User, context: Devvit.Context) {
-  const { kvStore } = context;
   const key = getKeyForAuthor(author);
-  return ((await redis.get(key)) as number) || 0;
+  return ((await context.redis.get(key)) as number) || 0;
 }
 ```
 
@@ -121,9 +118,8 @@ async function getAuthorStrikes(author: User, context: Devvit.Context) {
 ```typescript
 async function checkStrikes(event: MenuItemOnPressEvent, context: Devvit.Context) {
   const author = await getAuthor(event, context);
-  const { ui } = context;
   const strikes = await getAuthorStrikes(author, context);
-  ui.showToast(`Author u/$\{author.username} strike count: ${strikes}`);
+  context.ui.showToast(`Author u/$\{author.username} strike count: ${strikes}`);
 }
 ```
 
@@ -139,9 +135,8 @@ This function allows the moderator to change a user’s strike count.
 
 ```typescript
 async function setAuthorStrikes(author: User, strikes: number, context: Devvit.Context) {
-  const { redis } = context;
   const key = getKeyForAuthor(author);
-  await kvStore.put(key, strikes);
+  await context.redis.put(key, strikes);
 }
 ```
 
@@ -152,15 +147,16 @@ async function removeStrike(event: MenuItemOnPressEvent, context: Devvit.Context
   // Get some relevant data from the post or comment
   const author = await getAuthor(event, context);
   let strikes = await getAuthorStrikes(author, context);
-  const { ui } = context;
 
   if (strikes > 0) {
     await setAuthorStrikes(author, --strikes, context);
-    ui.showToast(`Removed a strike from u/$\{author.username}. Remaining strikes: ${strikes}.`);
+    context.ui.showToast(
+      `Removed a strike from u/$\{author.username}. Remaining strikes: ${strikes}.`
+    );
     return;
   }
 
-  ui.showToast(`u/$\{author.username} does not have any strikes!`);
+  context.ui.showToast(`u/$\{author.username} does not have any strikes!`);
 }
 ```
 
@@ -179,17 +175,16 @@ async function clearStrikes(event: MenuItemOnPressEvent, context: Devvit.Context
   // Get some relevant data from the post or comment
   const author = await getAuthor(event, context);
   const hadStrikes = await getAuthorStrikes(author, context);
-  const { ui } = context;
 
   if (hadStrikes > 0) {
     await setAuthorStrikes(author!, 0, context);
-    ui.showToast(
+    context.ui.showToast(
       `Cleared ${hadStrikes} strike${hadStrikes !== 1 ? 's' : ''} from u/$\{author.username}!`
     );
     return;
   }
 
-  ui.showToast(`u/$\{author.username} does not have any strikes!`);
+  context.ui.showToast(`u/$\{author.username} does not have any strikes!`);
 }
 ```
 
@@ -203,7 +198,6 @@ This function shows the mod where the action came from, pulls relevant data from
 async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   // Use the correct term in our message based on what was acted upon
   const { location } = event;
-  const { reddit, ui } = context;
   const thing = await getThing(event, context);
   const author = await getAuthor(event, context);
   /**
@@ -229,7 +223,7 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   let days = 0;
 
   // Get the current subreddit from the metadata
-  const subreddit = await reddit.getCurrentSubreddit();
+  const subreddit = await context.reddit.getCurrentSubreddit();
   const { permalink } = thing;
   switch (strikes) {
     case 1:
@@ -260,7 +254,7 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
    * NOTE: Apps are executed as the moderator that installed this app into a
    *       subreddit and will be used as the user that sends this message!
    */
-  await reddit.sendPrivateMessage({
+  await context.reddit.sendPrivateMessage({
     to: author.username,
     subject: `Received a strike on ${subreddit.name}`,
     text: pmMessage,
@@ -269,8 +263,8 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   const result = `u/$\{author.username} strikes: ${strikes} and has been ${punishment}.`;
 
   if (ban) {
-    const currentUser = await reddit.getCurrentUser();
-    await reddit.banUser({
+    const currentUser = await context.reddit.getCurrentUser();
+    await context.reddit.banUser({
       subredditName: subreddit.name,
       username: author.username,
       duration: days,
@@ -280,7 +274,7 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
     });
   }
 
-  ui.showToast(result);
+  context.ui.showToast(result);
 }
 ```
 

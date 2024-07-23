@@ -20,12 +20,6 @@ Devvit.configure({
 
 `useChannel` hook allows experience posts to subscribe and send to an event stream.
 
-```tsx
-// Defined within render function of an experience post
-
-const { useState, useChannel, redis, ui } = context;
-```
-
 A new channel can be setup with function handlers containing custom logic to update state:
 
 - `onMessage` - called every time a message is received on a channel
@@ -40,7 +34,7 @@ A new channel can be setup with function handlers containing custom logic to upd
 // You have the flexibility to define the message data shape to be published
 // via channel.send - same shape will be received in the onMessage handler
 
-const channel = useChannel({
+const channel = context.useChannel({
   name: 'events',
   onMessage: (data) => {
     // modify local state
@@ -80,32 +74,28 @@ channel.subscribe();
 `realtime.send` is recommended for re-rendering experience posts based on server events. This can be invoked on an event trigger, scheduled job, or after a HTTP fetch call. [Server-Push](#server-push) example illustrates how to compose scheduler and realtime together.
 
 ```tsx
-
 // During app installation, we create a scheduled job 'publish_to_channel' that runs
 // every minute - it uses realtime plugin to publish events to an arbitrary channel
 
-Devvit.addTrigger(
- event: 'AppInstall',
- onEvent: async (_, { scheduler }) => {
-   await scheduler.runJob({
-     name: 'publish_to_channel',
-     cron: '* * * * *'
-   })
- },
+Devvit.addTrigger({
+  event: 'AppInstall',
+  onEvent: async (_, context) => {
+    await context.scheduler.runJob({
+      name: 'publish_to_channel',
+      cron: '* * * * *',
+    });
+  },
 });
 
 // Experience posts subscribed to the 'events' channel via useChannel hook will start
 // receiving messages which can processed in the onMessage handler to update local state.
 Devvit.addSchedulerJob({
-   name:'publish_to_channel',
-   onRun: async (_, { realtime, postId }) => {
-   await realtime.send(
-     'events',
-     {
-       'message': payload
-     }
-   );
- },
+  name: 'publish_to_channel',
+  onRun: async (_, context) => {
+    await context.realtime.send('events', {
+      message: payload,
+    });
+  },
 });
 ```
 

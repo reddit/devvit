@@ -34,17 +34,16 @@ Devvit.addMenuItem({
   location: 'comment',
   label: 'Sample HTTP request',
   onPress: async (_, context) => {
-    const { commentId, ui } = context;
-    console.log(`Comment ID:  ${commentId}`);
+    console.log(`Comment ID:  ${context.commentId}`);
     const response = await fetch('https://example.com', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ content: commentId }),
+      body: JSON.stringify({ content: context.commentId }),
     });
-    ui.showToast(
-      `Invoked HTTP request on comment: ${commentId}. Completed with status: ${response.status}`
+    context.ui.showToast(
+      `Invoked HTTP request on comment: ${context.commentId}. Completed with status: ${response.status}`
     );
   },
 });

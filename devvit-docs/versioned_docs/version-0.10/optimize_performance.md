@@ -6,27 +6,25 @@ You may want to optimize your app to make it run faster, use resources more effi
 
 Look at the render function of this experience post.
 
-```
+```ts
 render: (context) => {
-    const { useState, postId } = context;
-    const [postInfo] = useState(async () => {
-      return await getThreadInfoById(postId, context);
-    });
+  const [postInfo] = context.useState(async () => {
+    return await getThreadInfoById(context.postId, context);
+  });
 
-    const [user] = useState(async () => {
-      return await getUser(context);
-    });
+  const [user] = context.useState(async () => {
+    return await getUser(context);
+  });
 
-    const [weather] = useState(async () => {
-      return await getTheWeather(context);
-    });
+  const [weather] = context.useState(async () => {
+    return await getTheWeather(context);
+  });
 
-    const [leaderboardStats] = useState(async () => {
-      return await getLeaderboard(context);
-    });
-
-….
-
+  const [leaderboardStats] = context.useState(async () => {
+    return await getLeaderboard(context);
+  });
+  // ...
+};
 ```
 
 You can see that the app fetches data about the post, the user, the weather, and the leaderboard stats. In Devvit, the first [render](rendering_apps.md) happens on the server side, and all four data requests need to be resolved before the app can be rendered for the user.
@@ -42,10 +40,9 @@ Here’s how the optimized version looks:
 
 ```
 render: (context) => {
-    const { useState, postId } = context;
-    const [appState, setAppState] = useState(async ()=>{
+    const [appState, setAppState] = context.useState(async ()=>{
     const [postInfo,user,weather,leaderboardStats] = await Promise.all([
-        getThreadInfoById(postId, context),
+        getThreadInfoById(context.postId, context),
         getUser(context),
         getTheWeather(context),
         getLeaderboard(context),

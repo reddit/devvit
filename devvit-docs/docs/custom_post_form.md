@@ -76,9 +76,9 @@ Devvit.addCustomPostType({
 ```jsx
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
-  render: ({ useState, reddit }) => {
-    const [currentUsername] = useState(async () => {
-      const currentUser = await reddit.getCurrentUser();
+  render: (context) => {
+    const [currentUsername] = context.useState(async () => {
+      const currentUser = await context.reddit.getCurrentUser();
       return currentUser.username;
     });
 
@@ -98,15 +98,15 @@ Devvit.addCustomPostType({
 ```ts
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
-  render: ({ useState, useForm, reddit, ui }) => {
-    const [currentUsername] = useState(async () => {
-      const currentUser = await reddit.getCurrentUser();
+  render: (context) => {
+    const [currentUsername] = context.useState(async () => {
+      const currentUser = await context.reddit.getCurrentUser();
       return currentUser.username;
     });
 
-    const [answer, setAnswer] = useState('');
+    const [answer, setAnswer] = context.useState('');
 
-    const howAreYouForm = useForm(
+    const howAreYouForm = context.useForm(
       {
         fields: [
           {
@@ -117,12 +117,12 @@ Devvit.addCustomPostType({
           },
         ],
       },
-      async ({ answer }) => {
-        ui.showToast({
+      async (data) => {
+        context.ui.showToast({
           text: 'Thanks for answering!',
           appearance: 'success',
         });
-        setAnswer(answer);
+        setAnswer(data.answer);
       }
     );
 
@@ -139,7 +139,7 @@ Devvit.addCustomPostType({
           ) : (
             <button
               onPress={() => {
-                ui.showForm(howAreYouForm);
+                context.ui.showForm(howAreYouForm);
               }}
             >
               Answer Question
@@ -159,9 +159,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Submit custom post',
   onPress: async (_, context) => {
-    const { reddit, ui } = context;
-    const currentSubreddit = await reddit.getCurrentSubreddit();
-    await reddit.submitPost({
+    const currentSubreddit = await context.reddit.getCurrentSubreddit();
+    await context.reddit.submitPost({
       title: 'My custom post',
       subredditName: currentSubreddit.name,
       preview: (
@@ -170,7 +169,7 @@ Devvit.addMenuItem({
         </vstack>
       ),
     });
-    ui.showToast(`Submitted custom post to ${currentSubreddit.name}`);
+    context.ui.showToast(`Submitted custom post to ${currentSubreddit.name}`);
   },
 });
 ```

@@ -6,27 +6,26 @@ You may want to optimize your app to make it run faster, use resources more effi
 
 Look at the render function of this experience post.
 
-```
+```tsx
 render: (context) => {
-    const { useState, postId } = context;
-    const [postInfo] = useState(async () => {
-      return await getThreadInfoById(postId, context);
-    });
+  const [postInfo] = context.useState(async () => {
+    return await getThreadInfo(context);
+  });
 
-    const [user] = useState(async () => {
-      return await getUser(context);
-    });
+  const [user] = context.useState(async () => {
+    return await getUser(context);
+  });
 
-    const [weather] = useState(async () => {
-      return await getTheWeather(context);
-    });
+  const [weather] = context.useState(async () => {
+    return await getTheWeather(context);
+  });
 
-    const [leaderboardStats] = useState(async () => {
-      return await getLeaderboard(context);
-    });
+  const [leaderboardStats] = context.useState(async () => {
+    return await getLeaderboard(context);
+  });
 
-….
-
+  // the rest of the render function
+};
 ```
 
 You can see that the app fetches data about the post, the user, the weather, and the leaderboard stats. In Devvit, the first [render](rendering_apps.md) happens on the server side, and all four data requests need to be resolved before the app can be rendered for the user.
@@ -40,26 +39,27 @@ To achieve this, you can:
 
 Here’s how the optimized version looks:
 
-```
+```tsx
 render: (context) => {
-    const { useState, postId } = context;
-    const [appState, setAppState] = useState(async ()=>{
-    const [postInfo,user,weather,leaderboardStats] = await Promise.all([
-        getThreadInfoById(postId, context),
-        getUser(context),
-        getTheWeather(context),
-        getLeaderboard(context),
+  const [appState, setAppState] = context.useState(async () => {
+    const [postInfo, user, weather, leaderboardStats] = await Promise.all([
+      getThreadInfo(context),
+      getUser(context),
+      getTheWeather(context),
+      getLeaderboard(context),
     ]);
     return {
-        postInfo,
-        user,
-        weather,
-        leaderboardStats,
-    }
+      postInfo,
+      user,
+      weather,
+      leaderboardStats,
+    };
   });
 
-  const {postInfo,user,weather,leaderboardStats} = appState;
-….
+  const { postInfo, user, weather, leaderboardStats } = appState;
+
+  // the rest of the render function
+};
 ```
 
 You can see the app gets the same variables from the state object, which means that you won’t need to change the way you access the data from the state in the rest of the app.
@@ -73,10 +73,10 @@ If you need to update one of the state props, instead of
 
 Imagine your app needs to get data from an external resource, such as a weather API. The code would look like this:
 
-```
-const [externalData] = useState(async => {
-    return fetch(“https://external.weather.com”);
-})
+```tsx
+const [externalData] = context.useState((async) => {
+  return fetch('https://external.weather.com');
+});
 ```
 
 ### Request overload
@@ -108,26 +108,27 @@ To achieve the best performance in this scenario, you can use [realtime](./capab
 
 Before using realtime, the leaderboard fetching code looked like this:
 
-```
-    const getLeaderboard = async () => await context.redis.zRange('leaderboard', 0, 5, {
-      reverse: true,
-      by: 'rank',
-    });
+```tsx
+const getLeaderboard = async () =>
+  await context.redis.zRange('leaderboard', 0, 5, {
+    reverse: true,
+    by: 'rank',
+  });
 
-    const [leaderboard, setLeaderboard] = context.useState(async () => {
-      return await getLeaderboard();
-    });
+const [leaderboard, setLeaderboard] = context.useState(async () => {
+  return await getLeaderboard();
+});
 
-    const leaderboardInterval = context.useInterval(async () => {
-      const newLeaderboard = await getLeaderboard();
-      setLeaderboard(newLeaderboard);
-    }, 1000);
+const leaderboardInterval = context.useInterval(async () => {
+  const newLeaderboard = await getLeaderboard();
+  setLeaderboard(newLeaderboard);
+}, 1000);
 ```
 
 And code for setting the leaderboard looked like this:
 
-```
-await context.redis.zAdd('leaderboard', {member: `${username}:${datetime}`, score: gameScore})
+```tsx
+await context.redis.zAdd('leaderboard', { member: `${username}:${datetime}`, score: gameScore });
 ```
 
 ### With realtime
@@ -136,25 +137,25 @@ Using realtime, you can fetch the leaderboard during the initial render and emit
 
 This is the updated game completion code:
 
-```
-await context.redis.zAdd('leaderboard', {member: `${username}:${datetime}`, score: gameScore}) // stays as is
+```tsx
+await context.redis.zAdd('leaderboard', { member: `${username}:${datetime}`, score: gameScore }); // stays as is
 const newLeaderboard = await getLeaderboard();
 context.realtime.send('leaderboard_updates', newLeaderboard);
 ```
 
 Now replace the interval with the realtime subscription:
 
-```
- const [leaderboard, setLeaderboard] = context.useState(async () => {
-      return await getLeaderboard();
-    }); // stays as is
+```tsx
+const [leaderboard, setLeaderboard] = context.useState(async () => {
+  return await getLeaderboard();
+}); // stays as is
 
-    const channel = context.useChannel({
-      name: 'leaderboard_updates',
-      onMessage: (newLeaderboard) => {
-        setLeaderboard(newLeaderboard);
-      }
-    });
+const channel = context.useChannel({
+  name: 'leaderboard_updates',
+  onMessage: (newLeaderboard) => {
+    setLeaderboard(newLeaderboard);
+  },
+});
 ```
 
 Using realtime ensures that extra requests will not impact your app’s performance, and the app only emits the event when the data has changed.

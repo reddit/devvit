@@ -159,9 +159,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Submit custom post',
   onPress: async (_, context) => {
-    const { reddit, ui } = context;
-    const currentSubreddit = await reddit.getCurrentSubreddit();
-    await reddit.submitPost({
+    const currentSubreddit = await context.reddit.getCurrentSubreddit();
+    await context.reddit.submitPost({
       title: 'My custom post',
       subredditName: currentSubreddit.name,
       preview: (
@@ -170,7 +169,7 @@ Devvit.addMenuItem({
         </vstack>
       ),
     });
-    ui.showToast(`Submitted custom post to ${currentSubreddit.name}`);
+    context.ui.showToast(`Submitted custom post to ${currentSubreddit.name}`);
   },
 });
 ```

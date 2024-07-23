@@ -136,19 +136,18 @@ Devvit.addSchedulerJob({
         await post.remove();
       }
     }
-  }
+  },
 });
 
 Devvit.addMenuItem({
   label: 'Check for new posts',
   location: 'location',
-  onPress: (event, context) => {
-    const { scheduler } = context;
-    const = await scheduler.runJob({
+  onPress: async (event, context) => {
+    const jobId = await context.scheduler.runJob({
       name: 'checkNewPosts',
-      when: new Date(Date.now() + 5000) // in 5 seconds
+      when: new Date(Date.now() + 5000), // in 5 seconds
     });
-  }
+  },
 });
 ```
 

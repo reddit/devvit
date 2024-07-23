@@ -16,9 +16,8 @@ Devvit.configure({
 
 // use within one of our capability handlers e.g. Menu Actions, Triggers, Scheduled Job Type, etc
 async (event, context) => {
-  const { reddit } = context;
-  const subreddit = await reddit.getSubredditById(context.subredditId);
-  context.reddit.submitPost({
+  const subreddit = await context.reddit.getSubredditById(context.subredditId);
+  await context.reddit.submitPost({
     subredditName: subreddit.name,
     title: 'test post',
     text: 'test body',
