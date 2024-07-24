@@ -6,7 +6,7 @@ To use the latest version of Devvit, follow the [upgrade instructions](https://d
 
 ## Devvit 0.10.23: Additional triggers and some fixes
 
-**Release Date: Jul 24, 2024**
+**Release Date: July 24, 2024**
 
 Devvit 0.10.23 adds new [mod triggers](./capabilities/triggers.md#nsfw-and-spoiler-triggers) when user posts are marked as NSFW or spoiler by mods.
 

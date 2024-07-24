@@ -25,13 +25,15 @@ Event triggers let your app automatically respond to a user’s action. For exam
 - PostCreate
 - PostDelete
 - PostFlairUpdate
+- PostNsfwUpdate
+- PostSpoilerUpdate
 - PostReport
 - PostSubmit
 - PostUpdate
 
 This example adds event triggers that will automatically execute your app. Once a trigger is added, your app listens for the event and the event handler executes the action.
 
-```ts
+```tsx
 import { Devvit } from '@devvit/public-api';
 
 // Logging on a PostSubmit event
@@ -63,11 +65,13 @@ Be careful when creating recursive triggers (like a comment trigger that creates
 
 :::
 
-## Modmail trigger
+## Mod triggers
 
-The modmail trigger alerts the mod when modmail is sent or received. This example enables the app to listen to modmail events and fetch the relevant message payload via the Reddit API wrapper.
+### Modmail trigger
 
-```ts
+This alerts the mod when modmail is sent or received. This example enables the app to listen to modmail events and fetch the relevant message payload via the Reddit API wrapper.
+
+```tsx
 import { Devvit } from '@devvit/public-api';
 
 Devvit.configure({ redditAPI: true });
@@ -98,6 +102,53 @@ Devvit.addTrigger({
 });
 
 export default Devvit;
+```
+
+### NSFW and spoiler triggers
+
+These are triggered when a mod or automod marks a post as NSFW or a spoiler.
+
+:::note
+NSFW and spoiler triggers only work for user posts that a moderator flags. Moderators cannot trigger a label for their own posts.
+:::
+
+**NSFW example**
+
+```tsx
+Devvit.addTrigger({
+  event: 'PostNsfwUpdate',
+  onEvent: async (event, context) => {
+    //App received this event when:
+    // moderator changes a non-moderator post to nsfw
+    // automoderator changes post from nsfw to sfw
+    console.log(`Received nsfw trigger event:\n${JSON.stringify(event)}`);
+    if (event.isNsfw) {
+      console.log(`This is event ${JSON.stringify(event)} changed to nsfw`);
+    } else {
+      console.log(`This is event ${JSON.stringify(event)} changed to non-nsfw`);
+    }
+  },
+});
+```
+
+**Spoiler example**
+
+```tsx
+Devvit.addTrigger({
+  event: 'PostSpoilerUpdate',
+  onEvent: async (event, context) => {
+    //App received this event when:
+    // moderator changes a non-moderator post to spoiler
+    // moderator changes post from spoiler to non-spoiler
+
+    console.log(`Received spoiler trigger event:\n${JSON.stringify(event)}`);
+    if (event.isSpoiler) {
+      console.log(`This is event ${JSON.stringify(event)} changed to spoiler`);
+    } else {
+      console.log(`This is event ${JSON.stringify(event)} changed to non-spoiler`);
+    }
+  },
+});
 ```
 
 ## Mod actions
