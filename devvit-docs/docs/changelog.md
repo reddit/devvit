@@ -4,6 +4,14 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 To use the latest version of Devvit, follow the [upgrade instructions](https://developers.reddit.com/docs/update-devvit).
 
+## Devvit 0.10.23: Additional triggers and some fixes
+
+**Release Date: Jul 24, 2024**
+
+Devvit 0.10.23 adds new [mod triggers](./capabilities/triggers.md#nsfw-and-spoiler-triggers) when user posts are marked as NSFW or spoiler by mods.
+
+This release also includes some hot fixes related to the realtime capability and our CLI metrics.
+
 ## Devvit 0.10.22: Adding image uploads to forms and CLI metrics
 
 **Release Date: June 10, 2024**
