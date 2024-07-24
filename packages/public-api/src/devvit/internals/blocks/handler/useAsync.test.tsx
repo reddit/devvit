@@ -123,7 +123,6 @@ describe('regressions', () => {
     };
     response = await handler.handle(request, mockMetadata);
     expect(response.state!['App.useState-0'].value).toEqual(2);
-    expect(response.events).toEqual([asyncRequestEvent(asyncRef, 2)]);
   });
 
   test("error response doesn't requeue", async () => {
@@ -184,6 +183,7 @@ describe('invalidation', () => {
           "load_state": "loading",
         },
         "App.useState-0": {
+          "load_state": "loaded",
           "value": 1,
         },
         "__cache": {},

@@ -14,7 +14,7 @@ export type AsyncOptions = {
   depends?: JSONValue;
 };
 
-type LoadState = 'initial' | 'loading' | 'loaded' | 'error' | 'disabled';
+export type LoadState = 'initial' | 'loading' | 'loaded' | 'error' | 'disabled';
 
 type AsyncState<S extends JSONValue> = {
   depends: JSONValue;

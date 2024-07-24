@@ -18,11 +18,13 @@ exports[`useInterval > initial state is stopped 1`] = `
     "running": false,
   },
   "component.useState-0": {
+    "load_state": "loaded",
     "value": {
       "foo": "bar",
     },
   },
   "component.useState-1": {
+    "load_state": "loaded",
     "value": 0,
   },
 }

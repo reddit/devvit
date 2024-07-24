@@ -2,6 +2,7 @@ import type { Effect, Metadata, UIEvent, UIRequest } from '@devvit/protos';
 import type { Devvit } from '../../../Devvit.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
 import type { BlocksState, EventHandler, Hook, HookRef, HookSegment } from './types.js';
+import type { ReifiedBlockElement } from '../BlocksReconciler.js';
 
 /**
  * @internal
@@ -34,7 +35,18 @@ export class RenderContext implements EffectEmitter {
   _hooks: { [hookID: string]: Hook } = {};
   _prevHookId: string = '';
   _effects: { [key: string]: Effect } = {};
+
+  /**
+   * While processing events, we do some renders to load hooks.  If those renders produce valid content, then
+   * we won't have to render at the end of the event processing, rather we can hang onto the last render and
+   * reuse it.
+   */
+  _latestRenderContent: ReifiedBlockElement | undefined;
+
+  /** Has this state been mutated since initially loaded? */
   _changed: { [hookID: string]: true } = {};
+  /** Does this hook still exist in the most recent render? */
+  _touched: { [hookID: string]: true } = {};
   /** Events that will re-enter the dispatcher queue */
   _requeueEvents: UIEvent[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

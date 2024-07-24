@@ -1,7 +1,5 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
-
-import type { UIRequest } from '@devvit/protos';
 import { describe, expect, test } from 'vitest';
 import type { UseStateResult } from '../../../../index.js';
 import { Devvit } from '../../../Devvit.js';
@@ -19,7 +17,7 @@ const syncLegacyComponent: Devvit.BlockComponent = (
   return <text>{state.foo}</text>;
 };
 
-const deprecatedComponent: Devvit.BlockComponent = (
+const objectComponent: Devvit.BlockComponent = (
   _props: JSX.Props,
   { useState }: Devvit.Context
 ) => {
@@ -112,8 +110,8 @@ describe('useState', () => {
       }
     );
 
-    test('async deprecation works again', async () => {
-      const handler = new BlocksHandler(deprecatedComponent);
+    test('state isnt null while async request in flight ', async () => {
+      const handler = new BlocksHandler(objectComponent);
       await handler.handle(EmptyRequest, mockMetadata);
     });
 
@@ -121,19 +119,7 @@ describe('useState', () => {
       const handler = new BlocksHandler(asyncComponent);
       const response = await handler.handle(EmptyRequest, mockMetadata);
 
-      expect(response.state).toMatchSnapshot();
-      expect(response.events.length).toEqual(1);
-      expect(response.blocks).toBeUndefined();
-
-      const event = response.events[0];
-      expect(event?.async).toBeFalsy();
-      const next: UIRequest = {
-        events: [event],
-        state: response.state,
-      };
-      const nextResponse = await handler.handle(next, mockMetadata);
-      expect(nextResponse.events.length).toEqual(0);
-      expect(JSON.stringify(nextResponse.blocks ?? '')).toContain('hello world');
+      expect(JSON.stringify(response.blocks ?? '')).toContain('hello world');
     });
   });
 });
@@ -142,16 +128,16 @@ describe('state setter', () => {
   test('updates the value given a new value', async () => {
     const handler = new BlocksHandler(counterComponent);
     await handler.handle(EmptyRequest, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 0 });
+    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded' });
     let req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 1 });
+    expect(findHookState(counterRef)).toEqual({ value: 1, load_state: 'loaded' });
     req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 2 });
+    expect(findHookState(counterRef)).toEqual({ value: 2, load_state: 'loaded' });
     req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 3 });
+    expect(findHookState(counterRef)).toEqual({ value: 3, load_state: 'loaded' });
   });
 
   test('can be used multiple times in a component', async () => {
@@ -173,12 +159,12 @@ describe('state setter', () => {
   test('handles void or undefined values properly', async () => {
     const handler = new BlocksHandler(conditionalComponent);
     await handler.handle(EmptyRequest, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 0 });
+    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded' });
     for (let i = 0; i < 15; i++) {
       const req = generatePressRequest(counterButtonRef);
       await handler.handle(req, mockMetadata);
     }
-    expect(findHookState(counterRef)).toEqual({ value: 0 });
+    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded' });
   });
 
   test('typing is intuitive', () => {

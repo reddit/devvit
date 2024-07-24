@@ -18,6 +18,7 @@ exports[`when circuit-breaking: false > receiving request 1`] = `
     "load_state": "loading",
   },
   "App.useState-0": {
+    "load_state": "loaded",
     "value": 1,
   },
   "__cache": {},
@@ -42,6 +43,7 @@ exports[`when circuit-breaking: true > receiving request 1`] = `
     "load_state": "loading",
   },
   "App.useState-0": {
+    "load_state": "loaded",
     "value": 1,
   },
   "__cache": {},

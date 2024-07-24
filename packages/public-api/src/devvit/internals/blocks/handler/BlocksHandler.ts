@@ -1,7 +1,6 @@
 import type { UIEvent } from '@devvit/protos';
 import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
-import isEqual from 'lodash.isequal';
 import type { BlockElement } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
 import { BlocksTransformer } from '../BlocksTransformer.js';
@@ -81,6 +80,7 @@ export function registerHook<H extends Hook>(
 
   const hookId = _activeRenderContext.nextHookId(options);
   const context = _activeRenderContext;
+  context._touched[hookId] = true;
   const params: HookParams = {
     hookId,
     invalidate: () => {
@@ -157,6 +157,14 @@ export class BlocksHandler {
       | undefined;
     let remaining: UIEvent[] = [...eventsToProcess];
 
+    /**
+     * When purely rendering, we now add one synthetic event.  This enables us to loop over the events that an initial render may generate
+     * in an async world.  This is a bit of a hack, but it's the simplest way to handle this.
+     */
+    if (eventsToProcess.length === 0) {
+      eventsToProcess.push({});
+    }
+
     if (this.#debug) console.debug('[blocks] starting processing events');
     while (eventsToProcess.length > 0) {
       if (this.#debug)
@@ -185,6 +193,7 @@ export class BlocksHandler {
         }
       } catch (e) {
         if (this.#debug) console.debug('[blocks] caught in handler', e);
+        context._latestRenderContent = undefined;
         /**
          * If we have a progress, we can recover from an error by rolling back to the last progress, and then letting the
          * remaining events be reprocessed.
@@ -202,6 +211,7 @@ export class BlocksHandler {
           context.addToRequeueEvents(...requeueable);
           break;
         } else {
+          console.error('[blocks] unhandled error in handler', e);
           throw e;
         }
       }
@@ -249,37 +259,16 @@ export class BlocksHandler {
       }
     } // End of while loop
 
+    // Rendering only happens on the main queue.
     if (isMainQueue) {
-      const stateCopy = _structuredClone(context._state);
-      const eventsCopy = [...context._requeueEvents];
-      const effectsCopy = { ...context._effects };
-
-      // Rendering only happens on the main queue.
-      const tags = this.#renderRoot(this.#root, context._rootProps ?? {}, context);
-
-      /**
-       * It's technically ok for renderRoot to mutate, but that's only in the context of loadHooks.  This render should
-       * be idempotent, so we're going to enforce that it doesn't mutate state.
-       *
-       * TODO: hide this behind a flag, because it's possibly expensive.
-       */
-      if (!isEqual(context._state, stateCopy)) {
-        console.error('[blocks] State was mutated during rendering', context._state, stateCopy);
-      }
-      if (!isEqual(context._requeueEvents, eventsCopy)) {
-        console.error(
-          '[blocks] Events were mutated during rendering',
-          context._requeueEvents,
-          eventsCopy
+      if (!context._latestRenderContent) {
+        context._latestRenderContent = this.#renderRoot(
+          this.#root,
+          context.request.props ?? {},
+          context
         );
       }
-      if (!isEqual(context._effects, effectsCopy)) {
-        console.error(
-          '[blocks] Effects were mutated during rendering',
-          context._effects,
-          effectsCopy
-        );
-      }
+      const tags = context._latestRenderContent;
 
       if (tags) {
         blocks = this.#blocksTransformer.createBlocksElementOrThrow(tags);
@@ -301,8 +290,13 @@ export class BlocksHandler {
 
   #loadHooks(context: RenderContext, ..._events: UIEvent[]): void {
     // TBD: partial rendering
-    context._hooks = {};
+    context._touched = {};
     this.#renderRoot(this.#root, context.request.props ?? {}, context);
+    for (const hookId in context._hooks) {
+      if (!context._touched[hookId]) {
+        delete context._hooks[hookId];
+      }
+    }
   }
 
   /**
@@ -359,8 +353,7 @@ export class BlocksHandler {
       await this.#attemptHook(context, event);
       if (this.#debug) console.log('[blocks] after', context._state);
     }
-
-    // TODO: Decide whether this is excessive.  It doesn't hurt anything besides performance.
+    // We need this to process possible unmounts given the most recent event
     this.#loadHooks(context);
   }
 
@@ -396,6 +389,8 @@ export class BlocksHandler {
           `The root element must return a valid block, not a string. Try wrapping the element in a <text>your content</text> tag to continue.`
         );
       }
+
+      context._latestRenderContent = root;
 
       return root;
     } catch (e) {

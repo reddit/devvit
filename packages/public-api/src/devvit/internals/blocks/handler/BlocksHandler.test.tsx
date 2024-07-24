@@ -88,8 +88,32 @@ const ConditionalComponent = (): JSX.Element => {
   );
 };
 
+let n = 0;
+const AsyncStateComponent = (): JSX.Element => {
+  const [_count, setCount] = captureHookRef(
+    useState(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      return n++;
+    }),
+    stateARef
+  );
+  return <button onPress={captureHookRef(() => setCount((c) => ++c), pressARef)}>A</button>;
+};
+
 describe('BlocksHandler', () => {
   describe('regressions', () => {
+    test('async initializer should only fire once, because the state is already there in the second request', async () => {
+      expect(!vi.isFakeTimers());
+      n = 0;
+      const handler = new BlocksHandler(AsyncStateComponent);
+      const rsp = await handler.handle(EmptyRequest, mockMetadata);
+      expect(n).toBe(1);
+
+      const req = { ...EmptyRequest, state: rsp.state };
+      await handler.handle(req, mockMetadata);
+      expect(n).toBe(1);
+    });
+
     test('conditional components should not throw (bonus test)', async () => {
       const handler = new BlocksHandler(ConditionalComponent);
       await handler.handle(EmptyRequest, mockMetadata);
@@ -112,9 +136,11 @@ describe('BlocksHandler', () => {
             "__deleted": true,
           },
           "ConditionalComponent.hstack.ComponentB-1.useState-0": {
+            "load_state": "loaded",
             "value": 0,
           },
           "ConditionalComponent.useState-0": {
+            "load_state": "loaded",
             "value": false,
           },
           "__cache": {},
@@ -314,8 +340,8 @@ describe('BlocksHandler', () => {
       {
         // initial.
         const rsp = await handler.handle(EmptyRequest, mockMetadata);
-        expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 0 });
-        expect(rsp.state![findHookId(counter2Ref)]).toEqual({ value: 0 });
+        expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 0, load_state: 'loaded' });
+        expect(rsp.state![findHookId(counter2Ref)]).toEqual({ value: 0, load_state: 'loaded' });
         expect(findHookValue(counter1Ref)).toBe(0);
         expect(findHookValue(counter2Ref)).toBe(0);
       }
@@ -324,7 +350,7 @@ describe('BlocksHandler', () => {
         // press button1.
         const req = generatePressRequest(positiveRef);
         const rsp = await handler.handle(req, mockMetadata);
-        expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 1 });
+        expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 1, load_state: 'loaded' });
         expect(rsp.state![findHookId(counter2Ref)]).toBe(undefined);
         expect(findHookValue(counter1Ref)).toBe(1);
         expect(findHookValue(counter2Ref)).toBe(0);
@@ -335,7 +361,7 @@ describe('BlocksHandler', () => {
         const req = generatePressRequest(negativeRef);
         const rsp = await handler.handle(req, mockMetadata);
         expect(rsp.state![findHookId(counter1Ref)]).toBe(undefined);
-        expect(rsp.state![findHookId(counter2Ref)]).toEqual({ value: -1 });
+        expect(rsp.state![findHookId(counter2Ref)]).toEqual({ value: -1, load_state: 'loaded' });
         expect(findHookValue(counter1Ref)).toBe(1);
         expect(findHookValue(counter2Ref)).toBe(-1);
       }
@@ -372,7 +398,7 @@ describe('BlocksHandler', () => {
       expect(rsp.events[1].hook).toBe(req.events[0].hook);
       expect(rsp.events[1].retry).toBe(true);
 
-      expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 3 });
+      expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 3, load_state: 'loaded' });
       expect(findHookValue(counter1Ref)).toBe(3);
     });
   });

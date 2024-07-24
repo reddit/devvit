@@ -183,6 +183,7 @@ exports[`useForm > test rendering FormSubmittedEvent 1`] = `
   "events": [],
   "state": {
     "App2.useState-0": {
+      "load_state": "loaded",
       "value": "Genghis Corgi",
     },
     "__cache": {},
