@@ -1,6 +1,5 @@
 import * as protos from '@devvit/protos';
 import type { PaymentsService } from '@devvit/protos/payments.js';
-import { PaymentsServiceDefinition } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
@@ -136,47 +135,43 @@ export class Devvit extends Actor {
     this.#config = { ...this.#config, ...config };
 
     if (pluginIsEnabled(config.http)) {
-      this.#use(protos.HTTPDefinition);
+      this.use(protos.HTTPDefinition);
     }
 
     if (pluginIsEnabled(config.kvStore) || pluginIsEnabled(config.redis)) {
-      this.#use(protos.KVStoreDefinition);
-      this.#use(protos.RedisAPIDefinition);
+      this.use(protos.KVStoreDefinition);
+      this.use(protos.RedisAPIDefinition);
     }
 
     if (pluginIsEnabled(config.media)) {
-      this.#use(protos.MediaServiceDefinition);
+      this.use(protos.MediaServiceDefinition);
     }
 
     if (pluginIsEnabled(config.modLog)) {
-      this.#use(protos.ModlogDefinition);
+      this.use(protos.ModlogDefinition);
     }
 
     if (pluginIsEnabled(config.redditAPI)) {
       // Loading all Reddit API plugins for now.
       // In the future we can split this by oauth scope or section.
-      this.#use(protos.FlairDefinition);
-      this.#use(protos.GraphQLDefinition);
-      this.#use(protos.LinksAndCommentsDefinition);
-      this.#use(protos.ListingsDefinition);
-      this.#use(protos.ModerationDefinition);
-      this.#use(protos.ModNoteDefinition);
-      this.#use(protos.NewModmailDefinition);
-      this.#use(protos.PrivateMessagesDefinition);
-      this.#use(protos.SubredditsDefinition);
-      this.#use(protos.PostCollectionsDefinition);
-      this.#use(protos.UsersDefinition);
-      this.#use(protos.WidgetsDefinition);
-      this.#use(protos.WikiDefinition);
-      this.#use(protos.RedditAPIV2Definition);
+      this.use(protos.FlairDefinition);
+      this.use(protos.GraphQLDefinition);
+      this.use(protos.LinksAndCommentsDefinition);
+      this.use(protos.ListingsDefinition);
+      this.use(protos.ModerationDefinition);
+      this.use(protos.ModNoteDefinition);
+      this.use(protos.NewModmailDefinition);
+      this.use(protos.PrivateMessagesDefinition);
+      this.use(protos.SubredditsDefinition);
+      this.use(protos.PostCollectionsDefinition);
+      this.use(protos.UsersDefinition);
+      this.use(protos.WidgetsDefinition);
+      this.use(protos.WikiDefinition);
+      this.use(protos.RedditAPIV2Definition);
     }
 
     if (pluginIsEnabled(config.realtime)) {
-      this.#use(protos.RealtimeDefinition);
-    }
-
-    if (pluginIsEnabled(config.payments)) {
-      this.#use(PaymentsServiceDefinition);
+      this.use(protos.RealtimeDefinition);
     }
   }
 
@@ -282,7 +277,7 @@ export class Devvit extends Actor {
    */
   static addSchedulerJob<T extends JSONObject | undefined>(job: ScheduledJobType<T>): void {
     if (!this.#pluginClients[protos.SchedulerDefinition.fullName]) {
-      this.#use(protos.SchedulerDefinition);
+      this.use(protos.SchedulerDefinition);
     }
 
     if (this.#scheduledJobHandlers.has(job.name)) {
@@ -361,7 +356,7 @@ export class Devvit extends Actor {
     }
 
     if (!this.#pluginClients[protos.SettingsDefinition.fullName]) {
-      this.#use(protos.SettingsDefinition);
+      this.use(protos.SettingsDefinition);
     }
   }
 
@@ -452,7 +447,7 @@ export class Devvit extends Actor {
   } = {};
 
   /** @internal */
-  static #use<T>(d: protos.Definition, opts?: DeepPartial<protos.PackageQuery>): T {
+  static use<T>(d: protos.Definition, opts?: DeepPartial<protos.PackageQuery>): T {
     this.#uses[d.fullName] = {
       def: d,
       options: opts ?? {},
@@ -620,19 +615,6 @@ export class Devvit extends Actor {
     }
 
     return realtime as protos.Realtime;
-  }
-
-  /** @internal */
-  static get paymentsPlugin(): PaymentsService {
-    const payments = this.#pluginClients[PaymentsServiceDefinition.fullName];
-
-    if (!payments) {
-      throw new Error(
-        'Payments is not enabled. You can enable it by passing `payments: true` to `Devvit.configure`'
-      );
-    }
-
-    return payments as PaymentsService;
   }
 
   /** @internal */

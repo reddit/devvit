@@ -89,8 +89,8 @@ export type HookParams = {
 };
 
 /**
- * Circuit-breaking triggers a {remoteOnly=true, async=false, retry=true} event.
- * This triggers a {remoteOnly=false, async=true, retry=false} event. In
+ * Circuit-breaking triggers a {scope=REMOTE, async=false, retry=true} event.
+ * This triggers a {scope=ALL, async=true, retry=false} event. In
  * practice, that has some slight implications for how it flows through the
  * event loop. If we wanted to, we could change this out, if we fully understand
  * the semantics. This aligns more with useAsync than circuit-breaking today,

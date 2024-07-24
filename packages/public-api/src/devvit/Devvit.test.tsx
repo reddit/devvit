@@ -34,18 +34,6 @@ describe('configure', () => {
 
     expect(() => Devvit.realtimePlugin).toBeDefined();
   });
-
-  test('should configure additional plugins without overriding previous configs', () => {
-    Devvit.configure({
-      payments: true,
-    });
-
-    Devvit.configure({
-      redditAPI: true,
-    });
-
-    expect(() => Devvit.paymentsPlugin).toBeDefined();
-  });
 });
 
 describe('components type system', () => {
