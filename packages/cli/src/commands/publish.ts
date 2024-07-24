@@ -1,19 +1,17 @@
 import type { LinkedBundle } from '@devvit/protos';
 import type {
   AppInfo,
-  FullAppInfo,
+  AppVersionUpdateRequest,
   FullAppVersionInfo,
-  OptionalVersionVisibility,
 } from '@devvit/protos/community.js';
 import {
-  AppVersionUpdateRequest,
-  GetAppBySlugRequest,
+  AppPublishRequestVisibility,
   InstallationType,
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
-import { Args, ux } from '@oclif/core';
+import { Args, Flags, ux } from '@oclif/core';
 import chalk from 'chalk';
 import open from 'open';
 import {
@@ -26,6 +24,7 @@ import { getInfoForSlugString } from '../util/common-actions/slugVersionStringTo
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { readLine } from '../util/input-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
+import inquirer from 'inquirer';
 
 export default class Publish extends ProjectCommand {
   static override description =
@@ -46,12 +45,27 @@ export default class Publish extends ProjectCommand {
     }),
   };
 
+  static override flags = {
+    public: Flags.boolean({
+      name: 'public',
+      description: 'Submit the app for review to be published publicly',
+      required: false,
+    }),
+    unlisted: Flags.boolean({
+      name: 'unlisted',
+      description:
+        'Submit the app for review to be published unlisted (installable only by you, ' +
+        'but removes subreddit size restrictions)',
+      required: false,
+    }),
+  };
+
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();
   readonly #appPRClient = createAppPublishRequestClient();
 
   async run(): Promise<void> {
-    const { args } = await this.parse(Publish);
+    const { args, flags } = await this.parse(Publish);
     const appWithVersion = await this.inferAppNameAndVersion(args.appWithVersion);
 
     await this.checkIfUserLoggedIn();
@@ -71,6 +85,7 @@ export default class Publish extends ProjectCommand {
     if (!appInfo.app) {
       this.error('There was an error retrieving the app info.');
     }
+    const appDetailsUrl = `${DEVVIT_PORTAL_URL}/apps/${appInfo.app.slug}`;
 
     const resp = await this.#appVersionClient.GetAppVersionBundle({
       id: appVersion.id,
@@ -78,22 +93,6 @@ export default class Publish extends ProjectCommand {
     const bundle = resp.actorBundles[0].bundle;
     if (!bundle) {
       this.error(`There was an error getting the bundles for that app version.`);
-    }
-
-    const appCreatesCustomPost = await this.#checkIfAppCreatesCustomPost(bundle);
-    if (appCreatesCustomPost) {
-      this.log(
-        "Custom post apps need to be approved before they can be published, so I'll submit your app for review!"
-      );
-      await this.#submitForReview(appVersion.id, devvitVersion);
-      return;
-    }
-
-    const appUsesFetch = await this.#checkIfAppUsesFetch(bundle);
-    const appDetailsUrl = `${DEVVIT_PORTAL_URL}/apps/${appInfo.app.slug}`;
-
-    if (appUsesFetch) {
-      await this.checkAppVersionTermsAndConditions(appInfo.app, appDetailsUrl);
     }
 
     if (appVersion.visibility !== VersionVisibility.PRIVATE) {
@@ -105,45 +104,64 @@ export default class Publish extends ProjectCommand {
       return;
     }
 
-    await this.#updateVersion(appVersion.id, devvitVersion);
+    let visibility: AppPublishRequestVisibility = AppPublishRequestVisibility.UNRECOGNIZED;
+    if (flags['public'] && flags['unlisted']) {
+      this.error('You cannot specify both --public and --unlisted flags - pick one!');
+    }
+    if (flags['public']) {
+      visibility = AppPublishRequestVisibility.PUBLIC;
+    }
+    if (flags['unlisted']) {
+      visibility = AppPublishRequestVisibility.UNLISTED;
+    }
+    if (visibility === AppPublishRequestVisibility.UNRECOGNIZED) {
+      visibility = await this.#promptForVisibility();
+    }
+
+    const appCreatesCustomPost = await this.#checkIfAppCreatesCustomPost(bundle);
+    if (appCreatesCustomPost) {
+      this.log(
+        "Custom post apps need to be approved before they can be published, so I'll submit your app for review!"
+      );
+      await this.#submitForReview(appVersion.id, devvitVersion, visibility);
+      return;
+    }
+
+    const appUsesFetch = await this.#checkIfAppUsesFetch(bundle);
+
+    if (appUsesFetch) {
+      await this.checkAppVersionTermsAndConditions(appInfo.app, appDetailsUrl);
+    }
+
+    await this.#updateVersion(appVersion.id, devvitVersion, visibility);
     this.log(`\n✨ Visit ${chalk.cyan.bold(`${appDetailsUrl}`)} to view your app!`);
   }
 
   async #updateVersion(
     appVersionId: string,
-    devvitVersion: DevvitVersion
+    devvitVersion: DevvitVersion,
+    visibility: AppPublishRequestVisibility
   ): Promise<FullAppVersionInfo> {
-    const visibility: OptionalVersionVisibility = {
-      value: VersionVisibility.UNLISTED,
-    };
-
-    const appVersionUpdateRequest = AppVersionUpdateRequest.fromPartial({
+    const appVersionUpdateRequest: AppVersionUpdateRequest = {
       id: appVersionId,
-      visibility,
+      visibility: {
+        // Regardless of what you requested, we give you UNLISTED for free immediately
+        value: VersionVisibility.UNLISTED,
+      },
       validInstallTypes: [InstallationType.SUBREDDIT],
-    });
+      pool: 0, // Don't change the pool
+    };
 
     ux.action.start(`Publishing version "${devvitVersion.toString()}" to Reddit...`);
     try {
       const appVersionInfo = await this.#appVersionClient.Update(appVersionUpdateRequest);
       ux.action.stop(`Success! ✅`);
 
-      await this.#submitForReview(appVersionId, devvitVersion);
+      await this.#submitForReview(appVersionId, devvitVersion, visibility);
 
       return appVersionInfo;
     } catch (error) {
       return handleTwirpError(error, (message: string) => this.error(message));
-    }
-  }
-
-  /**
-   * throws error if the app is not found, or if the user doesn't have permission to view the app
-   */
-  async getAppBySlug(slug: string): Promise<FullAppInfo> {
-    try {
-      return await this.#appClient.GetBySlug(GetAppBySlugRequest.fromPartial({ slug }));
-    } catch (err) {
-      this.error(StringUtil.caughtToString(err));
     }
   }
 
@@ -178,10 +196,14 @@ export default class Publish extends ProjectCommand {
     }
   };
 
-  async #submitForReview(appVersionId: string, devvitVersion: DevvitVersion): Promise<void> {
+  async #submitForReview(
+    appVersionId: string,
+    devvitVersion: DevvitVersion,
+    visibility: AppPublishRequestVisibility
+  ): Promise<void> {
     ux.action.start(`Submitting version "${devvitVersion.toString()}" for review...`);
     try {
-      await this.#appPRClient.Submit({ appVersionId });
+      await this.#appPRClient.Submit({ appVersionId, visibility });
       ux.action.stop(`Success! ✅ You'll receive a DM when your app has been reviewed.`);
       return;
     } catch (err) {
@@ -190,5 +212,28 @@ export default class Publish extends ProjectCommand {
       }
       this.error(StringUtil.caughtToString(err));
     }
+  }
+
+  async #promptForVisibility(): Promise<AppPublishRequestVisibility> {
+    const res = await inquirer.prompt<{ visibility: AppPublishRequestVisibility }>([
+      {
+        name: 'visibility',
+        message: "What visibility would you like for your app once it's approved?",
+        type: 'list',
+        choices: [
+          {
+            name: 'Public',
+            value: AppPublishRequestVisibility.PUBLIC,
+            short: 'Publicly visible and installable by anyone',
+          },
+          {
+            name: 'Unlisted',
+            value: AppPublishRequestVisibility.UNLISTED,
+            short: 'Installable only by you, but removes subreddit size restrictions',
+          },
+        ],
+      },
+    ]);
+    return res.visibility;
   }
 }
