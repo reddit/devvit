@@ -89,7 +89,7 @@ export type GetModNotesOptions = Prettify<
 
 export type CreateModNoteOptions = Prettify<
   PostNotesRequest & {
-    redditId: T1ID | T3ID;
+    redditId?: T1ID | T3ID;
     label: UserNoteLabel;
   }
 >;

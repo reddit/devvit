@@ -1002,7 +1002,7 @@ export class RedditAPIClient {
    * @param options - Options for the request
    * @param options.subreddit - The name of the subreddit to add the mod note to. e.g. 'memes'
    * @param options.user - The username of the user to add the mod note to. e.g. 'spez'
-   * @param options.redditId - The ID of the comment or post to add the mod note to. e.g. 't3_1234'
+   * @param options.redditId - (optional) The ID of the comment or post to add the mod note to. e.g. 't3_1234'
    * @param options.label - The label of the mod note. e.g. 'SPAM_WARNING'
    * @param options.note - The text of the mod note.
    * @returns A Promise that resolves if the mod note was successfully added.
@@ -1012,7 +1012,7 @@ export class RedditAPIClient {
   ): Promise<ModNote> {
     const req = {
       ...options,
-      redditId: asTID<T1ID | T3ID>(options.redditId),
+      redditId: options.redditId ? asTID<T1ID | T3ID>(options.redditId) : undefined,
     };
     return ModNote.add(req, this.#metadata);
   }
