@@ -39,7 +39,10 @@ export function omitRelativeSizes(
     blockSizes.width?.value?.unit === BlockSizeUnit.SIZE_UNIT_PERCENT ||
     blockSizes.width?.min?.unit === BlockSizeUnit.SIZE_UNIT_PERCENT
   ) {
-    if (stackParentLayout.direction === BlockStackDirection.STACK_HORIZONTAL) {
+    if (
+      stackParentLayout.direction === BlockStackDirection.STACK_HORIZONTAL ||
+      stackParentLayout.direction === BlockStackDirection.STACK_DEPTH
+    ) {
       if (!stackParentLayout.hasWidth) {
         blockSizes.width = undefined;
       }
@@ -50,7 +53,10 @@ export function omitRelativeSizes(
     blockSizes.height?.value?.unit === BlockSizeUnit.SIZE_UNIT_PERCENT ||
     blockSizes.height?.min?.unit === BlockSizeUnit.SIZE_UNIT_PERCENT
   ) {
-    if (stackParentLayout.direction === BlockStackDirection.STACK_VERTICAL) {
+    if (
+      stackParentLayout.direction === BlockStackDirection.STACK_VERTICAL ||
+      stackParentLayout.direction === BlockStackDirection.STACK_DEPTH
+    ) {
       if (!stackParentLayout.hasHeight) {
         blockSizes.height = undefined;
       }
