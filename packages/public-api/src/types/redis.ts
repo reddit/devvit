@@ -713,6 +713,7 @@ export type RedisClient = {
   /**
    * Increments the number stored at field in the hash stored at key by increment.
    * https://redis.io/commands/hincrby/
+   * @deprecated Use {@link RedisClient.hIncrBy} instead.
    * @arg {} key
    * @arg {} field
    * @arg {} value
@@ -722,7 +723,6 @@ export type RedisClient = {
   /**
    * Increments the number stored at field in the hash stored at key by increment.
    * https://redis.io/commands/hincrby/
-   * @deprecated Use {@link RedisClient.hIncrBy} instead.
    * @arg {} key
    * @arg {} field
    * @arg {} value
