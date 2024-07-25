@@ -75,3 +75,6 @@ vendor/
 vitest.config.js.timestamp-*.mjs
 
 yarn.lock # Don't commit this - we'll generate it ourselves.
+
+
+.snootobuf
