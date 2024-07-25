@@ -83,23 +83,47 @@ export type TxClientLike = {
    * Returns the length of the string value stored at key.
    * An error is returned when key holds a non-string value.
    * https://redis.io/commands/strlen/
+   * @deprecated Use {@link TxClientLike.strLen} instead.
    * @arg {} key
    * @returns length of the string stored at key
    */
   strlen(key: string): Promise<TxClientLike>;
+  /**
+   * Returns the length of the string value stored at key.
+   * An error is returned when key holds a non-string value.
+   * https://redis.io/commands/strlen/
+   * @arg {} key
+   * @returns length of the string stored at key
+   */
+  strLen(key: string): Promise<TxClientLike>;
+  /**
+   * Returns the values of all specified keys.
+   * https://redis.io/commands/mget/
+   * @deprecated Use {@link TxClientLike.mGet} instead.
+   * @arg {} keys
+   * @returns list of values at the specified keys
+   */
+  mget(keys: string[]): Promise<TxClientLike>;
   /**
    * Returns the values of all specified keys.
    * https://redis.io/commands/mget/
    * @arg {} keys
    * @returns list of values at the specified keys
    */
-  mget(keys: string[]): Promise<TxClientLike>;
+  mGet(keys: string[]): Promise<TxClientLike>;
+  /**
+   * Sets the given keys to their respective values.
+   * https://redis.io/commands/mset/
+   * @deprecated Use {@link TxClientLike.mSet} instead.
+   * @arg {} keyValues
+   */
+  mset(keyValues: { [key: string]: string }): Promise<TxClientLike>;
   /**
    * Sets the given keys to their respective values.
    * https://redis.io/commands/mset/
    * @arg {} keyValues
    */
-  mset(keyValues: { [key: string]: string }): Promise<TxClientLike>;
+  mSet(keyValues: { [key: string]: string }): Promise<TxClientLike>;
   /**
    * Set a timeout on key.
    * https://redis.io/commands/expire/
@@ -221,11 +245,29 @@ export type TxClientLike = {
   /**
    * Sets the specified fields to their respective values in the hash stored at key.
    * https://redis.io/commands/hset
+   * @deprecated Use {@link TxClientLike.hSet} instead.
    * @arg {} key
    * @arg {} fieldValues
    * @returns number of fields that were added
    */
   hset(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike>;
+  /**
+   * Sets the specified fields to their respective values in the hash stored at key.
+   * https://redis.io/commands/hset
+   * @arg {} key
+   * @arg {} fieldValues
+   * @returns number of fields that were added
+   */
+  hSet(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike>;
+  /**
+   * Returns the value associated with field in the hash stored at key.
+   * https://redis.io/commands/hget
+   * @deprecated Use {@link TxClientLike.hGet} instead.
+   * @arg {} key
+   * @arg {} field
+   * @returns value associated with field
+   */
+  hget(key: string, field: string): Promise<TxClientLike>;
   /**
    * Returns the value associated with field in the hash stored at key.
    * https://redis.io/commands/hget
@@ -233,14 +275,31 @@ export type TxClientLike = {
    * @arg {} field
    * @returns value associated with field
    */
-  hget(key: string, field: string): Promise<TxClientLike>;
+  hGet(key: string, field: string): Promise<TxClientLike>;
+  /**
+   * Returns all fields and values of the hash stored at key
+   * https://redis.io/commands/hgetall
+   * @deprecated Use {@link TxClientLike.hGetAll} instead.
+   * @arg {} key
+   * @returns a map of fields and their values stored in the hash,
+   */
+  hgetall(key: string): Promise<TxClientLike>;
   /**
    * Returns all fields and values of the hash stored at key
    * https://redis.io/commands/hgetall
    * @arg {} key
    * @returns a map of fields and their values stored in the hash,
    */
-  hgetall(key: string): Promise<TxClientLike>;
+  hGetAll(key: string): Promise<TxClientLike>;
+  /**
+   * Removes the specified fields from the hash stored at key.
+   * https://redis.io/commands/hdel/
+   * @deprecated Use {@link TxClientLike.hDel} instead.
+   * @arg {} key
+   * @arg {} fields
+   * @returns number of fields that were removed from the hash
+   */
+  hdel(key: string, fields: string[]): Promise<TxClientLike>;
   /**
    * Removes the specified fields from the hash stored at key.
    * https://redis.io/commands/hdel/
@@ -248,9 +307,10 @@ export type TxClientLike = {
    * @arg {} fields
    * @returns number of fields that were removed from the hash
    */
-  hdel(key: string, fields: string[]): Promise<TxClientLike>;
+  hDel(key: string, fields: string[]): Promise<TxClientLike>;
   /**
    * Iterates fields of Hash types and their associated values.
+   * @deprecated Use {@link TxClientLike.hScan} instead.
    * @arg {} key
    * @arg {} cursor
    * @arg {} pattern
@@ -263,10 +323,39 @@ export type TxClientLike = {
     count?: number | undefined
   ): Promise<TxClientLike>;
   /**
+   * Iterates fields of Hash types and their associated values.
+   * @arg {} key
+   * @arg {} cursor
+   * @arg {} pattern
+   * @arg {} count
+   */
+  hScan(
+    key: string,
+    cursor: number,
+    pattern?: string | undefined,
+    count?: number | undefined
+  ): Promise<TxClientLike>;
+  /**
    * Returns all field names in the hash stored at key.
+   * @deprecated Use {@link TxClientLike.hKeys} instead.
    * @arg {} key
    */
   hkeys(key: string): Promise<TxClientLike>;
+  /**
+   * Returns all field names in the hash stored at key.
+   * @arg {} key
+   */
+  hKeys(key: string): Promise<TxClientLike>;
+  /**
+   * Increments the number stored at field in the hash stored at key by increment.
+   * https://redis.io/commands/hincrby/
+   * @deprecated Use {@link TxClientLike.hIncrBy} instead.
+   * @arg {} key
+   * @arg {} field
+   * @arg {} value
+   * @returns value of key after the increment
+   */
+  hincrby(key: string, field: string, value: number): Promise<TxClientLike>;
   /**
    * Increments the number stored at field in the hash stored at key by increment.
    * https://redis.io/commands/hincrby/
@@ -275,13 +364,20 @@ export type TxClientLike = {
    * @arg {} value
    * @returns value of key after the increment
    */
-  hincrby(key: string, field: string, value: number): Promise<TxClientLike>;
+  hIncrBy(key: string, field: string, value: number): Promise<TxClientLike>;
+  /**
+   * Returns the number of fields contained in the hash stored at key.
+   * @deprecated Use {@link TxClientLike.hLen} instead.
+   * @arg {} key
+   * @returns the number of fields in the hash, or 0 when the key does not exist.
+   */
+  hlen(key: string): Promise<TxClientLike>;
   /**
    * Returns the number of fields contained in the hash stored at key.
    * @arg {} key
    * @returns the number of fields in the hash, or 0 when the key does not exist.
    */
-  hlen(key: string): Promise<TxClientLike>;
+  hLen(key: string): Promise<TxClientLike>;
 };
 
 // See redis.io/commands for what these do.
@@ -343,10 +439,19 @@ export type RedisClient = {
    * Returns the length of the string value stored at key.
    * An error is returned when key holds a non-string value.
    * https://redis.io/commands/strlen/
+   * @deprecated Use {@link RedisClient.strLen} instead.
    * @arg {} key
    * @returns length of the string stored at key
    */
   strlen(key: string): Promise<number>;
+  /**
+   * Returns the length of the string value stored at key.
+   * An error is returned when key holds a non-string value.
+   * https://redis.io/commands/strlen/
+   * @arg {} key
+   * @returns length of the string stored at key
+   */
+  strLen(key: string): Promise<number>;
   /**
    * Increments the number stored at key by increment.
    * https://redis.io/commands/incrby/
@@ -358,16 +463,31 @@ export type RedisClient = {
   /**
    * Returns the values of all specified keys.
    * https://redis.io/commands/mget/
+   * @deprecated Use {@link RedisClient.mGet} instead.
    * @arg {} keys
    * @returns list of values at the specified keys
    */
   mget(keys: string[]): Promise<(string | null)[]>;
   /**
+   * Returns the values of all specified keys.
+   * https://redis.io/commands/mget/
+   * @arg {} keys
+   * @returns list of values at the specified keys
+   */
+  mGet(keys: string[]): Promise<(string | null)[]>;
+  /**
+   * Sets the given keys to their respective values.
+   * https://redis.io/commands/mset/
+   * @deprecated Use {@link RedisClient.mSet} instead.
+   * @arg {} keyValues
+   */
+  mset(keyValues: { [key: string]: string }): Promise<void>;
+  /**
    * Sets the given keys to their respective values.
    * https://redis.io/commands/mset/
    * @arg {} keyValues
    */
-  mset(keyValues: { [key: string]: string }): Promise<void>;
+  mSet(keyValues: { [key: string]: string }): Promise<void>;
   /**
    * Set a timeout on key.
    * https://redis.io/commands/expire/
@@ -489,11 +609,29 @@ export type RedisClient = {
   /**
    * Sets the specified fields to their respective values in the hash stored at key.
    * https://redis.io/commands/hset
+   * @deprecated Use {@link RedisClient.hSet} instead.
    * @arg {} key
    * @arg {} fieldValues
    * @returns number of fields that were added
    */
   hset(key: string, fieldValues: { [field: string]: string }): Promise<number>;
+  /**
+   * Sets the specified fields to their respective values in the hash stored at key.
+   * https://redis.io/commands/hset
+   * @arg {} key
+   * @arg {} fieldValues
+   * @returns number of fields that were added
+   */
+  hSet(key: string, fieldValues: { [field: string]: string }): Promise<number>;
+  /**
+   * Returns the value associated with field in the hash stored at key.
+   * https://redis.io/commands/hget
+   * @deprecated Use {@link RedisClient.hGet} instead.
+   * @arg {} key
+   * @arg {} field
+   * @returns value associated with field
+   */
+  hget(key: string, field: string): Promise<string | undefined>;
   /**
    * Returns the value associated with field in the hash stored at key.
    * https://redis.io/commands/hget
@@ -501,14 +639,31 @@ export type RedisClient = {
    * @arg {} field
    * @returns value associated with field
    */
-  hget(key: string, field: string): Promise<string | undefined>;
+  hGet(key: string, field: string): Promise<string | undefined>;
+  /**
+   * Returns all fields and values of the hash stored at key
+   * https://redis.io/commands/hgetall
+   * @deprecated Use {@link RedisClient.hGetAll} instead.
+   * @arg {} key
+   * @returns a map of fields and their values stored in the hash,
+   */
+  hgetall(key: string): Promise<Record<string, string> | undefined>;
   /**
    * Returns all fields and values of the hash stored at key
    * https://redis.io/commands/hgetall
    * @arg {} key
    * @returns a map of fields and their values stored in the hash,
    */
-  hgetall(key: string): Promise<Record<string, string> | undefined>;
+  hGetAll(key: string): Promise<Record<string, string> | undefined>;
+  /**
+   * Removes the specified fields from the hash stored at key.
+   * https://redis.io/commands/hdel/
+   * @deprecated Use {@link RedisClient.hDel} instead.
+   * @arg {} key
+   * @arg {} fields
+   * @returns number of fields that were removed from the hash
+   */
+  hdel(key: string, fields: string[]): Promise<number>;
   /**
    * Removes the specified fields from the hash stored at key.
    * https://redis.io/commands/hdel/
@@ -516,9 +671,10 @@ export type RedisClient = {
    * @arg {} fields
    * @returns number of fields that were removed from the hash
    */
-  hdel(key: string, fields: string[]): Promise<number>;
+  hDel(key: string, fields: string[]): Promise<number>;
   /**
    * Iterates fields of Hash types and their associated values.
+   * @deprecated Use {@link RedisClient.hScan} instead.
    * @arg {} key
    * @arg {} cursor
    * @arg {} pattern
@@ -531,10 +687,29 @@ export type RedisClient = {
     count?: number | undefined
   ): Promise<HScanResponse>;
   /**
+   * Iterates fields of Hash types and their associated values.
+   * @arg {} key
+   * @arg {} cursor
+   * @arg {} pattern
+   * @arg {} count
+   */
+  hScan(
+    key: string,
+    cursor: number,
+    pattern?: string | undefined,
+    count?: number | undefined
+  ): Promise<HScanResponse>;
+  /**
    * Returns all field names in the hash stored at key.
+   * @deprecated Use {@link RedisClient.hKeys} instead.
    * @arg {} key
    */
   hkeys(key: string): Promise<string[]>;
+  /**
+   * Returns all field names in the hash stored at key.
+   * @arg {} key
+   */
+  hKeys(key: string): Promise<string[]>;
   /**
    * Increments the number stored at field in the hash stored at key by increment.
    * https://redis.io/commands/hincrby/
@@ -545,11 +720,28 @@ export type RedisClient = {
    */
   hincrby(key: string, field: string, value: number): Promise<number>;
   /**
+   * Increments the number stored at field in the hash stored at key by increment.
+   * https://redis.io/commands/hincrby/
+   * @deprecated Use {@link RedisClient.hIncrBy} instead.
+   * @arg {} key
+   * @arg {} field
+   * @arg {} value
+   * @returns value of key after the increment
+   */
+  hIncrBy(key: string, field: string, value: number): Promise<number>;
+  /**
    * Returns the number of fields contained in the hash stored at key.
+   * @deprecated Use {@link RedisClient.hLen} instead.
    * @arg {} key
    * @returns the number of fields in the hash, or 0 when the key does not exist.
    */
   hlen(key: string): Promise<number>;
+  /**
+   * Returns the number of fields contained in the hash stored at key.
+   * @arg {} key
+   * @returns the number of fields in the hash, or 0 when the key does not exist.
+   */
+  hLen(key: string): Promise<number>;
 
   /**
    * Allows read/write operations to global keys in Redis

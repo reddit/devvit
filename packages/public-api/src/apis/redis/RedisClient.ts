@@ -120,16 +120,28 @@ export class TxClient implements TxClientLike {
   }
 
   async strlen(key: string): Promise<TxClientLike> {
+    return this.strLen(key);
+  }
+
+  async strLen(key: string): Promise<TxClientLike> {
     await this.#storage.Strlen({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
   async mget(keys: string[]): Promise<TxClientLike> {
+    return this.mGet(keys);
+  }
+
+  async mGet(keys: string[]): Promise<TxClientLike> {
     await this.#storage.MGet({ keys, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
   async mset(keyValues: { [key: string]: string }): Promise<TxClientLike> {
+    return this.mSet(keyValues);
+  }
+
+  async mSet(keyValues: { [key: string]: string }): Promise<TxClientLike> {
     const kv = Object.entries(keyValues).map(([key, value]) => ({ key, value }));
     await this.#storage.MSet({ kv, transactionId: this.#transactionId }, this.#metadata);
     return this;
@@ -265,11 +277,19 @@ export class TxClient implements TxClientLike {
   }
 
   async hgetall(key: string): Promise<TxClientLike> {
+    return this.hGetAll(key);
+  }
+
+  async hGetAll(key: string): Promise<TxClientLike> {
     await this.#storage.HGetAll({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
   async hget(key: string, field: string): Promise<TxClientLike> {
+    return this.hGet(key, field);
+  }
+
+  async hGet(key: string, field: string): Promise<TxClientLike> {
     await this.#storage.HGet(
       { key: key, field: field, transactionId: this.#transactionId },
       this.#metadata
@@ -278,12 +298,20 @@ export class TxClient implements TxClientLike {
   }
 
   async hset(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike> {
+    return this.hSet(key, fieldValues);
+  }
+
+  async hSet(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike> {
     const fv = Object.entries(fieldValues).map(([field, value]) => ({ field, value }));
     await this.#storage.HSet({ key, fv, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
   async hincrby(key: string, field: string, value: number): Promise<TxClientLike> {
+    return this.hIncrBy(key, field, value);
+  }
+
+  async hIncrBy(key: string, field: string, value: number): Promise<TxClientLike> {
     await this.#storage.HIncrBy(
       { key, field, value, transactionId: this.#transactionId },
       this.#metadata
@@ -292,11 +320,24 @@ export class TxClient implements TxClientLike {
   }
 
   async hdel(key: string, fields: string[]): Promise<TxClientLike> {
+    return this.hDel(key, fields);
+  }
+
+  async hDel(key: string, fields: string[]): Promise<TxClientLike> {
     await this.#storage.HDel({ key, fields, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
   async hscan(
+    key: string,
+    cursor: number,
+    pattern?: string | undefined,
+    count?: number | undefined
+  ): Promise<TxClientLike> {
+    return this.hScan(key, cursor, pattern, count);
+  }
+
+  async hScan(
     key: string,
     cursor: number,
     pattern?: string | undefined,
@@ -314,11 +355,19 @@ export class TxClient implements TxClientLike {
   }
 
   async hkeys(key: string): Promise<TxClientLike> {
+    return this.hKeys(key);
+  }
+
+  async hKeys(key: string): Promise<TxClientLike> {
     await this.#storage.HKeys({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
   async hlen(key: string): Promise<TxClientLike> {
+    return this.hLen(key);
+  }
+
+  async hLen(key: string): Promise<TxClientLike> {
     await this.#storage.HLen({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
@@ -412,7 +461,12 @@ export class RedisClient implements RedisClientLike {
     );
     return response.value;
   }
+
   async strlen(key: string): Promise<number> {
+    return this.strLen(key);
+  }
+
+  async strLen(key: string): Promise<number> {
     const response = await this.storage.Strlen({ key, scope: this.scope }, this.#metadata);
     return response.value;
   }
@@ -515,11 +569,19 @@ export class RedisClient implements RedisClientLike {
   }
 
   async mget(keys: string[]): Promise<(string | null)[]> {
+    return this.mGet(keys);
+  }
+
+  async mGet(keys: string[]): Promise<(string | null)[]> {
     const response = await this.storage.MGet({ keys, scope: this.scope }, this.#metadata);
     return response !== null ? response.values.map((value) => value || null) : response;
   }
 
   async mset(keyValues: { [key: string]: string }): Promise<void> {
+    return this.mSet(keyValues);
+  }
+
+  async mSet(keyValues: { [key: string]: string }): Promise<void> {
     const kv = Object.entries(keyValues).map(([key, value]) => ({ key, value }));
     await this.storage.MSet({ kv, scope: this.scope }, this.#metadata);
   }
@@ -545,22 +607,38 @@ export class RedisClient implements RedisClientLike {
   }
 
   async hget(key: string, field: string): Promise<string | undefined> {
+    return this.hGet(key, field);
+  }
+
+  async hGet(key: string, field: string): Promise<string | undefined> {
     const response = await this.storage.HGet({ key, field, scope: this.scope }, this.#metadata);
     return response !== null ? response.value ?? undefined : response;
   }
 
   async hset(key: string, fieldValues: { [field: string]: string }): Promise<number> {
+    return this.hSet(key, fieldValues);
+  }
+
+  async hSet(key: string, fieldValues: { [field: string]: string }): Promise<number> {
     const fv = Object.entries(fieldValues).map(([field, value]) => ({ field, value }));
     const response = await this.storage.HSet({ key, fv, scope: this.scope }, this.#metadata);
     return response.value;
   }
 
   async hgetall(key: string): Promise<Record<string, string> | undefined> {
+    return this.hGetAll(key);
+  }
+
+  async hGetAll(key: string): Promise<Record<string, string> | undefined> {
     const response = await this.storage.HGetAll({ key, scope: this.scope }, this.#metadata);
     return response !== null ? response.fieldValues : response;
   }
 
   async hdel(key: string, fields: string[]): Promise<number> {
+    return this.hDel(key, fields);
+  }
+
+  async hDel(key: string, fields: string[]): Promise<number> {
     const response = await this.storage.HDel({ key, fields, scope: this.scope }, this.#metadata);
     return response.value;
   }
@@ -571,16 +649,33 @@ export class RedisClient implements RedisClientLike {
     pattern?: string | undefined,
     count?: number | undefined
   ): Promise<HScanResponse> {
+    return this.hScan(key, cursor, pattern, count);
+  }
+
+  async hScan(
+    key: string,
+    cursor: number,
+    pattern?: string | undefined,
+    count?: number | undefined
+  ): Promise<HScanResponse> {
     const request: HScanRequest = { key, cursor, pattern, count, scope: this.scope };
     return await this.storage.HScan(request, this.#metadata);
   }
 
   async hkeys(key: string): Promise<string[]> {
+    return this.hKeys(key);
+  }
+
+  async hKeys(key: string): Promise<string[]> {
     const response = await this.storage.HKeys({ key, scope: this.scope }, this.#metadata);
     return response !== null ? response.keys : response;
   }
 
   async hincrby(key: string, field: string, value: number): Promise<number> {
+    return this.hIncrBy(key, field, value);
+  }
+
+  async hIncrBy(key: string, field: string, value: number): Promise<number> {
     const response = await this.storage.HIncrBy(
       { key, field, value, scope: this.scope },
       this.#metadata
@@ -589,6 +684,10 @@ export class RedisClient implements RedisClientLike {
   }
 
   async hlen(key: string): Promise<number> {
+    return this.hLen(key);
+  }
+
+  async hLen(key: string): Promise<number> {
     const response = await this.storage.HLen({
       key,
       scope: this.scope,
