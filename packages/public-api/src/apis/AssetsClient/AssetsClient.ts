@@ -5,6 +5,13 @@ export type GetURLOptions = {
   webview?: boolean | undefined;
 };
 
+function assertValidUrl(path: string): void | never {
+  // This will throw an exception if it's an invalid URL such as a relative path
+  // NOTE: substring is here to only check up until the data segment if this is a data URL so we don't waste time needlessly parsing data.
+  //       Technically this will lose the last character if this isn't a data URL but we're just validating structure.
+  new URL(path.slice(0, path.indexOf(',')));
+}
+
 export class AssetsClient {
   readonly #assetMap: AssetMap = {};
   readonly #webviewAssetMap: AssetMap = {};
@@ -57,12 +64,9 @@ export class AssetsClient {
     }
 
     try {
-      // This will throw an exception if it's an invalid URL such as a relative path
-      // NOTE: substring is here to only check up until the data segment if this is a data URL so we don't waste time needlessly parsing data.
-      //       Technically this will lose the last character if this isn't a data URL but we're just validating structure.
-      new URL(assetPath.slice(0, assetPath.indexOf(',')));
+      assertValidUrl(assetPath);
       // URL is valid
-      return assetPath;
+      return encodeURI(assetPath);
     } catch {
       // Not a fully qualified URL, not an asset, return an empty string
       return '';
@@ -82,9 +86,8 @@ export class AssetsClient {
           retval[path] = cache[path];
         } else {
           try {
-            // see note in #getURL()
-            new URL(path.slice(0, path.indexOf(',')));
-            retval[path] = path;
+            assertValidUrl(path);
+            retval[path] = encodeURI(path);
           } catch {
             // invalid URL, missing from cache
             missingPaths.push(path);
