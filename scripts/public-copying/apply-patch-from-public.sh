@@ -1,7 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 
-BRANCH_NAME="public-import--${GITHUB_REF_NAME}" # This is an ENV var we get from GH Actions
+# This should only run from Drone CI with a couple of ENV vars set - if they're not, this is probably a mistake, and we should exit
+
+if [ -z "$SPECIALTY_CI_RUN" ]; then
+  echo "SPECIALTY_CI_RUN is not set, exiting"
+  exit 1
+fi
+
+if [ -z "$PUBLIC_BRANCH_NAME" ]; then
+  echo "PUBLIC_BRANCH_NAME is not set, exiting"
+  exit 1
+fi
+
+BRANCH_NAME="public-import--${PUBLIC_BRANCH_NAME}"
 
 # Clone the public repo
 git clone https://github.com/reddit/devvit.git
@@ -42,6 +54,6 @@ find . -name 'README.md.tmp' -exec bash -c 'mv `dirname $0`/README.md `dirname $
 
 # Commit & push this branch up & open a PR for it
 git add -A
-git commit -m "Import from public"
+git commit -m "Import from public branch $PUBLIC_BRANCH_NAME"
 git push origin "$BRANCH_NAME"
 gh pr create --title "[COPYBARA-SKIP] Import from public" --body "This was merged into the public repo's main. Please review it to make sure we copied it over right, and merge away!" --head "$BRANCH_NAME" --base main
