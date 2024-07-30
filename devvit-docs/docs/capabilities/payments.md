@@ -16,6 +16,12 @@ Before you can sell products in your app, you’ll need to enroll in the [Reddit
 Karma- and gold-earning requirements are waived for developers.
 :::
 
+Install Payments in your app by running the following command:
+
+```bash
+devvit install @devvit/payments@next
+```
+
 ## How it works
 
 Users make in-app purchases with Reddit [gold](https://support.reddithelp.com/hc/en-us/articles/17331548463764-What-is-gold-and-how-do-I-use-it). When you configure your products, you’ll set the price of your product in gold. The gold you receive for your products accumulates in your app account. The payout rate for gold is $0.01 per Reddit gold spent in your app.
@@ -171,25 +177,25 @@ You can fetch details about products by using the `getProduct` or `getProducts m
 
 ```tsx
 import { getProducts } from "@devvit/payments"
-const product = await payments.getProducts({ skus: [‘extra_life’] });
-if (product) {
-  return (
-    <hstack>
-      <button onPress={() => context.ui.purchase({products: ["extra_life"]})>
-        Buy {product.displayName}
-      </button>
-      <price product={product}>
-    </hstack>
-  );
-} else {
-  return <text>Not available.</text>;
-}
+const products = await getProducts({ skus: [‘extra_life’] });
+
+return (
+  <vstack>
+    { products.map(product => (
+      <hstack>
+        <text>{product.name}</text>
+        <text>{product.price}</text>
+      </hstack>
+    )) }
+  </vstack>
+)
 ```
 
 You can also fetch all products using custom-defined metadata or by an array of skus. Only one is required; if you provide both then they will be AND’d.
 
 ```tsx
-const products = await payments.getProducts({
+import { getProducts } from "@devvit/payments"
+const products = await getProducts({
   skus: [“extra_life”, “cosmic_sword”],
   metadata: {
     category: “powerup”,
@@ -202,16 +208,31 @@ const products = await payments.getProducts({
 Provide the product sku to trigger a purchase. This automatically populates the most recently approved product metadata for that product id.
 
 ```tsx
-const order = context.ui.createOrder({
-  skus: [‘extra_life’],
-  // metadata: {key: ‘value’}, - Optional. This allows you to track
-  //                           additional purchase-related metadata,
-  //                           e.g. metrics, experiments
-},(order) => {
-  // this is only called on a successful purchase
-});
+import { createOrder } from '@devvit/payments';
 
-onClick=() => order.purchase()
+// Define the product SKU
+const product = 'extra_life';
+
+// metadata: {key: ‘value’}, - Optional. This allows you to track
+//                           additional purchase-related metadata,
+//                           e.g. metrics, experiments
+const metadata = {
+  screen: 'game-over',
+};
+
+// Define the callback function
+const callback = (result) => {
+  if (result.success) {
+    console.log(`Purchase successful! Order ID: ${result.orderId}`);
+  } else {
+    console.log(`Purchase failed: ${result.errorMessage}`);
+  }
+};
+
+// Create the order
+const order = createOrder(product, metadata, callback);
+
+onClick = () => order.purchase();
 ```
 
 ## Test your app
@@ -244,26 +265,35 @@ Reddit keeps track of historical purchases and lets you query user purchases.
 Orders are returned in reverse chronological order and can be filtered based on user, product, success state, or other attributes.
 
 ```tsx
-const ordersResult = await context.payments.getOrders({
-  filter: {
-    user: await reddit.getCurrentUser().id,
-    skus: [‘cosmic_sword’], // Only orders for this specific product.
-    status: ‘paid’, // Only load successful, non-refunded orders.
-    metadata: { category: “weapon” }, // Only orders for specific metadata
-    // You can also filter by:
-    //   subreddit: currentSubredditId,
-    //   post: currentPostId,
-  },
-});
+import { getOrders, OrderStatus } from '@devvit/payments';
+
+const [orders, setOrders] = context.useState<null | Omit<Order, 'createdAt' | 'updatedAt'>[]>(null);
+
+const loadOrders = async () => {
+  try {
+    const orders = await getOrders({
+      sku: 'cosmic_sword',
+      buyer: await reddit.getCurrentUser().id,
+      status: OrderStatus.PAID,
+      metadata: {
+        category: 'weapon',
+      },
+    });
+    if (!orders.length) {
+      context.ui.showToast('No orders were found.');
+    }
+    setOrders(orders);
+  } catch (e) {
+    context.ui.showToast('Failed to load orders. See console for details.');
+  }
+};
 
 // if the user hasn’t already bought the cosmic sword
 // then show them the purchase button
 if (ordersResult.orders.length > 0) {
   return <text>Purchased!</text>;
 } else {
-  return (
-    <button onPress={/* Trigger purchase */}>Buy Cosmic Sword</button>
-  );
+  return <button onPress={/* Trigger purchase */}>Buy Cosmic Sword</button>;
 }
 ```
 
