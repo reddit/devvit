@@ -99,7 +99,7 @@
     "vitest": "1.6.0"
   },
   "engines": {
-    "node": ">=22.2.0"
+    "node": ">=20"
   },
   "oclif": {
     "bin": "devvit",
