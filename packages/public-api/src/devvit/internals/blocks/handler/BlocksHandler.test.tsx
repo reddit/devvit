@@ -17,6 +17,7 @@ import {
 import type { HookRef } from './types.js';
 import { useAsync } from './useAsync.js';
 import { useState } from './useState.js';
+import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
 
 const funnyRef: HookRef = {};
 
@@ -47,7 +48,10 @@ const SuccessFail = (): JSX.Element => {
   return (
     <hstack>
       <button onPress={captureHookRef(() => setCounter((c) => c + 1), positiveRef)}>Yay</button>
-      <button onPress={captureHookRef(() => Promise.reject('error'), negativeRef)}> Nay</button>
+      <button onPress={captureHookRef(() => Promise.reject(CircuitBreak(undefined)), negativeRef)}>
+        {' '}
+        Nay
+      </button>
     </hstack>
   );
 };
@@ -136,10 +140,12 @@ describe('BlocksHandler', () => {
             "__deleted": true,
           },
           "ConditionalComponent.hstack.ComponentB-1.useState-0": {
+            "error": null,
             "load_state": "loaded",
             "value": 0,
           },
           "ConditionalComponent.useState-0": {
+            "error": null,
             "load_state": "loaded",
             "value": false,
           },
@@ -231,7 +237,7 @@ describe('BlocksHandler', () => {
       req.events.push(structuredClone(req.events[0]));
       req.events.unshift(nay);
 
-      await expect(handler.handle(req, mockMetadata)).rejects.toThrow('error');
+      await expect(handler.handle(req, mockMetadata)).rejects.toThrow('ServerCallRequired');
     });
   });
 
@@ -340,8 +346,16 @@ describe('BlocksHandler', () => {
       {
         // initial.
         const rsp = await handler.handle(EmptyRequest, mockMetadata);
-        expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 0, load_state: 'loaded' });
-        expect(rsp.state![findHookId(counter2Ref)]).toEqual({ value: 0, load_state: 'loaded' });
+        expect(rsp.state![findHookId(counter1Ref)]).toEqual({
+          value: 0,
+          load_state: 'loaded',
+          error: null,
+        });
+        expect(rsp.state![findHookId(counter2Ref)]).toEqual({
+          value: 0,
+          load_state: 'loaded',
+          error: null,
+        });
         expect(findHookValue(counter1Ref)).toBe(0);
         expect(findHookValue(counter2Ref)).toBe(0);
       }
@@ -350,7 +364,11 @@ describe('BlocksHandler', () => {
         // press button1.
         const req = generatePressRequest(positiveRef);
         const rsp = await handler.handle(req, mockMetadata);
-        expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 1, load_state: 'loaded' });
+        expect(rsp.state![findHookId(counter1Ref)]).toEqual({
+          value: 1,
+          load_state: 'loaded',
+          error: null,
+        });
         expect(rsp.state![findHookId(counter2Ref)]).toBe(undefined);
         expect(findHookValue(counter1Ref)).toBe(1);
         expect(findHookValue(counter2Ref)).toBe(0);
@@ -361,7 +379,11 @@ describe('BlocksHandler', () => {
         const req = generatePressRequest(negativeRef);
         const rsp = await handler.handle(req, mockMetadata);
         expect(rsp.state![findHookId(counter1Ref)]).toBe(undefined);
-        expect(rsp.state![findHookId(counter2Ref)]).toEqual({ value: -1, load_state: 'loaded' });
+        expect(rsp.state![findHookId(counter2Ref)]).toEqual({
+          value: -1,
+          load_state: 'loaded',
+          error: null,
+        });
         expect(findHookValue(counter1Ref)).toBe(1);
         expect(findHookValue(counter2Ref)).toBe(-1);
       }
@@ -398,7 +420,11 @@ describe('BlocksHandler', () => {
       expect(rsp.events[1].hook).toBe(req.events[0].hook);
       expect(rsp.events[1].retry).toBe(true);
 
-      expect(rsp.state![findHookId(counter1Ref)]).toEqual({ value: 3, load_state: 'loaded' });
+      expect(rsp.state![findHookId(counter1Ref)]).toEqual({
+        value: 3,
+        load_state: 'loaded',
+        error: null,
+      });
       expect(findHookValue(counter1Ref)).toBe(3);
     });
   });

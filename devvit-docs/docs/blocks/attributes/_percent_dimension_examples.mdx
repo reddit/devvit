@@ -62,10 +62,10 @@ Z stack dimensions are valid because it satisfies the following rules:
 
 Z stack dimensions are invalid because it does not satisfy any of the rules:
 
-- `hstack` is not stretching horizontally because because the `vstack` indicates an alignment.
-  Therefore, there is no parent width for the `zstack` to based its `width=100%` on.
-- `hstack` is not growing vertically because it does not indicate `grow`.
+- Height: `hstack` is not growing vertically because it does not indicate `grow`.
   Therefore, there is no parent height for the `zstack` to base its `height=100%` on.
+- Width: `hstack` is not stretching horizontally because because the `vstack` indicates an alignment.
+  Therefore, there is no parent width for the `zstack` to based its `width=100%` on. Width will be omitted, because the relative width is invalid and the parent is an `hstack`.
 
 ---
 
@@ -85,11 +85,11 @@ the `zstack` dimensions are **valid**.
 ---
 
 ```tsx
-<vstack backgroundColor="yellow" width="300px">
-  <hstack backgroundColor="red" width="200px" grow>
+<vstack backgroundColor="yellow" height="300px">
+  <hstack backgroundColor="red" height="200px">
     <zstack height="100%" width="100%" backgroundColor="green" />
   </hstack>
 </vstack>
 ```
 
-In this example, the `vstack` does not specify height, so there’s nothing for the `hstack` to infer. The `zstack` dimensions are **invalid**, and the block will not render.
+In this example, the `vstack` does not specify width, so there’s nothing for the `hstack` to infer. The width of the `zstack` is **invalid**. Therefore, the width will be omitted.

@@ -183,6 +183,7 @@ describe('invalidation', () => {
           "load_state": "loading",
         },
         "App.useState-0": {
+          "error": null,
           "load_state": "loaded",
           "value": 1,
         },

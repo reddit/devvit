@@ -5,7 +5,8 @@ export const heightStretch = 'vertically in a hstack';
 export const widthGrow = 'horizontally in a hstack';
 export const heightGrow = 'vertically in a vstack';
 
-A block and its children will not be rendered if the relative {props.dimension} is invalid.
+A block's {props.dimension} will be omitted if the relative {props.dimension} is invalid and the parent is a {(props.dimension == "width") && ("hstack")}{(props.dimension != "width") && ("vstack")}.
+If the parent is a `zstack`, then an invalid {props.dimension} will always be omitted.
 
 A relative {props.dimension} is valid if it meets one of the following rules:
 
@@ -16,7 +17,7 @@ A relative {props.dimension} is valid if it meets one of the following rules:
 
 :::note
 Relative {props.dimension} can only grow or stretch in a constrained dimension. The nearest ancestor without a definition will break
-the chain, and the block will not render.
+the chain, and the block's {props.dimension} will be omitted.
 :::
 
 <details>

@@ -7,6 +7,7 @@ import isEqual from 'lodash.isequal';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 export type AsyncOptions = {
   /**
    * The data loader will re-run if the value of `depends` changes.
@@ -15,6 +16,28 @@ export type AsyncOptions = {
 };
 
 export type LoadState = 'initial' | 'loading' | 'loaded' | 'error' | 'disabled';
+
+/**
+ * This tries to save an error into the state.  If the error is a circuit breaker, it will throw the error instead,
+ * as those errors are not meant to be saved in state.
+ *
+ * @param e  -- an original error type
+ * @returns A JSONValue that can be saved in states
+ */
+export function toSerializableErrorOrCircuitBreak(e: unknown): {
+  message: string;
+  details: string;
+} {
+  // This is a little side-effecty, so open to suggestions on how to improve.
+  if (e instanceof Error) {
+    if (e.message === CIRCUIT_BREAKER_MSG) {
+      throw e;
+    }
+    return { message: e.message, details: e.stack ?? '' };
+  } else {
+    return { message: 'Unknown error', details: StringUtil.caughtToString(e) };
+  }
+}
 
 type AsyncState<S extends JSONValue> = {
   depends: JSONValue;
@@ -84,14 +107,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
           value: await this.#initializer(),
         };
       } catch (e) {
-        if (e instanceof Error) {
-          if (e.message === CIRCUIT_BREAKER_MSG) {
-            throw e;
-          }
-          asyncResponse.error = { message: e.message, details: e.stack ?? '' };
-        } else {
-          asyncResponse.error = { message: 'Unknown error', details: String(e) };
-        }
+        asyncResponse.error = toSerializableErrorOrCircuitBreak(e);
       }
 
       const requeueEvent: UIEvent = {

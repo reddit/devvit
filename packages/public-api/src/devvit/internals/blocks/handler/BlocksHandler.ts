@@ -9,6 +9,7 @@ import { ContextBuilder } from './ContextBuilder.js';
 import { _isTombstone, RenderContext } from './RenderContext.js';
 import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
 import { RenderInterruptError } from './types.js';
+import { isCircuitBreaker } from '@devvit/shared-types/CircuitBreaker.js';
 
 /**
  * This can be a global/singleton because render is synchronous.
@@ -192,6 +193,13 @@ export class BlocksHandler {
           await this.#handleMainQueue(context, ...batch);
         }
       } catch (e) {
+        /**
+         * Guard clause, retries are only applicable for circuit breakers.  If we're not a circuit breaker, we need to throw the error.
+         */
+        if (!isCircuitBreaker(e)) {
+          throw e;
+        }
+
         if (this.#debug) console.debug('[blocks] caught in handler', e);
         context._latestRenderContent = undefined;
         /**

@@ -121,6 +121,18 @@ describe('useState', () => {
 
       expect(JSON.stringify(response.blocks ?? '')).toContain('hello world');
     });
+
+    test('async initializer that throws fails', async () => {
+      const component: Devvit.BlockComponent = (_: JSX.Props, { useState }: Devvit.Context) => {
+        const [state] = useState<string>(async () => {
+          throw Error('message');
+        });
+        return <text>{state}</text>;
+      };
+
+      const handler = new BlocksHandler(component);
+      await expect(handler.handle(EmptyRequest, mockMetadata)).rejects.toThrow('message');
+    });
   });
 });
 
@@ -128,16 +140,16 @@ describe('state setter', () => {
   test('updates the value given a new value', async () => {
     const handler = new BlocksHandler(counterComponent);
     await handler.handle(EmptyRequest, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded' });
+    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded', error: null });
     let req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 1, load_state: 'loaded' });
+    expect(findHookState(counterRef)).toEqual({ value: 1, load_state: 'loaded', error: null });
     req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 2, load_state: 'loaded' });
+    expect(findHookState(counterRef)).toEqual({ value: 2, load_state: 'loaded', error: null });
     req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 3, load_state: 'loaded' });
+    expect(findHookState(counterRef)).toEqual({ value: 3, load_state: 'loaded', error: null });
   });
 
   test('can be used multiple times in a component', async () => {
@@ -159,12 +171,12 @@ describe('state setter', () => {
   test('handles void or undefined values properly', async () => {
     const handler = new BlocksHandler(conditionalComponent);
     await handler.handle(EmptyRequest, mockMetadata);
-    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded' });
+    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded', error: null });
     for (let i = 0; i < 15; i++) {
       const req = generatePressRequest(counterButtonRef);
       await handler.handle(req, mockMetadata);
     }
-    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded' });
+    expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded', error: null });
   });
 
   test('typing is intuitive', () => {

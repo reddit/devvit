@@ -9,13 +9,17 @@ import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
 import { RenderInterruptError } from './types.js';
-import type { LoadState } from './useAsync.js';
+import { toSerializableErrorOrCircuitBreak, type LoadState } from './useAsync.js';
 
 /**
  * Implementation of the useState hook.
  */
 class UseStateHook<S extends JSONValue> implements Hook {
-  state: { value: S | null; load_state: LoadState } = { value: null, load_state: 'initial' };
+  state: {
+    value: S | null;
+    load_state: LoadState;
+    error: { message: string; details: string } | null;
+  } = { value: null, load_state: 'initial', error: null };
   #changed: () => void;
   #ctx: RenderContext;
   #initializer: UseStateInitializer<S>;
@@ -46,7 +50,7 @@ class UseStateHook<S extends JSONValue> implements Hook {
         this.state.load_state = 'loaded';
       } catch (e) {
         this.state.load_state = 'error';
-        console.error('Error loading async state: ', e);
+        this.state.error = toSerializableErrorOrCircuitBreak(e);
       }
       this.#changed();
     } else {
@@ -73,6 +77,9 @@ class UseStateHook<S extends JSONValue> implements Hook {
      */
     if (this.state.load_state === 'loading') {
       throw new RenderInterruptError();
+    }
+    if (this.state.load_state === 'error') {
+      throw new Error(this.state.error?.message ?? 'Unknown error');
     }
     if (this.state.load_state === 'initial') {
       let initialValue: S | Promise<S>;
