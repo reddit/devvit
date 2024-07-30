@@ -16,7 +16,7 @@ import {
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
-import { PaymentProcessorDefinition } from '@devvit/protos/payments.js';
+import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
   ASSET_DIRNAME,
@@ -449,14 +449,29 @@ export default class Upload extends ProjectCommand {
       bundle.assetIds = assetMap ?? {};
       bundle.webviewAssetIds = webViewAssetMap ?? {};
 
-      // check that if products were detected, that we are providing the `PaymentsProcessor` actor
+      const usesProductsPlugin = bundle.dependencies?.uses.find(
+        (dep) => dep.typeName === PaymentsServiceDefinition.fullName
+      );
       const hasProducts = Object.values(bundle.paymentsConfig?.products ?? {}).length > 0;
       const providesPaymentProcessor = bundle.dependencies?.provides.find(
         (prv) => prv.definition?.fullName === PaymentProcessorDefinition.fullName
       );
+      // check that if products were detected, that we are providing the `PaymentsProcessor` actor
       if (hasProducts && !providesPaymentProcessor) {
         this.error(
           'You have a `products.json` with products, but your app does not handle payment processing of those products. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation to enable the payments feature.'
+        );
+      }
+
+      if (providesPaymentProcessor && !hasProducts) {
+        this.error(
+          'Your app provides payment processing handlers, but does not specify products in `products.json`. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation on enabling the payments feature.'
+        );
+      }
+
+      if (usesProductsPlugin && !hasProducts) {
+        this.error(
+          'Your app uses the Payments capability, which requires products to be specified in `products.json`, and payment processing handlers to be specified using the `addPaymentHandler` API. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation on enabling the payments feature.'
         );
       }
     }
