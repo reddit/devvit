@@ -85,7 +85,7 @@
     "@types/inquirer": "9.0.3",
     "@types/js-yaml": "4.0.5",
     "@types/mustache": "4.2.2",
-    "@types/node": "18.18.2",
+    "@types/node": "20.14.12",
     "@types/open": "6.2.1",
     "@types/ps-node": "0.1.1",
     "@types/tsv": "0.2.1",
@@ -99,7 +99,7 @@
     "vitest": "1.6.0"
   },
   "engines": {
-    "node": ">=18.18.2"
+    "node": ">=22.2.0"
   },
   "oclif": {
     "bin": "devvit",

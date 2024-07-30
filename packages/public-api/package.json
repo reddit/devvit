@@ -19,7 +19,7 @@
   "scripts": {
     "build": "yarn build:icon-types && yarn build:semantic-colors && tsc && cp -af devvit.tsconfig.json dist/ && yarn build:types && yarn build:min && yarn build:unmin",
     "build:icon-types": "make-icons src/types/icons.ts",
-    "build:min": "esbuild   --bundle --sourcemap=linked --target=es2020 --format=esm  --metafile=dist/meta.min.json --outfile=dist/public-api.min.js --external:@devvit/protos --minify src/index.ts",
+    "build:min": "esbuild --bundle --sourcemap=linked --target=es2020 --format=esm  --metafile=dist/meta.min.json --outfile=dist/public-api.min.js --external:@devvit/protos --minify src/index.ts",
     "build:semantic-colors": "node scripts/make-semantic-colors.js",
     "build:types": "api-extractor run && sed -ne '/declare global {/,$ p' src/devvit/Devvit.ts >> dist/public-api.d.ts",
     "build:unmin": "esbuild --bundle --sourcemap=inline --target=es2020 --format=iife --metafile=dist/meta.json     --outfile=dist/public-api.iife.js --global-name=devvitPublicAPI                    src/index.ts",
@@ -57,7 +57,7 @@
     "@types/lodash.isequal": "4.5.6",
     "@vitest/coverage-c8": "0.32.0",
     "chokidar-cli": "3.0.0",
-    "esbuild": "0.18.12",
+    "esbuild": "0.23.0",
     "eslint": "8.9.0",
     "typescript": "5.3.2",
     "vitest": "1.6.0"

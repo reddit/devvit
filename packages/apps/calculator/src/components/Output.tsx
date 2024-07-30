@@ -42,7 +42,7 @@ export const Output: Devvit.BlockComponent<OutputProps> = ({ calc }) => {
     <CurrentOp op={op} active={op === calc?.op} />
   ));
 
-  const bufferText = calc?.op !== undefined ? calc?.operandA ?? '' : '';
+  const bufferText = calc?.op !== undefined ? (calc?.operandA ?? '') : '';
 
   return (
     <vstack

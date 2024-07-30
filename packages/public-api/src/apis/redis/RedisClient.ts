@@ -411,7 +411,7 @@ export class RedisClient implements RedisClientLike {
 
   async get(key: string): Promise<string | undefined> {
     const response = await this.storage.Get({ key, scope: this.scope }, this.#metadata);
-    return response !== null ? response.value ?? undefined : response;
+    return response !== null ? (response.value ?? undefined) : response;
   }
 
   async set(key: string, value: string, options?: SetOptions): Promise<string> {
@@ -612,7 +612,7 @@ export class RedisClient implements RedisClientLike {
 
   async hGet(key: string, field: string): Promise<string | undefined> {
     const response = await this.storage.HGet({ key, field, scope: this.scope }, this.#metadata);
-    return response !== null ? response.value ?? undefined : response;
+    return response !== null ? (response.value ?? undefined) : response;
   }
 
   async hset(key: string, fieldValues: { [field: string]: string }): Promise<number> {

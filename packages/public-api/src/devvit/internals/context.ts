@@ -3,7 +3,7 @@ import type { AppDebug } from '@devvit/shared-types/Header.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
-import pkg from '../../version.json' assert { type: 'json' };
+import pkg from '../../version.json' with { type: 'json' };
 
 export function getContextFromMetadata(
   metadata: Metadata,

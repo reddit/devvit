@@ -60,7 +60,7 @@ To make a new package quickly, you can copy the `template-package` directory and
 
 ### Dependencies
 
-- Node v18 - specifically, v18.18.2 or later, but not v20 (yet!). We recommend you [install it using NVM.](https://github.com/nvm-sh/nvm)
+- Node v22 - specifically, v22.2.0 or later. We recommend you [install it using NVM.](https://github.com/nvm-sh/nvm)
 - yarn, should be pre-installed on node18 with corepack enabled:
   ```sh
   corepack enable
