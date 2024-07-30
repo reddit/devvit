@@ -208,31 +208,21 @@ const products = await getProducts({
 Provide the product sku to trigger a purchase. This automatically populates the most recently approved product metadata for that product id.
 
 ```tsx
-import { createOrder } from '@devvit/payments';
+import { createOrder, usePayments } from '@devvit/payments';
 
-// Define the product SKU
-const product = 'extra_life';
+// Define product SKU
+const product = 'sword';
 
-// metadata: {key: ‘value’}, - Optional. This allows you to track
-//                           additional purchase-related metadata,
-//                           e.g. metrics, experiments
-const metadata = {
-  screen: 'game-over',
-};
+const swordOrder = createOrder(product, (result: OnPurchaseResult) => { console.log(result.success ? 'The sword is yours!' : 'No sword for you'); });
 
-// Define the callback function
-const callback = (result) => {
-  if (result.success) {
-    console.log(`Purchase successful! Order ID: ${result.orderId}`);
-  } else {
-    console.log(`Purchase failed: ${result.errorMessage}`);
-  }
-};
+// talking to a sword-smithing blacksmith:
+<button onPress={swordOrder.purchase()}>Buy a Sword</button>
 
-// Create the order
-const order = createOrder(product, metadata, callback);
+// handles purchase results
+const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.success); });
 
-onClick = () => order.purchase();
+// foreach sku in products:
+<button onPress{payments.purchase(sku)}>Buy a {sku}</button>
 ```
 
 ## Test your app
