@@ -16,9 +16,9 @@ Experience posts or apps that use HTTP fetch cannot use devvit publish.
 
 ## Listing your app
 
-To make your app visible in the App directory and publicly available for mods and admins to download, you’ll need an app review.
+To make your app visible in the App directory and publicly available for mods and admins to download, you’ll need an [app review](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform).
 
-If you published your app from the CLI, it will be automatically reviewed by the Developer Platform team. If you didn’t publish your app via the CLI, you can submit an app review form.
+If you published your app from the CLI, it will be automatically reviewed by the Developer Platform team. If you didn’t publish your app via the CLI, you can submit the [app review form](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform).
 
 :::note
 We recommend thoroughly playtesting your app, familiarizing yourself with Devvit guidelines, and providing a detailed app overview in your README.md to expedite the app review cycle.
@@ -34,6 +34,18 @@ The Developer Platform team will review your code, read through your app README.
 - Rejected on the basis of a policy, guideline, or conflict with the intended behavior of our products
 
 Our guidelines are evolving, which can impact the status of previously reviewed apps.
+
+## Unlisiting your app
+
+If you want to hide your app from the public after it's been listed, follow these steps.
+
+1. Go to [Apps directory](https://developers.reddit.com/apps) and find your app.
+2. From the "App Details" page, scroll to the "Developer Settings".
+3. Toggle the "Available" option off.
+
+:::note
+This will not remove the code from the directory, and it will not remove the app from subreddits that have installed previous versions. Once an app is published and installed, that version will continue to exist until a moderator explicitly removes it.
+:::
 
 ## Promotion
 
