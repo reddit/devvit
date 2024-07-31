@@ -55,6 +55,10 @@ export default class Cutter {
         await fsp.mkdir(newTarget);
         await this.#cut(newSource, newTarget, mustacheContext);
       } else if (entry.isFile()) {
+        // skip template config since it's only needed for CLI
+        if (entry.name === 'template-config.json') {
+          continue;
+        }
         const type = await fileTypeFromFile(newSource);
         // If we could determine the file type, and it starts with a raw mime type indicator
         if (type && RAW_FILE_MIME_TYPES.some((mime) => type.mime.startsWith(mime))) {

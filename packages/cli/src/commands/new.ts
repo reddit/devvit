@@ -75,9 +75,7 @@ export default class New extends DevvitCommand {
     template: Flags.string({
       description:
         'Template name or pen URL. Available templates are: ' +
-        // The pen template is only for use internally to scaffold a project from
-        // a pen URL.
-        `${templateResolver.options.filter((name) => name !== 'pen').join(', ')}.`,
+        `${templateResolver.options.filter(({ hidden }) => !hidden).join(', ')}.`,
       required: false,
       char: 't',
     }),
@@ -266,7 +264,12 @@ export default class New extends DevvitCommand {
   }
 
   async #promptChooseTemplate(): Promise<string> {
-    const choices = templateResolver.options.filter((name) => name !== 'pen');
+    const choices = templateResolver.options
+      .filter(({ hidden }) => !hidden)
+      .map((option) => ({
+        name: option.description ? `${option.name}: ${option.description}` : option.name,
+        value: option.name,
+      }));
 
     const res = await inquirer.prompt<{ templateName: string }>([
       {

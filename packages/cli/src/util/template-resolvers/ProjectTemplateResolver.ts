@@ -2,9 +2,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// For now, the ProjectTemplate type is just a string that is the absolute path to a template folder
-// Could see this becoming string | FileSystem in the future if we allow ActorTemplateQueries to provide urls (Github urls, for instance)
-export type ProjectTemplate = string;
+export type ProjectName = string;
+export type ProjectPath = string;
+export type ProjectConfig = {
+  description: string;
+  hidden?: boolean;
+};
+export type ProjectTemplate = {
+  path: ProjectPath;
+  name: ProjectName;
+} & ProjectConfig;
 
 export type ProjectTemplateQuery = {
   name: string;
@@ -19,21 +26,24 @@ const DEFAULT_PROJECT_TEMPLATES_PATH = path.join(
 );
 
 export class ProjectTemplateResolver {
-  readonly #templateOptions: Map<string, ProjectTemplate> = new Map<string, ProjectTemplate>();
+  readonly #templateOptions: Map<ProjectName, ProjectTemplate> = new Map<
+    ProjectName,
+    ProjectTemplate
+  >();
   readonly options: ProjectTemplate[];
 
   constructor(projectTemplatesPath: string = DEFAULT_PROJECT_TEMPLATES_PATH) {
     this.#initOptions(projectTemplatesPath);
-    this.options = Array.from(this.#templateOptions.keys());
+    this.options = Array.from(this.#templateOptions.values());
   }
 
-  resolve(query: ProjectTemplateQuery): ProjectTemplate {
+  resolve(query: ProjectTemplateQuery): ProjectPath {
     const projectTemplateName = query.name;
     const templateProject = this.#templateOptions.get(projectTemplateName);
     if (!templateProject) {
       throw new Error(`Specified template: ${projectTemplateName} does not exist`);
     }
-    return templateProject;
+    return templateProject.path;
   }
 
   #initOptions(templatesPath: string): void {
@@ -41,8 +51,23 @@ export class ProjectTemplateResolver {
       .filter((d) => d.isDirectory()) // only get directories
       .forEach((dirent) => {
         const projectName = dirent.name.split(path.sep).at(-1)!;
-        const projectDir = path.join(templatesPath, dirent.name);
-        this.#templateOptions.set(projectName, projectDir);
+        const projectPath = path.join(templatesPath, dirent.name);
+        let projectConfig: ProjectConfig;
+        try {
+          projectConfig = JSON.parse(
+            fs.readFileSync(path.join(templatesPath, dirent.name, 'template-config.json'), 'utf-8')
+          );
+        } catch {
+          projectConfig = {
+            description: '',
+            hidden: false,
+          };
+        }
+        this.#templateOptions.set(projectName, {
+          path: projectPath,
+          name: projectName,
+          ...projectConfig,
+        });
       });
   }
 }

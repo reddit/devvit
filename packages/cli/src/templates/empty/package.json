@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "empty-template",
-  "version": "0.10.15",
+  "version": "0.10.22",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.15"
+    "@devvit/public-api": "0.10.22"
   },
   "devDependencies": {
     "typescript": "5.3.2"
