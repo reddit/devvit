@@ -122,6 +122,18 @@ describe('useState', () => {
       expect(JSON.stringify(response.blocks ?? '')).toContain('hello world');
     });
 
+    test('sync initializer that throws fails', async () => {
+      const component: Devvit.BlockComponent = (_: JSX.Props, { useState }: Devvit.Context) => {
+        const [state] = useState<string>(() => {
+          throw Error('message');
+        });
+        return <text>{state}</text>;
+      };
+
+      const handler = new BlocksHandler(component);
+      await expect(handler.handle(EmptyRequest, mockMetadata)).rejects.toThrow('Unknown error'); // to-do: toThrow('message').
+    });
+
     test('async initializer that throws fails', async () => {
       const component: Devvit.BlockComponent = (_: JSX.Props, { useState }: Devvit.Context) => {
         const [state] = useState<string>(async () => {
