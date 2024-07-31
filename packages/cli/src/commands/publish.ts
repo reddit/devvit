@@ -69,7 +69,7 @@ export default class Publish extends ProjectCommand {
     const appWithVersion = await this.inferAppNameAndVersion(args.appWithVersion);
 
     await this.checkIfUserLoggedIn();
-    await this.checkDevvitTermsAndConditions();
+    await this.checkDeveloperAccount();
 
     ux.action.start(`Finding ${appWithVersion}...`);
     const { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);

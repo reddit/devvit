@@ -60,7 +60,7 @@ export default class Install extends DevvitCommand {
     const appWithVersion = await this.inferAppNameAndVersion(args.appWithVersion);
 
     await this.checkIfUserLoggedIn();
-    await this.checkDevvitTermsAndConditions();
+    await this.checkDeveloperAccount();
 
     const token = await getAccessTokenAndLoginIfNeeded();
     const userT2Id = await this.getUserT2Id(token);

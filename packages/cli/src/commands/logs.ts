@@ -127,7 +127,7 @@ export default class Logs extends DevvitCommand {
     process.on('SIGINT', () => void this.#onExit());
 
     await this.checkIfUserLoggedIn();
-    await this.checkDevvitTermsAndConditions();
+    await this.checkDeveloperAccount();
 
     const { args, flags } = await this.parse(Logs);
 

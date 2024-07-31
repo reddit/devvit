@@ -133,7 +133,7 @@ export default class Upload extends ProjectCommand {
     const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
 
-    await this.checkDevvitTermsAndConditions();
+    await this.checkDeveloperAccount();
 
     const projectConfig = await this.getProjectConfig();
     const { flags } = await this.parse(Upload);

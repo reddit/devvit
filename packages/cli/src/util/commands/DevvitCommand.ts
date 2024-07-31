@@ -63,29 +63,21 @@ export abstract class DevvitCommand extends Command {
   }
 
   readonly waitlistClient = createWaitlistClient();
-  protected ensureDeveloperAccountExists = async (): Promise<void> => {
-    try {
-      await this.waitlistClient.EnsureDeveloperAccountExists(Empty.fromPartial({}));
-    } catch (err) {
-      this.error(`Error creating developer account: ${err}`);
-    }
-  };
-
-  protected checkDevvitTermsAndConditions = async (): Promise<void> => {
-    await this.ensureDeveloperAccountExists();
-
+  protected checkDeveloperAccount = async (): Promise<void> => {
     const { acceptedTermsVersion, currentTermsVersion } =
       await this.waitlistClient.GetCurrentUserStatus(Empty.fromPartial({}));
 
-    const termsUrl = `${DEVVIT_PORTAL_URL}/terms`;
+    const devAccountUrl = `${DEVVIT_PORTAL_URL}/create-account?cli=true`;
     if (acceptedTermsVersion < currentTermsVersion) {
-      this.log('Please accept our Terms and Conditions before proceeding:');
-      this.log(`${termsUrl} (press enter to open, control-c to quit)`);
+      this.log('Please finish setting up your developer account before proceeding:');
+      this.log(`${devAccountUrl} (press enter to open, control-c to quit)`);
       await readLine();
       try {
-        await open(termsUrl);
+        await open(devAccountUrl);
       } catch {
-        this.error('An error occurred when opening Terms and Conditions');
+        this.error(
+          'An error occurred when trying to open the developer account page. Please try again.'
+        );
       }
       // Waiting is necessary, for some reason, or the browser doesn't open!
       // See issue: https://github.com/sindresorhus/open/issues/189

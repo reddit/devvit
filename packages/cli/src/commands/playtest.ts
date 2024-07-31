@@ -148,7 +148,7 @@ export default class Playtest extends Upload {
 
     const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
-    await this.checkDevvitTermsAndConditions();
+    await this.checkDeveloperAccount();
 
     const projectConfig = await this.getProjectConfig();
     const appName = projectConfig.slug ?? projectConfig.name;
