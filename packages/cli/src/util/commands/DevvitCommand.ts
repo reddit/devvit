@@ -5,14 +5,13 @@ import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import { parse } from '@oclif/core/lib/parser/index.js';
 import open from 'open';
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
-import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../../util/devvitConfig.js';
-import { findProjectRoot } from '../../util/project-util.js';
+import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../devvitConfig.js';
+import { findProjectRoot } from '../project-util.js';
 import { createWaitlistClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
-import { readLine } from '../input-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
-import { sleep } from '../sleep.js';
 import { getAccessToken } from '../auth.js';
+import inquirer from 'inquirer';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`
@@ -70,19 +69,49 @@ export abstract class DevvitCommand extends Command {
     const devAccountUrl = `${DEVVIT_PORTAL_URL}/create-account?cli=true`;
     if (acceptedTermsVersion < currentTermsVersion) {
       this.log('Please finish setting up your developer account before proceeding:');
-      this.log(`${devAccountUrl} (press enter to open, control-c to quit)`);
-      await readLine();
-      try {
-        await open(devAccountUrl);
-      } catch {
-        this.error(
-          'An error occurred when trying to open the developer account page. Please try again.'
-        );
+      this.log(devAccountUrl);
+
+      type ActionType = 'open' | 'tryAgain' | 'exit';
+      const { action } = await inquirer.prompt<{ action: ActionType }>({
+        name: 'action',
+        message: 'What would you like to do?',
+        type: 'list',
+        choices: [
+          {
+            name: 'Open developer account page in browser',
+            value: 'open',
+          },
+          {
+            name: 'I have finished setting up my developer account; check again',
+            value: 'tryAgain',
+          },
+          {
+            name: 'Exit',
+            value: 'exit',
+          },
+        ],
+      });
+
+      if (action === 'open') {
+        try {
+          await open(devAccountUrl);
+        } catch {
+          this.error(
+            'An error occurred when trying to open the developer account page. Please try again.'
+          );
+        }
+        return this.checkDeveloperAccount();
       }
-      // Waiting is necessary, for some reason, or the browser doesn't open!
-      // See issue: https://github.com/sindresorhus/open/issues/189
-      await sleep(5000);
-      process.exit();
+
+      if (action === 'tryAgain') {
+        return this.checkDeveloperAccount();
+      }
+
+      if (action === 'exit') {
+        process.exit(1);
+      }
+
+      this.error('Invalid action; quitting');
     }
   };
 
