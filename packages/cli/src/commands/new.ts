@@ -239,7 +239,7 @@ export default class New extends DevvitCommand {
     const templateName = pen
       ? // Pens alway use the pen template.
         'pen'
-      : flags.template ?? (await this.#promptChooseTemplate());
+      : (flags.template ?? (await this.#promptChooseTemplate()));
 
     this.#createAppParams = {
       appName: appName.toLowerCase(),

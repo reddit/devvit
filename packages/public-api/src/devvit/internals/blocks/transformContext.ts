@@ -122,8 +122,8 @@ function makeBlockGrowStretchDetails(
   const isStretching = parentIsHoritzontal
     ? Boolean(vnone)
     : parentIsVerticalOrRoot
-    ? Boolean(hnone)
-    : false;
+      ? Boolean(hnone)
+      : false;
 
   let stretchDirection = ExpandDirection.NONE;
   if (parentIsHoritzontal && isStretching) {

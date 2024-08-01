@@ -155,7 +155,7 @@ describe('createForm() typing is intuitive', () => {
       () =>
         ({
           fields: [{ label: 'string label', type: 'string', name: 'strVal' }],
-        } as const),
+        }) as const,
       (data) => {
         data.values.strVal satisfies string | undefined;
       }
@@ -168,7 +168,7 @@ describe('createForm() typing is intuitive', () => {
           fields: [
             { label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' },
           ],
-        } as const),
+        }) as const,
       (data) => {
         data.values.strVal satisfies string | undefined;
       }
@@ -178,7 +178,7 @@ describe('createForm() typing is intuitive', () => {
     const local = (data: JSONObject) =>
       ({
         fields: [{ label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' }],
-      } as const);
+      }) as const;
     D.createForm(local, (data) => {
       data.values.strVal satisfies string | undefined;
     });
