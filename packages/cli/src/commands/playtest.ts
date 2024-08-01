@@ -35,6 +35,8 @@ import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
+import { ASSET_DIRNAME, WEBVIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
+import chokidar from 'chokidar';
 
 export default class Playtest extends Upload {
   static override description =
@@ -85,10 +87,12 @@ export default class Playtest extends Upload {
   #existingInstallInfo?: FullInstallationInfo | undefined;
   #appInfo?: FullAppInfo | undefined;
   #version?: DevvitVersion;
+  #lastBundle: undefined | Readonly<Bundle>;
   #lastQueuedBundle: undefined | Readonly<Bundle>;
   #isOnWatchExecuting: boolean = false;
   #server?: PlaytestServer;
   #flags?: CommandFlags<typeof Playtest>;
+  #watchAssets?: chokidar.FSWatcher;
 
   async #getExistingInstallInfo(subreddit: string): Promise<FullInstallationInfo | undefined> {
     const existingInstalls = await this.#installationsClient.GetAllWithInstallLocation(
@@ -183,10 +187,21 @@ export default class Playtest extends Upload {
     );
 
     const srcDir = path.join(this.projectRoot, ACTOR_SRC_DIR);
-    const watch = this.#bundler.watch(srcDir, {
+    const assetDir = path.join(this.projectRoot, ASSET_DIRNAME);
+    const webviewAssetDir = path.join(this.projectRoot, WEBVIEW_ASSET_DIRNAME);
+
+    const watchSrc = this.#bundler.watch(srcDir, {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
       version: projectConfig.version,
+    });
+
+    const assetPaths = [assetDir, webviewAssetDir];
+    this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
+
+    this.#watchAssets.on('all', () => {
+      // asset changes don't result in a code change, so just re-send the last bundle
+      void this.#onWatch(this.#lastBundle, subreddit);
     });
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
@@ -225,7 +240,7 @@ export default class Playtest extends Upload {
     // unsupported (https://github.com/ReactiveX/rxjs/issues/2827). Pipe all
     // bundles through an asynchronous observable and only open a subscription
     // for errors. We just dispose the source (bundler) to unsubscribe.
-    watch
+    watchSrc
       .pipe(map((bundle: Bundle | undefined) => this.#onWatch(bundle, subreddit)))
       .subscribe({ error: this.#onWatchError });
 
@@ -297,6 +312,8 @@ export default class Playtest extends Upload {
     if (!bundle) {
       return;
     }
+
+    this.#lastBundle = bundle;
 
     if (!this.#version) {
       this.error('Something went wrong: no version of this app exists.');
@@ -372,6 +389,7 @@ export default class Playtest extends Upload {
     this.#appLogSub?.unsubscribe();
     await this.#bundler.dispose();
     this.#server?.close();
+    await this.#watchAssets?.close();
     this.log(
       `\nYour playtest session has ended, but your playtest version is still installed. To revert back to the latest non-playtest version of the app, run: \n${revertCommand}`
     );
