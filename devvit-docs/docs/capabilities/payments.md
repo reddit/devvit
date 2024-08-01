@@ -173,33 +173,38 @@ Order processing happens in coordination with the frontend and backend of your a
 
 ### Get your product details
 
-You can fetch details about products by using the `getProduct` or `getProducts methods`.
+You can fetch details about products by using the `useProducts` hook or `getProducts` function.
 
 ```tsx
-import { getProducts } from "@devvit/payments"
-const products = await getProducts({ skus: [‘extra_life’] });
+import { useProducts } from '@devvit/payments';
 
-return (
-  <vstack>
-    { products.map(product => (
-      <hstack>
-        <text>{product.name}</text>
-        <text>{product.price}</text>
-      </hstack>
-    )) }
-  </vstack>
-)
+export function ProductsList(context: Devvit.Context): JSX.Element {
+  const { products } = useProducts(context, {
+    skus: ['extra_life', 'cosmic_sword'],
+  });
+
+  return (
+    <vstack>
+      {products.map((product) => (
+        <hstack>
+          <text>{product.name}</text>
+          <text>{product.price}</text>
+        </hstack>
+      ))}
+    </vstack>
+  );
+}
 ```
 
 You can also fetch all products using custom-defined metadata or by an array of skus. Only one is required; if you provide both then they will be AND’d.
 
 ```tsx
-import { getProducts } from "@devvit/payments"
+import { getProducts } from '@devvit/payments';
 const products = await getProducts({
-  skus: [“extra_life”, “cosmic_sword”],
+  skus: ['extra_life', 'cosmic_sword'],
   metadata: {
-    category: “powerup”,
-  }
+    category: 'powerup',
+  },
 });
 ```
 
@@ -255,35 +260,20 @@ Reddit keeps track of historical purchases and lets you query user purchases.
 Orders are returned in reverse chronological order and can be filtered based on user, product, success state, or other attributes.
 
 ```tsx
-import { getOrders, OrderStatus } from '@devvit/payments';
+import { useOrders, OrderStatus } from '@devvit/payments';
 
-const [orders, setOrders] = context.useState<null | Omit<Order, 'createdAt' | 'updatedAt'>[]>(null);
+export function CosmicSwordShop(context: Devvit.Context): JSX.Element {
+  const { orders } = useOrders(context, {
+    sku: 'cosmic_sword',
+  });
 
-const loadOrders = async () => {
-  try {
-    const orders = await getOrders({
-      sku: 'cosmic_sword',
-      buyer: await reddit.getCurrentUser().id,
-      status: OrderStatus.PAID,
-      metadata: {
-        category: 'weapon',
-      },
-    });
-    if (!orders.length) {
-      context.ui.showToast('No orders were found.');
-    }
-    setOrders(orders);
-  } catch (e) {
-    context.ui.showToast('Failed to load orders. See console for details.');
+  // if the user hasn’t already bought the cosmic sword
+  // then show them the purchase button
+  if (orders.length > 0) {
+    return <text>Purchased!</text>;
+  } else {
+    return <button onPress={/* Trigger purchase */}>Buy Cosmic Sword</button>;
   }
-};
-
-// if the user hasn’t already bought the cosmic sword
-// then show them the purchase button
-if (ordersResult.orders.length > 0) {
-  return <text>Purchased!</text>;
-} else {
-  return <button onPress={/* Trigger purchase */}>Buy Cosmic Sword</button>;
 }
 ```
 
