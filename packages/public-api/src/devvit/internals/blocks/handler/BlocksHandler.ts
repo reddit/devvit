@@ -453,7 +453,7 @@ export class BlocksHandler {
         context.pop();
         return children;
       } else if (typeof element.type === 'function') {
-        const propsWithChildren = { ...element.props, children: element.children };
+        const propsWithChildren = { ...element.props, children: element.children.flat(Infinity) };
         return this.#render(element.type, propsWithChildren, context);
       } else {
         context.push({ namespace: element.type, ...element.props });
