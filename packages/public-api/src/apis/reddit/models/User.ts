@@ -94,6 +94,59 @@ export type GetUserOverviewOptions = {
   before?: string;
 };
 
+export const enum SocialLinkType {
+  Custom = 'CUSTOM',
+  Reddit = 'REDDIT',
+  Instagram = 'INSTAGRAM',
+  Twitter = 'TWITTER',
+  Tiktok = 'TIKTOK',
+  Twitch = 'TWITCH',
+  Facebook = 'FACEBOOK',
+  Youtube = 'YOUTUBE',
+  Tumblr = 'TUMBLR',
+  Spotify = 'SPOTIFY',
+  Soundcloud = 'SOUNDCLOUD',
+  Beacons = 'BEACONS',
+  Linktree = 'LINKTREE',
+  Discord = 'DISCORD',
+  Venmo = 'VENMO',
+  CashApp = 'CASH_APP',
+  Patreon = 'PATREON',
+  Kofi = 'KOFI',
+  Paypal = 'PAYPAL',
+  Cameo = 'CAMEO',
+  Onlyfans = 'ONLYFANS',
+  Substack = 'SUBSTACK',
+  Kickstarter = 'KICKSTARTER',
+  Indiegogo = 'INDIEGOGO',
+  BuyMeACoffee = 'BUY_ME_A_COFFEE',
+  Shopify = 'SHOPIFY',
+}
+
+/**
+ * @field id: ID of the social link.
+ *
+ * @field handle: Display name of social media link.
+ *
+ * @field outboundUrl: Outbound url of social media link.
+ *
+ * @field type: Type of social media link i.e. Instagram, YouTube.
+ *
+ * @field title: Title or name of social media link.
+ */
+export type UserSocialLink = {
+  id: string;
+  handle?: string;
+  outboundUrl: string;
+  type: SocialLinkType;
+  title: string;
+};
+
+/**
+ * @internal
+ */
+type UserSocialLinkResponse = Omit<UserSocialLink, 'handle'> & { handle: string | null };
+
 /**
  * A class representing a user.
  */
@@ -336,6 +389,35 @@ export class User {
 
   getSnoovatarUrl(): Promise<string | undefined> {
     return User.getSnoovatarUrl(this.username, this.#metadata);
+  }
+
+  /**
+   * Gets social links of the user
+   *
+   * @returns A Promise that resolves an Array of UserSocialLink objects
+   * @example
+   * ```ts
+   * const socialLinks = await user.getSocialLinks();
+   * ```
+   */
+  async getSocialLinks(): Promise<UserSocialLink[]> {
+    const operationName = 'GetUserSocialLinks';
+    const persistedQueryHash = '2aca18ef5f4fc75fb91cdaace3e9aeeae2cb3843b5c26ad511e6f01b8521593a';
+    const response = await GraphQL.query(
+      operationName,
+      persistedQueryHash,
+      { name: this.username },
+      this.#metadata
+    );
+
+    if (!response.data?.user?.profile?.socialLinks) {
+      return [];
+    }
+
+    return response.data.user.profile.socialLinks.map((link: UserSocialLinkResponse) => ({
+      ...link,
+      handle: link.handle ?? undefined,
+    }));
   }
 
   /** @internal */

@@ -9,6 +9,7 @@
 - [FlairType](../enums/models.FlairType.md)
 - [ModMailActionType](../enums/models.ModMailActionType.md)
 - [ModMailConversationState](../enums/models.ModMailConversationState.md)
+- [SocialLinkType](../enums/models.SocialLinkType.md)
 - [WikiPagePermissionLevel](../enums/models.WikiPagePermissionLevel.md)
 
 ### Classes
@@ -130,6 +131,7 @@
 - [UserFlairPageOptions](models.md#userflairpageoptions)
 - [UserNote](models.md#usernote)
 - [UserNoteLabel](models.md#usernotelabel)
+- [UserSocialLink](models.md#usersociallink)
 - [WithUserData](models.md#withuserdata)
 
 ### Functions
@@ -1219,3 +1221,54 @@ An individual Removal Reason object.
 #### Returns
 
 [`Listing`](../classes/models.Listing.md)\<[`ModAction`](../interfaces/models.ModAction.md)\>
+
+---
+
+### <a id="getsubredditleaderboard" name="getsubredditleaderboard"></a> getSubredditLeaderboard
+
+▸ **getSubredditLeaderboard**(`subredditId`, `metadata`): `Promise`\<[`SubredditLeaderboard`](models.md#subredditleaderboard)\>
+
+#### Parameters
+
+| Name          | Type                      |
+| :------------ | :------------------------ |
+| `subredditId` | `string`                  |
+| `metadata`    | `undefined` \| `Metadata` |
+
+#### Returns
+
+`Promise`\<[`SubredditLeaderboard`](models.md#subredditleaderboard)\>
+
+---
+
+### <a id="getvaultbyaddress" name="getvaultbyaddress"></a> getVaultByAddress
+
+▸ **getVaultByAddress**(`address`, `metadata`): `Promise`\<[`Vault`](models.md#vault)\>
+
+#### Parameters
+
+| Name       | Type                      |
+| :--------- | :------------------------ |
+| `address`  | `string`                  |
+| `metadata` | `undefined` \| `Metadata` |
+
+#### Returns
+
+`Promise`\<[`Vault`](models.md#vault)\>
+
+---
+
+### <a id="getvaultbyuserid" name="getvaultbyuserid"></a> getVaultByUserId
+
+▸ **getVaultByUserId**(`userId`, `metadata`): `Promise`\<[`Vault`](models.md#vault)\>
+
+#### Parameters
+
+| Name       | Type                      |
+| :--------- | :------------------------ |
+| `userId`   | \`t2\_$\{string}\`        |
+| `metadata` | `undefined` \| `Metadata` |
+
+#### Returns
+
+`Promise`\<[`Vault`](models.md#vault)\>
