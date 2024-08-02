@@ -26,6 +26,7 @@ import {
   truncateString,
 } from './utils.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { DevvitWatermarkWrapper } from '@devvit/kit';
 
 Devvit.configure({
   redditAPI: true,
@@ -220,7 +221,7 @@ Devvit.addCustomPostType({
 
     const [currentUserId] = context.useState<string | null>(async () => {
       const user = await context.reddit.getCurrentUser();
-      return user?.id;
+      return user?.id || null;
     });
 
     const [isReminderSet, setIsReminderSet] = context.useState<boolean>(async () => {
@@ -398,62 +399,64 @@ Devvit.addCustomPostType({
 
     return (
       <blocks height="regular">
-        <zstack width={100} height={100} grow>
-          <vstack alignment="center" height={100} width={100}>
-            <spacer grow></spacer>
-            <hstack width={100}>
-              <spacer width="56px" />
+        <DevvitWatermarkWrapper appName={'countdown-post'} developer={'Reddit'}>
+          <zstack width={100} height={100} grow>
+            <vstack alignment="center" height={100} width={100}>
+              <spacer grow></spacer>
+              <hstack width={100}>
+                <spacer width="56px" />
+                <text
+                  style="heading"
+                  size="xlarge"
+                  alignment="center"
+                  grow
+                  color="neutral-content-strong"
+                  overflow="ellipsis"
+                  maxWidth="90%"
+                >
+                  {postAssociatedData.description}
+                </text>
+                <spacer width="56px" />
+              </hstack>
+              <spacer size="xsmall"></spacer>
               <text
                 style="heading"
-                size="xlarge"
+                size="small"
+                weight="regular"
                 alignment="center"
-                grow
-                color="neutral-content-strong"
-                overflow="ellipsis"
-                maxWidth="90%"
+                color="neutral-content"
               >
-                {postAssociatedData.description}
+                {formattedDueDate}
               </text>
-              <spacer width="56px" />
-            </hstack>
-            <spacer size="xsmall"></spacer>
-            <text
-              style="heading"
-              size="small"
-              weight="regular"
-              alignment="center"
-              color="neutral-content"
-            >
-              {formattedDueDate}
-            </text>
-            {!imgUrl ? (
-              <spacer size="large"></spacer>
-            ) : (
-              <>
-                <spacer size="xsmall"></spacer>
-                <hstack alignment="center" padding="small">
-                  <vstack cornerRadius="large">
-                    <image
-                      url={imgUrl}
-                      imageWidth={120}
-                      imageHeight={120}
-                      resizeMode="cover"
-                    ></image>
-                  </vstack>
-                </hstack>
-              </>
-            )}
+              {!imgUrl ? (
+                <spacer size="large"></spacer>
+              ) : (
+                <>
+                  <spacer size="xsmall"></spacer>
+                  <hstack alignment="center" padding="small">
+                    <vstack cornerRadius="large">
+                      <image
+                        url={imgUrl}
+                        imageWidth={120}
+                        imageHeight={120}
+                        resizeMode="cover"
+                      ></image>
+                    </vstack>
+                  </hstack>
+                </>
+              )}
 
-            {renderPostBottom()}
-            <spacer grow={true}></spacer>
-          </vstack>
-          {hasLink || imgUrl ? (
-            <hstack padding="small" width={100}>
-              <spacer grow></spacer>
-              {renderSmallReminderButton()}
-            </hstack>
-          ) : null}
-        </zstack>
+              {renderPostBottom()}
+              <spacer grow={true}></spacer>
+            </vstack>
+            {hasLink || imgUrl ? (
+              <hstack padding="small" width={100}>
+                <spacer grow></spacer>
+                {renderSmallReminderButton()}
+              </hstack>
+            ) : null}
+          </zstack>
+        </DevvitWatermarkWrapper>
       </blocks>
     );
   },

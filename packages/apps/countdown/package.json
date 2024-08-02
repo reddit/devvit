@@ -8,6 +8,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@devvit/kit": "1.1.3",
     "@devvit/public-api": "0.11.0-dev",
     "@devvit/shared-types": "0.11.0-dev",
     "moment-timezone": "0.5.43",
