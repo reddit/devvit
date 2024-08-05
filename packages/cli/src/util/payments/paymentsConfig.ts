@@ -20,7 +20,8 @@ import { validateProductsJSON } from '@devvit/shared-types/payments/productSchem
  */
 export async function readAndInjectBundleProducts(
   projectRoot: string,
-  bundle: Bundle
+  bundle: Bundle,
+  verifyProductImgAssets: boolean = true
 ): Promise<void> {
   const productsJSONFile = path.join(projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
   try {
@@ -31,11 +32,15 @@ export async function readAndInjectBundleProducts(
 
   const fileJSON = await readFile(productsJSONFile, 'utf-8');
   const products = parseProductsFileJSON(fileJSON);
-  checkProductsConfig(products, bundle);
+  checkProductsConfig(products, bundle, verifyProductImgAssets);
   bundle.paymentsConfig = makePaymentsConfig(products);
 }
 
-function checkProductsConfig(products: Product[], bundle: Readonly<Bundle>): void {
+function checkProductsConfig(
+  products: Product[],
+  bundle: Readonly<Bundle>,
+  verifyProductImgAssets: boolean = true
+): void {
   const hasProducts = products.length > 0;
   const usesPaymentPlugin = !!bundle.dependencies?.uses.find(
     (uses) => uses.typeName === PaymentsServiceDefinition.fullName
@@ -52,16 +57,18 @@ function checkProductsConfig(products: Product[], bundle: Readonly<Bundle>): voi
       );
     }
 
-    // check that all product images are included in the assets
-    const productImages = products.map((product) => Object.values(product.images || {})).flat();
-    const assets = Object.keys(bundle.assetIds);
-    productImages.forEach((image) => {
-      if (!assets.includes(image)) {
-        throw new Error(
-          `Product image ${image} is not included in the assets of the bundle. Please ensure that the image is included in the /assets directory.`
-        );
-      }
-    });
+    if (verifyProductImgAssets) {
+      // check that all product images are included in the assets
+      const productImages = products.map((product) => Object.values(product.images || {})).flat();
+      const assets = Object.keys(bundle.assetIds);
+      productImages.forEach((image) => {
+        if (!assets.includes(image)) {
+          throw new Error(
+            `Product image ${image} is not included in the assets of the bundle. Please ensure that the image is included in the /assets directory.`
+          );
+        }
+      });
+    }
   }
 
   if ((providesPaymentProcessor || usesPaymentPlugin) && !hasProducts) {

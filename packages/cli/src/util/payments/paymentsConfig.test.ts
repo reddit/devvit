@@ -112,4 +112,29 @@ describe(readAndInjectBundleProducts.name, () => {
     await readAndInjectBundleProducts(PROJECT_ROOT, bundle);
     expect(bundle.paymentsConfig).toStrictEqual(makePaymentsConfig(MOCK_PRODUCTS_JSON.products));
   });
+
+  it('ignores product image asset verification if option is set to false', async () => {
+    const productImage = 'doesnotexist.jpg';
+    const products = {
+      products: [{ ...MOCK_PRODUCTS_JSON.products[0], images: { icon: productImage } }],
+    };
+    const bundle = Bundle.fromPartial({
+      dependencies: {
+        provides: [
+          {
+            definition: {
+              fullName: PaymentProcessorDefinition.fullName,
+            },
+          },
+        ],
+      },
+      assetIds: {
+        'exists.jpg': 'abc123',
+      },
+    });
+    vi.mocked(access).mockResolvedValueOnce();
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
+    await readAndInjectBundleProducts(PROJECT_ROOT, bundle, false);
+    expect(bundle.paymentsConfig).toStrictEqual(makePaymentsConfig(products.products));
+  });
 });

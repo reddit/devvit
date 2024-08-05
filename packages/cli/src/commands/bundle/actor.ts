@@ -9,6 +9,7 @@ import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { distDirFilename } from '../../util/config.js';
 import { readDevvitConfig } from '../../util/devvitConfig.js';
 import { getAccessToken } from '../../util/auth.js';
+import { readAndInjectBundleProducts } from '../../util/payments/paymentsConfig.js';
 
 export default class BundleActor extends ProjectCommand {
   static override description = 'Bundle an actor into bundle.json';
@@ -43,6 +44,8 @@ export default class BundleActor extends ProjectCommand {
         version: config.version,
       })
     );
+
+    await readAndInjectBundleProducts(this.projectRoot, bundle, false);
 
     await mkdir(path.join(this.projectRoot, distDirFilename), { recursive: true });
     await writeFile(
