@@ -16,7 +16,6 @@ import {
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
-import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
   ASSET_DIRNAME,
@@ -62,6 +61,7 @@ import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import { sendEvent } from '../util/metrics.js';
 import type { MediaSignatureStatus } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
+import { readAndInjectBundleProducts } from '../util/payments/paymentsConfig.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -197,7 +197,17 @@ export default class Upload extends ProjectCommand {
     ux.action.start(didVerificationBuild ? 'Rebuilding for first upload...' : 'Building...');
     const bundles = await this.bundleActors(username, version.toString(), !flags.disableTypecheck);
     ux.action.stop('✅');
-    await this.createVersion(appInfo, version, bundles, VersionVisibility.PRIVATE);
+
+    try {
+      await this.createVersion(appInfo, version, bundles, VersionVisibility.PRIVATE);
+    } catch (err) {
+      if (err instanceof Error) {
+        this.error(err);
+      } else {
+        this.error('An unknown error occurred when creating the app version.\n${err}');
+      }
+    }
+
     this.log(
       `\n✨ Visit ${chalk.cyan.bold(
         `${DEVVIT_PORTAL_URL}/apps/${appInfo.app?.slug}`
@@ -449,30 +459,16 @@ export default class Upload extends ProjectCommand {
       bundle.assetIds = assetMap ?? {};
       bundle.webviewAssetIds = webViewAssetMap ?? {};
 
-      const usesProductsPlugin = bundle.dependencies?.uses.find(
-        (dep) => dep.typeName === PaymentsServiceDefinition.fullName
-      );
-      const hasProducts = Object.values(bundle.paymentsConfig?.products ?? {}).length > 0;
-      const providesPaymentProcessor = bundle.dependencies?.provides.find(
-        (prv) => prv.definition?.fullName === PaymentProcessorDefinition.fullName
-      );
-      // check that if products were detected, that we are providing the `PaymentsProcessor` actor
-      if (hasProducts && !providesPaymentProcessor) {
-        this.error(
-          'You have a `products.json` with products, but your app does not handle payment processing of those products. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation to enable the payments feature.'
-        );
-      }
-
-      if (providesPaymentProcessor && !hasProducts) {
-        this.error(
-          'Your app provides payment processing handlers, but does not specify products in `products.json`. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation on enabling the payments feature.'
-        );
-      }
-
-      if (usesProductsPlugin && !hasProducts) {
-        this.error(
-          'Your app uses the Payments capability, which requires products to be specified in `products.json`, and payment processing handlers to be specified using the `addPaymentHandler` API. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation on enabling the payments feature.'
-        );
+      try {
+        await readAndInjectBundleProducts(this.projectRoot, bundle);
+      } catch (err) {
+        if (err instanceof Error) {
+          throw err;
+        } else {
+          throw new Error(
+            'An unknown error occurred when reading and validating products.json. Please refer to https://developers.reddit.com/docs/capabilities/payments and ensure that your app is in a compatible state.\n${err}'
+          );
+        }
       }
     }
 

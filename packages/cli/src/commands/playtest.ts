@@ -16,6 +16,7 @@ import {
   ACTOR_SRC_DIR,
   ACTOR_SRC_PRIMARY_NAME,
   MAX_ALLOWED_SUBSCRIBER_COUNT,
+  PRODUCTS_JSON_FILE,
 } from '@devvit/shared-types/constants.js';
 import { Args, Flags, ux } from '@oclif/core';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
@@ -189,6 +190,7 @@ export default class Playtest extends Upload {
     const srcDir = path.join(this.projectRoot, ACTOR_SRC_DIR);
     const assetDir = path.join(this.projectRoot, ASSET_DIRNAME);
     const webviewAssetDir = path.join(this.projectRoot, WEBVIEW_ASSET_DIRNAME);
+    const productsJSON = path.join(this.projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
 
     const watchSrc = this.#bundler.watch(srcDir, {
       name: ACTOR_SRC_PRIMARY_NAME,
@@ -196,7 +198,7 @@ export default class Playtest extends Upload {
       version: projectConfig.version,
     });
 
-    const assetPaths = [assetDir, webviewAssetDir];
+    const assetPaths = [assetDir, webviewAssetDir, productsJSON];
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
 
     this.#watchAssets.on('all', () => {
@@ -212,6 +214,8 @@ export default class Playtest extends Upload {
     this.#existingInstallInfo = await this.#getExistingInstallInfo(subreddit);
 
     if (!this.#existingInstallInfo) {
+      ux.action.stop(`No existing installation.`);
+
       const userT2Id = await this.getUserT2Id(token);
 
       ux.action.start(`Installing...`);
@@ -227,6 +231,8 @@ export default class Playtest extends Upload {
       } catch {
         this.error('There was an error installing your app. Please try again later.');
       }
+    } else {
+      ux.action.stop(`Found!`);
     }
 
     this.#appLogSub = this.#newAppLogSub(
@@ -291,7 +297,7 @@ export default class Playtest extends Upload {
       );
   }
 
-  #onWatch = async (bundle: Readonly<Bundle> | undefined, subreddit: string): Promise<void> => {
+  #onWatch = async (bundle: Bundle | undefined, subreddit: string): Promise<void> => {
     /* We have to do this here because none of the rxjs functions fit this use case perfectly. What
      * we need is something that serializes this whole pipeline, but also discards all but the most
      * recent value once we resume processing. We would love to use one of these, but...
@@ -333,12 +339,24 @@ export default class Playtest extends Upload {
     modifyBundleVersion(bundle, this.#version.toString());
 
     // 4. create new playtest version:
-    const appVersionInfo = await this.createVersion(
-      this.#appInfo!,
-      this.#version,
-      [bundle],
-      VersionVisibility.PRIVATE
-    );
+    let appVersionInfo: AppVersionInfo;
+    try {
+      appVersionInfo = await this.createVersion(
+        this.#appInfo!,
+        this.#version,
+        [bundle],
+        VersionVisibility.PRIVATE
+      );
+    } catch (err) {
+      if (err instanceof Error) {
+        // Don't log as error so we don't exit the process.
+        this.log(chalk.red(`\n${err}\n`));
+      } else {
+        this.error('An unknown error occurred when creating the app version.\n${err}');
+      }
+      this.#isOnWatchExecuting = false;
+      return;
+    }
 
     // 5. confirm new version has finished building:
     if (!(await this.checkVersionBuildStatus(appVersionInfo))) {
