@@ -16,12 +16,12 @@ const UIComponentBindings: [[Definition, MethodDefinition, JSX.ComponentFunction
   ],
 ];
 
-function makeHandler(
+export function makeHandler(
   component: JSX.ComponentFunction
 ): (req: UIRequest, metadata: Metadata) => Promise<UIResponse> {
   return async (req: UIRequest, metadata: Metadata) => {
     const handler = new BlocksHandler(component);
-    return UIResponse.fromJSON(handler.handle(req, metadata));
+    return UIResponse.fromJSON(await handler.handle(req, metadata));
   };
 }
 
