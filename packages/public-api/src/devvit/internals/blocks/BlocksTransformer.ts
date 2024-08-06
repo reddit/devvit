@@ -1,11 +1,11 @@
 import type {
-  Block,
   BlockAction,
   BlockAlignment,
   BlockBorder,
   BlockColor,
   BlockConfig,
 } from '@devvit/protos';
+import type { Block } from '@devvit/protos';
 import {
   BlockActionType,
   BlockAnimationDirection,
@@ -884,17 +884,17 @@ export class BlocksTransformer {
     };
   }
 
-  ensureRootBlock(b: Block): Block {
-    const block = b as Block;
+  ensureRootBlock(block: Block): Block {
+    let root: Block;
 
-    if ((block as Block).type === BlockType.BLOCK_ROOT) {
+    if (block.type === BlockType.BLOCK_ROOT) {
       if (block.config?.rootConfig && Devvit.customPostType?.height) {
         block.config.rootConfig.height = this.makeRootHeight(Devvit.customPostType?.height);
       }
-      return block;
+      root = block;
+    } else {
+      root = this.wrapRoot(undefined, [block]);
     }
-
-    const root = this.wrapRoot(undefined, [block]);
 
     if (!root) {
       throw new Error('Could not create root block');

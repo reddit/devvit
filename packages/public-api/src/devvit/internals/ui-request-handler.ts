@@ -1,5 +1,5 @@
-import type { Definition, Metadata, MethodDefinition, UIRequest, UIResponse } from '@devvit/protos';
-import { CustomPostDefinition } from '@devvit/protos';
+import type { Definition, Metadata, MethodDefinition, UIRequest } from '@devvit/protos';
+import { CustomPostDefinition, UIResponse } from '@devvit/protos';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Devvit } from '../Devvit.js';
 import { BlocksHandler } from './blocks/handler/BlocksHandler.js';
@@ -21,7 +21,7 @@ function makeHandler(
 ): (req: UIRequest, metadata: Metadata) => Promise<UIResponse> {
   return async (req: UIRequest, metadata: Metadata) => {
     const handler = new BlocksHandler(component);
-    return handler.handle(req, metadata);
+    return UIResponse.fromJSON(handler.handle(req, metadata));
   };
 }
 

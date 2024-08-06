@@ -4,7 +4,7 @@ import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
+import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 import { assertValidFormFields } from '../apis/ui/helpers/assertValidFormFields.js';
 import type {
@@ -912,18 +912,9 @@ export namespace Devvit {
       id?: string;
     };
 
-    export type OnPressEvent = {
-      state?: JSONObject;
-    };
+    export type OnPressEventHandler = (data: JSONObject) => void | Promise<void>;
 
-    export type OnMessageEvent = {
-      type: string;
-      data?: JSONValue;
-    };
-
-    export type OnPressEventHandler = (event: OnPressEvent) => void | Promise<void>;
-
-    export type OnWebViewEventHandler = (event: OnMessageEvent) => void | Promise<void>;
+    export type OnWebViewEventHandler = (message: JSONObject) => void | Promise<void>;
 
     export type Actionable = {
       onPress?: OnPressEventHandler | undefined;

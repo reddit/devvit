@@ -11,7 +11,7 @@ async function onGetSettingsFields(): Promise<GetFieldsResponse> {
     throw new Error('App settings were not defined.');
   }
 
-  return GetFieldsResponse.fromPartial({
+  return GetFieldsResponse.fromJSON({
     fields: {
       fields: transformFormFields(Devvit.appSettings),
     },

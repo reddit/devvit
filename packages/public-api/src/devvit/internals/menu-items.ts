@@ -1,15 +1,16 @@
-import type { ContextActionList, ContextActionRequest, Empty, Metadata } from '@devvit/protos';
-import {
-  ContextActionDefinition,
+import type {
   ContextActionDescription,
-  ContextActionResponse,
+  ContextActionRequest,
+  Empty,
+  Metadata,
 } from '@devvit/protos';
+import { ContextActionDefinition, ContextActionList, ContextActionResponse } from '@devvit/protos';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';
-import type { MenuItem, MenuItemOnPressEvent } from '../../types/menu-item.js';
+import type { MenuItem, MenuItemOnPressEvent } from '../../types/index.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
@@ -33,8 +34,8 @@ async function getActions(
     throw new Error('No menu items registered.');
   }
 
-  const actions = menuItems.map((item, index) => {
-    return ContextActionDescription.fromPartial({
+  const actions: DeepPartial<ContextActionDescription>[] = menuItems.map((item, index) => {
+    return {
       actionId: getActionId(index),
       name: item.label,
       description: item.description,
@@ -49,10 +50,10 @@ async function getActions(
         moderator: item.forUserType?.includes('moderator'),
       },
       postFilters: item.postFilter === 'currentApp' ? { currentApp: true } : undefined,
-    });
+    };
   });
 
-  return { actions };
+  return ContextActionList.fromJSON({ actions });
 }
 
 async function onAction(
@@ -92,7 +93,7 @@ async function onAction(
 
   await menuItem.onPress(event, context);
 
-  return ContextActionResponse.fromPartial({
+  return ContextActionResponse.fromJSON({
     effects: getEffectsFromUIClient(context.ui),
   });
 }

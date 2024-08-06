@@ -29,10 +29,10 @@ export async function onValidateFormHelper(
     throw new Error('Settings were not defined.');
   }
 
-  const response = ValidateFormResponse.fromPartial({
+  const response: ValidateFormResponse = {
     success: true,
     errors: {},
-  });
+  };
 
   const formValues = getFormValues(req.fieldValues);
   const flattendFields = extractSettingsFields(settings);
@@ -69,5 +69,5 @@ export async function onValidateFormHelper(
     })
   );
 
-  return response;
+  return ValidateFormResponse.fromJSON(response);
 }

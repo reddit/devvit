@@ -1,5 +1,5 @@
-import type { Metadata, RenderPostRequest, RenderPostResponse } from '@devvit/protos';
-import { CustomPostDefinition } from '@devvit/protos';
+import type { Metadata, RenderPostRequest } from '@devvit/protos';
+import { CustomPostDefinition, RenderPostResponse } from '@devvit/protos';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Devvit } from '../Devvit.js';
@@ -26,13 +26,13 @@ async function renderPost(
 
   const blocksUI = await reconciler.render();
 
-  return {
+  return RenderPostResponse.fromJSON({
     state: reconciler.state,
     blocks: {
       ui: blocksUI,
     },
     effects: reconciler.getEffects(),
-  };
+  });
 }
 
 export function registerCustomPost(config: Config): void {

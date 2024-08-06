@@ -1,5 +1,5 @@
-import type { HandleUIEventRequest, HandleUIEventResponse, Metadata } from '@devvit/protos';
-import { EffectType, UIEventHandlerDefinition } from '@devvit/protos';
+import type { HandleUIEventRequest, Metadata } from '@devvit/protos';
+import { EffectType, HandleUIEventResponse, UIEventHandlerDefinition } from '@devvit/protos';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
@@ -43,10 +43,10 @@ async function handleUIEvent(
 
         await blocksReconciler.reconcile();
 
-        return {
+        return HandleUIEventResponse.fromJSON({
           state: blocksReconciler.state,
           effects: blocksReconciler.getEffects(),
-        };
+        });
       }
     }
 
@@ -99,10 +99,10 @@ async function handleUIEvent(
 
       await blocksReconciler.reconcile();
 
-      return {
+      return HandleUIEventResponse.fromJSON({
         state: blocksReconciler.state,
         effects: blocksReconciler.getEffects(),
-      };
+      });
     }
   } else if (req.event?.toastAction) {
     throw new Error('Toast actions not yet implemented');
@@ -124,10 +124,10 @@ async function handleUIEvent(
       ]
     : uiEffects;
 
-  return {
+  return HandleUIEventResponse.fromJSON({
     state,
     effects,
-  };
+  });
 }
 
 export function registerUIEventHandler(config: Config): void {

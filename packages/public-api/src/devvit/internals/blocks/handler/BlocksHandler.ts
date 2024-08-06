@@ -1,5 +1,5 @@
-import type { UIEvent } from '@devvit/protos';
-import { type Effect, type Metadata, type UIRequest, type UIResponse } from '@devvit/protos';
+import type { UIEvent, UIResponse } from '@devvit/protos';
+import { type Effect, type Metadata, type UIRequest } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { BlockElement } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
@@ -287,7 +287,7 @@ export class BlocksHandler {
     return {
       state: context._changedState,
       effects: context.effects,
-      blocks,
+      blocks: blocks,
       events: context._requeueEvents,
     };
   }
@@ -479,7 +479,11 @@ export class BlocksHandler {
             namespace: key,
             key: false,
           },
-          ({ hookId }) => ({ hookId, state: null, onUIEvent: props[key] })
+          ({ hookId }) => ({
+            hookId,
+            state: null,
+            onUIEvent: (event) => props[key](event.userAction?.data),
+          })
         );
         reifiedProps[key] = hook.hookId;
         if ('captureHookRef' in props[key]) {
