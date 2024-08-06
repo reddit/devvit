@@ -124,6 +124,8 @@ export default class Publish extends ProjectCommand {
         "Custom post apps need to be approved before they can be published, so I'll submit your app for review!"
       );
       await this.#submitForReview(appVersion.id, devvitVersion, visibility);
+      this.log("You'll receive a DM when your app has been reviewed.");
+      this.log("Once approved, you'll be able to install your app anywhere you're a moderator!");
       return;
     }
 
@@ -134,7 +136,13 @@ export default class Publish extends ProjectCommand {
     }
 
     await this.#updateVersion(appVersion.id, devvitVersion, visibility);
-    this.log(`\n✨ Visit ${chalk.cyan.bold(`${appDetailsUrl}`)} to view your app!`);
+    this.log('Your app is now unlisted. You can install it on any subreddit you moderate!');
+    if (visibility === AppPublishRequestVisibility.PUBLIC) {
+      this.log("You'll receive a DM when your app has been reviewed & made public.");
+      this.log(
+        'Once approved, you (and everyone else!) will be able to install your app anywhere they moderate!'
+      );
+    }
   }
 
   async #updateVersion(
@@ -204,7 +212,7 @@ export default class Publish extends ProjectCommand {
     ux.action.start(`Submitting version "${devvitVersion.toString()}" for review...`);
     try {
       await this.#appPRClient.Submit({ appVersionId, visibility });
-      ux.action.stop(`Success! ✅ You'll receive a DM when your app has been reviewed.`);
+      ux.action.stop(`Success!`);
       return;
     } catch (err) {
       if (err && typeof err === 'object' && 'code' in err && err.code === 'already_exists') {
