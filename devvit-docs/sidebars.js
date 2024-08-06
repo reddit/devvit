@@ -49,6 +49,7 @@ const sidebars = {
         'capabilities/adding-links',
         'capabilities/cache',
         'capabilities/forms',
+        'capabilities/http-fetch',
         'capabilities/image-uploads',
         'capabilities/menu-actions',
         'capabilities/redis',
@@ -56,7 +57,6 @@ const sidebars = {
         'capabilities/scheduler',
         'capabilities/secrets-storage',
         'capabilities/triggers',
-        'capabilities/http-fetch',
       ],
     },
     {
