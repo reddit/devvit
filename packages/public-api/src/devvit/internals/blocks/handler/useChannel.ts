@@ -140,5 +140,9 @@ export function useChannel<Message extends JSONValue>(
   // allow RealtimeEffectHandler to compute hook ID. maintain compatibility with
   // realtimeChannelToHookID().
   const id = `useChannel:${opts.name}`;
-  return registerHook({ id, namespace: id }, (params) => new ChannelHook(opts, params));
+  return registerHook({
+    id,
+    namespace: id,
+    initializer: (params) => new ChannelHook(opts, params),
+  });
 }

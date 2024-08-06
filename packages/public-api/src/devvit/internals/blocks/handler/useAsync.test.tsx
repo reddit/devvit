@@ -153,6 +153,119 @@ describe('regressions', () => {
     `);
     expect(response.events.length).toEqual(0);
   });
+
+  test('multiple useAsyncs can resolve when they are dependent', async () => {
+    shouldThrow = true;
+    const async1Ref: HookRef = {};
+    const async2Ref: HookRef = {};
+    const AppUseAsyncs: Devvit.BlockComponent = () => {
+      const {
+        data: data1,
+        error: error1,
+        loading: loading1,
+      } = captureHookRef(useAsync(loader), async1Ref);
+      const {
+        data: data2,
+        error: error2,
+        loading: loading2,
+      } = captureHookRef(useAsync(loader, { depends: data1 }), async2Ref);
+      return (
+        <hstack>
+          <text>{loading1 ? 'loading' : data1 || (error1 ?? 'none').toString()}</text>
+          <text>{loading2 ? 'loading' : data2 || (error2 ?? 'none').toString()}</text>
+        </hstack>
+      );
+    };
+
+    const handler = new BlocksHandler(AppUseAsyncs);
+    const request1: UIRequest = EmptyRequest;
+    const response1 = await handler.handle(request1, mockMetadata);
+
+    expect(response1.state).toMatchInlineSnapshot(`
+      {
+        "AppUseAsyncs.useAsync-0": {
+          "data": null,
+          "depends": null,
+          "error": null,
+          "load_state": "loading",
+        },
+        "AppUseAsyncs.useAsync-1": {
+          "data": null,
+          "depends": null,
+          "error": null,
+          "load_state": "loading",
+        },
+        "__cache": {},
+      }
+    `);
+
+    const event = {
+      asyncResponse: {
+        requestId: (async1Ref.id ?? '') + '-null',
+        data: { value: 'foo' },
+        error: undefined,
+      },
+      hook: async1Ref.id,
+    };
+
+    const request2: UIRequest = { events: [event], state: response1.state };
+    const response2 = await handler.handle(request2, mockMetadata);
+
+    expect(response2.events).toMatchInlineSnapshot(`
+      [
+        {
+          "async": true,
+          "asyncRequest": {
+            "requestId": "AppUseAsyncs.useAsync-1-"foo"",
+          },
+          "hook": "AppUseAsyncs.useAsync-1",
+        },
+      ]
+    `);
+
+    expect(response2.state).toMatchInlineSnapshot(`
+      {
+        "AppUseAsyncs.useAsync-0": {
+          "data": "foo",
+          "depends": null,
+          "error": null,
+          "load_state": "loaded",
+        },
+        "AppUseAsyncs.useAsync-1": {
+          "data": null,
+          "depends": "foo",
+          "error": null,
+          "load_state": "loading",
+        },
+        "__cache": {},
+      }
+    `);
+
+    const event3 = {
+      asyncResponse: {
+        requestId: (async2Ref.id ?? '') + '-"foo"',
+        data: { value: 'bar' },
+        error: undefined,
+      },
+      hook: async2Ref.id,
+    };
+
+    const request3: UIRequest = { events: [event3], state: response2.state };
+    const response3 = await handler.handle(request3, mockMetadata);
+
+    expect(response3.events).toMatchInlineSnapshot(`[]`);
+    expect(response3.state).toMatchInlineSnapshot(`
+      {
+        "AppUseAsyncs.useAsync-1": {
+          "data": "bar",
+          "depends": "foo",
+          "error": null,
+          "load_state": "loaded",
+        },
+        "__cache": {},
+      }
+    `);
+  });
 });
 
 describe('circuit breaking', () => {

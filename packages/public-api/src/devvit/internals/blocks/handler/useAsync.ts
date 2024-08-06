@@ -50,20 +50,20 @@ class AsyncHook<S extends JSONValue> implements Hook {
   state: AsyncState<S>;
   readonly #debug: boolean;
   #hookId: string;
-  #initializer: AsyncUseStateInitializer<S>;
+  initializer: AsyncUseStateInitializer<S>;
   #invalidate: () => void;
   #ctx: RenderContext;
-  #localDepends: JSONValue;
+  localDepends: JSONValue;
 
   constructor(initializer: AsyncUseStateInitializer<S>, options: AsyncOptions, params: HookParams) {
     this.#debug = !!params.context.devvitContext.debug.useAsync;
     if (this.#debug) console.debug('[useAsync] v1', options);
     this.state = { data: null, load_state: 'initial', error: null, depends: null };
     this.#hookId = params.hookId;
-    this.#initializer = initializer;
+    this.initializer = initializer;
     this.#invalidate = params.invalidate;
     this.#ctx = params.context;
-    this.#localDepends = options.depends ?? null;
+    this.localDepends = options.depends ?? null;
   }
 
   /**
@@ -75,10 +75,11 @@ class AsyncHook<S extends JSONValue> implements Hook {
     }
     if (this.#debug) console.debug('[useAsync] async onLoad ', this.#hookId, this.state);
     if (this.#debug)
-      console.debug('[useAsync] async onLoad have ', this.#localDepends, 'and', this.state.depends);
-    if (!isEqual(this.#localDepends, this.state.depends) || this.state.load_state === 'initial') {
+      console.debug('[useAsync] async onLoad have ', this.localDepends, 'and', this.state.depends);
+    if (!isEqual(this.localDepends, this.state.depends) || this.state.load_state === 'initial') {
+      if (this.#debug) console.debug(`[useAsync] attempting to resolve for hookId`, this.#hookId);
       this.state.load_state = 'loading';
-      this.state.depends = this.#localDepends;
+      this.state.depends = this.localDepends;
       this.#invalidate();
 
       const requeueEvent: UIEvent = {
@@ -104,7 +105,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
       const asyncResponse: AsyncResponse = { requestId: event.asyncRequest.requestId };
       try {
         asyncResponse.data = {
-          value: await this.#initializer(),
+          value: await this.initializer(),
         };
       } catch (e) {
         asyncResponse.error = toSerializableErrorOrCircuitBreak(e);
@@ -145,8 +146,22 @@ export function useAsync<S extends JSONValue>(
   initializer: AsyncUseStateInitializer<S>,
   options: AsyncOptions = {}
 ): UseAsyncResult<S> {
-  const hook = registerHook({ namespace: 'useAsync' }, (params) => {
-    return new AsyncHook(initializer, options, params);
+  const hook = registerHook({
+    namespace: 'useAsync',
+    initializer: (params) => {
+      return new AsyncHook(initializer, options, params);
+    },
+    /**
+     * This is required due to hook caching. We need a way for certain values to always have the most
+     * up to date information before evaluating the hook again.
+     *
+     * initializer can use values from other stateful hook and always needs the latest values to be accurate
+     * localDepends is needed so that the dependency check is against the latest values
+     */
+    refresh: (h) => {
+      h.initializer = initializer;
+      h.localDepends = options.depends ?? null;
+    },
   });
 
   return {

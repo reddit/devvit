@@ -73,8 +73,11 @@ export function useInterval(
   callback: () => void | Promise<void>,
   requestedDelayMs: number
 ): UseIntervalResult {
-  const hook = registerHook({ namespace: 'useInterval' }, (params) => {
-    return new IntervalHook(callback, requestedDelayMs, params);
+  const hook = registerHook({
+    namespace: 'useInterval',
+    initializer: (params) => {
+      return new IntervalHook(callback, requestedDelayMs, params);
+    },
   });
 
   return {

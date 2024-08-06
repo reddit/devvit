@@ -120,10 +120,10 @@ export function useState<S extends JSONValue>(
 export function useState<S extends JSONValue>(
   initialState: UseStateInitializer<S>
 ): UseStateResult<S> {
-  const hook = registerHook(
-    { namespace: 'useState' },
-    (params) => new UseStateHook(initialState, params)
-  );
+  const hook = registerHook({
+    namespace: 'useState',
+    initializer: (params) => new UseStateHook(initialState, params),
+  });
 
   return [hook.state.value as S, hook.setter.bind(hook)];
 }

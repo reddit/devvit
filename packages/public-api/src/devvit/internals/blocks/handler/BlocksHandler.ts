@@ -56,7 +56,27 @@ function shouldFireAttemptHookWarning(event: UIEvent): boolean {
   return !event.hook;
 }
 
+type RegisterHookOptions<H extends Hook> = HookSegment & {
+  /**
+   * Factory function to build the hook. Only called once for the entire lifecycle of a
+   * BlocksHandler.handle() invocation.
+   */
+  initializer: (p: HookParams) => H;
+  /**
+   * A lifecycle hook that gives you the living reference of the hook being used during render. This enables
+   * you to augment properties on the hook as BlocksHandler.handle() is processing events since the initializer
+   * is only called once.
+   *
+   * We require this as hooks are sometimes cached while evaluating events in BlocksHandler.handle(). The best
+   * use of this function is to ensure that your hooks contain up to date information if they have can have
+   * a relationship with a hook that is evaluated before it (see useAsync for an example).
+   */
+  refresh?: (hook: H) => void;
+};
+
 /**
+ * This can get called multiple times in a given render. Initialize is only called once!
+ *
  * This is the recommended low-level interface for creating hooks like useState or useAsync.
  *
  * Practically, this initializes your hook if it doesn't already exist, and makes sure
@@ -67,19 +87,20 @@ function shouldFireAttemptHookWarning(event: UIEvent): boolean {
  *    factory for building this hook
  * @returns
  */
-export function registerHook<H extends Hook>(
-  options: HookSegment,
-  initializer: (p: HookParams) => H
-): H {
+export function registerHook<H extends Hook>({
+  initializer,
+  refresh,
+  ...hookSegment
+}: RegisterHookOptions<H>): H {
   if (!_activeRenderContext) {
     throw new Error(
       "Hooks can only be declared at the top of a component.  You cannot declare hooks outside of components or inside of event handlers.  It's almost always a mistake to declare hooks inside of loops or conditionals."
     );
   }
 
-  assertValidNamespace(options.namespace);
+  assertValidNamespace(hookSegment.namespace);
 
-  const hookId = _activeRenderContext.nextHookId(options);
+  const hookId = _activeRenderContext.nextHookId(hookSegment);
   const context = _activeRenderContext;
   context._touched[hookId] = true;
   const params: HookParams = {
@@ -95,6 +116,14 @@ export function registerHook<H extends Hook>(
     _isTombstone(_activeRenderContext._state[hookId]);
   _activeRenderContext._hooks[hookId] = _activeRenderContext._hooks[hookId] ?? initializer(params);
   const hook: H = _activeRenderContext._hooks[hookId] as H;
+
+  /**
+   * We now cache hooks sometimes during the lifecycle of a request. However,
+   * certain hooks (useAsync) needs the latest information to make sure it works correctly
+   * refresh gives callers the living reference as a parameter so that they can
+   * mutate it as they see fit.
+   */
+  refresh?.(hook);
 
   if (!fromNull) {
     hook.state = _activeRenderContext._state[hookId];
@@ -474,17 +503,15 @@ export class BlocksHandler {
       if (typeof props[key] === 'undefined') {
         // skip
       } else if (typeof props[key] === 'function') {
-        const hook = registerHook(
-          {
-            namespace: key,
-            key: false,
-          },
-          ({ hookId }) => ({
+        const hook = registerHook({
+          namespace: key,
+          key: false,
+          initializer: ({ hookId }) => ({
             hookId,
             state: null,
             onUIEvent: (event) => props[key](event.userAction?.data),
-          })
-        );
+          }),
+        });
         reifiedProps[key] = hook.hookId;
         if ('captureHookRef' in props[key]) {
           props[key].captureHookRef();

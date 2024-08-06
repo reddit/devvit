@@ -41,11 +41,11 @@ export function useForm<const T extends Form | FormFunction>(
   form: T,
   onSubmit: (values: FormToFormValues<T>) => void | Promise<void>
 ): FormKey {
-  const hook = registerHook(
-    { namespace: 'useForm' },
-    (params) =>
-      new UseFormHook(params, form, onSubmit as (values: FormValues) => void | Promise<void>)
-  );
+  const hook = registerHook({
+    namespace: 'useForm',
+    initializer: (params) =>
+      new UseFormHook(params, form, onSubmit as (values: FormValues) => void | Promise<void>),
+  });
   return hookRefToFormKey({ id: hook.hookId });
 }
 

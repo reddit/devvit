@@ -43,7 +43,18 @@ export class RenderContext implements EffectEmitter {
    */
   _latestRenderContent: ReifiedBlockElement | undefined;
 
-  /** Has this state been mutated since initially loaded? */
+  /**
+   * Has this state been mutated since initially loaded?
+   *
+   * _changed is used to determine the state deltas to report in the response
+   * of the handle function inside of BlocksHandler. It's very important
+   * that this list contains a comprehensive list of all hooks that have
+   * changed during the entire invocation of BlocksHandler.handle.
+   *
+   * It may be tempting to clear the state deltas on every iteration via the
+   * loop, but in doing so you'll create many roundtrips from the client to
+   * the runtime resulting in the UI flickering.
+   */
   _changed: { [hookID: string]: true } = {};
   /** Does this hook still exist in the most recent render? */
   _touched: { [hookID: string]: true } = {};
@@ -112,7 +123,11 @@ export class RenderContext implements EffectEmitter {
 
   /** Replacing state resets the delta for the next render. */
   set _state(state: BlocksState) {
-    this._changed = {};
+    // You may be tempted to put `this._changed = {}` here, please DON'T!
+    // There are many times we may choose to reset the state while processing
+    // events. Remember that the BlocksHandler can do N number of passes before
+    // it determines it is time to send a response back to the client. _changed
+    // needs to encompass all of those changes.
     this._hooks = {};
     this.#state = state;
   }

@@ -92,6 +92,24 @@ const ConditionalComponent = (): JSX.Element => {
   );
 };
 
+const DependentUseAsyncs = (): JSX.Element => {
+  const { data: fooData } = useAsync(async () => 'foo');
+  const { data: barData } = useAsync(
+    async () => {
+      if (!fooData) return null;
+      return 'bar';
+    },
+    { depends: fooData }
+  );
+
+  return (
+    <hstack>
+      <text wrap>{JSON.stringify(fooData, null, 2)}</text>
+      <text wrap>{JSON.stringify(barData, null, 2)}</text>
+    </hstack>
+  );
+};
+
 let n = 0;
 const AsyncStateComponent = (): JSX.Element => {
   const [_count, setCount] = captureHookRef(
@@ -154,6 +172,29 @@ describe('BlocksHandler', () => {
       `);
       await press(toggleRef);
       expect(findHookValue(stateARef)).toEqual(0);
+    });
+
+    test('All deltas should be returned from handle on a blocking request', async () => {
+      const handler = new BlocksHandler(DependentUseAsyncs);
+      const data = await handler.handle({ events: [{ blocking: {} }] }, mockMetadata);
+
+      expect(data.state).toMatchInlineSnapshot(`
+        {
+          "DependentUseAsyncs.useAsync-0": {
+            "data": "foo",
+            "depends": null,
+            "error": null,
+            "load_state": "loaded",
+          },
+          "DependentUseAsyncs.useAsync-1": {
+            "data": "bar",
+            "depends": "foo",
+            "error": null,
+            "load_state": "loaded",
+          },
+          "__cache": {},
+        }
+      `);
     });
   });
 
