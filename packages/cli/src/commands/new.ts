@@ -267,7 +267,9 @@ export default class New extends DevvitCommand {
     const choices = templateResolver.options
       .filter(({ hidden }) => !hidden)
       .map((option) => ({
-        name: option.description ? `${option.name}: ${option.description}` : option.name,
+        name: option.description
+          ? `${chalk.bold(option.name)}: ${option.description}`
+          : option.name,
         value: option.name,
       }));
 
