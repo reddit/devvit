@@ -104,6 +104,7 @@ export function makePaymentsConfig(products: Readonly<Product[]>): PaymentsConfi
         amount: product.price,
         currency: Currency.GOLD,
       },
+      images: product.images ?? {},
       environment: Environment.ENVIRONMENT_SANDBOX, // We default to sandbox for any build from the CLI
       productMetadata: product.metadata ?? {},
     };
