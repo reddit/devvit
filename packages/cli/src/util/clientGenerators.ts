@@ -7,7 +7,6 @@ import type {
   EventsClient,
   FeedbackClient,
   InstallationsClient,
-  WaitlistAdminClient,
   WaitlistClient,
 } from '@devvit/protos/community.js';
 import {
@@ -17,7 +16,6 @@ import {
   EventsClientJSON,
   FeedbackClientJSON,
   InstallationsClientJSON,
-  WaitlistAdminClientJSON,
   WaitlistClientJSON,
 } from '@devvit/protos/community.js';
 import { Headers } from 'node-fetch';
@@ -106,16 +104,6 @@ export function createWaitlistClient(): WaitlistClient {
   return new WaitlistClientJSON(
     NodeFetchRPC({
       baseUrl: `${DEVVIT_PORTAL_API}/${WAITLIST_PATH}`,
-      getToken: getAccessToken,
-      headers: getHeaders(),
-    })
-  );
-}
-
-export function createWaitlistAdminClient(): WaitlistAdminClient {
-  return new WaitlistAdminClientJSON(
-    NodeFetchRPC({
-      baseUrl: `${DEVVIT_PORTAL_API}/admin/${WAITLIST_PATH}`,
       getToken: getAccessToken,
       headers: getHeaders(),
     })
