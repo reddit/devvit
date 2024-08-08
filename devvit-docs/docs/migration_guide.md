@@ -208,7 +208,7 @@ Devvit.addMenuItem({
       body: JSON.stringify({ content: comment?.body }),
     });
     // if you want to show a toast
-    context.ui.showToast(repsonse);
+    context.ui.showToast(response);
   },
 });
 ```
