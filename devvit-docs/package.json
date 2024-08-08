@@ -23,7 +23,6 @@
   },
   "dependencies": {
     "@cmfcmf/docusaurus-search-local": "1.1.0",
-    "@devvit/cli": "0.11.0-dev",
     "@devvit/protos": "0.11.0-dev",
     "@docusaurus/core": "3.1.1",
     "@docusaurus/plugin-content-docs": "3.1.1",
