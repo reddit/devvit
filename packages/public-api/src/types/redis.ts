@@ -1067,7 +1067,7 @@ export type RedisClient = {
    * }
    * ```
    */
-  zScore(key: string, member: string): Promise<number>;
+  zScore(key: string, member: string): Promise<number | undefined>;
   /**
    * Returns the rank of member in the sorted set stored at key
    * https://redis.io/commands/zrank/
@@ -1089,7 +1089,7 @@ export type RedisClient = {
    * }
    * ```
    */
-  zRank(key: string, member: string): Promise<number>;
+  zRank(key: string, member: string): Promise<number | undefined>;
   /**
    * Increments the score of member in the sorted set stored at key by value
    * https://redis.io/commands/zincrby/
@@ -1325,7 +1325,7 @@ export type RedisClient = {
    * @arg {} key
    * @returns a map of fields and their values stored in the hash,
    */
-  hgetall(key: string): Promise<Record<string, string> | undefined>;
+  hgetall(key: string): Promise<Record<string, string>>;
   /**
    * Returns all fields and values of the hash stored at key
    * https://redis.io/commands/hgetall
@@ -1348,7 +1348,7 @@ export type RedisClient = {
    * }
    * ```
    */
-  hGetAll(key: string): Promise<Record<string, string> | undefined>;
+  hGetAll(key: string): Promise<Record<string, string>>;
   /**
    * Removes the specified fields from the hash stored at key.
    * https://redis.io/commands/hdel/

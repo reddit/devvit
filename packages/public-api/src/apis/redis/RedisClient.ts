@@ -17,6 +17,23 @@ import type {
   ZRangeOptions,
 } from '../../types/redis.js';
 
+function isRedisNilError(e: unknown): boolean {
+  // TODO: Replace with impl in a Gatsby-only world
+  //return e && e.details === 'redis: nil';
+
+  if (
+    e &&
+    typeof e === 'object' &&
+    'message' in e &&
+    e.message !== undefined &&
+    typeof e.message === 'string'
+  ) {
+    return e.message.includes('redis: nil');
+  } else {
+    return false;
+  }
+}
+
 export class TxClient implements TxClientLike {
   #storage: RedisAPI;
   #transactionId: TransactionId;
@@ -410,8 +427,22 @@ export class RedisClient implements RedisClientLike {
   }
 
   async get(key: string): Promise<string | undefined> {
-    const response = await this.storage.Get({ key, scope: this.scope }, this.#metadata);
-    return response !== null ? (response.value ?? undefined) : response;
+    try {
+      const response = await this.storage.Get(
+        { key, scope: this.scope },
+        {
+          ...this.#metadata,
+          'throw-redis-nil': { values: ['true'] },
+        }
+      );
+      return response !== null ? (response.value ?? undefined) : response;
+    } catch (e) {
+      if (isRedisNilError(e)) {
+        return undefined;
+      }
+
+      throw e;
+    }
   }
 
   async set(key: string, value: string, options?: SetOptions): Promise<string> {
@@ -544,20 +575,43 @@ export class RedisClient implements RedisClientLike {
     return response.value;
   }
 
-  async zScore(key: string, member: string): Promise<number> {
-    const response = await this.storage.ZScore(
-      { key: { key }, member, scope: this.scope },
-      this.#metadata
-    );
-    return response !== null ? response.value : response;
+  async zScore(key: string, member: string): Promise<number | undefined> {
+    try {
+      const response = await this.storage.ZScore(
+        { key: { key }, member, scope: this.scope },
+        {
+          ...this.#metadata,
+          'throw-redis-nil': { values: ['true'] },
+        }
+      );
+
+      return response !== null ? response.value : response;
+    } catch (e) {
+      if (isRedisNilError(e)) {
+        return undefined;
+      }
+
+      throw e;
+    }
   }
 
-  async zRank(key: string, member: string): Promise<number> {
-    const response = await this.storage.ZRank(
-      { key: { key }, member, scope: this.scope },
-      this.#metadata
-    );
-    return response !== null ? response.value : response;
+  async zRank(key: string, member: string): Promise<number | undefined> {
+    try {
+      const response = await this.storage.ZRank(
+        { key: { key }, member, scope: this.scope },
+        {
+          ...this.#metadata,
+          'throw-redis-nil': { values: ['true'] },
+        }
+      );
+      return response !== null ? response.value : response;
+    } catch (e) {
+      if (isRedisNilError(e)) {
+        return undefined;
+      }
+
+      throw e;
+    }
   }
 
   async zIncrBy(key: string, member: string, value: number): Promise<number> {
@@ -611,8 +665,22 @@ export class RedisClient implements RedisClientLike {
   }
 
   async hGet(key: string, field: string): Promise<string | undefined> {
-    const response = await this.storage.HGet({ key, field, scope: this.scope }, this.#metadata);
-    return response !== null ? (response.value ?? undefined) : response;
+    try {
+      const response = await this.storage.HGet(
+        { key, field, scope: this.scope },
+        {
+          ...this.#metadata,
+          'throw-redis-nil': { values: ['true'] },
+        }
+      );
+      return response !== null ? (response.value ?? undefined) : response;
+    } catch (e) {
+      if (isRedisNilError(e)) {
+        return undefined;
+      }
+
+      throw e;
+    }
   }
 
   async hset(key: string, fieldValues: { [field: string]: string }): Promise<number> {
@@ -625,11 +693,11 @@ export class RedisClient implements RedisClientLike {
     return response.value;
   }
 
-  async hgetall(key: string): Promise<Record<string, string> | undefined> {
+  async hgetall(key: string): Promise<Record<string, string>> {
     return this.hGetAll(key);
   }
 
-  async hGetAll(key: string): Promise<Record<string, string> | undefined> {
+  async hGetAll(key: string): Promise<Record<string, string>> {
     const response = await this.storage.HGetAll({ key, scope: this.scope }, this.#metadata);
     return response !== null ? response.fieldValues : response;
   }
