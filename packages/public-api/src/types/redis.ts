@@ -397,8 +397,10 @@ export type TxClientLike = {
    *    {member: "caesar", score: 20},
    *    {member: "alexander", score: 25},
    *  );
-   *  const score : number = await context.redis.zScore("leaderboard", "caesar");
-   *  console.log("Caesar's score: " + score);
+   *  const score : number | undefined = await context.redis.zScore("leaderboard", "caesar");
+   *  if(score !== undefined) {
+   *    console.log("Caesar's score: " + score);
+   *  }
    * }
    * ```
    */
@@ -1084,8 +1086,10 @@ export type RedisClient = {
    *    {member: "dog", score: 95},
    *    {member: "elephant", score: 97}
    *  );
-   *  const rank : number = await context.redis.zRank("animals", "dog");
-   *  console.log("Dog's rank: " + rank);
+   *  const rank : number | undefined = await context.redis.zRank("animals", "dog");
+   *  if(rank !== undefined) {
+   *    console.log("Dog's rank: " + rank);
+   *  }
    * }
    * ```
    */
@@ -1340,10 +1344,10 @@ export type RedisClient = {
    *   "milk": "1"
    *  });
    *
-   *  const record : Record<string, string> | undefined = await context.redis.hGetAll("groceryList");
+   *  const record : Record<string, string> = await context.redis.hGetAll("groceryList");
    *
-   *  if (record != undefined) {
-   *   console.log("Eggs: " + record.eggs + ", Apples: " + record.apples + ", Milk: " + record.milk);
+   *  if (record.eggs !== undefined) {
+   *   console.log(`Eggs: ${record.eggs}`);
    *  }
    * }
    * ```
