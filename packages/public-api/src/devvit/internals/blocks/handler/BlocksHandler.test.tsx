@@ -196,6 +196,28 @@ describe('BlocksHandler', () => {
         }
       `);
     });
+
+    test('async child components are forbidden and throw a helpful error', async () => {
+      const AsyncChild = async (): Promise<JSX.Element> => {
+        return <text>async child</text>;
+      };
+      const Parent = (): JSX.Element => {
+        return (
+          <blocks>
+            {/* 
+            // @ts-expect-error - We're testing that our code guards against this invalid case! */}
+            <AsyncChild />
+          </blocks>
+        );
+      };
+
+      const handler = new BlocksHandler(Parent);
+      await expect(() =>
+        handler.handle(EmptyRequest, mockMetadata)
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: Components (found: AsyncChild) cannot be async. To use data from an async endpoint, please use "const [data] = context.useState(async () => {/** your async code */})".]`
+      );
+    });
   });
 
   describe('transformation', () => {

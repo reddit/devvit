@@ -417,7 +417,7 @@ export class BlocksHandler {
       // That's why the check is not root instanceof Promise
       if (root === '[object Promise]') {
         throw new Error(
-          `Root elements cannot be asynchronous. To use data from an async endpoint, please use "const [data] = context.useState(async () => {/** your async code */})".`
+          `Root elements cannot be async. To use data from an async endpoint, please use "const [data] = context.useState(async () => {/** your async code */})".`
         );
       }
 
@@ -451,6 +451,13 @@ export class BlocksHandler {
     context.push({ namespace: component.name || 'anonymous', ...props });
     try {
       const element = component(props, context.devvitContext);
+
+      if (element instanceof Promise) {
+        throw new Error(
+          `Components (found: ${component.name ?? 'unknown component'}) cannot be async. To use data from an async endpoint, please use "const [data] = context.useState(async () => {/** your async code */})".`
+        );
+      }
+
       return this.#renderElement(element, context);
     } finally {
       context.pop();
