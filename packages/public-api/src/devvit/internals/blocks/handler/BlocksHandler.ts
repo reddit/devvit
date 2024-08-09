@@ -373,7 +373,14 @@ export class BlocksHandler {
       try {
         await hook.onUIEvent(event, context);
       } catch (e) {
-        console.error('Error in event handler', e);
+        if (isCircuitBreaker(e)) {
+          if (this.#debug) {
+            console.error('Server call required', e);
+          }
+        } else {
+          console.error('Error in event handler', e);
+        }
+
         throw e;
       }
     } else {
