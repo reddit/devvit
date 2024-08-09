@@ -501,7 +501,6 @@ export class RedditAPIClient {
    *
    * @param options - Options for the request
    * @param options.subredditName - The name of the subreddit to get posts from. e.g. 'memes'
-   * @param options.timeframe - The timeframe to get posts from. e.g. 'day'
    * @param options.limit - The maximum number of posts to return. e.g. 1000
    * @param options.pageSize - The number of posts to return per request. e.g. 100
    * @returns A Listing of Post objects.
@@ -509,7 +508,6 @@ export class RedditAPIClient {
    * ```ts
    * const posts = await reddit.getNewPosts({
    *   subredditName: 'memes',
-   *   timeframe: 'day',
    *   limit: 1000,
    *   pageSize: 100
    * }).all();

@@ -1107,7 +1107,6 @@ A Listing of Post objects.
 const posts = await reddit
   .getNewPosts({
     subredditName: 'memes',
-    timeframe: 'day',
     limit: 1000,
     pageSize: 100,
   })
