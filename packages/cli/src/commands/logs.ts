@@ -23,6 +23,7 @@ import {
 } from '../util/app-logs/app-log-util.js';
 import { createInstallationsClient, createRemoteLoggerClient } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
+import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 
 const durationFlag = Flags.custom<Date>({
   default: async () => new Date(),
@@ -138,10 +139,11 @@ export default class Logs extends DevvitCommand {
     if (flags.connect) this.#playtest.open();
 
     const appName = args.app || (await this.inferAppNameFromProject());
-    const subredditAppName = await this.#getTailFilter(args.subreddit, appName);
+    const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
+    const subredditAppName = await this.#getTailFilter(subreddit, appName);
 
     if (!flags.json) {
-      this.log(formatAppLogDivider(`streaming logs for ${appName} on ${args.subreddit}`));
+      this.log(formatAppLogDivider(`streaming logs for ${appName} on r/${subreddit}`));
     }
 
     this.#appLogSub = this.#newAppLogSub(subredditAppName, flags);

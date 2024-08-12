@@ -5,6 +5,7 @@ import { Args, ux } from '@oclif/core';
 import { createAppVersionClient, createInstallationsClient } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
+import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 
 type UninstallParseResult = {
   args: {
@@ -41,22 +42,19 @@ export default class Uninstall extends DevvitCommand {
 
   async run(): Promise<void> {
     const { args }: UninstallParseResult = await this.parse(Uninstall);
+    const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
     const appName = args.app || (await this.inferAppNameFromProject());
 
     await getAccessTokenAndLoginIfNeeded();
 
-    ux.action.start(
-      `Finding installation of the app "${appName}" in ${
-        args.subreddit.startsWith('r/') ? args.subreddit : `r/${args.subreddit}`
-      }`
-    );
+    ux.action.start(`Finding installation of the app "${appName}" in r/${subreddit}`);
     let id: string;
     try {
       const allInstalledHere = await this.#installationsClient.GetAllWithInstallLocation(
         GetAllWithInstallLocationRequest.fromPartial({
           type: InstallationType.SUBREDDIT,
-          location: args.subreddit,
+          location: subreddit,
         })
       );
       // TODO I do not like how I'm doing this. I think we should make a new API call for this, but this _does_ work for now.

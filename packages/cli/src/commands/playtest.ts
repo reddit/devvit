@@ -38,6 +38,7 @@ import { updateDevvitConfig } from '../util/devvitConfig.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { ASSET_DIRNAME, WEBVIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import chokidar from 'chokidar';
+import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 
 export default class Playtest extends Upload {
   static override description =
@@ -158,9 +159,7 @@ export default class Playtest extends Upload {
     const projectConfig = await this.getProjectConfig();
     const appName = projectConfig.slug ?? projectConfig.name;
 
-    const subreddit = args.subreddit.startsWith('r/')
-      ? args.subreddit.substring(2)
-      : args.subreddit;
+    const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
     this.#appInfo = await this.getAppBySlug(appName);
 

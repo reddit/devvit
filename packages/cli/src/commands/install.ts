@@ -22,6 +22,7 @@ import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitComm
 import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
 import { TwirpError } from 'twirp-ts/build/twirp/errors.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
+import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 
 export default class Install extends DevvitCommand {
   static override description =
@@ -56,7 +57,8 @@ export default class Install extends DevvitCommand {
 
   async run(): Promise<void> {
     const { args } = await this.parse(Install);
-    const { subreddit } = args;
+    const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
+
     const appWithVersion = await this.inferAppNameAndVersion(args.appWithVersion);
 
     await this.checkIfUserLoggedIn();
@@ -87,8 +89,7 @@ export default class Install extends DevvitCommand {
 
     this.log(nutritionCategoriesToString(name, nutrition.categories));
 
-    const r = subreddit.startsWith('r/') ? '' : 'r/';
-    ux.action.start(`Installing ${name} to ${r}${subreddit}`);
+    ux.action.start(`Installing ${name} to r/${subreddit}`);
     let installationInfo: FullInstallationInfo;
     try {
       if (existingInstallInfo) {
