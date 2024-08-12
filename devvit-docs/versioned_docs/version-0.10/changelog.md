@@ -4,6 +4,24 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 To use the latest version of Devvit, follow the [upgrade instructions](https://developers.reddit.com/docs/update-devvit).
 
+## Devvit 0.10.24: Publishing from the CLI and other fixes
+
+**Release Date: Aug 12, 2024**
+
+Devvit 0.10.24 streamlines the app review process. Now when you use `devvit publish`, your app is automatically submitted for approval. The CLI will prompt you to select how you want your app to be displayed: public or unlisted. See [publishing an app](publishing.md) for details. We also added support for Node v22.
+
+This release includes a handful of devvitor-requested features and fixes:
+
+- API Client updates:
+  - Added the ability to get social links for a user: `const socialLinks = await user.getSocialLinks()`
+  - Made `redditId` as optional for `addModNote`
+  - Fixed `getByUsername()` for suspended accounts so that it sends back undefined instead of throwing a 404
+  - Added `approvedAt` and `bannedAt` fields to posts and comments
+- Other updates:
+  - Fixed validations running on nested settings
+  - Standardized casing for Redis methods
+  - Added `unwatch()` to Redis
+
 ## Devvit 0.10.23: Additional triggers and some fixes
 
 **Release Date: July 24, 2024**

@@ -278,14 +278,19 @@ export function CosmicSwordShop(context: Devvit.Context): JSX.Element {
 ```
 
 :::note
-Once your app is in production, existing installations will need to be manually updated via the admin tool if you release a new version. Contact the Developer Platform team[LINK] if you need to update your app installation versions.
+Once your app is in production, existing installations will need to be manually updated via the admin tool if you release a new version. Contact the Developer Platform team if you need to update your app installation versions.
 
 Automatic updates will be supported in the future.
 :::
 
 ## Submit your app for approval
 
-When you’re satisfied with your app, it’s time to submit your app and products to the Developer Platform team for review and approval. To submit your products and app, fill out the app review form.
+When you’re satisfied with your app, it’s time to submit your app and products to the Developer Platform team for review and approval. To submit your products and app, run `devvit publish` and select how you want your app to appear in the Apps directory:
+
+- **Unlisted** means that the app is only visible to you in the directory, and you can install your app on larger subreddits that you moderate.
+- **Public** means that your app is visible to all users in the Apps directory and can be installed by mods and admins across Reddit.
+
+You can change your app visibility at any time. See [publishing an app](publishing.md) for details.
 
 :::note
 All products will be reviewed to ensure compliance with our content policy. There is no partial approval. If one product is not approved, the app will be rejected.

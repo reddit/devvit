@@ -8,21 +8,12 @@ To use your app in larger subreddits, you’ll need to publish your app. To do t
 devvit publish
 ```
 
-This will let you install your app on any subreddit you moderate. However, other users will not be able to see your app in the Apps directory or install it in their own communities.
+Your app is automatically submitted to the Devvit team for review and approval. From the CLI, you’ll be prompted to select how you want your app to appear in the Apps directory:
 
-:::note
-Experience posts or apps that use HTTP fetch cannot use devvit publish.
-:::
+- **Unlisted** means that the app is only visible to you in the directory, and you can install your app on larger subreddits that you moderate.
+- **Public** means that your app is visible to all users in the Apps directory and can be installed by mods and admins across Reddit.
 
-## Listing your app
-
-To make your app visible in the App directory and publicly available for mods and admins to download, you’ll need an [app review](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform).
-
-If you published your app from the CLI, it will be automatically reviewed by the Developer Platform team. If you didn’t publish your app via the CLI, you can submit the [app review form](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform).
-
-:::note
-We recommend thoroughly playtesting your app, familiarizing yourself with Devvit guidelines, and providing a detailed app overview in your README.md to expedite the app review cycle.
-:::
+Don’t worry, you can change your app visibility at any time.
 
 ## App review
 
@@ -33,19 +24,33 @@ The Developer Platform team will review your code, read through your app README.
 - Rejected with feedback on how to get your app approved
 - Rejected on the basis of a policy, guideline, or conflict with the intended behavior of our products
 
-Our guidelines are evolving, which can impact the status of previously reviewed apps.
+:::note
+We recommend thoroughly playtesting your app, familiarizing yourself with Devvit guidelines, and providing a detailed app overview in your README.md to expedite the app review cycle.
+:::
 
-## Unlisiting your app
+## Changing app visibility
 
-If you want to hide your app from the public after it's been listed, follow these steps.
+After your app has been approved, you may want to change the visibility status.
 
-1. Go to [Apps directory](https://developers.reddit.com/apps) and find your app.
-2. From the "App Details" page, scroll to the "Developer Settings".
-3. Toggle the "Available" option off.
+### Public to unlisted
+
+To hide your app from the public after it’s been listed, run:
+
+```tsx
+devvit publish --unlisted
+```
 
 :::note
 This will not remove the code from the directory, and it will not remove the app from subreddits that have installed previous versions. Once an app is published and installed, that version will continue to exist until a moderator explicitly removes it.
 :::
+
+### Unlisted to public
+
+To make your unlisted app public after it's been approved, run:
+
+```tsx
+devvit publish --public
+```
 
 ## Promotion
 
