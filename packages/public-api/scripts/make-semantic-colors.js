@@ -18,12 +18,34 @@ function RPLtoHex(color, globalColors, themedColors, fallbackColors) {
   let finalColor = color;
   const matchingColor = getMatchingRPLColor(finalColor, globalColors, themedColors, fallbackColors);
 
+  // most of the colors in RPL are named, but some are rgba
+  if (!matchingColor && color.startsWith('rgba')) {
+    return rbgaToHex(color);
+  }
+
   // Some colors reference other RPL colors. If so, match again.
   finalColor = matchingColor.startsWith('#')
     ? matchingColor
     : getMatchingRPLColor(matchingColor, globalColors, themedColors, fallbackColors);
 
   return finalColor;
+}
+
+/** @type {(color: string) => string} */
+function rbgaToHex(color) {
+  if (color.includes('/')) {
+    throw new Error(
+      'Cannot convert colors that use / for alpha channels, please use number based rgba values'
+    );
+  }
+
+  return color
+    .replace(/^rgba?\(|\s+|\)$/g, '') // Remove the rgba(  ) from the string
+    .split(',') // break out the channels
+    .map((channel) => parseFloat(channel)) // convert the channels to numbers
+    .map((channel, index) => (index === 3 ? Math.round(channel * 255) : channel)) // convert the alpha channel to a 0-255 value
+    .map((channel) => channel.toString(16).padStart(2, '0')) // convert the channels to hex
+    .reduce((out, val) => out + val, '#'); // join the channels back together with a # prefix
 }
 
 function setOpacity(hex, alpha) {

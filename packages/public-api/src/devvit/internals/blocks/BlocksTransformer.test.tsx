@@ -697,7 +697,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
         width: BlockBorderWidth.BORDER_WIDTH_THIN,
         color: '#00000019',
         colors: {
-          dark: '#ffffff19',
+          dark: '#FFFFFF19',
           light: '#00000019',
         },
       });

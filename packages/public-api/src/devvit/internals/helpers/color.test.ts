@@ -24,7 +24,7 @@ describe('color', () => {
 
   describe('getHexFromRPLColor', () => {
     test('should pass when is a valid rpl color', async () => {
-      expect(getHexFromRPLColor('orangered-500')).toEqual('#D93A00');
+      expect(getHexFromRPLColor('orangered-500')).toEqual('#D93900');
     });
 
     test('should give named color result', async () => {

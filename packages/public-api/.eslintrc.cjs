@@ -7,7 +7,10 @@ const config = {
   ...base,
   parserOptions: {
     ...base.parserOptions,
-    project: path.join(__dirname, 'tsconfig.json'),
+    project: [
+      path.join(__dirname, 'tsconfig.json'),
+      path.join(__dirname, 'scripts', 'tsconfig.json'),
+    ],
   },
 };
 

@@ -1,0 +1,6 @@
+{
+  "extends": "@devvit/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true // tsc is only used for type-checking.
+  }
+}
