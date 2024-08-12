@@ -151,17 +151,6 @@ export function useAsync<S extends JSONValue>(
     initializer: (params) => {
       return new AsyncHook(initializer, options, params);
     },
-    /**
-     * This is required due to hook caching. We need a way for certain values to always have the most
-     * up to date information before evaluating the hook again.
-     *
-     * initializer can use values from other stateful hook and always needs the latest values to be accurate
-     * localDepends is needed so that the dependency check is against the latest values
-     */
-    refresh: (h) => {
-      h.initializer = initializer;
-      h.localDepends = options.depends ?? null;
-    },
   });
 
   return {

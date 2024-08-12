@@ -24,7 +24,7 @@ class UseStateHook<S extends JSONValue> implements Hook {
   #ctx: RenderContext;
   #initializer: UseStateInitializer<S>;
   #hookId: string;
-  #promise: Promise<S> | undefined;
+  _promise: Promise<S> | undefined;
 
   constructor(initializer: UseStateInitializer<S>, params: HookParams) {
     this.#initializer = initializer;
@@ -44,9 +44,9 @@ class UseStateHook<S extends JSONValue> implements Hook {
    * version, but this version is provided for backwards compatibility.
    */
   async onUIEvent(): Promise<void> {
-    if (this.state.load_state === 'loading' && this.#promise) {
+    if (this.state.load_state === 'loading' && this._promise) {
       try {
-        this.state.value = await this.#promise;
+        this.state.value = await this._promise;
         this.state.load_state = 'loaded';
       } catch (e) {
         this.state.load_state = 'error';
@@ -58,7 +58,7 @@ class UseStateHook<S extends JSONValue> implements Hook {
        * This would probably be some sort of concurrent access bug.  It's not clear what would put us
        * in this state, but it's worth logging so we can investigate.
        */
-      console.warn('Invalid state: ', this.state.load_state, this.#promise);
+      console.warn('Invalid state: ', this.state.load_state, this._promise);
     }
   }
 
@@ -72,6 +72,8 @@ class UseStateHook<S extends JSONValue> implements Hook {
    * After the existing state is loaded, we need to run the initializer if there was no state found.
    */
   onStateLoaded(): void {
+    this._promise = (this.#ctx._prevHooks[this.#hookId] as UseStateHook<S> | undefined)?._promise;
+
     /**
      * If the state is still loading, we need to throw an error to prevent using the null state.
      */
@@ -93,7 +95,7 @@ class UseStateHook<S extends JSONValue> implements Hook {
         return;
       }
       if (initialValue instanceof Promise) {
-        this.#promise = initialValue;
+        this._promise = initialValue;
         this.state.load_state = 'loading';
         const requeueEvent: UIEvent = {
           asyncRequest: { requestId: this.#hookId },

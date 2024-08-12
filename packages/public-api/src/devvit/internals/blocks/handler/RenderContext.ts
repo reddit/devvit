@@ -32,7 +32,8 @@ export class RenderContext implements EffectEmitter {
   readonly meta: Readonly<Metadata>;
   #state: BlocksState;
   _segments: (HookSegment & { next: number })[] = [];
-  _hooks: { [hookID: string]: Hook } = {};
+  #hooks: { [hookID: string]: Hook } = {};
+  _prevHooks: { [hookID: string]: Hook } = {};
   _prevHookId: string = '';
   _effects: { [key: string]: Effect } = {};
 
@@ -94,7 +95,7 @@ export class RenderContext implements EffectEmitter {
     };
     for (const key in this._changed) changed[key] = this._state[key];
     const unmounted = new Set(Object.keys(this._state));
-    Object.keys(this._hooks).forEach((key) => {
+    Object.keys(this.#hooks).forEach((key) => {
       if (key === '__cache') {
         return;
       }
@@ -112,8 +113,13 @@ export class RenderContext implements EffectEmitter {
     return changed;
   }
 
-  get hooks(): { readonly [hookID: string]: Hook } {
-    return this._hooks;
+  get _hooks(): { [hookID: string]: Hook } {
+    return this.#hooks;
+  }
+
+  set _hooks(hooks: { [hookID: string]: Hook }) {
+    this._prevHooks = this.#hooks;
+    this.#hooks = hooks;
   }
 
   /** The complete render state. */
@@ -128,7 +134,7 @@ export class RenderContext implements EffectEmitter {
     // events. Remember that the BlocksHandler can do N number of passes before
     // it determines it is time to send a response back to the client. _changed
     // needs to encompass all of those changes.
-    this._hooks = {};
+    this.#hooks = {};
     this.#state = state;
   }
 
@@ -149,7 +155,7 @@ export class RenderContext implements EffectEmitter {
   }
 
   getHook(ref: HookRef): Hook {
-    return this._hooks[ref.id!];
+    return this.#hooks[ref.id!];
   }
   /** Catches events with no active handler and routes to the corresponding hook to detach/unsubscribe/etc **/
   static addGlobalUndeliveredEventHandler(id: string, handler: EventHandler): void {

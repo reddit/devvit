@@ -38,7 +38,7 @@ class ChannelHook<Message extends JSONValue> implements UseChannelResult<Message
     if (!installID) throw Error('useChannel missing install ID from metadata');
 
     const channel = `${appID}:${installID}:${opts.name}`;
-    const duplicate = Object.values(this.#context.hooks)
+    const duplicate = Object.values(this.#context._hooks)
       .filter((hook) => hook instanceof ChannelHook)
       .some((hook) => (hook as ChannelHook<Message>).state.channel === channel);
     if (duplicate) throw Error(`useChannel channel names must be unique; "${channel}" duplicated`);
@@ -119,7 +119,7 @@ class ChannelHook<Message extends JSONValue> implements UseChannelResult<Message
   }
 
   #emitSubscribed(): void {
-    const channels = Object.values(this.#context.hooks)
+    const channels = Object.values(this.#context._hooks)
       .filter((hook) => hook instanceof ChannelHook && hook.state.subscribed)
       .map((hook) => (hook as ChannelHook<Message>).state.channel);
     this.#context.emitEffect(this.state.channel, {

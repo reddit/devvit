@@ -62,16 +62,6 @@ type RegisterHookOptions<H extends Hook> = HookSegment & {
    * BlocksHandler.handle() invocation.
    */
   initializer: (p: HookParams) => H;
-  /**
-   * A lifecycle hook that gives you the living reference of the hook being used during render. This enables
-   * you to augment properties on the hook as BlocksHandler.handle() is processing events since the initializer
-   * is only called once.
-   *
-   * We require this as hooks are sometimes cached while evaluating events in BlocksHandler.handle(). The best
-   * use of this function is to ensure that your hooks contain up to date information if they have can have
-   * a relationship with a hook that is evaluated before it (see useAsync for an example).
-   */
-  refresh?: (hook: H) => void;
 };
 
 /**
@@ -89,7 +79,6 @@ type RegisterHookOptions<H extends Hook> = HookSegment & {
  */
 export function registerHook<H extends Hook>({
   initializer,
-  refresh,
   ...hookSegment
 }: RegisterHookOptions<H>): H {
   if (!_activeRenderContext) {
@@ -102,7 +91,6 @@ export function registerHook<H extends Hook>({
 
   const hookId = _activeRenderContext.nextHookId(hookSegment);
   const context = _activeRenderContext;
-  context._touched[hookId] = true;
   const params: HookParams = {
     hookId,
     invalidate: () => {
@@ -116,14 +104,6 @@ export function registerHook<H extends Hook>({
     _isTombstone(_activeRenderContext._state[hookId]);
   _activeRenderContext._hooks[hookId] = _activeRenderContext._hooks[hookId] ?? initializer(params);
   const hook: H = _activeRenderContext._hooks[hookId] as H;
-
-  /**
-   * We now cache hooks sometimes during the lifecycle of a request. However,
-   * certain hooks (useAsync) needs the latest information to make sure it works correctly
-   * refresh gives callers the living reference as a parameter so that they can
-   * mutate it as they see fit.
-   */
-  refresh?.(hook);
 
   if (!fromNull) {
     hook.state = _activeRenderContext._state[hookId];
@@ -326,14 +306,9 @@ export class BlocksHandler {
   }
 
   #loadHooks(context: RenderContext, ..._events: UIEvent[]): void {
-    // TBD: partial rendering
-    context._touched = {};
+    context._hooks = {};
+
     this.#renderRoot(this.#root, context.request.props ?? {}, context);
-    for (const hookId in context._hooks) {
-      if (!context._touched[hookId]) {
-        delete context._hooks[hookId];
-      }
-    }
   }
 
   /**
