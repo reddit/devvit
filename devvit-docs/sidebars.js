@@ -69,6 +69,7 @@ const sidebars = {
         'post_size',
         'dimensions',
         'working_with_usestate',
+        'working_with_useasync',
         'working_with_useinterval',
       ],
     },

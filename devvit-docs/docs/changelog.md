@@ -2,7 +2,178 @@
 
 While we're always shipping fixes and improvements, our team bundles new features, breaking changes, and other user-facing updates into regular releases. This page logs the changes to each version of Devvit.
 
-To use the latest version of Devvit, follow the [upgrade instructions](https://developers.reddit.com/docs/update-devvit).
+Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
+
+## Devvit 0.11.0: useAsync and new render architecture
+
+**Release Date: August 15, 2024**
+
+Devvit 0.11.0 adds a new, experimental [useAsync](/docs/working_with_useasync.md) feature that makes to easier to fetch data in a non-blocking way.
+
+**Very important! Please update your Devvit CLI to the latest version before moving to this release by running `npm install -g devvit`.**
+
+**Breaking changes**
+
+- Asynchronous components are no longer supported and will throw an error.
+
+```tsx
+// Old; does not work in v0.11.0 or greater.
+const MyComponent = async () => {
+  const data = await redis.get('count');
+
+  return <hstack></hstack>;
+};
+
+import { useState } from '@devvt/public-api';
+
+const MyComponent = () => {
+  const [data] = useState(async () => redis.get('count'));
+
+  return <hstack></hstack>;
+};
+
+// Note: If you want this request to be non-blocking you can also use useAsync
+import { useAsync } from '@devvt/public-api';
+
+const MyComponent = () => {
+  const { data, loading } = useAsync(async () => await redis.get('count'));
+
+  return <hstack></hstack>;
+};
+```
+
+- You can no longer use forms created with `Devvit.createForm` inside of render.
+
+```tsx
+// Old
+const myForm = Devvit.createForm(
+  {
+    fields: [
+      {
+        type: 'string',
+        name: 'food',
+        label: 'What is your favorite food?',
+      },
+    ],
+  },
+  (event, context) => {
+    // onSubmit handler
+    context.ui.showToast({ text: event.values.food });
+  }
+);
+
+const MyComponent = (context) => {
+  return (
+    <hstack>
+      <button onPress={() => context.ui.showForm(myForm)}>Show form</button>
+    </hstack>
+  );
+};
+
+// New
+import { Devvit, useForm } from '@devvit/public-api';
+
+const MyComponent = (context) => {
+  const myForm = useForm(
+    {
+      fields: [
+        {
+          type: 'string',
+          name: 'food',
+          label: 'What is your favorite food?',
+        },
+      ],
+    },
+    (event, context) => {
+      // onSubmit handler
+      context.ui.showToast({ text: event.values.food });
+    }
+  );
+
+  return (
+    <hstack>
+      <button onPress={() => context.ui.showForm(myForm)}>Show form</button>
+    </hstack>
+  );
+};
+```
+
+**Deprecation Notice**
+
+- Using hooks off of `context` is deprecated and will be removed in a future release. This helps the performance of your app and paves the way for new features in the future. We hope this change makes it easier to write shareable hooks!
+
+```ts
+import { Devvit } from '@devvit/public-api';
+
+const MyComponent = (context) => {
+  // This is now deprecated!
+  const [count, setCount] = context.useState(0);
+
+  return <hstack></hstack>;
+};
+
+// New pattern
+import { Devvit, useState } from '@devvit/public-api';
+
+const MyComponent = () => {
+  const [count, setCount] = useState(0);
+
+  return <hstack></hstack>;
+};
+```
+
+**Features**
+
+- New hook architecture. All of the dreaded hook errors should be resolved. Hook rules still apply, so if you see this error: `Error: Invalid hook call. Hooks can only be called at the top-level of a function component. Make sure that you are not calling hooks inside loops, conditions, or nested functions.`, this is most likely an error inside of your code.
+- `useAsync` is a new hook that allows you to fetch data in a non-blocking way. This is an experimental feature that we will be iterating on over time.
+- Composable hooks. Create hooks that can be shared across projects. You could do this with the old hooks off of context, but the bugs in rendering prevented you from using them in various parts of your app. With this release you should be able to abstract everything into hooks!
+
+```tsx
+import { Devvit, useState } from '@devvit/public-api';
+
+const useCounter = (startingCount: number) => {
+  const [counter, setCounter] = useState(startingCount);
+
+  return {
+    counter,
+    increment: () => setCounter((x) => x + 1),
+    decrement: () => setCounter((x) => x - 1),
+  };
+};
+
+const MyComponent = () => {
+  const { counter, increment } = useCounter(5);
+
+  return (
+    <vstack>
+      <text>Count: {counter}</text>
+      <button onPress={() => increment()}>Increment</button>
+    </vstack>
+  );
+};
+```
+
+- Hooks can be imported from the package instead of relying on `context`
+
+```tsx
+// Prefer this
+import { Devvit, useState } from '@devvit/public-api';
+
+const MyComponent = () => {
+  const [count, setCount] = useState(0);
+
+  return <hstack></hstack>;
+};
+
+// Over this
+import { Devvit } from '@devvit/public-api';
+
+const MyComponent = (context) => {
+  const [count, setCount] = context.useState(0);
+
+  return <hstack></hstack>;
+};
+```
 
 ## Devvit 0.10.24: Publishing from the CLI and other fixes
 

@@ -29,7 +29,7 @@ The UI is wrapped in `<blocks>`. If you don’t include them, `<blocks>` will be
 
 **Example**
 
-```ts
+```tsx
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
   description: 'A big hello text.',
@@ -60,7 +60,7 @@ The `submitPost(options: SubmitPostOptions)` function has these parameters:
 
 **Example**
 
-```ts
+```tsx
 await reddit.submitPost({
   title: 'My custom post',
   subredditName: currentSubreddit.name,
@@ -84,7 +84,7 @@ The `.addMenuItem(menuItem: MenuItem)` function has these parameters:
 
 **Example**
 
-```ts
+```tsx
 Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Add a poll',

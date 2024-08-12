@@ -15,9 +15,11 @@ The `useInterval` method lets you build live apps that automatically update in r
 The `useInterval` method lets you request that your experience be re-rendered at a specified interval. Intervals are set in milliseconds, with a 1000ms minimum.
 
 ```tsx
-const [counter, setCounter] = context.useState(1000);
+import { Devvit, useState, useInterval } from '@devvit/public-api';
 
-const updateInterval = context.useInterval(() => {
+const [counter, setCounter] = useState(1000);
+
+const updateInterval = useInterval(() => {
   setCounter((counter) => counter - 1);
 }, 1000);
 
@@ -47,7 +49,7 @@ The `useInterval` method is different from the scheduler, in a few important way
 ### Code sample
 
 ```tsx
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useState, useInterval } from '@devvit/public-api';
 
 function getCurrentTime() {
   const now = new Date();
@@ -60,9 +62,9 @@ function getCurrentTime() {
 Devvit.addCustomPostType({
   name: 'Clock',
   render: (context) => {
-    const [time, setTime] = context.useState(() => getCurrentTime());
+    const [time, setTime] = useState(() => getCurrentTime());
     const tick = () => setTime(() => getCurrentTime());
-    context.useInterval(tick, 1000).start();
+    useInterval(tick, 1000).start();
 
     return (
       <vstack alignment="center middle" height="100%">

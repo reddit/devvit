@@ -3,7 +3,8 @@
 You can add a database to your app to store and retrieve data. The Redis plugin is designed to be fast, scalable, and secure. It supports a subset of the full Redis API, including:
 
 - [Transactions](#transactions) for things like counting votes atomically in polls
-- [String operations](#strings) for batch writing or incrementing numbers
+- [String operations](#strings) for persisting information
+- [Number operations](#numbers) for incrementing numbers
 - [Sorted sets](#sorted-set) for creating leaderboards
 - [Hashes](#hash) for managing a collection of key-value pairs
 

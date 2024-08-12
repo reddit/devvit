@@ -12,13 +12,13 @@ Let's start with a simple "Hello World" app using the Devvit playground, which i
 
 3. **Add the following code.**
 
-   ```typescript
-   import { Devvit } from '@devvit/public-api';
+   ```tsx
+   import { Devvit, useState } from '@devvit/public-api';
 
    Devvit.addCustomPostType({
      name: 'Say Hello',
      render: (context) => {
-       const [counter, setCounter] = context.useState(0);
+       const [counter, setCounter] = useState(0);
        return (
          <vstack alignment="center middle" height="100%" gap="large">
            <text size="xxlarge" weight="bold">
@@ -134,10 +134,10 @@ Let's break down the code you just wrote. Think of Typescript as Python's cousin
 
 ### Hooks (the hardest part)
 
-- **`const [counter, setCounter] = context.useState(0)`:** This line uses a “hook” (in this case, `useState`). `useState` creates a special variable that Devvit can track and update automatically. **Unlike a regular variable, when a hook's value changes, Devvit knows to re-render the parts of your app that use that value when it changes.**
+- **`const [counter, setCounter] = useState(0)`:** This line uses a “hook” (in this case, `useState`). `useState` creates a special variable that Devvit can track and update automatically. **Unlike a regular variable, when a hook's value changes, Devvit knows to re-render your app that use that value when it changes.**
 
-  - `useState` returns two objects: the variable itself and a function for setting that variable. (The syntactic trick of object destructuring is used to assign both variables at once here.) Again, every time `setCounter` is called, the value for counter updates and Devvit is told to re-render the post. This is what makes your app interactive.
-  - `useState` variables are not like plain variables. Plain variables will reset every re-render, and they don’t tell the app to re-render. Hooks solve this problem. In this case, `useState(0)` creates a variable called `counter` with an initial value of 0. It also gives you a function called `setCounter` that you can use to update the counter's value.
+  - `useState` returns two values: the variable itself and a function for setting that variable. (The syntactic trick of object destructuring is used to assign both variables at once here.) Again, every time `setCounter` is called, the value for counter updates and Devvit is told to re-render the post. This is what makes your app interactive.
+  - `useState` variables are not like plain variables. Plain variables will reset every re-render, and they don’t tell the app to re-render. Hooks solve this problem. In this case, `useState(0)` creates a variable called `counter` with an initial value of `0`. It also gives you a function called `setCounter` that you can use to update the counter's value.
 
 :::note
 Hooks are a concept borrowed from React, and the reason we need hooks is because of the way Devvit renders things. It's is complex, but basically when Devvit renders a view, it does so in several passes. For more info, check out [what is react](https://www.reddit.com/r/learnprogramming/comments/8yi54n/please_explain_what_react_is_like_im_5/) and [what are hooks](https://www.reddit.com/r/react/comments/11ftu0p/what_are_hooks/).
@@ -163,7 +163,7 @@ Hooks are a concept borrowed from React, and the reason we need hooks is because
 
   _Truthiness in Typescript:_
 
-  - In Typescript (and Javascript), values like 0, `null`, `undefined`, and empty strings are considered "falsy".
+  - In Typescript (and Javascript), values like `0`, `null`, `undefined`, and `''` (empty string) are considered "falsy".
   - All other values are considered "truthy".
 
   In this case, the condition is `counter`. Since `counter` starts at 0 (which is falsy), the second expression (`<text>&nbsp;</text>`) is evaluated, displaying a non-breaking space. After the button is clicked, `counter` becomes truthy, so the first expression is evaluated, displaying the click count.

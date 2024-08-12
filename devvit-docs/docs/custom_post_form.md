@@ -74,10 +74,12 @@ Devvit.addCustomPostType({
 7. Use the Reddit API to say hello to the user.
 
 ```jsx
+import { Devvit, useState } from '@devvit/public-api';
+
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
   render: (context) => {
-    const [currentUsername] = context.useState(async () => {
+    const [currentUsername] = useState(async () => {
       const currentUser = await context.reddit.getCurrentUser();
       return currentUser.username;
     });
@@ -95,18 +97,20 @@ Devvit.addCustomPostType({
 
 8.  Create a form to collect user input.
 
-```ts
+```tsx
+import { Devvit, useState, useForm } from '@devvit/public-api';
+
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
   render: (context) => {
-    const [currentUsername] = context.useState(async () => {
+    const [currentUsername] = useState(async () => {
       const currentUser = await context.reddit.getCurrentUser();
       return currentUser.username;
     });
 
-    const [answer, setAnswer] = context.useState('');
+    const [answer, setAnswer] = useState('');
 
-    const howAreYouForm = context.useForm(
+    const howAreYouForm = useForm(
       {
         fields: [
           {

@@ -2,10 +2,6 @@
 
 Create responsive experience posts.
 
-:::note
-This is an experimental capability that may not be available on older mobile app versions.
-:::
-
 Dimensions provides a way for you to create responsive experiences by giving you the dimensions of the root node as part of the context object. This lets you write responsive interfaces based on the space available within the context object.
 
 Dimensions are dynamic and update in real time if the device or viewport changes. You can also resize your screen as you develop to see how your posts respond in real time. This is the same post displayed on a phone (left) and a tablet (right):

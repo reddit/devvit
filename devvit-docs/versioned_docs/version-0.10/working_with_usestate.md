@@ -141,7 +141,7 @@ In this example, when a user session ends, state will no longer be available to 
 
 The `redis` [plugin](https://developers.reddit.com/docs/redis) serves as your app’s long-term, server-side memory, while `useState` serves as its short-term, client-side memory.
 
-‘useState’ will keep your custom posts performant and responsive. UI that relies on too many serverside calls will slow down your app.
+‘useState’ will keep your custom posts performant and responsive. UI that relies on too many server-side calls will slow down your app.
 
 The `redis` should be used for storing data that needs to persist across sessions. Make these updates to your app in the background i.e. separate from the UI updates you are making. This way, your app does not need to wait on expensive calls to render new components. You should retrieve `redis` data once on render.
 

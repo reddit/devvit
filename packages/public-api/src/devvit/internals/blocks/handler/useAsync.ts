@@ -8,6 +8,7 @@ import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+
 export type AsyncOptions = {
   /**
    * The data loader will re-run if the value of `depends` changes.

@@ -58,11 +58,13 @@ Add a custom post type for your app.
 **`Example`**
 
 ```ts
+import { Devvit, useState } from '@devvit/public-api';
+
 Devvit.addCustomPostType({
   name: 'Counter',
   description: 'A simple click counter post.',
   render: (context) => {
-    const [counter, setCounter] = context.useState();
+    const [counter, setCounter] = useState();
 
     return (
       <vstack>

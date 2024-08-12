@@ -26,11 +26,7 @@
     {
       "type": "category",
       "label": "Showcase",
-      "items": [
-        "showcase/apps",
-        "showcase/playgrounds",
-        "showcase/tutorials"
-      ]
+      "items": ["showcase/apps", "showcase/playgrounds", "showcase/tutorials"]
     },
     {
       "type": "category",
@@ -66,13 +62,7 @@
     {
       "type": "category",
       "label": "Developer tools",
-      "items": [
-        "playground",
-        "playtest",
-        "debug",
-        "devvit_cli",
-        "devvit_kit"
-      ]
+      "items": ["playground", "playtest", "debug", "devvit_cli", "devvit_kit"]
     },
     {
       "type": "category",
@@ -133,13 +123,7 @@
     {
       "type": "category",
       "label": "Resources",
-      "items": [
-        "mod_resources",
-        "beta_participation",
-        "limits",
-        "help",
-        "reddit_developer_funds"
-      ]
+      "items": ["mod_resources", "beta_participation", "limits", "help", "reddit_developer_funds"]
     },
     {
       "type": "doc",

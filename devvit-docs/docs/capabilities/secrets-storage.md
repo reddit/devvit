@@ -60,6 +60,8 @@ Successfully added app settings for open-ai-api-key!
 Once you’ve stored the secrets via CLI, your app can access the secrets during invocations.
 
 ```tsx
+import { Devvit, useState } from '@devvit/public-api';
+
 Devvit.configure({
   http: true,
 });
@@ -91,7 +93,7 @@ async function fetchResponse(context: Devvit.Context): Promise<string | void> {
 Devvit.addCustomPostType({
   name: 'Devvit - Ask GPT',
   render: (context) => {
-    const [answer, setAnswer] = context.useState<string | undefined>(undefined);
+    const [answer, setAnswer] = useState<string | undefined>(undefined);
 
     async function onPress() {
       const response = await fetchResponse(context);

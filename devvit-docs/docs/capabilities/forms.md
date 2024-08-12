@@ -17,14 +17,14 @@ There are several ways to add a form to your app, and the method you'll use depe
 This example shows an experience post with a text label and a button that triggers a form. When the form is submitted, the onSubmit handler takes the form input and manipulates state with [`useState`](/docs/working_with_usestate.md). The state update triggers a rerender and the new data is displayed.
 
 ```tsx
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useState, useForm } from '@devvit/public-api';
 
 Devvit.addCustomPostType({
   name: 'TemplateName',
   render: (context) => {
-    const [name, setName] = context.useState('unknown');
+    const [name, setName] = useState('unknown');
 
-    const myForm = context.useForm(
+    const myForm = useForm(
       {
         fields: [
           {
@@ -483,7 +483,7 @@ export default Devvit;
 Add a multi-step dynamic form to an experience post
 
 ```tsx
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useState, useForm } from '@devvit/public-api';
 
 Devvit.configure({
   redditAPI: true,
@@ -492,11 +492,11 @@ Devvit.configure({
 Devvit.addCustomPostType({
   name: 'Multi-step Form',
   render: (context) => {
-    const [name, setName] = context.useState('');
-    const [food, setFood] = context.useState('');
-    const [drink, setDrink] = context.useState('');
+    const [name, setName] = useState('');
+    const [food, setFood] = useState('');
+    const [drink, setDrink] = useState('');
 
-    const form3 = context.useForm(
+    const form3 = useForm(
       {
         fields: [
           {
@@ -512,7 +512,7 @@ Devvit.addCustomPostType({
       }
     );
 
-    const form2 = context.useForm(
+    const form2 = useForm(
       {
         fields: [
           {
@@ -529,7 +529,7 @@ Devvit.addCustomPostType({
       }
     );
 
-    const form1 = context.useForm(
+    const form1 = useForm(
       {
         fields: [
           {

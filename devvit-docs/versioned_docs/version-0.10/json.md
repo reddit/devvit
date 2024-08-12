@@ -103,7 +103,10 @@ declare global {
 ```ts
 // Problem
 class XY {
-  constructor(public x: number, public y: number) {}
+  constructor(
+    public x: number,
+    public y: number
+  ) {}
 
   add(xy: XY): void {
     this.x += xy.x;
@@ -159,7 +162,10 @@ class XY {
     return new XY(json?.x ?? 0, json?.y ?? 0);
   }
 
-  constructor(public x: number, public y: number) {}
+  constructor(
+    public x: number,
+    public y: number
+  ) {}
 
   sub(xy: Readonly<XY>): XY {
     return new XY(this.x - xy.x, this.y - xy.y);
