@@ -4,7 +4,7 @@ import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
 import type { ActorSpec, Bundle } from '@devvit/protos';
 import { CompileParams } from '@devvit/protos';
-import { LOCAL_HOSTNAME } from '@devvit/runtimes/lib/HostnameUtil.js';
+import { LOCAL_HOSTNAME } from '@devvit/shared-types/HostnameUtil.js';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS } from './config.js';
