@@ -1,11 +1,10 @@
 import { ESBuildPack } from '@devvit/build-pack/esbuild/ESBuildPack.js';
 import { TscTypeChecker } from '@devvit/build-pack/index.js';
+import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
 import type { ActorSpec, Bundle } from '@devvit/protos';
 import { CompileParams } from '@devvit/protos';
-import { newBuildInfoDependencies } from '@devvit/runtimes/lib/BuildInfoUtil.js';
 import { LOCAL_HOSTNAME } from '@devvit/runtimes/lib/HostnameUtil.js';
-import path from 'node:path';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 import { DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS } from './config.js';
@@ -23,10 +22,9 @@ export class Bundler {
     );
   }
 
-  /** @arg {actorDir} Main source directory relative present working directory. */
-  async bundle(actorDir: string, actorSpec: ActorSpec): Promise<Bundle> {
+  async bundle(root: ProjectRootDir, actorSpec: ActorSpec): Promise<Bundle> {
     const compiledRes = await this.#buildPack.Compile(
-      CompileParams.fromPartial({ filename: actorDir, info: actorSpec, includeAssets: true }),
+      CompileParams.fromPartial({ filename: root, info: actorSpec, includeAssets: true }),
       undefined
     );
 
@@ -42,31 +40,22 @@ export class Bundler {
       throw new Error('Missing bundle');
     }
 
-    return newBundle(actorDir, compiledRes.bundle);
+    return compiledRes.bundle;
   }
 
   async dispose(): Promise<void> {
     await this.#buildPack.dispose();
   }
 
-  watch(actorDir: string, actorSpec: ActorSpec): Observable<Bundle | undefined> {
+  watch(root: ProjectRootDir, actorSpec: ActorSpec): Observable<Bundle | undefined> {
     return this.#buildPack
-      .Watch(CompileParams.fromPartial({ filename: actorDir, info: actorSpec }), undefined)
+      .Watch(CompileParams.fromPartial({ filename: root, info: actorSpec }), undefined)
       .pipe(
         map((rsp) => {
           if (rsp.warnings.length > 0) console.warn(formatLogs(rsp.warnings));
           if (rsp.errors.length > 0) console.error(formatLogs(rsp.errors));
-          return rsp.bundle ? newBundle(actorDir, rsp.bundle) : undefined;
+          return rsp.bundle;
         })
       );
   }
-}
-
-function newBundle(actorDir: string, bundle: Bundle): Bundle {
-  // to-do: use Builder and pass buildInfo through.
-  const dependencies = newBuildInfoDependencies(path.join(process.cwd(), actorDir));
-  return {
-    ...bundle,
-    buildInfo: { created: new Date(), dependencies },
-  };
 }

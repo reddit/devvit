@@ -3,7 +3,7 @@ import type { AppDebug } from '@devvit/shared-types/Header.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
-import pkg from '../../version.json' with { type: 'json' };
+import { PUBLIC_API_VERSION } from './public-api-version.js';
 
 export function getContextFromMetadata(
   metadata: Metadata,
@@ -81,7 +81,7 @@ export function parseDebug(meta: Readonly<Metadata>): ContextDebugInfo {
   // @devvit/public-api v1.2.3 emitSnapshots=true foo=bar
   if (meta[Header.Debug])
     console.info(
-      `[api] @devvit/public-api v${pkg.version} ${Object.entries(debug)
+      `[api] @devvit/public-api v${PUBLIC_API_VERSION} ${Object.entries(debug)
         .map(([k, v]) => `${k}=${v}`)
         .join(' ')}`
     );

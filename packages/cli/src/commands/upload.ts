@@ -15,6 +15,7 @@ import {
   UploadNewMediaRequest,
   VersionVisibility,
 } from '@devvit/protos/community.js';
+import type { MediaSignatureStatus } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
@@ -28,13 +29,13 @@ import {
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import {
-  ACTOR_SRC_DIR,
   ACTOR_SRC_PRIMARY_NAME,
   ASSET_HASHING_ALGO,
   MAX_ALLOWED_SUBSCRIBER_COUNT,
 } from '@devvit/shared-types/constants.js';
 import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
 import { Flags, ux } from '@oclif/core';
+import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import chalk from 'chalk';
 import { createHash } from 'crypto';
@@ -48,6 +49,7 @@ import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 import { MY_PORTAL_ENABLED } from '../lib/config.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
 import { Bundler } from '../util/Bundler.js';
+import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { getCaptcha } from '../util/captcha.js';
 import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
@@ -55,13 +57,10 @@ import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import type { DevvitConfig } from '../util/devvitConfig.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
 import { dirExists } from '../util/files.js';
-import { readPackageJSON } from '../util/package-managers/package-util.js';
-import { handleTwirpError } from '../util/twirp-error-handler.js';
-import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import { sendEvent } from '../util/metrics.js';
-import type { MediaSignatureStatus } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
-import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
+import { readPackageJSON } from '../util/package-managers/package-util.js';
 import { readAndInjectBundleProducts } from '../util/payments/paymentsConfig.js';
+import { handleTwirpError } from '../util/twirp-error-handler.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -505,7 +504,7 @@ export default class Upload extends ProjectCommand {
 
     try {
       return [
-        await bundler.bundle(path.join(this.projectRoot, ACTOR_SRC_DIR), {
+        await bundler.bundle(this.projectRoot, {
           name: ACTOR_SRC_PRIMARY_NAME,
           owner: username,
           version: version,

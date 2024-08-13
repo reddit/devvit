@@ -10,6 +10,7 @@ import {
   VersionVisibility,
   type FullAppInfo,
 } from '@devvit/protos/community.js';
+import { ASSET_DIRNAME, WEBVIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import {
@@ -21,6 +22,7 @@ import {
 import { Args, Flags, ux } from '@oclif/core';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import chalk from 'chalk';
+import chokidar from 'chokidar';
 import path from 'path';
 import type { Subscription } from 'rxjs';
 import { filter, map, merge, retry } from 'rxjs';
@@ -31,13 +33,11 @@ import { PlaytestServer } from '../lib/playtest-server.js';
 import type { CommandFlags } from '../lib/types/oclif.js';
 import { Bundler } from '../util/Bundler.js';
 import { AppLogObserver } from '../util/app-logs/app-log-observer.js';
+import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { createInstallationsClient, createRemoteLoggerClient } from '../util/clientGenerators.js';
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
-import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
-import { ASSET_DIRNAME, WEBVIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
-import chokidar from 'chokidar';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 
 export default class Playtest extends Upload {
@@ -186,12 +186,11 @@ export default class Playtest extends Upload {
       v.prereleaseVersion
     );
 
-    const srcDir = path.join(this.projectRoot, ACTOR_SRC_DIR);
     const assetDir = path.join(this.projectRoot, ASSET_DIRNAME);
     const webviewAssetDir = path.join(this.projectRoot, WEBVIEW_ASSET_DIRNAME);
     const productsJSON = path.join(this.projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
 
-    const watchSrc = this.#bundler.watch(srcDir, {
+    const watchSrc = this.#bundler.watch(this.projectRoot, {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
       version: projectConfig.version,

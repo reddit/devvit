@@ -1,14 +1,13 @@
 import { ActorSpec, Bundle } from '@devvit/protos';
-import { ACTOR_SRC_DIR } from '@devvit/shared-types/constants.js';
 import { Args } from '@oclif/core';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { getAccessToken } from '../../util/auth.js';
 import { Bundler } from '../../util/Bundler.js';
 import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { distDirFilename } from '../../util/config.js';
 import { readDevvitConfig } from '../../util/devvitConfig.js';
-import { getAccessToken } from '../../util/auth.js';
 import { readAndInjectBundleProducts } from '../../util/payments/paymentsConfig.js';
 
 export default class BundleActor extends ProjectCommand {
@@ -37,7 +36,7 @@ export default class BundleActor extends ProjectCommand {
 
     const actorBundler = new Bundler();
     const bundle = await actorBundler.bundle(
-      ACTOR_SRC_DIR,
+      this.projectRoot,
       ActorSpec.fromPartial({
         name: actorName,
         owner: username,
