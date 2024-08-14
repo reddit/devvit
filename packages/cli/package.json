@@ -46,7 +46,6 @@
     "@devvit/play": "0.0.39",
     "@devvit/protos": "0.11.0-dev",
     "@devvit/public-api": "0.11.0-dev",
-    "@devvit/runtimes": "0.11.0-dev",
     "@devvit/shared-types": "0.11.0-dev",
     "@improbable-eng/grpc-web": "0.15.0",
     "@improbable-eng/grpc-web-node-http-transport": "0.15.0",
