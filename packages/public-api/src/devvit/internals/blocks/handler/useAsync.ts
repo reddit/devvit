@@ -34,8 +34,10 @@ export function toSerializableErrorOrCircuitBreak(e: unknown): {
     if (e.message === CIRCUIT_BREAKER_MSG) {
       throw e;
     }
+    console.error(e);
     return { message: e.message, details: e.stack ?? '' };
   } else {
+    console.error(e);
     return { message: 'Unknown error', details: StringUtil.caughtToString(e) };
   }
 }
