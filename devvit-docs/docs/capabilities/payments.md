@@ -116,7 +116,9 @@ If you do not provide an image, the default Reddit product image will be used.
 
 ## Adding custom handlers to complete the payment flow
 
-You must specify a `PaymentHandler` using the `addPaymentHandler` function to customize how your app will fulfill product orders (refunds are in progress!).
+You must specify a function that is called during the order flow using the `addPaymentHandler`. This will to customize how your app will fulfill product orders and provide the ability for the developer to reject an order. (refunds are in progress!).
+
+Any error thrown within the payment handler will automatically reject the order. If you would like to provide a custom error message to the frontend of your application, you can return `{success: false, reason: <string>}` with a reason for order rejection.
 
 For example, imagine a scenario where you would want to issue an "extra life" to a user when they purchase the "extra_life" product.
 
@@ -129,34 +131,26 @@ const EXTRA_LIVES_SKU = 'extra_lives';
 
 addPaymentHandler({
   fulfillOrder: async (order: Order, ctx: Context) => {
-    switch (order.product.sku) {
-      case EXTRA_LIVES_SKU: {
-        // redis key for storing number of lives user has left
-        const livesKey = `${ctx.userId}:lives`;
-
-        // get the current life count
-        const curLives = await ctx.redis.get(livesKey);
-
-        // reject the order if the user already has more than or equal MAX_LIVES
-        if (curLives != null && Number(curLives) >= MAX_LIVES) {
-          return {
-            rejectionReason: 'Max lives exceeded',
-          };
-        }
-
-        // fulfill the order by incrementing the lives count for the user
-        ctx.redis.incrBy(`${ctx.userId}:lives`, 1);
-
-        return {
-          acknowledged: true,
-        };
-      }
-      default: {
-        return {
-          rejectionReason: `Unknown sku ${order.product.sku}`,
-        };
-      }
+    if (!order.products.some(({ sku }) => sku === EXTRA_LIVES_SKU)) {
+      // this error will be visible to your logs but not users; the order will be rejected
+      throw new Error('Unable to fulfill order: sku not found');
     }
+
+    // redis key for storing number of lives user has left
+    const livesKey = `${ctx.userId}:lives`;
+
+    // get the current life count
+    const curLives = await ctx.redis.get(livesKey);
+
+    // reject the order if the user already has more than or equal MAX_LIVES
+    if (curLives != null && Number(curLives) >= MAX_LIVES) {
+      // the reason provided here will be delivered to the `usePayments` callback function
+      // as `result.errorMessage` to optionally display to the end-user.
+      return { success: false, reason: 'Max lives exceeded' };
+    }
+
+    // fulfill the order by incrementing the lives count for the user
+    await ctx.redis.incrBy(`${ctx.userId}:lives`, 1);
   },
 });
 ```
