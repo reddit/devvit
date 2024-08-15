@@ -10,6 +10,7 @@ import {
   PaymentProcessorDefinition,
 } from '@devvit/protos/payments.js';
 import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
+import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/index.js';
 
 /**
  * reads src/products.json and injects products into bundle. Will throw an error if
@@ -104,6 +105,7 @@ export function makePaymentsConfig(products: Readonly<Product[]>): PaymentsConfi
         amount: product.price,
         currency: Currency.GOLD,
       },
+      accountingType: mapAccountingTypeToProto(product.accountingType),
       images: product.images ?? {},
       environment: Environment.ENVIRONMENT_SANDBOX, // We default to sandbox for any build from the CLI
       productMetadata: product.metadata ?? {},

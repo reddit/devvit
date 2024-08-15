@@ -2,6 +2,7 @@ import { makePaymentsConfig, readAndInjectBundleProducts } from './paymentsConfi
 import { Bundle } from '@devvit/protos';
 import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
+import { AccountingType } from '@devvit/shared-types/payments/Product.js';
 import { access, readFile } from 'node:fs/promises';
 
 vi.mock('node:fs/promises', () => ({
@@ -16,6 +17,7 @@ const MOCK_PRODUCTS_JSON: { products: Product[] } = {
       sku: 'product-1',
       displayName: 'Product 1',
       price: 25,
+      accountingType: AccountingType.INSTANT,
       metadata: {},
     },
   ],
