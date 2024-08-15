@@ -7,6 +7,7 @@ import type {
   UploadNewMediaResponse,
 } from '@devvit/protos/community.js';
 import {
+  AppCapability,
   AppCreationRequest,
   AppVersionCreationRequest,
   FullAppInfo,
@@ -450,7 +451,7 @@ export default class Upload extends ProjectCommand {
 
     // Sync and upload assets
     const { assetMap, webViewAssetMap } = await this.#syncAssets(
-      appInfo.app?.isWebviewEnabled === true
+      appInfo.app?.capabilities.includes(AppCapability.WEBVIEW)
     );
 
     // Dump these in the assets fields of the bundles
