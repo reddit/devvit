@@ -1,1 +1,1 @@
-Prevents the used value of `height` from becoming larger than the minimum height if set.
+Prevents the used value of `height` from becoming larger than the maximum height if set.
