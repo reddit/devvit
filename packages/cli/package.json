@@ -70,7 +70,7 @@
     "open": "10.1.0",
     "ps-node": "^0.1.6",
     "rxjs": "7.8.1",
-    "semver": "7.5.0",
+    "semver": "7.5.1",
     "string-length": "5.0.1",
     "tiny-glob": "0.2.9",
     "tsv": "0.2.0",
