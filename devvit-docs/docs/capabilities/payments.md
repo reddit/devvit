@@ -163,7 +163,7 @@ Products are tied to app versions. This means if you create a product in version
 
 ![Order workflow diagram](../assets/payments_order_flow.jpg)
 
-Order processing happens in coordination with the frontend and backend of your application. From the frontend, you launch the payment flow by calling `createOrder` and `order.purchase()`. This triggers a native payment flow on each platform (web, iOS, Android). The native workflow works with the Reddit backend to process the order, and your app is called via the `fulfillOrder()` hook during this process. This gives your app the opportunity to acknowledge or reject the order. For example, for goods that have limited quantities, your app may not fulfill an order once the product is sold out and instead reject the order.
+Order processing happens in coordination with the frontend and backend of your application. From the frontend, you launch the payment flow by creating a hook with `usePayments()` followed by `hook.purchase()` when you want to initiate the purchase. This triggers a native payment flow on each platform (web, iOS, Android). The native workflow works with the Reddit backend to process the order, and your app is called via the `fulfillOrder()` hook during this process. This gives your app the opportunity to acknowledge or reject the order. For example, for goods that have limited quantities, your app may not fulfill an order once the product is sold out and instead reject the order.
 
 ### Get your product details
 
@@ -207,15 +207,7 @@ const products = await getProducts({
 Provide the product sku to trigger a purchase. This automatically populates the most recently approved product metadata for that product id.
 
 ```tsx
-import { createOrder, usePayments } from '@devvit/payments';
-
-// Define product SKU
-const product = 'sword';
-
-const swordOrder = createOrder(product, (result: OnPurchaseResult) => { console.log(result.success ? 'The sword is yours!' : 'No sword for you'); });
-
-// talking to a sword-smithing blacksmith:
-<button onPress={swordOrder.purchase()}>Buy a Sword</button>
+import { usePayments } from '@devvit/payments';
 
 // handles purchase results
 const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.success); });
