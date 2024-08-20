@@ -4,6 +4,11 @@ import type { Config } from '@devvit/shared-types/Config.js';
 import { Devvit } from '../Devvit.js';
 import { BlocksHandler } from './blocks/handler/BlocksHandler.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
+import {
+  makeUpgradeAppComponent,
+  parseDevvitUserAgent,
+  shouldShowUpgradeAppScreen,
+} from './upgrade-app-shim.js';
 
 /**
  * Extend me to add new surfaces to Devvit.
@@ -20,6 +25,12 @@ export function makeHandler(
   component: JSX.ComponentFunction
 ): (req: UIRequest, metadata: Metadata) => Promise<UIResponse> {
   return async (req: UIRequest, metadata: Metadata) => {
+    const parsedUserAgent = parseDevvitUserAgent(metadata['devvit-user-agent']?.values?.[0] ?? '');
+    if (parsedUserAgent && shouldShowUpgradeAppScreen(parsedUserAgent)) {
+      const handler = new BlocksHandler(makeUpgradeAppComponent(parsedUserAgent.platform));
+      return UIResponse.fromJSON(await handler.handle(req, metadata));
+    }
+
     const handler = new BlocksHandler(component);
     return UIResponse.fromJSON(await handler.handle(req, metadata));
   };
