@@ -6,7 +6,7 @@ There are two sets of dimensions that you’ll need to think about when creating
 
 ## Post height
 
-Height is a property on `addCustomPostType`. You can set the height to regular or tall. By default, posts are regular height.
+Height is a property on `addCustomPostType`. You can set the height to `regular` or `tall`. By default, posts are regular height.
 
 ### [Playground link](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAbaDJgDoIAgQGEJaMlwAKxMwBUAnoRgAKYBooVIseLwBy0GDzIbhQAFjB4AOYhZN48ZBAyMoHBGDBgQhjeAPpYxGBkMAAelAC8AHxUwe6pZBIYYBROVe4UADyyxFgA1mhlze6toh3dvc0AlMHMGswTmmBFJOQUQmwQEjKU2iIoIHQwGGh4eQgAjMxAA)
 

@@ -16,9 +16,9 @@ Learn how to implement a Remind Me Later feature on Reddit using scheduler and t
 
 **Capabilities used:**
 
-- [Menu actions](../menu_actions)
-- [Forms](../forms)
-- [Scheduler](../scheduler)
+- [Menu actions](../capabilities/menu_actions)
+- [Forms](../capabilities/forms)
+- [Scheduler](../capabilities/scheduler)
 
 ## [Three strikes](./tutorials/three_strikes.md)
 
@@ -26,6 +26,6 @@ In this tutorial, you'll learn to implement a powerful moderation tool using Red
 
 **Capabilities used:**
 
-- [Menu actions](../menu_actions)
-- [Forms](../forms)
-- [Redis](../redis)
+- [Menu actions](../capabilities/menu_actions)
+- [Forms](../capabilities/forms)
+- [Redis](../capabilities/redis)
