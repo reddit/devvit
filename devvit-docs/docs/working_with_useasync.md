@@ -4,13 +4,13 @@
 This feature is experimental, which means the design is not final but it's still available for you to use.
 :::
 
-`useAsync` is a hook that allows to use fetch remote data in a non-blocking way.
+`useAsync` is a hook that allows your app to fetch remote data in a non-blocking way.
 
-### Blocking versus Non-blocking
+## Blocking versus non-blocking
 
 The code you write in Javascript can be blocking or non-blocking. To keep applications speedy, non-blocking code is preferred.
 
-Blocking code produces a waterfall of actions. One line must happen after another, so the speed in which a program can render takes a large hit. We want to avoid waterfalls at all costs to provide a nice experience for users.
+Blocking code produces a waterfall of actions. One line must happen after another, so the speed in which a program can render takes a large hit. We want to avoid waterfalls to provide a nice experience for users.
 
 **Blocking**
 

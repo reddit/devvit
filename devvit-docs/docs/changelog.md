@@ -4,6 +4,12 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.10.25: Take two: devvit publish
+
+**Release Date: Aug 16, 2024**
+
+Devvit 0.10.25 includes the devvit publish CLI commands that were missing in 0.10.24. This release also includes a small fix for when certain Redis commands were returning 0 instead of null.
+
 ## Devvit 0.10.24: Publishing from the CLI and other fixes
 
 **Release Date: Aug 12, 2024**
