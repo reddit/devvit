@@ -169,10 +169,10 @@ Redis hashes can store up to ~ 4.2 billion key-value pairs. We recommend using h
 | [hGet](https://redis.io/commands/hget)        | Returns the value associated with field in the hash stored at key.              |
 | [hSet](https://redis.io/commands/hset/)       | Sets the specified fields to their respective values in the hash stored at key. |
 | [hDel](https://redis.io/commands/hdel/)       | Removes the specified fields from the hash stored at key.                       |
-| [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash                     |
+| [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash.                    |
 | [hKeys](https://redis.io/commands/hkeys/)     | Returns all field names in the hash stored at key.                              |
 | [hScan](https://redis.io/commands/hscan/)     | Iterates fields of Hash types and their associated values.                      |
-| [hIncrBy](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value         |
+| [hIncrBy](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value.        |
 | [hLen](https://redis.io/commands/hlen/)       | Returns the number of fields contained in the hash stored at key.               |
 
 <details><summary>Code Examples</summary>
@@ -387,15 +387,19 @@ Redis transactions allow a group of commands to be executed in a single isolated
 - Increment the count for selected option.
 - Add the user to voted user list.
 
+The `watch` command provides an entrypoint for transactions. It returns a [TxClientLike](https://developers.reddit.com/docs/api/public-api/#-txclientlike) which can be used to call `multi`, `exec`, `discard`, `unwatch`, and all other Redis commands to be executed within a transaction.
+
 You can sequence all of the above steps in a single transaction using `multi` and `exec` to ensure that either all of the steps happen together or none at all.
 
-| **Command**                                   | **Action**                                                                                            |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [multi](https://redis.io/commands/multi/)     | Marks the start of a transaction block.                                                               |
-| [exec](https://redis.io/commands/exec/)       | Executes all previously queued commands in a transaction and restores the connection state to normal. |
-| [discard](https://redis.io/commands/discard/) | Flushes all previously queued commands in a transaction and restores the connection state to normal.  |
-| [watch](https://redis.io/commands/watch/)     | Marks the given keys to be watched for conditional execution of a transaction.                        |
-| [unwatch](https://redis.io/commands/unwatch/) | Flushes all the previously watched keys for a transaction.                                            |
+If an error occurs inside a transaction before `exec` is called, Redis discards the transaction automatically. See the Redis docs: [Errors inside a transaction](https://redis.io/docs/latest/develop/interact/transactions/#errors-inside-a-transaction) for more info.
+
+| **Command**                                   | **Action**                                                                                                                                                                                                                                      |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [multi](https://redis.io/commands/multi/)     | Marks the start of a transaction block.                                                                                                                                                                                                         |
+| [exec](https://redis.io/commands/exec/)       | Executes all previously queued commands in a transaction and restores the connection state to normal.                                                                                                                                           |
+| [discard](https://redis.io/commands/discard/) | Flushes all previously queued commands in a transaction and restores the connection state to normal.                                                                                                                                            |
+| [watch](https://redis.io/commands/watch/)     | Marks the given keys to be watched for conditional execution of a transaction. `watch` returns a [TxClientLike](https://developers.reddit.com/docs/api/public-api/#-txclientlike) which should be used to call Redis commands in a transaction. |
+| [unwatch](https://redis.io/commands/unwatch/) | Flushes all the previously watched keys for a transaction.                                                                                                                                                                                      |
 
 <details><summary>Code Examples</summary>
 
