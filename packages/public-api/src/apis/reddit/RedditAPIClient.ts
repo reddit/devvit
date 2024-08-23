@@ -217,12 +217,12 @@ export class RedditAPIClient {
   }
 
   /**
-   * Retrieves the current subreddit based on the provided metadata.
+   * Retrieves the current subreddit.
    *
    * @returns {Promise<Subreddit>} A Promise that resolves a Subreddit object.
    * @example
    * ```ts
-   * const currentSubreddit = await reddit.getCurrentSubreddit(metadata);
+   * const currentSubreddit = await reddit.getCurrentSubreddit();
    * ```
    */
   getCurrentSubreddit(): Promise<Subreddit> {
@@ -320,13 +320,13 @@ export class RedditAPIClient {
   }
 
   /**
-   * Get the current calling user based on the provided metadata.
+   * Get the current calling user.
    * Resolves to undefined for logged-out custom post renders.
    *
    * @returns A Promise that resolves to a User object or undefined
    * @example
    * ```ts
-   * const user = await reddit.getCurrentUser(metadata);
+   * const user = await reddit.getCurrentUser();
    * ```
    */
   getCurrentUser(): Promise<User | undefined> {

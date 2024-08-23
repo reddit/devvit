@@ -798,7 +798,7 @@ const posts = await reddit
 
 ▸ **getCurrentSubreddit**(): `Promise`\<[`Subreddit`](models.Subreddit.md)\>
 
-Retrieves the current subreddit based on the provided metadata.
+Retrieves the current subreddit.
 
 #### Returns
 
@@ -809,7 +809,7 @@ A Promise that resolves a Subreddit object.
 **`Example`**
 
 ```ts
-const currentSubreddit = await reddit.getCurrentSubreddit(metadata);
+const currentSubreddit = await reddit.getCurrentSubreddit();
 ```
 
 ---
@@ -818,7 +818,7 @@ const currentSubreddit = await reddit.getCurrentSubreddit(metadata);
 
 ▸ **getCurrentUser**(): `Promise`\<[`User`](models.User.md)\>
 
-Get the current calling user based on the provided metadata.
+Get the current calling user.
 
 #### Returns
 
@@ -829,7 +829,7 @@ A Promise that resolves to a User object.
 **`Example`**
 
 ```ts
-const user = await reddit.getCurrentUser(metadata);
+const user = await reddit.getCurrentUser();
 ```
 
 ---

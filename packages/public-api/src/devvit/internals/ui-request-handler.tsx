@@ -10,14 +10,25 @@ import {
   shouldShowUpgradeAppScreen,
 } from './upgrade-app-shim.js';
 
+const FeatureUnavailable: Devvit.BlockComponent = () => (
+  <vstack alignment="center middle" width="100%" height="100%">
+    <text>This feature is not available yet</text>
+  </vstack>
+);
+
 /**
  * Extend me to add new surfaces to Devvit.
  */
-const UIComponentBindings: [[Definition, MethodDefinition, JSX.ComponentFunction]] = [
+const UIComponentBindings: [Definition, MethodDefinition, JSX.ComponentFunction][] = [
   [
     CustomPostDefinition,
     CustomPostDefinition.methods['renderPostContent'],
     (_props: {}, context: Devvit.Context) => Devvit.customPostType?.render(context) ?? null,
+  ],
+  [
+    CustomPostDefinition,
+    CustomPostDefinition.methods['renderPostComposer'],
+    (_props: {}, _context: Devvit.Context) => <FeatureUnavailable />,
   ],
 ];
 
