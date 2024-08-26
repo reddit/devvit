@@ -93,6 +93,7 @@ export class Comment {
   #modReportReasons: string[];
   #userReportReasons: string[];
   #url: string;
+  #ignoringReports: boolean;
 
   #metadata: Metadata | undefined;
 
@@ -135,6 +136,7 @@ export class Comment {
     this.#permalink = data.permalink;
     // R2 API does not include a URL for a comment, just a permalink
     this.#url = new URL(data.permalink ?? '', 'https://www.reddit.com/').toString();
+    this.#ignoringReports = data.ignoreReports ?? false;
 
     this.#modReportReasons = ((data.modReports as unknown as [string, string]) ?? []).map(
       ([reason]) => reason
@@ -262,6 +264,10 @@ export class Comment {
     return this.#url;
   }
 
+  get ignoringReports(): boolean {
+    return this.#ignoringReports;
+  }
+
   toJSON(): Pick<
     Comment,
     | 'id'
@@ -287,6 +293,7 @@ export class Comment {
     | 'userReportReasons'
     | 'modReportReasons'
     | 'url'
+    | 'ignoringReports'
   > {
     return {
       id: this.id,
@@ -312,6 +319,7 @@ export class Comment {
       modReportReasons: this.modReportReasons,
       userReportReasons: this.userReportReasons,
       url: this.url,
+      ignoringReports: this.ignoringReports,
     };
   }
 
@@ -341,6 +349,10 @@ export class Comment {
 
   isEdited(): boolean {
     return this.#edited;
+  }
+
+  isIgnoringReports(): boolean {
+    return this.#ignoringReports;
   }
 
   async delete(): Promise<void> {
@@ -425,6 +437,16 @@ export class Comment {
     const { distinguishedBy, stickied } = await Comment.undistinguish(this.id, this.#metadata);
     this.#distinguishedBy = distinguishedBy;
     this.#stickied = stickied;
+  }
+
+  async ignoreReports(): Promise<void> {
+    await Comment.ignoreReports(this.id, this.#metadata);
+    this.#ignoringReports = true;
+  }
+
+  async unignoreReports(): Promise<void> {
+    await Comment.unignoreReports(this.id, this.#metadata);
+    this.#ignoringReports = false;
   }
 
   /**
@@ -700,6 +722,30 @@ export class Comment {
         };
       },
     });
+  }
+
+  /** @internal */
+  static async ignoreReports(id: T1ID, metadata: Metadata | undefined): Promise<void> {
+    const client = Devvit.redditAPIPlugins.Moderation;
+
+    await client.IgnoreReports(
+      {
+        id,
+      },
+      metadata
+    );
+  }
+
+  /** @internal */
+  static async unignoreReports(id: T1ID, metadata: Metadata | undefined): Promise<void> {
+    const client = Devvit.redditAPIPlugins.Moderation;
+
+    await client.UnignoreReports(
+      {
+        id,
+      },
+      metadata
+    );
   }
 
   static #getCommentsListing(
