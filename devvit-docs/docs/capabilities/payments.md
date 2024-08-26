@@ -122,7 +122,7 @@ Any error thrown within the payment handler will automatically reject the order.
 
 For example, imagine a scenario where you would want to issue an "extra life" to a user when they purchase the "extra_life" product.
 
-```typescript
+```ts
 import { type Context } from '@devvit/public-api';
 import { addPaymentHandler, type Order } from '@devvit/payments';
 

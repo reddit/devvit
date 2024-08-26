@@ -4,39 +4,34 @@ Build automatic actions into your app.
 
 A trigger is an action you can build into your app that will occur automatically when the trigger condition is met.
 
-## Setup triggers
-
-Setup triggers enable your app to automatically respond when a user is installing or configuring your app. These triggers are supported:
-
-- AppInstall
-- AppUpgrade
-
 ## Event triggers
 
-Event triggers let your app automatically respond to a user’s action. For example, if you set the OnSubredditSubscribe trigger, the app will automatically respond when a user joins the community. These triggers are supported:
+Event triggers let your app automatically respond to a user’s action. For example, if you set the OnSubredditSubscribe trigger, the app will automatically respond when a user joins the community. These triggers types are supported:
 
-- CommentCreate
-- CommentDelete
-- CommentReport
-- CommentSubmit
-- CommentUpdate
-- ModAction
-- ModMail
-- PostCreate
-- PostDelete
-- PostFlairUpdate
-- PostNsfwUpdate
-- PostSpoilerUpdate
-- PostReport
-- PostSubmit
-- PostUpdate
+- `PostSubmit`
+- `PostCreate`
+- `PostUpdate`
+- `PostReport`
+- `PostDelete`
+- `PostFlairUpdate`
+- `CommentCreate`
+- `CommentDelete`
+- `CommentReport`
+- `CommentSubmit`
+- `CommentUpdate`
+- [`PostNsfwUpdate`](#nsfw-example)
+- [`PostSpoilerUpdate`](#spoiler-example)
+- [`AppInstall`](#setup-triggers)
+- [`AppUpgrade`](#setup-triggers)
+- [`ModActions`](#mod-actions)
+- [`ModMail`](#modmail-trigger)
 
 This example adds event triggers that will automatically execute your app. Once a trigger is added, your app listens for the event and the event handler executes the action.
 
 ```tsx
 import { Devvit } from '@devvit/public-api';
 
-// Logging on a PostSubmit event
+// Handling a PostSubmit event
 Devvit.addTrigger({
   event: 'PostSubmit', // Event name from above
   onEvent: async (event) => {
@@ -44,7 +39,7 @@ Devvit.addTrigger({
   },
 });
 
-// Logging on multiple events: PostUpdate and PostReport
+// Handling multiple events: PostUpdate and PostReport
 Devvit.addTrigger({
   events: ['PostUpdate', 'PostReport'], // An array of events
   onEvent: async (event) => {
@@ -65,9 +60,21 @@ Be careful when creating recursive triggers (like a comment trigger that creates
 
 :::
 
+## Setup triggers
+
+Setup triggers allow your app to automatically respond when a user is installing or configuring that app.
+These triggers are supported:
+
+- `AppInstall`
+- `AppUpgrade`
+
 ## Mod triggers
 
 ### Modmail trigger
+
+```ts
+event: 'ModMail',
+```
 
 This alerts the mod when modmail is sent or received. This example enables the app to listen to modmail events and fetch the relevant message payload via the Reddit API wrapper.
 
@@ -112,15 +119,15 @@ These are triggered when a mod or automod marks a post as NSFW or a spoiler.
 NSFW and spoiler triggers only work for user posts that a moderator flags. Moderators cannot trigger a label for their own posts.
 :::
 
-**NSFW example**
+#### NSFW example
 
 ```tsx
 Devvit.addTrigger({
   event: 'PostNsfwUpdate',
   onEvent: async (event, context) => {
-    //App received this event when:
-    // moderator changes a non-moderator post to nsfw
-    // automoderator changes post from nsfw to sfw
+    // App received this event when:
+    // 1. moderator changes a non-moderator post to nsfw
+    // 2. automoderator changes post from nsfw to sfw
     console.log(`Received nsfw trigger event:\n${JSON.stringify(event)}`);
     if (event.isNsfw) {
       console.log(`This is event ${JSON.stringify(event)} changed to nsfw`);
@@ -131,15 +138,15 @@ Devvit.addTrigger({
 });
 ```
 
-**Spoiler example**
+#### Spoiler example
 
 ```tsx
 Devvit.addTrigger({
   event: 'PostSpoilerUpdate',
   onEvent: async (event, context) => {
-    //App received this event when:
-    // moderator changes a non-moderator post to spoiler
-    // moderator changes post from spoiler to non-spoiler
+    // App received this event when:
+    // 1. moderator changes a non-moderator post to spoiler
+    // 2. moderator changes post from spoiler to non-spoiler
 
     console.log(`Received spoiler trigger event:\n${JSON.stringify(event)}`);
     if (event.isSpoiler) {
@@ -154,3 +161,14 @@ Devvit.addTrigger({
 ## Mod actions
 
 Mod actions are another kind of trigger that are just for mods. These triggers show up in the mod log. Check out the list of available [mod actions](/docs/mod_actions.md), and if you don't see an action you want, let us know in [r/devvit modmail](https://reddit.com/message/compose/?to=/r/Devvit).
+
+```ts
+Devvit.addTrigger({
+  event: 'ModAction',
+  async onEvent(event, context) {
+    if (event.action === 'BAN_USER') {
+      console.log(`A new user ${event.targetUser?.name} was banned!`);
+    }
+  },
+});
+```

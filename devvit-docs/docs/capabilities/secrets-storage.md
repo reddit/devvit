@@ -57,7 +57,9 @@ Successfully added app settings for open-ai-api-key!
 
 ## Retrieving secrets
 
-Once you’ve stored the secrets via CLI, your app can access the secrets during invocations.
+Once you’ve stored the secrets via CLI, your app can access the secrets during invocations using `context.settings.get(secretName)` method.
+
+<details><summary>Code Example</summary>
 
 ```tsx
 import { Devvit, useState } from '@devvit/public-api';
@@ -66,34 +68,45 @@ Devvit.configure({
   http: true,
 });
 
-async function fetchResponse(context: Devvit.Context): Promise<string | void> {
-  const apiKey = await context.settings.get('open-ai-api-key');
+Devvit.addSettings([
+  {
+    name: 'open-ai-api-key',
+    label: 'Open AI API key',
+    type: 'string',
+    isSecret: true,
+    scope: 'app',
+  },
+]);
 
-  return fetch('https://api.openai.com/v1/chat/completions', {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    method: 'POST',
-    body: JSON.stringify({
-      model: 'gpt-4-turbo',
-      messages: [{ role: 'system', content: 'You are a helpful assistant.' }],
-    }),
-  })
-    .then(async (res) => {
-      const json = await res.json();
-      return json?.choices?.length > 0 ? json?.choices[0]?.message?.content : 'No response';
-    })
-    .catch((e) => {
-      console.log('Fetch error ', e);
-      return e.toString();
+async function fetchResponse(context: Devvit.Context): Promise<string> {
+  try {
+    const apiKey = await context.settings.get('open-ai-api-key');
+
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        model: 'gpt-4-turbo',
+        messages: [{ role: 'system', content: 'You are a helpful assistant.' }],
+      }),
     });
+
+    const json = await res.json();
+
+    return json?.choices?.length > 0 ? json?.choices[0]?.message?.content : 'No response';
+  } catch (e: any) {
+    console.log('Fetch error ', e);
+    return e.toString();
+  }
 }
 
 Devvit.addCustomPostType({
   name: 'Devvit - Ask GPT',
   render: (context) => {
-    const [answer, setAnswer] = useState<string | undefined>(undefined);
+    const [answer, setAnswer] = useState<string>('');
 
     async function onPress() {
       const response = await fetchResponse(context);
@@ -115,6 +128,8 @@ Devvit.addCustomPostType({
 
 export default Devvit;
 ```
+
+</details>
 
 ## Limitations
 

@@ -105,7 +105,7 @@ The form object enables you to customize the form container and the [list of for
 #### Usage
 
 ```tsx
-{
+const myForm = {
   title: 'My form',
   description: 'This is my form. There are many like it, but this one is mine.',
   fields: [
@@ -122,7 +122,7 @@ The form object enables you to customize the form container and the [list of for
   ],
   acceptLabel: 'Submit',
   cancelLabel: 'Cancel',
-}
+};
 ```
 
 #### Supported properties
@@ -175,11 +175,11 @@ A single-line text input.
 #### Usage
 
 ```ts
-{
+const stringField = {
   type: 'string',
   name: 'title',
   label: 'Tournament title',
-}
+};
 ```
 
 #### Properties
@@ -206,7 +206,7 @@ A dropdown menu with predefined options.
 #### Usage
 
 ```ts
-{
+const selectField = {
   type: 'select',
   name: 'interval',
   label: 'Update the leaderboard',
@@ -217,7 +217,7 @@ A dropdown menu with predefined options.
     { label: 'Monthly', value: 'monthly' },
     { label: 'Yearly', value: 'yearly' },
   ],
-}
+};
 ```
 
 #### Properties
@@ -244,11 +244,11 @@ A multi-line text input for longer responses.
 #### Usage
 
 ```ts
-{
+const paragraphField = {
   type: 'paragraph',
   name: 'description',
   label: 'Description',
-}
+};
 ```
 
 #### Properties
@@ -275,11 +275,11 @@ An input for numerical values.
 #### Usage
 
 ```ts
-{
+const numberField = {
   type: 'number',
   name: 'tokens',
   label: 'Token balance',
-}
+};
 ```
 
 #### Properties
@@ -304,11 +304,11 @@ A yes/no or true/false type input.
 #### Usage
 
 ```ts
-{
+const booleanField = {
   type: 'boolean',
   name: 'enable',
   label: 'Enable the event',
-}
+};
 ```
 
 #### Properties
@@ -323,6 +323,37 @@ A yes/no or true/false type input.
 | `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
 | `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
 
+### Image
+
+An image upload field.
+
+![Image input](../assets/capabilities/forms/forms-image.png)
+
+#### Usage
+
+```ts
+const imageField = {
+  type: 'image', // This tells the form to expect an image
+  name: 'myImage',
+  label: 'Image goes here',
+  required: true,
+};
+```
+
+#### Properties
+
+| Property      | Supported types                                                                | Description                                                                                                                                                      |
+| :------------ | :----------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`        | `string`                                                                       | The desired field type.                                                                                                                                          |
+| `name`        | `string`                                                                       | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                                           |
+| `label`       | `string`                                                                       | The label of the field. This will be displayed to the user.                                                                                                      |
+| `helpText`    | `string` `undefined`                                                           | An optional help text that will be displayed below the field.                                                                                                    |
+| `required`    | `boolean` `undefined`                                                          | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
+| `disabled`    | `boolean` `undefined`                                                          | If true the field will be disabled. Defaults to `false`.                                                                                                         |
+| `scope`       | [`SettingScopeType`](../api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `placeholder` | `string` `undefined`                                                           | Placeholder text for display before a value is present.                                                                                                          |
+| `isSecret`    | `boolean` `undefined`                                                          | Makes the form field secret.                                                                                                                                     |
+
 ### Group
 
 A collection of related fields that allows for better readability.
@@ -330,7 +361,7 @@ A collection of related fields that allows for better readability.
 #### Usage
 
 ```ts
-{
+const groupField = {
   type: 'group',
   label: 'This is a group of input fields',
   fields: [
@@ -345,7 +376,7 @@ A collection of related fields that allows for better readability.
       label: 'How would you rate your meal on a scale from 1 to 10?',
     },
   ],
-}
+};
 ```
 
 #### Properties

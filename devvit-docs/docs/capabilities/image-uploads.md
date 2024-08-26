@@ -2,23 +2,14 @@
 
 Include images that are 20 MB or less in your app.
 
-You can embed the image in a post or comment and use rich-text builder to format the text heading, paragraph, code block, and more.
+You can embed the image in a post or comment and use rich-text builder to format the text heading, paragraph, code block, and more. There are two ways to upload an image: using a template or starting from scratch.
 
-There are two ways to upload images:
+## Option 1: Use a template
 
-- Use a template
-- Start from scratch
-
-## Use a template
-
-Using a template is the easiest way to upload your image. You can use a simple template or dive into a more complex template depending on your needs and comfort level.
-
-### Easy
-
-Use the simple `image-uploads` template to create a new app.
+Use the `image-uploads` template to create a new app:
 
 1. From the terminal, navigate to a directory where you'd like to store your code.
-2. Enter the following command to create the app.
+2. Enter the following command to create the app:
 
 ```ts
 devvit new <your-app-name> --template=image-uploads
@@ -26,9 +17,7 @@ devvit new <your-app-name> --template=image-uploads
 
 This will create a template that uses `Devvit.addMenuItem` to allow the user reply to a comment with the defined gif.
 
-## Start from scratch
-
-If you’re starting from scratch, configure Devvit to allow media, and then use `devvit.addMenuItem` to design your image upload.
+## Option 2: Start from scratch
 
 1. From the terminal, navigate to a directory where you'd like to store your code.
 2. Enter the following command to create the app.
@@ -37,7 +26,27 @@ If you’re starting from scratch, configure Devvit to allow media, and then use
 devvit new <your-app-name>
 ```
 
-3. Add this snippet to main.ts.
+3. Configure `Devvit` to allow media
+
+```ts
+Devvit.configure({
+  media: true,
+  // other capabilities
+});
+```
+
+4. Use `context.media.upload()` to upload images/gifs to your app.
+
+```ts
+await context.media.upload({
+  url: 'https://media2.giphy.com/media/xTiN0CNHgoRf1Ha7CM/giphy.gif',
+  type: 'gif',
+});
+```
+
+You can use the code snippet below as a starting point:
+
+<details><summary>Code example</summary>
 
 ```ts
 import { Devvit, RichTextBuilder } from '@devvit/public-api';
@@ -69,6 +78,8 @@ Devvit.addMenuItem({
 
 export default Devvit;
 ```
+
+</details>
 
 ## Test your app
 
