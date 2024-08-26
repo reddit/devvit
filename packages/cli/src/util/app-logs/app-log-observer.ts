@@ -1,4 +1,4 @@
-import type { RemoteLogMessage } from '@devvit/protos';
+import type { RemoteLogMessage, RemoteLogQuery } from '@devvit/protos';
 import { LogErrorMessage, LogEventMessage, LogMessage, Severity } from '@devvit/protos';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import chalk from 'chalk';
@@ -26,10 +26,21 @@ export class AppLogObserver implements Observer<RemoteLogMessage> {
   #config: AppLogObserverConfig;
   /** Often a DevvitCommand. */
   #logger: Console;
+  /** Query for logs. Observer needs to update its since on messages, in case of later retries. */
+  #logsQuery: RemoteLogQuery;
+  /** Query for errors. Observer needs to update its since on messages, in case of later retries. */
+  #errorsQuery: RemoteLogQuery;
 
-  constructor(config: AppLogObserverConfig, logger: Console) {
+  constructor(
+    config: AppLogObserverConfig,
+    logger: Console,
+    logsQuery: RemoteLogQuery,
+    errorsQuery: RemoteLogQuery
+  ) {
     this.#config = config;
     this.#logger = logger;
+    this.#logsQuery = logsQuery;
+    this.#errorsQuery = errorsQuery;
   }
 
   complete(): void {
@@ -44,15 +55,29 @@ export class AppLogObserver implements Observer<RemoteLogMessage> {
 
   next(msg: RemoteLogMessage): void {
     if (msg.error != null) {
+      if (this.#errorsQuery.since != null && msg.error?.timestamp != null) {
+        this.#errorsQuery.since = new Date(msg.error.timestamp);
+        this.#errorsQuery.since.setMilliseconds(this.#errorsQuery.since.getMilliseconds() + 1);
+      }
       if (this.#config.json) this.#logger.log(JSON.stringify(LogErrorMessage.toJSON(msg.error)));
       else this.#logError(msg.error);
     } else if (msg.event != null) {
       if (this.#config.json) this.#logger.log(JSON.stringify(LogEventMessage.toJSON(msg.event)));
       else this.#logEvent(msg.event);
     } else if (msg.log != null) {
+      if (this.#logsQuery.since != null && msg.log?.timestamp != null) {
+        this.#logsQuery.since = new Date(msg.log.timestamp);
+        this.#logsQuery.since.setMilliseconds(this.#logsQuery.since.getMilliseconds() + 1);
+      }
       if (this.#config.json) this.#logger.log(JSON.stringify(LogMessage.toJSON(msg.log)));
       else this.#logger.log(formatAppLogMessage(msg.log, this.#config));
     } else if (msg.keepalive && this.#config.showKeepAlive) {
+      const ts = msg.keepalive.timestamp;
+      if (ts != null) {
+        ts.setMilliseconds(ts.getMilliseconds() + 1);
+        this.#errorsQuery.since = ts;
+        this.#logsQuery.since = ts;
+      }
       this.#logger.log(chalk.dim(formatAppLogDivider('keep alive')));
     }
   }

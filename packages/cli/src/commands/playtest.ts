@@ -267,16 +267,18 @@ export default class Playtest extends Upload {
     const subredditAppName = { appName, subreddit };
     const now = new Date();
 
-    const logs = client.Tail({
+    const logsQuery = {
       type: RemoteLogType.LOG,
       subredditAppName,
       since: now,
-    });
-    const errors = client.Tail({
+    };
+    const logs = client.Tail(logsQuery);
+    const errorsQuery = {
       type: RemoteLogType.ERROR,
       subredditAppName,
       since: now,
-    });
+    };
+    const errors = client.Tail(errorsQuery);
 
     return merge(logs, errors)
       .pipe(retry({ count: 5, delay: 1_000, resetOnSuccess: true }))
@@ -290,7 +292,9 @@ export default class Playtest extends Upload {
             showKeepAlive: false,
             verbose,
           },
-          this
+          this,
+          logsQuery,
+          errorsQuery
         )
       );
   }

@@ -155,20 +155,18 @@ export default class Logs extends DevvitCommand {
   ): Subscription {
     const client = createRemoteLoggerClient();
 
-    const logs = client.Tail(
-      RemoteLogQuery.fromPartial({
-        type: RemoteLogType.LOG,
-        since: flags.since,
-        subredditAppName,
-      })
-    );
-    const errors = client.Tail(
-      RemoteLogQuery.fromPartial({
-        type: RemoteLogType.ERROR,
-        since: flags.since,
-        subredditAppName,
-      })
-    );
+    const logsQuery = RemoteLogQuery.fromPartial({
+      type: RemoteLogType.LOG,
+      since: flags.since,
+      subredditAppName,
+    });
+    const logs = client.Tail(logsQuery);
+    const errorsQuery = RemoteLogQuery.fromPartial({
+      type: RemoteLogType.ERROR,
+      since: flags.since,
+      subredditAppName,
+    });
+    const errors = client.Tail(errorsQuery);
 
     return merge(logs, errors)
       .pipe(retry({ count: 3, delay: 1000, resetOnSuccess: true }))
@@ -182,7 +180,9 @@ export default class Logs extends DevvitCommand {
             showKeepAlive: flags.showKeepAlive,
             verbose: flags.verbose,
           },
-          this
+          this,
+          logsQuery,
+          errorsQuery
         )
       );
   }
