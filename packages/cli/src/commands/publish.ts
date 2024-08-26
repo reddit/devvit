@@ -118,25 +118,25 @@ export default class Publish extends ProjectCommand {
       visibility = await this.#promptForVisibility();
     }
 
-    const appCreatesCustomPost = await this.#checkIfAppCreatesCustomPost(bundle);
-    if (appCreatesCustomPost) {
-      this.log(
-        "Custom post apps need to be approved before they can be published, so I'll submit your app for review!"
-      );
-      await this.#submitForReview(appVersion.id, devvitVersion, visibility);
+    if (await this.#checkIfAppUsesFetch(bundle)) {
+      await this.#checkAppVersionTermsAndConditions(appInfo.app, appDetailsUrl);
+    }
+
+    await this.#submitForReview(appVersion.id, devvitVersion, visibility);
+
+    if (await this.#checkIfAppCreatesCustomPost(bundle)) {
+      this.log('Custom post apps need to be approved before they can be published');
       this.log("You'll receive a DM when your app has been reviewed.");
       this.log("Once approved, you'll be able to install your app anywhere you're a moderator!");
+
+      // Early return
       return;
     }
 
-    const appUsesFetch = await this.#checkIfAppUsesFetch(bundle);
+    await this.#updateVersion(appVersion.id, devvitVersion);
 
-    if (appUsesFetch) {
-      await this.checkAppVersionTermsAndConditions(appInfo.app, appDetailsUrl);
-    }
+    this.log("Your app is now unlisted. You can install it anywhere you're a moderator!");
 
-    await this.#updateVersion(appVersion.id, devvitVersion, visibility);
-    this.log('Your app is now unlisted. You can install it on any subreddit you moderate!');
     if (visibility === AppPublishRequestVisibility.PUBLIC) {
       this.log("You'll receive a DM when your app has been reviewed & made public.");
       this.log(
@@ -147,8 +147,7 @@ export default class Publish extends ProjectCommand {
 
   async #updateVersion(
     appVersionId: string,
-    devvitVersion: DevvitVersion,
-    visibility: AppPublishRequestVisibility
+    devvitVersion: DevvitVersion
   ): Promise<FullAppVersionInfo> {
     const appVersionUpdateRequest: AppVersionUpdateRequest = {
       id: appVersionId,
@@ -163,9 +162,7 @@ export default class Publish extends ProjectCommand {
     ux.action.start(`Publishing version "${devvitVersion.toString()}" to Reddit...`);
     try {
       const appVersionInfo = await this.#appVersionClient.Update(appVersionUpdateRequest);
-      ux.action.stop(`Success! ✅`);
-
-      await this.#submitForReview(appVersionId, devvitVersion, visibility);
+      ux.action.stop('✅');
 
       return appVersionInfo;
     } catch (error) {
@@ -181,10 +178,7 @@ export default class Publish extends ProjectCommand {
     return !!bundle.uses.find((use) => use.hostname === 'http.plugins.local');
   }
 
-  protected checkAppVersionTermsAndConditions = async (
-    app: AppInfo,
-    appDetailsUrl: string
-  ): Promise<void> => {
+  async #checkAppVersionTermsAndConditions(app: AppInfo, appDetailsUrl: string): Promise<void> {
     const { termsAndConditions, privacyPolicy } = app;
     if (!termsAndConditions || !privacyPolicy) {
       this.log(
@@ -202,7 +196,7 @@ export default class Publish extends ProjectCommand {
       }
       process.exit();
     }
-  };
+  }
 
   async #submitForReview(
     appVersionId: string,
@@ -212,7 +206,7 @@ export default class Publish extends ProjectCommand {
     ux.action.start(`Submitting version "${devvitVersion.toString()}" for review...`);
     try {
       await this.#appPRClient.Submit({ appVersionId, visibility });
-      ux.action.stop(`Success!`);
+      ux.action.stop('✅');
       return;
     } catch (err) {
       if (err && typeof err === 'object' && 'code' in err && err.code === 'already_exists') {
