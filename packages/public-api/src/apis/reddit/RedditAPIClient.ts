@@ -856,7 +856,7 @@ export class RedditAPIClient {
       {
         type: 'moderator_invite',
         subredditName: options.subredditName,
-        username: options.subredditName,
+        username: options.username,
         permissions: options.permissions ?? [],
       },
       this.#metadata

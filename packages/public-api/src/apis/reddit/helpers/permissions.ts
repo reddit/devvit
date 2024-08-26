@@ -14,19 +14,14 @@ export const MODERATOR_PERMISSIONS = [
   'chat_operator',
 ];
 
-export function formatPermissions(
-  permissions: string[],
-  allPermissions: string[],
-  encodePlusSign: boolean = false
-): string {
-  const plus = encodePlusSign ? '%2b' : '+';
+export function formatPermissions(permissions: string[], allPermissions: string[]): string {
   return allPermissions
-    .map((permission) => (permissions.includes(permission) ? plus : '-') + permission)
+    .map((permission) => (permissions.includes(permission) ? '+' : '-') + permission)
     .join(',');
 }
 
 export function formatModeratorPermissions(permissions: string[]): string {
-  return formatPermissions(permissions, MODERATOR_PERMISSIONS, true);
+  return formatPermissions(permissions, MODERATOR_PERMISSIONS);
 }
 
 export function validModPermissions(permissions: string[]): ModeratorPermission[] {
