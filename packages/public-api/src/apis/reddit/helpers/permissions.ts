@@ -10,8 +10,8 @@ export const MODERATOR_PERMISSIONS = [
   'flair',
   'channels',
   'chat_config',
-  'chat_community',
   'chat_operator',
+  'community_chat',
 ];
 
 export function formatPermissions(permissions: string[], allPermissions: string[]): string {

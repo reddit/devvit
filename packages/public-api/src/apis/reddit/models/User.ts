@@ -46,7 +46,7 @@ export type ModeratorPermission =
   | 'chat_operator'
   | 'chat_config'
   | 'channels'
-  | 'chat_community';
+  | 'community_chat';
 
 export type CreateRelationshipOptions = {
   subredditName: string;
