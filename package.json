@@ -14,6 +14,7 @@
     "build": "turbo run build --output-logs=new-only",
     "build:all": "yarn build && yarn build:go",
     "build:go": "make -C devvit-compute-go build; make -C devvit-gateway-service/ build; make -C services/snooron-worker-devvit build",
+    "build:protos": "make protos",
     "bump-version": "node ./packages/repo-tools/bin/bump-packages-version.mjs",
     "clean": "turbo run clean --output-logs=new-only && rm -rf .husky/_ .eslintcache .nojekyll faceplate-docs",
     "clean:all": "yarn clean && yarn clean:go",
