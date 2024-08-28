@@ -52,6 +52,10 @@ export type BaseContext = {
   userId?: string | undefined;
   /** The ID of the current app's account */
   appAccountId: string;
+  /** The slug of the app that is running */
+  appName: string;
+  /** The version of the app that is running */
+  appVersion: string;
   /** The ID of the current comment */
   commentId?: string | undefined;
   /** Returns a JSON representation of the context */
