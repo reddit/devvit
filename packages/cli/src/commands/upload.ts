@@ -34,7 +34,7 @@ import {
   ASSET_HASHING_ALGO,
   MAX_ALLOWED_SUBSCRIBER_COUNT,
 } from '@devvit/shared-types/constants.js';
-import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
+import { generateRandomSlug, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
 import { Flags, ux } from '@oclif/core';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
@@ -62,6 +62,8 @@ import { sendEvent } from '../util/metrics.js';
 import { readPackageJSON } from '../util/package-managers/package-util.js';
 import { readAndInjectBundleProducts } from '../util/payments/paymentsConfig.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
+
+const MAX_RANDOM_SLUG_RETRIES = 5;
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -236,41 +238,25 @@ export default class Upload extends ProjectCommand {
     });
   }
 
-  async #promptNameUntilNotTaken(appName: string | undefined): Promise<string> {
-    for (;;) {
-      const rsp = await inquirer.prompt([
-        {
-          default: appName,
-          name: 'appName',
-          type: 'input',
-          message: 'Pick a name for your app:',
-          validate: async (input: string) => {
-            if (!sluggable(input)) {
-              return `The name of your app must be between 3 and ${APP_SLUG_BASE_MAX_LENGTH} characters long, and contains only alphanumeric characters, spaces, and dashes.`;
-            }
-            return true;
-          },
-          filter: (input: string) => {
-            return makeSlug(input.trim().toLowerCase());
-          },
-        },
-      ]);
-      appName = rsp.appName;
-      if (appName) {
-        const isAvailableResponse = await this.#checkAppNameAvailability(appName);
-        if (!isAvailableResponse.exists) {
-          // Doesn't exist, we're good
-          return appName;
-        }
-        this.warn(`The app name "${appName}" is unavailable.`);
-        if (isAvailableResponse.suggestions.length > 0) {
-          this.log(
-            `Here's some suggestions:\n  * ${isAvailableResponse.suggestions.join('\n  * ')}`
-          );
-          appName = isAvailableResponse.suggestions[0];
-        }
-      }
+  async #ensureAppNameIsAvailable(appName: string | undefined): Promise<string> {
+    // If we don't have an app name, generate a random one
+    if (!appName) {
+      appName = generateRandomSlug();
     }
+
+    for (let i = 0; i < MAX_RANDOM_SLUG_RETRIES; i++) {
+      const isAvailableResponse = await this.#checkAppNameAvailability(appName);
+      if (!isAvailableResponse.exists) {
+        // Doesn't exist, we're good!
+        return appName;
+      }
+      // Try again with a random slug
+      appName = generateRandomSlug();
+    }
+
+    this.error(
+      `Failed to generate a unique app name after ${MAX_RANDOM_SLUG_RETRIES} attempts. This shouldn't happen; please try again, and if it's still happening, contact support.`
+    );
   }
 
   async createNewApp(
@@ -278,7 +264,7 @@ export default class Upload extends ProjectCommand {
     copyPaste: boolean,
     justDoIt: boolean
   ): Promise<FullAppInfo> {
-    projectConfig.name = await this.#promptNameUntilNotTaken(
+    projectConfig.name = await this.#ensureAppNameIsAvailable(
       sluggable(projectConfig.name) ? makeSlug(projectConfig.name) : undefined
     );
     const description = await this.#getAppDescription();
