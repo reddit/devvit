@@ -134,7 +134,14 @@ export class RenderContext implements EffectEmitter {
     // events. Remember that the BlocksHandler can do N number of passes before
     // it determines it is time to send a response back to the client. _changed
     // needs to encompass all of those changes.
-    this.#hooks = {};
+
+    // You may also be tempted to put `this._hooks = {}` here, please DON'T!
+    // Some hooks (useState) may rely on values held on the previous hook. If you
+    // set this._hooks = {} and then call #loadHooks from BlocksHandler, you will
+    // accidentally remove all state held in prevHooks since the first step of
+    // #loadHooks is to set hooks values to {}. Setting hooks to {} is a concern that
+    // should live outside of RenderContext and inside of BlocksHandler on a case
+    // by case basis.
     this.#state = state;
   }
 

@@ -110,6 +110,40 @@ const DependentUseAsyncs = (): JSX.Element => {
   );
 };
 
+const UseAsyncBeforeUseStateComponent = (): JSX.Element => {
+  const { data, loading } = useAsync(async () => {
+    return 'useAsyncResolved';
+  });
+  const [useStateValue] = useState(async () => {
+    return 'useStateResolved';
+  });
+
+  return (
+    <vstack height="100%" width="100%" gap="medium" alignment="center middle">
+      <text>useAsyncLoading: {loading}</text>
+      <text>useAsyncValue: {data}</text>
+      <text>useStateValue: {useStateValue}</text>
+    </vstack>
+  );
+};
+
+const UseStateBeforeUseAsyncComponent = (): JSX.Element => {
+  const [useStateValue] = useState(async () => {
+    return 'useStateResolved';
+  });
+  const { data, loading } = useAsync(async () => {
+    return 'useAsyncResolved';
+  });
+
+  return (
+    <vstack height="100%" width="100%" gap="medium" alignment="center middle">
+      <text>useAsyncLoading: {loading}</text>
+      <text>useAsyncValue: {data}</text>
+      <text>useStateValue: {useStateValue}</text>
+    </vstack>
+  );
+};
+
 let n = 0;
 const AsyncStateComponent = (): JSX.Element => {
   const [_count, setCount] = captureHookRef(
@@ -191,6 +225,50 @@ describe('BlocksHandler', () => {
             "depends": "foo",
             "error": null,
             "load_state": "loaded",
+          },
+          "__cache": {},
+        }
+      `);
+    });
+
+    test('useState async initializer after useAsync should resolve', async () => {
+      const handler = new BlocksHandler(UseAsyncBeforeUseStateComponent);
+      const resp = await handler.handle({ events: [{ blocking: {} }] }, mockMetadata);
+
+      expect(resp.state).toMatchInlineSnapshot(`
+        {
+          "UseAsyncBeforeUseStateComponent.useAsync-0": {
+            "data": "useAsyncResolved",
+            "depends": null,
+            "error": null,
+            "load_state": "loaded",
+          },
+          "UseAsyncBeforeUseStateComponent.useState-1": {
+            "error": null,
+            "load_state": "loaded",
+            "value": "useStateResolved",
+          },
+          "__cache": {},
+        }
+      `);
+    });
+
+    test('useState async initializer before useAsync should resolve', async () => {
+      const handler = new BlocksHandler(UseStateBeforeUseAsyncComponent);
+      const resp = await handler.handle({ events: [{ blocking: {} }] }, mockMetadata);
+
+      expect(resp.state).toMatchInlineSnapshot(`
+        {
+          "UseStateBeforeUseAsyncComponent.useAsync-1": {
+            "data": "useAsyncResolved",
+            "depends": null,
+            "error": null,
+            "load_state": "loaded",
+          },
+          "UseStateBeforeUseAsyncComponent.useState-0": {
+            "error": null,
+            "load_state": "loaded",
+            "value": "useStateResolved",
           },
           "__cache": {},
         }
