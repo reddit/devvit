@@ -11,6 +11,9 @@ import {
 } from '@devvit/protos/payments.js';
 import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
 import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/index.js';
+import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
+import { imageSize } from 'image-size';
+import type { ISizeCalculationResult } from 'image-size/dist/types/interface.js';
 
 /**
  * reads src/products.json and injects products into bundle. Will throw an error if
@@ -58,17 +61,39 @@ function checkProductsConfig(
       );
     }
 
+    const missingAssets: String[] = [];
     if (verifyProductImgAssets) {
       // check that all product images are included in the assets
-      const productImages = products.map((product) => Object.values(product.images || {})).flat();
       const assets = Object.keys(bundle.assetIds);
-      productImages.forEach((image) => {
-        if (!assets.includes(image)) {
-          throw new Error(
-            `Product image ${image} is not included in the assets of the bundle. Please ensure that the image is included in the /assets directory.`
-          );
+
+      for (const product of products) {
+        // check to see if there are images associated with this product
+        if (!product.images) {
+          continue;
         }
-      });
+
+        // find any assets used in products that are missing from the assets in the bundle
+        const missing = Object.values(product.images).filter(
+          (assetPath) => !assets.includes(assetPath)
+        );
+
+        // if there are missing assets, add them to the list and check the next product
+        if (missing.length > 0) {
+          missingAssets.push(...missing);
+          continue;
+        }
+
+        // enforce image constraints on icons
+        if (product.images.icon) {
+          validateProductIcon(path.join(ASSET_DIRNAME, product.images.icon));
+        }
+      }
+
+      if (missingAssets.length > 0) {
+        throw new Error(
+          `Product images ${missingAssets.join(', ')} are not included in the assets of the bundle. Please ensure that the image is included in the /assets directory.`
+        );
+      }
     }
   }
 
@@ -112,4 +137,31 @@ export function makePaymentsConfig(products: Readonly<Product[]>): PaymentsConfi
     };
   });
   return { products: formattedProducts };
+}
+
+export function validateProductIcon(assetPath: string): void {
+  let size: ISizeCalculationResult;
+  try {
+    size = imageSize(assetPath);
+  } catch {
+    throw new Error(`Product icon ${assetPath} is not a valid image`);
+  }
+
+  const { width, height, type } = size;
+
+  if (type !== 'png') {
+    throw new Error(`Product icon ${assetPath} must be a PNG`);
+  }
+
+  if (width !== height) {
+    throw new Error(
+      `Product icon ${assetPath} must be square. The provided asset is ${width}x${height}px`
+    );
+  }
+
+  if (!width || width < 256) {
+    throw new Error(
+      `Product icon ${assetPath} must be at least 256x256. The provided asset is ${width}x${height}px`
+    );
+  }
 }

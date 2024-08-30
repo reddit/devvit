@@ -1,9 +1,14 @@
-import { makePaymentsConfig, readAndInjectBundleProducts } from './paymentsConfig.js';
+import {
+  makePaymentsConfig,
+  readAndInjectBundleProducts,
+  validateProductIcon,
+} from './paymentsConfig.js';
 import { Bundle } from '@devvit/protos';
 import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { AccountingType } from '@devvit/shared-types/payments/Product.js';
 import { access, readFile } from 'node:fs/promises';
+import path from 'path';
 
 vi.mock('node:fs/promises', () => ({
   access: vi.fn().mockResolvedValue(void 0),
@@ -74,7 +79,7 @@ describe(readAndInjectBundleProducts.name, () => {
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
     await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
-      `Product image ${productImage} is not included in the assets`
+      `Product images ${productImage} are not included in the assets`
     );
     expect(bundle.paymentsConfig).toBeUndefined();
   });
@@ -138,5 +143,33 @@ describe(readAndInjectBundleProducts.name, () => {
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
     await readAndInjectBundleProducts(PROJECT_ROOT, bundle, false);
     expect(bundle.paymentsConfig).toStrictEqual(makePaymentsConfig(products.products));
+  });
+});
+
+describe(validateProductIcon.name, () => {
+  const imgPath = (filename: string): string => path.join(__dirname, 'test-images', filename);
+
+  it('rejects non-images', () => {
+    expect(() => validateProductIcon(imgPath('not-an-image.png'))).toThrowError(
+      'not a valid image'
+    );
+  });
+
+  it('rejects non pngs', () => {
+    expect(() => validateProductIcon(imgPath('not-png.jpg'))).toThrowError('must be a PNG');
+  });
+
+  it('rejects non square', () => {
+    expect(() => validateProductIcon(imgPath('not-square.png'))).toThrowError('must be square');
+  });
+
+  it('rejects small images', () => {
+    expect(() => validateProductIcon(imgPath('too-small.png'))).toThrowError(
+      'must be at least 256x256'
+    );
+  });
+
+  it('allows valid images', () => {
+    expect(() => validateProductIcon(imgPath('good.png'))).not.toThrow();
   });
 });
