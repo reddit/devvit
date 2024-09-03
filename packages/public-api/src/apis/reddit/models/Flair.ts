@@ -462,8 +462,8 @@ function asFlairTextColor(color?: string): FlairTextColor {
 function asFlairBackgroundColor(color?: string): FlairBackgroundColor {
   assertNonNull(color, 'Flair background color is required');
 
-  if (color === 'transparent') {
-    return color;
+  if (color.length === 0 || color === 'transparent') {
+    return 'transparent';
   }
 
   if (/^#([A-Fa-f0-9]{6})$/.test(color)) {
