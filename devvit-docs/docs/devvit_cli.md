@@ -242,7 +242,7 @@ $ devvit new [directory-name] [-t <value>] [--here]
 
   Directory name for your new app project. This creates a new directory for your app code. If no name is entered, you will be prompted to choose one.
 
-- `-t <value>, --template <value>`
+- `--template <value>`
 
   Template name or pen URL. If no template is entered, you will be prompted to choose one.
 

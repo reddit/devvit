@@ -74,10 +74,12 @@ export default class New extends DevvitCommand {
     }),
     template: Flags.string({
       description:
-        'Template name or pen URL. Available templates are: ' +
-        `${templateResolver.options.filter(({ hidden }) => !hidden).join(', ')}.`,
+        'Template name or pen URL. Available templates are: \n' +
+        `${templateResolver.options
+          .filter(({ hidden }) => !hidden)
+          .map((tmpl) => `- ${tmpl.name}`)
+          .join('\n')}`,
       required: false,
-      char: 't',
     }),
     noDependencies: Flags.boolean({
       required: false,
