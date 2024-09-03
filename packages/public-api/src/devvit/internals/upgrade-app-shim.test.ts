@@ -67,9 +67,9 @@ describe('shouldShowUpgradeAppScreen', () => {
     ['Reddit;Android;2024.32.0+5262029.1819908', false],
     ['Reddit;Android;2024.32.0+5262029.1819907', true],
     // iOS
-    ['Reddit;iOS;2024.31.0.614941', false],
-    ['Reddit;iOS;2024.31.0.614940', false],
-    ['Reddit;iOS;2024.31.0.614939', true],
+    ['Reddit;iOS;2024.31.0.614974', false],
+    ['Reddit;iOS;2024.31.0.614973', false],
+    ['Reddit;iOS;2024.31.0.614972', true],
     // Shreddit
     ['Reddit;Shreddit;not-provided', false],
     // Play
