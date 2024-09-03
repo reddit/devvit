@@ -114,6 +114,12 @@ export default class Upload extends ProjectCommand {
       description: 'Copy-paste the auth code instead of opening a browser',
       default: false,
     }),
+    verbose: Flags.boolean({
+      char: 'v',
+      description: 'Include more details about discovered assets',
+      default: false,
+      hidden: true,
+    }),
   };
 
   readonly appClient = createAppClient();
@@ -130,6 +136,7 @@ export default class Upload extends ProjectCommand {
     } as Record<string, string | boolean | undefined>,
   };
   #eventSent = false;
+  #verbose = false;
 
   async run(): Promise<void> {
     const token = await getAccessTokenAndLoginIfNeeded();
@@ -139,6 +146,7 @@ export default class Upload extends ProjectCommand {
 
     const projectConfig = await this.getProjectConfig();
     const { flags } = await this.parse(Upload);
+    this.#verbose = flags.verbose;
 
     // for backwards compatibility, we'll use the app's name as the slug to
     // check if it already exists
@@ -562,7 +570,7 @@ export default class Upload extends ProjectCommand {
     webViewAssetMap?: AssetMap;
   }> {
     const regularAssets = await this.#getAssets(ASSET_DIRNAME, ALLOWED_ASSET_EXTENSIONS);
-    let webViewAssets = await this.#getAssets(WEBVIEW_ASSET_DIRNAME);
+    let webViewAssets = await this.#getAssets(WEBVIEW_ASSET_DIRNAME, [], true);
 
     if (!isWebViewEnabled && webViewAssets.length > 0) {
       ux.warn('WebView is not enabled for this app. Skipping webview assets.');
@@ -600,7 +608,8 @@ export default class Upload extends ProjectCommand {
 
   async #getAssets(
     folder: string,
-    allowedExtensions: string[] = []
+    allowedExtensions: string[] = [],
+    webviewAssets: boolean = false
   ): Promise<MediaSignatureWithContents[]> {
     if (!(await dirExists(path.join(this.projectRoot, folder)))) {
       // Return early if there isn't an assets directory
@@ -633,6 +642,7 @@ export default class Upload extends ProjectCommand {
           filePath: filename,
           size,
           hash,
+          isWebviewAsset: webviewAssets,
           contents,
         };
       })
@@ -702,7 +712,10 @@ export default class Upload extends ProjectCommand {
     }, {});
   }
 
-  async #getAssetStatuses(assets: MediaSignatureWithContents[]): Promise<MediaSignatureStatus[]> {
+  async #getAssetStatuses(
+    assets: MediaSignatureWithContents[],
+    webviewAssets: boolean = false
+  ): Promise<MediaSignatureStatus[]> {
     const config = await this.getProjectConfig();
     const res = await this.appClient.CheckIfMediaExists({
       id: undefined,
@@ -711,6 +724,7 @@ export default class Upload extends ProjectCommand {
         size: a.size,
         hash: a.hash,
         filePath: a.filePath,
+        isWebviewAsset: webviewAssets,
       })),
     });
     return res.statuses;
@@ -723,9 +737,20 @@ export default class Upload extends ProjectCommand {
     const webViewMsg = webViewAsset ? 'webview ' : '';
 
     const config = await this.getProjectConfig();
-    const statuses = await this.#getAssetStatuses(assets);
+    const statuses = await this.#getAssetStatuses(assets, webViewAsset);
     ux.action.start(`Checking for new ${webViewMsg}assets`);
     const [newAssets, existingAssets] = await this.#findNewAssets(assets, statuses);
+    if (this.#verbose) {
+      ux.info(`Found ${assets.length} ${webViewMsg}assets (${newAssets.length} new assets)`);
+      ux.info('New assets:');
+      newAssets.forEach((asset) => {
+        ux.info(` · ${asset.filePath}`);
+      });
+      ux.info('Existing assets:');
+      Object.entries(existingAssets).forEach(([path, id]) => {
+        ux.info(` · ${path} (id: ${id})`);
+      });
+    }
 
     const assetMap: AssetMap = existingAssets;
 
