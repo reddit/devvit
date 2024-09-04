@@ -1,10 +1,13 @@
-import { UUID } from '@devvit/protos';
-import { GetAllWithInstallLocationRequest, InstallationType } from '@devvit/protos/community.js';
+import {
+  GetAllWithInstallLocationRequest,
+  InstallationType,
+  UUID,
+} from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, ux } from '@oclif/core';
+import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { createAppVersionClient, createInstallationsClient } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
-import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 
 type UninstallParseResult = {

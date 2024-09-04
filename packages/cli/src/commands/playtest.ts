@@ -1,5 +1,5 @@
 import type { Bundle } from '@devvit/protos';
-import { ActorSpec, DependencySpec, RemoteLogType, Severity, UUID } from '@devvit/protos';
+import { ActorSpec, DependencySpec, RemoteLogType, Severity } from '@devvit/protos';
 import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
 import {
   BuildStatus,
@@ -7,6 +7,7 @@ import {
   InstallationCreationRequest,
   InstallationType,
   InstallationUpgradeRequest,
+  UUID,
   VersionVisibility,
   type FullAppInfo,
 } from '@devvit/protos/community.js';
