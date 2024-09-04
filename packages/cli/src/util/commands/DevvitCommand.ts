@@ -1,16 +1,17 @@
+import { Empty } from '@devvit/protos';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { Command, Flags } from '@oclif/core';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import { parse } from '@oclif/core/lib/parser/index.js';
-import inquirer from 'inquirer';
 import open from 'open';
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
-import { getAccessToken } from '../auth.js';
-import { createWaitlistClient } from '../clientGenerators.js';
-import { DEVVIT_PORTAL_URL } from '../config.js';
 import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../devvitConfig.js';
 import { findProjectRoot } from '../project-util.js';
+import { createWaitlistClient } from '../clientGenerators.js';
+import { DEVVIT_PORTAL_URL } from '../config.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
+import { getAccessToken } from '../auth.js';
+import inquirer from 'inquirer';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`
@@ -63,7 +64,7 @@ export abstract class DevvitCommand extends Command {
   readonly waitlistClient = createWaitlistClient();
   protected checkDeveloperAccount = async (): Promise<void> => {
     const { acceptedTermsVersion, currentTermsVersion } =
-      await this.waitlistClient.GetCurrentUserStatus({});
+      await this.waitlistClient.GetCurrentUserStatus(Empty.fromPartial({}));
 
     const devAccountUrl = `${DEVVIT_PORTAL_URL}/create-account?cli=true`;
     if (acceptedTermsVersion < currentTermsVersion) {

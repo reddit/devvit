@@ -1,9 +1,9 @@
+import type { Empty } from '@devvit/protos';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import open from 'open';
 import type { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs';
 
-import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
 import type { Disposable } from '@devvit/shared-types/Disposable.js';
 import inquirer from 'inquirer';
 import fetch, { FormData } from 'node-fetch';

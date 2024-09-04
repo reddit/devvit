@@ -1,10 +1,10 @@
-import { Value } from '@devvit/protos/types/google/protobuf/struct.js';
-import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
 import path from 'node:path';
+import fs from 'node:fs/promises';
+import crypto from 'node:crypto';
 import { DOT_DEVVIT_DIR_FILENAME } from '../lib/config.js';
-import { createEventsClient } from './clientGenerators.js';
 import { isFile } from './file-util.js';
+import { createEventsClient } from './clientGenerators.js';
+import { Value } from '@devvit/protos';
 
 export async function isMetricsEnabled(): Promise<boolean> {
   if (process.env.DEVVIT_DISABLE_METRICS) {
