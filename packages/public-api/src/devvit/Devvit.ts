@@ -1,3 +1,4 @@
+import type { UnknownMessage } from '@devvit/protos';
 import * as protos from '@devvit/protos';
 import type { PaymentsService } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
@@ -42,7 +43,7 @@ import { registerUIEventHandler } from './internals/ui-event-handler.js';
 import { registerUIRequestHandlers } from './internals/ui-request-handler.js';
 
 type UseHandler = {
-  [name: string]: (args: protos.UnknownMessage | undefined, metadata?: protos.Metadata) => void;
+  [name: string]: (args: UnknownMessage | undefined, metadata?: protos.Metadata) => void;
 };
 
 type PluginType =
@@ -456,10 +457,7 @@ export class Devvit extends Actor {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const wrapped: any = {};
     for (const method of Object.values(d.methods)) {
-      wrapped[method.name] = (
-        args: protos.UnknownMessage | undefined,
-        metadata?: protos.Metadata
-      ) =>
+      wrapped[method.name] = (args: UnknownMessage | undefined, metadata?: protos.Metadata) =>
         this.#uses[d.fullName].handler?.[method.name]?.(
           method.requestType?.fromPartial(args ?? {}),
           metadata
