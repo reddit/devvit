@@ -5,6 +5,7 @@
 ### Enumerations
 
 - [AboutLocations](../enums/models.AboutLocations.md)
+- [CollectionDisplayLayout](../enums/models.CollectionDisplayLayout.md)
 - [FlairType](../enums/models.FlairType.md)
 - [ModMailActionType](../enums/models.ModMailActionType.md)
 - [ModMailConversationState](../enums/models.ModMailConversationState.md)
@@ -25,6 +26,7 @@
 - [ModMailService](../classes/models.ModMailService.md)
 - [ModNote](../classes/models.ModNote.md)
 - [Post](../classes/models.Post.md)
+- [PostCollection](../classes/models.PostCollection.md)
 - [PostFlairWidget](../classes/models.PostFlairWidget.md)
 - [PrivateMessage](../classes/models.PrivateMessage.md)
 - [Subreddit](../classes/models.Subreddit.md)
@@ -118,6 +120,7 @@
 - [SubmitMediaOptions](models.md#submitmediaoptions)
 - [SubmitPostOptions](models.md#submitpostoptions)
 - [SubmitSelfPostOptions](models.md#submitselfpostoptions)
+- [SubredditCollectionsInput](models.md#subredditcollectionsinput)
 - [SubredditData](models.md#subredditdata)
 - [SubredditSettings](models.md#subredditsettings)
 - [SubredditType](models.md#subreddittype)
@@ -311,6 +314,21 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 | `recentComments`            | \{ `[id: string]`: \{ `comment?`: `string` ; `date?`: `string` ; `permalink?`: `string` ; `title?`: `string` }; } | Recent comments      |
 | `recentConvos`              | \{ `[id: string]`: \{ `date?`: `string` ; `id?`: `string` ; `permalink?`: `string` ; `subject?`: `string` }; }    | Recent conversations |
 | `recentPosts`               | \{ `[id: string]`: \{ `date?`: `string` ; `permalink?`: `string` ; `title?`: `string` }; }                        | Recent posts         |
+
+---
+
+### <a id="createcollectioninput" name="createcollectioninput"></a> CreateCollectionInput
+
+Ƭ **CreateCollectionInput**: `Object`
+
+#### Type declaration
+
+| Name             | Type                                                                    | Description                                                                            |
+| :--------------- | :---------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
+| `description?`   | `string`                                                                | The description of the collection.                                                     |
+| `displayLayout?` | [`CollectionDisplayLayout`](../enums/models.CollectionDisplayLayout.md) | One of: TIMELINE \| GALLERY. This determines the layout of posts in the collection UI. |
+| `subredditId?`   | `string`                                                                | The t5\_ id of the subreddit in which this collection will be created.                 |
+| `title?`         | `string`                                                                | The title of the collection.                                                           |
 
 ---
 
@@ -991,6 +1009,18 @@ An individual Removal Reason object.
 ### <a id="submitselfpostoptions" name="submitselfpostoptions"></a> SubmitSelfPostOptions
 
 Ƭ **SubmitSelfPostOptions**: [`PostTextOptions`](models.md#posttextoptions) & [`CommonSubmitPostOptions`](models.md#commonsubmitpostoptions)
+
+---
+
+### <a id="subredditcollectionsinput" name="subredditcollectionsinput"></a> SubredditCollectionsInput
+
+Ƭ **SubredditCollectionsInput**: `Object`
+
+#### Type declaration
+
+| Name           | Type     | Description                                                                 |
+| :------------- | :------- | :-------------------------------------------------------------------------- |
+| `subredditId?` | `string` | The t5\_ id of the subreddit that contains the collections to be retrieved. |
 
 ---
 

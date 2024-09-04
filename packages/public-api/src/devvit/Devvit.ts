@@ -68,6 +68,8 @@ type PluginType =
   | protos.Widgets
   | protos.Wiki
   | protos.MediaService
+  | protos.PostCollections
+  | protos.RedditAPIV2
   | protos.Realtime
   | PaymentsService;
 
@@ -161,9 +163,11 @@ export class Devvit extends Actor {
       this.use(protos.NewModmailDefinition);
       this.use(protos.PrivateMessagesDefinition);
       this.use(protos.SubredditsDefinition);
+      this.use(protos.PostCollectionsDefinition);
       this.use(protos.UsersDefinition);
       this.use(protos.WidgetsDefinition);
       this.use(protos.WikiDefinition);
+      this.use(protos.RedditAPIV2Definition);
     }
 
     if (pluginIsEnabled(config.realtime)) {
@@ -481,6 +485,7 @@ export class Devvit extends Actor {
     Users: protos.Users;
     PrivateMessages: protos.PrivateMessages;
     Subreddits: protos.Subreddits;
+    PostCollections: protos.PostCollections;
   } {
     if (!pluginIsEnabled(this.#config.redditAPI)) {
       throw new Error(
@@ -502,6 +507,9 @@ export class Devvit extends Actor {
         protos.PrivateMessagesDefinition.fullName
       ] as protos.PrivateMessages,
       Subreddits: this.#pluginClients[protos.SubredditsDefinition.fullName] as protos.Subreddits,
+      PostCollections: this.#pluginClients[
+        protos.PostCollectionsDefinition.fullName
+      ] as protos.PostCollections,
       Users: this.#pluginClients[protos.UsersDefinition.fullName] as protos.Users,
       Widgets: this.#pluginClients[protos.WidgetsDefinition.fullName] as protos.Widgets,
       Wiki: this.#pluginClients[protos.WikiDefinition.fullName] as protos.Wiki,
@@ -570,6 +578,17 @@ export class Devvit extends Actor {
       );
     }
     return media as protos.MediaService;
+  }
+
+  /** @internal */
+  static get redditapiv2Plugin(): protos.RedditAPIV2 {
+    const apiV2 = this.#pluginClients[protos.RedditAPIV2Definition.fullName];
+    if (!apiV2) {
+      throw new Error(
+        'RedditAPIV2 is not enabled. You can enable it by passing `apiV2: true` to `Devvit.configure`'
+      );
+    }
+    return apiV2 as protos.RedditAPIV2;
   }
 
   /** @internal */
