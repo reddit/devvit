@@ -1,10 +1,7 @@
-import type { Bundle, LinkedBundle } from '@devvit/protos';
+import type { LinkedBundle } from '@devvit/protos';
 import type {
-  AppAccountExistsResponse,
   AppInfo,
-  AppVersionInfo,
   AppVersionUpdateRequest,
-  FullAppInfo,
   FullAppVersionInfo,
 } from '@devvit/protos/community.js';
 import {
@@ -28,16 +25,6 @@ import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { readLine } from '../util/input-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
 import inquirer from 'inquirer';
-import {
-  APP_SLUG_BASE_MAX_LENGTH,
-  isRandomSlug,
-  makeSlug,
-  sluggable,
-} from '@devvit/shared-types/slug.js';
-import { getCaptcha } from '../util/captcha.js';
-import { Bundler } from '../util/Bundler.js';
-import { ACTOR_SRC_PRIMARY_NAME } from '@devvit/shared-types/constants.js';
-import { updateDevvitConfig } from '../util/devvitConfig.js';
 
 export default class Publish extends ProjectCommand {
   static override description =
@@ -85,7 +72,7 @@ export default class Publish extends ProjectCommand {
     await this.checkDeveloperAccount();
 
     ux.action.start(`Finding ${appWithVersion}...`);
-    let { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);
+    const { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);
     ux.action.stop(`✅`);
 
     const devvitVersion = new DevvitVersion(
@@ -98,7 +85,7 @@ export default class Publish extends ProjectCommand {
     if (!appInfo.app) {
       this.error('There was an error retrieving the app info.');
     }
-    let appDetailsUrl = `${DEVVIT_PORTAL_URL}/apps/${appInfo.app.slug}`;
+    const appDetailsUrl = `${DEVVIT_PORTAL_URL}/apps/${appInfo.app.slug}`;
 
     const resp = await this.#appVersionClient.GetAppVersionBundle({
       id: appVersion.id,
@@ -115,22 +102,6 @@ export default class Publish extends ProjectCommand {
         )} to view your app!`
       );
       return;
-    }
-
-    // If this is a temporary app name, rename it to a permanent one.
-    if (isRandomSlug(appInfo.app.slug)) {
-      // parentheses around this are necessary because of the destructuring; see TS2809
-      ({ appInfo, appVersion } = await this.#renameApp(appInfo, appVersion));
-      if (!appInfo.app) {
-        this.error('There was an error retrieving the new app info; this should never happen?!');
-      }
-
-      appDetailsUrl = `${DEVVIT_PORTAL_URL}/apps/${appInfo.app.slug}`;
-      this.log(
-        `Your app has been renamed successfully.\n✨ Visit ${chalk.cyan.bold(
-          `${appDetailsUrl}`
-        )} to view your new app!`
-      );
     }
 
     let visibility: AppPublishRequestVisibility = AppPublishRequestVisibility.UNRECOGNIZED;
@@ -266,125 +237,5 @@ export default class Publish extends ProjectCommand {
       },
     ]);
     return res.visibility;
-  }
-
-  async #renameApp(
-    appInfo: FullAppInfo,
-    appVersion: AppVersionInfo
-  ): Promise<{ appInfo: FullAppInfo; appVersion: AppVersionInfo }> {
-    // Prompt for a new app name
-    const newName = await this.#promptForNewSlug(appInfo.app!.slug);
-
-    // Create new app
-    const captcha = await getCaptcha({ copyPaste: false });
-    const newApp = await this.#appClient.Create({
-      name: newName,
-      description: appInfo.app!.description,
-      isNsfw: appInfo.app!.isNsfw,
-      categories: appInfo.app!.categories,
-      autogenerateName: false,
-      captcha,
-    });
-
-    // Update devvit.yaml with new app name
-    await updateDevvitConfig(this.projectRoot, this.configFile, {
-      name: newName,
-    });
-
-    // Build new actor bundle
-    const bundler = new Bundler(false);
-    let actorBundles: Bundle[];
-
-    try {
-      actorBundles = [
-        await bundler.bundle(this.projectRoot, {
-          name: ACTOR_SRC_PRIMARY_NAME,
-          owner: newApp.owner!.displayName,
-          version: DevvitVersion.fromProtoAppVersionInfo(appVersion).toString(),
-        }),
-      ];
-    } catch (err) {
-      this.error(StringUtil.caughtToString(err));
-    }
-
-    // Upload version of app
-    const newAppVersion = await this.#appVersionClient.Create({
-      appId: newApp.id,
-      visibility: VersionVisibility.PRIVATE,
-      validInstallTypes: appVersion.validInstallTypes,
-      majorVersion: appVersion.majorVersion,
-      minorVersion: appVersion.minorVersion,
-      patchVersion: appVersion.patchVersion,
-      prereleaseVersion: appVersion.prereleaseVersion,
-      about: appVersion.about,
-      actorBundles,
-    });
-
-    // Archive old app
-    await this.#appClient.Unpublish({
-      slug: appInfo.app!.slug,
-      shouldDelist: false,
-    });
-
-    // Return new app & version info
-    return {
-      appInfo: {
-        app: newApp,
-        versions: [newAppVersion], // we just made the app this is a safe assumption
-      },
-      appVersion: newAppVersion,
-    };
-  }
-
-  async #promptForNewSlug(oldSlug: string): Promise<string> {
-    this.log(`The app name "${oldSlug}" is temporary, and must be changed before publishing.`);
-    let appSlug = '';
-
-    for (;;) {
-      const rsp = await inquirer.prompt([
-        {
-          default: appSlug,
-          name: 'appSlug',
-          type: 'input',
-          message: 'Pick a name for your app:',
-          validate: async (input: string) => {
-            if (!sluggable(input)) {
-              return `The name of your app must be between 3 and ${APP_SLUG_BASE_MAX_LENGTH} characters long, and contains only alphanumeric characters, spaces, and dashes.`;
-            }
-            return true;
-          },
-          filter: (input: string) => {
-            return makeSlug(input.trim().toLowerCase());
-          },
-        },
-      ]);
-      appSlug = rsp.appSlug;
-      if (appSlug) {
-        const isAvailableResponse = await this.#checkAppNameAvailability(appSlug);
-        if (!isAvailableResponse.exists) {
-          // Doesn't exist, we're good
-          return appSlug;
-        }
-        this.warn(`The app name "${appSlug}" is unavailable.`);
-        if (isAvailableResponse.suggestions.length > 0) {
-          this.log(
-            `Here's some suggestions:\n  * ${isAvailableResponse.suggestions.join('\n  * ')}`
-          );
-          appSlug = isAvailableResponse.suggestions[0];
-        }
-      }
-    }
-  }
-
-  async #checkAppNameAvailability(name: string): Promise<AppAccountExistsResponse> {
-    const [appAccountExistsRes, appExistsRes] = await Promise.all([
-      this.#appClient.AppAccountExists({ accountName: name }),
-      this.#appClient.Exists({ slug: name }),
-    ]);
-
-    return {
-      exists: appAccountExistsRes.exists || appExistsRes.exists,
-      suggestions: appAccountExistsRes.suggestions,
-    };
   }
 }
