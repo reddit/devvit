@@ -10,7 +10,6 @@ import type {
   BanUserOptions,
   BanWikiContributorOptions,
   CommentSubmissionOptions,
-  CreateCollectionInput,
   CreateFlairTemplateOptions,
   CreateModNoteOptions,
   CreateWikiPageOptions,
@@ -54,7 +53,6 @@ import {
   ModMailService,
   ModNote,
   Post,
-  PostCollection,
   PrivateMessage,
   Subreddit,
   User,
@@ -287,18 +285,6 @@ export class RedditAPIClient {
    */
   getUserById(id: string): Promise<User | undefined> {
     return User.getById(asTID<T2ID>(id), this.#metadata);
-  }
-
-  getCollectionById(collectionId: string): Promise<PostCollection> {
-    return PostCollection.getCollectionById({ collectionId }, this.#metadata);
-  }
-
-  createCollection(options: CreateCollectionInput): Promise<PostCollection> {
-    return PostCollection.create(options, this.#metadata);
-  }
-
-  getCollectionsForSubreddit(subredditId: string): Promise<PostCollection[]> {
-    return PostCollection.getCollectionsForSubreddit({ subredditId }, this.#metadata);
   }
 
   /**

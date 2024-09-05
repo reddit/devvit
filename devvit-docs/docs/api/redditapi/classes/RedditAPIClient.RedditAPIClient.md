@@ -376,22 +376,6 @@ Ban a user from contributing to the wiki on a subreddit.
 
 ---
 
-### <a id="createcollection" name="createcollection"></a> createCollection
-
-▸ **createCollection**(`options`): `Promise`\<[`PostCollection`](models.PostCollection.md)\>
-
-#### Parameters
-
-| Name      | Type                                                                  |
-| :-------- | :-------------------------------------------------------------------- |
-| `options` | [`CreateCollectionInput`](../modules/models.md#createcollectioninput) |
-
-#### Returns
-
-`Promise`\<[`PostCollection`](models.PostCollection.md)\>
-
----
-
 ### <a id="createpostflairtemplate" name="createpostflairtemplate"></a> createPostFlairTemplate
 
 ▸ **createPostFlairTemplate**(`options`): `Promise`\<[`FlairTemplate`](models.FlairTemplate.md)\>
@@ -628,38 +612,6 @@ Get a list of users who are banned from contributing to the wiki on a subreddit.
 [`Listing`](models.Listing.md)\<[`User`](models.User.md)\>
 
 A Listing of User objects.
-
----
-
-### <a id="getcollectionbyid" name="getcollectionbyid"></a> getCollectionById
-
-▸ **getCollectionById**(`collectionId`): `Promise`\<[`PostCollection`](models.PostCollection.md)\>
-
-#### Parameters
-
-| Name           | Type     |
-| :------------- | :------- |
-| `collectionId` | `string` |
-
-#### Returns
-
-`Promise`\<[`PostCollection`](models.PostCollection.md)\>
-
----
-
-### <a id="getcollectionsforsubreddit" name="getcollectionsforsubreddit"></a> getCollectionsForSubreddit
-
-▸ **getCollectionsForSubreddit**(`subredditId`): `Promise`\<[`PostCollection`](models.PostCollection.md)[]\>
-
-#### Parameters
-
-| Name          | Type     |
-| :------------ | :------- |
-| `subredditId` | `string` |
-
-#### Returns
-
-`Promise`\<[`PostCollection`](models.PostCollection.md)[]\>
 
 ---
 
