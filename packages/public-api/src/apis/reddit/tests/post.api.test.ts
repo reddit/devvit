@@ -4,6 +4,9 @@ import { describe, expect, test, vi } from 'vitest';
 import { Devvit } from '../../../devvit/Devvit.js';
 import { Post } from '../models/Post.js';
 import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
+import { createPreview } from './utils/createTestPreview.js';
+import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
+import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
 
 describe('Post API', () => {
   const defaultPostData = {
@@ -94,6 +97,146 @@ describe('Post API', () => {
         },
         metadata
       );
+    });
+
+    describe('submit()', () => {
+      const commonPostFields = {
+        kind: 'custom',
+        preview: {
+          children: [
+            {
+              children: [],
+              props: {
+                description: 'Striped blue background',
+                height: '100%',
+                imageHeight: 1024,
+                imageWidth: 1500,
+                resizeMode: 'cover',
+                url: 'background.png',
+                width: '100%',
+              },
+              type: 'image',
+            },
+          ],
+          props: {
+            alignment: 'center middle',
+            height: '100%',
+            width: '100%',
+          },
+          type: 'zstack',
+        },
+        richtextJson: '',
+        sr: 'askReddit',
+        subredditName: 'askReddit',
+        title: 'My First Post',
+      };
+
+      test('converts plain text to a richtext paragraph', async () => {
+        const { reddit, metadata } = createTestRedditApiClient();
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.LinksAndComments, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await reddit.submitPost({
+          title: mockedPost.title,
+          subredditName: mockedPost.subredditName,
+          preview: createPreview(),
+          textFallback: { text: 'This is a post with text as a fallback' },
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            ...commonPostFields,
+            richtextJson:
+              'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
+            richtextFallback:
+              '{"document":[{"e":"par","c":[{"e":"text","t":"This is a post with text as a fallback"}]}]}',
+          },
+          metadata
+        );
+      });
+
+      test('builds the richtext object', async () => {
+        const { reddit, metadata } = createTestRedditApiClient();
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.LinksAndComments, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        const textFallbackRichtext = new RichTextBuilder()
+          .heading({ level: 1 }, (h) => {
+            h.rawText('Hello world');
+          })
+          .codeBlock({}, (cb: CodeBlockContext) =>
+            cb.rawText('This post was created via the Devvit API')
+          );
+
+        await reddit.submitPost({
+          title: mockedPost.title,
+          subredditName: mockedPost.subredditName,
+          preview: createPreview(),
+          textFallback: { richtext: textFallbackRichtext },
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            ...commonPostFields,
+            richtextJson:
+              'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
+            richtextFallback:
+              '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
+          },
+          metadata
+        );
+      });
+
+      test('adds the built richtext string to the submitPost call', async () => {
+        const { reddit, metadata } = createTestRedditApiClient();
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.LinksAndComments, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        const textFallbackRichtext = new RichTextBuilder()
+          .heading({ level: 1 }, (h) => {
+            h.rawText('Hello world');
+          })
+          .codeBlock({}, (cb: CodeBlockContext) =>
+            cb.rawText('This post was created via the Devvit API')
+          )
+          .build();
+
+        await reddit.submitPost({
+          title: mockedPost.title,
+          subredditName: mockedPost.subredditName,
+          preview: createPreview(),
+          textFallback: { richtext: textFallbackRichtext },
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            ...commonPostFields,
+            richtextJson:
+              'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
+            richtextFallback:
+              '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
+          },
+          metadata
+        );
+      });
     });
   });
 });

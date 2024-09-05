@@ -8,6 +8,7 @@ export function createTestRedditApiClient(): { metadata: Metadata; reddit: Reddi
     [Header.AppUser]: {
       values: ['t2_appuser'],
     },
+    [Header.Subreddit]: { values: ['t5_0'] },
   };
 
   const reddit = new RedditAPIClient(metadata);

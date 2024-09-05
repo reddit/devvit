@@ -2,6 +2,7 @@ import type {
   Listing as ListingProto,
   Metadata,
   RedditObject,
+  SubmitRequest,
   SubmitResponse,
 } from '@devvit/protos';
 import { Block } from '@devvit/protos';
@@ -20,6 +21,10 @@ import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
+import {
+  richTextToTextFallbackString,
+  textToTextFallbackString,
+} from '../helpers/textFallbackToRichtext.js';
 
 export type GetPostsOptions = ListingFetchOptions & {
   subredditName?: string;
@@ -142,6 +147,16 @@ export type PostTextOptions =
       richtext: object | RichTextBuilder;
     };
 
+export type CustomPostRichTextFallback = RichTextBuilder | string;
+
+export type CustomPostTextFallbackOptions =
+  | {
+      text: string;
+    }
+  | {
+      richtext: CustomPostRichTextFallback;
+    };
+
 // TODO - refactor submit post options
 export type SubmitLinkOptions = CommonSubmitPostOptions & {
   url: string;
@@ -164,6 +179,7 @@ export type SubmitSelfPostOptions = PostTextOptions & CommonSubmitPostOptions;
 
 export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
   preview: JSX.Element;
+  textFallback?: CustomPostTextFallbackOptions;
 };
 
 export type CommonSubmitPostOptions = {
@@ -935,15 +951,26 @@ export class Post {
       const previewBlock = await reconciler.buildBlocksUI();
       const encodedCached = Block.encode(previewBlock).finish();
 
-      response = await client.Submit(
-        {
-          kind: 'custom',
-          sr: options.subredditName,
-          richtextJson: fromByteArray(encodedCached),
-          ...options,
-        },
-        metadata
-      );
+      const { textFallback, ...sanitizedOptions } = options;
+
+      let richtextFallback = '';
+      if (textFallback) {
+        if ('text' in textFallback) {
+          richtextFallback = textToTextFallbackString(textFallback.text);
+        } else if ('richtext' in textFallback) {
+          richtextFallback = richTextToTextFallbackString(textFallback.richtext);
+        }
+      }
+
+      const submitRequest: SubmitRequest = {
+        kind: 'custom',
+        sr: options.subredditName,
+        richtextJson: fromByteArray(encodedCached),
+        richtextFallback,
+        ...sanitizedOptions,
+      };
+
+      response = await client.SubmitCustomPost(submitRequest, metadata);
     } else {
       response = await client.Submit(
         {
