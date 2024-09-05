@@ -1,7 +1,7 @@
 import { File as IFile, FileSystem as IFileSystem } from '@devvit/protos';
 import { lstat, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { type IGit } from './Git.js';
+import type { IGit } from './Git.js';
 
 export abstract class FileSystem {
   public static async fromGitProject(git: IGit): Promise<IFileSystem> {

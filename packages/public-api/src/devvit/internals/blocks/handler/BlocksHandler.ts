@@ -1,5 +1,5 @@
-import type { UIEvent, UIResponse } from '@devvit/protos';
-import { type Effect, type Metadata, type UIRequest } from '@devvit/protos';
+import type { Effect, Metadata, UIEvent, UIRequest, UIResponse } from '@devvit/protos';
+import { isCircuitBreaker } from '@devvit/shared-types/CircuitBreaker.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { BlockElement } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
@@ -9,7 +9,6 @@ import { ContextBuilder } from './ContextBuilder.js';
 import { _isTombstone, RenderContext } from './RenderContext.js';
 import type { BlocksState, Hook, HookParams, HookSegment, Props } from './types.js';
 import { RenderInterruptError } from './types.js';
-import { isCircuitBreaker } from '@devvit/shared-types/CircuitBreaker.js';
 
 /**
  * This can be a global/singleton because render is synchronous.

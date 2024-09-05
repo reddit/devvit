@@ -1,4 +1,4 @@
-import { type Metadata, type JsonWrappedComment } from '@devvit/protos';
+import type { Metadata, JsonWrappedComment } from '@devvit/protos';
 import { describe, expect, test } from 'vitest';
 import { Devvit } from '../../../devvit/Devvit.js';
 import type { RedditAPIClient } from '../RedditAPIClient.js';

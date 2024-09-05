@@ -1,16 +1,16 @@
-import path from 'node:path';
-import { readFile, access } from 'node:fs/promises';
-import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
-import { type Product } from '@devvit/shared-types/payments/Product.js';
 import type { Bundle, PaymentsConfig } from '@devvit/protos';
 import {
-  Environment,
   Currency,
-  PaymentsServiceDefinition,
+  Environment,
   PaymentProcessorDefinition,
+  PaymentsServiceDefinition,
 } from '@devvit/protos/payments.js';
-import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
+import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/index.js';
+import type { Product } from '@devvit/shared-types/payments/Product.js';
+import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
+import { access, readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { imageSize } from 'image-size';
 import type { ISizeCalculationResult } from 'image-size/dist/types/interface.js';

@@ -1,10 +1,6 @@
-import type {
-  ContextActionDescription,
-  ContextActionRequest,
-  Empty,
-  Metadata,
-} from '@devvit/protos';
+import type { ContextActionDescription, ContextActionRequest, Metadata } from '@devvit/protos';
 import { ContextActionDefinition, ContextActionList, ContextActionResponse } from '@devvit/protos';
+import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';
