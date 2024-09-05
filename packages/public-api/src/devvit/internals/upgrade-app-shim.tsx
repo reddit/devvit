@@ -107,7 +107,7 @@ export const shouldShowUpgradeAppScreen = (
   }
 
   if (parsedDevvitUserAgent.platform === 'Android') {
-    return parsedDevvitUserAgent.versionNumber < 1819908;
+    return parsedDevvitUserAgent.versionNumber < 1875012;
   }
 
   if (parsedDevvitUserAgent.platform === 'iOS') {

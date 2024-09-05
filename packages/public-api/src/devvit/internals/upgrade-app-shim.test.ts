@@ -63,9 +63,9 @@ describe('parseDevvitUserAgent', () => {
 describe('shouldShowUpgradeAppScreen', () => {
   it.each<[userAgent: string, shouldShow: boolean]>([
     // Android
-    ['Reddit;Android;2024.32.0+5262029.1819909', false],
-    ['Reddit;Android;2024.32.0+5262029.1819908', false],
-    ['Reddit;Android;2024.32.0+5262029.1819907', true],
+    ['Reddit;Android;2024.32.0+5262029.1875013', false],
+    ['Reddit;Android;2024.32.0+5262029.1875012', false],
+    ['Reddit;Android;2024.32.0+5262029.1875011', true],
     // iOS
     ['Reddit;iOS;2024.31.0.614974', false],
     ['Reddit;iOS;2024.31.0.614973', false],
