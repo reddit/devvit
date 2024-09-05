@@ -70,7 +70,7 @@ export async function fetchNflSchedule(
   const apiKey = await context.settings.get(APIKey.nfl);
   try {
     const request = new Request(
-      `https://api.sportradar.us/nfl/official/production/v7/en/games/2023/${seasonType}/schedule.json?api_key=${apiKey}`
+      `https://api.sportradar.us/nfl/official/production/v7/en/games/2024/${seasonType}/schedule.json?api_key=${apiKey}`
     );
     // console.log(request.url);
     const response = await fetch(request);
