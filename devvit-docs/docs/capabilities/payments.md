@@ -59,7 +59,7 @@ Each product in the `products` field comprises of the following attributes:
 | `displayName` | The official name of the product that is displayed in purchase confirmation screens. The name must be fewer than 50 characters, including spaces.                                                                                                      |
 | `description` | A text string that describes the product and is displayed in purchase confirmation screens. The description must be fewer than 150 characters, including spaces.                                                                                       |
 | `price`       | An predefined integer that sets the product price in Reddit gold. See details below.                                                                                                                                                                   |
-| `image.icon`  | **(optional)** The path to the icon that represents your product in your [assets](https://developers.reddit.com/docs/app_image_assets) folder.                                                                                                         |
+| `image.icon`  | **(optional)** The path to the icon that represents your product in your [assets](../app_image_assets) folder.                                                                                                                                         |
 | `metadata`    | **(optional)** An optional object that contains additional attributes you want to use to group and filter products. Keys and values must be alphanumeric (a - Z, 0 - 9, and - ) and contain 30 characters or less. You can add up to 10 metadata keys. |
 
 :::note
@@ -67,7 +67,7 @@ Actual payments will not be processed until your products are approved. While yo
 :::
 
 :::note
-Registered products are updated every time an app is uploaded, including when you use [Devvit playtest](https://developers.reddit.com/docs/playtest).
+Registered products are updated every time an app is uploaded, including when you use [Devvit playtest](../playtest).
 :::
 
 ### Pricing
