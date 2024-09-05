@@ -1,5 +1,4 @@
 import type { Metadata } from '@devvit/protos';
-import { Empty } from '@devvit/protos';
 import { describe, expect, test, vi } from 'vitest';
 import { Devvit } from '../../../devvit/Devvit.js';
 import type { RedditAPIClient } from '../RedditAPIClient.js';
@@ -15,7 +14,7 @@ describe('ModNote API', () => {
   describe('RedditAPIClient:ModNote', () => {
     test('addRemovalNote()', async () => {
       const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.ModNote, 'PostRemovalNote');
-      spyPlugin.mockImplementationOnce(async () => Empty);
+      spyPlugin.mockImplementationOnce(async () => ({}));
 
       await api.reddit.addRemovalNote({
         itemIds: ['t3_abcdef'],

@@ -7,6 +7,7 @@ import type {
 import { ContextActionDefinition, ContextActionList, ContextActionResponse } from '@devvit/protos';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
+import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';
@@ -14,7 +15,6 @@ import type { MenuItem, MenuItemOnPressEvent } from '../../types/index.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
-import { Header } from '@devvit/shared-types/Header.js';
 
 const getActionId = (index: number): string => {
   return `menuItem.${index}`;
