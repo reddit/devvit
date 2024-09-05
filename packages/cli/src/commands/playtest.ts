@@ -119,9 +119,9 @@ export default class Playtest extends Upload {
 
   async checkVersionBuildStatus(appVersionInfo: AppVersionInfo): Promise<boolean> {
     ux.action.start('App is building remotely...');
-    for (let i = 0; i < 5 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
+    for (let i = 0; i < 20 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
       // version is still building: wait and try again
-      await sleep(1000);
+      await sleep(2000);
       const info = await this.appVersionClient.Get({ id: appVersionInfo.id });
 
       if (!info.appVersion) {
@@ -129,6 +129,10 @@ export default class Playtest extends Upload {
       }
 
       appVersionInfo = info.appVersion;
+
+      if (i === 10) {
+        this.log(`Your app's taking a while to build - sorry for the delay!`);
+      }
     }
     if (appVersionInfo.buildStatus === BuildStatus.READY) {
       ux.action.stop(`✅`);
