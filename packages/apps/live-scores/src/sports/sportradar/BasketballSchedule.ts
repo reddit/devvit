@@ -26,7 +26,7 @@ export async function fetchNbaSchedule(
   let data;
   const apiKey = await context.settings.get(APIKey.nba);
   try {
-    const url = `https://api.sportradar.us/nba/production/v8/en/games/2023/${seasonType}/schedule.json?api_key=${apiKey}`;
+    const url = `https://api.sportradar.us/nba/production/v8/en/games/2024/${seasonType}/schedule.json?api_key=${apiKey}`;
     // console.log(request.url);
     const response = await fetch(url);
     if (!response.ok) throw Error(`HTTP error ${response.status}: ${response.statusText}`);
@@ -63,7 +63,7 @@ export async function fetchNcaaMensBasketballSchedule(
   let data;
   const apiKey = await context.settings.get(APIKey.ncaamb);
   try {
-    const url = `https://api.sportradar.us/ncaamb/production/v8/en/games/2023/${seasonType}/schedule.json?api_key=${apiKey}`;
+    const url = `https://api.sportradar.us/ncaamb/production/v8/en/games/2024/${seasonType}/schedule.json?api_key=${apiKey}`;
     // console.log(url)
     const response = await fetch(url);
     if (!response.ok) throw Error(`HTTP error ${response.status}: ${response.statusText}`);
