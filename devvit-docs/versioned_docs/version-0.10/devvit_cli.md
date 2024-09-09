@@ -208,6 +208,8 @@ $ devvit logs <subreddit> [app-name] [-d <value>] [-j] [-s <value>] [--verbose]
 
 - `--verbose`
 
+  Displays the log levels and timestamps when the logs were created.
+
 #### Examples
 
 ```bash
@@ -218,12 +220,6 @@ $ devvit logs mySubreddit my-app
 $ devvit logs mySubreddit my-app --since 15s
 
 $ devvit logs mySubreddit my-app --verbose
-```
-
-#### Usage
-
-```bash
-$ devvit help
 ```
 
 ## devvit new

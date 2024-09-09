@@ -61,10 +61,11 @@ Custom post apps use a client-side runtime to speed up execution, so `console.lo
 
 You can view historical logs by using the `--since=XX` flag. You can use the following shorthand:
 
+- `Xs`: show logs in the past X seconds
+- `Xm`: show logs in the past X minutes
 - `Xh`: show logs in the past X hours
 - `Xd`: show logs in the past X days
 - `Xw`: show logs in the past X weeks
-- `Xm`: show logs in the past X months
 
 The following example will show logs from `my-app` on `my-subreddit` in the past day.
 
