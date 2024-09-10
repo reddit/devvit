@@ -83,6 +83,8 @@ export type CommentMediaTypes = 'giphy' | 'static' | 'animated' | 'expression';
 export type FlairSettings = {
   enabled: boolean;
   usersCanAssign: boolean;
+  userFlairBackgroundColor?: string;
+  userFlairTextColor?: string;
 };
 
 export type GetUserFlairOptions = UserFlairPageOptions & {
@@ -239,9 +241,17 @@ export type SubredditSettings = {
    */
   headerTitle?: string;
   /**
+   * The 6-digit rgb hex color of the subreddit's key color, e.g. `#AABBCC`,
+   */
+  keyColor?: string;
+  /**
    * Banner image used on mobile apps.
    */
   mobileBannerImage?: string;
+  /**
+   * The 6-digit rgb hex color of the subreddit's primary color, e.g. `#AABBCC`,
+   */
+  primaryColor?: string;
   /**
    * The user flair settings for the subreddit.
    */
@@ -272,6 +282,66 @@ export type SubredditLeaderboardSummary = {
 export type SubredditLeaderboard = {
   id: string;
   summary: SubredditLeaderboardSummary;
+};
+
+export type BackgroundImagePosition = 'cover' | 'tiled' | 'centered';
+export type BannerHeight = 'small' | 'medium' | 'large';
+export type CommunityNameFormat = 'slashtag' | 'pretty' | 'hide';
+export type CustomizationFlag = 'default' | 'custom';
+export type ImagePosition = 'cover' | 'tiled';
+export type MenuPosition = 'default' | 'overlay';
+export type Visibility = 'show' | 'hide';
+
+/**
+ * A class representing the styles of a Subreddit.
+ */
+export type SubredditStyles = {
+  backgroundColor?: string;
+  backgroundImage?: string;
+  backgroundImagePosition?: BackgroundImagePosition;
+  bannerBackgroundColor?: string;
+  bannerBackgroundImage?: string;
+  bannerBackgroundImagePosition?: string;
+  bannerCommunityName?: string;
+  bannerCommunityNameFormat?: CommunityNameFormat;
+  bannerHeight?: BannerHeight;
+  bannerOverlayColor?: string;
+  bannerPositionedImage?: string;
+  bannerPositionedImagePosition?: string;
+  bannerShowCommunityIcon?: Visibility;
+  highlightColor?: string;
+  icon?: string;
+  legacyBannerBackgroundImage?: string;
+  legacyPrimaryColor?: string;
+  menuBackgroundBlur?: number;
+  menuBackgroundColor?: string;
+  menuBackgroundImage?: string;
+  menuBackgroundOpacity?: number;
+  menuLinkColorActive?: string;
+  menuLinkColorHover?: string;
+  menuLinkColorInactive?: string;
+  menuPosition?: MenuPosition;
+  mobileBannerImage?: string;
+  mobileKeyColor?: string;
+  postBackgroundColor?: string;
+  postBackgroundImage?: string;
+  postBackgroundImagePosition?: ImagePosition;
+  postDownvoteCountColor?: string;
+  postDownvoteIconActive?: string;
+  postDownvoteIconInactive?: string;
+  postPlaceholderImage?: string;
+  postPlaceholderImagePosition?: ImagePosition;
+  postTitleColor?: string;
+  postUpvoteCountColor?: string;
+  postUpvoteIconActive?: string;
+  postUpvoteIconInactive?: string;
+  postVoteIcons?: CustomizationFlag;
+  primaryColor?: string;
+  secondaryBannerPositionedImage?: string;
+  sidebarWidgetBackgroundColor?: string;
+  sidebarWidgetHeaderColor?: string;
+  submenuBackgroundColor?: string;
+  submenuBackgroundStyle?: CustomizationFlag;
 };
 
 /**
@@ -358,10 +428,14 @@ export class Subreddit {
       bannerImage: data.bannerImg,
       communityIcon: data.communityIcon,
       headerTitle: data.headerTitle,
+      keyColor: data.keyColor,
       mobileBannerImage: data.mobileBannerImage,
+      primaryColor: data.primaryColor,
       userFlairs: {
         enabled: data.userFlairEnabledInSr ?? false,
         usersCanAssign: data.canAssignUserFlair ?? false,
+        userFlairBackgroundColor: data.userFlairBackgroundColor,
+        userFlairTextColor: data.userFlairTextColor,
       },
       postFlairs: {
         enabled: data.linkFlairEnabled ?? false,
@@ -1203,6 +1277,26 @@ export async function getSubredditLeaderboard(
     id: leaderboard.id,
     summary: leaderboard.summary,
   };
+}
+
+export async function getSubredditStyles(
+  subredditId: string,
+  metadata: Metadata | undefined
+): Promise<SubredditStyles> {
+  const operationName = 'GetSubredditStyles';
+  const persistedQueryHash = 'd491d17ea8858f563ea578b26b9595d64adecf4bf34557d567c7e53c470f5f22';
+  const response = await GraphQL.query(
+    operationName,
+    persistedQueryHash,
+    { id: subredditId },
+    metadata
+  );
+
+  const styles = response.data?.subredditInfoById?.styles;
+
+  if (!styles) throw new Error('subreddit styles not found');
+
+  return styles;
 }
 
 function asSubredditType(type?: string): SubredditType {

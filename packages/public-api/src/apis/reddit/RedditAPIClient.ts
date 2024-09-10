@@ -39,6 +39,7 @@ import type {
   SetUserFlairOptions,
   SubmitPostOptions,
   SubredditLeaderboard,
+  SubredditStyles,
   UpdatePageSettingsOptions,
   UpdateWikiPageOptions,
   Vault,
@@ -60,6 +61,7 @@ import {
   WikiPage,
   getModerationLog,
   getSubredditLeaderboard,
+  getSubredditStyles,
   getVaultByAddress,
   getVaultByUserId,
 } from './models/index.js';
@@ -1595,5 +1597,16 @@ export class RedditAPIClient {
    */
   getSubredditLeaderboard(subredditId: string): Promise<SubredditLeaderboard> {
     return getSubredditLeaderboard(subredditId, this.#metadata);
+  }
+
+  /**
+   * Returns the styles for a given subreddit ID.
+   *
+   * @param subredditId ID of the subreddit from which to retrieve the styles.
+   *
+   * @returns {SubredditStyles} Styles for the given subreddit.
+   */
+  getSubredditStyles(subredditId: string): Promise<SubredditStyles> {
+    return getSubredditStyles(subredditId, this.#metadata);
   }
 }
