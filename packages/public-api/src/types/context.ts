@@ -46,6 +46,8 @@ export type ContextDebugInfo = {
 export type BaseContext = {
   /** The ID of the current subreddit */
   subredditId: string;
+  /** The name of the current subreddit */
+  subredditName?: string;
   /** The ID of the current post */
   postId?: string | undefined;
   /** The current user's ID if this event was triggered by a logged in user */

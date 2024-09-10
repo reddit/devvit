@@ -13,6 +13,8 @@ export function getContextFromMetadata(
   const subredditId = metadata[Header.Subreddit]?.values[0];
   assertNonNull<string | undefined>(subredditId, 'subreddit is missing from Context');
 
+  const subredditName = metadata[Header.SubredditName]?.values[0];
+
   // devvit-app-user is only available in the remote runtime.
   const appAccountId = metadata[Header.AppUser]?.values[0];
   const appName = metadata[Header.App]?.values[0];
@@ -27,6 +29,7 @@ export function getContextFromMetadata(
       return appAccountId;
     },
     subredditId,
+    subredditName,
     userId,
     postId,
     commentId,
@@ -39,6 +42,7 @@ export function getContextFromMetadata(
         appName,
         appVersion,
         subredditId,
+        subredditName,
         userId,
         postId,
         commentId,
