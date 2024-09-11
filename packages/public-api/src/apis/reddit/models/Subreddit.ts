@@ -290,6 +290,7 @@ export type CommunityNameFormat = 'slashtag' | 'pretty' | 'hide';
 export type CustomizationFlag = 'default' | 'custom';
 export type ImagePosition = 'cover' | 'tiled';
 export type MenuPosition = 'default' | 'overlay';
+export type PositionedImagePosition = 'left' | 'right' | 'centered';
 export type Visibility = 'show' | 'hide';
 
 /**
@@ -301,13 +302,13 @@ export type SubredditStyles = {
   backgroundImagePosition?: BackgroundImagePosition;
   bannerBackgroundColor?: string;
   bannerBackgroundImage?: string;
-  bannerBackgroundImagePosition?: string;
+  bannerBackgroundImagePosition?: ImagePosition;
   bannerCommunityName?: string;
   bannerCommunityNameFormat?: CommunityNameFormat;
   bannerHeight?: BannerHeight;
   bannerOverlayColor?: string;
   bannerPositionedImage?: string;
-  bannerPositionedImagePosition?: string;
+  bannerPositionedImagePosition?: PositionedImagePosition;
   bannerShowCommunityIcon?: Visibility;
   highlightColor?: string;
   icon?: string;

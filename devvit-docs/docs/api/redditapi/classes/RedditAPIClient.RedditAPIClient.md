@@ -89,6 +89,7 @@ async (event, context) => {
 - [getSubredditById](RedditAPIClient.RedditAPIClient.md#getsubredditbyid)
 - [getSubredditByName](RedditAPIClient.RedditAPIClient.md#getsubredditbyname)
 - [getSubredditRemovalReasons](RedditAPIClient.RedditAPIClient.md#getsubredditremovalreasons)
+- [getSubredditStyles](RedditAPIClient.RedditAPIClient.md#getsubredditstyles)
 - [getTopPosts](RedditAPIClient.RedditAPIClient.md#gettopposts)
 - [getUnmoderated](RedditAPIClient.RedditAPIClient.md#getunmoderated)
 - [getUserById](RedditAPIClient.RedditAPIClient.md#getuserbyid)
@@ -1362,6 +1363,34 @@ const reasons = await reddit.getSubredditRemovalReasons('askReddit');
 for (let reason of reasons) {
   console.log(reason.id, reason.message, reason.title);
 }
+```
+
+---
+
+### <a id="getsubredditstyles" name="getsubredditstyles"></a> getSubredditStyles
+
+▸ **getSubredditStyles**(`subredditId`): `Promise`\<[`SubredditStyles`](../modules/models.md#subredditstyles)\>
+
+Returns the styles for a given subreddit ID.
+
+#### Parameters
+
+| Name          | Type     |
+| :------------ | :------- |
+| `subredditId` | `string` |
+
+#### Returns
+
+`Promise`\<[`SubredditStyles`](../modules/models.md#subredditstyles)\>
+
+Styles for the given subreddit.
+
+**`Example`**
+
+```ts
+const styles = await reddit.getSubredditStyles('t5_2th52');
+
+console.log('Subreddit primaryColor: ' + styles.primaryColor);
 ```
 
 ---
