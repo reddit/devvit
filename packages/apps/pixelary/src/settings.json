@@ -6,7 +6,7 @@
     "dailyDrawingsExpiration": 86400000,
     "dailyDrawingsQuota": 3,
     "feedbackDuration": 15,
-    "cardDrawDuration": 5,
+    "cardDrawDuration": 10,
     "drawingDuration": 60,
     "guesserPointMultiplier": [
         {

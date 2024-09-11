@@ -1,12 +1,11 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useAsync, useInterval, useState } from '@devvit/public-api';
 import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
 import { getRandomString } from '../utils/getRandomString.js';
 import Words from '../data/words.json';
 import { blankCanvas } from '../utils/blankCanvas.js';
-import type { pages } from '../types/pages.js';
-import { formatNumberWithCommas } from '../utils/formatNumbers.js';
+import type { Page } from '../types/Page.js';
 import { getScoreMultiplier } from '../utils/getScoreMultiplier.js';
 import type { PostData } from '../types/PostData.js';
 import { PixelText } from '../components/PixelText.js';
@@ -19,6 +18,7 @@ import { LeaderboardPage } from '../components/LeaderboardPage.js';
 import { OverviewPage } from '../components/OverviewPage.js';
 import { ReviewPage } from '../components/ReviewPage.js';
 import { ViewerPage } from '../components/ViewerPage.js';
+import { LoadingState } from './LoadingState.js';
 
 type InitialData = {
   gameSettings: GameSettings;
@@ -31,31 +31,43 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     throw new Error('No post id found in context');
   }
 
-  const { useState, useInterval, useForm, redis, postId, reddit, ui } = context;
+  const { redis, postId, reddit } = context;
   const service = new Service(redis);
 
-  const getUser = (): Promise<null | string> => {
+  const getUsername = (): Promise<null | string> => {
     if (!context.userId) {
       return Promise.resolve(null);
     }
     return reddit
       .getCurrentUser()
-      .then((user) => user.username)
+      .then((user) => user?.username ?? null)
       .catch(() => null);
   };
 
-  const [[currentSubreddit, username]] = useState<[string, string | null]>(async () => {
-    return await Promise.all([reddit.getCurrentSubreddit().then((sub) => sub.name), getUser()]);
+  const { data: metadata, loading: metadataLoading } = useAsync<{
+    subreddit: string;
+    username: string | null;
+  }>(async () => {
+    const values = await Promise.all([
+      reddit.getCurrentSubreddit().then((sub) => sub.name),
+      getUsername(),
+    ]);
+
+    return {
+      subreddit: values[0],
+      username: values[1],
+    };
   });
   const maxLength = 8;
 
-  const [{ gameSettings, postData, scores }] = useState<InitialData>(
-    async (): Promise<InitialData> => {
+  const { data: gameData, loading: gamesDataLoading } = useAsync<InitialData>(
+    async () => {
       const defaultSettings: GameSettings = {
         activeFlairId: undefined,
         endedFlairId: undefined,
         heroPostId: undefined,
       };
+
       const defaultPostData: PostData = {
         word: 'loading',
         data: [],
@@ -63,12 +75,17 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
         date: 0,
         published: false,
       };
+      const defaultData = {
+        gameSettings: defaultSettings,
+        postData: defaultPostData,
+        scores: [],
+      };
 
       try {
         const [gameSettings = defaultSettings, postData = defaultPostData, scores = []] =
           await Promise.all([
             service.getGameSettings(),
-            service.getPostData(postId, username),
+            service.getPostData(postId, metadata?.username ?? null),
             service.getScoreBoard(maxLength),
           ]);
 
@@ -80,31 +97,104 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
       } catch (error) {
         console.error('Error loading initial data:', error);
 
-        return {
-          gameSettings: defaultSettings,
-          postData: defaultPostData,
-          scores: [],
-        };
+        return defaultData;
       }
+    },
+    {
+      depends: metadata,
     }
   );
 
-  const [dailyDrawings, setDailyDrawings] = useState<PostData[]>(async () => {
-    return await service.getDailyDrawings(username);
-  });
+  const { data: dailyDrawingsRemote, loading: dailyDrawingsRemoteLoading } = useAsync<PostData[]>(
+    async () => {
+      return metadata?.username ? await service.getDailyDrawings(metadata.username) : [];
+    },
+    {
+      depends: metadata,
+    }
+  );
+
+  if (
+    metadataLoading ||
+    !metadata ||
+    dailyDrawingsRemoteLoading ||
+    !dailyDrawingsRemote ||
+    gamesDataLoading ||
+    !gameData
+  ) {
+    return <LoadingState />;
+  }
+
+  /*
+   * Page Router
+   *
+   * Default to a viewer page if the post is not the hero post.
+   * If the post is the hero post, default to the overview page.
+   * Can be extended to include more page types in the future.
+   */
+
+  const isHero = gameData?.gameSettings?.heroPostId === postId;
+
+  /*
+   * Return the custom post unit
+   */
+
+  return (
+    <Router
+      initialPage={isHero ? 'overview' : 'viewer'}
+      dailyDrawingsRemote={dailyDrawingsRemote}
+      gameData={gameData}
+      metadata={metadata}
+    />
+  );
+};
+
+const PageContainer: Devvit.BlockComponent = ({ children }) => {
+  return (
+    <zstack width="100%" height="100%" alignment="top start">
+      <image
+        imageHeight={1024}
+        imageWidth={1500}
+        height="100%"
+        width="100%"
+        url="background.png"
+        description="Striped blue background"
+        resizeMode="cover"
+      />
+      {children!}
+    </zstack>
+  );
+};
+
+const Router: Devvit.BlockComponent<{
+  initialPage: Page;
+  gameData: InitialData;
+  dailyDrawingsRemote: PostData[];
+  metadata: {
+    subreddit: string;
+    username: string | null;
+  };
+}> = ({ gameData, dailyDrawingsRemote, metadata, initialPage }, { redis, reddit, postId }) => {
+  const [page, setPage] = useState<Page>(initialPage);
+  const service = new Service(redis);
+
+  const [dailyDrawingsLocal, setDailyDrawingsLocal] = useState<PostData[]>([]);
+  const dailyDrawings = [...(dailyDrawingsRemote ?? []), ...dailyDrawingsLocal];
 
   const [data, setData] = useState<number[]>(blankCanvas);
-  const randomWord = getRandomString(Words);
-  const [word, setWord] = useState<string>(randomWord);
-  const [currentColor, setCurrentColor] = useState<number>(1);
+  const [candidateWords, setCandidateWords] = useState<string[]>([
+    getRandomString(Words),
+    getRandomString(Words),
+    getRandomString(Words),
+  ]);
+  const [word, setWord] = useState<string>(candidateWords[0]);
 
-  const [scoreBoardUser] = useState(async () => await service.getScoreBoardUserEntry(username));
-  const isSolved = postData?.solved ?? false;
-  const isAuthor = postData?.authorUsername === username;
+  const isSolved = gameData?.postData?.solved ?? false;
+  const isAuthor = gameData?.postData?.authorUsername === metadata?.username;
 
   // How many points has the user earned from this drawing.
   const [pointsEarned, setPointsEarned] = useState<number>(
-    username ? postData?.pointsEarnedByUser || 0 : 0
+    metadata?.username ? gameData?.postData?.pointsEarnedByUser || 0 : 0
   );
 
   // [Start] Countdown Timers
@@ -112,7 +202,7 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     startTime: number;
     durationMs: number;
     timeLeftMs: number;
-    finalRedirect: pages;
+    finalRedirect: Page;
   } | null>(null);
 
   function updateCountdownState(): void {
@@ -139,7 +229,7 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     updateCountdownState();
   }, 1000);
 
-  const startTimer = (durationMs: number, redirectPage: pages): void => {
+  const startTimer = (durationMs: number, redirectPage: Page): void => {
     setCountdownState({
       startTime: Date.now(),
       durationMs,
@@ -160,42 +250,12 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
   // [End] Countdown Timer
 
   function clearData(): void {
-    const randomWord = getRandomString(Words);
-    setWord(randomWord.toUpperCase());
+    const newWords = [getRandomString(Words), getRandomString(Words), getRandomString(Words)];
+    setCandidateWords(newWords);
+    setWord(newWords[0]);
     setData(blankCanvas);
     cancelTimer();
   }
-
-  /*
-   * Cancel drawing confirmation form
-   */
-
-  const cancelConfirmationForm = useForm(
-    {
-      title: 'Are you sure?',
-      description: `This will exhaust a daily drawing attempt. If you submit the drawing and someone guesses right, you will get ${formatNumberWithCommas(
-        Settings.drawerPoints
-      )} points.`,
-      acceptLabel: 'Discard drawing',
-      cancelLabel: 'Back',
-      fields: [],
-    },
-    async () => {
-      const postData: PostData = {
-        word,
-        data,
-        authorUsername: username!,
-        date: Date.now(),
-        published: false,
-      };
-
-      await service.storeDailyDrawing(postData);
-      setDailyDrawings([...dailyDrawings, postData]);
-      setPage('overview');
-      clearData();
-      ui.showToast('Drawing canceled');
-    }
-  );
 
   /*
    * Guess feedback timer
@@ -217,17 +277,20 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
    * Guess validation
    */
 
-  async function validateGuess(guess: string): Promise<void> {
-    if (!postData) {
+  async function onValidateGuess(guess: string): Promise<void> {
+    if (!gameData?.postData || !metadata?.username) {
       return;
     }
-    const { authorUsername, date, word: correctWord } = postData;
+    const {
+      postData: { authorUsername, date, word: correctWord },
+    } = gameData;
+
     const scoreMultiplier = getScoreMultiplier(date);
     const points = Settings.guesserPoints * scoreMultiplier;
     const formattedGuess = guess.toUpperCase();
     if (formattedGuess === correctWord.toUpperCase()) {
       await service
-        .handleDrawingSolvedEvent(postId!, authorUsername, username!, date, isSolved)
+        .handleDrawingSolvedEvent(postId!, authorUsername, metadata.username, date, isSolved)
         .then(async (firstSolver) => {
           setPointsEarned(points);
           setShowFeedback(true);
@@ -235,7 +298,7 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
           if (firstSolver) {
             await reddit.submitComment({
               id: postId!,
-              text: `${username} is the first to solve this drawing!`,
+              text: `${metadata.username} is the first to solve this drawing!`,
             });
           }
         });
@@ -246,48 +309,14 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     }
   }
 
-  /*
-   * Guess form
-   */
-
-  const guessForm = useForm(
-    {
-      title: 'Guess the word',
-      acceptLabel: 'Guess',
-      fields: [
-        {
-          type: 'string',
-          name: 'guess',
-          label: 'Word',
-          helpText: 'A single, case insensitive word',
-          required: true,
-        },
-      ],
-    },
-    async (values) => {
-      const guess = values.guess.trim();
-      await validateGuess(guess);
-    }
-  );
-
-  /*
-   * Page Router
-   *
-   * Default to a viewer page if the post is not the hero post.
-   * If the post is the hero post, default to the overview page.
-   * Can be extended to include more page types in the future.
-   */
-
-  const isHero = gameSettings?.heroPostId === postId;
-  const [page, setPage] = useState<pages>(isHero ? 'overview' : 'viewer');
-
-  let currentPage;
+  let currentPage: JSX.Element;
   switch (page) {
     case 'card-draw':
       currentPage = (
         <CardDrawPage
-          word={word}
+          candidateWords={candidateWords}
           setPage={setPage}
+          setWord={setWord}
           cardDrawCountdown={
             countdownState
               ? Math.round(countdownState.timeLeftMs / 1000)
@@ -303,8 +332,6 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
           data={data}
           setData={setData}
           setPage={setPage}
-          currentColor={currentColor}
-          setCurrentColor={setCurrentColor}
           drawingCountdown={
             countdownState ? Math.round(countdownState.timeLeftMs / 1000) : Settings.drawingDuration
           }
@@ -314,21 +341,20 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
       );
       break;
     case 'info':
-      currentPage = <InfoPage onClose={() => setPage(isHero ? 'overview' : 'viewer')} />;
+      currentPage = <InfoPage onClose={() => setPage(initialPage)} />;
       break;
     case 'leaderboard':
       currentPage = (
-        <LeaderboardPage scores={scores} onClose={() => setPage(isHero ? 'overview' : 'viewer')} />
+        <LeaderboardPage scores={gameData.scores} onClose={() => setPage(initialPage)} />
       );
       break;
     case 'overview':
       currentPage = (
         <OverviewPage
           dailyDrawings={dailyDrawings}
-          userPoints={scoreBoardUser.score}
           setPage={setPage}
           startCardDrawTimer={startCardDrawTimer}
-          username={username}
+          username={metadata.username}
         />
       );
       break;
@@ -339,13 +365,11 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
           word={word}
           clearData={clearData}
           setPage={setPage}
-          dailyDrawings={dailyDrawings}
-          setDailyDrawings={setDailyDrawings}
-          cancelConfirmationForm={cancelConfirmationForm}
-          currentSubreddit={currentSubreddit}
-          username={username}
-          gameSettings={gameSettings}
-          isHero={isHero}
+          setDailyDrawingsLocal={setDailyDrawingsLocal}
+          currentSubreddit={metadata.subreddit}
+          username={metadata.username}
+          gameSettings={gameData.gameSettings}
+          initialPage={initialPage}
         />
       );
       break;
@@ -353,14 +377,14 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
       currentPage = (
         <ViewerPage
           setPage={setPage}
-          postData={postData}
+          onValidateGuess={onValidateGuess}
+          postData={gameData.postData}
           showFeedback={showFeedback}
           pointsEarned={pointsEarned}
           isSolved={isSolved}
           isAuthor={isAuthor}
-          guessForm={guessForm}
-          username={username}
-          heroPostId={gameSettings.heroPostId}
+          username={metadata.username}
+          heroPostId={gameData.gameSettings.heroPostId}
           canDraw={dailyDrawings.length < Settings.dailyDrawingsQuota}
         />
       );
@@ -374,22 +398,5 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
       break;
   }
 
-  /*
-   * Return the custom post unit
-   */
-
-  return (
-    <zstack width="100%" height="100%" alignment="top start">
-      <image
-        imageHeight={1024}
-        imageWidth={1500}
-        height="100%"
-        width="100%"
-        url="background.png"
-        description="Striped blue background"
-        resizeMode="cover"
-      />
-      {currentPage}
-    </zstack>
-  );
+  return <PageContainer>{currentPage}</PageContainer>;
 };

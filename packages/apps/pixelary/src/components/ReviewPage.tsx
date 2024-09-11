@@ -1,12 +1,12 @@
-import type { Context, FormKey } from '@devvit/public-api';
-import { Devvit } from '@devvit/public-api';
+import type { Context, StateSetter } from '@devvit/public-api';
+import { Devvit, useForm } from '@devvit/public-api';
 import { Drawing } from './Drawing.js';
 import Settings from '../settings.json';
 import type { PostData } from '../types/PostData.js';
 import { StyledButton } from './StyledButton.js';
 import { PixelText } from './PixelText.js';
 import { PixelSymbol } from './PixelSymbol.js';
-import type { pages } from '../types/pages.js';
+import type { Page } from '../types/Page.js';
 import { formatNumberWithCommas } from '../utils/formatNumbers.js';
 import { LoadingState } from './LoadingState.js';
 import { Service } from '../service/Service.js';
@@ -14,15 +14,14 @@ import type { GameSettings } from '../types/GameSettings.js';
 
 interface ReviewPageProps {
   word: string;
-  setPage: (page: pages) => void;
-  setDailyDrawings: (drawings: PostData[]) => void;
+  setPage: (page: Page) => void;
+  setDailyDrawingsLocal: StateSetter<PostData[]>;
   data: number[];
   clearData: () => void;
-  cancelConfirmationForm: FormKey;
   currentSubreddit: string;
   username: string | null;
   gameSettings: GameSettings;
-  isHero: boolean;
+  initialPage: Page;
 }
 
 export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Element => {
@@ -31,15 +30,50 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
     setPage,
     data,
     clearData,
-    cancelConfirmationForm,
-    setDailyDrawings,
+    setDailyDrawingsLocal,
     currentSubreddit,
     username,
     gameSettings,
-    isHero,
+    initialPage,
   } = props;
   const { ui, reddit, redis, scheduler } = context;
   const service = new Service(redis);
+
+  /*
+   * Cancel drawing confirmation form
+   */
+
+  const cancelConfirmationForm = useForm(
+    {
+      title: 'Are you sure?',
+      description: `This will exhaust a daily drawing attempt. If you submit the drawing and someone guesses right, you will get ${formatNumberWithCommas(
+        Settings.drawerPoints
+      )} points.`,
+      acceptLabel: 'Discard drawing',
+      cancelLabel: 'Back',
+      fields: [],
+    },
+    async () => {
+      if (!username) {
+        return;
+      }
+
+      const postData: PostData = {
+        word,
+        data,
+        authorUsername: username,
+        date: Date.now(),
+        published: false,
+      };
+
+      await service.storeDailyDrawing(postData);
+      setDailyDrawingsLocal((x) => [...x, postData]);
+
+      setPage('overview');
+      clearData();
+      ui.showToast('Drawing canceled');
+    }
+  );
 
   async function submitDrawingHandler(): Promise<void> {
     if (!username) {
@@ -56,8 +90,8 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
         appearance: 'neutral',
       });
       // Update the UI
-      setDailyDrawings(dailyDrawings);
-      setPage(isHero ? 'overview' : 'viewer');
+      setDailyDrawingsLocal(dailyDrawings);
+      setPage(initialPage);
       clearData();
       return;
     }
@@ -103,8 +137,8 @@ export const ReviewPage = (props: ReviewPageProps, context: Context): JSX.Elemen
     ]);
 
     // Update the UI
-    setDailyDrawings([...dailyDrawings, postData]);
-    setPage(isHero ? 'overview' : 'viewer');
+    setDailyDrawingsLocal((x) => [...x, postData]);
+    setPage(initialPage);
     clearData();
     ui.showToast('Drawing submitted');
   }

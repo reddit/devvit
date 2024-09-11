@@ -1,4 +1,4 @@
-export type pages =
+export type Page =
   | 'card-draw'
   | 'editor'
   | 'info'

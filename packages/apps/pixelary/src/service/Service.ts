@@ -115,9 +115,18 @@ export class Service {
       // Update score board
       await this.redis.zRemRangeByRank(this.#scoreBoardKey, 0, -1);
       await this.redis.zAdd(this.#scoreBoardKey, ...scores);
-      // console.log('Updated the score board.');
+      console.log('Updated the score board.');
     } catch (error) {
       // console.error('Error updating score board', error);
+    }
+  }
+
+  // Clear score board events
+  async clearScoreBoard(): Promise<void> {
+    try {
+      await this.redis.del(this.#scoreBoardEventsKey);
+    } catch (error) {
+      console.error('Error clearing score board events', error);
     }
   }
 
@@ -165,7 +174,7 @@ export class Service {
         [word]: '',
       });
     } catch (error) {
-      console.error('Error saving incorrect guess', error);
+      throw new Error('Error saving incorrect guess');
     }
   }
 
@@ -173,8 +182,7 @@ export class Service {
     try {
       return await this.redis.hkeys(this.#incorrectGuessesKey);
     } catch (error) {
-      console.error('Error fetching incorrect guesses', error);
-      return [];
+      throw new Error('Error fetching incorrect guesses');
     }
   }
 
@@ -182,7 +190,7 @@ export class Service {
     try {
       await this.redis.del(this.#incorrectGuessesKey);
     } catch (error) {
-      console.error('Error deleting incorrect guesses', error);
+      throw new Error('Error deleting incorrect guesses');
     }
   }
 

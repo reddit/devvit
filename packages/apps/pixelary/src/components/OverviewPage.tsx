@@ -1,29 +1,39 @@
 import type { Context, Post } from '@devvit/public-api';
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useAsync } from '@devvit/public-api';
 import type { PostData } from '../types/PostData.js';
 import { Drawing } from './Drawing.js';
 import { DrawingAnnotation } from './DrawingAnnotation.js';
 import { StyledButton } from './StyledButton.js';
 import { PointsPill } from './PointsPill.js';
 import { PixelText } from './PixelText.js';
-import type { pages } from '../types/pages.js';
 import { Service } from '../service/Service.js';
+import type { Page } from '../types/Page.js';
 
 interface OverviewPageProps {
-  setPage: (page: pages) => void;
+  setPage: (page: Page) => void;
   dailyDrawings: PostData[];
-  userPoints: number;
   startCardDrawTimer: () => void;
   username: string | null;
 }
 
 export const OverviewPage = (props: OverviewPageProps, context: Context): JSX.Element => {
-  const { setPage, dailyDrawings, userPoints, startCardDrawTimer, username } = props;
+  const { setPage, dailyDrawings, startCardDrawTimer, username } = props;
+  const { data: scoreBoardUser } = useAsync(
+    async () => {
+      const service = new Service(context.redis);
+
+      return username ? await service.getScoreBoardUserEntry(username) : null;
+    },
+    {
+      depends: username,
+    }
+  );
+
   const { reddit, ui } = context;
 
   const tileSize = 83.5;
-  const dailyDrawingAttemps = 3;
-  const dailyDrawingsLeft = dailyDrawingAttemps - dailyDrawings.length;
+  const dailyDrawingAttempts = 3;
+  const dailyDrawingsLeft = dailyDrawingAttempts - dailyDrawings.length;
 
   const myDrawings: JSX.Element[] = dailyDrawings.map((drawing) => {
     const isPublished = drawing.published;
@@ -110,7 +120,7 @@ export const OverviewPage = (props: OverviewPageProps, context: Context): JSX.El
     <vstack width="100%" height="100%" alignment="center" padding="large" gap="large">
       {/* Header */}
       <hstack width="100%" alignment="end middle">
-        <PointsPill value={userPoints} />
+        <PointsPill value={scoreBoardUser?.score ?? 0} />
       </hstack>
 
       <spacer grow />

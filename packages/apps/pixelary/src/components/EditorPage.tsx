@@ -1,22 +1,20 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useState } from '@devvit/public-api';
 import Settings from '../settings.json';
 import { splitArray } from '../utils/splitArray.js';
 import { StyledButton } from './StyledButton.js';
 import { PixelText } from './PixelText.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { Shadow } from './Shadow.js';
-import type { pages } from '../types/pages.js';
+import type { Page } from '../types/Page.js';
 
 interface EditorPageProps {
   word: string;
-  setPage: (page: pages) => void;
+  setPage: (page: Page) => void;
   data: number[];
   setData: (data: number[]) => void;
   drawingCountdown: number;
   cancelDrawingTimer: () => void;
   fallbackTimerUpdate: () => void;
-  currentColor: number;
-  setCurrentColor: (color: number) => void;
 }
 
 export const EditorPage = (props: EditorPageProps): JSX.Element => {
@@ -28,9 +26,8 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     drawingCountdown,
     cancelDrawingTimer,
     fallbackTimerUpdate,
-    currentColor,
-    setCurrentColor,
   } = props;
+  const [currentColor, setCurrentColor] = useState<number>(1);
 
   const size = '275px';
   const innerSize = 275;

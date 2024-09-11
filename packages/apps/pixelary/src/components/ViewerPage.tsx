@@ -1,5 +1,5 @@
-import type { Context, FormKey } from '@devvit/public-api';
-import { Devvit } from '@devvit/public-api';
+import type { Context } from '@devvit/public-api';
+import { Devvit, useForm } from '@devvit/public-api';
 import { Drawing } from './Drawing.js';
 import type { PostData } from '../types/PostData.js';
 import Settings from '../settings.json';
@@ -9,38 +9,62 @@ import { getScoreMultiplier } from '../utils/getScoreMultiplier.js';
 import { PixelText } from './PixelText.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PointsToast } from './PointsToast.js';
-import type { pages } from '../types/pages.js';
 import { formatNumberWithCommas } from '../utils/formatNumbers.js';
 import { Service } from '../service/Service.js';
+import type { Page } from '../types/Page.js';
 
 interface ViewerPageProps {
-  setPage: (page: pages) => void;
+  setPage: (page: Page) => void;
   postData: PostData;
   showFeedback: boolean;
   pointsEarned: number;
   isSolved: boolean;
   isAuthor: boolean;
-  guessForm: FormKey;
   username: string | null;
   heroPostId?: string;
+  onValidateGuess: (guess: string) => Promise<void>;
   canDraw: boolean;
 }
 
 export const ViewerPage = (props: ViewerPageProps, context: Context): JSX.Element => {
   const {
     setPage,
+    onValidateGuess,
     postData,
     showFeedback,
     pointsEarned,
     isSolved,
     isAuthor,
-    guessForm,
     username,
     heroPostId,
     canDraw,
   } = props;
   const { ui } = context;
   const { word, data, date, expired = false }: PostData = postData;
+
+  /*
+   * Guess form
+   */
+
+  const guessForm = useForm(
+    {
+      title: 'Guess the word',
+      acceptLabel: 'Guess',
+      fields: [
+        {
+          type: 'string',
+          name: 'guess',
+          label: 'Word',
+          helpText: 'A single, case insensitive word',
+          required: true,
+        },
+      ],
+    },
+    async (values) => {
+      const guess = values.guess.trim();
+      await onValidateGuess(guess);
+    }
+  );
 
   const isSolvedByUser = pointsEarned > 0;
 

@@ -195,7 +195,12 @@ const resetDailyDrawingsForm = Devvit.createForm(
   },
   async (event, context) => {
     const { redis, ui } = context;
-    const username = event.values.username;
+    const username = event.values.username?.trim();
+
+    if (!username) {
+      throw new Error(`Cannot reset daily drawling for user because no username given`);
+    }
+
     const service = new Service(redis);
     const key = service.getDailyDrawingsKey(username);
     await redis.del(key);
@@ -223,6 +228,11 @@ Devvit.addMenuItem({
     const service = new Service(redis);
     const guesses = await service.getIncorrectGuesses();
     const currentUser = await reddit.getCurrentUser();
+
+    if (!currentUser) {
+      throw new Error(`Cannot get incorrect guesses because could not find currentUser`);
+    }
+
     await reddit.sendPrivateMessage({
       to: currentUser.username,
       subject: 'Pixelary: Incorrect guesses',
@@ -242,6 +252,45 @@ Devvit.addMenuItem({
     const service = new Service(redis);
     await service.deleteIncorrectGuesses();
     ui.showToast('Deleted incorrect guesses');
+  },
+});
+
+// ADMIN ONLY
+Devvit.addMenuItem({
+  label: '[Pixelary] Clear leaderboard',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const { redis, ui } = context;
+    const service = new Service(redis);
+    await service.clearScoreBoard();
+    ui.showToast('Cleared the leaderboard');
+  },
+});
+
+// ADMIN ONLY
+Devvit.addMenuItem({
+  label: '[Pixelary] Update leaderboard',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const { redis, ui, scheduler } = context;
+    const service = new Service(redis);
+    await service.updateScoreBoard();
+    console.log(await scheduler.listJobs());
+    ui.showToast('Updated the leaderboard');
+  },
+});
+
+// ADMIN ONLY
+Devvit.addMenuItem({
+  label: '[Pixelary] Start update job',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const { ui, scheduler } = context;
+    await scheduler.runJob({ cron: '* * * * *', name: 'UpdateScoreBoard' });
+    ui.showToast('Started cron job!');
   },
 });
 
