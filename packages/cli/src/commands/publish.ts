@@ -29,6 +29,14 @@ import {
   AppCapability,
 } from '@devvit/shared-types/AppCapabilities.js';
 
+const appCapabilityToReviewRequirementMessage: Record<
+  AppCapability.CustomPost | AppCapability.Payments,
+  string
+> = {
+  [AppCapability.CustomPost]: 'Creates custom posts',
+  [AppCapability.Payments]: 'Sells digital goods or services',
+};
+
 export default class Publish extends ProjectCommand {
   static override description =
     'Publish any previously uploaded version of an app. In this state, only the app owner can find or install the app to a subreddit which they moderate.';
@@ -131,8 +139,17 @@ export default class Publish extends ProjectCommand {
 
     await this.#submitForReview(appVersion.id, devvitVersion, visibility);
 
-    if (appCapabilities.includes(AppCapability.CustomPost)) {
-      this.log('Custom post apps need to be approved before they can be published');
+    const appCapabilitiesForReview = appCapabilities.filter(
+      (capability): capability is AppCapability.CustomPost | AppCapability.Payments =>
+        capability === AppCapability.CustomPost || capability === AppCapability.Payments
+    );
+    if (appCapabilitiesForReview.length > 0) {
+      this.log(
+        'Apps that meet the following criteria must be reviewed before they can be published:'
+      );
+      appCapabilitiesForReview.forEach((capability) => {
+        this.log(`  - ${appCapabilityToReviewRequirementMessage[capability]}`);
+      });
       this.log("You'll receive a DM when your app has been reviewed.");
       this.log("Once approved, you'll be able to install your app anywhere you're a moderator!");
 
@@ -174,6 +191,17 @@ export default class Publish extends ProjectCommand {
       return appVersionInfo;
     } catch (error) {
       return handleTwirpError(error, (message: string) => this.error(message));
+    }
+  }
+
+  #getAppReviewRequirementMessage(
+    appCapability: AppCapability.CustomPost | AppCapability.Payments
+  ): string {
+    switch (appCapability) {
+      case AppCapability.CustomPost:
+        return 'Creates custom posts';
+      case AppCapability.Payments:
+        return 'Sells digital goods or services';
     }
   }
 
