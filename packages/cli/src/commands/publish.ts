@@ -1,4 +1,3 @@
-import type { LinkedBundle } from '@devvit/protos';
 import type {
   AppInfo,
   AppVersionUpdateRequest,
@@ -25,6 +24,10 @@ import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { readLine } from '../util/input-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
 import inquirer from 'inquirer';
+import {
+  appCapabilitiesFromLinkedBundle,
+  AppCapability,
+} from '@devvit/shared-types/AppCapabilities.js';
 
 export default class Publish extends ProjectCommand {
   static override description =
@@ -118,13 +121,14 @@ export default class Publish extends ProjectCommand {
       visibility = await this.#promptForVisibility();
     }
 
-    if (await this.#checkIfAppUsesFetch(bundle)) {
+    const appCapabilities = appCapabilitiesFromLinkedBundle(bundle);
+    if (appCapabilities.includes(AppCapability.HTTP)) {
       await this.#checkAppVersionTermsAndConditions(appInfo.app, appDetailsUrl);
     }
 
     await this.#submitForReview(appVersion.id, devvitVersion, visibility);
 
-    if (await this.#checkIfAppCreatesCustomPost(bundle)) {
+    if (appCapabilities.includes(AppCapability.CustomPost)) {
       this.log('Custom post apps need to be approved before they can be published');
       this.log("You'll receive a DM when your app has been reviewed.");
       this.log("Once approved, you'll be able to install your app anywhere you're a moderator!");
@@ -168,14 +172,6 @@ export default class Publish extends ProjectCommand {
     } catch (error) {
       return handleTwirpError(error, (message: string) => this.error(message));
     }
-  }
-
-  async #checkIfAppCreatesCustomPost(bundle: LinkedBundle): Promise<boolean> {
-    return !!bundle.provides.find((provision) => provision.name === 'CustomPost');
-  }
-
-  async #checkIfAppUsesFetch(bundle: LinkedBundle): Promise<boolean> {
-    return !!bundle.uses.find((use) => use.hostname === 'http.plugins.local');
   }
 
   async #checkAppVersionTermsAndConditions(app: AppInfo, appDetailsUrl: string): Promise<void> {
