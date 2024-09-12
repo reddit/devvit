@@ -37,6 +37,7 @@ After your app has been approved, you may want to change the visibility status.
 To hide your app from the public after it’s been listed, run:
 
 ```tsx
+devvit upload
 devvit publish --unlisted
 ```
 
@@ -49,6 +50,7 @@ This will not remove the code from the directory, and it will not remove the app
 To make your unlisted app public after it's been approved, run:
 
 ```tsx
+devvit upload
 devvit publish --public
 ```
 

@@ -99,8 +99,11 @@ export default class Publish extends ProjectCommand {
     }
 
     if (appVersion.visibility !== VersionVisibility.PRIVATE) {
+      const currentVisibility = VersionVisibility[appVersion.visibility].toLowerCase();
+      const newVisibility = currentVisibility === 'unlisted' ? 'public' : 'unlisted';
+
       this.log(
-        `Version "${devvitVersion}" has already been published.\n\n✨ Visit ${chalk.cyan.bold(
+        `Version "${devvitVersion}" has already been published and is ${currentVisibility}.\nTo make it ${newVisibility}, run ${chalk.cyan(`devvit upload`)} to create a new version. Then run ${chalk.cyan(`devvit publish --${newVisibility}`)}.\n\n✨ Visit ${chalk.cyan.bold(
           `${appDetailsUrl}`
         )} to view your app!`
       );
