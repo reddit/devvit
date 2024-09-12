@@ -40,6 +40,7 @@ import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
+import { isCurrentUserEmployee } from '../lib/http/gql.js';
 
 export default class Playtest extends Upload {
   static override description =
@@ -73,6 +74,13 @@ export default class Playtest extends Upload {
         hidden: true,
       }),
       verbose: Flags.boolean({ default: false }),
+      'employee-update': Flags.boolean({
+        name: 'employee-update',
+        description:
+          "I'm an employee and I want to update someone else's app. (This will only work if you're an employee.)",
+        required: false,
+        hidden: true,
+      }),
     };
   }
 
@@ -163,6 +171,20 @@ export default class Playtest extends Upload {
 
     const projectConfig = await this.getProjectConfig();
     const appName = projectConfig.slug ?? projectConfig.name;
+    const appInfo: FullAppInfo | undefined = await this.getAppBySlug(appName);
+
+    if (appInfo?.app?.owner?.displayName !== username) {
+      if (flags['employee-update']) {
+        const isEmployee = await isCurrentUserEmployee(token);
+        if (!isEmployee) {
+          this.error(`You're not an employee, so you can't playtest someone else's app.`);
+        }
+        // Else, we're an employee, so we can update someone else's app
+        this.warn(`Overriding ownership check because you're an employee and told me to!`);
+      } else {
+        this.error(`You're not an employee, so you can't playtest someone else's app.`);
+      }
+    }
 
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
