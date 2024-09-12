@@ -126,6 +126,7 @@ export class NodeFSAuthenticationPlugin implements Disposable {
       redirect_uri: this.#authCfg.copyPasteRedirectUri,
       response_type: 'code',
       scope: this.#authCfg.scopes,
+      devvit_cli: 'true',
       state,
     })}`;
 
@@ -209,6 +210,7 @@ export class NodeFSAuthenticationPlugin implements Disposable {
       redirect_uri: this.#authCfg.redirectUri,
       response_type: 'code',
       scope: this.#authCfg.scopes,
+      devvit_cli: 'true',
       state,
     })}`;
 
