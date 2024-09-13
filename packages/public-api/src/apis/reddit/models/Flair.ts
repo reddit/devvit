@@ -460,9 +460,7 @@ function asFlairTextColor(color?: string): FlairTextColor {
 }
 
 function asFlairBackgroundColor(color?: string): FlairBackgroundColor {
-  assertNonNull(color, 'Flair background color is required');
-
-  if (color.length === 0 || color === 'transparent') {
+  if (!color || color.length === 0 || color === 'transparent') {
     return 'transparent';
   }
 
