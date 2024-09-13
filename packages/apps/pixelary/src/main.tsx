@@ -154,6 +154,56 @@ Devvit.addMenuItem({
   },
 });
 
+Devvit.addMenuItem({
+  label: '[Pixelary] Resticky Post',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const { ui, redis, reddit } = context;
+    const service = new Service(redis);
+    const community = await reddit.getCurrentSubreddit();
+
+    // Check if post flairs are enabled in the community
+    const postFlairEnabled = await community.postFlairsEnabled;
+    if (!postFlairEnabled) {
+      ui.showToast('Enable post flairs first!');
+      return;
+    }
+
+    // Check if Pixelary is already installed
+    const currentSettings = await service.getGameSettings();
+
+    if (
+      !currentSettings.activeFlairId ||
+      !currentSettings.endedFlairId ||
+      !currentSettings.heroPostId
+    ) {
+      ui.showToast('Pixelary is not installed!');
+      return;
+    }
+
+    const oldPost = await reddit.getPostById(currentSettings.heroPostId);
+    await oldPost.unsticky();
+
+    // Create the main game post and pin it to the top
+    const post = await reddit.submitPost({
+      title: 'Pixelary',
+      subredditName: community.name,
+      preview: <LoadingState />,
+    });
+
+    await post.sticky();
+
+    // Store the game settings
+    await service.storeGameSettings({
+      ...currentSettings,
+      heroPostId: post.id,
+    });
+
+    ui.showToast('Restickied Pixelary post!');
+  },
+});
+
 // Do the following when a drawing post expires
 Devvit.addSchedulerJob<JobData>({
   name: 'PostExpiration',
