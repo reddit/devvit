@@ -49,7 +49,12 @@ export const Pixelary: Devvit.CustomPostComponent = (context: Context) => {
     username: string | null;
   }>(async () => {
     const values = await Promise.all([
-      reddit.getCurrentSubreddit().then((sub) => sub.name),
+      // Workaround for a P0 android bug. Remove after next release hits >80%
+      // For some reason on the subreddit feed page, the subreddit ID was not
+      // being passed down correctly. This is a workaround to help android
+      // render more often.
+      (async () => 'Pixelary')(),
+      // reddit.getCurrentSubreddit().then((sub) => sub.name),
       getUsername(),
     ]);
 
