@@ -1,5 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import Glyphs from '../data/glyphs.json';
+import Settings from '../settings.json';
 
 export type SupportedGlyphs = keyof typeof Glyphs;
 
@@ -16,7 +17,7 @@ interface PixelSymbolProps {
 }
 
 export function PixelSymbol(props: PixelSymbolProps): JSX.Element {
-  const { type, scale = 2, color = 'black' } = props;
+  const { type, scale = 2, color = Settings.theme.primary } = props;
 
   const glyph: Glyph = Glyphs[type];
 

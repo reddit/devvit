@@ -1,7 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import Settings from '../settings.json';
 import { generateRandomArray } from '../utils/generateRandomArray.js';
-import { Shadow } from './Shadow.js';
 
 interface DrawingProps {
   data?: number[];
@@ -11,10 +10,10 @@ interface DrawingProps {
 
 export const Drawing = (props: DrawingProps): JSX.Element => {
   const dummyData = generateRandomArray(Settings.resolution * Settings.resolution);
-  const { data = dummyData, size = 275, onPress } = props;
-  const borderSize = 4;
-  const height: Devvit.Blocks.SizeString = `${size - borderSize}px`;
-  const width: Devvit.Blocks.SizeString = `${size - borderSize}px`;
+  const { data = dummyData, size = 288, onPress } = props;
+  const shadowOffset = 4;
+  const height: Devvit.Blocks.SizeString = `${size + shadowOffset}px`;
+  const width: Devvit.Blocks.SizeString = `${size + shadowOffset}px`;
 
   function indexToXY(index: number, resolution: number): { x: number; y: number } {
     return {
@@ -24,14 +23,24 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
   }
 
   return (
-    <Shadow width={width} height={height} onPress={onPress}>
-      <hstack width={width} height={height} backgroundColor="black" padding="none">
-        <hstack width="100%" height="100%" backgroundColor="white">
+    <zstack height={height} width={width} onPress={onPress}>
+      {/* Shadow */}
+      <vstack height={height} width={width}>
+        <spacer height="4px" />
+        <hstack grow>
+          <spacer width="4px" />
+          <hstack grow backgroundColor={Settings.theme.shadow} />
+        </hstack>
+      </vstack>
+
+      {/* Card */}
+      <vstack height={height} width={width}>
+        <hstack grow>
           <image
             imageWidth={size}
             imageHeight={size}
-            width="100%"
-            height="100%"
+            height={`${size}px`}
+            width={`${size}px`}
             description="Drawing"
             resizeMode="fill"
             url={`data:image/svg+xml,
@@ -56,8 +65,10 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
             </svg>
           `}
           />
+          <spacer width="4px" />
         </hstack>
-      </hstack>
-    </Shadow>
+        <spacer height="4px" />
+      </vstack>
+    </zstack>
   );
 };

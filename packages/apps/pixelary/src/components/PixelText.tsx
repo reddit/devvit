@@ -1,5 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import Glyphs from '../data/glyphs.json';
+import Settings from '../settings.json';
 
 type SupportedGlyphs = keyof typeof Glyphs;
 
@@ -17,7 +18,7 @@ interface PixelTextProps {
 }
 
 export function PixelText(props: PixelTextProps): JSX.Element {
-  const { children, scale = 2, color = 'black' } = props;
+  const { children, scale = 2, color = Settings.theme.primary } = props;
   const line = children[0].split('');
   const gap = 1;
   const height = Glyphs['A'].height;

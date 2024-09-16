@@ -1,7 +1,6 @@
 import type { RedisClient, ZMember, ZRangeOptions } from '@devvit/public-api';
 import Settings from '../settings.json';
 import Words from '../data/words.json';
-import { getScoreMultiplier } from '../utils/getScoreMultiplier.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 import type { GameSettings } from '../types/GameSettings.js';
 import type { PostData } from '../types/PostData.js';
@@ -23,40 +22,62 @@ export class Service {
 
   // Methods that handles DB updates on drawing solving event
   // Returns true if drawing was not solved before
-  async handleDrawingSolvedEvent(
-    postId: string,
-    drawingAuthorName: string,
-    username: string,
-    drawingDate: number,
-    isSolved: boolean
-  ): Promise<boolean> {
-    // Determine how many points the user gets
-    const points = Settings.guesserPoints * getScoreMultiplier(drawingDate);
-
-    await Promise.all([
-      // Save score board event
-      this.#saveScoreBoardEvent({
-        username,
-        postId: postId,
-        points,
-      }),
-      // Save that the drawing was solved
-      this.storePostData({
-        postId: postId,
-        solved: true,
-        pointsEarnedByUser: points,
-        username,
-      }),
-      // Update score for drawing author if it was the first time being solved
-      !isSolved &&
+  async handleGuessEvent(event: {
+    postId: string;
+    authorUsername: string;
+    username: string;
+    word: string;
+    guess: string;
+  }): Promise<boolean> {
+    const pointsPerGuess = Settings.pointsPerGuess;
+    const correctGuess = event.guess.toLowerCase() === event.word.toLowerCase();
+    const [
+      _saveUserEvent,
+      _saveAuthorEvent,
+      _userPoints,
+      _userGuesses,
+      wordGuesses,
+      _drawerPoints,
+    ] = await Promise.all([
+      // Save score board event. Not sure we need this anymore.
+      correctGuess &&
         this.#saveScoreBoardEvent({
-          username: drawingAuthorName,
-          points: Settings.drawerPoints,
-          postId: postId,
+          username: event.username,
+          postId: event.postId,
+          points: pointsPerGuess,
         }),
+      //Update score for drawing author if it was the first time being solved
+      correctGuess &&
+        this.#saveScoreBoardEvent({
+          username: event.authorUsername,
+          points: pointsPerGuess,
+          postId: event.postId,
+        }),
+      // Update user points
+      correctGuess &&
+        this.redis.hIncrBy(
+          this.getPostDataKey(event.postId),
+          `user:${event.username}:points`,
+          pointsPerGuess
+        ),
+      // Increment the number of guesses this user has made on this post
+      this.redis.hIncrBy(this.getPostDataKey(event.postId), `user:${event.username}:guesses`, 1),
+      // Increment number of times this word has been guessed
+      this.redis.hIncrBy(
+        this.getPostDataKey(event.postId),
+        `guess:${event.guess.toLowerCase()}`,
+        1
+      ),
+      // Update drawer points
+      correctGuess &&
+        this.redis.hIncrBy(
+          this.getPostDataKey(event.postId),
+          `user:${event.authorUsername}:points`,
+          pointsPerGuess
+        ),
     ]);
 
-    return !isSolved;
+    return wordGuesses === 1;
   }
 
   // Saving score board events
@@ -194,140 +215,143 @@ export class Service {
     }
   }
 
-  // Daily drawings
-  getDailyDrawingsKey(username: string): string {
-    const today = new Date();
-    const dateStamp = today.toISOString().split('T')[0];
-    return `daily-drawings:${username}:${dateStamp}`;
+  /*
+   * My Drawings
+   *
+   * All shared drawings are stored in a sorted set for each player:
+   * - Member: Stringified post data
+   * - Score: Unix epoch time
+   */
+
+  getMyDrawingsKey(username: string): string {
+    return `my-drawings:${username}}`;
   }
 
-  async storeDailyDrawing(postData: PostData): Promise<void> {
-    const key = this.getDailyDrawingsKey(postData.authorUsername);
-    const field = new Date().toISOString();
-    await this.redis.hset(key, {
-      [field]: JSON.stringify(postData),
+  async storeMyDrawing(postData: PostData): Promise<void> {
+    const key = this.getMyDrawingsKey(postData.authorUsername);
+    await this.redis.zAdd(key, {
+      member: JSON.stringify(postData),
+      score: Date.now(),
     });
-    await this.redis.expire(key, Settings.dailyDrawingsExpiration);
   }
 
-  async getDailyDrawings(username: string | null): Promise<PostData[]> {
-    if (!username) {
-      return [];
-    }
-
-    const key = this.getDailyDrawingsKey(username);
-    const data = await this.redis.hgetall(key);
-
-    if (!data || data === undefined) {
-      return [];
-    }
-
-    const keys = Object.keys(data);
-    const output: PostData[] = [];
-
-    keys.forEach((value: string) => {
-      const valueParsed = JSON.parse(data![value]) as PostData;
-      output.push(valueParsed);
+  async getMyDrawings(
+    username: string | null,
+    min: number = 0,
+    max: number = -1
+  ): Promise<PostData[]> {
+    if (!username) return [];
+    const key = this.getMyDrawingsKey(username);
+    const data = await this.redis.zRange(key, min, max, {
+      reverse: true,
+      by: 'rank',
     });
-
-    return output;
+    if (!data || data === undefined) return [];
+    return data.map((value) => JSON.parse(value.member)) as PostData[];
   }
 
-  async getDailyDrawingsLeft(username: string | null): Promise<number> {
-    const defaultValue = Settings.dailyDrawingsQuota;
-    if (!username) {
-      return defaultValue;
-    }
-    try {
-      const key = this.getDailyDrawingsKey(username);
-      const data = await this.redis.hkeys(key);
-      if (!data) {
-        return defaultValue;
-      }
-      return defaultValue - data.length;
-    } catch (error) {
-      throw new Error('Error getting daily drawings left');
-    }
-  }
+  /*
+   * Post data
+   */
 
-  // Post data
   getPostDataKey(postId: string): string {
     return `post-${postId}`;
   }
 
-  async getPostData(postId: string, username: string | null): Promise<PostData | undefined> {
-    const key = this.getPostDataKey(postId);
-    // TODO: Swap out with HMGET and a list of fields when supported
-    const data = await this.redis.hgetall(key);
-
-    if (!data || !data.postId) {
-      return undefined;
-    }
-
+  parsePostData(data: Record<string, string> | undefined, username: string | null): PostData {
     const response: PostData = {
-      postId: postId,
-      authorUsername: data.authorUsername,
-      data: JSON.parse(data.data),
-      date: parseInt(data.date),
-      word: data.word,
-      published: true,
+      postId: data?.postId ? data.postId : '',
+      authorUsername: data?.authorUsername || '',
+      data: data?.data ? JSON.parse(data.data) : [],
+      date: data?.date ? parseInt(data.date) : 0,
+      word: data?.word ? data.word : '',
+      expired: data?.expired ? JSON.parse(data.expired) : false,
+      count: {
+        players: 0,
+        winners: data?.[`guess:${data.word.toLowerCase()}`]
+          ? parseInt(data[`guess:${data.word.toLowerCase()}`])
+          : 0,
+        guesses: 0,
+        words: 0,
+      },
+      user: {
+        guesses: 0,
+        points: 0,
+        solved: false,
+      },
+      guesses: [],
     };
 
-    if (data.expired) {
+    // Check if the post has expired
+    if (data?.expired) {
       response.expired = data.expired === 'true';
     }
-    if (data.solved) {
-      response.solved = data.solved === 'true';
+
+    // Tally how many times the user has guessed
+    const userGuessCountKey = `user:${username}:guesses`;
+    if (data?.[userGuessCountKey]) {
+      response.user.guesses = parseInt(data[userGuessCountKey]);
     }
 
-    const pointsEarnedByUserKey = `pointsEarnedBy:${username}`;
-    if (data[pointsEarnedByUserKey]) {
-      response.pointsEarnedByUser = parseInt(data[pointsEarnedByUserKey]);
+    // Check if the user has solved the post
+    const userPointsEarnedKey = `user:${username}:points`;
+    if (data?.[userPointsEarnedKey]) {
+      response.user.solved = true;
+      response.user.points = parseInt(data[userPointsEarnedKey]);
     }
 
+    if (data) {
+      const guesses = Object.keys(data).filter((key) => key.startsWith('guess:'));
+      if (guesses.length > 0) {
+        guesses.forEach((key) => {
+          const word = key.split(':')[1];
+          const count = parseInt(data[key]);
+          response.count.guesses += count;
+          response.count.words += 1;
+          response.guesses.push({ word, count });
+          if (word === response.word) {
+            response.count.winners = count;
+          }
+        });
+      }
+    }
+
+    // Count how many players have guessed
+    const playerGuesses = Object.keys(data || {}).filter(
+      (key) => key.startsWith('user:') && key.endsWith(':guesses')
+    );
+    response.count.players = playerGuesses.length;
+
+    // Return the parsed post data
     return response;
+  }
+
+  async expirePost(postId: string): Promise<void> {
+    const key = this.getPostDataKey(postId);
+    await this.redis.hSet(key, { expired: 'true' });
+  }
+
+  async getPostData(postId: string, username: string | null): Promise<PostData | undefined> {
+    const key = this.getPostDataKey(postId);
+    const data = await this.redis.hGetAll(key);
+    return this.parsePostData(data, username);
   }
 
   async storePostData(data: {
     postId: string;
-    word?: string;
-    data?: number[];
-    authorUsername?: string;
-    date?: number;
-    expired?: boolean;
-    solved?: boolean;
-    pointsEarnedByUser?: number;
-    username?: string;
+    word: string;
+    data: number[];
+    authorUsername: string;
   }): Promise<void> {
-    const hashData: Record<string, string> = {
-      postId: data.postId,
-    };
-
-    if (data.word) {
-      hashData.word = data.word;
-    }
-    if (data.data) {
-      hashData.data = JSON.stringify(data.data);
-    }
-    if (data.authorUsername) {
-      hashData.authorUsername = data.authorUsername;
-    }
-    if (data.date) {
-      hashData.date = JSON.stringify(data.date);
-    }
-    if (data.expired) {
-      hashData.expired = JSON.stringify(data.expired);
-    }
-    if (data.solved) {
-      hashData.solved = JSON.stringify(data.solved);
-    }
-    if (data.pointsEarnedByUser) {
-      const pointsEarnedByUserKey = `pointsEarnedBy:${data.username}`;
-      hashData[pointsEarnedByUserKey] = JSON.stringify(data.pointsEarnedByUser);
-    }
-
     const key = this.getPostDataKey(data.postId);
-    await this.redis.hset(key, hashData);
+    await this.redis.hSet(key, {
+      postId: data.postId,
+      data: JSON.stringify(data.data),
+      authorUsername: data.authorUsername,
+      date: Date.now().toString(),
+      expired: 'false',
+      word: data.word,
+    });
   }
 
   // Game settings

@@ -1,45 +1,42 @@
-import { Devvit, useState } from '@devvit/public-api';
-import Settings from '../settings.json';
-import { splitArray } from '../utils/splitArray.js';
-import { StyledButton } from './StyledButton.js';
-import { PixelText } from './PixelText.js';
-import { PixelSymbol } from './PixelSymbol.js';
-import { Shadow } from './Shadow.js';
-import type { Page } from '../types/Page.js';
+import { Devvit, useState, useInterval } from '@devvit/public-api';
+import Settings from '../../settings.json';
+import { splitArray } from '../../utils/splitArray.js';
+import { StyledButton } from '../../components/StyledButton.js';
+import { PixelText } from '../../components/PixelText.js';
+import { PixelSymbol } from '../../components/PixelSymbol.js';
+import { Shadow } from '../../components/Shadow.js';
+import { blankCanvas } from '../../utils/blankCanvas.js';
 
-interface EditorPageProps {
+interface DrawTabEditorStepProps {
   word: string;
-  setPage: (page: Page) => void;
-  data: number[];
-  setData: (data: number[]) => void;
-  drawingCountdown: number;
-  cancelDrawingTimer: () => void;
-  fallbackTimerUpdate: () => void;
+  onNext: (drawing: number[]) => void;
 }
 
-export const EditorPage = (props: EditorPageProps): JSX.Element => {
-  const {
-    word,
-    setPage,
-    data,
-    setData,
-    drawingCountdown,
-    cancelDrawingTimer,
-    fallbackTimerUpdate,
-  } = props;
+export const DrawTabEditorStep = (props: DrawTabEditorStepProps): JSX.Element => {
   const [currentColor, setCurrentColor] = useState<number>(1);
+  const [drawingData, setDrawingData] = useState<number[]>(blankCanvas);
+
+  const [startTime] = useState(Date.now());
+  const [elapsedTime, setElapsedtime] = useState<number>(0);
+
+  useInterval(() => {
+    setElapsedtime(Date.now() - startTime);
+    const remainingTime = Settings.drawingDuration * 1000 - elapsedTime;
+    if (remainingTime <= 0) props.onNext(drawingData);
+  }, 200).start();
+
+  const secondsLeft = Math.round(Settings.drawingDuration - elapsedTime / 1000);
 
   const size = '275px';
   const innerSize = 275;
   const pixelSize: Devvit.Blocks.SizeString = `${innerSize / Settings.resolution}px`;
 
-  const pixels = data.map((pixel, index) => (
+  const pixels = drawingData.map((pixel, index) => (
     <hstack
       onPress={() => {
-        const newData = data;
+        const newData = drawingData;
         newData[index] = currentColor;
-        setData(newData);
-        fallbackTimerUpdate();
+        setDrawingData(newData);
       }}
       height={pixelSize}
       width={pixelSize}
@@ -68,7 +65,6 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
                 alignment="center middle"
                 onPress={() => {
                   setCurrentColor(i);
-                  fallbackTimerUpdate();
                 }}
               >
                 {currentColor === i && (
@@ -83,18 +79,18 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     </hstack>
   );
 
-  const drawingIsBlank = !data.some((value) => value !== -1);
+  const drawingIsBlank = !drawingData.some((value) => value !== -1);
 
   return (
     <vstack width="100%" height="100%" alignment="center top" padding="large">
       {/* Header */}
       <hstack width="100%" alignment="middle">
         <vstack alignment="top start">
-          <PixelText scale={3}>{word}</PixelText>
+          <PixelText scale={3}>{props.word}</PixelText>
           <spacer size="small" />
           <hstack alignment="middle" gap="small">
             <PixelSymbol type="clock" />
-            <PixelText>{drawingCountdown.toString()}</PixelText>
+            <PixelText>{secondsLeft.toString()}</PixelText>
             <PixelText>s left</PixelText>
           </hstack>
         </vstack>
@@ -105,8 +101,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
           width="80px"
           label="DONE"
           onPress={() => {
-            cancelDrawingTimer();
-            setPage('review');
+            props.onNext(drawingData);
           }}
         />
       </hstack>
@@ -121,7 +116,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
             width={size}
             url="grid-template.png"
           />
-          {drawingIsBlank && <PixelText color="#B2B2B2">Tap to draw</PixelText>}
+          {drawingIsBlank && <PixelText color={Settings.theme.weak}>Tap to draw</PixelText>}
           {grid}
         </zstack>
       </Shadow>

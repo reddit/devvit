@@ -4,8 +4,20 @@ export type PostData = {
   authorUsername: string;
   date: number;
   expired?: boolean;
-  published: boolean;
-  postId?: string;
-  solved?: boolean;
-  pointsEarnedByUser?: number;
+  postId: string;
+  count: {
+    players: number;
+    winners: number;
+    guesses: number;
+    words: number;
+  };
+  user: {
+    guesses: number;
+    solved: boolean;
+    points: number;
+  };
+  guesses: {
+    word: string;
+    count: number;
+  }[];
 };

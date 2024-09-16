@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+import Settings from '../settings.json';
 
 interface ShadowProps {
   height: Devvit.Blocks.SizeString;
@@ -14,10 +15,10 @@ export const Shadow = (props: ShadowProps): JSX.Element => {
     <zstack alignment="start top" onPress={onPress}>
       {/* Shadow */}
       <vstack width="100%" height="100%">
-        <spacer size="xsmall" />
+        <spacer height="4px" />
         <hstack width="100%" height="100%">
-          <spacer size="xsmall" />
-          <hstack height={height} width={width} backgroundColor="rgba(0,0,0,0.2)" />
+          <spacer width="4px" />
+          <hstack height={height} width={width} backgroundColor={Settings.theme.shadow} />
         </hstack>
       </vstack>
 

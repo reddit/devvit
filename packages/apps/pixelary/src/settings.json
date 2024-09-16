@@ -1,35 +1,11 @@
 {
     "resolution": 16,
     "postLiveSpan": 86400000,
-    "guesserPoints": 100,
-    "drawerPoints": 500,
-    "dailyDrawingsExpiration": 86400000,
-    "dailyDrawingsQuota": 3,
+    "pointsPerGuess": 1,
+    "maxPointsPerDrawing": 100,
     "feedbackDuration": 15,
     "cardDrawDuration": 10,
     "drawingDuration": 60,
-    "guesserPointMultiplier": [
-        {
-          "start": 0,
-          "end": 10800000,
-          "multiplier": 2
-        },
-        {
-          "start": 10800000,
-          "end": 21600000,
-          "multiplier": 1.5
-        },
-        {
-          "start": 21600000,
-          "end": 43200000,
-          "multiplier": 1
-        },
-        {
-          "start": 43200000,
-          "end": 86400000,
-          "multiplier": 0.75
-        }
-    ],
     "colors": [
       "#FFFFFF",
       "#000000",
@@ -39,5 +15,14 @@
       "#27AE60",
       "#2F80ED",
       "#9B51E0"
-  ]
+  ],
+  "theme": {
+    "primary": "#000000",
+    "secondary": "#07495F",
+    "tertiary": "#0E92BE",
+    "weak": "#B2B2B2",
+    "background": "#56CCF2",
+    "shadow": "rgba(0,0,0,0.2)",
+    "orangered": "#FF4500" 
+  }
 }

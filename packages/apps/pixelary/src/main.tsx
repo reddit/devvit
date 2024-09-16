@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { LoadingState } from './components/LoadingState.js';
-import { Pixelary } from './components/Pixelary.js';
+import { Router } from './posts/Router.js';
 import { Service } from './service/Service.js';
 import type { JobData } from './types/job-data.js';
 
@@ -14,7 +14,7 @@ Devvit.addCustomPostType({
   name: 'Pixelary',
   description: 'A pixel art drawing and guessing game',
   height: 'tall',
-  render: Pixelary,
+  render: Router,
 });
 
 // Install script
@@ -213,12 +213,7 @@ Devvit.addSchedulerJob<JobData>({
     const service = new Service(redis);
     const gameSettings = await service.getGameSettings();
     const currentSubreddit = await reddit.getCurrentSubreddit();
-
-    await service.storePostData({
-      postId,
-      expired: true,
-    });
-
+    await service.expirePost(postId);
     await reddit.setPostFlair({
       subredditName: currentSubreddit.name,
       postId: postId,
@@ -234,37 +229,19 @@ Devvit.addSchedulerJob<JobData>({
   },
 });
 
-// DEBUG ONLY
-const resetDailyDrawingsForm = Devvit.createForm(
-  {
-    fields: [{ name: 'username', label: 'Username?', type: 'string' }],
-    title: 'Reset daily drawings for user',
-    description:
-      'This will reset the daily drawings quota for the user. But will it not affect any of their existing drawings.',
-    acceptLabel: 'Reset',
-  },
-  async (event, context) => {
-    const { redis, ui } = context;
-    const username = event.values.username?.trim();
-
-    if (!username) {
-      throw new Error(`Cannot reset daily drawling for user because no username given`);
-    }
-
-    const service = new Service(redis);
-    const key = service.getDailyDrawingsKey(username);
-    await redis.del(key);
-    ui.showToast('Reset daily drawings!');
-  }
-);
-
 Devvit.addMenuItem({
-  label: '[Pixelary] Reset daily drawings',
+  label: '[Pixelary] Clear my history',
   location: 'subreddit',
-  forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { ui } = context;
-    ui.showForm(resetDailyDrawingsForm);
+    const user = await context.reddit.getCurrentUser();
+    if (!user) {
+      context.ui.showToast('Username not found');
+      return;
+    }
+    const service = new Service(context.redis);
+    const key = service.getMyDrawingsKey(user.username);
+    await context.redis.del(key);
+    context.ui.showToast('Cleared');
   },
 });
 
