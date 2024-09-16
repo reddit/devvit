@@ -77,7 +77,7 @@ export class Service {
         ),
     ]);
 
-    return wordGuesses === 1;
+    return correctGuess && wordGuesses === 1;
   }
 
   // Saving score board events
