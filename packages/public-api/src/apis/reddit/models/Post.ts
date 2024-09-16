@@ -21,10 +21,7 @@ import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
-import {
-  richTextToTextFallbackString,
-  textToTextFallbackString,
-} from '../helpers/textFallbackToRichtext.js';
+import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
 
 export type GetPostsOptions = ListingFetchOptions & {
   subredditName?: string;
@@ -177,10 +174,14 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
 
 export type SubmitSelfPostOptions = PostTextOptions & CommonSubmitPostOptions;
 
-export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
-  preview: JSX.Element;
+export type SubmitCustomPostTextFallbackOptions = {
   textFallback?: CustomPostTextFallbackOptions;
 };
+
+export type SubmitCustomPostOptions = CommonSubmitPostOptions &
+  SubmitCustomPostTextFallbackOptions & {
+    preview: JSX.Element;
+  };
 
 export type CommonSubmitPostOptions = {
   title: string;
@@ -779,6 +780,19 @@ export class Post {
     this.#edited = newPost.edited;
   }
 
+  async setTextFallback(options: SubmitCustomPostTextFallbackOptions): Promise<void> {
+    const newPost = await Post.setTextFallback(
+      {
+        id: this.id,
+        ...options,
+      },
+      this.#metadata
+    );
+
+    this.#body = newPost.body;
+    this.#edited = newPost.edited;
+  }
+
   async addComment(options: CommentSubmissionOptions): Promise<Comment> {
     return Comment.submit(
       {
@@ -952,15 +966,7 @@ export class Post {
       const encodedCached = Block.encode(previewBlock).finish();
 
       const { textFallback, ...sanitizedOptions } = options;
-
-      let richtextFallback = '';
-      if (textFallback) {
-        if ('text' in textFallback) {
-          richtextFallback = textToTextFallbackString(textFallback.text);
-        } else if ('richtext' in textFallback) {
-          richtextFallback = richTextToTextFallbackString(textFallback.richtext);
-        }
-      }
+      const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
 
       const submitRequest: SubmitRequest = {
         kind: 'custom',
@@ -1054,6 +1060,34 @@ export class Post {
     // The LinksAndComments.EditUserText response is wrong and assumes that
     // the API is only used to for comments so we fetch the new post here.
     return Post.getById(id, metadata);
+  }
+
+  /** @internal */
+  static async setTextFallback(
+    options: SubmitCustomPostTextFallbackOptions & { id: T3ID },
+    metadata: Metadata | undefined
+  ): Promise<Post> {
+    if (!options.textFallback) {
+      throw new Error(`No text fallback provided for post ${options.id}.`);
+    }
+
+    const client = Devvit.redditAPIPlugins.LinksAndComments;
+
+    const richtextFallback = getCustomPostRichTextFallback(options.textFallback);
+
+    const response = await client.EditCustomPost(
+      {
+        thingId: options.id,
+        richtextFallback,
+      },
+      metadata
+    );
+
+    if (response.json?.errors?.length) {
+      throw new Error('Failed to set post text fallback');
+    }
+
+    return Post.getById(options.id, metadata);
   }
 
   /** @internal */
