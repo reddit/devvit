@@ -316,7 +316,7 @@ export class Devvit extends Actor {
    *     label: 'Default city to show the weather for by default',
    *     scope: SettingScope.Installation,
    *     onValidate: ({ value }) => {
-   *       if (isValidCity(value)) {
+   *       if (!isValidCity(value)) {
    *         return 'You must ender a valid city: ${validCities.join(", ")}';
    *       }
    *     }
@@ -327,7 +327,7 @@ export class Devvit extends Actor {
    *     label: 'The number of days to show for forecast for by default',
    *     scope: SettingScope.Installation,
    *     onValidate: ({ value }) => {
-   *       if (value < 10 || value < 1) {
+   *       if (value > 10 || value < 1) {
    *         return 'Forecast window must be from 1 to 10 days';
    *       }
    *     }

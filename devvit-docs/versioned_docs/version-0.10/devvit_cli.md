@@ -67,7 +67,7 @@ Install an app or experience from the Apps directory to a subreddit that you mod
 #### Usage
 
 ```bash
-$ devvit install <subreddit> [app-name][version]
+$ devvit install <subreddit> [app-name]@[version]
 ```
 
 #### Required Arguments

@@ -1,6 +1,6 @@
 # Reddit Developer Funds
 
-[Sign up today!](https://forms.gle/u3txmj1G78kD9mG27) Reddit Developer Funds is a rewards program for adventurous devs who build successful [experiences](https://developers.reddit.com/docs/experiences) and mod tools on Reddit.
+[Sign up when you create an account!](https://developers.reddit.com/create-account) Reddit Developer Funds is a rewards program for adventurous devs who build successful [experiences](https://developers.reddit.com/docs/experiences) and mod tools on Reddit.
 
 ## What we’re looking for
 
@@ -48,7 +48,7 @@ The “Qualified Install” threshold is met when your app exceeds the threshold
   - You are welcome to use elements from example code or templates as a starting point for your project, as well as tools from [Devvit Kit](https://github.com/reddit/devvit-kit)
 - Apps must be on the latest version of Devvit
 
-To be eligible for the program please sign up using [this form](https://forms.gle/u3txmj1G78kD9mG27). You must have a verified reddit email in order to receive onboarding instructions.
+To be eligible for the program please sign up by [creating a developer account](https://developers.reddit.com/create-account). You must have a verified reddit email in order to receive onboarding instructions.
 
 ## Tracking
 
