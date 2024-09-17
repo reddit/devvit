@@ -379,6 +379,11 @@
     "width": 5,
     "height": 7
   },
+  "'": {
+    "path": "M3 0H1V2H0V3H2V2H3V0Z",
+    "width": 3,
+    "height": 7
+  },
   "arrow-left": {
     "path": "M4 1H2V2H1V3H0V4H1V5H2V6H4V5H3V4H6V3H3V2H4V1Z",
     "width": 6,

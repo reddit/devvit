@@ -105,12 +105,23 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
   return (
     <vstack width="100%" height="100%" alignment="center">
       <spacer height="24px" />
-      <PixelText scale={3}>Well done!</PixelText>
-      <spacer height="4px" />
-      <PixelText scale={3}>Share drawing?</PixelText>
-      <spacer height="24px" />
-      <Drawing data={props.drawing} />
 
+      {/* Title */}
+      <PixelText scale={3}>That's a wrap!</PixelText>
+      <spacer height="24px" />
+
+      {/* Drawing */}
+      <Drawing size={256} data={props.drawing} />
+      <spacer height="24px" />
+
+      {/* Body copy */}
+      <vstack alignment="center">
+        <PixelText color={Settings.theme.secondary}>Post your drawing</PixelText>
+        <spacer height="4px" />
+        <PixelText color={Settings.theme.secondary}>and earn points for</PixelText>
+        <spacer height="4px" />
+        <PixelText color={Settings.theme.secondary}>every correct guess!</PixelText>
+      </vstack>
       <spacer grow />
 
       {/* Footer */}
@@ -122,7 +133,7 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
           onPress={() => context.ui.showForm(cancelConfirmationForm)}
         />
         <spacer size="small" />
-        <StyledButton width="138px" label="SHARE" onPress={submitDrawingHandler} />
+        <StyledButton width="138px" label="POST" onPress={submitDrawingHandler} />
       </hstack>
 
       <spacer height="24px" />
