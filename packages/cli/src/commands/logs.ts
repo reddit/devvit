@@ -1,13 +1,13 @@
 import {
-  RemoteLogQuery,
-  RemoteLogSubredditAppNameFilter,
-  RemoteLogType,
-  Severity,
-} from '@devvit/protos';
-import {
   GetByAppNameAndInstallLocationRequest,
   InstallationType,
 } from '@devvit/protos/community.js';
+import { Severity } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
+import {
+  RemoteLogQuery,
+  RemoteLogSubredditAppNameFilter,
+  RemoteLogType,
+} from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import { Args, Flags } from '@oclif/core';
 import { sub } from 'date-fns';
 import type { Subscription } from 'rxjs';

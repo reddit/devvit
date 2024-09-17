@@ -1,19 +1,22 @@
-import type { Bundle, PaymentsConfig } from '@devvit/protos';
 import {
   Currency,
   Environment,
   PaymentProcessorDefinition,
   PaymentsServiceDefinition,
 } from '@devvit/protos/payments.js';
+import type {
+  Bundle,
+  PaymentsConfig,
+} from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/index.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
-import { access, readFile } from 'node:fs/promises';
-import path from 'node:path';
-import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { imageSize } from 'image-size';
 import type { ISizeCalculationResult } from 'image-size/dist/types/interface.js';
+import { access, readFile } from 'node:fs/promises';
+import path from 'node:path';
 
 /**
  * reads src/products.json and injects products into bundle. Will throw an error if
