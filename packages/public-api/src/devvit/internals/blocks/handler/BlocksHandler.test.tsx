@@ -293,7 +293,7 @@ describe('BlocksHandler', () => {
       await expect(() =>
         handler.handle(EmptyRequest, mockMetadata)
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: Components (found: AsyncChild) cannot be async. To use data from an async endpoint, please use "const [data] = context.useState(async () => {/** your async code */})".]`
+        `[Error: Components (found: AsyncChild) cannot be async. To use data from an async endpoint, please use "const [data] = useState(async () => {/** your async code */})".]`
       );
     });
   });

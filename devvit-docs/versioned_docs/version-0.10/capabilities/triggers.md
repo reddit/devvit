@@ -13,7 +13,7 @@ Setup triggers enable your app to automatically respond when a user is installin
 
 ## Event triggers
 
-Event triggers let your app automatically respond to a user’s action. For example, if you set the OnSubredditSubscribe trigger, the app will automatically respond when a user joins the community. These triggers are supported:
+Event triggers let your app automatically respond to a user’s action. For example, if you set the PostSubmit trigger, the app will automatically respond when a new post is made in the community. These triggers types are supported:
 
 - CommentCreate
 - CommentDelete
