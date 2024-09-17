@@ -90,11 +90,6 @@ maintain that lockfile internally, so you don't need to worry about it in this r
 - `yarn test` to test all packages and check their TypeScript types
 - `yarn lint` to lint all packages
 
-### Pre-commit linting
-
-The repo is set up to do some basic and global linting and formatting through `package.json`'s husky
-config. This is a good way to catch basic issues before you commit.
-
 ## Help
 
 Need help? Check out the [Devvit](https://www.reddit.com/r/devvit/) community on
