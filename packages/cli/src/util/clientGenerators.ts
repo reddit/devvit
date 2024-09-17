@@ -18,18 +18,17 @@ import {
   InstallationsClientJSON,
   WaitlistClientJSON,
 } from '@devvit/protos/community.js';
-import { Headers } from 'node-fetch';
+import type { DevPortalAppPublishRequestClient } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
+import { DevPortalAppPublishRequestClientJSON } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 import {
   HEADER_DEVVIT_CANARY,
   HEADER_DEVVIT_CLI,
   HEADER_USER_AGENT,
 } from '../constants/Headers.js';
+import { getAccessToken } from './auth.js';
 import { DEVVIT_GATEWAY_URL, DEVVIT_PORTAL_API } from './config.js';
 import { GrpcWebRpc } from './grpc-web-rpc.js';
 import { NodeFetchRPC } from './node-fetch-twirp-rpc.js';
-import { getAccessToken } from './auth.js';
-import type { DevPortalAppPublishRequestClient } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
-import { DevPortalAppPublishRequestClientJSON } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 
 const APP_PATH = 'app';
 const APP_VERSION_PATH = 'appVersion';

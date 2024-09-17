@@ -1,5 +1,4 @@
 import { NodeHttpTransport } from '@improbable-eng/grpc-web-node-http-transport';
-import type { Headers } from 'node-fetch';
 import { defer, mergeMap, Observable } from 'rxjs';
 
 // TODO: figure out why this import is so funky

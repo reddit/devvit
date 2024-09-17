@@ -67,7 +67,6 @@
     "listr": "0.14.3",
     "lookpath": "1.2.2",
     "mustache": "4.2.0",
-    "node-fetch": "3.3.0",
     "open": "10.1.0",
     "ps-node": "^0.1.6",
     "rxjs": "7.8.1",

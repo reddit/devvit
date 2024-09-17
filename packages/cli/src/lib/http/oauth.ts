@@ -1,6 +1,5 @@
 import { isObject } from '@devvit/shared-types/isObject.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
-import fetch, { FormData } from 'node-fetch';
 
 /** Reddit API (r2) OAuth 2 config. */
 export type R2OAuthConfig = {

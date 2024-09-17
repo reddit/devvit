@@ -1,6 +1,5 @@
 import type { Hook } from '@oclif/core';
 import { ux } from '@oclif/core';
-import fetch from 'node-fetch';
 import type { SemVer } from 'semver';
 import semver from 'semver';
 

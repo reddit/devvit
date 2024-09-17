@@ -6,7 +6,6 @@ import { map } from 'rxjs';
 import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
 import type { Disposable } from '@devvit/shared-types/Disposable.js';
 import inquirer from 'inquirer';
-import fetch, { FormData } from 'node-fetch';
 import crypto from 'node:crypto';
 import querystring from 'node:querystring';
 import { readLine } from '../../util/input-util.js';

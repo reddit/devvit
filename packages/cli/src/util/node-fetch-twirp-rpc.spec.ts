@@ -1,4 +1,3 @@
-import { Response } from 'node-fetch';
 import type { TwirpError } from 'twirp-ts';
 import { vi } from 'vitest';
 import { StoredToken } from '../lib/auth/StoredToken.js';
@@ -7,6 +6,11 @@ import { ContentType, NodeFetchRPC } from './node-fetch-twirp-rpc.js';
 const { mockFetch } = vi.hoisted(() => {
   return { mockFetch: vi.fn(), Headers: vi.fn() };
 });
+
+beforeEach(() => {
+  globalThis.fetch = mockFetch;
+});
+
 vi.mock('node-fetch', async (importOriginal) => {
   const mod = await importOriginal<object>();
   return {

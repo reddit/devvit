@@ -1,5 +1,3 @@
-import type { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
-import fetch, { Headers } from 'node-fetch';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts/build/twirp/errors.js';
 import type { StoredToken } from '../lib/auth/StoredToken.js';
 
