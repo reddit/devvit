@@ -780,14 +780,8 @@ export class Post {
     this.#edited = newPost.edited;
   }
 
-  async setTextFallback(options: SubmitCustomPostTextFallbackOptions): Promise<void> {
-    const newPost = await Post.setTextFallback(
-      {
-        id: this.id,
-        ...options,
-      },
-      this.#metadata
-    );
+  async setTextFallback(options: CustomPostTextFallbackOptions): Promise<void> {
+    const newPost = await Post.setTextFallback(options, this.id, this.#metadata);
 
     this.#body = newPost.body;
     this.#edited = newPost.edited;
@@ -1064,20 +1058,21 @@ export class Post {
 
   /** @internal */
   static async setTextFallback(
-    options: SubmitCustomPostTextFallbackOptions & { id: T3ID },
+    options: CustomPostTextFallbackOptions,
+    postId: T3ID,
     metadata: Metadata | undefined
   ): Promise<Post> {
-    if (!options.textFallback) {
-      throw new Error(`No text fallback provided for post ${options.id}.`);
+    if (!('text' in options) && !('richtext' in options)) {
+      throw new Error(`No text fallback provided for post ${postId}.`);
     }
 
     const client = Devvit.redditAPIPlugins.LinksAndComments;
 
-    const richtextFallback = getCustomPostRichTextFallback(options.textFallback);
+    const richtextFallback = getCustomPostRichTextFallback(options);
 
     const response = await client.EditCustomPost(
       {
-        thingId: options.id,
+        thingId: postId,
         richtextFallback,
       },
       metadata
@@ -1087,7 +1082,7 @@ export class Post {
       throw new Error('Failed to set post text fallback');
     }
 
-    return Post.getById(options.id, metadata);
+    return Post.getById(postId, metadata);
   }
 
   /** @internal */

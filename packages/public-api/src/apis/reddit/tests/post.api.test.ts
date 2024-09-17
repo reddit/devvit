@@ -240,6 +240,27 @@ describe('Post API', () => {
     });
 
     describe('setTextFallback()', () => {
+      test('throws error if no fallback was set', async () => {
+        const { metadata } = createTestRedditApiClient();
+        const selftext =
+          '# DX_Bundle:\n\n    Gm9jYzZhYTIyMC0xNmQ1LTQyYzgtOWQwNS0zNmNiNzI3YzAxNjMudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYitQQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErABCjdkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC5SZW5kZXJQb3N0EgpSZW5kZXJQb3N0KjNkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlcXVlc3QyNGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5SZW5kZXJQb3N0UmVzcG9uc2USoAEKPmRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0LlJlbmRlclBvc3RDb250ZW50EhFSZW5kZXJQb3N0Q29udGVudCokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlEqIBCj9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC5SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuEBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpQEKNWRldnZpdC51aS5ldmVudHMudjFhbHBoYS5VSUV2ZW50SGFuZGxlci5IYW5kbGVVSUV2ZW50Eg1IYW5kbGVVSUV2ZW50Ki1kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlcXVlc3QyLmRldnZpdC51aS5ldmVudHMudjFhbHBoYS5IYW5kbGVVSUV2ZW50UmVzcG9uc2UaDlVJRXZlbnRIYW5kbGVyMoEBEg8KBG5vZGUSBzE4LjE5LjESNAoOQGRldnZpdC9wcm90b3MSIjAuMTEuMC1uZXh0LTIwMjQtMDctMTEtZTlmNGJiOWY2LjASOAoSQGRldnZpdC9wdWJsaWMtYXBpEiIwLjExLjAtbmV4dC0yMDI0LTA3LTExLWU5ZjRiYjlmNi4w\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkkKRwpCCAEqFhIJCgcNAACQQxABGgkKBw0AAKBDEAEaJhIkCAISGggCGhYaFAoQQSBjdXN0b20gcG9zdCEhIVgBIgQIARABEMAC';
+        const mockedPost = new Post({ ...defaultPostData, selftext }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.LinksAndComments, 'EditCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { things: [{ kind: 'post' }] }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        try {
+          // @ts-expect-error
+          await mockedPost.setTextFallback({ otherParam: '' });
+        } catch (testError: unknown) {
+          expect(testError).toBeDefined();
+        }
+      });
+
       test('sets plain text as the richtext fallback', async () => {
         const { metadata } = createTestRedditApiClient();
         const selftext =
@@ -253,9 +274,7 @@ describe('Post API', () => {
 
         vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
 
-        await mockedPost.setTextFallback({
-          textFallback: { text: 'This is a post with text as a fallback' },
-        });
+        await mockedPost.setTextFallback({ text: 'This is a post with text as a fallback' });
 
         expect(spyPlugin).toHaveBeenCalledWith(
           {
@@ -289,9 +308,7 @@ describe('Post API', () => {
           )
           .build();
 
-        await mockedPost.setTextFallback({
-          textFallback: { richtext: textFallbackRichtext },
-        });
+        await mockedPost.setTextFallback({ richtext: textFallbackRichtext });
 
         expect(spyPlugin).toHaveBeenCalledWith(
           {
