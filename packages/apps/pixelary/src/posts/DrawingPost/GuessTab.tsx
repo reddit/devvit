@@ -7,6 +7,7 @@ import { StyledButton } from '../../components/StyledButton.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PointsToast } from '../../components/PointsToast.js';
 import { Service } from '../../service/Service.js';
+import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 
 interface GuessTabProps {
   data: {
@@ -98,6 +99,7 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
     }
   );
 
+  const isAuthor = props.data.username === props.data.postData.authorUsername;
   const isSolvedByUser = props.data.postData.user.solved;
   const playerCount = props.data.postData.count.players;
   const winnerCount = props.data.postData.count.winners;
@@ -123,7 +125,7 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
       <spacer height="20px" />
       <PixelText
         color={Settings.theme.primary}
-      >{`${playerCount} player${playerCount === 1 ? '' : 's'} tried`}</PixelText>
+      >{`${abbreviateNumber(playerCount)} player${playerCount === 1 ? '' : 's'} tried`}</PixelText>
       <spacer height="4px" />
       <PixelText color={Settings.theme.secondary}>{`${winPercentage}% got it right`}</PixelText>
       <spacer grow />
@@ -136,11 +138,89 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
     </vstack>
   );
 
+  const rowCount = 6;
+  const rowHeight = `${100 / rowCount}%`;
+  const topGuesses = props.data.postData.guesses
+    .sort((a, b) => b.count - a.count)
+    .slice(0, rowCount)
+    .map((guess) => {
+      const percentage = Math.round((guess.count / props.data.postData.count.guesses) * 100);
+      return (
+        <zstack
+          height={rowHeight}
+          width="100%"
+          alignment="top start"
+          backgroundColor="rgba(255, 255, 255, 0.2)"
+        >
+          {/* Progress Bar */}
+          <hstack width={`${percentage}%`} height="100%" backgroundColor="white" />
+          {/* Guess */}
+          <hstack height="100%" width="100%" alignment="start middle">
+            <spacer width="12px" />
+            <PixelText scale={2}>
+              {guess.word.charAt(0).toUpperCase() + guess.word.slice(1)}
+            </PixelText>
+          </hstack>
+          {/* Metadata */}
+          <hstack height="100%" width="100%" alignment="end middle">
+            <PixelText scale={1.5} color={Settings.theme.secondary}>
+              {guess.count.toString()}
+            </PixelText>
+            <spacer width="12px" />
+            <PixelText scale={1.5} color={Settings.theme.primary}>
+              {`${percentage}%`}
+            </PixelText>
+            <spacer width="12px" />
+          </hstack>
+        </zstack>
+      );
+    });
+
+  const placeholderRows = Array.from({ length: rowCount - topGuesses.length }).map(
+    (_value, _index) => (
+      <zstack height={rowHeight} width="100%" backgroundColor="rgba(255, 255, 255, 0.2)" />
+    )
+  );
+
   const resultsView = (
-    <vstack grow alignment="center middle">
-      <PixelText color={Settings.theme.secondary}>Results list</PixelText>
+    <vstack grow width="100%" alignment="center middle">
+      <spacer height="24px" />
+      {/* Header */}
+      <hstack gap="medium" alignment="center middle">
+        <Drawing size={64} data={props.data.postData.data} />
+        <vstack gap="small" alignment="start middle">
+          <PixelText scale={2}>{props.data.postData.word}</PixelText>
+          <PixelText scale={1.5} color={Settings.theme.secondary}>
+            {`By u/${props.data.postData.authorUsername}`}
+          </PixelText>
+        </vstack>
+      </hstack>
+      <spacer height="24px" />
+      {/* List */}
+      <hstack width="100%" grow>
+        <spacer width="24px" />
+        <vstack grow gap="small">
+          {topGuesses}
+          {placeholderRows}
+        </vstack>
+        <spacer width="24px" />
+      </hstack>
+      <spacer height="24px" />
+      {/* Metadata */}
+      <vstack alignment="center">
+        <PixelText
+          scale={1.5}
+          color={Settings.theme.secondary}
+        >{`${abbreviateNumber(playerCount)} player${playerCount === 1 ? '' : 's'} have`}</PixelText>
+        <spacer height="4px" />
+        <PixelText
+          scale={1.5}
+          color={Settings.theme.secondary}
+        >{`made ${abbreviateNumber(props.data.postData.count.guesses)} guess${props.data.postData.count.guesses === 1 ? '' : 'es'}`}</PixelText>
+      </vstack>
+      <spacer height="24px" />
     </vstack>
   );
 
-  return isSolvedByUser ? resultsView : guessView;
+  return isSolvedByUser || isAuthor ? resultsView : guessView;
 };

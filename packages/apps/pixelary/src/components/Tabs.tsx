@@ -1,5 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { PixelText } from './PixelText.js';
+import Settings from '../settings.json';
 
 interface TabsProps {
   children: JSX.Element[];
@@ -22,9 +23,15 @@ export const Tab = (props: TabProps): JSX.Element => {
       <spacer width="12px" />
       <vstack alignment="center">
         <spacer height="24px" />
-        <PixelText color={isActive ? '#000000' : '#07495F'}>{label}</PixelText>
+        <PixelText color={isActive ? Settings.theme.primary : Settings.theme.secondary}>
+          {label}
+        </PixelText>
         <spacer height="6px" />
-        <hstack height="2px" width="100%" backgroundColor={isActive ? '#000000' : 'transparent'} />
+        <hstack
+          height="2px"
+          width="100%"
+          backgroundColor={isActive ? Settings.theme.primary : 'transparent'}
+        />
       </vstack>
       <spacer width="12px" />
     </hstack>

@@ -95,8 +95,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
           postData,
         };
       } catch (error) {
-        console.error('Error loading initial data:', error);
-
         return defaultData;
       }
     },
