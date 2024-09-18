@@ -56,9 +56,9 @@ export default class UpdateApp extends ProjectCommand {
           ux.action.start(`Attempting to ${action.description}...`);
           await action.run(this);
           ux.action.stop(`done!\nPlease run ${chalkCommand} to install the updated dependencies.`);
-        } catch (e) {
+        } catch (err) {
           this.warn(`An error occurred while attempting to ${action.description}:`);
-          this.warn(e as Error);
+          this.warn(err as Error);
           this.warn(
             `You should manually check and verify that this update has been performed correctly.`
           );
@@ -231,11 +231,11 @@ export async function matchDevvitPackageVersions(
     const oldestVersion = await syncDevvitDependencies(devvitVersion, packageJsons, forceUpdate);
 
     return { success: true, oldestVersion: oldestVersion ?? semver.parse('0.0.0')! };
-  } catch (e) {
+  } catch (err) {
     if (forceUpdate) {
       return { success: true, oldestVersion: semver.parse('0.0.0')! };
     }
-    console.log('Could not determine @devvit library versions in package.json', e);
+    console.log('Could not determine @devvit library versions in package.json', err);
     return { success: false, oldestVersion: undefined };
   }
 }

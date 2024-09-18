@@ -255,8 +255,10 @@ export default class Playtest extends Upload {
             location: subreddit,
           })
         );
-      } catch {
-        this.error('There was an error installing your app. Please try again later.');
+      } catch (err: unknown) {
+        this.error(
+          `An error occurred while installing your app: ${StringUtil.caughtToString(err)}`
+        );
       }
     } else {
       ux.action.stop(`Found!`);
@@ -383,7 +385,7 @@ export default class Playtest extends Upload {
         // Don't log as error so we don't exit the process.
         this.log(chalk.red(`\n${err}\n`));
       } else {
-        this.error('An unknown error occurred when creating the app version.\n${err}');
+        this.error(`An unknown error occurred when creating the app version.\n${err}`);
       }
       this.#isOnWatchExecuting = false;
       return;

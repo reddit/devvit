@@ -212,7 +212,7 @@ export default class Upload extends ProjectCommand {
       if (err instanceof Error) {
         this.error(err);
       } else {
-        this.error('An unknown error occurred when creating the app version.\n${err}');
+        this.error(`An unknown error occurred when creating the app version.\n${err}`);
       }
     }
 
@@ -794,8 +794,8 @@ export default class Upload extends ProjectCommand {
           ] as [MediaSignatureWithContents, UploadNewMediaResponse];
         })
       );
-    } catch (e) {
-      const error = e as Error;
+    } catch (err) {
+      const error = err as Error;
       const msg = `Failed to upload ${webViewMsg}assets. (${error.message})`;
       if (webViewAsset) {
         // don't fail on webview uploads in case we just don't have the feature enabled

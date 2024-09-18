@@ -23,6 +23,7 @@ import {
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 export default class Install extends DevvitCommand {
   static override description =
@@ -124,8 +125,8 @@ export default class Install extends DevvitCommand {
           installationInfo.appVersion!
         ).toString()} ✅`
       );
-    } catch {
-      this.error('There was an error installing your app. Please try again later.');
+    } catch (err: unknown) {
+      this.error(`An error occurred while installing your app: ${StringUtil.caughtToString(err)}`);
     }
   }
 
@@ -144,13 +145,13 @@ export default class Install extends DevvitCommand {
           location: subreddit,
         })
       );
-    } catch (error) {
-      if (error instanceof TwirpError) {
-        if (error.code === 'not_found') {
+    } catch (err) {
+      if (err instanceof TwirpError) {
+        if (err.code === 'not_found') {
           this.error(`Community '${subreddit}' not found.`);
         }
       }
-      throw error;
+      throw err;
     }
 
     const fullInstallInfoList = await Promise.all(
