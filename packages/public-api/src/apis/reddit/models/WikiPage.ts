@@ -70,6 +70,7 @@ export class WikiPage {
   #name: string;
   #subredditName: string;
   #content: string;
+  #contentHtml: string;
   #revisionId: string;
   #revisionDate: Date;
   #revisionReason: string;
@@ -91,6 +92,7 @@ export class WikiPage {
     this.#name = name;
     this.#subredditName = subredditName;
     this.#content = data.contentMd;
+    this.#contentHtml = data.contentHtml;
     this.#revisionId = data.revisionId;
     this.#revisionDate = new Date(data.revisionDate);
     this.#revisionReason = data.reason ?? '';
@@ -116,6 +118,11 @@ export class WikiPage {
     return this.#content;
   }
 
+  /** The HTML content of the page. */
+  get contentHtml(): string {
+    return this.#contentHtml;
+  }
+
   /** The ID of the revision. */
   get revisionId(): string {
     return this.#revisionId;
@@ -138,7 +145,13 @@ export class WikiPage {
 
   toJSON(): Pick<
     WikiPage,
-    'name' | 'subredditName' | 'content' | 'revisionId' | 'revisionDate' | 'revisionReason'
+    | 'name'
+    | 'subredditName'
+    | 'content'
+    | 'contentHtml'
+    | 'revisionId'
+    | 'revisionDate'
+    | 'revisionReason'
   > & {
     revisionAuthor: ReturnType<User['toJSON']>;
   } {
@@ -146,6 +159,7 @@ export class WikiPage {
       name: this.#name,
       subredditName: this.#subredditName,
       content: this.#content,
+      contentHtml: this.#contentHtml,
       revisionId: this.#revisionId,
       revisionDate: this.#revisionDate,
       revisionReason: this.#revisionReason,
