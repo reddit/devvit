@@ -1,6 +1,7 @@
 import type { Metadata, ScheduledAction } from '@devvit/protos';
 import { SchedulerHandlerDefinition } from '@devvit/protos';
 import type { Config } from '@devvit/shared-types/Config.js';
+
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';

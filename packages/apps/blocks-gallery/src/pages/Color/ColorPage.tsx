@@ -1,12 +1,12 @@
 import { Devvit } from '@devvit/public-api';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 import type { CategoryProps, SharedCategoryPageProps } from '../../components/CategoryPage.js';
 import { CategoryPage } from '../../components/CategoryPage.js';
 import { Page } from '../page.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import { ColorSubcategoryPage } from './ColorSubcategoryPage.js';
 import { ColorPrimitivesPage } from './ColorPrimitivesPage.js';
 import { ColorSemanticPage } from './ColorSemanticPage.js';
+import { ColorSubcategoryPage } from './ColorSubcategoryPage.js';
 
 const hexCategories = [
   ['#RRGGBB', 'six'],

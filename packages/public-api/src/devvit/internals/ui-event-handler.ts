@@ -2,9 +2,11 @@ import type { HandleUIEventRequest, Metadata } from '@devvit/protos';
 import { EffectType, HandleUIEventResponse, UIEventHandlerDefinition } from '@devvit/protos';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
+import { Header } from '@devvit/shared-types/Header.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 import cloneDeep from 'clone-deep';
 import isEqual from 'lodash.isequal';
+
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';
 import { getFormValues } from '../../apis/ui/helpers/getFormValues.js';
@@ -13,7 +15,6 @@ import { BlocksReconciler } from './blocks/BlocksReconciler.js';
 import { getContextFromMetadata } from './context.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 import { getMenuItemById } from './menu-items.js';
-import { Header } from '@devvit/shared-types/Header.js';
 
 async function handleUIEvent(
   req: HandleUIEventRequest,

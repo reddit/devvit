@@ -1,4 +1,5 @@
 import type { Metadata } from '@devvit/protos';
+
 import type { BlocksReconciler } from '../devvit/internals/blocks/BlocksReconciler.js';
 import { makeUseChannelHook } from '../devvit/internals/blocks/useChannel.js';
 import { makeUseFormHook } from '../devvit/internals/blocks/useForm.js';

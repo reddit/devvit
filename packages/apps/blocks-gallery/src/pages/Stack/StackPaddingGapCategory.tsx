@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { CategoryPageState } from '../../components/CategoryPage.js';
 import { CategoryPage } from '../../components/CategoryPage.js';
 import { StackPaddingGapPreview } from './StackPaddingGapPreview.js';

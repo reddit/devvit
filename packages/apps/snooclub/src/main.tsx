@@ -1,6 +1,7 @@
 import { Devvit, useAsync, useChannel, useState } from '@devvit/public-api';
 import { ChannelStatus } from '@devvit/public-api/types/realtime.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
+
 import { ConnectionStatus } from './ui/connection-status.js';
 import { Dpad } from './ui/dpad.js';
 

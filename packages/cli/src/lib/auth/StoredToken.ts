@@ -1,5 +1,6 @@
 import { isObject } from '@devvit/shared-types/isObject.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+
 import type { R2OAuthGrant } from '../http/oauth.js';
 
 const TOKEN_FRESHNESS_BUFFER: number = 120_000; // 2 minutes

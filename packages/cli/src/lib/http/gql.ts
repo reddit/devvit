@@ -1,4 +1,5 @@
 import type { JSONObject } from '@devvit/shared-types/json.js';
+
 import { GQL_QUERY_URL } from '../../util/config.js';
 import type { StoredToken } from '../auth/StoredToken.js';
 import { MY_PORTAL_ENABLED } from '../config.js';

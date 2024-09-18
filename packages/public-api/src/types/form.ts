@@ -6,9 +6,10 @@ import type {
   FieldConfig_Selection_Item,
   FieldConfig_String,
 } from '@devvit/protos';
-import type { Prettify } from '@devvit/shared-types/Prettify.js';
 import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { Prettify } from '@devvit/shared-types/Prettify.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
+
 import type { Devvit } from '../devvit/Devvit.js';
 import type { FormToFormValues } from './index.js';
 

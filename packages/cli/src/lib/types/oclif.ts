@@ -12,6 +12,6 @@ export type CommandFlags<Cmd extends typeof Command> = {
   [Flag in keyof Cmd['flags']]: Cmd['flags'][Flag] extends BooleanFlag<boolean>
     ? boolean
     : Cmd['flags'][Flag] extends OptionFlag<infer T>
-    ? T
-    : unknown;
+      ? T
+      : unknown;
 };

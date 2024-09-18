@@ -1,9 +1,10 @@
 import type {
+  ConversationData as ProtosConversationData,
+  MessageData as ProtosMessageData,
   Metadata,
   ModActionData as ProtosModActionData,
-  MessageData as ProtosMessageData,
-  ConversationData as ProtosConversationData,
 } from '@devvit/protos';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 
 export type SubredditData = {

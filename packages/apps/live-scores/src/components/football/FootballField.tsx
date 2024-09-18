@@ -1,6 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { NFLGameScoreInfo } from '../../sports/sportradar/NFLBoxscore.js';
-import { GameEvent, leagueAssetPath } from '../../sports/GameEvent.js';
+
+import type { GameEvent } from '../../sports/GameEvent.js';
+import { leagueAssetPath } from '../../sports/GameEvent.js';
+import type { NFLGameScoreInfo } from '../../sports/sportradar/NFLBoxscore.js';
 
 enum PossessionSide {
   Left,
@@ -138,8 +140,8 @@ export function FootballField(props: FootballFieldProps): JSX.Element {
       ? PossessionSide.Right
       : PossessionSide.Left
     : isInOwnZone
-    ? PossessionSide.Left
-    : PossessionSide.Right;
+      ? PossessionSide.Left
+      : PossessionSide.Right;
 
   const ballLocation = situation.location.yardline;
 

@@ -1,10 +1,10 @@
 import { Devvit } from '@devvit/public-api';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 import type { CategoryProps, SharedCategoryPageProps } from '../../components/CategoryPage.js';
 import { CategoryPage } from '../../components/CategoryPage.js';
 import { Page } from '../page.js';
 import { IconsCategory } from './IconsCategory.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { IconSizeCategory } from './IconSizeCategory.js';
 
 export const IconPage = ({ state }: SharedCategoryPageProps): JSX.Element => {

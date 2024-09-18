@@ -1,5 +1,6 @@
 import type { IntervalDetails, UIEvent } from '@devvit/protos';
 import { EffectType } from '@devvit/protos';
+
 import type { UseIntervalResult } from '../../../../types/hooks.js';
 import { registerHook } from './BlocksHandler.js';
 import { RenderContext } from './RenderContext.js';

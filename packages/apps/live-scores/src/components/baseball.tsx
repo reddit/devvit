@@ -1,9 +1,12 @@
 import { Devvit } from '@devvit/public-api';
-import { BaseballGameScoreInfo, InningState } from '../sports/espn/espn.js';
+
+import type { BaseballGameScoreInfo } from '../sports/espn/espn.js';
+import { InningState } from '../sports/espn/espn.js';
+import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
+import type { CommentData } from './comments.js';
+import { CommentBlock } from './comments.js';
 import { TeamBlock } from './TeamBlock.js';
 import { TopBar } from './TopBar.js';
-import { CommentData, CommentBlock } from './comments.js';
-import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
 
 export type TeamBlockBaseball = {
   isPitching: boolean;
@@ -55,10 +58,10 @@ export function BaseballScoreBoard(
                   scoreInfo.inningState === InningState.TOP
                     ? scoreInfo.batter
                     : scoreInfo.inningState === InningState.MID
-                    ? ''
-                    : scoreInfo.inningState === InningState.END
-                    ? scoreInfo.dueUp
-                    : scoreInfo.pitcher,
+                      ? ''
+                      : scoreInfo.inningState === InningState.END
+                        ? scoreInfo.dueUp
+                        : scoreInfo.pitcher,
                 isDueUp: scoreInfo.inningState === InningState.END,
               },
             })}
@@ -81,10 +84,10 @@ export function BaseballScoreBoard(
                   scoreInfo.inningState === InningState.TOP
                     ? scoreInfo.pitcher
                     : scoreInfo.inningState === InningState.MID
-                    ? scoreInfo.dueUp
-                    : scoreInfo.inningState === InningState.END
-                    ? ''
-                    : scoreInfo.batter,
+                      ? scoreInfo.dueUp
+                      : scoreInfo.inningState === InningState.END
+                        ? ''
+                        : scoreInfo.batter,
                 isDueUp: scoreInfo.inningState === InningState.MID,
               },
             })}

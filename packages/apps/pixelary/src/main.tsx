@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { LoadingState } from './components/LoadingState.js';
 import { Router } from './posts/Router.js';
 import { Service } from './service/Service.js';

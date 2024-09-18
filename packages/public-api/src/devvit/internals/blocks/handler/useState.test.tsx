@@ -1,6 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 import { describe, expect, test } from 'vitest';
+
 import type { UseStateResult } from '../../../../index.js';
 import { Devvit } from '../../../Devvit.js';
 import { BlocksHandler } from './BlocksHandler.js';

@@ -1,5 +1,6 @@
 import inquirer from 'inquirer';
 import open from 'open';
+
 import { localCodeServer } from '../lib/auth/local-code-server.js';
 import { DEVVIT_PORTAL_URL } from './config.js';
 import { readLine } from './input-util.js';

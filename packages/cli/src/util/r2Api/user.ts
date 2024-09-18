@@ -1,6 +1,7 @@
 import { Result } from '@devvit/shared-types/Result.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { asT2ID } from '@devvit/shared-types/tid.js';
+
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import type { JSONObject } from '../../vendor/@reddit/json-config/0.4.2/index.js';
 import { authHeaders } from '../auth.js';

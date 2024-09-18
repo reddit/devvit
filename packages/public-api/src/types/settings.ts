@@ -1,3 +1,6 @@
+import type { Prettify } from '@devvit/shared-types/Prettify.js';
+
+import type { Devvit } from '../devvit/Devvit.js';
 import type {
   BooleanField,
   FormFieldGroup,
@@ -6,8 +9,6 @@ import type {
   SelectField,
   StringField,
 } from './form.js';
-import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { Devvit } from '../devvit/Devvit.js';
 
 export type SettingsFormFieldValidatorEvent<ValueType> = {
   value: ValueType | undefined;

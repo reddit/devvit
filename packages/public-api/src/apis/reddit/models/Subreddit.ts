@@ -1,7 +1,7 @@
 import type {
   AboutLocationRequest,
-  Metadata,
   Listing as ProtoListing,
+  Metadata,
   SubredditAboutResponse_AboutData,
   WrappedRedditObject,
 } from '@devvit/protos';
@@ -10,7 +10,9 @@ import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
 import type { T5ID } from '@devvit/shared-types/tid.js';
 import { asT5ID } from '@devvit/shared-types/tid.js';
+
 import { Devvit } from '../../../devvit/Devvit.js';
+import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { Comment } from './Comment.js';
 import type {
@@ -18,12 +20,12 @@ import type {
   GetUserFlairBySubredditResponse,
   UserFlairPageOptions,
 } from './Flair.js';
-import { Flair, FlairTemplate, convertUserFlairProtoToAPI } from './Flair.js';
+import { convertUserFlairProtoToAPI, Flair, FlairTemplate } from './Flair.js';
 import type { ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import type {
-  ModAction,
   GetModerationLogOptions as _GetModerationLogOptions,
+  ModAction,
 } from './ModAction.js';
 import { getModerationLog } from './ModAction.js';
 import type {
@@ -39,7 +41,6 @@ import type {
   ModeratorPermission,
 } from './User.js';
 import { User } from './User.js';
-import { GraphQL } from '../graphql/GraphQL.js';
 
 type GetModerationLogOptions = Omit<_GetModerationLogOptions, 'subredditName'>;
 type GetUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'subredditName' | 'type'>;

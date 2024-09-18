@@ -1,6 +1,7 @@
 import type { Metadata, ValidateFormRequest, ValidateFormResponse } from '@devvit/protos';
 import { GetFieldsResponse, InstallationSettingsDefinition } from '@devvit/protos';
 import type { Config } from '@devvit/shared-types/Config.js';
+
 import { transformFormFields } from '../../apis/ui/helpers/transformForm.js';
 import { Devvit } from '../Devvit.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';

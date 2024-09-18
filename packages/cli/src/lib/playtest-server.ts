@@ -2,6 +2,7 @@ import type { PlaytestSubscriberMessage } from '@devvit/protos/types/devvit/cli/
 import { PlaytestProviderMessage } from '@devvit/protos/types/devvit/cli/playtest.js';
 import type { ErrorEvent, MessageEvent, VerifyClientCallbackSync, WebSocket } from 'ws';
 import { WebSocketServer } from 'ws';
+
 import type { AppLogConfig } from '../util/app-logs/app-log-util.js';
 import { formatAppLogDivider, formatAppLogMessage } from '../util/app-logs/app-log-util.js';
 

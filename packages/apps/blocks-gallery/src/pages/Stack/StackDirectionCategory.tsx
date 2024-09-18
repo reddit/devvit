@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
 
-import { Tile } from '../../components/Tile.js';
 import { Box } from '../../components/Box.js';
 import { Columns } from '../../components/Columns.js';
+import { Tile } from '../../components/Tile.js';
 
 const boxesPerLine: number = 3;
 const boxes: JSX.Element[] = new Array(boxesPerLine).fill(<Box color="rgba(0, 69, 172, 0.5)" />);

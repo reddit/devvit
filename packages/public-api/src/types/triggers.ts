@@ -1,4 +1,5 @@
 import type * as protos from '@devvit/protos';
+
 import type { Devvit } from '../devvit/Devvit.js';
 
 /** The event name for when a post is submitted */

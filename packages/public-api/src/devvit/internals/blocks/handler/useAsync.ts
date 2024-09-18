@@ -1,13 +1,13 @@
-import type { JSONValue } from '@devvit/shared-types/json.js';
-import type { AsyncUseStateInitializer, UseAsyncResult } from '../../../../types/hooks.js';
-
 import type { AsyncResponse, UIEvent } from '@devvit/protos';
 import { CIRCUIT_BREAKER_MSG } from '@devvit/shared-types/CircuitBreaker.js';
+import type { JSONValue } from '@devvit/shared-types/json.js';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import isEqual from 'lodash.isequal';
+
+import type { AsyncUseStateInitializer, UseAsyncResult } from '../../../../types/hooks.js';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 export type AsyncOptions = {
   /**

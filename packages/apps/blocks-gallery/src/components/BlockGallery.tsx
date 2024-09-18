@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-import type { SharedCategoryPageProps } from '../components/CategoryPage.js';
 
+import type { SharedCategoryPageProps } from '../components/CategoryPage.js';
 import {
   ButtonPage,
   ColorPage,
@@ -10,8 +10,8 @@ import {
   Page,
   SizePage,
   SpacerPage,
-  StacksPage,
   StackPaddingGapPage,
+  StacksPage,
   TextPage,
 } from '../pages/index.js';
 import type { GalleryState } from '../state/state.js';

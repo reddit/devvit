@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { Bar } from '../../components/Bar.js';
 import { Tile } from '../../components/Tile.js';
 

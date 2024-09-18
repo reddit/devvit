@@ -1,8 +1,9 @@
 /* eslint-disable sonarjs/no-identical-functions */
 import { describe, expect, test } from 'vitest';
+
+import type { RedisClient, SetOptions } from '../../types/redis.js';
 import type { CacheHelper } from './cache.js';
 import { makeCache } from './cache.js';
-import type { RedisClient, SetOptions } from '../../types/redis.js';
 import type { CacheEntry, LocalCache } from './promise_cache.js';
 import {
   _lock,

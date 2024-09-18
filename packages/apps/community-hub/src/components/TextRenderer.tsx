@@ -1,5 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import type { z } from 'zod';
+
 import type { richTextBody } from '../api/Schema.js';
 
 export const TextRenderer = ({ body }: { body: z.infer<typeof richTextBody> }): JSX.Element => {

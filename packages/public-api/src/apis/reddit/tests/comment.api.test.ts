@@ -1,10 +1,11 @@
-import type { Metadata, JsonWrappedComment } from '@devvit/protos';
+import type { JsonWrappedComment, Metadata } from '@devvit/protos';
+import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
+
 import { Devvit } from '../../../devvit/Devvit.js';
+import { Comment } from '../models/Comment.js';
 import type { RedditAPIClient } from '../RedditAPIClient.js';
 import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
-import { Comment } from '../models/Comment.js';
-import { Header } from '@devvit/shared-types/Header.js';
 
 describe('Commment API', () => {
   let api: { reddit: RedditAPIClient; metadata: Metadata };

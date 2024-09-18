@@ -1,15 +1,15 @@
 import { Devvit } from '@devvit/public-api';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
-import { ButtonAppearanceCategory } from './ButtonAppearanceCategory.js';
-import { ButtonSizeCategory } from './ButtonSizeCategory.js';
-import { ButtonContentCategory } from './ButtonContentCategory.js';
-import { ButtonGrowCategory } from './ButtonGrowCategory.js';
-import { ButtonDisabledCategory } from './ButtonDisabledCategory.js';
-import type { SharedCategoryPageProps, CategoryProps } from '../../components/CategoryPage.js';
+import type { CategoryProps, SharedCategoryPageProps } from '../../components/CategoryPage.js';
 import { CategoryPage } from '../../components/CategoryPage.js';
 import { Page } from '../page.js';
+import { ButtonAppearanceCategory } from './ButtonAppearanceCategory.js';
+import { ButtonContentCategory } from './ButtonContentCategory.js';
+import { ButtonDisabledCategory } from './ButtonDisabledCategory.js';
+import { ButtonGrowCategory } from './ButtonGrowCategory.js';
 import { ButtonIconCategory } from './ButtonIconCategory.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { ButtonSizeCategory } from './ButtonSizeCategory.js';
 
 export const ButtonPage = ({ state }: SharedCategoryPageProps): JSX.Element => {
   const categories: CategoryProps[] = [

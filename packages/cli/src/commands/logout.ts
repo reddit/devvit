@@ -1,5 +1,5 @@
-import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { getAccessToken, getOAuthSvc } from '../util/auth.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 
 export default class Logout extends DevvitCommand {
   static override description = 'Log out of Devvit via reddit.com';

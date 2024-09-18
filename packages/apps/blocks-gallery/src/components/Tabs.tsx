@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 
-type TabsProps = { tabs: TabProps[]; backIcon: JSX.Element; forwardIcon: JSX.Element  };
+type TabsProps = { tabs: TabProps[]; backIcon: JSX.Element; forwardIcon: JSX.Element };
 type TabProps = { label: string; isActive: boolean; onPress: () => void };
 
 const Tab = ({ label, isActive, onPress }: TabProps): JSX.Element => {

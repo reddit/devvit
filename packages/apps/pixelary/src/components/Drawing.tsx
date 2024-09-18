@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import Settings from '../settings.json';
 import { generateRandomArray } from '../utils/generateRandomArray.js';
 

@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { Columns } from '../../components/Columns.js';
 import { Tile } from '../../components/Tile.js';
 import { StackPaddingGapConfiguration } from './StackPaddingGapCategory.js';

@@ -1,8 +1,9 @@
 import { Devvit, useState } from '@devvit/public-api';
-import { DrawTabOverviewStep } from './DrawTabOverviewStep.js';
-import { DrawTabWordStep } from './DrawTabWordStep.js';
+
 import { DrawTabEditorStep } from './DrawTabEditorStep.js';
+import { DrawTabOverviewStep } from './DrawTabOverviewStep.js';
 import { DrawTabReviewStep } from './DrawTabReviewStep.js';
+import { DrawTabWordStep } from './DrawTabWordStep.js';
 
 interface DrawTabProps {
   data: {

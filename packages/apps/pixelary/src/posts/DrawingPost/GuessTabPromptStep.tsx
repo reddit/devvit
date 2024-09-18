@@ -1,10 +1,11 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useForm } from '@devvit/public-api';
+
 import { Drawing } from '../../components/Drawing.js';
-import type { PostData } from '../../types/PostData.js';
-import Settings from '../../settings.json';
-import { StyledButton } from '../../components/StyledButton.js';
 import { PixelText } from '../../components/PixelText.js';
+import { StyledButton } from '../../components/StyledButton.js';
+import Settings from '../../settings.json';
+import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 
 interface GuessTabPromptStepProps {

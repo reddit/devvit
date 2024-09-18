@@ -2,6 +2,7 @@ import type { JsonStatus, Metadata } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT3ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
+
 import { Devvit } from '../../devvit/Devvit.js';
 import type {
   AboutSubredditTypes,
@@ -19,8 +20,8 @@ import type {
   GetCommentsByUserOptions,
   GetCommentsOptions,
   GetHotPostsOptions,
-  GetModNotesOptions,
   GetModerationLogOptions,
+  GetModNotesOptions,
   GetPageRevisionsOptions,
   GetPostsByUserOptions,
   GetPostsOptions,
@@ -30,8 +31,8 @@ import type {
   GetUserOverviewOptions,
   Listing,
   ModAction,
-  ModLogOptions,
   ModeratorPermission,
+  ModLogOptions,
   RemovalReason,
   SendPrivateMessageAsSubredditOptions,
   SendPrivateMessageOptions,
@@ -51,6 +52,11 @@ import {
   Comment,
   Flair,
   FlairTemplate,
+  getModerationLog,
+  getSubredditLeaderboard,
+  getSubredditStyles,
+  getVaultByAddress,
+  getVaultByUserId,
   ModMailService,
   ModNote,
   Post,
@@ -59,11 +65,6 @@ import {
   User,
   Widget,
   WikiPage,
-  getModerationLog,
-  getSubredditLeaderboard,
-  getSubredditStyles,
-  getVaultByAddress,
-  getVaultByUserId,
 } from './models/index.js';
 
 type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;

@@ -1,9 +1,10 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { describe, it, expect } from 'vitest';
-import { makeStackDimensionsDetails } from './transformContext.js';
 import { BlockHorizontalAlignment, BlockVerticalAlignment } from '@devvit/protos';
+import { describe, expect, it } from 'vitest';
+
+import { makeStackDimensionsDetails } from './transformContext.js';
 
 describe('transform context', () => {
   describe('makeStackDimensionsDetails', () => {

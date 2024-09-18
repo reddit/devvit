@@ -1,8 +1,10 @@
 // Learn more at developers.reddit.com/docs
-import { Devvit } from '@devvit/public-api';
-import { Weird, defaultColor, startingColors } from './weird.js';
-import { Step, findBorderColor, Instructions, findUrl, createPost } from './guts/steps.js';
 import './guts/share.js';
+
+import { Devvit } from '@devvit/public-api';
+
+import { createPost, findBorderColor, findUrl, Instructions, Step } from './guts/steps.js';
+import { defaultColor, startingColors, Weird } from './weird.js';
 
 Devvit.configure({
   redditAPI: true,

@@ -1,5 +1,6 @@
 import type { Metadata, UIRequest } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
+
 import { AssetsClient } from '../../../../apis/AssetsClient/AssetsClient.js';
 import { KeyValueStorage } from '../../../../apis/key-value-storage/KeyValueStorage.js';
 import { MediaClient } from '../../../../apis/media/MediaClient.js';
@@ -12,13 +13,13 @@ import { SettingsClient } from '../../../../apis/settings/SettingsClient.js';
 import type { ContextAPIClients } from '../../../../types/context.js';
 import type { Devvit } from '../../../Devvit.js';
 import { getContextFromMetadata } from '../../context.js';
+import { makeCache } from './cache.js';
 import type { RenderContext } from './RenderContext.js';
 import { UIClient } from './UIClient.js';
 import { useChannel } from './useChannel.js';
 import { useForm } from './useForm.js';
 import { useInterval } from './useInterval.js';
 import { useState } from './useState.js';
-import { makeCache } from './cache.js';
 
 export class ContextBuilder {
   public buildContext(

@@ -1,5 +1,6 @@
 import type { UIEvent } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+
 import type {
   SetStateAction,
   UseStateInitializer,
@@ -9,7 +10,7 @@ import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
 import { RenderInterruptError } from './types.js';
-import { toSerializableErrorOrCircuitBreak, type LoadState } from './useAsync.js';
+import { type LoadState, toSerializableErrorOrCircuitBreak } from './useAsync.js';
 
 /**
  * Implementation of the useState hook.

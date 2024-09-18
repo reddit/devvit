@@ -2,14 +2,15 @@
 /** @jsxFrag Devvit.Fragment */
 
 import type { UIEvent, UIRequest } from '@devvit/protos';
-import { Devvit, useState } from '../../../../index.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
-import { useAsync } from './useAsync.js';
-import type { HookRef } from './types.js';
-import { captureHookRef } from './refs.js';
-import { BlocksHandler } from './BlocksHandler.js';
-import { EmptyRequest, findHookState, mockMetadata } from './test-helpers.js';
 import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
+import type { JSONValue } from '@devvit/shared-types/json.js';
+
+import { Devvit, useState } from '../../../../index.js';
+import { BlocksHandler } from './BlocksHandler.js';
+import { captureHookRef } from './refs.js';
+import { EmptyRequest, findHookState, mockMetadata } from './test-helpers.js';
+import type { HookRef } from './types.js';
+import { useAsync } from './useAsync.js';
 let shouldThrow = false;
 
 const loader = async (): Promise<string> => {

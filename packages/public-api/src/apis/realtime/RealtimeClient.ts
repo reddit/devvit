@@ -1,5 +1,6 @@
 import type { Metadata } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+
 import { Devvit } from '../../devvit/Devvit.js';
 
 export class RealtimeClient {

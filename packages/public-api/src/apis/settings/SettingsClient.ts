@@ -1,4 +1,5 @@
 import type { FormFieldValue, Metadata } from '@devvit/protos';
+
 import { Devvit } from '../../devvit/Devvit.js';
 import type {
   SettingsClient as _SettingsClient,

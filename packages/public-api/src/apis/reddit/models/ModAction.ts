@@ -1,5 +1,6 @@
 import type { AboutLogResponse, Metadata } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';

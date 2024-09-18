@@ -1,9 +1,10 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { CategoryProps, SharedCategoryPageProps } from '../../components/CategoryPage.js';
 import { CategoryPage } from '../../components/CategoryPage.js';
 import BlockComponent = Devvit.BlockComponent;
-import { SizeConstraintsCategory } from './SizeConstraintsCategory.js';
 import { SizeAbsoluteCategory } from './SizeAbsoluteCategory.js';
+import { SizeConstraintsCategory } from './SizeConstraintsCategory.js';
 import { SizeRelativeCategory } from './SizeRelativeCategory.js';
 
 const categories: CategoryProps[] = [

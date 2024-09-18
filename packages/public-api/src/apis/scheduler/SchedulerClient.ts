@@ -1,6 +1,7 @@
 import type { Metadata } from '@devvit/protos';
-import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { JSONObject } from '@devvit/shared-types/json.js';
+import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+
 import { Devvit } from '../../devvit/Devvit.js';
 import type {
   ScheduledCronJob,

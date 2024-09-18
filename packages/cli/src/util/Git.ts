@@ -1,8 +1,9 @@
-import git, { Errors as GitErrors, TREE } from 'isomorphic-git';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import git, { Errors as GitErrors, TREE } from 'isomorphic-git';
 
 const __dirname = fileURLToPath(path.join(import.meta.url, '..'));
 

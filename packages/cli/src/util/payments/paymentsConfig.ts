@@ -1,3 +1,6 @@
+import { access, readFile } from 'node:fs/promises';
+import path from 'node:path';
+
 import {
   Currency,
   Environment,
@@ -15,8 +18,6 @@ import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
 import { imageSize } from 'image-size';
 import type { ISizeCalculationResult } from 'image-size/dist/types/interface.js';
-import { access, readFile } from 'node:fs/promises';
-import path from 'node:path';
 
 /**
  * reads src/products.json and injects products into bundle. Will throw an error if

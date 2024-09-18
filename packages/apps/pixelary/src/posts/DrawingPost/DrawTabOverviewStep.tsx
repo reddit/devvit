@@ -1,11 +1,12 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useAsync, useState } from '@devvit/public-api';
-import type { PostData } from '../../types/PostData.js';
+
 import { Drawing } from '../../components/Drawing.js';
 import { PixelText } from '../../components/PixelText.js';
 import { StyledButton } from '../../components/StyledButton.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
+import type { PostData } from '../../types/PostData.js';
 
 interface DrawTabOverviewStepProps {
   data: {

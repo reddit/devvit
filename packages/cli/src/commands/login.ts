@@ -1,6 +1,7 @@
-import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { Flags } from '@oclif/core';
+
 import { getAccessTokenAndLoginIfNeeded, getOAuthSvc } from '../util/auth.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 
 export default class Login extends DevvitCommand {
   static override description = 'Log in to Devvit via reddit.com';

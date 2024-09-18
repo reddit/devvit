@@ -4,6 +4,7 @@ import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, ux } from '@oclif/core';
 import inquirer from 'inquirer';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
+
 import { createAppClient, createAppSettingsClient } from '../../util/clientGenerators.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { getAppBySlug } from '../../util/utils.js';

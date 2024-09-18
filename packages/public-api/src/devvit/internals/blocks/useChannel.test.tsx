@@ -4,6 +4,7 @@
 import { BlockRenderEventType, BlockRenderRequest, EffectType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
+
 import { Hook } from '../../../types/hooks.js';
 import { Devvit } from '../../Devvit.js';
 import { BlocksReconciler } from './BlocksReconciler.js';

@@ -1,5 +1,7 @@
 import { Devvit } from '@devvit/public-api';
-import type { BasketballScoreboardProps } from './BasketballScoreboard.js';
+
+import { NBA_TEAM_COLOR_MAP } from '../../sports/ColorMaps.js';
+import { leagueAssetPath } from '../../sports/GameEvent.js';
 import type {
   BasketballSummaryPlayer,
   BasketballSummaryTeam,
@@ -7,8 +9,7 @@ import type {
 import { getPlayerStatsForTeam } from '../../sports/sportradar/BasketballSummary.js';
 import type { NavigateToPage } from '../Scoreboard.js';
 import { ScoreboardColor, ScoreboardPage } from '../Scoreboard.js';
-import { leagueAssetPath } from '../../sports/GameEvent.js';
-import { NBA_TEAM_COLOR_MAP } from '../../sports/ColorMaps.js';
+import type { BasketballScoreboardProps } from './BasketballScoreboard.js';
 
 export function BasketballBoxscore(
   props: BasketballScoreboardProps,
@@ -147,8 +148,8 @@ function morePlayersButton(page: ScoreboardPage, onPress: NavigateToPage): JSX.E
       ? ScoreboardPage.HOME_STATS
       : ScoreboardPage.AWAY_STATS
     : isHomeTeam
-    ? ScoreboardPage.HOME_STATS_MORE
-    : ScoreboardPage.AWAY_STATS_MORE;
+      ? ScoreboardPage.HOME_STATS_MORE
+      : ScoreboardPage.AWAY_STATS_MORE;
   const buttonText = isShowingMore ? 'Back to top' : 'More players';
   const buttonIcon = isShowingMore ? 'up-arrow' : 'down-arrow';
 

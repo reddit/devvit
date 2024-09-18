@@ -1,6 +1,7 @@
 import type { Effect, Metadata, UIEvent, UIRequest, UIResponse } from '@devvit/protos';
 import { isCircuitBreaker } from '@devvit/shared-types/CircuitBreaker.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+
 import type { BlockElement } from '../../../Devvit.js';
 import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from '../BlocksReconciler.js';
 import { BlocksTransformer } from '../BlocksTransformer.js';

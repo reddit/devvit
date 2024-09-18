@@ -1,4 +1,5 @@
 import { Severity } from '@devvit/protos';
+
 import { formatAppLogDivider, formatAppLogMessage, parseAppLogDuration } from './app-log-util.js';
 
 describe('parseAppLogDuration', () => {

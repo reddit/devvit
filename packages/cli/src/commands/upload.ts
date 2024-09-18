@@ -1,3 +1,8 @@
+import { exec } from 'node:child_process';
+import fs from 'node:fs';
+import fsp from 'node:fs/promises';
+import path from 'node:path';
+
 import type {
   AppAccountExistsResponse,
   AppVersionInfo,
@@ -27,30 +32,27 @@ import {
   prettyPrintSize,
   WEBVIEW_ASSET_DIRNAME,
 } from '@devvit/shared-types/Assets.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import {
   ACTOR_SRC_PRIMARY_NAME,
   ASSET_HASHING_ALGO,
   MAX_ALLOWED_SUBSCRIBER_COUNT,
 } from '@devvit/shared-types/constants.js';
 import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import { Flags, ux } from '@oclif/core';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import chalk from 'chalk';
 import { createHash } from 'crypto';
 import inquirer from 'inquirer';
-import { exec } from 'node:child_process';
-import fs from 'node:fs';
-import fsp from 'node:fs/promises';
-import path from 'node:path';
 import { default as glob, default as tinyglob } from 'tiny-glob';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
+
 import { MY_PORTAL_ENABLED } from '../lib/config.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
-import { Bundler } from '../util/Bundler.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
+import { Bundler } from '../util/Bundler.js';
 import { getCaptcha } from '../util/captcha.js';
 import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';

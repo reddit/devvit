@@ -1,16 +1,15 @@
-import type { Tree } from '@oclif/core/lib/cli-ux/styled/tree.js';
-import { ux } from '@oclif/core';
+import fs from 'node:fs';
+import fsp, { readFile, writeFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
+import path from 'node:path';
 
+import { ux } from '@oclif/core';
+import type { Tree } from '@oclif/core/lib/cli-ux/styled/tree.js';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import type { SemVer } from 'semver';
 import semver from 'semver';
 import glob from 'tiny-glob';
-
-import fs from 'node:fs';
-import fsp, { readFile, writeFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
-import path from 'node:path';
 
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import type { PackageJSON } from '../../util/package-managers/package-util.js';

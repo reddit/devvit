@@ -1,10 +1,11 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useAsync } from '@devvit/public-api';
-import { Service } from '../service/Service.js';
-import type { PostData } from '../types/PostData.js';
-import type { GameSettings } from '../types/GameSettings.js';
-import { DrawingPost } from './DrawingPost/DrawingPost.js';
+
 import { LoadingState } from '../components/LoadingState.js';
+import { Service } from '../service/Service.js';
+import type { GameSettings } from '../types/GameSettings.js';
+import type { PostData } from '../types/PostData.js';
+import { DrawingPost } from './DrawingPost/DrawingPost.js';
 
 type InitialData = {
   gameSettings: GameSettings;

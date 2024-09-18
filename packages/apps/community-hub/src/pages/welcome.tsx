@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { PinToggler } from '../components/PinToggler.js';
 import type { PageProps } from '../types/page.js';
 import { standardizeUsername } from '../util.js';

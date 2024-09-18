@@ -1,8 +1,12 @@
-import { NFLBoxscoreLastEvent, NFLGameScoreInfo } from '../../sports/sportradar/NFLBoxscore.js';
-import { EventState } from '../../sports/GameEvent.js';
 import type { RedisClient } from '@devvit/public-api';
-import { CurrentEventData, Nullable } from '../types.js';
+
+import { EventState } from '../../sports/GameEvent.js';
 import { getEventById } from '../../sports/sportradar/LastEvents.js';
+import type {
+  NFLBoxscoreLastEvent,
+  NFLGameScoreInfo,
+} from '../../sports/sportradar/NFLBoxscore.js';
+import type { CurrentEventData, Nullable } from '../types.js';
 
 function getIsGameEnded(scoreInfo: NFLGameScoreInfo): boolean {
   return scoreInfo.event.state === EventState.FINAL;
@@ -35,8 +39,8 @@ export const getNavigationCallbacks = (
           const currentPosition = navigationEventOverride
             ? gameEventIds.indexOf(navigationEventOverride.id)
             : isGameEnded
-            ? gameEventIds.length
-            : gameEventIds.length - 1;
+              ? gameEventIds.length
+              : gameEventIds.length - 1;
           const newEventId = gameEventIds[currentPosition - 1];
           const newData = await getEventById(newEventId, redis, scoreInfo.event.id);
           setNavigationEventOverride(newData || null);

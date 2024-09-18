@@ -1,8 +1,9 @@
-import { describe, expect, test } from 'vitest';
-import { getSettingsValues, setDefaultsIfNecessary } from './SettingsClient.js';
-import type { SettingsValues } from '../../types/index.js';
 import type { FormFieldValue } from '@devvit/protos';
 import { FormFieldType } from '@devvit/protos';
+import { describe, expect, test } from 'vitest';
+
+import type { SettingsValues } from '../../types/index.js';
+import { getSettingsValues, setDefaultsIfNecessary } from './SettingsClient.js';
 
 describe('SettingsClient', () => {
   describe('setDefaultsIfNecessary', () => {

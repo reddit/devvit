@@ -8,26 +8,27 @@ import {
   InstallationType,
   VersionVisibility,
 } from '@devvit/protos/community.js';
+import {
+  appCapabilitiesFromLinkedBundle,
+  AppCapability,
+} from '@devvit/shared-types/AppCapabilities.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, Flags, ux } from '@oclif/core';
 import chalk from 'chalk';
+import inquirer from 'inquirer';
 import open from 'open';
+
 import {
   createAppClient,
-  createAppVersionClient,
   createAppPublishRequestClient,
+  createAppVersionClient,
 } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { readLine } from '../util/input-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
-import inquirer from 'inquirer';
-import {
-  appCapabilitiesFromLinkedBundle,
-  AppCapability,
-} from '@devvit/shared-types/AppCapabilities.js';
 
 const appCapabilityToReviewRequirementMessage: Record<
   AppCapability.CustomPost | AppCapability.Payments,

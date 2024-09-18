@@ -2,9 +2,11 @@
 /** @jsxFrag Devvit.Fragment */
 
 import { BlockType, type UIRequest } from '@devvit/protos';
+import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
 import { describe, expect, test, vi } from 'vitest';
+
 import { Devvit } from '../../../Devvit.js';
-import { BlocksHandler, assertValidNamespace } from './BlocksHandler.js';
+import { assertValidNamespace, BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
 import {
   EmptyRequest,
@@ -17,7 +19,6 @@ import {
 import type { HookRef } from './types.js';
 import { useAsync } from './useAsync.js';
 import { useState } from './useState.js';
-import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
 
 const funnyRef: HookRef = {};
 

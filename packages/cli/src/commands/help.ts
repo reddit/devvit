@@ -1,6 +1,7 @@
 import { Command } from '@oclif/core';
-import NoTopicHelpImpl from '../lib/help.js';
 import chalk from 'chalk';
+
+import NoTopicHelpImpl from '../lib/help.js';
 
 export default class Help extends Command {
   static override description = 'Display help for devvit';

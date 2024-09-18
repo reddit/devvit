@@ -1,11 +1,12 @@
-import { createAppClient, createAppSettingsClient } from '../../util/clientGenerators.js';
-import { ux } from '@oclif/core';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { Form } from '@devvit/protos';
 import { FormFieldType } from '@devvit/protos';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { ux } from '@oclif/core';
+import { TwirpError, TwirpErrorCode } from 'twirp-ts';
+
+import { createAppClient, createAppSettingsClient } from '../../util/clientGenerators.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { getAppBySlug } from '../../util/utils.js';
-import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 
 export default class ListAppSettings extends ProjectCommand {
   static override description =

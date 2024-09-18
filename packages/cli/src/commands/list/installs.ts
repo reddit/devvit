@@ -5,13 +5,14 @@ import type {
   MultipleInstallationsResponse,
 } from '@devvit/protos/community.js';
 import {
-  GetAllWithInstallLocationRequest,
   GetAllWithInstallerRequest,
+  GetAllWithInstallLocationRequest,
   InstallationType,
   UUID,
 } from '@devvit/protos/community.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
+
 import { getAccessTokenAndLoginIfNeeded } from '../../util/auth.js';
 import { createInstallationsClient } from '../../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';

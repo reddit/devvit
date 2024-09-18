@@ -1,19 +1,20 @@
 import type {
-  RedisAPI,
-  Metadata,
-  TransactionId,
-  ZMember,
   HScanRequest,
   HScanResponse,
+  Metadata,
+  RedisAPI,
+  TransactionId,
+  ZMember,
   ZScanRequest,
   ZScanResponse,
 } from '@devvit/protos';
 import { RedisKeyScope } from '@devvit/protos';
+
 import { Devvit } from '../../devvit/Devvit.js';
 import type {
   RedisClient as RedisClientLike,
-  TxClientLike,
   SetOptions,
+  TxClientLike,
   ZRangeOptions,
 } from '../../types/redis.js';
 

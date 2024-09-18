@@ -1,7 +1,8 @@
-import { beforeAll, describe, expect, test } from 'vitest';
-import { AssetsClient } from './AssetsClient.js';
-import { Devvit } from '../../devvit/Devvit.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
+import { beforeAll, describe, expect, test } from 'vitest';
+
+import { Devvit } from '../../devvit/Devvit.js';
+import { AssetsClient } from './AssetsClient.js';
 
 const ASSET_1 = 'test1.jpg';
 const ASSET_2 = 'test2.jpg';

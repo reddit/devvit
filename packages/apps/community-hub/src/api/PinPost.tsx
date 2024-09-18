@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { Redis } from './Redis.js';
 import type { PinPostInstance } from './Schema.js';
 

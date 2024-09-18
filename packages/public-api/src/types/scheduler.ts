@@ -1,4 +1,5 @@
 import type { JSONObject } from '@devvit/shared-types/json.js';
+
 import type { Devvit } from '../devvit/Devvit.js';
 
 export type ScheduledJob = {

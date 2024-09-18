@@ -1,5 +1,6 @@
-import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { Args } from '@oclif/core';
+
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { optInMetrics, optOutMetrics } from '../util/metrics.js';
 
 export default class Metrics extends DevvitCommand {

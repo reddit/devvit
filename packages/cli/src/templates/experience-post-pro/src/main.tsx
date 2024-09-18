@@ -1,5 +1,7 @@
-import { Devvit } from '@devvit/public-api';
 import './capabilities/actions/index.js';
+
+import { Devvit } from '@devvit/public-api';
+
 import { App } from './components/App.js';
 
 // Define what packages you want to use

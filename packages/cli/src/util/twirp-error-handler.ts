@@ -1,4 +1,4 @@
-import { TwirpError } from "twirp-ts";
+import { TwirpError } from 'twirp-ts';
 
 export const handleTwirpError = (error: unknown, logger: (message: string) => never): never => {
   if (error instanceof TwirpError) {

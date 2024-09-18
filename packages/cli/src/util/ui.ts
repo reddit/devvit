@@ -1,5 +1,6 @@
-import chalk from 'chalk';
 import os from 'node:os';
+
+import chalk from 'chalk';
 import stringLength from 'string-length';
 
 const STYLES = Object.freeze({

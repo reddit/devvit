@@ -1,4 +1,5 @@
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
+
 import type { CustomPostRichTextFallback, CustomPostTextFallbackOptions } from '../models/Post.js';
 
 /** @internal */

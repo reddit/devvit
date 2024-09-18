@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { PageProps } from '../types/page.js';
 
 export type PageContentProps = Pick<PageProps, 'navigate'> & {

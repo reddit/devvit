@@ -1,6 +1,7 @@
 import { RealtimeSubscriptionStatus } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { expect, test } from 'vitest';
+
 import { Devvit } from '../../../Devvit.js';
 import { BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';

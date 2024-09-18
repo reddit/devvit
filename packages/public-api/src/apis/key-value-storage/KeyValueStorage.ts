@@ -1,7 +1,8 @@
-import { Devvit } from '../../devvit/Devvit.js';
-import type { KVStore } from '../../types/kvStore.js';
 import type { Metadata } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+
+import { Devvit } from '../../devvit/Devvit.js';
+import type { KVStore } from '../../types/kvStore.js';
 
 export class KeyValueStorage implements KVStore {
   readonly #metadata: Metadata;

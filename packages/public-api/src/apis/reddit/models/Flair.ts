@@ -2,6 +2,7 @@ import type { FlairObject, Metadata, UserFlair as UserFlairProto } from '@devvit
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { T3ID } from '@devvit/shared-types/tid.js';
 import { asT3ID } from '@devvit/shared-types/tid.js';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 

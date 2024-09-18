@@ -1,6 +1,7 @@
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, Flags } from '@oclif/core';
 import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
+
 import { MY_PORTAL_ENABLED } from '../../lib/config.js';
 import { getCaptcha } from '../../util/captcha.js';
 import { createAppClient } from '../../util/clientGenerators.js';

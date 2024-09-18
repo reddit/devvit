@@ -5,6 +5,7 @@ import type { IntervalDetails, UIRequest, UIResponse } from '@devvit/protos';
 import { EffectType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
+
 import { Devvit } from '../../../Devvit.js';
 import { BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';

@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
-
 import type { z } from 'zod';
+
 import type { Schema } from '../../api/Schema.js';
 import { Page } from '../Page.js';
 import type { CommonPinProps } from './common.js';

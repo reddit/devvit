@@ -1,8 +1,9 @@
 import type { RealtimeSubscriptionEvent } from '@devvit/protos';
 import { RealtimeSubscriptionStatus } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
-import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+
 import type {
   UseChannelHook,
   UseChannelHookState,

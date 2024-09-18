@@ -1,26 +1,27 @@
 import { Devvit } from '@devvit/public-api';
-import {
-  type BasketballGameScoreInfo,
-  type BasketballGameScoreInfoPeriod,
-} from '../../sports/sportradar/BasketballPlayByPlay.js';
+
+import type { Reaction, ReactionScore } from '../../Reactions.js';
+import { NBA_TEAM_COLOR_MAP } from '../../sports/ColorMaps.js';
 import { eventPeriodStringShort } from '../../sports/espn/espn.js';
 import { EventState, leagueAssetPath } from '../../sports/GameEvent.js';
-import { NBA_TEAM_COLOR_MAP } from '../../sports/ColorMaps.js';
+import type {
+  BasketballGameScoreInfo,
+  BasketballGameScoreInfoPeriod,
+} from '../../sports/sportradar/BasketballPlayByPlay.js';
 import {
   BasketballEventType,
   getEventAtIndex,
   titleForEventType,
   totalEventsCount,
 } from '../../sports/sportradar/BasketballPlayByPlayEvents.js';
+import type { BasketballSummary } from '../../sports/sportradar/BasketballSummary.js';
 import type { Nullable } from '../../utils/types.js';
-import { msToHMS } from '../TopBar.js';
-import type { Reaction, ReactionScore } from '../../Reactions.js';
 import { Reactions } from '../ReactionsButtons.js';
 import type { NavigateToPage, ScoreboardProps } from '../Scoreboard.js';
 import { ScoreboardColor, ScoreboardPage } from '../Scoreboard.js';
-import type { BasketballSummary } from '../../sports/sportradar/BasketballSummary.js';
-import { BasketballBoxscore } from './BasketballBoxscore.js';
 import { SettingsPage } from '../Settings.js';
+import { msToHMS } from '../TopBar.js';
+import { BasketballBoxscore } from './BasketballBoxscore.js';
 
 const headerHeight = 106;
 const appWindowHeight = 320;
@@ -284,7 +285,7 @@ function EventBubble(props: BasketballScoreboardProps): JSX.Element {
 
   const displayEvent =
     props.eventIndexOverride >= 0
-      ? getEventAtIndex(props.eventIndexOverride, info) ?? latestEvent
+      ? (getEventAtIndex(props.eventIndexOverride, info) ?? latestEvent)
       : latestEvent;
 
   const hideClockTime =

@@ -1,4 +1,5 @@
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
+
 import type { ContextAPIClients } from './context.js';
 
 describe('useForm() typing is intuitive', () => {
@@ -114,7 +115,7 @@ describe('useForm() typing is intuitive', () => {
       () =>
         ({
           fields: [{ label: 'string label', type: 'string', name: 'strVal' }],
-        } as const),
+        }) as const,
       (data) => {
         data.strVal satisfies string | undefined;
       }
@@ -127,7 +128,7 @@ describe('useForm() typing is intuitive', () => {
           fields: [
             { label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' },
           ],
-        } as const),
+        }) as const,
       (data) => {
         data.strVal satisfies string | undefined;
       }
@@ -137,7 +138,7 @@ describe('useForm() typing is intuitive', () => {
     const local = (data: JSONObject) =>
       ({
         fields: [{ label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' }],
-      } as const);
+      }) as const;
     ctx.useForm(local, (data) => {
       data.strVal satisfies string | undefined;
     });

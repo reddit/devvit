@@ -1,6 +1,7 @@
 import type { ContextAPIClients } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+
 import type { CategoryProps, SharedCategoryPageProps } from '../../components/CategoryPage.js';
 import { CategoryPage, CategoryPageType } from '../../components/CategoryPage.js';
 import { Page } from '../page.js';

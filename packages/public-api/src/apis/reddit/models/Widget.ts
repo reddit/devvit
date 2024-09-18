@@ -7,8 +7,9 @@ import type {
   AddPostFlairWidgetRequest,
   AddTextAreaWidgetRequest,
   CalendarWidgetConfiguration,
-  Metadata,
   GetWidgetsResponse_WidgetItem_PostFlairTemplate as PostFlairTemplateData,
+  Metadata,
+  SubredditAboutRulesResponse,
   UpdateButtonWidgetRequest,
   UpdateCalendarWidgetRequest,
   UpdateCommunityListWidgetRequest,
@@ -19,13 +20,13 @@ import type {
   WidgetButton,
   WidgetImage,
   WidgetStyles,
-  SubredditAboutRulesResponse,
 } from '@devvit/protos';
 import {
   CommunityListWidget_CommunityData as CommunityData,
   GetWidgetsResponse_WidgetItem as WidgetItem,
 } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 

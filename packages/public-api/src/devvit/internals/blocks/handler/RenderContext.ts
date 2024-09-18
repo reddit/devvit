@@ -1,8 +1,9 @@
 import type { Effect, Metadata, UIEvent, UIRequest } from '@devvit/protos';
+
 import type { Devvit } from '../../../Devvit.js';
+import type { ReifiedBlockElement } from '../BlocksReconciler.js';
 import type { EffectEmitter } from '../EffectEmitter.js';
 import type { BlocksState, EventHandler, Hook, HookRef, HookSegment } from './types.js';
-import type { ReifiedBlockElement } from '../BlocksReconciler.js';
 
 /**
  * @internal

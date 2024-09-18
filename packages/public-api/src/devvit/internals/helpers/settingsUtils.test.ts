@@ -1,5 +1,5 @@
-import { extractSettingsFields } from './settingsUtils.js';
 import type { SettingsFormFieldGroup, ValidatedStringField } from '../../../types/index.js';
+import { extractSettingsFields } from './settingsUtils.js';
 
 describe('settings utils', () => {
   const stringField: ValidatedStringField = {

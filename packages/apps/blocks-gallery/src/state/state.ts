@@ -1,7 +1,7 @@
 import type { ContextAPIClients, UseStateResult } from '@devvit/public-api';
 
-import { Page } from '../pages/page.js';
 import { CategoryPageState } from '../components/CategoryPage.js';
+import { Page } from '../pages/page.js';
 
 export type StatefulProps = {
   useState: ContextAPIClients['useState'];

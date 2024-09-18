@@ -1,11 +1,12 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useForm } from '@devvit/public-api';
+
 import { Drawing } from '../../components/Drawing.js';
-import Settings from '../../settings.json';
-import { StyledButton } from '../../components/StyledButton.js';
-import { PixelText } from '../../components/PixelText.js';
 import { LoadingState } from '../../components/LoadingState.js';
+import { PixelText } from '../../components/PixelText.js';
+import { StyledButton } from '../../components/StyledButton.js';
 import { Service } from '../../service/Service.js';
+import Settings from '../../settings.json';
 
 interface DrawTabReviewStepProps {
   data: {

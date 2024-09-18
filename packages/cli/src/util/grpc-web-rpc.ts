@@ -1,14 +1,13 @@
-import { NodeHttpTransport } from '@improbable-eng/grpc-web-node-http-transport';
-import { defer, mergeMap, Observable } from 'rxjs';
-
 // TODO: figure out why this import is so funky
 import pkg from '@improbable-eng/grpc-web';
+import { NodeHttpTransport } from '@improbable-eng/grpc-web-node-http-transport';
+import { defer, mergeMap, Observable } from 'rxjs';
 const { grpc } = pkg;
 
 import type { Rpc } from '@devvit/protos';
-import type { StoredToken } from '../lib/auth/StoredToken.js';
 
 import { HEADER_AUTHORIZATION } from '../constants/Headers.js';
+import type { StoredToken } from '../lib/auth/StoredToken.js';
 
 export type GrpcWebRPCOptions = {
   baseUrl: string;

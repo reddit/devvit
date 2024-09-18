@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { Pin } from '../components/Pin/Pin.js';
 import type { PageProps } from '../types/page.js';
 

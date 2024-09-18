@@ -35,8 +35,9 @@ import {
   BlockType,
   BlockVerticalAlignment,
 } from '@devvit/protos';
+
+import type { AssetsClient, GetURLOptions } from '../../../apis/AssetsClient/AssetsClient.js';
 import { Devvit } from '../../Devvit.js';
-import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from './BlocksReconciler.js';
 import {
   getHexFromNamedHTMLColor,
   getHexFromRgbaColor,
@@ -47,7 +48,7 @@ import {
   isRgbaColor,
   isRPLColor,
 } from '../helpers/color.js';
-import type { AssetsClient, GetURLOptions } from '../../../apis/AssetsClient/AssetsClient.js';
+import type { ReifiedBlockElement, ReifiedBlockElementOrLiteral } from './BlocksReconciler.js';
 import type { TransformContext } from './transformContext.js';
 import { makeStackDimensionsDetails, ROOT_STACK_TRANSFORM_CONTEXT } from './transformContext.js';
 import { makeBlockSizes } from './transformerUtils.js';

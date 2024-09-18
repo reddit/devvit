@@ -13,15 +13,16 @@ import {
   OnPostCreateDefinition,
   OnPostDeleteDefinition,
   OnPostFlairUpdateDefinition,
+  OnPostNsfwUpdateDefinition,
   OnPostReportDefinition,
+  OnPostSpoilerUpdateDefinition,
   OnPostSubmitDefinition,
   OnPostUpdateDefinition,
-  OnPostNsfwUpdateDefinition,
-  OnPostSpoilerUpdateDefinition,
 } from '@devvit/protos';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import type { TriggerEvent, TriggerOnEventHandler } from '../../types/triggers.js';
 import { Devvit } from '../Devvit.js';

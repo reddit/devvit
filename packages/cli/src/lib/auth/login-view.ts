@@ -1,6 +1,8 @@
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type http from 'node:http';
 import util from 'node:util';
+
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+
 import { REDDIT_DEVELOPERS_LOGO_SVG } from './developers-logo.js';
 /**
  * Helper module to generate html for the login commands local http server

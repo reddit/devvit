@@ -11,6 +11,7 @@ import type {
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import chalk from 'chalk';
 import type { Observer } from 'rxjs';
+
 import type { AppLogConfig } from './app-log-util.js';
 import {
   formatAppLogDate,

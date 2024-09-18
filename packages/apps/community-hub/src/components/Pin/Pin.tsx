@@ -1,11 +1,12 @@
 import { Devvit } from '@devvit/public-api';
 import type { z } from 'zod';
+
 import type { Schema } from '../../api/Schema.js';
 import type { PageProps } from '../../types/page.js';
+import type { CommonPinProps, Pin as PinType } from './common.js';
 import { EventsPin } from './EventsPin.js';
 import { FlairPin } from './FlairPin.js';
 import { WikiPin } from './WikiPin.js';
-import type { CommonPinProps, Pin as PinType } from './common.js';
 
 type PinButtonProps = {
   pin: PinType;

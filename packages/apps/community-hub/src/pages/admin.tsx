@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { Page } from '../components/Page.js';
 import { feedbackAccount } from '../constants.js';
 import type { PageProps } from '../types/page.js';

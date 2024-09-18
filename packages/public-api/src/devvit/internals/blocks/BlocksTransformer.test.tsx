@@ -3,9 +3,6 @@
 
 // This import is NOT unused, don't listen to your IDE
 // noinspection ES6UnusedImports
-import { Devvit } from '../../Devvit.js';
-import { describe, expect, test } from 'vitest';
-
 import type { Block } from '@devvit/protos';
 import {
   BlockActionType,
@@ -36,6 +33,9 @@ import {
   BlockType,
   BlockVerticalAlignment,
 } from '@devvit/protos';
+import { describe, expect, test } from 'vitest';
+
+import { Devvit } from '../../Devvit.js';
 import { BlocksReconciler } from './BlocksReconciler.js';
 import { BlocksTransformer } from './BlocksTransformer.js';
 

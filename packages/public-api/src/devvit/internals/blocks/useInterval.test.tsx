@@ -4,6 +4,7 @@
 import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
+
 import type { UseIntervalHookState } from '../../../types/hooks.js';
 import { Hook } from '../../../types/hooks.js';
 import { Devvit } from '../../Devvit.js';

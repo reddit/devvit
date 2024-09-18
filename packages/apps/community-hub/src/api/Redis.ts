@@ -1,5 +1,6 @@
 import type { Devvit } from '@devvit/public-api';
 import type { TxClient } from '@devvit/public-api/apis/redis/RedisClient.js';
+
 import type { Config, PinPostInstance } from './Schema.js';
 import { Schema } from './Schema.js';
 

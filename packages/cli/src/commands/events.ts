@@ -1,14 +1,15 @@
 import { LogEventMessage } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
 import {
+  type RemoteLogMessage,
   RemoteLogQuery,
   RemoteLogType,
-  type RemoteLogMessage,
 } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { Duration } from 'date-fns';
 import { sub } from 'date-fns';
+
 import { formatAppLogDivider, supportedDurationFormats } from '../util/app-logs/app-log-util.js';
 import { createRemoteLoggerClient } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';

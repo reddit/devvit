@@ -1,10 +1,11 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useState, useInterval } from '@devvit/public-api';
-import type { PostData } from '../../types/PostData.js';
+import { Devvit, useInterval, useState } from '@devvit/public-api';
+
+import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
+import type { PostData } from '../../types/PostData.js';
 import { GuessTabPromptStep } from './GuessTabPromptStep.js';
 import { GuessTabResultsStep } from './GuessTabResultsStep.js';
-import { Service } from '../../service/Service.js';
 
 interface GuessTabProps {
   data: {

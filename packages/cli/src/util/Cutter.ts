@@ -1,10 +1,11 @@
-import { fileTypeFromFile } from 'file-type';
-import Mustache from 'mustache';
 import { exec as _exec } from 'node:child_process';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import util from 'node:util';
+
+import { fileTypeFromFile } from 'file-type';
+import Mustache from 'mustache';
 const exec = util.promisify(_exec);
 
 const RAW_FILE_MIME_TYPES: string[] = [

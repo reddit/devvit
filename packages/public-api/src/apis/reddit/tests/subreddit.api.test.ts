@@ -4,6 +4,7 @@ import type {
   SubredditAboutResponse_AboutData,
 } from '@devvit/protos';
 import { describe, expect, test, vi } from 'vitest';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import { AboutLocations, Subreddit } from '../models/Subreddit.js';
 import type { RedditAPIClient } from '../RedditAPIClient.js';

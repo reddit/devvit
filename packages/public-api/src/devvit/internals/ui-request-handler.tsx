@@ -1,6 +1,7 @@
 import type { Definition, Metadata, MethodDefinition, UIRequest } from '@devvit/protos';
 import { CustomPostDefinition, UIResponse } from '@devvit/protos';
 import type { Config } from '@devvit/shared-types/Config.js';
+
 import { Devvit } from '../Devvit.js';
 import { BlocksHandler } from './blocks/handler/BlocksHandler.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';

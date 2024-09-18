@@ -1,4 +1,5 @@
 import path from 'node:path';
+
 import { isFile } from './file-util.js';
 
 /**

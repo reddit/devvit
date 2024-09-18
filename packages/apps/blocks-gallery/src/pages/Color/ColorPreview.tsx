@@ -1,11 +1,9 @@
 import { Devvit } from '@devvit/public-api';
-
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 import type { CategoryPageState } from '../../components/CategoryPage.js';
 import { Columns } from '../../components/Columns.js';
 import { Tile } from '../../components/Tile.js';
-
 import { COLOR } from './colors.js';
 
 export const ColorPreview = ({

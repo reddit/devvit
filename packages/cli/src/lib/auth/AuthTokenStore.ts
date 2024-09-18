@@ -1,12 +1,14 @@
+import os from 'node:os';
+import path from 'node:path';
+
 import type { Disposable } from '@devvit/shared-types/Disposable.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { FSWatcher } from 'chokidar';
 import chokidar from 'chokidar';
 import fsp, { mkdir, readFile } from 'fs/promises';
-import os from 'node:os';
-import path from 'node:path';
 import type { Observable } from 'rxjs';
 import { ReplaySubject } from 'rxjs';
+
 import { isFile } from '../../util/file-util.js';
 import { StoredToken } from './StoredToken.js';
 

@@ -1,8 +1,9 @@
 import { Devvit, useState } from '@devvit/public-api';
+
+import { Tab, Tabs } from '../../components/Tabs.js';
 import type { PostData } from '../../types/PostData.js';
-import { Tabs, Tab } from '../../components/Tabs.js';
-import { GuessTab } from './GuessTab.js';
 import { DrawTab } from './DrawTab.js';
+import { GuessTab } from './GuessTab.js';
 import { ScoresTab } from './ScoresTab.js';
 
 /*

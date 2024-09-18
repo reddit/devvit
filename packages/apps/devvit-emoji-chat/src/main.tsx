@@ -1,5 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 import { ChannelStatus } from '@devvit/public-api/types/realtime.js';
+
 import type { ChatMessage, RealtimeMessage, UserRecord } from './types.js';
 import { MsgType, UserStatus } from './types.js';
 import { sessionId } from './util.js';

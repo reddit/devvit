@@ -1,4 +1,5 @@
 import { FormField as FormFieldProto, FormFieldType } from '@devvit/protos';
+
 import type {
   BooleanField,
   FormField,

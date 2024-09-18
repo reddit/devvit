@@ -1,12 +1,13 @@
 import type { Metadata } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
+import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
+import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import { describe, expect, test, vi } from 'vitest';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import { Post } from '../models/Post.js';
-import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
 import { createPreview } from './utils/createTestPreview.js';
-import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
-import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
+import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
 
 describe('Post API', () => {
   const defaultPostData = {

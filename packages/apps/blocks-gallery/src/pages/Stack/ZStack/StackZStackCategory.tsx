@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { CategoryPageState, CategoryProps } from '../../../components/CategoryPage.js';
 import { CategoryPage } from '../../../components/CategoryPage.js';
 import { Columns } from '../../../components/Columns.js';

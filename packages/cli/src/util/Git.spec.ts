@@ -1,11 +1,12 @@
-import tmp from 'tmp-promise';
 import { exec as _exec } from 'node:child_process';
-import { promisify } from 'node:util';
+import { readdir, writeFile } from 'node:fs/promises';
 import os from 'node:os';
+import { promisify } from 'node:util';
+
+import tmp from 'tmp-promise';
 
 import type { IGit } from './Git.js';
 import { Git } from './Git.js';
-import { readdir, writeFile } from 'node:fs/promises';
 
 const exec = promisify(_exec);
 tmp.setGracefulCleanup();

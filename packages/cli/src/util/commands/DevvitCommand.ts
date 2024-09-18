@@ -4,6 +4,7 @@ import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import { parse } from '@oclif/core/lib/parser/index.js';
 import inquirer from 'inquirer';
 import open from 'open';
+
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { getAccessToken } from '../auth.js';
 import { createWaitlistClient } from '../clientGenerators.js';

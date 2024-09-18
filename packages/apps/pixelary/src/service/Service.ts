@@ -1,9 +1,10 @@
 import type { RedisClient, ZMember, ZRangeOptions } from '@devvit/public-api';
-import Settings from '../settings.json';
+
 import Words from '../data/words.json';
-import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
+import Settings from '../settings.json';
 import type { GameSettings } from '../types/GameSettings.js';
 import type { PostData } from '../types/PostData.js';
+import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 
 // Service that handles the backbone logic for the application
 // This service is responsible for:

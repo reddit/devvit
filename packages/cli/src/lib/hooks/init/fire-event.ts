@@ -1,4 +1,5 @@
 import type { Hook } from '@oclif/core';
+
 import { sendEvent } from '../../../util/metrics.js';
 
 const hook: Hook<'init'> = async function (options) {

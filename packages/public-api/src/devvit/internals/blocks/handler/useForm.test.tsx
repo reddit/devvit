@@ -4,12 +4,13 @@
 import type { UIEvent } from '@devvit/protos';
 import { EffectType, FormFieldType } from '@devvit/protos';
 import { describe, expect, test } from 'vitest';
+
 import { Devvit } from '../../../Devvit.js';
 import { BlocksHandler } from './BlocksHandler.js';
-import { useUI } from './UIClient.js';
 import { captureHookRef } from './refs.js';
 import { EmptyRequest, generatePressRequest, mockMetadata } from './test-helpers.js';
 import type { HookRef } from './types.js';
+import { useUI } from './UIClient.js';
 import { hookRefToFormKey, useForm } from './useForm.js';
 import { useState } from './useState.js';
 

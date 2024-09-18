@@ -1,5 +1,6 @@
-import type { Hook } from '@oclif/core';
 import { createRequire } from 'node:module';
+
+import type { Hook } from '@oclif/core';
 
 const hook: Hook<'init'> = async function () {
   // Verify that the user is using a supported version of Node.js, based on the engines property in package.json

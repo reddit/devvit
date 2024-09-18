@@ -1,11 +1,12 @@
 import type {
   Metadata,
   WikiPage as WikiPageProto,
-  WikiPageRevisionListing,
   WikiPageRevision as WikiPageRevisionProto,
+  WikiPageRevisionListing,
   WikiPageSettings_Data,
 } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { Listing } from './Listing.js';

@@ -4,6 +4,7 @@
 import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test, vi } from 'vitest';
+
 import { Devvit } from '../../Devvit.js';
 import { BlocksReconciler } from './BlocksReconciler.js';
 

@@ -11,17 +11,18 @@ import type { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuil
 import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
 import { fromByteArray } from 'base64-js';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
+import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
-import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
 
 export type GetPostsOptions = ListingFetchOptions & {
   subredditName?: string;

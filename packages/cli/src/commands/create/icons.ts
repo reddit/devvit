@@ -1,8 +1,10 @@
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+
 import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { Args, ux } from '@oclif/core';
 import tinyglob from 'tiny-glob';
+
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { dirExists } from '../../util/files.js';
 

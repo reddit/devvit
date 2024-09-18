@@ -1,4 +1,5 @@
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+
 import { modifyBundleVersion } from '../commands/playtest.js';
 
 test('bundle has a version and is modified', () => {

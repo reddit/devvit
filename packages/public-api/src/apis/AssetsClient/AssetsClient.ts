@@ -1,4 +1,5 @@
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
+
 import { Devvit } from '../../devvit/Devvit.js';
 
 export type GetURLOptions = {

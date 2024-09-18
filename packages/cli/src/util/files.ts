@@ -1,5 +1,6 @@
-import yaml from 'js-yaml';
 import fsp, { readFile } from 'node:fs/promises';
+
+import yaml from 'js-yaml';
 
 // TODO: remove use of any below
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,11 +1,12 @@
 import type { Metadata } from '@devvit/protos';
 import { describe, expect, test, vi } from 'vitest';
+
 import { Devvit } from '../../../devvit/Devvit.js';
-import type { RedditAPIClient } from '../RedditAPIClient.js';
-import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
+import { MODERATOR_PERMISSIONS } from '../helpers/permissions.js';
 import type { ModeratorPermission } from '../models/User.js';
 import { User } from '../models/User.js';
-import { MODERATOR_PERMISSIONS } from '../helpers/permissions.js';
+import type { RedditAPIClient } from '../RedditAPIClient.js';
+import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
 
 describe('User API', () => {
   const subredditName = 'someTestSub';

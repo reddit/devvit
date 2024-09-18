@@ -1,5 +1,6 @@
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
+
 import type { Context } from './context.js';
 import type {
   BooleanField,
@@ -60,7 +61,7 @@ export type FormToFormValues<T extends Form | FormFunction = Form | FormFunction
  */
 type FormFieldsToFormValues<T extends readonly FormField[]> = T extends readonly [
   infer Field extends FormField,
-  ...infer Rest extends FormField[]
+  ...infer Rest extends FormField[],
 ]
   ? FormFieldToFormValue<Field> & FormFieldsToFormValues<Rest>
   : JSONObject; // possibly empty but more likely couldn't infer.
@@ -69,14 +70,14 @@ type FormFieldsToFormValues<T extends readonly FormField[]> = T extends readonly
 type FormFieldToFormValue<T extends FormField> = T extends BooleanField
   ? { [_ in T['name']]: boolean }
   : T extends ImageField | ParagraphField | StringField
-  ? FormFieldToRequiredFormValue<T, string>
-  : T extends NumberField
-  ? FormFieldToRequiredFormValue<T, number>
-  : T extends SelectField
-  ? { [_ in T['name']]: string[] }
-  : T extends FormFieldGroup
-  ? FormFieldsToFormValues<T['fields']>
-  : never;
+    ? FormFieldToRequiredFormValue<T, string>
+    : T extends NumberField
+      ? FormFieldToRequiredFormValue<T, number>
+      : T extends SelectField
+        ? { [_ in T['name']]: string[] }
+        : T extends FormFieldGroup
+          ? FormFieldsToFormValues<T['fields']>
+          : never;
 
 /**
  * Input is a FormField, output is a {fieldName: fieldType} or
@@ -84,7 +85,7 @@ type FormFieldToFormValue<T extends FormField> = T extends BooleanField
  */
 type FormFieldToRequiredFormValue<
   T extends ImageField | ParagraphField | StringField | NumberField,
-  V
+  V,
 > = T extends { required: true } | { defaultValue: boolean | number | string }
   ? { [_ in T['name']]: V }
   : { [_ in T['name']]?: V };

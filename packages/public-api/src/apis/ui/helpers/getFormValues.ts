@@ -1,5 +1,6 @@
 import type { FormFieldValue } from '@devvit/protos';
 import { FormFieldType } from '@devvit/protos';
+
 import type { FormValues } from '../../../types/form.js';
 
 export function flattenFormFieldValue(

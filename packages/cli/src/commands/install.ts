@@ -1,3 +1,5 @@
+import os from 'node:os';
+
 import type {
   FullInstallationInfo,
   MultipleInstallationsResponse,
@@ -10,10 +12,11 @@ import {
   NutritionCategory,
   UUID,
 } from '@devvit/protos/community.js';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
-import os from 'node:os';
 import { TwirpError } from 'twirp-ts/build/twirp/errors.js';
+
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import {
   createAppClient,
@@ -21,9 +24,8 @@ import {
   createInstallationsClient,
 } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
-import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
 
 export default class Install extends DevvitCommand {
   static override description =

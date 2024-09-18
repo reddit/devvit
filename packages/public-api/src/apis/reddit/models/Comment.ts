@@ -9,6 +9,7 @@ import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT1ID, asT2ID, asT3ID, asT5ID, isCommentId, isT1ID } from '@devvit/shared-types/tid.js';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';

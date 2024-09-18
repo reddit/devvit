@@ -1,6 +1,7 @@
-import { Devvit } from '../../devvit/Devvit.js';
-import type { MediaPlugin, MediaAsset, UploadMediaOptions } from '../../types/media.js';
 import type { Metadata } from '@devvit/protos';
+
+import { Devvit } from '../../devvit/Devvit.js';
+import type { MediaAsset, MediaPlugin, UploadMediaOptions } from '../../types/media.js';
 
 export class MediaClient implements MediaPlugin {
   readonly #metadata: Metadata;

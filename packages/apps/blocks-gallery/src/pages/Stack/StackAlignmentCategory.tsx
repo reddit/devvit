@@ -1,5 +1,6 @@
 import type { ContextAPIClients } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
+
 import type { CategoryPageState } from '../../components/CategoryPage.js';
 import { CategoryPage } from '../../components/CategoryPage.js';
 import { StackAlignmentPreview } from './StackAlignmentPreview.js';

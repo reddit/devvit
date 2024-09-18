@@ -1,5 +1,6 @@
 import type { Metadata } from '@devvit/protos';
 import { describe, expect, test, vi } from 'vitest';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import type { RedditAPIClient } from '../RedditAPIClient.js';
 import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';

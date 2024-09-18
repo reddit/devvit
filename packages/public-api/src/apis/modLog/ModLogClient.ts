@@ -1,4 +1,5 @@
 import type { Metadata } from '@devvit/protos';
+
 import { Devvit } from '../../devvit/Devvit.js';
 import type { ModLog, ModLogAddOptions } from '../../types/modlog.js';
 

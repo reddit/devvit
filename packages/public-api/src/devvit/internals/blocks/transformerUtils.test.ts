@@ -3,6 +3,7 @@ import {
   BlockStackDirection,
   BlockVerticalAlignment,
 } from '@devvit/protos';
+
 import { makeBlockSizes } from './transformerUtils.js';
 
 describe('makeBlockSizes', () => {

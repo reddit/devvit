@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { getHexFromRPLColor, getHexFromRgbaColor, isHexColor, isRPLColor } from './color.js';
+
+import { getHexFromRgbaColor, getHexFromRPLColor, isHexColor, isRPLColor } from './color.js';
 
 describe('color', () => {
   describe('isHexColor', () => {

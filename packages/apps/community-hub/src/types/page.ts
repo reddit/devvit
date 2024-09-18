@@ -1,5 +1,6 @@
 import type { Devvit } from '@devvit/public-api';
 import type { z } from 'zod';
+
 import type { PinPost } from '../api/PinPost.js';
 import type { Schema } from '../api/Schema.js';
 

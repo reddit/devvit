@@ -3,13 +3,14 @@ import { TscTypeChecker } from '@devvit/build-pack/index.js';
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
 import {
-  CompileParams,
   type Bundle,
+  CompileParams,
 } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { ActorSpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { LOCAL_HOSTNAME } from '@devvit/shared-types/HostnameUtil.js';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
+
 import { DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS } from './config.js';
 
 export class Bundler {

@@ -1,5 +1,6 @@
 import type { Metadata } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
+
 import { Devvit } from '../../../../devvit/Devvit.js';
 import { RedditAPIClient } from '../../RedditAPIClient.js';
 

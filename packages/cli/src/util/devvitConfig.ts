@@ -1,9 +1,10 @@
 import { writeFile } from 'node:fs/promises';
-import { validateConfig } from '../vendor/@reddit/json-config/0.4.2/index.js';
-import * as v from '../vendor/@reddit/json-config/0.4.2/validators.js';
 
 import type { JSONObject } from '@devvit/shared-types/json.js';
 import path from 'path';
+
+import { validateConfig } from '../vendor/@reddit/json-config/0.4.2/index.js';
+import * as v from '../vendor/@reddit/json-config/0.4.2/validators.js';
 import { isFile } from './file-util.js';
 import { dumpJsonToYaml, readYamlToJson } from './files.js';
 

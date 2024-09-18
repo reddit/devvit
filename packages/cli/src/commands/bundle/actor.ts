@@ -1,8 +1,10 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { ActorSpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { Args } from '@oclif/core';
-import { mkdir, writeFile } from 'node:fs/promises';
-import path from 'node:path';
+
 import { getAccessToken } from '../../util/auth.js';
 import { Bundler } from '../../util/Bundler.js';
 import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';

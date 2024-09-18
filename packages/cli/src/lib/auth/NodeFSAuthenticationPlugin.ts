@@ -1,21 +1,22 @@
+import crypto from 'node:crypto';
+import querystring from 'node:querystring';
+
+import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
+import type { Disposable } from '@devvit/shared-types/Disposable.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import inquirer from 'inquirer';
 import open from 'open';
 import type { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs';
 
-import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
-import type { Disposable } from '@devvit/shared-types/Disposable.js';
-import inquirer from 'inquirer';
-import crypto from 'node:crypto';
-import querystring from 'node:querystring';
 import { readLine } from '../../util/input-util.js';
 import type { R2OAuthConfig } from '../http/oauth.js';
 import { fetchR2OAuthGrant, fetchR2OAuthRefresh } from '../http/oauth.js';
 import type { TokenInfo } from './AuthTokenStore.js';
 import { AuthTokenStore } from './AuthTokenStore.js';
-import { StoredToken } from './StoredToken.js';
 import { localCodeServer } from './local-code-server.js';
 import { handleAccessDenied } from './login-view.js';
+import { StoredToken } from './StoredToken.js';
 
 export type NodeFSAuthenticationPluginConfig = {
   /** Directory of devvit's default config directory */

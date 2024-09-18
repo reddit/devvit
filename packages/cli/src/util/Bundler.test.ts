@@ -1,7 +1,9 @@
-import { ACTOR_SRC_DIR, ACTOR_SRC_PRIMARY_NAME } from '@devvit/shared-types/constants.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+
+import { ACTOR_SRC_DIR, ACTOR_SRC_PRIMARY_NAME } from '@devvit/shared-types/constants.js';
 import { lastValueFrom, take, toArray } from 'rxjs';
+
 import { Bundler } from './Bundler.js';
 
 let bundler: Bundler;

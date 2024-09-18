@@ -1,6 +1,7 @@
-import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { Flags } from '@oclif/core';
+
 import { getAccessToken } from '../util/auth.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 
 export default class Whoami extends DevvitCommand {
   static override description = 'Display the currently logged in reddit.com user';

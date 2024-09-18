@@ -1,13 +1,14 @@
 import type {
   Listing as ListingProto,
   Metadata,
+  User as UserProto,
   UserDataByAccountIdsResponse,
   UserDataByAccountIdsResponse_UserAccountData,
-  User as UserProto,
 } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
+
 import { Devvit } from '../../../devvit/Devvit.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
@@ -15,7 +16,7 @@ import { formatModeratorPermissions, validModPermissions } from '../helpers/perm
 import type { GetCommentsByUserOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { UserFlair } from './Flair.js';
-import { Flair, convertUserFlairProtoToAPI } from './Flair.js';
+import { convertUserFlairProtoToAPI, Flair } from './Flair.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import type { GetPostsByUserOptions } from './Post.js';

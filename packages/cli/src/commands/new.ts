@@ -1,28 +1,30 @@
-import type { PenSave } from '@devvit/play';
-import { penFromHash } from '@devvit/play';
-import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import { DevvitVersion } from '@devvit/shared-types/Version.js';
-import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
-import { Args, Flags } from '@oclif/core';
-import chalk from 'chalk';
-import type { Validator } from 'inquirer';
-import inquirer from 'inquirer';
+import { exec as _exec } from 'node:child_process';
 import { readdirSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { URL } from 'node:url';
+import util from 'node:util';
+
+import type { PenSave } from '@devvit/play';
+import { penFromHash } from '@devvit/play';
+import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
+import { DevvitVersion } from '@devvit/shared-types/Version.js';
+import { Args, Flags } from '@oclif/core';
+import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
+import chalk from 'chalk';
+import type { Validator } from 'inquirer';
+import inquirer from 'inquirer';
 import semver from 'semver';
-import Cutter from '../util/Cutter.js';
-import { Git } from '../util/Git.js';
+
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
+import Cutter from '../util/Cutter.js';
 import { generateDevvitConfig } from '../util/devvitConfig.js';
+import { Git } from '../util/Git.js';
+import { sendEvent } from '../util/metrics.js';
 import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTemplateResolver.js';
 import { logInBox } from '../util/ui.js';
-import { exec as _exec } from 'node:child_process';
-import util from 'node:util';
-import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
-import { sendEvent } from '../util/metrics.js';
 
 const exec = util.promisify(_exec);
 

@@ -1,12 +1,13 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useAsync } from '@devvit/public-api';
+
 import { Drawing } from '../../components/Drawing.js';
-import type { PostData } from '../../types/PostData.js';
-import Settings from '../../settings.json';
 import { PixelText } from '../../components/PixelText.js';
 import { PointsToast } from '../../components/PointsToast.js';
-import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 import { Service } from '../../service/Service.js';
+import Settings from '../../settings.json';
+import type { PostData } from '../../types/PostData.js';
+import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 
 interface GuessTabResultsStepProps {
   data: {
