@@ -1,4 +1,3 @@
-import type { Bundle } from '@devvit/protos';
 import type {
   AppAccountExistsResponse,
   AppVersionInfo,
@@ -17,6 +16,7 @@ import {
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { MediaSignatureStatus } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
+import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,

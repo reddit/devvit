@@ -1,10 +1,10 @@
-import { Args } from '@oclif/core';
-import { createAppClient, createAppSettingsClient } from '../../util/clientGenerators.js';
-import { SettingsValues, FormFieldType } from '@devvit/protos';
+import { FormFieldType } from '@devvit/protos';
+import { SettingsValues } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import { Args, ux } from '@oclif/core';
 import inquirer from 'inquirer';
-import { ux } from '@oclif/core';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
+import { createAppClient, createAppSettingsClient } from '../../util/clientGenerators.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { getAppBySlug } from '../../util/utils.js';
 

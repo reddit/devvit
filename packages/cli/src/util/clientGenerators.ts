@@ -1,5 +1,3 @@
-import type { RemoteLogConsumer } from '@devvit/protos';
-import { RemoteLogConsumerClientImpl } from '@devvit/protos';
 import type {
   AppClient,
   AppVersionClient,
@@ -20,6 +18,10 @@ import {
 } from '@devvit/protos/community.js';
 import type { DevPortalAppPublishRequestClient } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 import { DevPortalAppPublishRequestClientJSON } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
+import {
+  RemoteLogConsumerClientImpl,
+  type RemoteLogConsumer,
+} from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import {
   HEADER_DEVVIT_CANARY,
   HEADER_DEVVIT_CLI,

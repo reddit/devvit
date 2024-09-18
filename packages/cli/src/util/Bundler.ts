@@ -2,8 +2,11 @@ import { ESBuildPack } from '@devvit/build-pack/esbuild/ESBuildPack.js';
 import { TscTypeChecker } from '@devvit/build-pack/index.js';
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
-import type { ActorSpec, Bundle } from '@devvit/protos';
-import { CompileParams } from '@devvit/protos';
+import {
+  CompileParams,
+  type Bundle,
+} from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+import type { ActorSpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { LOCAL_HOSTNAME } from '@devvit/shared-types/HostnameUtil.js';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';

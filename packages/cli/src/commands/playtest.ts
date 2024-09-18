@@ -1,5 +1,3 @@
-import type { Bundle } from '@devvit/protos';
-import { ActorSpec, DependencySpec, RemoteLogType, Severity } from '@devvit/protos';
 import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
 import {
   BuildStatus,
@@ -11,6 +9,10 @@ import {
   VersionVisibility,
   type FullAppInfo,
 } from '@devvit/protos/community.js';
+import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+import { Severity } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
+import { RemoteLogType } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
+import { ActorSpec, DependencySpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { ASSET_DIRNAME, WEBVIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
@@ -37,9 +39,9 @@ import { AppLogObserver } from '../util/app-logs/app-log-observer.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { createInstallationsClient, createRemoteLoggerClient } from '../util/clientGenerators.js';
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
+import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
-import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
 
 export default class Playtest extends Upload {

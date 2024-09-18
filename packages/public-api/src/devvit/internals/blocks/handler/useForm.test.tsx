@@ -1,7 +1,8 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { EffectType, FormFieldType, UIEvent } from '@devvit/protos';
+import type { UIEvent } from '@devvit/protos';
+import { EffectType, FormFieldType } from '@devvit/protos';
 import { describe, expect, test } from 'vitest';
 import { Devvit } from '../../../Devvit.js';
 import { BlocksHandler } from './BlocksHandler.js';
@@ -65,17 +66,18 @@ describe('useForm', () => {
     const handler = new BlocksHandler(App);
     await handler.handle(EmptyRequest, mockMetadata);
     const response = await handler.handle(generatePressRequest(buttonRef), mockMetadata);
-    const event: UIEvent = UIEvent.fromPartial({
+    const event: UIEvent = {
       formSubmitted: {
         formId: hookRefToFormKey(formRef),
         results: {
           name: {
             stringValue: 'Genghis Corgi',
+            fieldType: 0,
           },
         },
       },
       hook: formRef.id,
-    });
+    };
     const req = { events: [event], state: response.state };
     await handler.handle(req, mockMetadata);
     expect(submitCount).toBe(1);
