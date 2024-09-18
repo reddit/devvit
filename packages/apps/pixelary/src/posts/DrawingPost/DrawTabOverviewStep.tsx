@@ -10,7 +10,6 @@ import Settings from '../../settings.json';
 interface DrawTabOverviewStepProps {
   data: {
     username: string | null;
-    subredditName: string;
   };
   onNext: () => void;
 }
@@ -45,10 +44,14 @@ export const DrawTabOverviewStep = (
       <Drawing
         size={tileSize}
         data={drawing.data}
-        onPress={() =>
-          context.ui.navigateTo(
-            `https://www.reddit.com/r/${props.data.subredditName}/comments/${drawing.postId!}`
-          )
+        onPress={async () =>
+          context.reddit.getPostById(drawing.postId).then((post) => {
+            if (!post) {
+              context.ui.showToast('Post not found');
+              return;
+            }
+            return context.ui.navigateTo(post);
+          })
         }
       />
     ));

@@ -10,7 +10,6 @@ import { Service } from '../../service/Service.js';
 interface DrawTabReviewStepProps {
   data: {
     username: string | null;
-    subredditName: string;
     activeFlairId: string | undefined;
   };
   word: string;
@@ -40,16 +39,18 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
     }
   );
 
-  async function submitDrawingHandler(): Promise<void> {
-    if (!props.data.username) {
-      context.ui.showToast('Please log in to submit a drawing');
+  async function onPostHandler(): Promise<void> {
+    if (props.data.username === null) {
+      context.ui.showToast('Please log in to post');
       return;
     }
+
+    const subreddit = await context.reddit.getCurrentSubreddit();
 
     // The back-end is configured to run this app's submitPost calls as the user
     const post = await context.reddit.submitPost({
       title: 'What is this?',
-      subredditName: props.data.subredditName,
+      subredditName: subreddit.name,
       preview: <LoadingState />,
     });
 
@@ -79,7 +80,7 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
     await Promise.all([
       // Post flair is applied with a second API call so that it's applied by the app account (a mod)
       context.reddit.setPostFlair({
-        subredditName: props.data.subredditName,
+        subredditName: subreddit.name,
         postId: post.id,
         flairTemplateId: props.data.activeFlairId,
       }),
@@ -133,7 +134,7 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
           onPress={() => context.ui.showForm(cancelConfirmationForm)}
         />
         <spacer size="small" />
-        <StyledButton width="138px" label="POST" onPress={submitDrawingHandler} />
+        <StyledButton width="138px" label="POST" onPress={onPostHandler} />
       </hstack>
 
       <spacer height="24px" />

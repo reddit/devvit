@@ -115,7 +115,8 @@ Devvit.addMenuItem({
       return;
     }
 
-    const postData = await service.getPostData(event.targetId, userId!);
+    const rawPostData = await service.getPostData(event.targetId);
+    const postData = service.parsePostData(rawPostData, userId!);
     if (!postData) {
       context.ui.showToast('No word is associated with this post');
       return;
@@ -133,17 +134,13 @@ Devvit.addMenuItem({
   onPress: async (event, context) => {
     const { scheduler, redis, postId, ui, userId } = context;
     const service = new Service(redis);
-    const postData = await service.getPostData(event.targetId, userId!);
-
-    if (!postData || !context.postId) {
-      ui.showToast('No post data found');
-      return;
-    }
+    const rawPostData = await service.getPostData(event.targetId);
+    const postData = service.parsePostData(rawPostData, userId!);
 
     await scheduler.runJob<JobData>({
       name: 'PostExpiration',
       data: {
-        postId: context.postId,
+        postId: event.targetId,
         answer: postData.word,
       },
       runAt: new Date(),

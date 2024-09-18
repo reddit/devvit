@@ -7,7 +7,6 @@ import { DrawTabReviewStep } from './DrawTabReviewStep.js';
 interface DrawTabProps {
   data: {
     username: string | null;
-    subredditName: string;
     activeFlairId: string | undefined;
   };
   setShowTabs: (showTabs: boolean) => void;

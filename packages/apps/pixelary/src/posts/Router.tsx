@@ -9,6 +9,7 @@ import { LoadingState } from '../components/LoadingState.js';
 type InitialData = {
   gameSettings: GameSettings;
   postData: PostData;
+  username: string | null;
 };
 
 /*
@@ -47,63 +48,31 @@ const defaultPostData: PostData = {
 const defaultData = {
   gameSettings: defaultSettings,
   postData: defaultPostData,
+  username: null,
 };
 
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
-  if (!context.postId) {
-    throw new Error('No post id found in context');
-  }
-
-  const { redis, postId, reddit } = context;
-  const service = new Service(redis);
-
-  const getUsername = (): Promise<null | string> => {
-    if (!context.userId) {
-      return Promise.resolve(null);
+  const service = new Service(context.redis);
+  const { data, loading } = useAsync<InitialData>(async () => {
+    try {
+      const [gameSettings = defaultSettings, rawPostData, username = null] = await Promise.all([
+        service.getGameSettings(),
+        service.getPostData(context.postId!),
+        context.reddit.getCurrentUser().then((user) => user?.username ?? null),
+      ]);
+      const postData = service.parsePostData(rawPostData, username);
+      return {
+        gameSettings,
+        postData,
+        username,
+      };
+    } catch (error) {
+      console.error('Error loading initial data', error);
+      return defaultData;
     }
-    return reddit
-      .getCurrentUser()
-      .then((user) => user?.username ?? null)
-      .catch(() => null);
-  };
-
-  const { data: metadata, loading: metadataLoading } = useAsync<{
-    subreddit: string;
-    username: string | null;
-  }>(async () => {
-    const values = await Promise.all([
-      reddit.getCurrentSubreddit().then((sub) => sub.name),
-      getUsername(),
-    ]);
-
-    return {
-      subreddit: values[0],
-      username: values[1],
-    };
   });
 
-  const { data: gameData, loading: gamesDataLoading } = useAsync<InitialData>(
-    async () => {
-      try {
-        const [gameSettings = defaultSettings, postData = defaultPostData] = await Promise.all([
-          service.getGameSettings(),
-          service.getPostData(postId, metadata?.username ?? null),
-        ]);
-
-        return {
-          gameSettings,
-          postData,
-        };
-      } catch (error) {
-        return defaultData;
-      }
-    },
-    {
-      depends: metadata,
-    }
-  );
-
-  if (metadataLoading || !metadata || gamesDataLoading || !gameData) {
+  if (loading || !data) {
     return <LoadingState />;
   }
 
@@ -113,10 +82,9 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     drawing: (
       <DrawingPost
         data={{
-          postData: gameData.postData,
-          username: metadata.username,
-          subredditName: metadata.subreddit,
-          activeFlairId: gameData.gameSettings.activeFlairId,
+          postData: data.postData,
+          username: data.username,
+          activeFlairId: data.gameSettings.activeFlairId,
         }}
       />
     ),

@@ -261,7 +261,7 @@ export class Service {
   parsePostData(data: Record<string, string> | undefined, username: string | null): PostData {
     const response: PostData = {
       postId: data?.postId ? data.postId : '',
-      authorUsername: data?.authorUsername || '',
+      authorUsername: data?.authorUsername ? data.authorUsername : '',
       data: data?.data ? JSON.parse(data.data) : [],
       date: data?.date ? parseInt(data.date) : 0,
       word: data?.word ? data.word : '',
@@ -331,10 +331,9 @@ export class Service {
     await this.redis.hSet(key, { expired: 'true' });
   }
 
-  async getPostData(postId: string, username: string | null): Promise<PostData | undefined> {
+  async getPostData(postId: string): Promise<Record<string, string> | undefined> {
     const key = this.getPostDataKey(postId);
-    const data = await this.redis.hGetAll(key);
-    return this.parsePostData(data, username);
+    return await this.redis.hGetAll(key);
   }
 
   async storePostData(data: {

@@ -5,7 +5,7 @@ import { generateRandomArray } from '../utils/generateRandomArray.js';
 interface DrawingProps {
   data?: number[];
   size?: number;
-  onPress?: () => void;
+  onPress?: Devvit.Blocks.OnPressEventHandler;
 }
 
 export const Drawing = (props: DrawingProps): JSX.Element => {

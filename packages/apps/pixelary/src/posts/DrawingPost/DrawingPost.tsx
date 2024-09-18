@@ -15,7 +15,6 @@ interface DrawingPostProps {
   data: {
     postData: PostData;
     username: string | null;
-    subredditName: string;
     activeFlairId: string | undefined;
   };
 }
