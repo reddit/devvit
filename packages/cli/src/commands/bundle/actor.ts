@@ -1,5 +1,4 @@
-import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { ActorSpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
+import { ActorSpec, Bundle } from '@devvit/protos';
 import { Args } from '@oclif/core';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';

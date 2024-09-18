@@ -1,13 +1,5 @@
-import {
-  LogErrorMessage,
-  LogEventMessage,
-  LogMessage,
-  Severity,
-} from '@devvit/protos/types/devvit/plugin/logger/logger.js';
-import type {
-  RemoteLogMessage,
-  RemoteLogQuery,
-} from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
+import type { RemoteLogMessage, RemoteLogQuery } from '@devvit/protos';
+import { LogErrorMessage, LogEventMessage, LogMessage, Severity } from '@devvit/protos';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import chalk from 'chalk';
 import type { Observer } from 'rxjs';

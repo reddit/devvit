@@ -1,8 +1,5 @@
-import type {
-  Listing as ListingProto,
-  Metadata,
-  SubredditAboutResponse_AboutData,
-} from '@devvit/protos';
+import type { Metadata, SubredditAboutResponse_AboutData } from '@devvit/protos';
+import { Listing as ListingProto } from '@devvit/protos';
 import { describe, expect, test, vi } from 'vitest';
 import { Devvit } from '../../../devvit/Devvit.js';
 import { AboutLocations, Subreddit } from '../models/Subreddit.js';
@@ -38,7 +35,7 @@ describe('Subreddit API', () => {
     api = createTestRedditApiClient();
   });
 
-  const mockListingWithPostsAndComments: ListingProto = {
+  const mockListingWithPostsAndComments = ListingProto.fromPartial({
     kind: 'Listing',
     data: {
       children: [
@@ -54,15 +51,6 @@ describe('Subreddit API', () => {
             subredditId: subredditId,
             linkId: 't3_abc123',
             permalink: 'permalink://',
-            allAwardings: [],
-            authorFlairRichtext: [],
-            awarders: [],
-            treatmentTags: [],
-            modPermissions: [],
-            linkFlairRichtext: [],
-            spoiler: false,
-            modReports: [],
-            userReports: [],
           },
         },
         {
@@ -79,20 +67,11 @@ describe('Subreddit API', () => {
             removed: true,
             removedBy: 'spez',
             removedByCategory: 'moderator',
-            allAwardings: [],
-            authorFlairRichtext: [],
-            awarders: [],
-            treatmentTags: [],
-            modPermissions: [],
-            linkFlairRichtext: [],
-            spoiler: false,
-            modReports: [],
-            userReports: [],
           },
         },
       ],
     },
-  };
+  });
 
   describe('RedditAPIClient:Subreddit', () => {
     test('getCommentsAndPostsByUser()', async () => {

@@ -1,14 +1,14 @@
-import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
-import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import type { Product } from '@devvit/shared-types/payments/Product.js';
-import { AccountingType } from '@devvit/shared-types/payments/Product.js';
-import { access, readFile } from 'node:fs/promises';
-import path from 'path';
 import {
   makePaymentsConfig,
   readAndInjectBundleProducts,
   validateProductIcon,
 } from './paymentsConfig.js';
+import { Bundle } from '@devvit/protos';
+import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
+import type { Product } from '@devvit/shared-types/payments/Product.js';
+import { AccountingType } from '@devvit/shared-types/payments/Product.js';
+import { access, readFile } from 'node:fs/promises';
+import path from 'path';
 
 vi.mock('node:fs/promises', () => ({
   access: vi.fn().mockResolvedValue(void 0),

@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
+import { BlockRenderEventType, BlockRenderRequest, UIEvent } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 import { Hook } from '../../../types/hooks.js';
@@ -75,17 +75,16 @@ describe('useForm', () => {
         );
         return <button onPress={() => ui.showForm(testForm)}>Open Form</button>;
       },
-      {
+      UIEvent.fromPartial({
         formSubmitted: {
           formId: 'form.hook.root.anonymous.0',
           results: {
             name: {
               stringValue: 'Genghis Corgi',
-              fieldType: 0,
             },
           },
         },
-      },
+      }),
       {
         __renderState: {
           'root.anonymous': {
