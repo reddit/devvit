@@ -39,6 +39,7 @@ import type { CommandFlags } from '../lib/types/oclif.js';
 import { AppLogObserver } from '../util/app-logs/app-log-observer.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { Bundler } from '../util/Bundler.js';
+import { checkAppNameAvailability } from '../util/checkAppNameAvailability.js';
 import { createInstallationsClient, createRemoteLoggerClient } from '../util/clientGenerators.js';
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
@@ -185,7 +186,16 @@ export default class Playtest extends Upload {
         // Else, we're an employee, so we can update someone else's app
         this.warn(`Overriding ownership check because you're an employee and told me to!`);
       } else {
-        this.error(`You're not an employee, so you can't playtest someone else's app.`);
+        // Check if the app name is available, implying this is a first run
+        const appExists = await checkAppNameAvailability(this.appClient, appName);
+        if (appExists.exists) {
+          this.error(`That app already exists, and you can't playtest someone else's app!`);
+        }
+
+        // App doesn't exist - tell the user to run `devvit upload` first
+        this.error(
+          `Your app doesn't exist yet - you'll need to run 'devvit upload' once before you can playtest your app.`
+        );
       }
     }
 

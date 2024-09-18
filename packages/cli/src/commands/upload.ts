@@ -4,7 +4,6 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 
 import type {
-  AppAccountExistsResponse,
   AppVersionInfo,
   Categories,
   MediaSignature,
@@ -54,6 +53,7 @@ import { isCurrentUserEmployee } from '../lib/http/gql.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { Bundler } from '../util/Bundler.js';
 import { getCaptcha } from '../util/captcha.js';
+import { checkAppNameAvailability } from '../util/checkAppNameAvailability.js';
 import { createAppClient, createAppVersionClient } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
@@ -267,7 +267,7 @@ export default class Upload extends ProjectCommand {
       ]);
       appName = rsp.appName;
       if (appName) {
-        const isAvailableResponse = await this.#checkAppNameAvailability(appName);
+        const isAvailableResponse = await checkAppNameAvailability(this.appClient, appName);
         if (!isAvailableResponse.exists) {
           // Doesn't exist, we're good
           return appName;
@@ -359,18 +359,6 @@ export default class Upload extends ProjectCommand {
         this.error(StringUtil.caughtToString(err));
       }
     }
-  }
-
-  async #checkAppNameAvailability(name: string): Promise<AppAccountExistsResponse> {
-    const [appAccountExistsRes, appExistsRes] = await Promise.all([
-      this.appClient.AppAccountExists({ accountName: name }),
-      this.appClient.Exists({ slug: name }),
-    ]);
-
-    return {
-      exists: appAccountExistsRes.exists || appExistsRes.exists,
-      suggestions: appAccountExistsRes.suggestions,
-    };
   }
 
   async #getAppDescription(): Promise<string | undefined> {
