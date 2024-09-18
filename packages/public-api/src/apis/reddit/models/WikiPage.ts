@@ -94,7 +94,7 @@ export class WikiPage {
     this.#content = data.contentMd;
     this.#contentHtml = data.contentHtml;
     this.#revisionId = data.revisionId;
-    this.#revisionDate = new Date(data.revisionDate);
+    this.#revisionDate = new Date(data.revisionDate * 1000); // data.revisionDate is represented in seconds, so multiply by 1000 to get milliseconds
     this.#revisionReason = data.reason ?? '';
 
     assertNonNull(data.revisionBy?.data, 'Wiki page author details are missing');
