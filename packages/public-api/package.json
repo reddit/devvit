@@ -51,7 +51,7 @@
     "@devvit/repo-tools": "0.11.0-dev",
     "@devvit/tsconfig": "0.11.0-dev",
     "@microsoft/api-extractor": "7.41.0",
-    "@reddit/faceplate-ui": "16.1.0",
+    "@reddit/faceplate-ui": "18.0.1",
     "@types/clone-deep": "4.0.1",
     "@types/core-js": "2.5.6",
     "@types/lodash.isequal": "4.5.6",
