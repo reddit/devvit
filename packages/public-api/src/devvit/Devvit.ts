@@ -748,7 +748,6 @@ export namespace Devvit {
       icon: Devvit.Blocks.IconProps;
       avatar: Devvit.Blocks.AvatarProps;
       fullsnoo: Devvit.Blocks.FullSnooProps;
-      animation: Devvit.Blocks.AnimationProps;
       webview: Devvit.Blocks.WebViewProps;
     }
 
@@ -763,9 +762,6 @@ export namespace Devvit {
       | `${HorizontalAlignment}`
       | `${VerticalAlignment} ${HorizontalAlignment}`
       | `${HorizontalAlignment} ${VerticalAlignment}`;
-    export type AnimationDirection = 'forward' | 'backward';
-    export type AnimationLoop = 'repeat' | 'bounce';
-    export type AnimationType = 'lottie';
     export type AvatarBackground = 'light' | 'dark';
     export type AvatarFacing = 'left' | 'right';
     export type AvatarSize =
@@ -1002,19 +998,6 @@ export namespace Devvit {
         userId: string;
         facing?: AvatarFacing | undefined;
         size?: FullSnooSize | undefined;
-      };
-
-    export type AnimationProps = BaseProps &
-      Actionable & {
-        url: string;
-        imageWidth: SizePixels | number;
-        imageHeight: SizePixels | number;
-        type?: AnimationType | undefined;
-        loop?: boolean | undefined;
-        loopMode?: AnimationLoop | undefined;
-        autoplay?: boolean | undefined;
-        speed?: number | undefined;
-        direction?: AnimationDirection | undefined;
       };
 
     export type WebViewProps = BaseProps &

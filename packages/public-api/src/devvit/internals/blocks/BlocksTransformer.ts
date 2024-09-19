@@ -1,16 +1,13 @@
 import type {
+  Block,
   BlockAction,
   BlockAlignment,
   BlockBorder,
   BlockColor,
   BlockConfig,
 } from '@devvit/protos';
-import type { Block } from '@devvit/protos';
 import {
   BlockActionType,
-  BlockAnimationDirection,
-  BlockAnimationLoopMode,
-  BlockAnimationType,
   BlockAvatarBackground,
   BlockAvatarFacing,
   BlockAvatarSize,
@@ -104,8 +101,6 @@ export class BlocksTransformer {
         return this.makeAvatar(props as Devvit.Blocks.AvatarProps, transformContext);
       case 'fullsnoo':
         return this.makeFullSnoo(props as Devvit.Blocks.FullSnooProps, transformContext);
-      case 'animation':
-        return this.makeAnimation(props as Devvit.Blocks.AnimationProps, transformContext);
       case 'webview':
         return this.makeWebView(props as Devvit.Blocks.WebViewProps, transformContext);
       case '__fragment':
@@ -460,36 +455,6 @@ export class BlocksTransformer {
     return undefined;
   }
 
-  makeBlockAnimationType(type: Devvit.Blocks.AnimationType | undefined): BlockAnimationType {
-    if (type === 'lottie' || type === undefined) {
-      return BlockAnimationType.ANIM_LOTTIE;
-    }
-    return BlockAnimationType.UNRECOGNIZED;
-  }
-
-  makeBlockAnimationDirection(
-    type: Devvit.Blocks.AnimationDirection | undefined
-  ): BlockAnimationDirection | undefined {
-    switch (type) {
-      case 'backward':
-        return BlockAnimationDirection.ANIM_DIR_BACKWARD;
-      case 'forward':
-        return BlockAnimationDirection.ANIM_DIR_FORWARD;
-    }
-  }
-
-  makeBlockLoopMode(
-    mode: Devvit.Blocks.AnimationLoop | undefined
-  ): BlockAnimationLoopMode | undefined {
-    switch (mode) {
-      case 'repeat':
-        return BlockAnimationLoopMode.ANIM_LOOP_REPEAT;
-      case 'bounce':
-        return BlockAnimationLoopMode.ANIM_LOOP_BOUNCE;
-    }
-    return undefined;
-  }
-
   getDataSet(props: DataSet): DataSet {
     return Object.keys(props)
       .filter((key) => key.startsWith(DATA_PREFIX))
@@ -827,28 +792,6 @@ export class BlocksTransformer {
           userId: props.userId,
           facing: this.makeBlockAvatarFacing(props.facing),
           size: this.makeBlockFullSnooSize(props.size),
-        },
-      })
-    );
-  }
-
-  makeAnimation(
-    props: Devvit.Blocks.AnimationProps | undefined,
-    transformContext: TransformContext
-  ): Block | undefined {
-    return (
-      props &&
-      this.makeBlock(BlockType.BLOCK_ANIMATION, props, transformContext, {
-        animationConfig: {
-          type: this.makeBlockAnimationType(props.type),
-          url: this.resolveAssetUrl(props.url),
-          loop: props.loop,
-          loopMode: this.makeBlockLoopMode(props.loopMode),
-          autoplay: props.autoplay,
-          width: this.parsePixels(props.imageWidth),
-          height: this.parsePixels(props.imageHeight),
-          direction: this.makeBlockAnimationDirection(props.direction),
-          speed: props.speed,
         },
       })
     );

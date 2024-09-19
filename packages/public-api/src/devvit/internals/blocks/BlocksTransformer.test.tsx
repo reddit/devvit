@@ -6,9 +6,6 @@
 import type { Block } from '@devvit/protos';
 import {
   BlockActionType,
-  BlockAnimationDirection,
-  BlockAnimationLoopMode,
-  BlockAnimationType,
   BlockAvatarBackground,
   BlockAvatarFacing,
   BlockAvatarSize,
@@ -557,46 +554,6 @@ describe('BlocksTransformer (JSX -> Block)', () => {
       expect(fullsnoo.userId).toEqual('t2_abc123');
       expect(fullsnoo.facing).toEqual(BlockAvatarFacing.AVATAR_FACING_RIGHT);
       expect(fullsnoo.size).toEqual(BlockFullSnooSize.FULLSNOO_XXLARGE);
-    });
-  });
-
-  describe('<animation>', () => {
-    test('outputs a valid object', async () => {
-      const ui = await render(
-        <animation type={'lottie'} url={VALID_URL} imageWidth={1} imageHeight={2} />
-      );
-
-      expect(ui.type === BlockType.BLOCK_ANIMATION);
-      expect(ui.config?.animationConfig).not.toBeUndefined();
-    });
-
-    test('all properties are properly copied to the object', async () => {
-      const ui = await render(
-        <animation
-          type={'lottie'}
-          url={'http:foo'}
-          imageWidth={1}
-          imageHeight={2}
-          loop={true}
-          loopMode={'bounce'}
-          autoplay={false}
-          speed={1.5}
-          direction={'backward'}
-          {...commonPropsWithActions}
-        />
-      );
-
-      commonPropsTestsWithActions(ui);
-      const animation = ui.config!.animationConfig!;
-      expect(animation.type).toEqual(BlockAnimationType.ANIM_LOTTIE);
-      expect(animation.url).toEqual('http:foo');
-      expect(animation.width).toEqual(1);
-      expect(animation.height).toEqual(2);
-      expect(animation.loop).toBeTruthy();
-      expect(animation.loopMode).toEqual(BlockAnimationLoopMode.ANIM_LOOP_BOUNCE);
-      expect(animation.autoplay).toBeFalsy();
-      expect(animation.speed).toEqual(1.5);
-      expect(animation.direction).toEqual(BlockAnimationDirection.ANIM_DIR_BACKWARD);
     });
   });
 
