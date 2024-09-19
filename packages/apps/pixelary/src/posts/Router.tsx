@@ -1,10 +1,10 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useAsync } from '@devvit/public-api';
+import { Devvit, useInterval, useState } from '@devvit/public-api';
 
-import { LoadingState } from '../components/LoadingState.js';
 import { Service } from '../service/Service.js';
 import type { GameSettings } from '../types/GameSettings.js';
 import type { PostData } from '../types/PostData.js';
+import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 import { DrawingPost } from './DrawingPost/DrawingPost.js';
 
 type InitialData = {
@@ -54,7 +54,7 @@ const defaultData = {
 
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
   const service = new Service(context.redis);
-  const { data, loading } = useAsync<InitialData>(async () => {
+  const [data] = useState<InitialData>(async () => {
     try {
       const [gameSettings = defaultSettings, rawPostData, username = null] = await Promise.all([
         service.getGameSettings(),
@@ -73,9 +73,64 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     }
   });
 
-  if (loading || !data) {
-    return <LoadingState />;
-  }
+  const getScoreboard = async (): Promise<{
+    scores: ScoreBoardEntry[];
+    scoreBoardUser: {
+      rank: number;
+      score: number;
+    };
+  }> => {
+    try {
+      const [scoreBoardUser, scores] = await Promise.all([
+        service.getScoreBoardUserEntry(data.username),
+        // Keep in sync with rowCount in ScoresTab.tsx
+        service.getScoreBoard(10),
+      ]);
+
+      return {
+        scores: Array.isArray(scores) ? scores : [],
+        scoreBoardUser: scoreBoardUser || { rank: 0, score: 0 },
+      };
+    } catch (error) {
+      return {
+        scores: [],
+        scoreBoardUser: {
+          rank: 0,
+          score: 0,
+        },
+      };
+    }
+  };
+
+  const getPostData = async (): Promise<PostData> => {
+    try {
+      return service.parsePostData(await service.getPostData(data.postData.postId), data.username);
+    } catch (error) {
+      console.error('Error loading latest post data', error);
+      return data.postData;
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  const getData = async () => {
+    return Promise.all([
+      data.username ? await service.getMyDrawings(data.username) : [],
+      getScoreboard(),
+      getPostData(),
+    ]);
+  };
+
+  const [[myDrawings, scoreBoardData, postData], setData] =
+    useState<Awaited<ReturnType<typeof getData>>>(getData);
+
+  const refetchInterval = useInterval(async () => {
+    refetchInterval.stop();
+    setData(await getData());
+  }, 100);
+
+  const refetch = (): void => {
+    refetchInterval.start();
+  };
 
   // Todo: Add the post type to the post data model
   const postType = 'drawing';
@@ -83,10 +138,13 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     drawing: (
       <DrawingPost
         data={{
-          postData: data.postData,
+          postData: postData ?? data.postData,
           username: data.username,
           activeFlairId: data.gameSettings.activeFlairId,
         }}
+        myDrawings={myDrawings}
+        scoreBoardData={scoreBoardData}
+        refetch={refetch}
       />
     ),
     // Add more post types here

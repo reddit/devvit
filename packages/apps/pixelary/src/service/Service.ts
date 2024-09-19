@@ -269,8 +269,8 @@ export class Service {
       expired: data?.expired ? JSON.parse(data.expired) : false,
       count: {
         players: 0,
-        winners: data?.[`guess:${data.word.toLowerCase()}`]
-          ? parseInt(data[`guess:${data.word.toLowerCase()}`])
+        winners: data?.[`guess:${data?.word?.toLowerCase()}`]
+          ? parseInt(data[`guess:${data?.word?.toLowerCase()}`])
           : 0,
         guesses: 0,
         words: 0,
@@ -334,7 +334,12 @@ export class Service {
 
   async getPostData(postId: string): Promise<Record<string, string> | undefined> {
     const key = this.getPostDataKey(postId);
-    return await this.redis.hGetAll(key);
+    const postData = await this.redis.hGetAll(key);
+    // Ensure the postId is set if postData is empty
+    if (!postData.postId) {
+      postData.postId = postId;
+    }
+    return postData;
   }
 
   async storePostData(data: {

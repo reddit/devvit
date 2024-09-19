@@ -1,8 +1,7 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useAsync, useState } from '@devvit/public-api';
+import { Devvit, useState } from '@devvit/public-api';
 
 import { Tab, Tabs } from '../../components/Tabs.js';
-import { Service } from '../../service/Service.js';
 import type { PostData } from '../../types/PostData.js';
 import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
 import { DrawTab } from './DrawTab.js';
@@ -21,6 +20,15 @@ interface DrawingPostProps {
     username: string | null;
     activeFlairId: string | undefined;
   };
+  myDrawings: PostData[];
+  scoreBoardData: {
+    scores: ScoreBoardEntry[];
+    scoreBoardUser: {
+      rank: number;
+      score: number;
+    };
+  };
+  refetch: () => void;
 }
 
 export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Element => {
@@ -28,78 +36,8 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
   const tabs = ['Guess', 'Draw', 'Scores'] as const;
   const [tab, setTab] = useState<(typeof tabs)[number]>(tabs[0]);
   const [showTabs, setShowTabs] = useState(true);
-  // Hack to force useAsync to refetch when we want
-  const [postDataFetchCounter, setPostDataFetchCounter] = useState(0);
-  const [drawTabFetchCounter, setDrawTabFetchCounter] = useState(0);
-  const [scoresTabFetchCounter, setScoresTabFetchCounter] = useState(0);
 
-  // We lifted state up to here to unblock Pixelary deploys due to
-  // https://reddit.atlassian.net/browse/DX-7961
-
-  const service = new Service(context.redis);
-  const { data: myDrawings, loading: myDrawingsLoading } = useAsync<PostData[]>(
-    async () => {
-      return props.data.username ? await service.getMyDrawings(props.data.username) : [];
-    },
-    {
-      depends: [props.data.username, drawTabFetchCounter],
-    }
-  );
-
-  const { data: scoreBoardData, loading: scoreBoardDataLoading } = useAsync<{
-    scores: ScoreBoardEntry[];
-    scoreBoardUser: {
-      rank: number;
-      score: number;
-    };
-  }>(
-    async () => {
-      const service = new Service(context.redis);
-      try {
-        const [scoreBoardUser, scores] = await Promise.all([
-          service.getScoreBoardUserEntry(props.data.username),
-          // Keep in sync with rowCount in ScoresTab.tsx
-          service.getScoreBoard(10),
-        ]);
-
-        return {
-          scores: Array.isArray(scores) ? scores : [],
-          scoreBoardUser: scoreBoardUser || { rank: 0, score: 0 },
-        };
-      } catch (error) {
-        return {
-          scores: [],
-          scoreBoardUser: {
-            rank: 0,
-            score: 0,
-          },
-        };
-      }
-    },
-    {
-      depends: [props.data.username, scoresTabFetchCounter],
-    }
-  );
-
-  // Pull latest data from the server
-  const { data: postData } = useAsync<PostData>(
-    async () => {
-      try {
-        return service.parsePostData(
-          await service.getPostData(props.data.postData.postId),
-          props.data.username
-        );
-      } catch (error) {
-        console.error('Error loading latest post data', error);
-        return props.data.postData;
-      }
-    },
-    {
-      depends: [props.data.postData, postDataFetchCounter],
-    }
-  );
-
-  const latestData = { ...props.data, postData: postData ?? props.data.postData };
+  const latestData = { ...props.data };
 
   // Tab content map
   const tabContentMap: Record<string, JSX.Element> = {
@@ -108,14 +46,14 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
         {...props}
         data={latestData}
         onDraw={() => {
-          setDrawTabFetchCounter((x) => x + 1);
+          props.refetch();
           setTab('Draw');
         }}
         onScores={() => {
-          setScoresTabFetchCounter((x) => x + 1);
+          props.refetch();
           setTab('Scores');
         }}
-        onCorrectGuess={() => setPostDataFetchCounter((x) => x + 1)}
+        onCorrectGuess={() => props.refetch()}
       />
     ),
     Draw: (
@@ -123,19 +61,19 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
         {...props}
         data={latestData}
         onDrawingSubmitted={() => {
-          setDrawTabFetchCounter((x) => x + 1);
+          props.refetch();
         }}
         setShowTabs={setShowTabs}
-        myDrawings={myDrawings}
-        myDrawingsLoading={myDrawingsLoading}
+        myDrawings={props.myDrawings}
+        myDrawingsLoading={false}
       />
     ),
     Scores: (
       <ScoresTab
         {...props}
         data={latestData}
-        scoreBoardData={scoreBoardData}
-        scoreBoardDataLoading={scoreBoardDataLoading}
+        scoreBoardData={props.scoreBoardData}
+        scoreBoardDataLoading={false}
       />
     ),
   };
@@ -150,13 +88,7 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
               label={label}
               isActive={tab === label}
               onPress={() => {
-                if (label === 'Draw') {
-                  setDrawTabFetchCounter((x) => x + 1);
-                } else if (label === 'Scores') {
-                  setScoresTabFetchCounter((x) => x + 1);
-                } else if (label === 'Guess') {
-                  setPostDataFetchCounter((x) => x + 1);
-                }
+                props.refetch();
 
                 setTab(label);
               }}
@@ -171,14 +103,14 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
           {...props}
           data={latestData}
           onDraw={() => {
-            setDrawTabFetchCounter((x) => x + 1);
+            props.refetch();
             setTab('Draw');
           }}
           onScores={() => {
-            setScoresTabFetchCounter((x) => x + 1);
+            props.refetch();
             setTab('Scores');
           }}
-          onCorrectGuess={() => setPostDataFetchCounter((x) => x + 1)}
+          onCorrectGuess={() => props.refetch()}
         />
       )}
     </vstack>
