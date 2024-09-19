@@ -1,10 +1,9 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useAsync, useState } from '@devvit/public-api';
+import { Devvit, useState } from '@devvit/public-api';
 
 import { Drawing } from '../../components/Drawing.js';
 import { PixelText } from '../../components/PixelText.js';
 import { StyledButton } from '../../components/StyledButton.js';
-import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 
@@ -12,6 +11,8 @@ interface DrawTabOverviewStepProps {
   data: {
     username: string | null;
   };
+  myDrawings: PostData[] | null;
+  myDrawingsLoading: boolean;
   onNext: () => void;
 }
 
@@ -20,18 +21,10 @@ export const DrawTabOverviewStep = (
   context: Context
 ): JSX.Element => {
   const tileSize = 88;
-  const service = new Service(context.redis);
   const rowsPerPage = 3;
   const [paginationOffset, setPaginationOffset] = useState(0);
 
-  const { data: myDrawings, loading: myDrawingsLoading } = useAsync<PostData[]>(
-    async () => {
-      return props.data.username ? await service.getMyDrawings(props.data.username) : [];
-    },
-    {
-      depends: props.data.username,
-    }
-  );
+  const { myDrawings, myDrawingsLoading } = props;
 
   const minWidth = 128;
   const width = Math.max(minWidth, context.dimensions?.width || 0);

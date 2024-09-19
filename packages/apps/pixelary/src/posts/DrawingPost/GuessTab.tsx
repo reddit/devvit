@@ -14,6 +14,7 @@ interface GuessTabProps {
   };
   onDraw: () => void;
   onScores: () => void;
+  onCorrectGuess: () => void;
 }
 
 export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element => {
@@ -31,7 +32,6 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
   const timer = useInterval(() => {
     if (feedbackDuration > 1) {
       setFeedbackDuration(feedbackDuration - 1);
-      console.log('tick');
     } else {
       setFeedback(null);
       timer.stop();
@@ -51,6 +51,7 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
 
     // If user guessed correctly, move to results step
     if (userGuessedCorrectly) {
+      props.onCorrectGuess();
       setCurrentStep('Results');
     }
 

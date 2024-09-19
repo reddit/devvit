@@ -1,10 +1,10 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useAsync } from '@devvit/public-api';
-import { ScoreBoardRow } from '../../components/ScoreBoardRow.js';
-import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
-import { Service } from '../../service/Service.js';
+import { Devvit } from '@devvit/public-api';
+
 import { PixelText } from '../../components/PixelText.js';
+import { ScoreBoardRow } from '../../components/ScoreBoardRow.js';
 import Settings from '../../settings.json';
+import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
 
 const Wrapper = (props: { children: JSX.Element }): JSX.Element => (
   <vstack width="100%" grow>
@@ -46,6 +46,14 @@ interface ScoresTabProps {
   data: {
     username: string | null;
   };
+  scoreBoardData: {
+    scores: ScoreBoardEntry[];
+    scoreBoardUser: {
+      rank: number;
+      score: number;
+    };
+  } | null;
+  scoreBoardDataLoading: boolean;
 }
 
 const rowCount = 10;
@@ -53,39 +61,7 @@ const availableHeight = 418;
 const dividerHeight = 10;
 
 export const ScoresTab = (props: ScoresTabProps, context: Context): JSX.Element => {
-  const { data: scoreBoardData, loading: scoreBoardDataLoading } = useAsync<{
-    scores: ScoreBoardEntry[];
-    scoreBoardUser: {
-      rank: number;
-      score: number;
-    };
-  }>(
-    async () => {
-      const service = new Service(context.redis);
-      try {
-        const [scoreBoardUser, scores] = await Promise.all([
-          service.getScoreBoardUserEntry(props.data.username),
-          service.getScoreBoard(rowCount),
-        ]);
-
-        return {
-          scores: Array.isArray(scores) ? scores : [],
-          scoreBoardUser: scoreBoardUser || { rank: 0, score: 0 },
-        };
-      } catch (error) {
-        return {
-          scores: [],
-          scoreBoardUser: {
-            rank: 0,
-            score: 0,
-          },
-        };
-      }
-    },
-    {
-      depends: props.data.username,
-    }
-  );
+  const { scoreBoardData, scoreBoardDataLoading } = props;
 
   // Return early view if data is loading
   if (scoreBoardDataLoading || scoreBoardData === null) {

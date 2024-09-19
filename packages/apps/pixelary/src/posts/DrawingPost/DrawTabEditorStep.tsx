@@ -1,11 +1,12 @@
-import { Devvit, useState, useInterval } from '@devvit/public-api';
-import Settings from '../../settings.json';
-import { splitArray } from '../../utils/splitArray.js';
-import { StyledButton } from '../../components/StyledButton.js';
-import { PixelText } from '../../components/PixelText.js';
+import { Devvit, useInterval, useState } from '@devvit/public-api';
+
 import { PixelSymbol } from '../../components/PixelSymbol.js';
+import { PixelText } from '../../components/PixelText.js';
 import { Shadow } from '../../components/Shadow.js';
+import { StyledButton } from '../../components/StyledButton.js';
+import Settings from '../../settings.json';
 import { blankCanvas } from '../../utils/blankCanvas.js';
+import { splitArray } from '../../utils/splitArray.js';
 
 interface DrawTabEditorStepProps {
   word: string;
@@ -17,15 +18,18 @@ export const DrawTabEditorStep = (props: DrawTabEditorStepProps): JSX.Element =>
   const [drawingData, setDrawingData] = useState<number[]>(blankCanvas);
 
   const [startTime] = useState(Date.now());
-  const [elapsedTime, setElapsedtime] = useState<number>(0);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
 
   useInterval(() => {
-    setElapsedtime(Date.now() - startTime);
+    setElapsedTime(Date.now() - startTime);
     const remainingTime = Settings.drawingDuration * 1000 - elapsedTime;
     if (remainingTime <= 0) props.onNext(drawingData);
-  }, 200).start();
+  }, 5000).start();
 
-  const secondsLeft = Math.round(Settings.drawingDuration - elapsedTime / 1000);
+  const secondsLeft = Math.max(
+    0, // Ensure non-negative value
+    Math.round((Settings.drawingDuration - elapsedTime / 1000) / 5) * 5 // Round to the nearest 5 seconds
+  );
 
   const size = '275px';
   const innerSize = 275;

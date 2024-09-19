@@ -1,5 +1,6 @@
 import { Devvit, useState } from '@devvit/public-api';
 
+import type { PostData } from '../../types/PostData.js';
 import { DrawTabEditorStep } from './DrawTabEditorStep.js';
 import { DrawTabOverviewStep } from './DrawTabOverviewStep.js';
 import { DrawTabReviewStep } from './DrawTabReviewStep.js';
@@ -10,6 +11,9 @@ interface DrawTabProps {
     username: string | null;
     activeFlairId: string | undefined;
   };
+  myDrawings: PostData[] | null;
+  myDrawingsLoading: boolean;
+  onDrawingSubmitted: () => void;
   setShowTabs: (showTabs: boolean) => void;
 }
 
@@ -54,6 +58,7 @@ export const DrawTab = (props: DrawTabProps): JSX.Element => {
         word={word}
         drawing={drawing}
         onNext={() => {
+          props.onDrawingSubmitted();
           setCurrentStep('Overview');
           props.setShowTabs(true);
         }}

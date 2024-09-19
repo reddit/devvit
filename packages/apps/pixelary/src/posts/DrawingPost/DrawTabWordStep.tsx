@@ -1,9 +1,10 @@
-import { Devvit, useState, useInterval } from '@devvit/public-api';
-import { PixelText } from '../../components/PixelText.js';
+import { Devvit, useInterval, useState } from '@devvit/public-api';
+
 import { PixelSymbol } from '../../components/PixelSymbol.js';
+import { PixelText } from '../../components/PixelText.js';
 import Words from '../../data/words.json';
-import { getRandomString } from '../../utils/getRandomString.js';
 import Settings from '../../settings.json';
+import { getRandomString } from '../../utils/getRandomString.js';
 
 interface DrawTabWordStepProps {
   onNext: (word: string) => void;
@@ -26,7 +27,7 @@ export const DrawTabWordStep = (props: DrawTabWordStepProps): JSX.Element => {
       // Timer is up
       props.onNext(candidateWords[0]);
     }
-  }, 200);
+  }, 900);
 
   timer.start();
 
