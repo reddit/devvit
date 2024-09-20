@@ -24,8 +24,8 @@ function FieldImage(): JSX.Element {
     <image
       height={'100%'}
       width={'100%'}
-      imageWidth={'1292px'}
-      imageHeight={'228px'}
+      imageWidth={'296px'}
+      imageHeight={'48px'}
       url="football/field.png"
       resizeMode="fill"
     />
@@ -84,16 +84,16 @@ function TeamLogos(division: number, event: GameEvent): JSX.Element {
       <image
         resizeMode="fit"
         width={`${division}%`}
-        imageWidth="240px"
-        imageHeight="240px"
+        imageWidth={`24px`}
+        imageHeight={`24px`}
         url={awayLogo}
       />
       <spacer size="small" grow />
       <image
         resizeMode="fit"
         width={`${division}%`}
-        imageWidth="240px"
-        imageHeight="240px"
+        imageWidth={`24px`}
+        imageHeight={`24px`}
         url={homeLogo}
       />
     </hstack>
@@ -131,8 +131,7 @@ export function FootballField(props: FootballFieldProps): JSX.Element {
     return <></>;
   }
   const situation = props.info.situation;
-  const summary = props.info.summary;
-  const isHome = situation.possession.id === summary.home.id;
+  const isHome = situation.possession.id === props.info.event.homeTeam.id;
   const direction = isHome ? PossessionDirection.Left : PossessionDirection.Right;
   const isInOwnZone = situation.possession.id === situation.location.id;
   const side = isHome

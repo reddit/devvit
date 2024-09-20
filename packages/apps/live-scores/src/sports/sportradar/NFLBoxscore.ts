@@ -1,10 +1,11 @@
 import type { Devvit } from '@devvit/public-api';
-import type { NFLGame, NFLSeasonInfo, NFLWeek } from './NFLSchedule.js';
+
 import type { GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { EventState } from '../GameEvent.js';
 import { APIService } from '../Sports.js';
 import { APIKey } from './APIKeys.js';
 import type { Team, TeamRecord } from './GenericModels.js';
+import type { NFLGame, NFLSeasonInfo, NFLWeek } from './NFLSchedule.js';
 
 type NFLBoxscoreSummary = {
   season: NFLSeasonInfo;
@@ -23,7 +24,7 @@ export type NFLGameTeam = Team & {
   record: TeamRecord;
 };
 
-type NFLBoxscoreSituation = {
+export type NFLBoxscoreSituation = {
   clock: string;
   down: number;
   yfd: number;
@@ -39,15 +40,15 @@ type NFLBoxscoreSituation = {
 };
 
 export type NFLBoxscoreLastEvent = {
-  type: string;
+  type?: string;
   id: string;
-  sequence: number;
+  sequence?: number;
   clock: string;
-  event_type: string;
+  event_type?: string;
   description: string;
-  created_at: string;
-  updated_at: string;
-  wall_clock: string;
+  created_at?: string;
+  updated_at?: string;
+  wall_clock?: string;
 };
 
 export type NFLBoxscore = NFLGame & {
@@ -137,11 +138,18 @@ function parseTeam(league: string, team: unknown): TeamInfo {
 }
 
 export type NFLGameScoreInfo = GeneralGameScoreInfo & {
-  summary: NFLBoxscoreSummary;
+  summary?: NFLBoxscoreSummary;
   clock?: string;
   quarter?: number;
   situation?: NFLBoxscoreSituation;
   lastEvent?: NFLBoxscoreLastEvent;
+  allEvents?: NFLBoxscoreLastEvent[];
+  timeouts?: NFLTimeoutsRemaining;
+};
+
+export type NFLTimeoutsRemaining = {
+  home: number;
+  away: number;
 };
 
 export function nflGameScoreInfo(game: NFLBoxscore): NFLGameScoreInfo {

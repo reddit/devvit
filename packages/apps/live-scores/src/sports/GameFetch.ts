@@ -1,11 +1,18 @@
-import { demoForId, leagueFromDemoId } from '../mock-scores/MockHelper.js';
+import type { Devvit, KVStore } from '@devvit/public-api';
+
+import { demoForId, gsFixtureForId, leagueFromDemoId } from '../mock-scores/MockHelper.js';
+import { getSubscriptions, removeSubscription } from '../subscriptions.js';
+import { fetchScoreForGame, parseGeneralGameScoreInfo } from './espn/espn.js';
 import type { GeneralGameScoreInfo } from './GameEvent.js';
 import { EventState } from './GameEvent.js';
-import type { GameSubscription } from './Sports.js';
-import { APIService, getLeagueFromString, getSportFromLeague } from './Sports.js';
-import { fetchScoreForGame, parseGeneralGameScoreInfo } from './espn/espn.js';
-import type { Devvit, KVStore } from '@devvit/public-api';
-import { getSubscriptions, removeSubscription } from '../subscriptions.js';
+import { fetchSimulatedGameScoreInfo } from './GameSimulator.js';
+import { fetchGSNFLGame, gsNflGameScoreInfo } from './geniussports/GSNFLMatchState.js';
+import type { BasketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
+import { fetchNBAGame, fetchNCAAMensBasketballGame } from './sportradar/BasketballPlayByPlay.js';
+import type { BasketballSummary } from './sportradar/BasketballSummary.js';
+import { fetchBasketballSummary } from './sportradar/BasketballSummary.js';
+import { fetchCricketMatch } from './sportradar/CricketMatch.js';
+import { storeAllEvents, storeLastEvent } from './sportradar/LastEvents.js';
 import type { NFLGameScoreInfo } from './sportradar/NFLBoxscore.js';
 import {
   fetchNFLBoxscore,
@@ -14,17 +21,12 @@ import {
   parseNFLBoxscore,
 } from './sportradar/NFLBoxscore.js';
 import { fetchSoccerEvent, parseSoccerEvent, soccerScoreInfo } from './sportradar/SoccerEvent.js';
-import { fetchCricketMatch } from './sportradar/CricketMatch.js';
-import { storeLastEvent } from './sportradar/LastEvents.js';
-import type { BasketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
-import { fetchNBAGame, fetchNCAAMensBasketballGame } from './sportradar/BasketballPlayByPlay.js';
-import { fetchSimulatedGameScoreInfo } from './GameSimulator.js';
-import type { BasketballSummary } from './sportradar/BasketballSummary.js';
-import { fetchBasketballSummary } from './sportradar/BasketballSummary.js';
+import type { GameSubscription } from './Sports.js';
+import { APIService, getLeagueFromString, getSportFromLeague } from './Sports.js';
 
-const CLOSE_TO_GAME_THRESHOLD_HOURS = 1;
-const STALE_INFO_THRESHOLD_HOURS = 1;
-const MS_TO_HOURS = 1000 * 60 * 60;
+const CLOSE_TO_GAME_THRESHOLD_MINUTES = 10;
+const STALE_INFO_THRESHOLD_MINUTES = 60;
+const MS_TO_MINUTES = 1000 * 60;
 
 export function makeKeyForSubscription(subscription: GameSubscription): string {
   if (subscription.simulationId) {
@@ -118,8 +120,13 @@ export function fetchDebugGameInfo(debugId: string): GeneralGameScoreInfo {
   if (sport === `soccer`) {
     return soccerScoreInfo(`eng.1`, parseSoccerEvent(demoForId(debugId)));
   }
-  if (league === `nfl`) {
+  if (league === `nfl` && debugId.startsWith('demo-nfl')) {
     return nflGameScoreInfo(parseNFLBoxscore(demoForId(debugId)));
+  }
+  if (league === `nfl` && debugId.startsWith('demo-gs-nfl')) {
+    const fixtures = gsFixtureForId(debugId);
+    const matchState = demoForId(debugId);
+    return gsNflGameScoreInfo({ fixtureInfo: fixtures.items[0], matchState });
   }
   return parseGeneralGameScoreInfo(demoForId(debugId), league, sport);
 }
@@ -167,7 +174,9 @@ ${info.event.homeTeam.abbreviation}) has ended. Cancelling subscription ${sub.ev
 
     if (info.event.gameType === 'football') {
       const footballInfo = info as NFLGameScoreInfo;
-      if (footballInfo.lastEvent) {
+      if (footballInfo.allEvents) {
+        await storeAllEvents(footballInfo.allEvents, context.redis, sub.eventId);
+      } else if (footballInfo.lastEvent) {
         await storeLastEvent(footballInfo.lastEvent, context.redis, sub.eventId);
       }
     }
@@ -195,8 +204,8 @@ async function filterSubscriptionsForFetch(
       const now = new Date();
       const start = new Date(info.event.date);
       const lastFetch = info.generatedDate ? new Date(info.generatedDate) : null;
-      const closeToGameThreshold = CLOSE_TO_GAME_THRESHOLD_HOURS * MS_TO_HOURS;
-      const stalePregameThreshold = STALE_INFO_THRESHOLD_HOURS * MS_TO_HOURS;
+      const closeToGameThreshold = CLOSE_TO_GAME_THRESHOLD_MINUTES * MS_TO_MINUTES;
+      const stalePregameThreshold = STALE_INFO_THRESHOLD_MINUTES * MS_TO_MINUTES;
       if (
         lastFetch === null ||
         start.getTime() - now.getTime() < closeToGameThreshold ||
@@ -219,6 +228,8 @@ function subscriptionFetches(
   gameSubscriptions.forEach((gameSub: GameSubscription) => {
     if (gameSub.service === APIService.SRNFL) {
       eventFetches.push(fetchNFLBoxscore(gameSub.eventId, context));
+    } else if (gameSub.service === APIService.GSNFL) {
+      eventFetches.push(fetchGSNFLGame(gameSub.eventId, context));
     } else if (gameSub.service === APIService.SRSoccer) {
       eventFetches.push(fetchSoccerEvent(gameSub.league, gameSub.eventId, context));
     } else if (gameSub.service === APIService.SRNBA || gameSub.service === APIService.SRNBASim) {

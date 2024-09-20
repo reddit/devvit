@@ -1,30 +1,31 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { BaseballGameScoreInfo } from '../sports/espn/espn.js';
 import { fetchActiveGames, fetchAllTeams } from '../sports/espn/espn.js';
-import { timezoneOptions } from '../sports/Timezones.js';
-import { APIService, League, getLeagueFromString, leaguesSupported } from '../sports/Sports.js';
-import {
-  espnGameSelectForm,
-  srSoccerGameSelectionForm,
-  srNflGameSelectForm,
-  srBasketballGameSelectForm,
-  srBasketballSimGameSelectForm,
-  srCricketMatchSelectionForm,
-} from './GameSelectionForm.js';
-import { espnSingleTeamSelectForm } from './SingleTeamSelectionForm.js';
-import { fetchNflSchedule, filteredGamesFromSeason } from '../sports/sportradar/NFLSchedule.js';
 import type { GeneralGameScoreInfo } from '../sports/GameEvent.js';
-import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
-import { fetchSoccerGames } from '../sports/sportradar/SoccerSchedule.js';
-import { fetchCricketSportEvents } from '../sports/sportradar/CricketTournaments.js';
-import { infoForLeague } from '../sports/sportradar/SoccerLeagues.js';
-import { infoForCricketLeague } from '../sports/sportradar/CricketLeague.js';
 import {
   fetchNbaSchedule,
   fetchNbaSimSchedule,
   fetchNcaaMensBasketballSchedule,
   filterGamesFromNbaSeason,
 } from '../sports/sportradar/BasketballSchedule.js';
+import { infoForCricketLeague } from '../sports/sportradar/CricketLeague.js';
+import { fetchCricketSportEvents } from '../sports/sportradar/CricketTournaments.js';
+import { fetchNflSchedule, filteredGamesFromSeason } from '../sports/sportradar/NFLSchedule.js';
+import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
+import { infoForLeague } from '../sports/sportradar/SoccerLeagues.js';
+import { fetchSoccerGames } from '../sports/sportradar/SoccerSchedule.js';
+import { APIService, getLeagueFromString, League, leaguesSupported } from '../sports/Sports.js';
+import { timezoneOptions } from '../sports/Timezones.js';
+import {
+  espnGameSelectForm,
+  srBasketballGameSelectForm,
+  srBasketballSimGameSelectForm,
+  srCricketMatchSelectionForm,
+  srNflGameSelectForm,
+  srSoccerGameSelectionForm,
+} from './GameSelectionForm.js';
+import { espnSingleTeamSelectForm } from './SingleTeamSelectionForm.js';
 
 export const espnScoreboardCreationForm = Devvit.createForm(
   () => {
@@ -115,7 +116,7 @@ export const srNflScoreboardCreationForm = Devvit.createForm(
             { label: 'Regular Season', value: 'REG' },
             { label: 'Post Season', value: 'PST' },
           ],
-          defaultValue: ['PST'],
+          defaultValue: ['REG'],
         },
         {
           name: 'timezone',
@@ -240,7 +241,7 @@ export const srNbaScoreboardCreationForm = Devvit.createForm(
             { label: 'Regular Season', value: 'REG' },
             { label: 'Post Season', value: 'PST' },
           ],
-          defaultValue: ['PST'],
+          defaultValue: ['REG'],
         },
         {
           name: 'timezone',
@@ -310,7 +311,7 @@ export const srNcaaMBScoreboardCreationForm = Devvit.createForm(
             { label: 'Conference Tournament', value: 'CT' },
             { label: 'Post Season', value: 'PST' },
           ],
-          defaultValue: ['PST'],
+          defaultValue: ['REG'],
         },
         {
           name: 'timezone',

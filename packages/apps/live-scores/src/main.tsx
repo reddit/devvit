@@ -1,39 +1,25 @@
 import type { Post, StateSetter } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
-import { GenericScoreBoard, ScoreboardPage } from './components/Scoreboard.js';
+
 import { BaseballScoreBoard } from './components/baseball.js';
+import { BasketballScoreboard } from './components/basketball/BasketballScoreboard.js';
 import type { CommentData } from './components/comments.js';
 import { debugComment, getLastComment } from './components/comments.js';
-import { nextMLBDemoPage, nextNFLDemoPage } from './mock-scores/MockHelper.js';
-import type { BaseballGameScoreInfo } from './sports/espn/espn.js';
-import type { GameSubscription } from './sports/Sports.js';
-import { APIService, League, getLeagueFromString } from './sports/Sports.js';
+import { CricketScoreboard } from './components/cricket.js';
+import { FootballScoreboard } from './components/football/FootballScoreboard.js';
+import { LoadingState, LoadingStateFootball } from './components/Loading.js';
+import { GenericScoreBoard, ScoreboardPage } from './components/Scoreboard.js';
+import { SoccerScoreboard } from './components/soccer.js';
+import { gsNflScoreboardCreationForm } from './forms/GSNFLForms.js';
 import {
+  srCricketScoreboardCreationForm,
   srNbaScoreboardCreationForm,
   srNbaSimScoreboardCreationForm,
   srNcaaMBScoreboardCreationForm,
-  srNflScoreboardCreationForm,
   srSoccerScoreboardCreationForm,
-  srCricketScoreboardCreationForm,
 } from './forms/ScoreboardCreateForm.js';
-import type { GeneralGameScoreInfo } from './sports/GameEvent.js';
-import { EventState } from './sports/GameEvent.js';
-import {
-  fetchDebugGameInfo,
-  fetchCachedGameInfoForPostId,
-  makeKeyForPostId,
-  fetchSubscriptions,
-  handlePostRemoval,
-  makeKeyForEventId,
-  fetchCachedBasketballSummary,
-} from './sports/GameFetch.js';
-import type { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
-import { SoccerScoreboard } from './components/soccer.js';
-import { APIKey, AppSettings } from './sports/sportradar/APIKeys.js';
 import { fetchAllSubsAndGames, subscriptionsForm } from './forms/SubscriptionsForm.js';
-import type { NFLBoxscoreLastEvent, NFLGameScoreInfo } from './sports/sportradar/NFLBoxscore.js';
-import { FootballScoreboard } from './components/football/FootballScoreboard.js';
-import { LoadingState, LoadingStateFootball } from './components/Loading.js';
+import { nextGSNFLDemoPage, nextMLBDemoPage, nextNFLDemoPage } from './mock-scores/MockHelper.js';
 import type { Reaction, ReactionScore } from './Reactions.js';
 import {
   combineReactionScores,
@@ -45,24 +31,39 @@ import {
   getAvailableReactions,
   incrementReaction,
 } from './Reactions.js';
-import { updateCustomPost } from './utils/updateRedditPost.js';
-import { getAllEventIds } from './sports/sportradar/LastEvents.js';
-import type { CurrentEventData, DevvitState, Nullable } from './utils/types.js';
-import { noop } from './utils/types.js';
-import { getNavigationCallbacks } from './utils/football/events.js';
-import { srManualNFLScoreboardCreateForm } from './forms/ManualGameCreateForm.js';
-import { BasketballScoreboard } from './components/basketball/BasketballScoreboard.js';
+import type { BaseballGameScoreInfo } from './sports/espn/espn.js';
+import type { GeneralGameScoreInfo } from './sports/GameEvent.js';
+import { EventState } from './sports/GameEvent.js';
+import {
+  fetchCachedBasketballSummary,
+  fetchCachedGameInfoForPostId,
+  fetchDebugGameInfo,
+  fetchSubscriptions,
+  handlePostRemoval,
+  makeKeyForEventId,
+  makeKeyForPostId,
+} from './sports/GameFetch.js';
+import { createNBASimulationPost, resetSimulator } from './sports/GameSimulator.js';
+import { AppSettings, settingsFields } from './sports/sportradar/APIKeys.js';
 import type { BasketballGameScoreInfo } from './sports/sportradar/BasketballPlayByPlay.js';
 import {
   getEventAtIndex,
   totalEventsCount,
 } from './sports/sportradar/BasketballPlayByPlayEvents.js';
-import { createNBASimulationPost, resetSimulator } from './sports/GameSimulator.js';
 import type { BasketballSummary } from './sports/sportradar/BasketballSummary.js';
-import { CricketScoreboard } from './components/cricket.js';
 import type { CricketMatchScoreInfo } from './sports/sportradar/CricketModels.js';
+import { getAllEventIds } from './sports/sportradar/LastEvents.js';
+import type { NFLBoxscoreLastEvent, NFLGameScoreInfo } from './sports/sportradar/NFLBoxscore.js';
+import type { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
+import type { GameSubscription } from './sports/Sports.js';
+import { APIService, getLeagueFromString, League } from './sports/Sports.js';
+import { getNavigationCallbacks } from './utils/football/events.js';
+import type { CurrentEventData, DevvitState, Nullable } from './utils/types.js';
+import { noop } from './utils/types.js';
+import { updateCustomPost } from './utils/updateRedditPost.js';
 
 const UPDATE_FREQUENCY_MINUTES: number = 1;
+const UPDATE_FREQUENCY_SECONDS: number = 15;
 
 // Devvit.debug.emitSnapshots = true;
 
@@ -73,51 +74,7 @@ Devvit.configure({
   kvStore: true,
 });
 
-Devvit.addSettings([
-  {
-    name: APIKey.soccer,
-    label: 'Sportradar Soccer API Key',
-    type: 'string',
-    isSecret: true,
-    scope: 'app',
-  },
-  {
-    name: APIKey.nfl,
-    label: 'Sportradar NFL API Key',
-    type: 'string',
-    isSecret: true,
-    scope: 'app',
-  },
-  {
-    name: APIKey.nba,
-    label: 'Sportradar NBA API Key',
-    type: 'string',
-    isSecret: true,
-    scope: 'app',
-  },
-  {
-    name: APIKey.ncaamb,
-    label: 'Sportradar NCAA Mens Basketball API Key',
-    type: 'string',
-    isSecret: true,
-    scope: 'app',
-  },
-  {
-    name: AppSettings.enableDynamicCachedLoader,
-    label: 'Use a dynamic cached loader for posts',
-    type: 'string',
-    isSecret: false,
-    scope: 'app',
-    defaultValue: 'DISABLED',
-  },
-  {
-    name: APIKey.cricket,
-    label: 'Sportradar Cricket API Key',
-    type: 'string',
-    isSecret: true,
-    scope: 'app',
-  },
-]);
+Devvit.addSettings(settingsFields);
 
 export const AppContent: Devvit.BlockComponent<{
   scoreInfo: GeneralGameScoreInfo;
@@ -227,26 +184,26 @@ export const AppContent: Devvit.BlockComponent<{
 //   },
 // });
 
+// Devvit.addMenuItem({
+//   label: 'Create simulated NFL scoreboard (Internal)',
+//   location: 'subreddit',
+//   forUserType: `moderator`,
+//   onPress: async (_event, { ui }) => {
+//     return ui.showForm(srManualNFLScoreboardCreateForm);
+//   },
+// });
+
 Devvit.addMenuItem({
-  label: 'Create simulated NFL scoreboard (Internal)',
+  label: '(Internal) Create NFL Scoreboard',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
-    return ui.showForm(srManualNFLScoreboardCreateForm);
+    return ui.showForm(gsNflScoreboardCreationForm);
   },
 });
 
 Devvit.addMenuItem({
-  label: 'Create NFL Scoreboard (Internal)',
-  location: 'subreddit',
-  forUserType: `moderator`,
-  onPress: async (_event, { ui }) => {
-    return ui.showForm(srNflScoreboardCreationForm);
-  },
-});
-
-Devvit.addMenuItem({
-  label: 'Create NBA Scoreboard (Internal)',
+  label: '(Internal) Create NBA Scoreboard',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
@@ -255,7 +212,7 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'Create NBA SportRadar Sim Scoreboard (Internal)',
+  label: '(Internal) Create NBA SportRadar Sim Scoreboard',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
@@ -264,7 +221,7 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'Create NCAA Mens Basketball Scoreboard (Internal)',
+  label: '(Internal) Create NCAA Mens Basketball Scoreboard',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
@@ -273,7 +230,7 @@ Devvit.addMenuItem({
 });
 
 // Devvit.addMenuItem({
-//   label: 'Create manual football scoreboard',
+//   label: '(Internal) Create Manual Soccer Scoreboard',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_event, { ui }) => {
@@ -282,7 +239,7 @@ Devvit.addMenuItem({
 // });
 
 Devvit.addMenuItem({
-  label: 'Create Soccer Scoreboard (Internal)',
+  label: '(Internal) Create Soccer Scoreboard',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
@@ -291,7 +248,7 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'Create Cricket Scoreboard (Internal)',
+  label: '(Internal) Create Cricket Scoreboard',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, { ui }) => {
@@ -300,7 +257,7 @@ Devvit.addMenuItem({
 });
 
 // Devvit.addMenuItem({
-//   label: 'Scoreboards: Remove all subscriptions',
+//   label: '(Internal) Scoreboards: Remove all subscriptions',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_, context) => {
@@ -318,7 +275,7 @@ Devvit.addMenuItem({
 // });
 
 // Devvit.addMenuItem({
-//   label: 'Scoreboards: Reset KV Store',
+//   label: '(Internal) Scoreboards: Reset KV Store',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_, { kvStore, ui }) => {
@@ -336,7 +293,7 @@ Devvit.addMenuItem({
 // });
 
 Devvit.addMenuItem({
-  label: 'Scoreboard: Manage Subscriptions',
+  label: '(Internal) Scoreboard: Manage Subscriptions',
   location: `subreddit`,
   forUserType: `moderator`,
   onPress: async (_event, context) => {
@@ -348,7 +305,7 @@ Devvit.addMenuItem({
 });
 
 // Devvit.addMenuItem({
-//   label: 'Create Baseball Scoreboard (Demo)',
+//   label: '(Internal) Create Baseball Scoreboard (Demo)',
 //   location: 'subreddit',
 //   forUserType: `moderator`,
 //   onPress: async (_event, context) => {
@@ -372,7 +329,7 @@ Devvit.addMenuItem({
 // });
 
 Devvit.addMenuItem({
-  label: 'Create NBA Simulator Post (Demo)',
+  label: '(Internal) Create NBA Simulator/Demo',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, context) => {
@@ -381,7 +338,7 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'Restart NBA Simulator Post (Demo)',
+  label: '(Internal) Restart NBA Simulator/Demo',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, context) => {
@@ -390,7 +347,7 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'Create Soccer Scoreboard (Demo)',
+  label: '(Internal) Create Soccer Scoreboard Demo',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, context) => {
@@ -414,20 +371,20 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: 'Create NFL Scoreboard (Demo)',
+  label: '(Internal) Create NFL Scoreboard Demo',
   location: 'subreddit',
   forUserType: `moderator`,
   onPress: async (_event, context) => {
     const currentSubreddit = await context.reddit.getCurrentSubreddit();
     const post: Post = await context.reddit.submitPost({
       preview: <LoadingStateFootball />,
-      title: `Scoreboard: Football Demo`,
+      title: `Scoreboard: NFL Football Demo`,
       subredditName: currentSubreddit.name,
     });
     const gameSub: GameSubscription = {
       league: League.NFL,
-      eventId: 'demo-nfl-game-01',
-      service: APIService.SRNFL,
+      eventId: 'demo-gs-nfl-01',
+      service: APIService.GSNFL,
     };
     await context.kvStore.put(makeKeyForPostId(post.id), JSON.stringify(gameSub));
     await configurePostWithAvailableReactions(post.id, context.redis, defaultReactions);
@@ -623,6 +580,24 @@ Devvit.addCustomPostType({
           await reactionUpdate(oldInfo, update);
         }
       }
+      if (pageId?.startsWith('demo-gs-nfl')) {
+        const nextPage = nextGSNFLDemoPage(pageId);
+        const gameSub: GameSubscription = {
+          league: getLeagueFromString('nfl'),
+          eventId: nextPage,
+          service: APIService.GSNFL,
+        };
+        await context.kvStore.put(makeKeyForPostId(postId), JSON.stringify(gameSub));
+        const oldInfo = scoreInfo;
+        const update = await fetchCachedGameInfoForPostId(context, postId);
+        setScoreInfo(update);
+        if (oldInfo && update) {
+          if (debugId) {
+            return;
+          }
+          await reactionUpdate(oldInfo, update);
+        }
+      }
     };
 
     const [page, setPage] = useState(ScoreboardPage.SCORE);
@@ -765,7 +740,7 @@ Devvit.addCustomPostType({
 
     const [eventIndexOverride, setEventIndexOverride] = useState(-1);
 
-    // FOOTBALL!
+    // SR FOOTBALL!
     if (scoreInfo.event.gameType === 'football') {
       const nflScoreInfo = scoreInfo as NFLGameScoreInfo;
       const { onNavigatePrev, onNavigateNext } = getNavigationCallbacks(
@@ -1035,7 +1010,7 @@ Devvit.addTrigger({
 
     console.log(`Creating a new game subscription job`);
     await context.scheduler.runJob({
-      cron: `*/${UPDATE_FREQUENCY_MINUTES} * * * *`,
+      cron: `*/${UPDATE_FREQUENCY_SECONDS} * * * * *`,
       name: 'game_subscription_thread',
       data: {},
     });

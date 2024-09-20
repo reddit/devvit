@@ -18,13 +18,23 @@ import { demoNflGame10 } from './nfl/nfl-a-10.js';
 import { demoNflGame11 } from './nfl/nfl-a-11.js';
 import { demoNflGame12 } from './nfl/nfl-a-12.js';
 import { demoNflGame13 } from './nfl/nfl-a-13.js';
+import { demoGSNflGame01 } from './nfl/nfl-gs-a-01.js';
+import { demoGSNflGame02 } from './nfl/nfl-gs-a-02.js';
+import { demoGSNflGame03 } from './nfl/nfl-gs-a-03.js';
+import { demoGSNflGame04 } from './nfl/nfl-gs-a-04.js';
+import { demoGSNflGame05 } from './nfl/nfl-gs-a-05.js';
+import { demoGSNflFixture01 } from './nfl/nfl-gs-a-fixture-01.js';
+import { demoGSNflFixture02 } from './nfl/nfl-gs-a-fixture-02.js';
+import { demoGSNflFixture03 } from './nfl/nfl-gs-a-fixture-03.js';
+import { demoGSNflFixture04 } from './nfl/nfl-gs-a-fixture-04.js';
+import { demoGSNflFixture05 } from './nfl/nfl-gs-a-fixture-05.js';
 
 export function leagueFromDemoId(demoString: string): string {
   const match = demoString.match(/-(mlb|epl|nfl)-/);
   return match ? match[1] : 'unknown';
 }
 
-export function demoForId(id: string): any {
+export function demoForId(id: string): unknown {
   switch (id) {
     case `demo-mlb-00`:
       return demoMlb0;
@@ -66,6 +76,33 @@ export function demoForId(id: string): any {
       return demoNflGame12;
     case 'demo-nfl-game-13':
       return demoNflGame13;
+    case `demo-gs-nfl-01`:
+      return demoGSNflGame01;
+    case `demo-gs-nfl-02`:
+      return demoGSNflGame02;
+    case `demo-gs-nfl-03`:
+      return demoGSNflGame03;
+    case `demo-gs-nfl-04`:
+      return demoGSNflGame04;
+    case `demo-gs-nfl-05`:
+      return demoGSNflGame05;
+    default:
+      return undefined;
+  }
+}
+
+export function gsFixtureForId(id: string): unknown {
+  switch (id) {
+    case `demo-gs-nfl-01`:
+      return demoGSNflFixture01;
+    case `demo-gs-nfl-02`:
+      return demoGSNflFixture02;
+    case `demo-gs-nfl-03`:
+      return demoGSNflFixture03;
+    case `demo-gs-nfl-04`:
+      return demoGSNflFixture04;
+    case `demo-gs-nfl-05`:
+      return demoGSNflFixture05;
     default:
       return undefined;
   }
@@ -116,6 +153,23 @@ export function nextNFLDemoPage(id: string): string {
       return `demo-nfl-game-13`;
     case `demo-nfl-game-13`:
       return `demo-nfl-game-01`;
+    default:
+      return `demo-nfl-game-01`;
+  }
+}
+
+export function nextGSNFLDemoPage(id: string): string {
+  switch (id) {
+    case `demo-gs-nfl-01`:
+      return `demo-gs-nfl-02`;
+    case `demo-gs-nfl-02`:
+      return `demo-gs-nfl-03`;
+    case `demo-gs-nfl-03`:
+      return `demo-gs-nfl-04`;
+    case `demo-gs-nfl-04`:
+      return `demo-gs-nfl-05`;
+    case `demo-gs-nfl-05`:
+      return `demo-gs-nfl-01`;
     default:
       return `demo-nfl-game-01`;
   }

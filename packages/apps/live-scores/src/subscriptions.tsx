@@ -1,7 +1,8 @@
 import type { Context, KVStore } from '@devvit/public-api';
+
 import type { GameSubscription } from './sports/Sports.js';
 
-const MAX_SUBSCRIPTIONS = 10;
+const MAX_SUBSCRIPTIONS = 30;
 const ALL_SUBSCRIPTIONS_KEY = 'subscriptions';
 
 /**

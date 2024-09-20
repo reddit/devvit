@@ -1,7 +1,8 @@
-import { Devvit } from '@devvit/public-api';
-import { Team, Period } from './GenericModels.js';
-import { APIKey } from './APIKeys.js';
+import type { Devvit } from '@devvit/public-api';
+
 import { getRelativeDate } from '../Timezones.js';
+import { APIKey } from './APIKeys.js';
+import type { Period, Team } from './GenericModels.js';
 
 export type NFLGame = {
   id: string;
@@ -70,7 +71,7 @@ export async function fetchNflSchedule(
   const apiKey = await context.settings.get(APIKey.nfl);
   try {
     const request = new Request(
-      `https://api.sportradar.us/nfl/official/production/v7/en/games/2023/${seasonType}/schedule.json?api_key=${apiKey}`
+      `https://api.sportradar.us/nfl/official/production/v7/en/games/2024/${seasonType}/schedule.json?api_key=${apiKey}`
     );
     // console.log(request.url);
     const response = await fetch(request);
@@ -82,7 +83,7 @@ export async function fetchNflSchedule(
   return parseScheduleData(data);
 }
 
-function parseScheduleData(jsonData: any): NFLSeason {
+function parseScheduleData(jsonData: unknown): NFLSeason {
   return {
     season: {
       id: jsonData.id,
@@ -90,11 +91,11 @@ function parseScheduleData(jsonData: any): NFLSeason {
       type: jsonData.type,
       name: jsonData.name,
     },
-    weeks: jsonData.weeks.map((week: any) => parseWeekData(week)),
+    weeks: jsonData.weeks.map((week: unknown) => parseWeekData(week)),
   };
 }
 
-function parseWeekData(jsonData: any): NFLWeek {
+function parseWeekData(jsonData: unknown): NFLWeek {
   return {
     id: jsonData.id,
     sequence: jsonData.sequence,
@@ -103,8 +104,8 @@ function parseWeekData(jsonData: any): NFLWeek {
   };
 }
 
-function parseGames(jsonData: any): NFLGame[] {
-  return jsonData.map((game: any) => ({
+function parseGames(jsonData: unknown): NFLGame[] {
+  return jsonData.map((game: unknown) => ({
     id: game.id,
     status: game.status,
     scheduled: game.scheduled,

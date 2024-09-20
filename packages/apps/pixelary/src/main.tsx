@@ -85,8 +85,7 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { redis } = context;
-    const service = new Service(redis);
+    const service = new Service(context);
     await service.upsertDictionary('main', Words);
     context.ui.showToast('Dictionary saved to Redis');
   },
@@ -104,8 +103,7 @@ const logDictionaryForm = Devvit.createForm(
     ],
   },
   async (event, context) => {
-    const { redis } = context;
-    const service = new Service(redis);
+    const service = new Service(context);
 
     await service.setSelectedDictionaryName(event.values.dictionary);
     await service.getDictionary(true);
@@ -140,8 +138,7 @@ const dynamicDictionaryForm = Devvit.createForm(
     ],
   },
   async (event, context) => {
-    const { redis } = context;
-    const service = new Service(redis);
+    const service = new Service(context);
 
     if (!event.values.words) {
       context.ui.showToast('Please enter a word');
@@ -198,8 +195,7 @@ const selectDictionaryForm = Devvit.createForm(
       return context.ui.showToast('Selected value must be a string!');
     }
 
-    const { redis } = context;
-    const service = new Service(redis);
+    const service = new Service(context);
     await service.setSelectedDictionaryName(value);
     return context.ui.showToast(`Dictionary selected: ${event.values.dictionary[0]}`);
   }
@@ -219,8 +215,7 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { redis } = context;
-    const service = new Service(redis);
+    const service = new Service(context);
     const selectedDictionary = await service.getSelectedDictionaryName();
     context.ui.showToast(`Current dictionary: ${selectedDictionary}`);
   },

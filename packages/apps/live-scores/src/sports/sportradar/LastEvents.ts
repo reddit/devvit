@@ -1,5 +1,6 @@
-import { NFLBoxscoreLastEvent } from './NFLBoxscore.js';
-import { RedisClient } from '@devvit/public-api';
+import type { RedisClient } from '@devvit/public-api';
+
+import type { NFLBoxscoreLastEvent } from './NFLBoxscore.js';
 
 function eventIdsKey(gameId: string): string {
   return `${gameId}:eventIds`;
@@ -35,6 +36,20 @@ export async function storeLastEvent(
   const updatedEvents = JSON.stringify(events);
   await redis.set(eventIdsKey(gameId), updatedEvents);
   await redis.set(eventKey(gameId, lastEvent.id), JSON.stringify(lastEvent));
+}
+
+export async function storeAllEvents(
+  events: NFLBoxscoreLastEvent[],
+  redis: RedisClient,
+  gameId: string
+): Promise<void> {
+  const existingEvents = await getAllEventIds(redis, gameId);
+  const newEvents = events.filter((event) => !existingEvents.includes(event.id));
+  const updatedEvents = [...existingEvents, ...newEvents.map((event) => event.id)];
+  await redis.set(eventIdsKey(gameId), JSON.stringify(updatedEvents));
+  for (const event of newEvents) {
+    await redis.set(eventKey(gameId, event.id), JSON.stringify(event));
+  }
 }
 
 export async function getEventById(

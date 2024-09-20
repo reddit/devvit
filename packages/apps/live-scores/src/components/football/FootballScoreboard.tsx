@@ -1,18 +1,18 @@
 import { Devvit } from '@devvit/public-api';
+
+import type { Reaction, ReactionScore } from '../../Reactions.js';
+import { eventPeriodString } from '../../sports/espn/espn.js';
+import { EventState, leagueAssetPath } from '../../sports/GameEvent.js';
 import type {
   NFLBoxscoreLastEvent,
   NFLGameScoreInfo,
-  NFLGameTeam,
 } from '../../sports/sportradar/NFLBoxscore.js';
-import { EventState, leagueAssetPath } from '../../sports/GameEvent.js';
-import { FootballField } from './FootballField.js';
-import { TopBar } from '../TopBar.js';
-import { eventPeriodString } from '../../sports/espn/espn.js';
-import type { Reaction, ReactionScore } from '../../Reactions.js';
-import type { CurrentEventData, DevvitState, Nullable } from '../../utils/types.js';
 import { getCurrentEventData, getPositionAndTotalEvents } from '../../utils/football/events.js';
+import type { CurrentEventData, DevvitState, Nullable } from '../../utils/types.js';
 import type { OnReactionPress } from '../ReactionsButtons.js';
 import { Reactions } from '../ReactionsButtons.js';
+import { TopBar } from '../TopBar.js';
+import { FootballField } from './FootballField.js';
 
 enum Color {
   primaryFont = '#F2F4F5',
@@ -82,11 +82,11 @@ function down(num: number): string {
   }
 }
 
-function PossessionComponent(team: NFLGameTeam, info: NFLGameScoreInfo): JSX.Element {
+function PossessionComponent(teamId: string, info: NFLGameScoreInfo): JSX.Element {
   if (
     info.event.state !== EventState.LIVE ||
     info.situation === undefined ||
-    team.id !== info.situation.possession.id
+    teamId !== info.situation.possession.id
   ) {
     return <></>;
   }
@@ -114,15 +114,15 @@ function timeoutsLeftString(tol: number): string {
   return '●'.repeat(tol) + '○'.repeat(3 - tol);
 }
 
-function ScoreComponent(team: NFLGameTeam, info: NFLGameScoreInfo): JSX.Element {
+function ScoreComponent(timeouts: number, score: string, info: NFLGameScoreInfo): JSX.Element {
   return (
-    <vstack height="100%" width={'44px'} alignment="end middle">
+    <vstack height="100%" width={'52px'} alignment="end middle">
       <text color={Color.primaryFont} size="xlarge" style="heading">
-        {team.points}
+        {score}
       </text>
       {info.event.state === EventState.LIVE && (
         <text color={Color.secondaryFont} size="xsmall" style="metadata">
-          {timeoutsLeftString(team.remaining_timeouts)}
+          {timeoutsLeftString(timeouts)}
         </text>
       )}
     </vstack>
@@ -130,6 +130,36 @@ function ScoreComponent(team: NFLGameTeam, info: NFLGameScoreInfo): JSX.Element 
 }
 
 function Team(isHome: Boolean, info: NFLGameScoreInfo): JSX.Element {
+  if (!info.summary) {
+    const logo = isHome ? info.event.homeTeam.logo : info.event.awayTeam.logo;
+    const team = isHome ? info.event.homeTeam : info.event.awayTeam;
+    const score = isHome ? info.homeScore : info.awayScore;
+    const logoUrl = leagueAssetPath(info.event) + logo;
+    const timeoutsRemaining = isHome ? info.timeouts?.home : info.timeouts?.away;
+    return (
+      <hstack width={'100%'} height={'58px'} alignment="start middle">
+        <hstack height={'100%'} alignment="start middle" grow>
+          <spacer size="small" />
+          <image url={logoUrl} height={'32px'} width={'32px'} imageHeight={240} imageWidth={240} />
+          <spacer size="small" />
+          <vstack alignment="top start">
+            <text color={Color.primaryFont} size="small">
+              {team.location}
+            </text>
+            <text color={Color.primaryFont} size="large" style="heading">
+              {team.name}
+            </text>
+          </vstack>
+        </hstack>
+        <hstack height={'100%'} alignment="center middle">
+          {PossessionComponent(team.id, info)}
+          {ScoreComponent(timeoutsRemaining ?? 3, score, info)}
+        </hstack>
+        <spacer size="small" />
+      </hstack>
+    );
+  }
+
   const team = isHome ? info.summary.home : info.summary.away;
   const logo = isHome ? info.event.homeTeam.logo : info.event.awayTeam.logo;
   const logoUrl = leagueAssetPath(info.event) + logo;
@@ -149,8 +179,8 @@ function Team(isHome: Boolean, info: NFLGameScoreInfo): JSX.Element {
         </vstack>
       </hstack>
       <hstack height={'100%'} alignment="center middle">
-        {PossessionComponent(team, info)}
-        {ScoreComponent(team, info)}
+        {PossessionComponent(team.id, info)}
+        {ScoreComponent(team.remaining_timeouts, String(team.points), info)}
       </hstack>
       <spacer size="small" />
     </hstack>
@@ -231,7 +261,6 @@ function EventOverlay(
   const prevColor = onNavigatePrev ? activeNavigationColor : inactiveNavigationColor;
   const nextColor = onNavigateNext ? activeNavigationColor : inactiveNavigationColor;
   const resetNavigationColor = onNavigateNext ? activeNavigationColor : inactiveNavigationColor;
-
   return (
     <vstack width={100} height={100} backgroundColor="black" padding="medium">
       <hstack alignment="center middle" width={100}>
@@ -319,6 +348,7 @@ export function FootballScoreboard(
 ): JSX.Element {
   const [lastEventOverlay, setLastEventOverlay] = props.lastEventOverlayState;
   const { onNavigateNext, onNavigatePrev, onResetNavigation } = props;
+
   const { currentPosition, totalEventCount } = getPositionAndTotalEvents(
     props.gameEventIds,
     props.scoreInfo,
@@ -343,8 +373,8 @@ export function FootballScoreboard(
       <image
         width={'100%'}
         height={'100%'}
-        imageWidth={1136}
-        imageHeight={648}
+        imageWidth={560}
+        imageHeight={320}
         url="football/background.png"
         resizeMode="cover"
       />
@@ -384,13 +414,14 @@ export function FootballScoreboard(
             onResetNavigation
           )
         : null}
-      {props.scoreInfo.event.id.startsWith(`demo-nfl-game`) && (
-        <hstack width={'100%'} height={'100%'} alignment="end bottom">
-          <button maxWidth={100} onPress={() => demoNext()}>
-            Next
-          </button>
-        </hstack>
-      )}
+      {props.scoreInfo.event.id.startsWith(`demo-nfl-game`) ||
+        (props.scoreInfo.event.id.startsWith(`demo-gs-nfl`) && (
+          <hstack width={'100%'} height={'100%'} alignment="end bottom">
+            <button maxWidth={100} onPress={() => demoNext()}>
+              Next
+            </button>
+          </hstack>
+        ))}
     </zstack>
   );
 }

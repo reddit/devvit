@@ -1,34 +1,35 @@
 import type { Data, Post } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
-import { eventStateToString, fetchScoreForGame } from '../sports/espn/espn.js';
-import type { GameSubscription } from '../sports/Sports.js';
-import { getDisplayNameFromLeague, getLeagueFromString, APIService } from '../sports/Sports.js';
-import { addSubscription } from '../subscriptions.js';
-import type { NFLGame } from '../sports/sportradar/NFLSchedule.js';
-import type { GameEvent, GeneralGameScoreInfo } from '../sports/GameEvent.js';
-import { compareEvents } from '../sports/GameEvent.js';
-import { fetchNFLBoxscore } from '../sports/sportradar/NFLBoxscore.js';
-import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
-import type {
-  CricketSportEvent,
-  BasicCricketMatchInfo,
-} from '../sports/sportradar/CricketModels.js';
-import {
-  fetchCricketMatch,
-  makeKeyForCricketMatchInfo,
-} from '../sports/sportradar/CricketMatch.js';
-import {
-  makeKeyForSubscription,
-  makeKeyForPostId,
-  makeKeyForEventId,
-} from '../sports/GameFetch.js';
+
 import { LoadingState, LoadingStateFootball } from '../components/Loading.js';
 import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
+import { eventStateToString, fetchScoreForGame } from '../sports/espn/espn.js';
+import type { GameEvent, GeneralGameScoreInfo } from '../sports/GameEvent.js';
+import { compareEvents } from '../sports/GameEvent.js';
+import {
+  makeKeyForEventId,
+  makeKeyForPostId,
+  makeKeyForSubscription,
+} from '../sports/GameFetch.js';
 import type { BasketballGame } from '../sports/sportradar/BasketballModels.js';
 import {
   fetchNBAGame,
   fetchNCAAMensBasketballGame,
 } from '../sports/sportradar/BasketballPlayByPlay.js';
+import {
+  fetchCricketMatch,
+  makeKeyForCricketMatchInfo,
+} from '../sports/sportradar/CricketMatch.js';
+import type {
+  BasicCricketMatchInfo,
+  CricketSportEvent,
+} from '../sports/sportradar/CricketModels.js';
+import { fetchNFLBoxscore } from '../sports/sportradar/NFLBoxscore.js';
+import type { NFLGame } from '../sports/sportradar/NFLSchedule.js';
+import { fetchSoccerEvent } from '../sports/sportradar/SoccerEvent.js';
+import type { GameSubscription } from '../sports/Sports.js';
+import { APIService, getDisplayNameFromLeague, getLeagueFromString } from '../sports/Sports.js';
+import { addSubscription } from '../subscriptions.js';
 
 export const espnGameSelectForm = Devvit.createForm(
   (data) => {
@@ -96,7 +97,7 @@ export const espnGameSelectForm = Devvit.createForm(
   }
 );
 
-async function createGamePost(
+export async function createGamePost(
   ctx: Devvit.Context,
   gameSub: GameSubscription,
   gameTitle: string,

@@ -17,6 +17,7 @@ export enum APIService {
   SRNBASim = `sr_nba_sim`,
   SimulatorNBA = `simulator_nba`,
   SRCricket = `sr_cricket`,
+  GSNFL = `gs_nfl`,
 }
 
 export enum League {
@@ -93,7 +94,7 @@ export function leaguesSupported(service: APIService): { label: string; value: s
         value: League.WNBA,
       },
     ];
-  } else if (service === APIService.SRNFL) {
+  } else if (service === APIService.SRNFL || service === APIService.GSNFL) {
     return [
       {
         label: getDisplayNameFromLeague(League.NFL),

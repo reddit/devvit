@@ -86,10 +86,10 @@ export function getCurrentEventData(
     primaryString = `Game has ended`;
     secondaryString = `Join the discussion in the comments, or expand this section to see the play-by-play`;
   } else if (info.lastEvent) {
-    primaryString = `Latest Update (${info.lastEvent.clock ?? ''})`;
+    primaryString = `Latest Update`;
     secondaryString = info.lastEvent.description ?? '';
   } else {
-    primaryString = `✨ New! Play history is here`;
+    primaryString = `Game has not started yet`;
     secondaryString = `Once the game starts, expand this section to see the current and past plays`;
   }
   return { primaryString, secondaryString };
