@@ -1,4 +1,11 @@
-import type { RedisClient, ZMember, ZRangeOptions } from '@devvit/public-api';
+import type {
+  RedisClient,
+  ZMember,
+  ZRangeOptions,
+  RedditAPIClient,
+  Comment,
+  Scheduler,
+} from '@devvit/public-api';
 
 import Words from '../data/words.json';
 import Settings from '../settings.json';
@@ -15,23 +22,49 @@ import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 
 export class Service {
   readonly redis: RedisClient;
+  readonly reddit?: RedditAPIClient;
+  readonly scheduler?: Scheduler;
   static readonly scoreWindow = 60 * 60 * 24 * 7; // 1 week
 
-  constructor(redis: RedisClient) {
-    this.redis = redis;
+  constructor(context: { redis: RedisClient; reddit?: RedditAPIClient; scheduler?: Scheduler }) {
+    this.redis = context.redis;
+    this.reddit = context.reddit;
+    this.scheduler = context.scheduler;
   }
 
-  // Methods that handles DB updates on drawing solving event
-  // Returns true if drawing was not solved before
+  /*
+   * Handle Guess Event
+   */
+
   async handleGuessEvent(event: {
-    postId: string;
-    authorUsername: string;
+    postData: PostData;
     username: string;
-    word: string;
     guess: string;
-  }): Promise<boolean> {
+    createComment: boolean;
+  }): Promise<void> {
+    if (!this.reddit || !this.scheduler) {
+      console.error('Reddit API client or Scheduler not available in Service');
+      return;
+    }
+
+    // Comment guess if user is the first to make it
+    const isGuessUnique = !event.postData.guesses.some((guess) => guess.word === event.guess);
+    let comment: Comment | undefined;
+    try {
+      if (event.createComment && isGuessUnique) {
+        comment = await this.reddit.submitComment({
+          id: event.postData.postId,
+          text: event.guess,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to submit comment:', error);
+      comment = undefined;
+    }
+
+    // Save data to Redis
     const pointsPerGuess = Settings.pointsPerGuess;
-    const correctGuess = event.guess.toLowerCase() === event.word.toLowerCase();
+    const isGuessCorrect = event.postData.word.toLowerCase() === event.guess.toLowerCase();
     const [
       _saveUserEvent,
       _saveAuthorEvent,
@@ -39,46 +72,76 @@ export class Service {
       _userGuesses,
       wordGuesses,
       _drawerPoints,
+      _guessComment,
     ] = await Promise.all([
       // Save score board event. Not sure we need this anymore.
-      correctGuess &&
+      isGuessCorrect &&
         this.#saveScoreBoardEvent({
           username: event.username,
-          postId: event.postId,
+          postId: event.postData.postId,
           points: pointsPerGuess,
         }),
       //Update score for drawing author if it was the first time being solved
-      correctGuess &&
+      isGuessCorrect &&
         this.#saveScoreBoardEvent({
-          username: event.authorUsername,
+          username: event.postData.authorUsername,
           points: pointsPerGuess,
-          postId: event.postId,
+          postId: event.postData.postId,
         }),
       // Update user points
-      correctGuess &&
+      isGuessCorrect &&
         this.redis.hIncrBy(
-          this.getPostDataKey(event.postId),
+          this.getPostDataKey(event.postData.postId),
           `user:${event.username}:points`,
           pointsPerGuess
         ),
       // Increment the number of guesses this user has made on this post
-      this.redis.hIncrBy(this.getPostDataKey(event.postId), `user:${event.username}:guesses`, 1),
+      this.redis.hIncrBy(
+        this.getPostDataKey(event.postData.postId),
+        `user:${event.username}:guesses`,
+        1
+      ),
       // Increment number of times this word has been guessed
       this.redis.hIncrBy(
-        this.getPostDataKey(event.postId),
+        this.getPostDataKey(event.postData.postId),
         `guess:${event.guess.toLowerCase()}`,
         1
       ),
       // Update drawer points
-      correctGuess &&
+      isGuessCorrect &&
         this.redis.hIncrBy(
-          this.getPostDataKey(event.postId),
-          `user:${event.authorUsername}:points`,
+          this.getPostDataKey(event.postData.postId),
+          `user:${event.postData.authorUsername}:points`,
           pointsPerGuess
         ),
+      // Save guess comment
+      event.createComment &&
+        comment &&
+        this.redis.hSet(this.getPostDataKey(event.postData.postId), {
+          [this.guessCommentField(event.guess)]: comment.id,
+        }),
     ]);
 
-    return correctGuess && wordGuesses === 1;
+    // Submit a comment if the user is the first to solve the drawing
+    const isFirstToGuessWord = wordGuesses === 1;
+    if (isFirstToGuessWord && isGuessCorrect) {
+      await this.scheduler.runJob({
+        name: 'FIRST_SOLVER_COMMENT',
+        data: {
+          postId: event.postData.postId,
+          username: event.username,
+        },
+        runAt: new Date(),
+      });
+    }
+  }
+
+  guessCommentField(word: string): string {
+    return `guess-comment:${word.toLowerCase()}`;
+  }
+
+  async removeGuessComment(postId: string, word: string, commentId: string): Promise<void> {
+    await this.redis.hDel(this.getPostDataKey(postId), [this.guessCommentField(word)]);
   }
 
   // Saving score board events
@@ -302,6 +365,16 @@ export class Service {
     }
 
     if (data) {
+      // Parse the guess comments
+      const comments: { [key: string]: string } = {};
+      Object.keys(data ?? {})
+        .filter((key) => key.startsWith('guess-comment:'))
+        .map((key) => {
+          const [_, word] = key.split(':');
+          comments[word] = data[key];
+        });
+
+      // Parse the guesses
       const guesses = Object.keys(data).filter((key) => key.startsWith('guess:'));
       if (guesses.length > 0) {
         guesses.forEach((key) => {
@@ -309,7 +382,7 @@ export class Service {
           const count = parseInt(data[key]);
           response.count.guesses += count;
           response.count.words += 1;
-          response.guesses.push({ word, count });
+          response.guesses.push({ word, count, commentId: comments[word] ?? '' });
           if (word === response.word) {
             response.count.winners = count;
           }
@@ -336,7 +409,7 @@ export class Service {
     const key = this.getPostDataKey(postId);
     const postData = await this.redis.hGetAll(key);
     // Ensure the postId is set if postData is empty
-    if (!postData.postId) {
+    if (postData && !postData.postId) {
       postData.postId = postId;
     }
     return postData;

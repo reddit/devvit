@@ -19,7 +19,7 @@ interface DrawTabReviewStepProps {
 }
 
 export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Context): JSX.Element => {
-  const service = new Service(context.redis);
+  const service = new Service(context);
 
   /*
    * Cancel drawing confirmation form

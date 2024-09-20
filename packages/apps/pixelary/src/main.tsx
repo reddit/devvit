@@ -24,8 +24,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { ui, redis, reddit, scheduler } = context;
-    const service = new Service(redis);
+    const { ui, reddit, scheduler } = context;
+    const service = new Service(context);
     const community = await reddit.getCurrentSubreddit();
 
     // Check if post flairs are enabled in the community
@@ -83,7 +83,7 @@ Devvit.addMenuItem({
 Devvit.addSchedulerJob({
   name: 'UpdateScoreBoard',
   onRun: async (_event, context) => {
-    const service = new Service(context.redis);
+    const service = new Service(context);
     await service.updateScoreBoard();
   },
 });
@@ -107,8 +107,8 @@ Devvit.addMenuItem({
   location: 'post',
   forUserType: 'moderator',
   onPress: async (event, context) => {
-    const { postId, redis, userId } = context;
-    const service = new Service(redis);
+    const { postId, userId } = context;
+    const service = new Service(context);
     const gameSettings = await service.getGameSettings();
 
     if (gameSettings.heroPostId === postId) {
@@ -133,8 +133,8 @@ Devvit.addMenuItem({
   location: 'post',
   forUserType: 'moderator',
   onPress: async (event, context) => {
-    const { scheduler, redis, postId, ui, userId } = context;
-    const service = new Service(redis);
+    const { scheduler, postId, ui, userId } = context;
+    const service = new Service(context);
     const rawPostData = await service.getPostData(event.targetId);
     const postData = service.parsePostData(rawPostData, userId!);
 
@@ -157,8 +157,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { ui, redis, reddit } = context;
-    const service = new Service(redis);
+    const { ui, reddit } = context;
+    const service = new Service(context);
     const community = await reddit.getCurrentSubreddit();
 
     // Check if post flairs are enabled in the community
@@ -206,9 +206,9 @@ Devvit.addMenuItem({
 Devvit.addSchedulerJob<JobData>({
   name: 'PostExpiration',
   onRun: async (event, context) => {
-    const { reddit, redis } = context;
+    const { reddit } = context;
     const { postId, answer } = event.data!;
-    const service = new Service(redis);
+    const service = new Service(context);
     const gameSettings = await service.getGameSettings();
     const currentSubreddit = await reddit.getCurrentSubreddit();
     await service.expirePost(postId);
@@ -236,7 +236,7 @@ Devvit.addMenuItem({
       context.ui.showToast('Username not found');
       return;
     }
-    const service = new Service(context.redis);
+    const service = new Service(context);
     const key = service.getMyDrawingsKey(user.username);
     await context.redis.del(key);
     context.ui.showToast('Cleared');
@@ -249,8 +249,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { redis, reddit, ui } = context;
-    const service = new Service(redis);
+    const { reddit, ui } = context;
+    const service = new Service(context);
     const guesses = await service.getIncorrectGuesses();
     const currentUser = await reddit.getCurrentUser();
 
@@ -273,8 +273,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { redis, ui } = context;
-    const service = new Service(redis);
+    const { ui } = context;
+    const service = new Service(context);
     await service.deleteIncorrectGuesses();
     ui.showToast('Deleted incorrect guesses');
   },
@@ -286,8 +286,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { redis, ui } = context;
-    const service = new Service(redis);
+    const { ui } = context;
+    const service = new Service(context);
     await service.clearScoreBoard();
     ui.showToast('Cleared the leaderboard');
   },
@@ -299,8 +299,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { redis, ui, scheduler } = context;
-    const service = new Service(redis);
+    const { ui, scheduler } = context;
+    const service = new Service(context);
     await service.updateScoreBoard();
     console.log(await scheduler.listJobs());
     ui.showToast('Updated the leaderboard');
@@ -316,6 +316,70 @@ Devvit.addMenuItem({
     const { ui, scheduler } = context;
     await scheduler.runJob({ cron: '* * * * *', name: 'UpdateScoreBoard' });
     ui.showToast('Started cron job!');
+  },
+});
+
+/*
+ * Comment Delete Trigger
+ *
+ * If a comment representing a guess has been deleted,
+ * we need to remove it from Redis so that it no longer
+ * appears up in the results tab.
+ */
+
+Devvit.addTrigger({
+  event: 'CommentDelete',
+  onEvent: async (event, context) => {
+    const service = new Service(context);
+    const data = await service.getPostData(event.postId);
+    if (!data || !data.word) return;
+
+    // Find any guesses associated with the comment
+    const matches: string[] = Object.keys(data ?? {})
+      .filter((key) => key.startsWith('guess-comment:'))
+      .filter((key) => {
+        const commentId = data[key];
+        return commentId === event.commentId;
+      });
+    if (matches.length === 0) return;
+
+    // Remove the comment references from Redis
+    await Promise.all(
+      matches.map(async (match) => {
+        const [_, word] = match.split(':');
+        await service.removeGuessComment(event.postId, word, event.commentId);
+        console.log(`Deleted guess comment: ${event.postId} → ${word} → ${event.commentId}`);
+      })
+    );
+  },
+});
+
+/*
+ * Comment when a user solves the drawing
+ */
+
+Devvit.addSchedulerJob({
+  name: 'FIRST_SOLVER_COMMENT',
+  onRun: async (
+    event: {
+      data: {
+        postId: string;
+        username: string;
+      };
+    },
+    context
+  ) => {
+    if (event.data) {
+      try {
+        const comment = await context.reddit.submitComment({
+          id: event.data.postId,
+          text: `u/${event.data.username} is the first to solve this drawing!`,
+        });
+        await comment.distinguish(true);
+      } catch (error) {
+        console.error('Failed to submit comment:', error);
+      }
+    }
   },
 });
 

@@ -19,5 +19,6 @@ export type PostData = {
   guesses: {
     word: string;
     count: number;
+    commentId: string;
   }[];
 };

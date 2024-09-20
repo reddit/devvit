@@ -18,7 +18,7 @@ interface GuessTabProps {
 }
 
 export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element => {
-  const service = new Service(context.redis);
+  const service = new Service(context);
   const isAuthor = props.data.postData.authorUsername === props.data.username;
   const isExpired = props.data.postData.expired;
   const isSolved = props.data.postData.user.solved;
@@ -39,7 +39,7 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
     }
   }, 100);
 
-  async function onGuessHandler(guess: string): Promise<void> {
+  async function onGuessHandler(guess: string, createComment: boolean): Promise<void> {
     if (!props.data?.postData || !props.data?.username) {
       return;
     }
@@ -56,22 +56,12 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
     }
 
     // Submit guess to the server
-    await service
-      .handleGuessEvent({
-        postId: props.data.postData.postId,
-        authorUsername: props.data.postData.authorUsername,
-        username: props.data.username,
-        word: props.data.postData.word.toLowerCase(),
-        guess: guess.toLowerCase(),
-      })
-      .then(async (firstToSolveDrawing) => {
-        if (firstToSolveDrawing) {
-          await context.reddit.submitComment({
-            id: props.data.postData.postId,
-            text: `${props.data.username} is the first to solve this drawing!`,
-          });
-        }
-      });
+    await service.handleGuessEvent({
+      postData: props.data.postData,
+      username: props.data.username,
+      guess,
+      createComment,
+    });
   }
 
   // Steps map

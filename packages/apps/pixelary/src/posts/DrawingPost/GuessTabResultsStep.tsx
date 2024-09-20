@@ -29,6 +29,8 @@ export const GuessTabResultsStep = (
 
   // Top N guesses (or whatever is available)
   const topGuesses = data.guesses
+    // Filter out guesses without a commentId
+    .filter((guess) => guess.commentId && guess.commentId.length > 0)
     .sort((a, b) => b.count - a.count)
     .slice(0, rowCount)
     .map((guess) => {
@@ -39,6 +41,10 @@ export const GuessTabResultsStep = (
           width="100%"
           alignment="top start"
           backgroundColor="rgba(255, 255, 255, 0.2)"
+          onPress={async () => {
+            const comment = await context.reddit.getCommentById(guess.commentId);
+            context.ui.navigateTo(comment);
+          }}
         >
           {/* Progress Bar */}
           <hstack width={`${percentage}%`} height="100%" backgroundColor="white" />

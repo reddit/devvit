@@ -13,7 +13,7 @@ interface GuessTabPromptStepProps {
     postData: PostData;
     username: string | null;
   };
-  onGuess: (word: string) => Promise<void>;
+  onGuess: (guess: string, userWantsToComment: boolean) => Promise<void>;
   feedback: boolean | null;
 }
 
@@ -39,17 +39,18 @@ export const GuessTabPromptStep = (
           label: 'Word',
           required: true,
         },
-        // {
-        //   type: 'boolean',
-        //   name: 'comment',
-        //   label: "Comment the word if you're first to make that guess",
-        //   defaultValue: true,
-        // },
+        {
+          type: 'boolean',
+          name: 'comment',
+          label: "Leave a comment if you're the first to make that guess.",
+          defaultValue: true,
+        },
       ],
     },
     async (values) => {
       const guess = values.guess.trim();
-      await props.onGuess(guess);
+      const userWantsToComment = values.comment;
+      await props.onGuess(guess, userWantsToComment);
     }
   );
 

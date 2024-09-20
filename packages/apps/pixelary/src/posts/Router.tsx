@@ -53,7 +53,7 @@ const defaultData = {
 };
 
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
-  const service = new Service(context.redis);
+  const service = new Service(context);
   const [data] = useState<InitialData>(async () => {
     try {
       const [gameSettings = defaultSettings, rawPostData, username = null] = await Promise.all([
