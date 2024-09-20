@@ -468,7 +468,7 @@ export class Service {
   async upsertDictionary(dictionaryName: string, newWords: string[]): Promise<{ rows: number }> {
     const key = this.getDictionaryKey(dictionaryName);
     const existingJSON = await this.redis.get(key);
-    const existingWords = JSON.parse(existingJSON ?? '[]');
+    const existingWords = existingJSON ? JSON.parse(existingJSON) : [];
 
     const uniqueNewWords = newWords.filter((word) => !existingWords.includes(word));
     if (uniqueNewWords.length === 0) {
@@ -484,11 +484,12 @@ export class Service {
     const selectedDictionary = await this.getSelectedDictionaryName();
     const key = this.getDictionaryKey(selectedDictionary);
     const dictionaryJsonString = await this.redis.get(key);
-    const parsedDictionary = JSON.parse(dictionaryJsonString ?? '[]');
+    const parsedDictionary = dictionaryJsonString ? JSON.parse(dictionaryJsonString) : [];
 
     if (printToLogs) {
       console.log(`${key}:`, parsedDictionary);
     }
+
     return parsedDictionary;
   }
 
