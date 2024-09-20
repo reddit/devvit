@@ -19,6 +19,9 @@ import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 // * Storing and fetching the score board
 // * Storing and fetching user settings
 // * Storing and fetching game settings
+// * Storing and fetching dynamic dictionaries
+
+export const selectedDictionaryKey = 'selectedDictionary';
 
 export class Service {
   readonly redis: RedisClient;
@@ -248,10 +251,13 @@ export class Service {
   // Save incorrect guesses that are not already part of the word list
   // so that they could be used to expande the word list in the future.
 
+  getCapitalizedWord(word: string): string {
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }
+
   readonly #incorrectGuessesKey: string = 'incorrectGuesses';
   async saveIncorrectGuess(word: string): Promise<void> {
-    const capitalizedWord = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    if (Words.includes(capitalizedWord)) {
+    if (Words.includes(this.getCapitalizedWord(word))) {
       return;
     }
     try {
@@ -445,5 +451,53 @@ export class Service {
   async getGameSettings(): Promise<GameSettings> {
     const key = this.getGameSettingsKey();
     return (await this.redis.hgetall(key)) as GameSettings;
+  }
+
+  // Dynamic dictionary
+  getDictionaryKey(dictionaryName: string): string {
+    return `dictionary:${dictionaryName}`;
+  }
+
+  /**
+   * Saves a list of words to the specified dictionary. If the dictionary does not exist, it will be created.
+   *
+   * @param dictionaryName The name of the dictionary to save the words to.
+   * @param newWords The list of words to save to the dictionary.
+   * @returns The number of words that were added to the dictionary.
+   */
+  async upsertDictionary(dictionaryName: string, newWords: string[]): Promise<{ rows: number }> {
+    const key = this.getDictionaryKey(dictionaryName);
+    const existingJSON = await this.redis.get(key);
+    const existingWords = JSON.parse(existingJSON ?? '[]');
+
+    const uniqueNewWords = newWords.filter((word) => !existingWords.includes(word));
+    if (uniqueNewWords.length === 0) {
+      return { rows: 0 };
+    }
+
+    const updatedWordsJson = JSON.stringify(Array.from(new Set([...existingWords, ...newWords])));
+    await this.redis.set(key, updatedWordsJson);
+    return { rows: uniqueNewWords.length };
+  }
+
+  async getDictionary(printToLogs: boolean): Promise<string[]> {
+    const selectedDictionary = await this.getSelectedDictionaryName();
+    const key = this.getDictionaryKey(selectedDictionary);
+    const dictionaryJsonString = await this.redis.get(key);
+    const parsedDictionary = JSON.parse(dictionaryJsonString ?? '[]');
+
+    if (printToLogs) {
+      console.log(`${key}:`, parsedDictionary);
+    }
+    return parsedDictionary;
+  }
+
+  async setSelectedDictionaryName(dictionaryName: string): Promise<void> {
+    await this.redis.set(selectedDictionaryKey, dictionaryName);
+  }
+
+  async getSelectedDictionaryName(): Promise<string> {
+    const selectedDictionary = await this.redis.get(selectedDictionaryKey);
+    return selectedDictionary ?? 'main';
   }
 }

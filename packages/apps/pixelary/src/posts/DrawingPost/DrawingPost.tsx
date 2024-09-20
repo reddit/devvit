@@ -19,6 +19,7 @@ interface DrawingPostProps {
     postData: PostData;
     username: string | null;
     activeFlairId: string | undefined;
+    currentDictionary: string[];
   };
   myDrawings: PostData[];
   scoreBoardData: {

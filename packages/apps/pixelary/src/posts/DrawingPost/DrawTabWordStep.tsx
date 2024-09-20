@@ -2,22 +2,36 @@ import { Devvit, useInterval, useState } from '@devvit/public-api';
 
 import { PixelSymbol } from '../../components/PixelSymbol.js';
 import { PixelText } from '../../components/PixelText.js';
-import Words from '../../data/words.json';
 import Settings from '../../settings.json';
-import { getRandomString } from '../../utils/getRandomString.js';
 
 interface DrawTabWordStepProps {
   onNext: (word: string) => void;
+  currentDictionary: string[];
 }
 
-const generateCandidateWords = (): string[] => [
-  getRandomString(Words),
-  getRandomString(Words),
-  getRandomString(Words),
-];
+/**
+ * Shuffles an array of words using the Fisher-Yates algorithm. Uses i-- to ensure each element is swapped only once, moving backward.
+ * (Math.random() * (i + 1)) limits the random index to unshuffled elements so no previously shuffled elements are reswapped.
+ * Limits the result to N words or less based on the number of available words
+ *
+ * @param words List of words to shuffle.
+ * @param N Number of words to return (default is 3).
+ * @returns string[] Shuffled list limited to N words.
+ */
+
+const generateCandidateWords = (words: string[], N: number = 3): string[] => {
+  const shuffledWords = [...words];
+  for (let i = shuffledWords.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
+  }
+  return shuffledWords.slice(0, Math.min(shuffledWords.length, N));
+};
 
 export const DrawTabWordStep = (props: DrawTabWordStepProps): JSX.Element => {
-  const [candidateWords, setCandidateWords] = useState<string[]>(() => generateCandidateWords());
+  const [candidateWords, setCandidateWords] = useState<string[]>(() =>
+    generateCandidateWords(props.currentDictionary)
+  );
 
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedtime] = useState(0);
@@ -102,7 +116,9 @@ export const DrawTabWordStep = (props: DrawTabWordStepProps): JSX.Element => {
         <spacer width="12px" />
         <PixelSymbol scale={3} type="arrow-left" color={Settings.theme.tertiary} />
         <spacer grow />
-        <hstack onPress={() => setCandidateWords(() => generateCandidateWords())}>
+        <hstack
+          onPress={() => setCandidateWords(() => generateCandidateWords(props.currentDictionary))}
+        >
           <PixelSymbol scale={3} type="undo" color={Settings.theme.secondary} />
           <spacer width="4px" />
         </hstack>

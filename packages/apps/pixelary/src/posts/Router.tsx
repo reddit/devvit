@@ -1,6 +1,7 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
+import Words from '../data/words.json';
 import { Service } from '../service/Service.js';
 import type { GameSettings } from '../types/GameSettings.js';
 import type { PostData } from '../types/PostData.js';
@@ -11,6 +12,7 @@ type InitialData = {
   gameSettings: GameSettings;
   postData: PostData;
   username: string | null;
+  currentDictionary: string[];
 };
 
 /*
@@ -50,22 +52,30 @@ const defaultData = {
   gameSettings: defaultSettings,
   postData: defaultPostData,
   username: null,
+  currentDictionary: Words,
 };
 
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
   const service = new Service(context);
   const [data] = useState<InitialData>(async () => {
     try {
-      const [gameSettings = defaultSettings, rawPostData, username = null] = await Promise.all([
+      const [
+        gameSettings = defaultSettings,
+        rawPostData,
+        username = null,
+        currentDictionary = Words,
+      ] = await Promise.all([
         service.getGameSettings(),
         service.getPostData(context.postId!),
         context.reddit.getCurrentUser().then((user) => user?.username ?? null),
+        service.getDictionary(false),
       ]);
       const postData = service.parsePostData(rawPostData, username);
       return {
         gameSettings,
         postData,
         username,
+        currentDictionary,
       };
     } catch (error) {
       console.error('Error loading initial data', error);
@@ -141,6 +151,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
           postData: postData ?? data.postData,
           username: data.username,
           activeFlairId: data.gameSettings.activeFlairId,
+          currentDictionary: data.currentDictionary,
         }}
         myDrawings={myDrawings}
         scoreBoardData={scoreBoardData}

@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
 import { LoadingState } from './components/LoadingState.js';
+import Words from './data/words.json';
 import { Router } from './posts/Router.js';
 import { Service } from './service/Service.js';
 import type { JobData } from './types/job-data.js';
@@ -76,6 +77,152 @@ Devvit.addMenuItem({
     await scheduler.runJob({ cron: '* * * * *', name: 'UpdateScoreBoard' });
 
     ui.showToast('Installed Pixelary!');
+  },
+});
+
+Devvit.addMenuItem({
+  label: '[Pixelary] Save dictionary to Redis',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const { redis } = context;
+    const service = new Service(redis);
+    await service.upsertDictionary('main', Words);
+    context.ui.showToast('Dictionary saved to Redis');
+  },
+});
+
+const logDictionaryForm = Devvit.createForm(
+  {
+    fields: [
+      {
+        type: 'string',
+        name: 'dictionary',
+        label: 'Which dictionary do you want to log?',
+        defaultValue: 'main',
+      },
+    ],
+  },
+  async (event, context) => {
+    const { redis } = context;
+    const service = new Service(redis);
+
+    await service.setSelectedDictionaryName(event.values.dictionary);
+    await service.getDictionary(true);
+    context.ui.showToast('Dictionary retrieved. Run `devvit logs` to view');
+  }
+);
+
+Devvit.addMenuItem({
+  label: '[Pixelary] Log dictionary',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    context.ui.showForm(logDictionaryForm);
+  },
+});
+
+const dynamicDictionaryForm = Devvit.createForm(
+  {
+    fields: [
+      {
+        type: 'string',
+        name: 'dictionary',
+        label: 'What dictionary do you want to add a word to?',
+        defaultValue: 'main',
+      },
+      {
+        type: 'string',
+        name: 'words',
+        label:
+          'What words do you want to add to the dictionary? (Separate multiple words with commas)',
+      },
+    ],
+  },
+  async (event, context) => {
+    const { redis } = context;
+    const service = new Service(redis);
+
+    if (!event.values.words) {
+      context.ui.showToast('Please enter a word');
+      return;
+    }
+    const words = event.values.words
+      .split(',')
+      .map((word) => service.getCapitalizedWord(word.trim()));
+    const wordsAdded = await service.upsertDictionary(event.values.dictionary, words);
+    if (wordsAdded.rows === 0) {
+      context.ui.showToast(`That word already exists in the dictionary`);
+    } else if (wordsAdded.rows === 1) {
+      context.ui.showToast(`${words} added to the dictionary`);
+    } else {
+      context.ui.showToast(`${words.length} words added to the dictionary`);
+    }
+  }
+);
+
+Devvit.addMenuItem({
+  label: '[Pixelary] Add words to dictionary',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: (_event, context) => {
+    context.ui.showForm(dynamicDictionaryForm);
+  },
+});
+
+const selectDictionaryForm = Devvit.createForm(
+  (data) => {
+    //TODO: get dictionary names from redis (need to implement this in Service)
+    return {
+      fields: [
+        {
+          name: 'dictionary',
+          label: 'Which dictionary do you want to use?',
+          type: 'select',
+          options: [
+            { label: 'main', value: 'main' },
+            { label: 'r/nintendoswitch', value: 'r/nintendoswitch' }, //hardcoding for r/nintendoswitch dictionary takeover 9/21/24
+          ],
+        },
+      ],
+      title: 'Select a dictionary',
+      acceptLabel: 'Select',
+    };
+  },
+  async (event, context) => {
+    if (!Array.isArray(event.values.dictionary)) {
+      return context.ui.showToast('Please select a dictionary');
+    }
+    const value = event.values.dictionary[0];
+    if (typeof value !== 'string') {
+      return context.ui.showToast('Selected value must be a string!');
+    }
+
+    const { redis } = context;
+    const service = new Service(redis);
+    await service.setSelectedDictionaryName(value);
+    return context.ui.showToast(`Dictionary selected: ${event.values.dictionary[0]}`);
+  }
+);
+
+Devvit.addMenuItem({
+  label: '[Pixelary] Select dictionary',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    context.ui.showForm(selectDictionaryForm);
+  },
+});
+
+Devvit.addMenuItem({
+  label: '[Pixelary] Log selected dictionary',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    const { redis } = context;
+    const service = new Service(redis);
+    const selectedDictionary = await service.getSelectedDictionaryName();
+    context.ui.showToast(`Current dictionary: ${selectedDictionary}`);
   },
 });
 

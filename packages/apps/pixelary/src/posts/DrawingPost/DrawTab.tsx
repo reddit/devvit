@@ -10,6 +10,7 @@ interface DrawTabProps {
   data: {
     username: string | null;
     activeFlairId: string | undefined;
+    currentDictionary: string[];
   };
   myDrawings: PostData[] | null;
   myDrawingsLoading: boolean;
@@ -40,6 +41,7 @@ export const DrawTab = (props: DrawTabProps): JSX.Element => {
           setWord(word);
           setCurrentStep('Editor');
         }}
+        currentDictionary={props.data.currentDictionary}
       />
     ),
     Editor: (
