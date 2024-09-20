@@ -158,7 +158,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     <zstack width="100%" height="100%" alignment="top start">
       <image
         imageHeight={1024}
-        imageWidth={1500}
+        imageWidth={2048}
         height="100%"
         width="100%"
         url="background.png"

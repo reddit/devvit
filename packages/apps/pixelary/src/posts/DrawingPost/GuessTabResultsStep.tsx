@@ -7,6 +7,7 @@ import { PointsToast } from '../../components/PointsToast.js';
 import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
+import { StyledButton } from '../../components/StyledButton.js';
 
 interface GuessTabResultsStepProps {
   data: {
@@ -15,6 +16,7 @@ interface GuessTabResultsStepProps {
   };
   rows?: number;
   feedback: boolean | null;
+  onDraw: () => void;
 }
 
 export const GuessTabResultsStep = (
@@ -118,6 +120,10 @@ export const GuessTabResultsStep = (
           >{`made ${abbreviateNumber(data.count.guesses)} guess${data.count.guesses === 1 ? '' : 'es'}`}</PixelText>
         </vstack>
         <spacer height="24px" />
+
+        {/* Call to action */}
+        <StyledButton label="DRAW A WORD" onPress={() => props.onDraw()} width="200px" />
+        <spacer height="20px" />
       </vstack>
 
       {/* Feedback */}

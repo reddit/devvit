@@ -67,7 +67,7 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
   // Steps map
   const steps: Record<string, JSX.Element> = {
     Prompt: <GuessTabPromptStep {...props} feedback={feedback} onGuess={onGuessHandler} />,
-    Results: <GuessTabResultsStep {...props} feedback={feedback} />,
+    Results: <GuessTabResultsStep {...props} feedback={feedback} onDraw={props.onDraw} />,
   };
 
   return (
