@@ -58,7 +58,7 @@ function validateModNoteType(str: string): str is ModNoteType {
 
 export type UserNote = {
   note?: string;
-  redditId: T1ID | T3ID | T5ID;
+  redditId?: T1ID | T3ID | T5ID;
   label?: UserNoteLabel;
 };
 
@@ -91,7 +91,7 @@ export type GetModNotesOptions = Prettify<
 export type CreateModNoteOptions = Prettify<
   PostNotesRequest & {
     redditId?: T1ID | T3ID;
-    label: UserNoteLabel;
+    label?: UserNoteLabel;
   }
 >;
 
@@ -144,7 +144,9 @@ export class ModNote {
       createdAt: new Date(protoModNote.createdAt! * 1000), // convert to ms
       userNote: {
         note: protoModNote.userNoteData?.note,
-        redditId: asTID<T1ID | T3ID | T5ID>(protoModNote.userNoteData?.redditId ?? ''),
+        redditId: protoModNote.userNoteData?.redditId
+          ? asTID<T1ID | T3ID | T5ID>(protoModNote.userNoteData?.redditId)
+          : undefined,
         label: protoModNote.userNoteData?.label as UserNoteLabel,
       },
       type: protoModNote.type as ModNoteType,
