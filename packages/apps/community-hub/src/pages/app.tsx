@@ -15,8 +15,7 @@ import { WelcomePage } from './welcome.js';
 const getPageForRoute = (route: Route): ((props: PageProps) => JSX.Element) => {
   switch (route) {
     case 'home':
-      // to-do: this should not be async.
-      // @ts-expect-error
+      // @ts-expect-error to-do: this should not be async.
       return HomePage;
     case 'admin':
       return AdminPage;

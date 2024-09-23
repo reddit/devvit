@@ -201,7 +201,7 @@ describe('state setter', () => {
 
       useState([1]) satisfies UseStateResult<number[]>;
 
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(undefined);
       useState('abc');
       useState(1);
@@ -212,7 +212,7 @@ describe('state setter', () => {
       useState({ a: 123 }) satisfies UseStateResult<{ a: number }>;
       useState([{ a: 123 }, 1, null]);
       useState(foo);
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(() => undefined);
       useState(() => 'abc');
       useState(() => 1);
@@ -221,9 +221,9 @@ describe('state setter', () => {
       useState(() => []);
       useState(() => ({}));
       useState(() => foo);
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(Promise.resolve(null));
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(() => Promise.resolve(undefined));
       useState(() => Promise.resolve('abc'));
       useState(() => Promise.resolve(1));
@@ -232,21 +232,21 @@ describe('state setter', () => {
       useState(() => Promise.resolve([]));
       useState(() => Promise.resolve({}));
       useState(() => Promise.resolve(foo));
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(new (class {})());
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(new Map());
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(new Set());
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(new Date());
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(() => Promise.resolve(new (class {})()));
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(() => Promise.resolve(new Map()));
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(() => Promise.resolve(new Set()));
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       useState(() => Promise.resolve(new Date()));
       return <text />;
     };

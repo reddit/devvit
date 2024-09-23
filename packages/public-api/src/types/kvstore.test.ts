@@ -24,22 +24,22 @@ test('typing is intuitive', async () => {
   };
   const foo: Foo = { bar: 'abc' };
   await kv.put('key', foo);
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', undefined);
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', new (class {})());
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', new Map());
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', new Set());
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', new Date());
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', () => Promise.resolve(new (class {})()));
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', () => Promise.resolve(new Map()));
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', () => Promise.resolve(new Set()));
-  // @ts-expect-error
+  // @ts-expect-error test bad type.
   await kv.put('key', () => Promise.resolve(new Date()));
 });
