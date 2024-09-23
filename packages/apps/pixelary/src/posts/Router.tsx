@@ -4,13 +4,14 @@ import { Devvit, useInterval, useState } from '@devvit/public-api';
 import Words from '../data/words.json';
 import { Service } from '../service/Service.js';
 import type { GameSettings } from '../types/GameSettings.js';
-import type { PostData } from '../types/PostData.js';
+import type { CollectionPostData, PostData } from '../types/PostData.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
+import { CollectionPost } from './CollectionPost/CollectionPost.js';
 import { DrawingPost } from './DrawingPost/DrawingPost.js';
 
 type InitialData = {
   gameSettings: GameSettings;
-  postData: PostData;
+  postData: PostData | CollectionPostData;
   username: string | null;
   currentDictionary: string[];
 };
@@ -46,6 +47,7 @@ const defaultPostData: PostData = {
     solved: false,
   },
   guesses: [],
+  postType: 'drawing',
 };
 
 const defaultData = {
@@ -70,7 +72,12 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         context.reddit.getCurrentUser().then((user) => user?.username ?? null),
         service.getDictionary(false),
       ]);
-      const postData = service.parsePostData(rawPostData, username);
+      let postData: PostData | CollectionPostData;
+      if (rawPostData.postType === 'collection') {
+        postData = service.parseCollectionPostData(rawPostData);
+      } else {
+        postData = service.parsePostData(rawPostData, username);
+      }
       return {
         gameSettings,
         postData,
@@ -142,13 +149,12 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     refetchInterval.start();
   };
 
-  // Todo: Add the post type to the post data model
-  const postType = 'drawing';
+  const postType = data.postData.postType;
   const postTypes: Record<string, JSX.Element> = {
     drawing: (
       <DrawingPost
         data={{
-          postData: postData ?? data.postData,
+          postData: postData ?? (data.postData as PostData),
           username: data.username,
           activeFlairId: data.gameSettings.activeFlairId,
           currentDictionary: data.currentDictionary,
@@ -158,6 +164,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         refetch={refetch}
       />
     ),
+    collection: <CollectionPost collection={data.postData as CollectionPostData} />,
     // Add more post types here
   };
 
