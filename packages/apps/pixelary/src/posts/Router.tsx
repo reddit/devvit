@@ -119,7 +119,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     }
   };
 
-  const getPostData = async (): Promise<PostData> => {
+  const getPostData = async (): Promise<PostData | CollectionPostData> => {
     try {
       return service.parsePostData(await service.getPostData(data.postData.postId), data.username);
     } catch (error) {
@@ -154,7 +154,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     drawing: (
       <DrawingPost
         data={{
-          postData: postData ?? (data.postData as PostData),
+          postData: (postData ?? data.postData) as PostData,
           username: data.username,
           activeFlairId: data.gameSettings.activeFlairId,
           currentDictionary: data.currentDictionary,
