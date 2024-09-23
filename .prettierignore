@@ -3,17 +3,9 @@ server/static/
 server/bin/
 *.template.ts
 
-*.yarnclean
-
-node_modules
+node_modules/
 
 /packages/build-pack/src/__tests__/test-actors/bad-syntax/main.ts
-/packages/cli/src/templates/pen
-
-# Fork of an open-source project that uses incompatible formatting 
-/packages/web-worker/
+/packages/cli/src/templates/pen/
 
 /devvit-dev-portal/graphql/operations.json
-
-# Generated icon files
-/packages/public-api/src/jsx/icons.ts

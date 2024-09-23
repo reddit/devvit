@@ -6,10 +6,8 @@
       "env": ["TRACE_ENVELOPES"],
       "outputs": [
         "dist/**",
-        "packages/protos/src/types/**",
         "packages/public-api/src/devvit/internals/semanticColors.ts",
-        "packages/web-worker-fork/cjs/**",
-        "node_modules/@reddit/shreddit.styles/**"
+        "packages/protos/src/types/**"
       ]
     },
     "dev": {
