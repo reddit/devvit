@@ -582,4 +582,42 @@ Devvit.addMenuItem({
   },
 });
 
+/*
+ * Mod Action to check if a comment is a guess
+ */
+Devvit.addMenuItem({
+  label: '[Pixelary] Is this a guess?',
+  location: 'comment',
+  forUserType: 'moderator',
+  onPress: async (_event, context) => {
+    if (!context.commentId) {
+      return context.ui.showToast('No comment ID found');
+    }
+
+    const comment = await context.reddit.getCommentById(context.commentId);
+    const postId = comment.postId;
+
+    const service = new Service(context);
+    const data = await service.getPostData(postId);
+    if (!data) {
+      return context.ui.showToast('No post data found');
+    }
+
+    const commentWasAutomated = Object.keys(data ?? {})
+      .filter((key) => key.startsWith('guess-comment:'))
+      .map((key) => {
+        const commentId = data[key];
+        const isMatch = commentId === context.commentId;
+        return isMatch;
+      })
+      .includes(true);
+
+    if (commentWasAutomated) {
+      return context.ui.showToast('Yes. Automated comment');
+    }
+
+    context.ui.showToast('No. Manual comment');
+  },
+});
+
 export default Devvit;
