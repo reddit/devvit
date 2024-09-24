@@ -1,4 +1,4 @@
-import type { AsyncResponse, UIEvent } from '@devvit/protos';
+import { type AsyncResponse, type UIEvent, UIEventScope } from '@devvit/protos';
 import { CIRCUIT_BREAKER_MSG } from '@devvit/shared-types/CircuitBreaker.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
@@ -86,6 +86,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
       this.#invalidate();
 
       const requeueEvent: UIEvent = {
+        scope: UIEventScope.ALL,
         hook: this.#hookId,
         async: true,
         asyncRequest: {
@@ -115,6 +116,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
       }
 
       const requeueEvent: UIEvent = {
+        scope: UIEventScope.ALL,
         asyncResponse: asyncResponse,
         hook: this.#hookId,
       };

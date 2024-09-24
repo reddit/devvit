@@ -2,7 +2,7 @@
 /** @jsxFrag Devvit.Fragment */
 
 import type { UIEvent } from '@devvit/protos';
-import { EffectType, FormFieldType } from '@devvit/protos';
+import { EffectType, FormFieldType, UIEventScope } from '@devvit/protos';
 import { describe, expect, test } from 'vitest';
 
 import { Devvit } from '../../../Devvit.js';
@@ -68,6 +68,7 @@ describe('useForm', () => {
     await handler.handle(EmptyRequest, mockMetadata);
     const response = await handler.handle(generatePressRequest(buttonRef), mockMetadata);
     const event: UIEvent = {
+      scope: UIEventScope.ALL,
       formSubmitted: {
         formId: hookRefToFormKey(formRef),
         results: {
@@ -124,6 +125,7 @@ describe('useForm', () => {
     await handler.handle(EmptyRequest, mockMetadata);
     const pressRsp = await handler.handle(generatePressRequest(buttonRef), mockMetadata);
     const event: UIEvent = {
+      scope: UIEventScope.ALL,
       formSubmitted: {
         formId: hookRefToFormKey(formRef),
         results: {

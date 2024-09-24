@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
+import { BlockRenderEventType, BlockRenderRequest, UIEventScope } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 
@@ -77,6 +77,7 @@ describe('useForm', () => {
         return <button onPress={() => ui.showForm(testForm)}>Open Form</button>;
       },
       {
+        scope: UIEventScope.ALL,
         formSubmitted: {
           formId: 'form.hook.root.anonymous.0',
           results: {

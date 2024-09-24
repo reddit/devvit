@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import type { UIEvent, UIRequest } from '@devvit/protos';
+import { type UIEvent, UIEventScope, type UIRequest } from '@devvit/protos';
 import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 
@@ -45,6 +45,7 @@ const NullApp: Devvit.BlockComponent = () => {
 
 const asyncRequestEvent = (ref: HookRef, depends: JSONValue = 1): UIEvent => {
   return {
+    scope: UIEventScope.ALL,
     asyncRequest: { requestId: (ref.id ?? '') + '-' + JSON.stringify(depends) },
     hook: ref.id,
     async: true,
@@ -53,6 +54,7 @@ const asyncRequestEvent = (ref: HookRef, depends: JSONValue = 1): UIEvent => {
 
 const asyncResponseEvent = (ref: HookRef, depends: JSONValue = 1): UIEvent => {
   return {
+    scope: UIEventScope.ALL,
     asyncResponse: {
       requestId: (ref.id ?? '') + '-' + JSON.stringify(depends),
       data: { value: 'hi world!' },
@@ -80,6 +82,7 @@ describe('regressions', () => {
       }
     `);
     const event = {
+      scope: UIEventScope.ALL,
       asyncResponse: {
         requestId: (asyncRef.id ?? '') + '-1',
         data: { value: null },
@@ -116,6 +119,7 @@ describe('regressions', () => {
     request = {
       events: [
         {
+          scope: UIEventScope.ALL,
           userAction: { actionId: buttonRef.id ?? 'wtf' },
           hook: buttonRef.id ?? 'wtf',
         },
@@ -201,6 +205,7 @@ describe('regressions', () => {
     `);
 
     const event = {
+      scope: UIEventScope.ALL,
       asyncResponse: {
         requestId: (async1Ref.id ?? '') + '-null',
         data: { value: 'foo' },
@@ -220,6 +225,7 @@ describe('regressions', () => {
             "requestId": "AppUseAsyncs.useAsync-1-"foo"",
           },
           "hook": "AppUseAsyncs.useAsync-1",
+          "scope": 0,
         },
       ]
     `);
@@ -243,6 +249,7 @@ describe('regressions', () => {
     `);
 
     const event3 = {
+      scope: UIEventScope.ALL,
       asyncResponse: {
         requestId: (async2Ref.id ?? '') + '-"foo"',
         data: { value: 'bar' },

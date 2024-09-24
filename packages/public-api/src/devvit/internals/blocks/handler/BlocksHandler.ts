@@ -1,4 +1,11 @@
-import type { Effect, Metadata, UIEvent, UIRequest, UIResponse } from '@devvit/protos';
+import {
+  type Effect,
+  type Metadata,
+  type UIEvent,
+  UIEventScope,
+  type UIRequest,
+  type UIResponse,
+} from '@devvit/protos';
 import { isCircuitBreaker } from '@devvit/shared-types/CircuitBreaker.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 
@@ -47,13 +54,6 @@ export function assertValidNamespace(input: string): void {
       `Hook with namespace '${input}' is invalid. Hook namespaces cannot be empty string or contain dashes/dots because they are used as delimiters internally. Please update the hook namespace and try again.`
     );
   }
-}
-
-function shouldFireAttemptHookWarning(event: UIEvent): boolean {
-  // These do not require a hook param to be handled
-  if (event.blocking || event.resize) return false;
-
-  return !event.hook;
 }
 
 type RegisterHookOptions<H extends Hook> = HookSegment & {
@@ -172,7 +172,9 @@ export class BlocksHandler {
      * in an async world.  This is a bit of a hack, but it's the simplest way to handle this.
      */
     if (eventsToProcess.length === 0) {
-      eventsToProcess.push({});
+      eventsToProcess.push({
+        scope: UIEventScope.ALL,
+      });
     }
 
     if (this.#debug) console.debug('[blocks] starting processing events');
@@ -330,19 +332,6 @@ export class BlocksHandler {
   }
 
   async #attemptHook(context: RenderContext, event: UIEvent): Promise<void> {
-    // I added this warning here as an alert for al weary travelers that there is a non-null
-    // assertion below that will wake a dragon! In RenderPostRequest land you need to add the
-    // hook field to all events otherwise they won't work. Since everything is optional you
-    // don't get type help so at least you'll get a warning at runtime.
-    //
-    // Unclear on if we can throw here or not so fell back to this.
-    if (shouldFireAttemptHookWarning(event)) {
-      console.warn(
-        `Received an event in #attemptHook that does not have an associated hook. This will cause the event to be undelivered and may cause bugs. Make sure that event passes a hook field. Event:`,
-        { event }
-      );
-    }
-
     const hook = context._hooks[event.hook!];
     if (hook?.onUIEvent) {
       try {

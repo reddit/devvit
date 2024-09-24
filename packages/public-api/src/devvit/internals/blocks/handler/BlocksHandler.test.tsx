@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockType, type UIRequest } from '@devvit/protos';
+import { BlockType, UIEventScope, type UIRequest } from '@devvit/protos';
 import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -211,7 +211,10 @@ describe('BlocksHandler', () => {
 
     test('All deltas should be returned from handle on a blocking request', async () => {
       const handler = new BlocksHandler(DependentUseAsyncs);
-      const data = await handler.handle({ events: [{ blocking: {} }] }, mockMetadata);
+      const data = await handler.handle(
+        { events: [{ blocking: {}, scope: UIEventScope.ALL }] },
+        mockMetadata
+      );
 
       expect(data.state).toMatchInlineSnapshot(`
         {
@@ -234,7 +237,10 @@ describe('BlocksHandler', () => {
 
     test('useState async initializer after useAsync should resolve', async () => {
       const handler = new BlocksHandler(UseAsyncBeforeUseStateComponent);
-      const resp = await handler.handle({ events: [{ blocking: {} }] }, mockMetadata);
+      const resp = await handler.handle(
+        { events: [{ blocking: {}, scope: UIEventScope.ALL }] },
+        mockMetadata
+      );
 
       expect(resp.state).toMatchInlineSnapshot(`
         {
@@ -256,7 +262,10 @@ describe('BlocksHandler', () => {
 
     test('useState async initializer before useAsync should resolve', async () => {
       const handler = new BlocksHandler(UseStateBeforeUseAsyncComponent);
-      const resp = await handler.handle({ events: [{ blocking: {} }] }, mockMetadata);
+      const resp = await handler.handle(
+        { events: [{ blocking: {}, scope: UIEventScope.ALL }] },
+        mockMetadata
+      );
 
       expect(resp.state).toMatchInlineSnapshot(`
         {
@@ -325,7 +334,10 @@ describe('BlocksHandler', () => {
 
     test('should process all futures in blocking SSR mode', async () => {
       const handler = new BlocksHandler(SomeAsyncComponent);
-      const response = await handler.handle({ events: [{ blocking: {} }] }, mockMetadata);
+      const response = await handler.handle(
+        { events: [{ blocking: {}, scope: UIEventScope.ALL }] },
+        mockMetadata
+      );
       expect(JSON.stringify(response.blocks)).toContain('done');
       expect(response.effects.length).toEqual(0);
       expect(response.events.length).toEqual(0);
@@ -727,6 +739,7 @@ describe('BlocksHandler', () => {
       const actionRequest: UIRequest = {
         events: [
           {
+            scope: UIEventScope.ALL,
             userAction: {
               actionId: action,
             },
@@ -748,6 +761,7 @@ describe('BlocksHandler', () => {
       const request: UIRequest = {
         events: [
           {
+            scope: UIEventScope.ALL,
             userAction: {
               actionId: action,
             },

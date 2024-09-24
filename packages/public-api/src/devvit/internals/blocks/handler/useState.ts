@@ -1,4 +1,4 @@
-import type { UIEvent } from '@devvit/protos';
+import { type UIEvent, UIEventScope } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 
 import type {
@@ -99,6 +99,7 @@ class UseStateHook<S extends JSONValue> implements Hook {
         this._promise = initialValue;
         this.state.load_state = 'loading';
         const requeueEvent: UIEvent = {
+          scope: UIEventScope.ALL,
           asyncRequest: { requestId: this.#hookId },
           hook: this.#hookId,
         };

@@ -1,4 +1,4 @@
-import type { UIEvent, UIRequest } from '@devvit/protos';
+import { type UIEvent, UIEventScope, type UIRequest } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 
@@ -25,6 +25,7 @@ export const EmptyRequest: UIRequest = { events: [] };
 
 export const generatePressRequest = (ref: HookRef): UIRequest => {
   const event: UIEvent = {
+    scope: UIEventScope.ALL,
     hook: ref.id!,
     userAction: {
       actionId: ref.id!,
@@ -38,6 +39,7 @@ export const generatePressRequest = (ref: HookRef): UIRequest => {
 
 export const generateTimerRequest = (ref: HookRef): UIRequest => {
   const event: UIEvent = {
+    scope: UIEventScope.ALL,
     hook: ref.id!,
     timer: {},
   };

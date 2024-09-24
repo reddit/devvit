@@ -1,4 +1,4 @@
-import { RealtimeSubscriptionStatus } from '@devvit/protos';
+import { RealtimeSubscriptionStatus, UIEventScope } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { expect, test } from 'vitest';
 
@@ -366,6 +366,7 @@ test('un/subscribe event invokes callback', async () => {
       {
         events: [
           {
+            scope: UIEventScope.LOCAL,
             hook: channelRef.id,
             realtimeEvent: {
               event: { channel: 'app:install:Channel' },
@@ -397,6 +398,7 @@ test('un/subscribe event invokes callback', async () => {
       {
         events: [
           {
+            scope: UIEventScope.LOCAL,
             hook: channelRef.id,
             realtimeEvent: {
               event: { channel: 'app:install:Channel' },
@@ -440,6 +442,7 @@ test('message event invokes callback', async () => {
     {
       events: [
         {
+          scope: UIEventScope.LOCAL,
           hook: channelRef.id,
           realtimeEvent: {
             event: { channel: 'app:install:Channel' },
@@ -456,6 +459,7 @@ test('message event invokes callback', async () => {
     {
       events: [
         {
+          scope: UIEventScope.LOCAL,
           hook: channelRef.id,
           realtimeEvent: {
             event: { channel: 'app:install:Channel', data: 'data' },
@@ -519,6 +523,7 @@ test('two channels', async () => {
       {
         events: [
           {
+            scope: UIEventScope.LOCAL,
             hook: channelARef.id,
             realtimeEvent: {
               event: { channel: 'app:install:ChannelA' },
@@ -554,6 +559,7 @@ test('two channels', async () => {
       {
         events: [
           {
+            scope: UIEventScope.LOCAL,
             hook: channelBRef.id,
             realtimeEvent: {
               event: { channel: 'app:install:ChannelB' },
@@ -589,6 +595,7 @@ test('two channels', async () => {
       {
         events: [
           {
+            scope: UIEventScope.LOCAL,
             hook: channelARef.id,
             realtimeEvent: {
               event: { channel: 'app:install:ChannelA', data: 'a' },
@@ -619,6 +626,7 @@ test('two channels', async () => {
       {
         events: [
           {
+            scope: UIEventScope.LOCAL,
             hook: channelBRef.id,
             realtimeEvent: {
               event: { channel: 'app:install:ChannelB', data: 'b' },
@@ -649,6 +657,7 @@ test('two channels', async () => {
       {
         events: [
           {
+            scope: UIEventScope.LOCAL,
             hook: channelARef.id,
             realtimeEvent: {
               event: { channel: 'app:install:ChannelA' },
@@ -684,6 +693,7 @@ test('two channels', async () => {
       {
         events: [
           {
+            scope: UIEventScope.LOCAL,
             hook: channelBRef.id,
             realtimeEvent: {
               event: { channel: 'app:install:ChannelB' },
