@@ -1,3 +1,4 @@
+// @ts-expect-error DX-6013.
 import { devvitVitestConfig } from '@devvit/tsconfig/base-vitest.config.js';
 
 export default {

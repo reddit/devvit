@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import type { Devvit, UseStateResult } from '@devvit/public-api';
+
 import type { KeyValue } from './types.js';
 import { Op } from './types.js';
 
 type CurrentOp = Op | undefined;
 
-// @ts-ignore
-const ops: Record<Op, (a: number, b: number) => number> = {
+const ops: Partial<Record<Op, (a: number, b: number) => number>> = {
   [Op.ADD]: (a, b) => a + b,
   [Op.SUBTRACT]: (a, b) => a - b,
   [Op.MULTIPLY]: (a, b) => a * b,
@@ -47,7 +47,7 @@ export class Calc {
       return;
     }
 
-    const result = ops[this.op](this.operandA, this.operandB);
+    const result = ops[this.op]!(this.operandA, this.operandB);
     this.setEntry(result);
     this.entry = result;
   }

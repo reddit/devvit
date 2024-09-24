@@ -1,16 +1,17 @@
 import type {
+  Comment,
+  Post,
+  RedditAPIClient,
   RedisClient,
+  Scheduler,
   ZMember,
   ZRangeOptions,
-  RedditAPIClient,
-  Comment,
-  Scheduler,
 } from '@devvit/public-api';
 
 import Words from '../data/words.json';
 import Settings from '../settings.json';
 import type { GameSettings } from '../types/GameSettings.js';
-import type { PostData } from '../types/PostData.js';
+import type { CollectionData, CollectionPostData, PostData } from '../types/PostData.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 
 // Service that handles the backbone logic for the application
@@ -328,18 +329,18 @@ export class Service {
     return `post-${postId}`;
   }
 
-  parsePostData(data: Record<string, string> | undefined, username: string | null): PostData {
+  parsePostData(data: Record<string, string>, username: string | null): PostData {
     const response: PostData = {
-      postId: data?.postId ? data.postId : '',
-      authorUsername: data?.authorUsername ? data.authorUsername : '',
-      data: data?.data ? JSON.parse(data.data) : [],
-      date: data?.date ? parseInt(data.date) : 0,
-      word: data?.word ? data.word : '',
-      expired: data?.expired ? JSON.parse(data.expired) : false,
+      postId: data.postId ? data.postId : '',
+      authorUsername: data.authorUsername ? data.authorUsername : '',
+      data: data.data ? JSON.parse(data.data) : [],
+      date: data.date ? parseInt(data.date) : 0,
+      word: data.word ? data.word : '',
+      expired: data.expired ? JSON.parse(data.expired) : false,
       count: {
         players: 0,
-        winners: data?.[`guess:${data?.word?.toLowerCase()}`]
-          ? parseInt(data[`guess:${data?.word?.toLowerCase()}`])
+        winners: data[`guess:${data.word?.toLowerCase()}`]
+          ? parseInt(data[`guess:${data.word?.toLowerCase()}`])
           : 0,
         guesses: 0,
         words: 0,
@@ -350,6 +351,7 @@ export class Service {
         solved: false,
       },
       guesses: [],
+      postType: 'drawing',
     };
 
     // Check if the post has expired
@@ -411,14 +413,11 @@ export class Service {
     await this.redis.hSet(key, { expired: 'true' });
   }
 
-  async getPostData(postId: string): Promise<Record<string, string> | undefined> {
+  async getPostData(postId: string): Promise<Record<string, string>> {
     const key = this.getPostDataKey(postId);
     const postData = await this.redis.hGetAll(key);
-    // Ensure the postId is set if postData is empty
-    if (postData && !postData.postId) {
-      postData.postId = postId;
-    }
-    return postData;
+    // Ensure the postId is set, even if postData is empty
+    return postData.postId ? postData : { postId };
   }
 
   async storePostData(data: {
@@ -500,5 +499,51 @@ export class Service {
   async getSelectedDictionaryName(): Promise<string> {
     const selectedDictionary = await this.redis.get(selectedDictionaryKey);
     return selectedDictionary ?? 'main';
+  }
+
+  /*
+   * Collections
+   */
+
+  async getPostDataFromSubredditPosts(posts: Post[], limit: number): Promise<CollectionData[]> {
+    return await Promise.all(
+      posts.map(async (post: Post) => {
+        const postData = await this.getPostData(post.id);
+        if (postData?.word) {
+          return {
+            postId: postData.postId,
+            data: JSON.parse(postData.data),
+            authorUsername: postData.authorUsername,
+          };
+        }
+        return null;
+      })
+    ).then((results) =>
+      results.filter((postData): postData is PostData => postData !== null).slice(0, limit)
+    );
+  }
+
+  async storeCollectionPostData(data: {
+    postId: string;
+    data: CollectionData[];
+    timeframe: string;
+    postType: string;
+  }): Promise<void> {
+    const key = this.getPostDataKey(data.postId);
+    await this.redis.hSet(key, {
+      postId: data.postId,
+      data: JSON.stringify(data.data),
+      timeframe: data.timeframe,
+      postType: data.postType,
+    });
+  }
+
+  parseCollectionPostData(rawData: Record<string, string>): CollectionPostData {
+    return {
+      postId: rawData.postId,
+      postType: 'collection',
+      data: JSON.parse(rawData.data),
+      timeframe: rawData.timeframe,
+    };
   }
 }

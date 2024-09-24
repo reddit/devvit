@@ -255,7 +255,7 @@ describe('Post API', () => {
         vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
 
         try {
-          // @ts-expect-error
+          // @ts-expect-error test bad type.
           await mockedPost.setTextFallback({ otherParam: '' });
         } catch (testError: unknown) {
           expect(testError).toBeDefined();

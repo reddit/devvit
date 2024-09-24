@@ -76,6 +76,7 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
         solved: false,
       },
       guesses: [],
+      postType: 'drawing',
     };
 
     await Promise.all([

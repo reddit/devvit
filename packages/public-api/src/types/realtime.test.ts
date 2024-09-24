@@ -19,19 +19,19 @@ test('typing is intuitive', () => {
 
     ctx.useChannel({
       name: 'name',
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       async onMessage() {},
     });
 
     ctx.useChannel({
       name: 'name',
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       async onMessage(): Promise<void> {},
     });
 
     ctx.useChannel({
       name: 'name',
-      // @ts-expect-error
+      // @ts-expect-error test bad type.
       async onMessage(): Promise<undefined> {},
     });
 

@@ -21,4 +21,14 @@ export type PostData = {
     count: number;
     commentId: string;
   }[];
+  postType: string;
+};
+
+// Collections
+export type CollectionData = Pick<PostData, 'postId' | 'data' | 'authorUsername'>;
+export type CollectionPostData = {
+  postId: string;
+  data: CollectionData[];
+  timeframe: string;
+  postType: string;
 };
