@@ -40,11 +40,13 @@ const defaultPostData: PostData = {
     players: 0,
     winners: 0,
     words: 0,
+    skipped: 0,
   },
   user: {
     guesses: 0,
     points: 0,
     solved: false,
+    skipped: false,
   },
   guesses: [],
   postType: 'drawing',

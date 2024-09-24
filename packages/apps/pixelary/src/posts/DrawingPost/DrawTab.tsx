@@ -14,7 +14,7 @@ interface DrawTabProps {
   };
   myDrawings: PostData[] | null;
   myDrawingsLoading: boolean;
-  onDrawingSubmitted: () => void;
+  refresh: () => void;
   setShowTabs: (showTabs: boolean) => void;
 }
 
@@ -60,7 +60,7 @@ export const DrawTab = (props: DrawTabProps): JSX.Element => {
         word={word}
         drawing={drawing}
         onNext={() => {
-          props.onDrawingSubmitted();
+          props.refresh();
           setCurrentStep('Overview');
           props.setShowTabs(true);
         }}

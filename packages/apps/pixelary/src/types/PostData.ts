@@ -8,12 +8,14 @@ export type PostData = {
   count: {
     players: number;
     winners: number;
+    skipped: number;
     guesses: number;
     words: number;
   };
   user: {
     guesses: number;
     solved: boolean;
+    skipped: boolean;
     points: number;
   };
   guesses: {

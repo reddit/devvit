@@ -14,7 +14,7 @@ interface GuessTabProps {
   };
   onDraw: () => void;
   onScores: () => void;
-  onCorrectGuess: () => void;
+  refresh: () => void;
 }
 
 export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element => {
@@ -22,8 +22,9 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
   const isAuthor = props.data.postData.authorUsername === props.data.username;
   const isExpired = props.data.postData.expired;
   const isSolved = props.data.postData.user.solved;
+  const isSkipped = props.data.postData.user.skipped;
   const [currentStep, setCurrentStep] = useState<string>(
-    isAuthor || isExpired || isSolved ? 'Results' : 'Prompt'
+    isAuthor || isExpired || isSolved || isSkipped ? 'Results' : 'Prompt'
   );
 
   // Guess feedback
@@ -51,7 +52,7 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
 
     // If user guessed correctly, move to results step
     if (userGuessedCorrectly) {
-      props.onCorrectGuess();
+      props.refresh();
       setCurrentStep('Results');
     }
 
@@ -64,9 +65,21 @@ export const GuessTab = (props: GuessTabProps, context: Context): JSX.Element =>
     });
   }
 
+  function onSkipHandler(): void {
+    props.refresh();
+    setCurrentStep('Results');
+  }
+
   // Steps map
   const steps: Record<string, JSX.Element> = {
-    Prompt: <GuessTabPromptStep {...props} feedback={feedback} onGuess={onGuessHandler} />,
+    Prompt: (
+      <GuessTabPromptStep
+        {...props}
+        feedback={feedback}
+        onGuess={onGuessHandler}
+        onSkip={onSkipHandler}
+      />
+    ),
     Results: <GuessTabResultsStep {...props} feedback={feedback} onDraw={props.onDraw} />,
   };
 

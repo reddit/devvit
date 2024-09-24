@@ -54,14 +54,14 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
           props.refetch();
           setTab('Scores');
         }}
-        onCorrectGuess={() => props.refetch()}
+        refresh={() => props.refetch()}
       />
     ),
     Draw: (
       <DrawTab
         {...props}
         data={latestData}
-        onDrawingSubmitted={() => {
+        refresh={() => {
           props.refetch();
         }}
         setShowTabs={setShowTabs}
@@ -90,7 +90,6 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
               isActive={tab === label}
               onPress={() => {
                 props.refetch();
-
                 setTab(label);
               }}
             />
@@ -111,7 +110,7 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
             props.refetch();
             setTab('Scores');
           }}
-          onCorrectGuess={() => props.refetch()}
+          refresh={() => props.refetch()}
         />
       )}
     </vstack>

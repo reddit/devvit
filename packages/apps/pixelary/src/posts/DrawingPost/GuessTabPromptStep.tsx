@@ -7,6 +7,7 @@ import { StyledButton } from '../../components/StyledButton.js';
 import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
+import { Service } from '../../service/Service.js';
 
 interface GuessTabPromptStepProps {
   data: {
@@ -14,6 +15,7 @@ interface GuessTabPromptStepProps {
     username: string | null;
   };
   onGuess: (guess: string, userWantsToComment: boolean) => Promise<void>;
+  onSkip: () => void;
   feedback: boolean | null;
 }
 
@@ -21,6 +23,7 @@ export const GuessTabPromptStep = (
   props: GuessTabPromptStepProps,
   context: Context
 ): JSX.Element => {
+  const service = new Service(context);
   const playerCount = props.data.postData.count.players;
   const winnerCount = props.data.postData.count.winners;
   const winPercentage =
@@ -54,6 +57,25 @@ export const GuessTabPromptStep = (
     }
   );
 
+  // Give up form
+  const giveUpForm = useForm(
+    {
+      title: 'Giving up already?',
+      description:
+        "You'll see the word and lose your chance to earn points. Ready to call it quits?",
+      acceptLabel: 'I Give Up',
+      cancelLabel: 'Back',
+      fields: [],
+    },
+    async () => {
+      if (!props.data.postData.postId || !props.data.username) {
+        return;
+      }
+      await service.skipPost(props.data.postData.postId, props.data.username);
+      props.onSkip();
+    }
+  );
+
   return (
     <vstack grow alignment="center">
       <spacer height="24px" />
@@ -76,12 +98,20 @@ export const GuessTabPromptStep = (
       <spacer height="4px" />
       <PixelText color={Settings.theme.secondary}>{`${winPercentage}% got it right`}</PixelText>
       <spacer grow />
-      <StyledButton
-        width="288px"
-        label="GUESS THE WORD"
-        onPress={() => context.ui.showForm(guessForm)}
-      />
-      <spacer height="24px" />
+
+      {/* Footer */}
+      <hstack alignment="center" width="100%">
+        <StyledButton
+          width="138px"
+          label="GIVE UP"
+          appearance="secondary"
+          onPress={() => context.ui.showForm(giveUpForm)}
+        />
+        <spacer width="8px" />
+        <StyledButton width="138px" label="GUESS" onPress={() => context.ui.showForm(guessForm)} />
+      </hstack>
+
+      <spacer height="20px" />
     </vstack>
   );
 };

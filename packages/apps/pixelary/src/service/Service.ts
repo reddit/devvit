@@ -344,11 +344,13 @@ export class Service {
           : 0,
         guesses: 0,
         words: 0,
+        skipped: 0,
       },
       user: {
         guesses: 0,
         points: 0,
         solved: false,
+        skipped: false,
       },
       guesses: [],
       postType: 'drawing',
@@ -359,17 +361,24 @@ export class Service {
       response.expired = data.expired === 'true';
     }
 
-    // Tally how many times the user has guessed
-    const userGuessCountKey = `user:${username}:guesses`;
-    if (data?.[userGuessCountKey]) {
-      response.user.guesses = parseInt(data[userGuessCountKey]);
-    }
+    if (username) {
+      // Tally how many times the user has guessed
+      const userGuessCountKey = `user:${username}:guesses`;
+      if (data?.[userGuessCountKey]) {
+        response.user.guesses = parseInt(data[userGuessCountKey]);
+      }
 
-    // Check if the user has solved the post
-    const userPointsEarnedKey = `user:${username}:points`;
-    if (data?.[userPointsEarnedKey]) {
-      response.user.solved = true;
-      response.user.points = parseInt(data[userPointsEarnedKey]);
+      // Check if the user has solved the post
+      const userPointsEarnedKey = `user:${username}:points`;
+      if (data?.[userPointsEarnedKey]) {
+        response.user.solved = true;
+        response.user.points = parseInt(data[userPointsEarnedKey]);
+      }
+
+      // Check if the user has skipped the post
+      if (data?.[this.userSkippedField(username)]) {
+        response.user.skipped = true;
+      }
     }
 
     if (data) {
@@ -396,13 +405,19 @@ export class Service {
           }
         });
       }
-    }
 
-    // Count how many players have guessed
-    const playerGuesses = Object.keys(data || {}).filter(
-      (key) => key.startsWith('user:') && key.endsWith(':guesses')
-    );
-    response.count.players = playerGuesses.length;
+      // Count how many players gave up
+      const skippedPlayers = Object.keys(data).filter(
+        (key) => key.startsWith('user:') && key.endsWith(':skipped')
+      );
+      response.count.skipped = skippedPlayers.length;
+
+      // Count how many players have guessed
+      const playerGuesses = Object.keys(data).filter(
+        (key) => key.startsWith('user:') && key.endsWith(':guesses')
+      );
+      response.count.players = playerGuesses.length;
+    }
 
     // Return the parsed post data
     return response;
@@ -413,11 +428,21 @@ export class Service {
     await this.redis.hSet(key, { expired: 'true' });
   }
 
+  userSkippedField(username: string): string {
+    return `user:${username}:skipped`;
+  }
+
+  async skipPost(postId: string, username: string): Promise<void> {
+    await this.redis.hSet(this.getPostDataKey(postId), {
+      [this.userSkippedField(username)]: 'true',
+    });
+  }
+
   async getPostData(postId: string): Promise<Record<string, string>> {
     const key = this.getPostDataKey(postId);
     const postData = await this.redis.hGetAll(key);
     // Ensure the postId is set, even if postData is empty
-    return postData.postId ? postData : { postId };
+    return postData?.postId ? postData : { postId };
   }
 
   async storePostData(data: {
