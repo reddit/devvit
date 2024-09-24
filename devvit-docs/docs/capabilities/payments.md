@@ -36,7 +36,7 @@ You can build products in your app for things like in-game items or exclusive fe
 
 ![Sample payment app screen](../assets/payments_example.png)
 
-All products must be approved by the Developer Platform team. To submit your products and app for approval, fill out the [app review form](https://docs.google.com/forms/d/e/1FAIpQLSdEyE5vrqOBlojue_mkrV25RiiHv_sxe-xqtcdzCMBTWmoROA/viewform).
+All products must be approved by the Developer Platform team. Products are approved during the [app review process](../publishing.md) when you publish your app.
 
 :::note
 Some products are not allowed and will not be approved:
@@ -47,7 +47,7 @@ Some products are not allowed and will not be approved:
 - Advertising or pay-for-promotion
   :::
 
-## Registering products
+## Register products
 
 Products are registered via a `src/products.json` file in your local app. The JSON schema for the file format is available at [https://developers.reddit.com/schema/products.json](https://developers.reddit.com/schema/products.json)
 
@@ -114,7 +114,7 @@ If you do not provide an image, the default Reddit product image will be used.
 }
 ```
 
-## Adding custom handlers to complete the payment flow
+## Add custom handlers to complete the payment flow
 
 You must specify a function that is called during the order flow using the `addPaymentHandler`. This will to customize how your app will fulfill product orders and provide the ability for the developer to reject an order. (refunds are in progress!).
 
