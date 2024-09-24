@@ -58,7 +58,7 @@ export class Service {
       if (event.createComment && isGuessUnique) {
         comment = await this.reddit.submitComment({
           id: event.postData.postId,
-          text: event.guess,
+          text: `I tried **${event.guess}**`,
         });
       }
     } catch (error) {
