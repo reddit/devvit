@@ -4,10 +4,11 @@ import { Devvit } from '@devvit/public-api';
 import { Drawing } from '../../components/Drawing.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PointsToast } from '../../components/PointsToast.js';
+import { StyledButton } from '../../components/StyledButton.js';
 import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
-import { StyledButton } from '../../components/StyledButton.js';
+import { obfuscateString } from '../../utils/obfuscateString.js';
 
 interface GuessTabResultsStepProps {
   data: {
@@ -31,12 +32,12 @@ export const GuessTabResultsStep = (
 
   // Top N guesses (or whatever is available)
   const topGuesses = data.guesses
-    // Filter out guesses without a commentId
-    .filter((guess) => guess.commentId && guess.commentId.length > 0)
     .sort((a, b) => b.count - a.count)
     .slice(0, rowCount)
     .map((guess) => {
       const percentage = Math.round((guess.count / data.count.guesses) * 100);
+      const word = guess.word.charAt(0).toUpperCase() + guess.word.slice(1);
+
       return (
         <zstack
           height={rowHeight}
@@ -44,6 +45,7 @@ export const GuessTabResultsStep = (
           alignment="top start"
           backgroundColor="rgba(255, 255, 255, 0.2)"
           onPress={async () => {
+            if (!guess.commentId) return;
             const comment = await context.reddit.getCommentById(guess.commentId);
             context.ui.navigateTo(comment);
           }}
@@ -53,9 +55,7 @@ export const GuessTabResultsStep = (
           {/* Guess */}
           <hstack height="100%" width="100%" alignment="start middle">
             <spacer width="12px" />
-            <PixelText scale={2}>
-              {guess.word.charAt(0).toUpperCase() + guess.word.slice(1)}
-            </PixelText>
+            <PixelText scale={2}>{guess.commentId ? word : obfuscateString(word)}</PixelText>
           </hstack>
           {/* Metadata */}
           <hstack height="100%" width="100%" alignment="end middle">
