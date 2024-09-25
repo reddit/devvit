@@ -306,6 +306,107 @@ describe('BlocksHandler', () => {
         `[Error: Components (found: AsyncChild) cannot be async. To use data from an async endpoint, please use "const [data] = useState(async () => {/** your async code */})".]`
       );
     });
+
+    test('useState with async initializer in child component renders', async () => {
+      const FooComponent = (): JSX.Element => {
+        const [state] = useState(async () => 'foo');
+        return <text>state: {state}</text>;
+      };
+
+      const Root = (): JSX.Element => {
+        return (
+          <blocks>
+            <FooComponent />
+          </blocks>
+        );
+      };
+
+      const handler = new BlocksHandler(Root);
+      const resp = await handler.handle(EmptyRequest, mockMetadata);
+
+      expect(JSON.stringify(resp.blocks)).toContain('state: foo');
+    });
+
+    test('useState with async initializer in child component renders (fragment)', async () => {
+      const FooComponent = (): JSX.Element => {
+        const [state] = useState(async () => 'foo');
+        return <text>state: {state}</text>;
+      };
+
+      const Root = (): JSX.Element => {
+        return (
+          <>
+            <FooComponent />
+          </>
+        );
+      };
+
+      const handler = new BlocksHandler(Root);
+      const resp = await handler.handle(EmptyRequest, mockMetadata);
+
+      expect(JSON.stringify(resp.blocks)).toContain('state: foo');
+    });
+
+    test('useState with async initializer in child component renders (deep)', async () => {
+      const BazComponent = ({ children }: { children: JSX.Element }): JSX.Element => {
+        return <vstack>{children}</vstack>;
+      };
+
+      const BarComponent = ({ children }: { children: JSX.Element }): JSX.Element => {
+        return <vstack>{children}</vstack>;
+      };
+
+      const FooComponent = (): JSX.Element => {
+        const [state] = useState(async () => 'foo');
+        return <text>state: {state}</text>;
+      };
+
+      const Root = (): JSX.Element => {
+        return (
+          <blocks>
+            <BazComponent>
+              <BarComponent>
+                <FooComponent />
+              </BarComponent>
+            </BazComponent>
+          </blocks>
+        );
+      };
+
+      const handler = new BlocksHandler(Root);
+      const resp = await handler.handle(EmptyRequest, mockMetadata);
+
+      expect(JSON.stringify(resp.blocks)).toContain('state: foo');
+    });
+
+    test('conditional component that contains useState with async initializer renders', async () => {
+      const FooComponent = (): JSX.Element => {
+        const [state] = useState(async () => 'foo');
+        return <text>state: {state}</text>;
+      };
+
+      const showFooRef: HookRef = {};
+      const pressRef: HookRef = {};
+      const Root = (): JSX.Element => {
+        const [showFooComponent, setShowFooComponent] = captureHookRef(useState(false), showFooRef);
+        return (
+          <blocks>
+            <button onPress={captureHookRef(() => setShowFooComponent(true), pressRef)}>
+              Show FooComponent
+            </button>
+            {showFooComponent && <FooComponent />}
+          </blocks>
+        );
+      };
+
+      const handler = new BlocksHandler(Root);
+      await handler.handle(EmptyRequest, mockMetadata);
+
+      const req = generatePressRequest(pressRef);
+      const resp = await handler.handle(req, mockMetadata);
+
+      expect(JSON.stringify(resp.blocks)).toContain('state: foo');
+    });
   });
 
   describe('transformation', () => {

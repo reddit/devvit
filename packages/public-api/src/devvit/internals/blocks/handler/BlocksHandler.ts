@@ -230,7 +230,9 @@ export class BlocksHandler {
           context.addToRequeueEvents(...requeueable);
           break;
         } else {
-          console.error('[blocks] unhandled error in handler', e);
+          if (!isCircuitBreaker(e)) {
+            console.error('[blocks] unhandled error in handler', e);
+          }
           throw e;
         }
       }
@@ -454,20 +456,26 @@ export class BlocksHandler {
     } else if (isBlockElement(element)) {
       // This means the element is a fragment
       if (element.type === undefined) {
-        context.push({ namespace: 'fragment', ...element.props });
-        // Since it's a fragment, don't reifyProps because you can't have props on a fragment
-        const children = this.#renderList(element.children, context);
-        context.pop();
-        return children;
+        try {
+          context.push({ namespace: 'fragment', ...element.props });
+          // Since it's a fragment, don't reifyProps because you can't have props on a fragment
+          return this.#renderList(element.children, context);
+        } finally {
+          context.pop();
+        }
       } else if (typeof element.type === 'function') {
         const propsWithChildren = { ...element.props, children: element.children.flat(Infinity) };
         return this.#render(element.type, propsWithChildren, context);
       } else {
-        context.push({ namespace: element.type, ...element.props });
-        const reifiedChildren = this.#renderList(element.children, context);
-        const reifiedProps = this.#reifyProps(element.props ?? {});
-        context.pop();
-        return [{ type: element.type, children: reifiedChildren, props: reifiedProps }];
+        try {
+          context.push({ namespace: element.type, ...element.props });
+          const reifiedChildren = this.#renderList(element.children, context);
+          const reifiedProps = this.#reifyProps(element.props ?? {});
+
+          return [{ type: element.type, children: reifiedChildren, props: reifiedProps }];
+        } finally {
+          context.pop();
+        }
       }
     } else {
       return [(element ?? '').toString()];
