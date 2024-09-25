@@ -39,6 +39,7 @@
 ### Interfaces
 
 - [ModAction](../interfaces/models.ModAction.md)
+- [PostNotesRequest](../interfaces/models.PostNotesRequest.md)
 
 ### Type Aliases
 
@@ -353,7 +354,7 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 
 ### <a id="createmodnoteoptions" name="createmodnoteoptions"></a> CreateModNoteOptions
 
-Ƭ **CreateModNoteOptions**: `Prettify`\<`PostNotesRequest` & \{ `label`: [`UserNoteLabel`](models.md#usernotelabel) ; `redditId`: `T1ID` \| `T3ID` }\>
+Ƭ **CreateModNoteOptions**: `Prettify`\<[`PostNotesRequest`](../interfaces/models.PostNotesRequest.md) & \{ `label?`: [`UserNoteLabel`](models.md#usernotelabel) ; `redditId?`: `T1ID` \| `T3ID` }\>
 
 ---
 
@@ -1254,11 +1255,11 @@ An individual Removal Reason object.
 
 #### Type declaration
 
-| Name       | Type                                       |
-| :--------- | :----------------------------------------- |
-| `label?`   | [`UserNoteLabel`](models.md#usernotelabel) |
-| `note?`    | `string`                                   |
-| `redditId` | `T1ID` \| `T3ID` \| `T5ID`                 |
+| Name        | Type                                       |
+| :---------- | :----------------------------------------- |
+| `label?`    | [`UserNoteLabel`](models.md#usernotelabel) |
+| `note?`     | `string`                                   |
+| `redditId?` | `T1ID` \| `T3ID` \| `T5ID`                 |
 
 ---
 
