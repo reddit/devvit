@@ -15,8 +15,7 @@ These platform upgrades create breaking changes for some apps. We’re releasing
 To get started on 0.11.0:
 
 1. Run `npm install -g devvit@next`.
-2. Make sure your app version is 2024.34 or higher.
-3. Run `devvit update app` and `npm i` to update your app.
+2. Run `devvit update app` and `npm i` to update your app.
 
 **New Features**
 
