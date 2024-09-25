@@ -55,6 +55,13 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
       preview: <LoadingState />,
     });
 
+    // Schedule a job to pin the TLDR comment
+    await context.scheduler.runJob({
+      name: 'DRAWING_PINNED_TLDR_COMMENT',
+      data: { postId: post.id },
+      runAt: new Date(Date.now()),
+    });
+
     const postData = {
       word: props.word,
       data: props.drawing,

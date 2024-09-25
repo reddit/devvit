@@ -513,13 +513,40 @@ Devvit.addSchedulerJob({
   ) => {
     if (event.data) {
       try {
-        const comment = await context.reddit.submitComment({
+        await context.reddit.submitComment({
           id: event.data.postId,
           text: `u/${event.data.username} is the first to solve this drawing!`,
         });
-        await comment.distinguish(true);
       } catch (error) {
         console.error('Failed to submit comment:', error);
+      }
+    }
+  },
+});
+
+/*
+ * Add and pin a TLDR comment to new drawing posts
+ */
+
+Devvit.addSchedulerJob({
+  name: 'DRAWING_PINNED_TLDR_COMMENT',
+  onRun: async (
+    event: {
+      data: {
+        postId: string;
+      };
+    },
+    context
+  ) => {
+    if (event.data) {
+      try {
+        const comment = await context.reddit.submitComment({
+          id: event.data.postId,
+          text: `Pixelary is a new pixel-based drawing and guessing game built on [Reddit's developer platform](https://developers.reddit.com). To play, press the "Guess" button to submit a guess or "Draw" button to create your own drawing. [Submit feedback](https://www.reddit.com/r/Pixelary/comments/1f578ps/hello_pixelary_community/).`,
+        });
+        await comment.distinguish(true);
+      } catch (error) {
+        console.error('Failed to submit TLDR comment:', error);
       }
     }
   },
