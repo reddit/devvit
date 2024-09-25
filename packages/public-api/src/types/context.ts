@@ -53,7 +53,10 @@ export type BaseContext = {
   postId?: string | undefined;
   /** The current user's ID if this event was triggered by a logged in user */
   userId?: string | undefined;
-  /** The ID of the current app's account */
+  /**
+   * The ID of the current app's account
+   * @deprecated Use {@link BaseContext.appName} instead to get the app's username
+   */
   appAccountId: string;
   /** The slug of the app that is running */
   appName: string;
