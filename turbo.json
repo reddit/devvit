@@ -3,7 +3,6 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "env": ["TRACE_ENVELOPES"],
       "outputs": [
         "dist/**",
         "packages/public-api/src/devvit/internals/semanticColors.ts",
@@ -22,7 +21,6 @@
       "outputs": []
     },
     "test": {
-      "env": ["TRACE_ENVELOPES"],
       "outputs": []
     },
     "test:size": {
@@ -32,19 +30,15 @@
       "outputs": []
     },
     "test:update": {
-      "env": ["TRACE_ENVELOPES"],
       "outputs": ["**/*.snap"]
     },
     "test:unit": {
-      "env": ["TRACE_ENVELOPES"],
       "outputs": []
     },
     "test:ui": {
-      "env": ["TRACE_ENVELOPES"],
       "outputs": []
     },
     "test:unit-with-coverage": {
-      "env": ["TRACE_ENVELOPES"],
       "outputs": []
     },
     "clean": {
