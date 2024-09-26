@@ -385,43 +385,6 @@ Devvit.addMenuItem({
   },
 });
 
-//ADMIN ONLY
-Devvit.addMenuItem({
-  label: '[Pixelary] Get incorrect guesses',
-  location: 'subreddit',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const { reddit, ui } = context;
-    const service = new Service(context);
-    const guesses = await service.getIncorrectGuesses();
-    const currentUser = await reddit.getCurrentUser();
-
-    if (!currentUser) {
-      throw new Error(`Cannot get incorrect guesses because could not find currentUser`);
-    }
-
-    await reddit.sendPrivateMessage({
-      to: currentUser.username,
-      subject: 'Pixelary: Incorrect guesses',
-      text: JSON.stringify(guesses),
-    });
-    ui.showToast('Sent PM with incorrect guesses!');
-  },
-});
-
-//ADMIN ONLY
-Devvit.addMenuItem({
-  label: '[Pixelary] Delete incorrect guesses',
-  location: 'subreddit',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const { ui } = context;
-    const service = new Service(context);
-    await service.deleteIncorrectGuesses();
-    ui.showToast('Deleted incorrect guesses');
-  },
-});
-
 // ADMIN ONLY
 Devvit.addMenuItem({
   label: '[Pixelary] Clear leaderboard',

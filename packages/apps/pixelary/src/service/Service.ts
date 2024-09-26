@@ -162,7 +162,7 @@ export class Service {
   }): Promise<void> {
     const { postId, username } = event;
     const key = this.#scoreBoardEventsKey;
-    await this.redis.hset(key, {
+    await this.redis.hSet(key, {
       [this.#scoreBoardEventField(postId, username)]: JSON.stringify(event),
     });
     await this.redis.expire(key, Service.scoreWindow);
@@ -178,7 +178,7 @@ export class Service {
 
   async updateScoreBoard(): Promise<void> {
     try {
-      const scoreEvents = await this.redis.hgetall(this.#scoreBoardEventsKey);
+      const scoreEvents = await this.redis.hGetAll(this.#scoreBoardEventsKey);
 
       if (!scoreEvents) {
         return;
@@ -236,8 +236,8 @@ export class Service {
         this.redis.zScore(this.#scoreBoardKey, username),
       ]);
       return {
-        rank: isNaN(rank) ? -1 : rank,
-        score: isNaN(score) ? 0 : score,
+        rank: rank === undefined ? -1 : rank,
+        score: score === undefined ? 0 : score,
       };
     } catch (error) {
       // console.error('Error fetching user score board entry', error);
@@ -248,42 +248,8 @@ export class Service {
     }
   }
 
-  // Incorrect guesses
-  // Save incorrect guesses that are not already part of the word list
-  // so that they could be used to expande the word list in the future.
-
   getCapitalizedWord(word: string): string {
     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }
-
-  readonly #incorrectGuessesKey: string = 'incorrectGuesses';
-  async saveIncorrectGuess(word: string): Promise<void> {
-    if (Words.includes(this.getCapitalizedWord(word))) {
-      return;
-    }
-    try {
-      await this.redis.hset(this.#incorrectGuessesKey, {
-        [word]: '',
-      });
-    } catch (error) {
-      throw new Error('Error saving incorrect guess');
-    }
-  }
-
-  async getIncorrectGuesses(): Promise<string[]> {
-    try {
-      return await this.redis.hkeys(this.#incorrectGuessesKey);
-    } catch (error) {
-      throw new Error('Error fetching incorrect guesses');
-    }
-  }
-
-  async deleteIncorrectGuesses(): Promise<void> {
-    try {
-      await this.redis.del(this.#incorrectGuessesKey);
-    } catch (error) {
-      throw new Error('Error deleting incorrect guesses');
-    }
   }
 
   /*
@@ -469,12 +435,12 @@ export class Service {
 
   async storeGameSettings(settings: GameSettings): Promise<void> {
     const key = this.getGameSettingsKey();
-    await this.redis.hset(key, settings);
+    await this.redis.hSet(key, settings);
   }
 
   async getGameSettings(): Promise<GameSettings> {
     const key = this.getGameSettingsKey();
-    return (await this.redis.hgetall(key)) as GameSettings;
+    return (await this.redis.hGetAll(key)) as GameSettings;
   }
 
   // Dynamic dictionary
