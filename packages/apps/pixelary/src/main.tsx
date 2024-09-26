@@ -178,7 +178,7 @@ const selectDictionaryForm = Devvit.createForm(
           type: 'select',
           options: [
             { label: 'main', value: 'main' },
-            { label: 'r/nintendoswitch', value: 'r/nintendoswitch' }, //hardcoding for r/nintendoswitch dictionary takeover 9/21/24
+            { label: 'r/piercing', value: 'r/piercing' }, //hardcoding for r/piercing dictionary takeover 9/26/24
           ],
         },
       ],
