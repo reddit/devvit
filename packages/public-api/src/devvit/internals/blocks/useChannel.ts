@@ -82,7 +82,8 @@ export function makeUseChannelHook(reconciler: BlocksReconciler): UseChannelHook
             break;
           default:
             if (debug) console.debug('[realtime] receives', event.event?.data);
-            result = options.onMessage(event.event?.data ?? {});
+            // expect msg. this must align to RealtimeClient.send().
+            result = options.onMessage(event.event?.data?.msg);
             break;
         }
 

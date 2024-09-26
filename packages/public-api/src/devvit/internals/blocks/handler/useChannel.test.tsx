@@ -462,7 +462,7 @@ test('message event invokes callback', async () => {
           scope: UIEventScope.LOCAL,
           hook: channelRef.id,
           realtimeEvent: {
-            event: { channel: 'app:install:Channel', data: 'data' },
+            event: { channel: 'app:install:Channel', data: { msg: 'data' } },
           },
         },
       ],
@@ -598,7 +598,7 @@ test('two channels', async () => {
             scope: UIEventScope.LOCAL,
             hook: channelARef.id,
             realtimeEvent: {
-              event: { channel: 'app:install:ChannelA', data: 'a' },
+              event: { channel: 'app:install:ChannelA', data: { msg: 'a' } },
             },
           },
         ],
@@ -629,7 +629,7 @@ test('two channels', async () => {
             scope: UIEventScope.LOCAL,
             hook: channelBRef.id,
             realtimeEvent: {
-              event: { channel: 'app:install:ChannelB', data: 'b' },
+              event: { channel: 'app:install:ChannelB', data: { msg: 'b' } },
             },
           },
         ],

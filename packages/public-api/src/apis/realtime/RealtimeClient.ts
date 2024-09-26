@@ -11,6 +11,7 @@ export class RealtimeClient {
   }
 
   async send(channel: string, msg: JSONValue): Promise<void> {
-    await Devvit.realtimePlugin.Send({ channel, data: msg }, this.#metadata);
+    // guarantee an object by wrapping msg. the key must align to useChannel().
+    await Devvit.realtimePlugin.Send({ channel, data: { msg } }, this.#metadata);
   }
 }

@@ -79,7 +79,8 @@ class ChannelHook<Message extends JSONValue> implements UseChannelResult<Message
         // to-do: define a RealtimeSubscriptionStatus.MESSAGE. this could have
         //        been a oneOf but the current approach allows for status + data
         //        and this default case will break if another new type is added.
-        this.#opts.onMessage(realtime.event?.data ?? {});
+        // expect msg. this must align to RealtimeClient.send().
+        this.#opts.onMessage(realtime.event?.data?.msg);
         break;
     }
   }
