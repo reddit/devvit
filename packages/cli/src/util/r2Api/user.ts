@@ -1,4 +1,3 @@
-import { Result } from '@devvit/shared-types/Result.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { asT2ID } from '@devvit/shared-types/tid.js';
 
@@ -6,6 +5,7 @@ import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import type { JSONObject } from '../../vendor/@reddit/json-config/0.4.2/index.js';
 import { authHeaders } from '../auth.js';
 import { REDDIT_OAUTH_API } from '../config.js';
+import { Result } from './result.js';
 
 // TODO: this should move under http/r2/user.ts of @devvit/dev-server which
 // @devvit/cli depends on so we have a common R2 API. The Result object here

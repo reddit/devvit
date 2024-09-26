@@ -2,7 +2,6 @@ import crypto from 'node:crypto';
 import querystring from 'node:querystring';
 
 import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
-import type { Disposable } from '@devvit/shared-types/Disposable.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import inquirer from 'inquirer';
 import open from 'open';
@@ -27,7 +26,7 @@ export type NodeFSAuthenticationPluginConfig = {
 /**
  * @description server side Node FS implementation of an authentication plugin
  */
-export class NodeFSAuthenticationPlugin implements Disposable {
+export class NodeFSAuthenticationPlugin {
   readonly #authCfg: NodeFSAuthenticationPluginConfig['auth'];
 
   readonly authTokenStore: AuthTokenStore;

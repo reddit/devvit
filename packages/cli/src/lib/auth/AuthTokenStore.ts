@@ -1,7 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
 
-import type { Disposable } from '@devvit/shared-types/Disposable.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { FSWatcher } from 'chokidar';
 import chokidar from 'chokidar';
@@ -20,7 +19,7 @@ export type TokenInfo = {
   copyPaste?: boolean;
 };
 
-export class AuthTokenStore implements Disposable {
+export class AuthTokenStore {
   readonly #dotDevvitDir: string;
 
   #tokenFileWatcher: FSWatcher | undefined;
