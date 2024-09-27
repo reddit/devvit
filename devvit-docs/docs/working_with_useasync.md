@@ -4,7 +4,7 @@
 This feature is experimental, which means the design is not final but it's still available for you to use.
 :::
 
-`useAsync` is a hook that allows your app to fetch remote data in a non-blocking way.
+`useAsync` is a hook that allows your app to perform server side calls like `redis.get` or `reddit.getCurrentUser` without blocking the render process.
 
 ## Blocking versus non-blocking
 
@@ -12,44 +12,55 @@ The code you write in Javascript can be blocking or non-blocking. To keep applic
 
 Blocking code produces a waterfall of actions. One line must happen after another, so the speed in which a program can render takes a large hit. We want to avoid waterfalls to provide a nice experience for users.
 
-**Blocking**
+### Without useAsync (blocking) example
 
 ```tsx
-// This will block render
-const [count, setCount] = useState(async () => await redis.get('count'));
+const App = () => {
+  // This will block the render until data is fetched
+  const [message] = useState(async () => await redis.get('welcomeMessage'));
 
-// This code will not execute until the useState above resolves
-const [color, setColor] = useState(async () => await redis.get('color'));
-
-// Any code after needs both count and color to resolve.
+  return <text>{message}</text>;
+};
 ```
 
-**Non-blocking**
+### With useAsync (non-blocking) example
 
 ```tsx
-// Both requests will be sent at the same time!
-const { data: countData, loading: countLoading } = useAsync(async () => await redis.get('count'));
-const { data: colorData, loading: colorLoading } = useAsync(async () => await redis.get('color'));
+const App = () => {
+  const { data: message, loading, error } = useAsync(async () => await redis.get('welcomeMessage'));
+
+  return (
+    <vstack>
+      {loading && <text>Loading...</text>}
+      {error && <text>Error fetching message</text>}
+      {message && <text>{message}</text>}
+    </vstack>
+  );
+};
 ```
 
-## Arguments
+This example displays “Loading…” immediately while fetching the data.
 
-`useAsync` takes an async function as the first argument and a config object containing:
+## Understanding useAsync
+
+### Syntax
 
 ```ts
-{
-  // Calls the async function every time this value changes (deep equality)
-  depends: JSON | JSON[]
-}
+const { data, loading, error } = useAsync(asyncFunction, { depends: {JSON object} });
 ```
 
-Returns an object of:
+- asyncFunction: an asynchronous function that must return a valid JSON value.
+- depends (optional): a JSON object or array of JSON objects that, when changed, will cause the asyncFunction to re-execute.
 
-- data: The data returned from the initializer
-- loading: A boolean that denotes if it is loading or not
-- error: An error if the request failed
+### Return values
+
+- data: the data returned from the initializer.
+- loading: aA boolean that denotes if it is loading or not.
+- error: an error if the request failed.
 
 **The initializer for `useAsync` (the first argument of the function) must return a valid JSON value.** This differs from React due to how Devvit components work across server and client boundaries.
+
+### Example: fetching user data
 
 ```ts
 // A normal useAsync function
@@ -83,44 +94,39 @@ const {
 );
 ```
 
-## Using `useAsync`
+### Example: complete application
 
-Leverage `useAsync` to fetch data in a non-blocking way.
+This a simple application that leverages useAsync to fetch data in a non-blocking way and updates the app whenever the page changes.
 
-```tsx
-const App: Devvit.CustomPostComponent = ({ useState }: Devvit.Context) => {
+```ts
+import { useAsync, useState } from '@devvit/public-api';
+
+const App = () => {
   const [count, setCount] = useState(1);
-  const loader = async () => {
-    const rsp = await fetch(`https://xkcd.com/${count}`, {
-      method: 'GET',
-      headers: { accept: 'text/html' },
-    });
-    if (!rsp.ok) throw Error(`HTTP error ${rsp.status}: ${rsp.statusText}`);
-    const text = await rsp.text();
-    const regex = /<div id="ctitle">(.*?)<\/div>/;
-    const match = regex.exec(text);
-    if (match) {
-      return match[1];
-    } else {
-      throw new Error('not found');
-    }
-  };
-  const { data, loading, error } = useAsync(loader, { depends: [count] });
+
+  const { data, loading, error } = useAsync(
+    async () => {
+      const response = await fetch(`https://xkcd.com/${count}/info.0.json`);
+      if (!response.ok) throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+      return await response.json();
+    },
+    { depends: [count] }
+  );
 
   return (
     <vstack alignment="center middle" height="100%" gap="small">
       <text size="large">XKCD Titles</text>
       <vstack>
-        {data && <text>{JSON.stringify(data)}</text>}
-        {loading && <text>loading</text>}
+        {loading && <text>Loading...</text>}
         {error && (
           <text color="red" wrap={true}>
-            {error.message.split(/:/)[0]}
+            {error.message}
           </text>
         )}
+        {data && <text>{data.title}</text>}
       </vstack>
-      <text>{count}</text>
-      <button onPress={() => setCount((count) => count + 1)}>increment</button>
+      <text>Comic Number: {count}</text>
+      <button onPress={() => setCount((prev) => prev + 1)}>Increment</button>
     </vstack>
   );
 };
@@ -128,14 +134,14 @@ const App: Devvit.CustomPostComponent = ({ useState }: Devvit.Context) => {
 //add your custom post
 Devvit.addCustomPostType({
   name: 'AppName',
-  description: 'Using useAsync!',
+  description: 'Using useAsync with XKCD API',
   render: App,
 });
 ```
 
-## When to useAsync over useState
+## When to use useAsync and useState
 
-In most cases, prefer using `useAsync` over `useState` to keep your app snappy. A downside is that you need to handle `loading` and `error` when using `useAsync` or `useState`.
+In most cases, you'll want to use `useAsync` over `useState` to keep your app snappy. One downside is that you need to handle `loading` and `error` when using `useAsync` or `useState`.
 
 One situation where `useState` could be preferable is if your app only has one request and it must be resolved in order to show any part of the app.
 
