@@ -8,10 +8,14 @@ import type {
   ZRangeOptions,
 } from '@devvit/public-api';
 
-import Words from '../data/words.json';
 import Settings from '../settings.json';
 import type { GameSettings } from '../types/GameSettings.js';
-import type { CollectionData, CollectionPostData, PostData } from '../types/PostData.js';
+import type {
+  CollectionData,
+  CollectionPostData,
+  PostData,
+  PinnedPostData,
+} from '../types/PostData.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 
 // Service that handles the backbone logic for the application
@@ -535,6 +539,25 @@ export class Service {
       postType: 'collection',
       data: JSON.parse(rawData.data),
       timeframe: rawData.timeframe,
+    };
+  }
+
+  /*
+   * Pinned Post
+   */
+
+  async storePinnedPostData(postId: string): Promise<void> {
+    const key = this.getPostDataKey(postId);
+    await this.redis.hSet(key, {
+      postId: postId,
+      postType: 'pinned',
+    });
+  }
+
+  parsePinnedPostData(rawData: Record<string, string>): PinnedPostData {
+    return {
+      postId: rawData.postId,
+      postType: 'pinned',
     };
   }
 }

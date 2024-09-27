@@ -1,24 +1,27 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useForm } from '@devvit/public-api';
 
-import { Drawing } from '../../components/Drawing.js';
-import { LoadingState } from '../../components/LoadingState.js';
-import { PixelText } from '../../components/PixelText.js';
-import { StyledButton } from '../../components/StyledButton.js';
-import { Service } from '../../service/Service.js';
-import Settings from '../../settings.json';
+import { Drawing } from './Drawing.js';
+import { LoadingState } from './LoadingState.js';
+import { PixelText } from './PixelText.js';
+import { StyledButton } from './StyledButton.js';
+import { Service } from '../service/Service.js';
+import Settings from '../settings.json';
 
-interface DrawTabReviewStepProps {
+interface EditorPageReviewStepProps {
   data: {
     username: string | null;
     activeFlairId: string | undefined;
   };
   word: string;
   drawing: number[];
-  onNext: () => void;
+  onCancel: () => void;
 }
 
-export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Context): JSX.Element => {
+export const EditorPageReviewStep = (
+  props: EditorPageReviewStepProps,
+  context: Context
+): JSX.Element => {
   const service = new Service(context);
 
   /*
@@ -35,7 +38,7 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
       fields: [],
     },
     async () => {
-      props.onNext();
+      props.onCancel();
       context.ui.showToast('Drawing canceled');
     }
   );
@@ -110,8 +113,7 @@ export const DrawTabReviewStep = (props: DrawTabReviewStepProps, context: Contex
       service.storeMyDrawing(postData),
     ]);
 
-    props.onNext();
-    context.ui.showToast('Drawing submitted');
+    context.ui.navigateTo(post);
   }
 
   return (

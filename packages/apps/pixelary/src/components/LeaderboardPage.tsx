@@ -1,13 +1,30 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
 
-import { PixelText } from '../../components/PixelText.js';
-import { ScoreBoardRow } from '../../components/ScoreBoardRow.js';
-import Settings from '../../settings.json';
-import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
+import { PixelText } from './PixelText.js';
+import { LeaderboardRow } from './LeaderboardRow.js';
+import Settings from '../settings.json';
+import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
+import { StyledButton } from './StyledButton.js';
 
-const Wrapper = (props: { children: JSX.Element }): JSX.Element => (
-  <vstack width="100%" grow>
+const Layout = (props: { children: JSX.Element; onClose: () => void }): JSX.Element => (
+  <vstack width="100%" height="100%">
+    <spacer height="24px" />
+    <hstack width="100%" alignment="middle">
+      <spacer width="24px" />
+      <PixelText scale={2.5} color={Settings.theme.primary}>
+        Leaderboard
+      </PixelText>
+      <spacer grow />
+      <StyledButton
+        appearance="primary"
+        label="x"
+        width="32px"
+        height="32px"
+        onPress={props.onClose}
+      />
+      <spacer width="20px" />
+    </hstack>
     <spacer height="24px" />
 
     <hstack grow>
@@ -42,7 +59,7 @@ const Wrapper = (props: { children: JSX.Element }): JSX.Element => (
   </vstack>
 );
 
-interface ScoresTabProps {
+interface LeaderboardPageProps {
   data: {
     username: string | null;
   };
@@ -54,23 +71,24 @@ interface ScoresTabProps {
     };
   } | null;
   scoreBoardDataLoading: boolean;
+  onClose: () => void;
 }
 
 const rowCount = 10;
 const availableHeight = 418;
 const dividerHeight = 10;
 
-export const ScoresTab = (props: ScoresTabProps, context: Context): JSX.Element => {
+export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): JSX.Element => {
   const { scoreBoardData, scoreBoardDataLoading } = props;
 
   // Return early view if data is loading
   if (scoreBoardDataLoading || scoreBoardData === null) {
     return (
-      <Wrapper>
+      <Layout onClose={props.onClose}>
         <vstack grow alignment="center middle">
           <PixelText color={Settings.theme.secondary}>Loading ...</PixelText>
         </vstack>
-      </Wrapper>
+      </Layout>
     );
   }
 
@@ -82,12 +100,12 @@ export const ScoresTab = (props: ScoresTabProps, context: Context): JSX.Element 
   const numberOfScoresToInclude =
     !scoreBoardDataLoading && scoreBoardData?.scoreBoardUser && isUserInTheTop ? 10 : 9;
 
-  const scoreBoardRows = scoreBoardData.scores.map((row, index) => {
+  const leaderboardRows = scoreBoardData.scores.map((row, index) => {
     if (index >= numberOfScoresToInclude) {
       return null;
     }
     return (
-      <ScoreBoardRow
+      <LeaderboardRow
         rank={index + 1}
         height={rowHeight}
         name={row.member}
@@ -111,7 +129,7 @@ export const ScoresTab = (props: ScoresTabProps, context: Context): JSX.Element 
       </vstack>
 
       {/* User */}
-      <ScoreBoardRow
+      <LeaderboardRow
         rank={scoreBoardData?.scoreBoardUser ? scoreBoardData.scoreBoardUser.rank : 0}
         height={rowHeight}
         name={props.data.username || 'Unknown'}
@@ -122,10 +140,10 @@ export const ScoresTab = (props: ScoresTabProps, context: Context): JSX.Element 
   );
 
   return (
-    <Wrapper>
-      {scoreBoardRows}
+    <Layout onClose={props.onClose}>
+      {leaderboardRows}
       {/* Append the user to the bottom if they are out of view */}
       {!isUserInTheTop && footer}
-    </Wrapper>
+    </Layout>
   );
 };

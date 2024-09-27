@@ -10,7 +10,7 @@ import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 import { obfuscateString } from '../../utils/obfuscateString.js';
 
-interface GuessTabResultsStepProps {
+interface DrawingPostResultsStepProps {
   data: {
     postData: PostData;
     username: string | null;
@@ -20,8 +20,8 @@ interface GuessTabResultsStepProps {
   onDraw: () => void;
 }
 
-export const GuessTabResultsStep = (
-  props: GuessTabResultsStepProps,
+export const DrawingPostResultsStep = (
+  props: DrawingPostResultsStepProps,
   context: Context
 ): JSX.Element => {
   const rowCount = props.rows || 6;
@@ -63,7 +63,7 @@ export const GuessTabResultsStep = (
               {guess.count.toString()}
             </PixelText>
             <spacer width="12px" />
-            <PixelText scale={1.5} color={Settings.theme.primary}>
+            <PixelText scale={2} color={Settings.theme.primary}>
               {`${percentage}%`}
             </PixelText>
             <spacer width="12px" />
@@ -80,7 +80,7 @@ export const GuessTabResultsStep = (
   );
 
   return (
-    <zstack grow width="100%" alignment="center middle">
+    <zstack height="100%" width="100%" alignment="center middle">
       <vstack height="100%" width="100%" alignment="center middle">
         <spacer height="24px" />
 
@@ -108,21 +108,20 @@ export const GuessTabResultsStep = (
         <spacer height="24px" />
 
         {/* Metadata */}
-        <vstack alignment="center">
-          <PixelText
-            scale={1.5}
-            color={Settings.theme.secondary}
-          >{`${abbreviateNumber(playerCount)} player${playerCount === 1 ? '' : 's'} ${playerCount === 1 ? 'has' : 'have'}`}</PixelText>
-          <spacer height="4px" />
-          <PixelText
-            scale={1.5}
-            color={Settings.theme.secondary}
-          >{`made ${abbreviateNumber(data.count.guesses)} guess${data.count.guesses === 1 ? '' : 'es'}`}</PixelText>
-        </vstack>
+        <PixelText
+          scale={1.5}
+          color={Settings.theme.secondary}
+        >{`${abbreviateNumber(data.count.guesses)} guess${data.count.guesses === 1 ? '' : 'es'} by ${abbreviateNumber(playerCount)} player${playerCount === 1 ? '' : 's'}`}</PixelText>
         <spacer height="24px" />
 
         {/* Call to action */}
-        <StyledButton label="DRAW A WORD" onPress={() => props.onDraw()} width="200px" />
+        <StyledButton
+          leadingIcon="+"
+          label="DRAW"
+          onPress={() => props.onDraw()}
+          width="128px"
+          height="32px"
+        />
         <spacer height="20px" />
       </vstack>
 

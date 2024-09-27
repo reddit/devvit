@@ -61,7 +61,8 @@ export const PaginatedDrawings: Devvit.BlockComponent<PaginatedDrawingsProps> = 
             leadingIcon="arrow-up"
             appearance="secondary"
             onPress={() => setPaginationOffset((x) => x - rowsPerPage)}
-            width="40px"
+            width="32px"
+            height="32px"
           />
         )}
         {hasOverflow && (
@@ -69,7 +70,8 @@ export const PaginatedDrawings: Devvit.BlockComponent<PaginatedDrawingsProps> = 
             leadingIcon="arrow-down"
             appearance="secondary"
             onPress={() => setPaginationOffset((x) => x + rowsPerPage)}
-            width="40px"
+            width="32px"
+            height="32px"
           />
         )}
       </hstack>

@@ -37,3 +37,19 @@ export const Tab = (props: TabProps): JSX.Element => {
     </hstack>
   );
 };
+
+/*
+Usage example:
+
+<Tabs>
+  {tabs.map((label) => (
+    <Tab
+      label={label}
+      isActive={tab === label}
+      onPress={() => {
+        setPage(label);
+      }}
+    />
+  ))}
+</Tabs>
+*/

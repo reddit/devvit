@@ -7,7 +7,7 @@ import Settings from '../settings.json';
 
 const styles = {
   primary: {
-    backgroundColor: Settings.theme.secondary,
+    backgroundColor: Settings.theme.primary,
     borderColor: Settings.theme.primary,
     color: 'white',
   },
@@ -24,13 +24,21 @@ interface StyledButtonProps {
   label?: string;
   trailingIcon?: SupportedGlyphs;
   appearance?: 'primary' | 'secondary';
-  width: Devvit.Blocks.SizeString;
+  width?: Devvit.Blocks.SizeString;
+  height?: Devvit.Blocks.SizeString;
 }
 
 export const StyledButton = (props: StyledButtonProps): JSX.Element => {
-  const { onPress, leadingIcon, label, trailingIcon, appearance, width } = props;
+  const {
+    onPress,
+    leadingIcon,
+    label,
+    trailingIcon,
+    appearance,
+    width = '100px',
+    height = '40px',
+  } = props;
 
-  const height: Devvit.Blocks.SizeString = '40px';
   const style = styles[appearance || 'primary'];
   return (
     <Shadow height={height} width={width}>
@@ -48,9 +56,9 @@ export const StyledButton = (props: StyledButtonProps): JSX.Element => {
           alignment="middle center"
           backgroundColor={style.backgroundColor}
         >
-          {leadingIcon ? <PixelSymbol scale={3} type={leadingIcon} color={style.color} /> : null}
+          {leadingIcon ? <PixelSymbol scale={2} type={leadingIcon} color={style.color} /> : null}
           {label ? <PixelText color={style.color}>{label}</PixelText> : null}
-          {trailingIcon ? <PixelSymbol scale={3} type={trailingIcon} color={style.color} /> : null}
+          {trailingIcon ? <PixelSymbol scale={2} type={trailingIcon} color={style.color} /> : null}
         </hstack>
       </hstack>
     </Shadow>

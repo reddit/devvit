@@ -1,3 +1,4 @@
+// Drawing Post
 export type PostData = {
   word: string;
   data: number[];
@@ -32,5 +33,11 @@ export type CollectionPostData = {
   postId: string;
   data: CollectionData[];
   timeframe: string;
+  postType: string;
+};
+
+// Pinned post
+export type PinnedPostData = {
+  postId: string;
   postType: string;
 };

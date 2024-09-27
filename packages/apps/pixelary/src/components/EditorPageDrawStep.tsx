@@ -1,19 +1,19 @@
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
-import { PixelSymbol } from '../../components/PixelSymbol.js';
-import { PixelText } from '../../components/PixelText.js';
-import { Shadow } from '../../components/Shadow.js';
-import { StyledButton } from '../../components/StyledButton.js';
-import Settings from '../../settings.json';
-import { blankCanvas } from '../../utils/blankCanvas.js';
-import { splitArray } from '../../utils/splitArray.js';
+import { PixelSymbol } from './PixelSymbol.js';
+import { PixelText } from './PixelText.js';
+import { Shadow } from './Shadow.js';
+import { StyledButton } from './StyledButton.js';
+import Settings from '../settings.json';
+import { blankCanvas } from '../utils/blankCanvas.js';
+import { splitArray } from '../utils/splitArray.js';
 
-interface DrawTabEditorStepProps {
+interface EditorPageDrawStepProps {
   word: string;
   onNext: (drawing: number[]) => void;
 }
 
-export const DrawTabEditorStep = (props: DrawTabEditorStepProps): JSX.Element => {
+export const EditorPageDrawStep = (props: EditorPageDrawStepProps): JSX.Element => {
   const [currentColor, setCurrentColor] = useState<number>(1);
   const [drawingData, setDrawingData] = useState<number[]>(blankCanvas);
 

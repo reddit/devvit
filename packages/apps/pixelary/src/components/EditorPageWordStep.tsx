@@ -1,10 +1,10 @@
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
-import { PixelSymbol } from '../../components/PixelSymbol.js';
-import { PixelText } from '../../components/PixelText.js';
-import Settings from '../../settings.json';
+import { PixelSymbol } from './PixelSymbol.js';
+import { PixelText } from './PixelText.js';
+import Settings from '../settings.json';
 
-interface DrawTabWordStepProps {
+interface EditorPageWordStepProps {
   onNext: (word: string) => void;
   currentDictionary: string[];
 }
@@ -28,7 +28,7 @@ const generateCandidateWords = (words: string[], N: number = 3): string[] => {
   return shuffledWords.slice(0, Math.min(shuffledWords.length, N));
 };
 
-export const DrawTabWordStep = (props: DrawTabWordStepProps): JSX.Element => {
+export const EditorPageWordStep = (props: EditorPageWordStepProps): JSX.Element => {
   const [candidateWords, setCandidateWords] = useState<string[]>(() =>
     generateCandidateWords(props.currentDictionary)
   );

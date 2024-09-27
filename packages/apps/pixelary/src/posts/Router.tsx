@@ -4,14 +4,15 @@ import { Devvit, useInterval, useState } from '@devvit/public-api';
 import Words from '../data/words.json';
 import { Service } from '../service/Service.js';
 import type { GameSettings } from '../types/GameSettings.js';
-import type { CollectionPostData, PostData } from '../types/PostData.js';
+import type { CollectionPostData, PostData, PinnedPostData } from '../types/PostData.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 import { CollectionPost } from './CollectionPost/CollectionPost.js';
 import { DrawingPost } from './DrawingPost/DrawingPost.js';
+import { PinnedPost } from './PinnedPost/PinnedPost.js';
 
 type InitialData = {
   gameSettings: GameSettings;
-  postData: PostData | CollectionPostData;
+  postData: PostData | CollectionPostData | PinnedPostData;
   username: string | null;
   currentDictionary: string[];
 };
@@ -74,9 +75,11 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         context.reddit.getCurrentUser().then((user) => user?.username ?? null),
         service.getDictionary(false),
       ]);
-      let postData: PostData | CollectionPostData;
+      let postData: PostData | CollectionPostData | PinnedPostData;
       if (rawPostData.postType === 'collection') {
         postData = service.parseCollectionPostData(rawPostData);
+      } else if (rawPostData.postType === 'pinned') {
+        postData = service.parsePinnedPostData(rawPostData);
       } else {
         postData = service.parsePostData(rawPostData, username);
       }
@@ -121,7 +124,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     }
   };
 
-  const getPostData = async (): Promise<PostData | CollectionPostData> => {
+  const getPostData = async (): Promise<PostData | CollectionPostData | PinnedPostData> => {
     try {
       return service.parsePostData(await service.getPostData(data.postData.postId), data.username);
     } catch (error) {
@@ -161,12 +164,23 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
           activeFlairId: data.gameSettings.activeFlairId,
           currentDictionary: data.currentDictionary,
         }}
+        refetch={refetch}
+      />
+    ),
+    collection: <CollectionPost collection={data.postData as CollectionPostData} />,
+    pinned: (
+      <PinnedPost
+        data={{
+          postData: (postData ?? data.postData) as PostData,
+          username: data.username,
+          activeFlairId: data.gameSettings.activeFlairId,
+          currentDictionary: data.currentDictionary,
+        }}
         myDrawings={myDrawings}
         scoreBoardData={scoreBoardData}
         refetch={refetch}
       />
     ),
-    collection: <CollectionPost collection={data.postData as CollectionPostData} />,
     // Add more post types here
   };
 

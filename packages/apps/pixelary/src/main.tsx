@@ -5,6 +5,7 @@ import Words from './data/words.json';
 import { Router } from './posts/Router.js';
 import { Service } from './service/Service.js';
 import type { JobData } from './types/job-data.js';
+import Settings from './settings.json';
 
 Devvit.configure({
   redditAPI: true,
@@ -19,7 +20,10 @@ Devvit.addCustomPostType({
   render: Router,
 });
 
-// Install script
+/*
+ * Install action
+ */
+
 Devvit.addMenuItem({
   label: '[Pixelary] Install Game',
   location: 'subreddit',
@@ -30,55 +34,57 @@ Devvit.addMenuItem({
     const community = await reddit.getCurrentSubreddit();
 
     // Check if post flairs are enabled in the community
-    const postFlairEnabled = await community.postFlairsEnabled;
-    if (!postFlairEnabled) {
+    if (!community.postFlairsEnabled) {
       ui.showToast('Enable post flairs first!');
       return;
     }
 
-    // Check if Pixelary is already installed
-    const currentSettings = await service.getGameSettings();
-    if (currentSettings && currentSettings.heroPostId) {
-      ui.showToast('Pixelary is already installed!');
-      return;
-    }
-
-    // Create the main game post and pin it to the top
+    // Create the pinned post
     const post = await reddit.submitPost({
-      title: 'Pixelary',
+      title: Settings.pinnedPost.title,
       subredditName: community.name,
       preview: <LoadingState />,
     });
 
-    await post.sticky();
+    const [_sticky, _storeData, activeFlair, endedFlair] = await Promise.all([
+      // Pin the post
+      await post.sticky(),
+      // Store the post data
+      await service.storePinnedPostData(post.id),
+      // Create the game "Active" flair for drawings
+      await reddit.createPostFlairTemplate({
+        subredditName: community.name,
+        text: 'Active',
+        textColor: 'dark',
+        backgroundColor: '#46D160',
+      }),
+      // Create the "Ended" flair for drawings
+      await reddit.createPostFlairTemplate({
+        subredditName: community.name,
+        text: 'Ended',
+        textColor: 'light',
+        backgroundColor: '#EA0027',
+      }),
+    ]);
 
-    // Create the game state flairs (active and ended)
-    const activeFlair = await reddit.createPostFlairTemplate({
-      subredditName: community.name,
-      text: 'Active',
-      textColor: 'dark',
-      backgroundColor: '#46D160',
-    });
-    const endedFlair = await reddit.createPostFlairTemplate({
-      subredditName: community.name,
-      text: 'Ended',
-      textColor: 'light',
-      backgroundColor: '#EA0027',
-    });
+    await Promise.all([
+      // Store the game settings
+      await service.storeGameSettings({
+        activeFlairId: activeFlair.id,
+        endedFlairId: endedFlair.id,
+      }),
+      // Schedule minutly updates of the score board
+      await scheduler.runJob({ cron: '* * * * *', name: 'UpdateScoreBoard' }),
+    ]);
 
-    // Store the game settings
-    await service.storeGameSettings({
-      activeFlairId: activeFlair.id,
-      endedFlairId: endedFlair.id,
-      heroPostId: post.id,
-    });
-
-    // Schedule minutly updates of the score board
-    await scheduler.runJob({ cron: '* * * * *', name: 'UpdateScoreBoard' });
-
+    ui.navigateTo(post);
     ui.showToast('Installed Pixelary!');
   },
 });
+
+/*
+ * Dictionary
+ */
 
 Devvit.addMenuItem({
   label: '[Pixelary] Save dictionary to Redis',
@@ -294,53 +300,31 @@ Devvit.addMenuItem({
   },
 });
 
+/*
+ * Pinned post
+ */
+
 Devvit.addMenuItem({
-  label: '[Pixelary] Resticky Post',
+  label: '[Pixelary] New Pinned Post',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
     const { ui, reddit } = context;
     const service = new Service(context);
-    const community = await reddit.getCurrentSubreddit();
 
-    // Check if post flairs are enabled in the community
-    const postFlairEnabled = await community.postFlairsEnabled;
-    if (!postFlairEnabled) {
-      ui.showToast('Enable post flairs first!');
-      return;
+    try {
+      const community = await reddit.getCurrentSubreddit();
+      const post = await reddit.submitPost({
+        title: Settings.pinnedPost.title,
+        subredditName: community.name,
+        preview: <LoadingState />,
+      });
+      await Promise.all([await post.sticky(), await service.storePinnedPostData(post.id)]);
+      ui.navigateTo(post);
+    } catch (error) {
+      console.error('Failed to create pinned post:', error);
+      ui.showToast('Failed to create post');
     }
-
-    // Check if Pixelary is already installed
-    const currentSettings = await service.getGameSettings();
-
-    if (
-      !currentSettings.activeFlairId ||
-      !currentSettings.endedFlairId ||
-      !currentSettings.heroPostId
-    ) {
-      ui.showToast('Pixelary is not installed!');
-      return;
-    }
-
-    const oldPost = await reddit.getPostById(currentSettings.heroPostId);
-    await oldPost.unsticky();
-
-    // Create the main game post and pin it to the top
-    const post = await reddit.submitPost({
-      title: 'Pixelary',
-      subredditName: community.name,
-      preview: <LoadingState />,
-    });
-
-    await post.sticky();
-
-    // Store the game settings
-    await service.storeGameSettings({
-      ...currentSettings,
-      heroPostId: post.id,
-    });
-
-    ui.showToast('Restickied Pixelary post!');
   },
 });
 
