@@ -10,10 +10,15 @@ import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 import { obfuscateString } from '../../utils/obfuscateString.js';
 
+function includesCaseInsensitive(array: string[], target: string): boolean {
+  return array.some((item) => item.toLowerCase() === target.toLowerCase());
+}
+
 interface DrawingPostResultsStepProps {
   data: {
     postData: PostData;
     username: string | null;
+    currentDictionary: string[];
   };
   rows?: number;
   feedback: boolean | null;
@@ -37,6 +42,9 @@ export const DrawingPostResultsStep = (
     .map((guess) => {
       const percentage = Math.round((guess.count / data.count.guesses) * 100);
       const word = guess.word.charAt(0).toUpperCase() + guess.word.slice(1);
+      const isCorrect = guess.word.toLowerCase() === data.word.toLowerCase();
+      const isInDictionary = includesCaseInsensitive(props.data.currentDictionary, guess.word);
+      const isSafeToShow = guess.commentId || isCorrect || isInDictionary;
 
       return (
         <zstack
@@ -55,7 +63,12 @@ export const DrawingPostResultsStep = (
           {/* Guess */}
           <hstack height="100%" width="100%" alignment="start middle">
             <spacer width="12px" />
-            <PixelText scale={2}>{guess.commentId ? word : obfuscateString(word)}</PixelText>
+            <PixelText
+              color={isSafeToShow ? Settings.theme.primary : Settings.theme.secondary}
+              scale={2}
+            >
+              {isSafeToShow ? word : obfuscateString(word)}
+            </PixelText>
           </hstack>
           {/* Metadata */}
           <hstack height="100%" width="100%" alignment="end middle">

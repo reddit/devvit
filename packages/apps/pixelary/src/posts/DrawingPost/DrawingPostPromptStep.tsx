@@ -106,25 +106,30 @@ export const DrawingPostPromptStep = (
       <PixelText
         color={Settings.theme.primary}
       >{`${abbreviateNumber(playerCount)} player${playerCount === 1 ? '' : 's'} tried`}</PixelText>
-      <spacer height="4px" />
-      <PixelText color={Settings.theme.secondary}>{`${winPercentage}% got it right`}</PixelText>
+      {playerCount > 0 && (
+        <>
+          <spacer height="4px" />
+          <PixelText color={Settings.theme.secondary}>{`${winPercentage}% got it right`}</PixelText>
+        </>
+      )}
+
       <spacer grow />
 
       {/* Footer */}
       <StyledButton
         width={`${width}px`}
         height="32px"
-        label="GIVE UP"
-        appearance="secondary"
-        onPress={() => context.ui.showForm(giveUpForm)}
+        label="GUESS THE WORD"
+        appearance="primary"
+        onPress={() => context.ui.showForm(guessForm)}
       />
       <spacer width="8px" />
       <StyledButton
         width={`${width}px`}
         height="32px"
-        label="GUESS THE WORD"
-        appearance="primary"
-        onPress={() => context.ui.showForm(guessForm)}
+        label="GIVE UP"
+        appearance="secondary"
+        onPress={() => context.ui.showForm(giveUpForm)}
       />
       <spacer height="20px" />
     </vstack>

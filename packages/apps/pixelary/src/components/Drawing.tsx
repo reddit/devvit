@@ -50,6 +50,7 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
               height="${Settings.resolution}"
               viewBox="0 0 ${Settings.resolution} ${Settings.resolution}"
               xmlns="http://www.w3.org/2000/svg"
+              fill="white"
             >
               ${data.map((pixel, index) => {
                 const { x, y } = indexToXY(index, Settings.resolution);
