@@ -134,14 +134,12 @@ export function createFeedbackClient(): FeedbackClient {
 }
 
 export function createRemoteLoggerClient(): RemoteLogConsumer {
-  return wrapWithRetry(
-    new RemoteLogConsumerClientImpl(
-      new GrpcWebRpc({
-        baseUrl: DEVVIT_GATEWAY_URL,
-        getToken: getAccessToken,
-        headers: getHeaders(),
-      })
-    )
+  return new RemoteLogConsumerClientImpl(
+    new GrpcWebRpc({
+      baseUrl: DEVVIT_GATEWAY_URL,
+      getToken: getAccessToken,
+      headers: getHeaders(),
+    })
   );
 }
 
