@@ -747,7 +747,6 @@ export namespace Devvit {
       spacer: Devvit.Blocks.SpacerProps;
       icon: Devvit.Blocks.IconProps;
       avatar: Devvit.Blocks.AvatarProps;
-      fullsnoo: Devvit.Blocks.FullSnooProps;
       webview: Devvit.Blocks.WebViewProps;
     }
 
@@ -814,7 +813,6 @@ export namespace Devvit {
      * large = 32px;
      */
     export type ContainerPadding = 'none' | 'xsmall' | 'small' | 'medium' | 'large';
-    export type FullSnooSize = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge';
     export type HorizontalAlignment = 'start' | 'center' | 'end';
     /**
      * xsmall = 12px;
@@ -991,13 +989,6 @@ export namespace Devvit {
         facing?: AvatarFacing | undefined;
         size?: AvatarSize | undefined;
         background?: AvatarBackground | undefined;
-      };
-
-    export type FullSnooProps = BaseProps &
-      Actionable & {
-        userId: string;
-        facing?: AvatarFacing | undefined;
-        size?: FullSnooSize | undefined;
       };
 
     export type WebViewProps = BaseProps &

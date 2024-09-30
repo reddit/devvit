@@ -12,7 +12,6 @@ import {
   BlockBorderWidth,
   BlockButtonAppearance,
   BlockButtonSize,
-  BlockFullSnooSize,
   BlockGap,
   BlockHorizontalAlignment,
   BlockIconSize,
@@ -528,32 +527,6 @@ describe('BlocksTransformer (JSX -> Block)', () => {
       expect(avatar.facing).toEqual(BlockAvatarFacing.AVATAR_FACING_RIGHT);
       expect(avatar.size).toEqual(BlockAvatarSize.AVATAR_SIZE_XXXLARGE);
       expect(avatar.background).toEqual(BlockAvatarBackground.AVATAR_BG_DARK);
-    });
-  });
-
-  describe('<fullsnoo>', () => {
-    test('outputs a valid object', async () => {
-      const ui = await render(<fullsnoo userId={'t2_abc123'} />);
-
-      expect(ui.type === BlockType.BLOCK_FULLSNOO);
-      expect(ui.config?.fullsnooConfig).not.toBeUndefined();
-    });
-
-    test('all properties are properly copied to the object', async () => {
-      const ui = await render(
-        <fullsnoo
-          userId={'t2_abc123'}
-          facing={'right'}
-          size={'xxlarge'}
-          {...commonPropsWithActions}
-        />
-      );
-
-      commonPropsTestsWithActions(ui);
-      const fullsnoo = ui.config!.fullsnooConfig!;
-      expect(fullsnoo.userId).toEqual('t2_abc123');
-      expect(fullsnoo.facing).toEqual(BlockAvatarFacing.AVATAR_FACING_RIGHT);
-      expect(fullsnoo.size).toEqual(BlockFullSnooSize.FULLSNOO_XXLARGE);
     });
   });
 

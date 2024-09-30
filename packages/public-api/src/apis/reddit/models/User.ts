@@ -53,6 +53,7 @@ export type CreateRelationshipOptions = {
   subredditName: string;
   username: string;
   type: RelationshipType;
+  /** The ID of the post or comment that caused the ban. */
   banContext?: string;
   banMessage?: string;
   banReason?: string;

@@ -14,7 +14,6 @@ import {
   BlockBorderWidth,
   BlockButtonAppearance,
   BlockButtonSize,
-  BlockFullSnooSize,
   BlockGap,
   BlockHorizontalAlignment,
   BlockIconSize,
@@ -99,8 +98,6 @@ export class BlocksTransformer {
         return this.makeIcon(props as Devvit.Blocks.IconProps, transformContext);
       case 'avatar':
         return this.makeAvatar(props as Devvit.Blocks.AvatarProps, transformContext);
-      case 'fullsnoo':
-        return this.makeFullSnoo(props as Devvit.Blocks.FullSnooProps, transformContext);
       case 'webview':
         return this.makeWebView(props as Devvit.Blocks.WebViewProps, transformContext);
       case '__fragment':
@@ -419,26 +416,6 @@ export class BlocksTransformer {
         return BlockAvatarFacing.AVATAR_FACING_LEFT;
       case 'right':
         return BlockAvatarFacing.AVATAR_FACING_RIGHT;
-    }
-    return undefined;
-  }
-
-  makeBlockFullSnooSize(
-    size: Devvit.Blocks.FullSnooSize | undefined
-  ): BlockFullSnooSize | undefined {
-    switch (size) {
-      case 'xsmall':
-        return BlockFullSnooSize.FULLSNOO_XSMALL;
-      case 'small':
-        return BlockFullSnooSize.FULLSNOO_SMALL;
-      case 'medium':
-        return BlockFullSnooSize.FULLSNOO_MEDIUM;
-      case 'large':
-        return BlockFullSnooSize.FULLSNOO_LARGE;
-      case 'xlarge':
-        return BlockFullSnooSize.FULLSNOO_XLARGE;
-      case 'xxlarge':
-        return BlockFullSnooSize.FULLSNOO_XXLARGE;
     }
     return undefined;
   }
@@ -776,22 +753,6 @@ export class BlocksTransformer {
           size: this.makeBlockAvatarSize(props.size),
           facing: this.makeBlockAvatarFacing(props.facing),
           background: this.makeBlockAvatarBackground(props.background),
-        },
-      })
-    );
-  }
-
-  makeFullSnoo(
-    props: Devvit.Blocks.FullSnooProps | undefined,
-    transformContext: TransformContext
-  ): Block | undefined {
-    return (
-      props &&
-      this.makeBlock(BlockType.BLOCK_FULLSNOO, props, transformContext, {
-        fullsnooConfig: {
-          userId: props.userId,
-          facing: this.makeBlockAvatarFacing(props.facing),
-          size: this.makeBlockFullSnooSize(props.size),
         },
       })
     );
