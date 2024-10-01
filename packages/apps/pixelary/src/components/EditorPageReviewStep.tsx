@@ -49,6 +49,18 @@ export const EditorPageReviewStep = (
       return;
     }
 
+    // Add a temporary lock key to prevent duplicate posting.
+    // This lock will expire after 10 seconds.
+    // If the lock is already set return early.
+    const lockKey = `locked:${props.data.username}`;
+    const locked = await context.redis.get(lockKey);
+    if (locked === 'true') return;
+    const lockoutPeriod = 10000; // 10 seconds
+    await context.redis.set(lockKey, 'true', {
+      nx: true,
+      expiration: new Date(Date.now() + lockoutPeriod),
+    });
+
     const subreddit = await context.reddit.getCurrentSubreddit();
 
     // The back-end is configured to run this app's submitPost calls as the user
@@ -112,6 +124,9 @@ export const EditorPageReviewStep = (
       // Store daily drawing
       service.storeMyDrawing(postData),
     ]);
+
+    // Remove the post lock
+    await context.redis.del(lockKey);
 
     context.ui.navigateTo(post);
   }
