@@ -1,8 +1,4 @@
-import type {
-  AppInfo,
-  AppVersionUpdateRequest,
-  FullAppVersionInfo,
-} from '@devvit/protos/community.js';
+import type { AppVersionUpdateRequest, FullAppVersionInfo } from '@devvit/protos/community.js';
 import {
   AppPublishRequestVisibility,
   InstallationType,
@@ -134,16 +130,32 @@ export default class Publish extends ProjectCommand {
     }
 
     const appCapabilities = appCapabilitiesFromLinkedBundle(bundle);
-    if (appCapabilities.includes(AppCapability.HTTP)) {
-      await this.#checkAppVersionTermsAndConditions(appInfo.app, appDetailsUrl);
+    const appSettingsURL = `${appDetailsUrl}/developer-settings`;
+
+    if (
+      appCapabilities.includes(AppCapability.HTTP) &&
+      (!appInfo.app.termsAndConditions || !appInfo.app.privacyPolicy)
+    ) {
+      this.log(
+        'Apps that use the http plugin must have terms & conditions and a privacy policy linked before publishing. Add these links on the app details page and run `devvit publish` again.'
+      );
+      await this.#promptOpenURL(appSettingsURL);
+    }
+
+    if (appCapabilities.includes(AppCapability.Payments) && !appInfo.app.termsAndConditions) {
+      this.log(
+        'Apps that sell goods must have terms & conditions linked before publishing. Add this link on the app details page and run `devvit publish` again.'
+      );
+      await this.#promptOpenURL(appSettingsURL);
     }
 
     await this.#submitForReview(appVersion.id, devvitVersion, visibility);
 
     const appCapabilitiesForReview = appCapabilities.filter(
-      (capability): capability is AppCapability.CustomPost | AppCapability.Payments =>
+      (capability): capability is keyof typeof appCapabilityToReviewRequirementMessage =>
         capability === AppCapability.CustomPost || capability === AppCapability.Payments
     );
+
     if (appCapabilitiesForReview.length > 0) {
       this.log(
         'Apps that meet the following criteria must be reviewed before they can be published:'
@@ -206,24 +218,17 @@ export default class Publish extends ProjectCommand {
     }
   }
 
-  async #checkAppVersionTermsAndConditions(app: AppInfo, appDetailsUrl: string): Promise<void> {
-    const { termsAndConditions, privacyPolicy } = app;
-    if (!termsAndConditions || !privacyPolicy) {
-      this.log(
-        'Apps that use the http plugin must have terms & conditions and a privacy policy linked before publishing. Add these links on the app details page and run `devvit publish` again.'
-      );
+  async #promptOpenURL(url: string): Promise<void> {
+    this.log(`${url} \n(press enter to open, control-c to quit)`);
 
-      this.log(`${appDetailsUrl} \n(press enter to open, control-c to quit)`);
-
-      if (await readLine()) {
-        try {
-          await open(appDetailsUrl);
-        } catch (_err) {
-          this.error('An error occurred when opening the app details page');
-        }
+    if (await readLine()) {
+      try {
+        await open(url);
+      } catch (_err) {
+        this.error(`An error occurred when opening the URL: ${url}`);
       }
-      process.exit();
     }
+    process.exit();
   }
 
   async #submitForReview(
