@@ -125,9 +125,6 @@ export const EditorPageReviewStep = (
       service.storeMyDrawing(postData),
     ]);
 
-    // Remove the post lock
-    await context.redis.del(lockKey);
-
     context.ui.navigateTo(post);
   }
 
