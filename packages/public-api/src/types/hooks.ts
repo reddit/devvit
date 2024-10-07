@@ -1,4 +1,4 @@
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
+import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Context } from './context.js';
@@ -64,7 +64,8 @@ type FormFieldsToFormValues<T extends readonly FormField[]> = T extends readonly
   ...infer Rest extends FormField[],
 ]
   ? FormFieldToFormValue<Field> & FormFieldsToFormValues<Rest>
-  : JSONObject; // possibly empty but more likely couldn't infer.
+  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    { [key: string]: any }; // possibly empty but more likely couldn't infer.
 
 /** Input is a FormField, output is a {fieldName: fieldType}. */
 type FormFieldToFormValue<T extends FormField> = T extends BooleanField

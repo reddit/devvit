@@ -59,7 +59,10 @@ export type Form = {
  * });
  * ```
  * */
-export type FormFunction<T extends JSONObject = JSONObject> = (data: T) => Form;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type FormFunction<T extends { [key: string]: any } = { [key: string]: any }> = (
+  data: T
+) => Form;
 
 export type FormDefinition<T extends Form | FormFunction = Form | FormFunction> = {
   /** A form or a function that returns a form */
