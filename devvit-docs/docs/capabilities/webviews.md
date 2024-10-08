@@ -83,14 +83,15 @@ window.onmessage = (ev) => {
 
 
 function sendPing() {
-   window.parent.postMessage({
+    window.parent.postMessage(
+  {
        type: 'ping',
        data: {
            hello: 'world',
-       },
-"*"
-   });
-}
+       }
+   },
+  "*"
+);
 
 
 document.body.querySelector('#ping').onclick = sendPing;

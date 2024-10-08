@@ -1399,7 +1399,7 @@ console.log('Subreddit primaryColor: ' + styles.primaryColor);
 
 ▸ **getTopPosts**(`options`): [`Listing`](models.Listing.md)\<[`Post`](models.Post.md)\>
 
-Get a list of controversial posts from a specific subreddit.
+Get a list of top posts from a specific subreddit.
 
 #### Parameters
 
@@ -1417,7 +1417,7 @@ A Listing of Post objects.
 
 ```ts
 const posts = await reddit
-  .getControversialPosts({
+  .getTopPosts({
     subredditName: 'memes',
     timeframe: 'day',
     limit: 1000,
