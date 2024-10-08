@@ -146,21 +146,142 @@ export type ContextAPIClients = {
    * setCounter(1); // counter = 1
    * setCounter((count) => count + 1) // counter = 2
    * ```
+   *
+   * @deprecated Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api.
+   * ```ts
+   * // Old:
+   * const [counter, setCounter] = context.useState(0);
+   *
+   * // New:
+   * import { useState } from '@devvit/public-api'
+   *
+   * const [counter, setCounter] = useState(0);
+   * ```
    */
   useState(initialState: boolean | (() => boolean | Promise<boolean>)): UseStateResult<boolean>;
+  /**
+   * A hook for managing a state between Block renders. This is only available
+   * within a Block Component. Returns a tuple containing the current state and
+   * a function to update it.
+   *
+   * ```ts
+   * const [counter, setCounter] = useState(0);
+   * setCounter(1); // counter = 1
+   * setCounter((count) => count + 1) // counter = 2
+   * ```
+   *
+   * @deprecated Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api.
+   * ```ts
+   * // Old:
+   * const [counter, setCounter] = context.useState(0);
+   *
+   * // New:
+   * import { useState } from '@devvit/public-api'
+   *
+   * const [counter, setCounter] = useState(0);
+   * ```
+   */
   useState(initialState: number | (() => number | Promise<number>)): UseStateResult<number>;
+  /**
+   * A hook for managing a state between Block renders. This is only available
+   * within a Block Component. Returns a tuple containing the current state and
+   * a function to update it.
+   *
+   * ```ts
+   * const [counter, setCounter] = useState(0);
+   * setCounter(1); // counter = 1
+   * setCounter((count) => count + 1) // counter = 2
+   * ```
+   *
+   * @deprecated Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api.
+   * ```ts
+   * // Old:
+   * const [counter, setCounter] = context.useState(0);
+   *
+   * // New:
+   * import { useState } from '@devvit/public-api'
+   *
+   * const [counter, setCounter] = useState(0);
+   * ```
+   */
   useState(initialState: string | (() => string | Promise<string>)): UseStateResult<string>;
+  /**
+   * A hook for managing a state between Block renders. This is only available
+   * within a Block Component. Returns a tuple containing the current state and
+   * a function to update it.
+   *
+   * ```ts
+   * const [counter, setCounter] = useState(0);
+   * setCounter(1); // counter = 1
+   * setCounter((count) => count + 1) // counter = 2
+   * ```
+   *
+   * @deprecated Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api.
+   * ```ts
+   * // Old:
+   * const [counter, setCounter] = context.useState(0);
+   *
+   * // New:
+   * import { useState } from '@devvit/public-api'
+   *
+   * const [counter, setCounter] = useState(0);
+   * ```
+   */
   useState<S extends JSONValue | undefined | void>(
+    /**
+     * A hook for managing a state between Block renders. This is only available
+     * within a Block Component. Returns a tuple containing the current state and
+     * a function to update it.
+     *
+     * ```ts
+     * const [counter, setCounter] = useState(0);
+     * setCounter(1); // counter = 1
+     * setCounter((count) => count + 1) // counter = 2
+     * ```
+     *
+     * @deprecated Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api.
+     * ```ts
+     * // Old:
+     * const [counter, setCounter] = context.useState(0);
+     *
+     * // New:
+     * import { useState } from '@devvit/public-api'
+     *
+     * const [counter, setCounter] = useState(0);
+     * ```
+     */
     initialState: S | (() => S | Promise<S>)
   ): UseStateResult<S>;
   /**
    * A hook for managing a callback that runs on an interval between Block renders.
    * This is only available within a Block Component.
+   *
+   * @deprecated Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api.
+   * ```ts
+   * // Old:
+   * const interval = context.useInterval(() => {}, 1000);
+   *
+   * // New:
+   * import { useInterval } from '@devvit/public-api'
+   *
+   * const interval = useInterval(() => {}, 1000);
+   * ```
    */
   useInterval: UseIntervalHook;
   /**
    * A hook for managing a form between Block renders.
    * This is only available within a Block Component.
+   *
+   * @deprecated Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api.
+   * ```ts
+   * // Old:
+   * const myForm = context.useForm(...);
+   *
+   * // New:
+   * import { useForm } from '@devvit/public-api'
+   *
+   * const myForm = useForm(...);
+   * ```
    */
   useForm: <const T extends Form | FormFunction = Form | FormFunction>(
     form: T,
@@ -169,6 +290,17 @@ export type ContextAPIClients = {
   /**
    * A hook for managing a realtime pubsub channel between Block renders.
    * This is only available within a Block Component.
+   *
+   * @deprecated Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api.
+   * ```ts
+   * // Old:
+   * const channel = context.useChannel(...);
+   *
+   * // New:
+   * import { useChannel } from '@devvit/public-api'
+   *
+   * const channel = useChannel(...);
+   * ```
    */
   useChannel: <Message extends JSONValue = JSONValue>(
     options: ChannelOptions<Message>
