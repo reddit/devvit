@@ -36,6 +36,24 @@ When you update your app, every subreddit that has installed your app has to be 
 
 ![app update](./assets/app-update.png)
 
+## Understanding client-side apps
+
+Client-side apps run on the user’s device instead of a remote server. This increases the speed and responsiveness of the app and provides a better user experience. Devvit apps operate like most client-side apps (browser extensions, html5 games, etc). When a user visits an [experience post](experiences.md) that has a running Devvit app, the bundled source code is transmitted to the user. The app runs in the user’s client for optimal app performance, which exposes app details to clients during runtime.
+
+What is available to the client:
+
+- App source code
+- Anything stored in state (e.g. useState)
+
+What is not available to the client:
+
+- Any server side plugins (outside of state), like data from Redis, secrets, and settings
+- Fetch calls to external services from within an app
+
+:::note
+We are working on mechanisms to split your code into server portions (hidden) and client portions (exposed).
+:::
+
 ## Development stages
 
 Devvit apps go through three stages during development. This lets you build and iterate on your app until you're ready to share it with the rest of Reddit.

@@ -2,6 +2,22 @@
 
 Your app must comply with all applicable Reddit policies, which include the Reddit [Developer Terms](https://www.redditinc.com/policies/developer-terms) and [Data API Terms](https://www.redditinc.com/policies/data-api-terms), as well as our [User Agreement](https://www.redditinc.com/policies/), [Privacy Policy](https://www.reddit.com/policies/privacy-policy), [Content Policy](https://www.redditinc.com/policies/content-policy) and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements) (“Reddit Terms & Policies”). Based on these policies, Reddit may review your app prior to hosting it, and/or take enforcement actions ranging from temporary suspension to permanent removal of your app, blocking your access to Reddit's Developer Platform, or suspending your developer account.
 
+## Copycats
+
+We want apps built on Reddit’s Developer Platform to be unique and solve real use cases for communities and their users.
+
+Apps should:
+
+- **Be original and innovative.** We know you have great ideas and can’t wait to see how you introduce new features or improve existing ones in a meaningful way.
+- **Respect intellectual property.** Be fair to others. Don’t copy code, UI, images, or logos from other apps without permission and respect existing trademarks.
+- **Not cause confusion.** Apps that impersonate another app, developer, or service are prohibited. This includes cloning apps or suggesting that an app is another app that already exists.
+
+Copycat apps that violate any of these guidelines are subject to removal from the portal at any time, and developers who egregiously violate these policies may be removed from the program.
+
+:::note
+If you believe an app is in violation of any of the guidelines above, please report it to the Developer Platform team.
+:::
+
 ## User-generated content
 
 Apps that accept and display user-generated content (UGC) need to follow Reddit’s broader guidelines around UGC. When an app accepts UGC, it should create a new post or comment with the UGC author clearly identified as the author of the submitted content.
@@ -100,7 +116,6 @@ Don’t:
 - Create an app or functionality for use in or that targets services in a prohibited or regulated industry such as (but not limited to) gambling, healthcare, financial and cryptocurrency products and services, political advertisement, alcohol, recreational drugs, or any other restricted category listed in the [Reddit Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements)
 - Process account data to infer Redditors' personal characteristics, such as racial or ethnic origin, political opinions, religious or philosophical beliefs, union membership, genetics or biometrics, health, sex life, or sexual orientation
 - Gather intelligence nor attempt to track Redditors or Reddit content for the purpose of surveillance, and/or to provide that information to governments or other entities conducting surveillance
-- Create copycat apps; your apps should be reasonably original or they will not be approved. If you like someone else's work, ask to contribute to their project. We expect devvitors to fork and borrow responsibly, and be conscientious about what apps already exist in the ecosystem. Private moderation tools are an exception here
 - Intrude on Redditors' privacy and autonomy in spaces your app isn't authorized to access or moderate
 - Request that Redditors share their login credentials or any other personal information to access or complete any action through your app
 - Attempt to publish an app targeting anyone under 13 -- Redditors must all be over the age of 13 to use the platform!

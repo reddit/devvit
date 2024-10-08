@@ -6,7 +6,7 @@ Before upgrading `@devvit/public-api` in your project, always update the CLI fir
 
 ## Devvit 0.11.0: Platform updates, breaking changes, and useAsync
 
-**Release Date: Aug 20, 2024**
+**Release Date: October 9, 2024**
 
 One of the biggest issues for devs who are building experiences is that data fetching slows down the render of the app. Devvit 0.11.0 introduces a new platform architecture for improved performance and scalability. This release includes a new, experimental [useAsync](working_with_useasync.md) feature that allows you to fetch data in a non-blocking way and a new hook architecture that lets you build composable hooks.
 
