@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-identical-functions */
 import type {
   ConversationData,
   ConversationUserData,

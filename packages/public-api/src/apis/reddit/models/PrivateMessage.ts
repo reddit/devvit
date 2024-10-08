@@ -38,7 +38,6 @@ type PrivateMessageAuthor =
 export class PrivateMessage {
   readonly #id: TID;
   readonly #from: PrivateMessageAuthor;
-  readonly #parentId: TID | undefined;
   readonly #body: string;
   readonly #bodyHtml: string;
   readonly #created: Date;
@@ -150,8 +149,6 @@ export class PrivateMessage {
     const created = new Date(0);
     created.setUTCSeconds(data.createdUtc!);
     this.#created = created;
-
-    this.#parentId = data.parentId ? asTID<TID>(data.parentId) : undefined;
 
     this.#metadata = metadata;
   }

@@ -13,7 +13,6 @@
     "tldts": "^6.0.14"
   },
   "devDependencies": {
-    "@devvit/eslint-config": "0.11.0-dev",
     "typescript": "5.3.2",
     "vitest": "1.6.0"
   }

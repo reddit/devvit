@@ -207,17 +207,6 @@ export default class Publish extends ProjectCommand {
     }
   }
 
-  #getAppReviewRequirementMessage(
-    appCapability: AppCapability.CustomPost | AppCapability.Payments
-  ): string {
-    switch (appCapability) {
-      case AppCapability.CustomPost:
-        return 'Creates custom posts';
-      case AppCapability.Payments:
-        return 'Sells digital goods or services';
-    }
-  }
-
   async #promptOpenURL(url: string): Promise<void> {
     this.log(`${url} \n(press enter to open, control-c to quit)`);
 

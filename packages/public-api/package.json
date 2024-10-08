@@ -47,7 +47,6 @@
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
-    "@devvit/eslint-config": "0.11.0-dev",
     "@devvit/repo-tools": "0.11.0-dev",
     "@devvit/tsconfig": "0.11.0-dev",
     "@microsoft/api-extractor": "7.41.0",
@@ -58,7 +57,7 @@
     "@vitest/coverage-c8": "0.32.0",
     "chokidar-cli": "3.0.0",
     "esbuild": "0.23.0",
-    "eslint": "8.9.0",
+    "eslint": "9.11.1",
     "typescript": "5.3.2",
     "vitest": "1.6.0"
   },

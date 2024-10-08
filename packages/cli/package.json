@@ -78,7 +78,7 @@
     "ws": "8.18.0"
   },
   "devDependencies": {
-    "@devvit/eslint-config": "0.11.0-dev",
+    "@devvit/repo-tools": "0.11.0-dev",
     "@devvit/tsconfig": "0.11.0-dev",
     "@types/file-type": "10.9.1",
     "@types/inquirer": "9.0.3",
@@ -87,10 +87,11 @@
     "@types/node": "20.14.12",
     "@types/open": "6.2.1",
     "@types/ps-node": "0.1.1",
+    "@types/semver": "7.5.8",
     "@types/tsv": "0.2.1",
     "chai": "4.3.7",
     "concurrently": "7.5.0",
-    "eslint": "8.9.0",
+    "eslint": "9.11.1",
     "oclif": "3.17.2",
     "shx": "0.3.4",
     "tmp-promise": "3.0.3",
