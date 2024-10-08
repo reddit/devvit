@@ -1,12 +1,12 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useForm } from '@devvit/public-api';
+import { Devvit, useAsync, useForm } from '@devvit/public-api';
 
+import { Service } from '../service/Service.js';
+import Settings from '../settings.json';
 import { Drawing } from './Drawing.js';
 import { LoadingState } from './LoadingState.js';
 import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';
-import { Service } from '../service/Service.js';
-import Settings from '../settings.json';
 
 interface EditorPageReviewStepProps {
   data: {
@@ -22,6 +22,7 @@ export const EditorPageReviewStep = (
   props: EditorPageReviewStepProps,
   context: Context
 ): JSX.Element => {
+  const [loading, setLoading] = context.useState(false);
   const service = new Service(context);
 
   /*
@@ -128,6 +129,19 @@ export const EditorPageReviewStep = (
     context.ui.navigateTo(post);
   }
 
+  useAsync(
+    async () => {
+      // Don't run on initial render
+      if (loading === false) return null;
+
+      await onPostHandler();
+      return null;
+    },
+    {
+      depends: [loading],
+    }
+  );
+
   return (
     <vstack width="100%" height="100%" alignment="center">
       <spacer height="24px" />
@@ -159,7 +173,12 @@ export const EditorPageReviewStep = (
           onPress={() => context.ui.showForm(cancelConfirmationForm)}
         />
         <spacer size="small" />
-        <StyledButton width="138px" label="POST" onPress={onPostHandler} />
+        <StyledButton
+          width="138px"
+          label="POST"
+          onPress={() => setLoading(true)}
+          disabled={loading}
+        />
       </hstack>
 
       <spacer height="24px" />

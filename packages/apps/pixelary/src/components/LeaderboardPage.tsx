@@ -1,10 +1,11 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useAsync } from '@devvit/public-api';
 
-import { PixelText } from './PixelText.js';
-import { LeaderboardRow } from './LeaderboardRow.js';
+import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
+import { LeaderboardRow } from './LeaderboardRow.js';
+import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';
 
 const Layout = (props: { children: JSX.Element; onClose: () => void }): JSX.Element => (
@@ -60,17 +61,7 @@ const Layout = (props: { children: JSX.Element; onClose: () => void }): JSX.Elem
 );
 
 interface LeaderboardPageProps {
-  data: {
-    username: string | null;
-  };
-  scoreBoardData: {
-    scores: ScoreBoardEntry[];
-    scoreBoardUser: {
-      rank: number;
-      score: number;
-    };
-  } | null;
-  scoreBoardDataLoading: boolean;
+  username: string | null;
   onClose: () => void;
 }
 
@@ -79,10 +70,43 @@ const availableHeight = 418;
 const dividerHeight = 10;
 
 export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): JSX.Element => {
-  const { scoreBoardData, scoreBoardDataLoading } = props;
+  const { data, loading } = useAsync(
+    async (): Promise<{
+      scores: ScoreBoardEntry[];
+      scoreBoardUser: {
+        rank: number;
+        score: number;
+      };
+    }> => {
+      const service = new Service(context);
+      try {
+        const [scoreBoardUser, scores] = await Promise.all([
+          service.getScoreBoardUserEntry(props.username),
+          // Keep in sync with rowCount in ScoresTab.tsx
+          service.getScoreBoard(10),
+        ]);
+
+        return {
+          scores: Array.isArray(scores) ? scores : [],
+          scoreBoardUser: scoreBoardUser || { rank: 0, score: 0 },
+        };
+      } catch (error) {
+        return {
+          scores: [],
+          scoreBoardUser: {
+            rank: 0,
+            score: 0,
+          },
+        };
+      }
+    },
+    {
+      depends: [props.username],
+    }
+  );
 
   // Return early view if data is loading
-  if (scoreBoardDataLoading || scoreBoardData === null) {
+  if (loading || data === null) {
     return (
       <Layout onClose={props.onClose}>
         <vstack grow alignment="center middle">
@@ -92,15 +116,14 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
     );
   }
 
-  const isUserInTheTop = scoreBoardData.scoreBoardUser.rank < rowCount;
+  const isUserInTheTop = data.scoreBoardUser.rank < rowCount;
   const rowHeight = isUserInTheTop
     ? `${(availableHeight - dividerHeight) / rowCount}px`
     : `${availableHeight / rowCount}px`;
 
-  const numberOfScoresToInclude =
-    !scoreBoardDataLoading && scoreBoardData?.scoreBoardUser && isUserInTheTop ? 10 : 9;
+  const numberOfScoresToInclude = !loading && data?.scoreBoardUser && isUserInTheTop ? 10 : 9;
 
-  const leaderboardRows = scoreBoardData.scores.map((row, index) => {
+  const leaderboardRows = data.scores.map((row, index) => {
     if (index >= numberOfScoresToInclude) {
       return null;
     }
@@ -130,11 +153,11 @@ export const LeaderboardPage = (props: LeaderboardPageProps, context: Context): 
 
       {/* User */}
       <LeaderboardRow
-        rank={scoreBoardData?.scoreBoardUser ? scoreBoardData.scoreBoardUser.rank : 0}
+        rank={data?.scoreBoardUser ? data.scoreBoardUser.rank : 0}
         height={rowHeight}
-        name={props.data.username || 'Unknown'}
-        score={scoreBoardData?.scoreBoardUser ? scoreBoardData.scoreBoardUser.score : 0}
-        onPress={() => context.ui.navigateTo(`https://reddit.com/u/${props.data.username}`)}
+        name={props.username || 'Unknown'}
+        score={data?.scoreBoardUser ? data.scoreBoardUser.score : 0}
+        onPress={() => context.ui.navigateTo(`https://reddit.com/u/${props.username}`)}
       />
     </>
   );

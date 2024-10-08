@@ -1,10 +1,11 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useAsync } from '@devvit/public-api';
 
 import { Drawing } from '../../components/Drawing.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PointsToast } from '../../components/PointsToast.js';
 import { StyledButton } from '../../components/StyledButton.js';
+import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
@@ -32,7 +33,25 @@ export const DrawingPostResultsStep = (
   const rowCount = props.rows || 6;
   const rowHeight: Devvit.Blocks.SizeString = `${100 / rowCount}%`;
 
-  const data = props.data.postData;
+  // Pull latest data from the server
+  const { data: postData } = useAsync<PostData>(
+    async () => {
+      try {
+        const service = new Service(context);
+        return service.parsePostData(
+          await service.getPostData(props.data.postData.postId),
+          props.data.username
+        );
+      } catch (error) {
+        console.error('Error loading latest post data', error);
+        return props.data.postData;
+      }
+    },
+    {
+      depends: props.data.postData,
+    }
+  );
+  const data = !postData ? props.data.postData : postData;
   const playerCount = data.count.players;
 
   // Top N guesses (or whatever is available)

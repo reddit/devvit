@@ -1,13 +1,12 @@
 import { Devvit, useState } from '@devvit/public-api';
 
-import type { PostData } from '../../types/PostData.js';
-import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
-import { LeaderboardPage } from '../../components/LeaderboardPage.js';
-import { StyledButton } from '../../components/StyledButton.js';
-import { PixelText } from '../../components/PixelText.js';
-import { HowToPlayPage } from '../../components/HowToPlayPage.js';
 import { EditorPage } from '../../components/EditorPage.js';
+import { HowToPlayPage } from '../../components/HowToPlayPage.js';
+import { LeaderboardPage } from '../../components/LeaderboardPage.js';
 import { MyDrawingsPage } from '../../components/MyDrawingsPage.js';
+import { PixelText } from '../../components/PixelText.js';
+import { StyledButton } from '../../components/StyledButton.js';
+import type { PostData } from '../../types/PostData.js';
 
 interface PinnedPostProps {
   data: {
@@ -16,15 +15,6 @@ interface PinnedPostProps {
     activeFlairId: string | undefined;
     currentDictionary: string[];
   };
-  myDrawings: PostData[];
-  scoreBoardData: {
-    scores: ScoreBoardEntry[];
-    scoreBoardUser: {
-      rank: number;
-      score: number;
-    };
-  };
-  refetch: () => void;
 }
 
 export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
@@ -104,22 +94,12 @@ export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
     draw: <EditorPage data={latestData} onCancel={onClose} />,
     'my-drawings': (
       <MyDrawingsPage
-        data={latestData}
-        myDrawings={props.myDrawings}
-        myDrawingsLoading={false}
+        username={latestData.username}
         onClose={onClose}
         onDraw={() => setPage('draw')}
       />
     ),
-    leaderboard: (
-      <LeaderboardPage
-        data={latestData}
-        scoreBoardData={props.scoreBoardData}
-        // TODO: Implement loading state
-        scoreBoardDataLoading={false}
-        onClose={onClose}
-      />
-    ),
+    leaderboard: <LeaderboardPage username={latestData.username} onClose={onClose} />,
     'how-to-play': <HowToPlayPage onClose={onClose} />,
   };
 

@@ -1,9 +1,10 @@
 import { Devvit } from '@devvit/public-api';
-import { PixelText } from './PixelText.js';
+
+import Settings from '../settings.json';
 import type { SupportedGlyphs } from './PixelSymbol.js';
 import { PixelSymbol } from './PixelSymbol.js';
+import { PixelText } from './PixelText.js';
 import { Shadow } from './Shadow.js';
-import Settings from '../settings.json';
 
 const styles = {
   primary: {
@@ -26,6 +27,7 @@ interface StyledButtonProps {
   appearance?: 'primary' | 'secondary';
   width?: Devvit.Blocks.SizeString;
   height?: Devvit.Blocks.SizeString;
+  disabled?: boolean;
 }
 
 export const StyledButton = (props: StyledButtonProps): JSX.Element => {
@@ -37,6 +39,7 @@ export const StyledButton = (props: StyledButtonProps): JSX.Element => {
     appearance,
     width = '100px',
     height = '40px',
+    disabled,
   } = props;
 
   const style = styles[appearance || 'primary'];
@@ -45,7 +48,7 @@ export const StyledButton = (props: StyledButtonProps): JSX.Element => {
       <hstack
         height={height}
         width={width}
-        onPress={onPress}
+        onPress={disabled ? () => {} : onPress}
         backgroundColor={style.borderColor}
         padding="xsmall"
       >
@@ -54,7 +57,7 @@ export const StyledButton = (props: StyledButtonProps): JSX.Element => {
           width="100%"
           gap="small"
           alignment="middle center"
-          backgroundColor={style.backgroundColor}
+          backgroundColor={disabled ? '#585656' : style.backgroundColor}
         >
           {leadingIcon ? <PixelSymbol scale={2} type={leadingIcon} color={style.color} /> : null}
           {label ? <PixelText color={style.color}>{label}</PixelText> : null}
