@@ -50,8 +50,10 @@ export type SubredditType =
   | 'private'
   | 'restricted'
   | 'employees_only'
+  | 'gold_only'
   | 'gold_restricted'
-  | 'archived';
+  | 'archived'
+  | 'user';
 
 export enum AboutLocations {
   Reports = 'reports',
@@ -344,6 +346,77 @@ export type SubredditStyles = {
   sidebarWidgetHeaderColor?: string;
   submenuBackgroundColor?: string;
   submenuBackgroundStyle?: CustomizationFlag;
+};
+
+export class SubredditDescription {
+  markdown?: string;
+}
+
+export class SubredditWikiSettings {
+  wikiEditMode?: WikiEditMode;
+}
+
+export type WikiEditMode = 'disabled' | 'modonly' | 'anyone';
+
+export type PostType =
+  | 'link'
+  | 'image'
+  | 'video'
+  | 'text'
+  | 'spoiler'
+  | 'poll'
+  | 'gallery'
+  | 'talk'
+  | 'prediction'
+  | 'videogif'
+  | 'streaming'
+  | 'crosspost';
+
+export type PostCapabilities = 'ama';
+
+export class AuthorFlairSettings {
+  isEnabled?: boolean;
+  isSelfAssignabled?: boolean;
+}
+
+export class PostFlairSettings {
+  isEnabled?: boolean;
+  isSelfAssignabled?: boolean;
+}
+
+/**
+ * A class representing information about a Subreddit.
+ */
+export type SubredditInfo = {
+  id?: T5ID;
+  name?: string;
+  createdAt?: Date;
+  type?: SubredditType;
+  title?: string;
+  description?: SubredditDescription;
+  detectedLanguage?: string;
+  subscribersCount?: number;
+  activeCount?: number;
+  isNsfw?: boolean;
+  isQuarantined?: boolean;
+  isDiscoveryAllowed?: boolean;
+  isPredictionContributorsAllowed?: boolean;
+  isPredictionAllowed?: boolean;
+  isPredictionsTournamentAllowed?: boolean;
+  isChatPostCreationAllowed?: boolean;
+  isChatPostFeatureEnabled?: boolean;
+  isCrosspostingAllowed?: boolean;
+  isEmojisEnabled?: boolean;
+  isCommentingRestricted?: boolean;
+  isPostingRestricted?: boolean;
+  isArchivePostsEnabled?: boolean;
+  isSpoilerAvailable?: boolean;
+  allAllowedPostTypes?: PostType[];
+  allowedPostCapabilities?: PostCapabilities[];
+  allowedMediaInComments?: CommentMediaTypes[];
+  authorFlairSettings?: AuthorFlairSettings;
+  postFlairSettings?: PostFlairSettings;
+  wikiSettings?: SubredditWikiSettings;
 };
 
 /**
@@ -1257,6 +1330,60 @@ export class Subreddit {
   }
 }
 
+/**
+ * Gets a {@link SubredditInfo} object by ID
+ *
+ * @param {string} id - The ID (starting with t5_) of the subreddit to retrieve. e.g. t5_2qjpg
+ * @param metadata - Optional RPC metadata passed with every request.
+ * @returns {Promise<SubredditInfo>} A Promise that resolves a SubredditInfo object.
+ */
+export async function getSubredditInfoById(
+  subredditId: string,
+  metadata: Metadata | undefined
+): Promise<SubredditInfo> {
+  const operationName = 'GetSubredditInfoById';
+  const persistedQueryHash = '315a9b75c22a017d526afdf2d274616946156451aacfd56dfb91e7ad3f7a2fde';
+  const response = await GraphQL.query(
+    operationName,
+    persistedQueryHash,
+    { id: subredditId },
+    metadata
+  );
+
+  const subredditInfo = response.data?.subredditInfoById;
+
+  if (!subredditInfo) throw new Error('subreddit info not found');
+
+  return subredditInfo;
+}
+
+/**
+ * Gets a {@link SubredditInfo} object by name
+ *
+ * @param {string} name The name of a subreddit omitting the r/. This is case insensitive.
+ * @param metadata - Optional RPC metadata passed with every request.
+ * @returns {Promise<SubredditInfo>} A Promise that resolves a SubredditInfo object.
+ */
+export async function getSubredditInfoByName(
+  subredditName: string,
+  metadata: Metadata | undefined
+): Promise<SubredditInfo> {
+  const operationName = 'GetSubredditInfoByName';
+  const persistedQueryHash = '4aa69726c7e3f5d33ab2bee22b3d74fce645824fddd5ea3ec6dfe30bdb4295cb';
+  const response = await GraphQL.query(
+    operationName,
+    persistedQueryHash,
+    { name: subredditName },
+    metadata
+  );
+
+  const subredditInfo = response.data?.subredditInfoByName;
+
+  if (!subredditInfo) throw new Error('subreddit info not found');
+
+  return subredditInfo;
+}
+
 export async function getSubredditLeaderboard(
   subredditId: string,
   metadata: Metadata | undefined
@@ -1307,8 +1434,10 @@ function asSubredditType(type?: string): SubredditType {
     type === 'private' ||
     type === 'restricted' ||
     type === 'employees_only' ||
+    type === 'gold_only' ||
     type === 'gold_restricted' ||
-    type === 'archived'
+    type === 'archived' ||
+    type === 'user'
   ) {
     return type;
   }

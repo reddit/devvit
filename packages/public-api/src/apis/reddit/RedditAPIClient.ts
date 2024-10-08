@@ -39,6 +39,7 @@ import type {
   SetPostFlairOptions,
   SetUserFlairOptions,
   SubmitPostOptions,
+  SubredditInfo,
   SubredditLeaderboard,
   SubredditStyles,
   UpdatePageSettingsOptions,
@@ -53,6 +54,8 @@ import {
   Flair,
   FlairTemplate,
   getModerationLog,
+  getSubredditInfoById,
+  getSubredditInfoByName,
   getSubredditLeaderboard,
   getSubredditStyles,
   getVaultByAddress,
@@ -140,6 +143,7 @@ export class RedditAPIClient {
   /**
    * Gets a {@link Subreddit} object by ID
    *
+   * @deprecated Use {@link getSubredditInfoById} instead.
    * @param {string} id - The ID (starting with t5_) of the subreddit to retrieve. e.g. t5_2qjpg
    * @returns {Promise<Subreddit>} A Promise that resolves a Subreddit object.
    * @example
@@ -152,8 +156,23 @@ export class RedditAPIClient {
   }
 
   /**
+   * Gets a {@link SubredditInfo} object by ID
+   *
+   * @param {string} id - The ID (starting with t5_) of the subreddit to retrieve. e.g. t5_2qjpg
+   * @returns {Promise<SubredditInfo>} A Promise that resolves a SubredditInfo object.
+   * @example
+   * ```ts
+   * const memes = await reddit.getSubredditInfoById('t5_2qjpg');
+   * ```
+   */
+  getSubredditInfoById(id: string): Promise<SubredditInfo> {
+    return getSubredditInfoById(id, this.#metadata);
+  }
+
+  /**
    * Gets a {@link Subreddit} object by name
    *
+   * @deprecated Use {@link getSubredditInfoByName} instead.
    * @param {string} name The name of a subreddit omitting the r/. This is case insensitive.
    * @returns {Promise<Subreddit>} A Promise that resolves a Subreddit object.
    * @example
@@ -163,6 +182,20 @@ export class RedditAPIClient {
    */
   getSubredditByName(name: string): Promise<Subreddit> {
     return Subreddit.getByName(name, this.#metadata);
+  }
+
+  /**
+   * Gets a {@link SubredditInfo} object by name
+   *
+   * @param {string} name The name of a subreddit omitting the r/. This is case insensitive.
+   * @returns {Promise<SubredditInfo>} A Promise that resolves a SubredditInfo object.
+   * @example
+   * ```ts
+   * const askReddit = await reddit.getSubredditInfoByName('askReddit');
+   * ```
+   */
+  getSubredditInfoByName(name: string): Promise<SubredditInfo> {
+    return getSubredditInfoByName(name, this.#metadata);
   }
 
   /**
