@@ -34,6 +34,7 @@ import {
 import {
   ACTOR_SRC_PRIMARY_NAME,
   ASSET_HASHING_ALGO,
+  ASSET_UPLOAD_BATCH_SIZE,
   MAX_ALLOWED_SUBSCRIBER_COUNT,
 } from '@devvit/shared-types/constants.js';
 import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
@@ -743,11 +744,18 @@ export default class Upload extends ProjectCommand {
     const config = await this.getProjectConfig();
     const statuses = await this.#getAssetStatuses(assets, webViewAsset);
     ux.action.start(`Checking for new ${webViewMsg}assets`);
-    const [newAssets, existingAssets] = await this.#findNewAssets(assets, statuses);
+    const { newAssets, duplicateAssets, existingAssets } = await this.#findNewAssets(
+      assets,
+      statuses
+    );
+    ux.info(`Found ${assets.length} ${webViewMsg}assets (${newAssets.length} unique new assets)`);
     if (this.#verbose) {
-      ux.info(`Found ${assets.length} ${webViewMsg}assets (${newAssets.length} new assets)`);
       ux.info('New assets:');
       newAssets.forEach((asset) => {
+        ux.info(` · ${asset.filePath}`);
+      });
+      ux.info('Duplicates of another asset already listed as new:');
+      duplicateAssets.forEach((asset) => {
         ux.info(` · ${asset.filePath}`);
       });
       ux.info('Existing assets:');
@@ -764,26 +772,35 @@ export default class Upload extends ProjectCommand {
     }
 
     // Upload everything, giving back pairs of the assets & their upload response
-    ux.action.start(`Uploading new ${webViewMsg}assets...`);
-    let uploadResults: [MediaSignatureWithContents, UploadNewMediaResponse][];
+    ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining...`);
+    let uploadResults: [MediaSignatureWithContents, UploadNewMediaResponse][] = [];
     try {
-      uploadResults = await Promise.all(
-        newAssets.map(async (f) => {
-          return [
-            f,
-            await this.appClient.UploadNewMedia(
-              UploadNewMediaRequest.fromPartial({
-                slug: config.name,
-                size: f.size,
-                hash: f.hash,
-                contents: f.contents,
-                webviewAsset: webViewAsset,
-                filePath: f.filePath,
-              })
-            ),
-          ] as [MediaSignatureWithContents, UploadNewMediaResponse];
-        })
-      );
+      // Do this in batches - we don't want to upload everything at once and
+      // overwhelm the server
+      while (newAssets.length > 0) {
+        const batch = newAssets.splice(0, ASSET_UPLOAD_BATCH_SIZE);
+        uploadResults = [
+          ...uploadResults,
+          ...(await Promise.all(
+            batch.map(async (f) => {
+              return [
+                f,
+                await this.appClient.UploadNewMedia(
+                  UploadNewMediaRequest.fromPartial({
+                    slug: config.name,
+                    size: f.size,
+                    hash: f.hash,
+                    contents: f.contents,
+                    webviewAsset: webViewAsset,
+                    filePath: f.filePath,
+                  })
+                ),
+              ] as [MediaSignatureWithContents, UploadNewMediaResponse];
+            })
+          )),
+        ];
+        ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining...`);
+      }
     } catch (err) {
       const error = err as Error;
       const msg = `Failed to upload ${webViewMsg}assets. (${error.message})`;
@@ -802,7 +819,9 @@ export default class Upload extends ProjectCommand {
     return assets.reduce<{ [asset: string]: string }>((map, asset) => {
       const assetId =
         statuses.find((status) => status.filePath === asset.filePath)?.existingMediaId ??
-        uploadResults.find(([result]) => result.filePath === asset.filePath)?.[1].assetId;
+        uploadResults.find(
+          ([result]) => result.hash === asset.hash && result.size === asset.size
+        )?.[1].assetId;
       if (assetId) {
         map[asset.filePath] = assetId;
       }
@@ -813,9 +832,14 @@ export default class Upload extends ProjectCommand {
   async #findNewAssets(
     assets: MediaSignatureWithContents[],
     statuses: MediaSignatureStatus[]
-  ): Promise<[MediaSignatureWithContents[], AssetMap]> {
+  ): Promise<{
+    newAssets: MediaSignatureWithContents[];
+    duplicateAssets: MediaSignatureWithContents[];
+    existingAssets: AssetMap;
+  }> {
     // ensure everything is accounted for
     const newAssets: MediaSignatureWithContents[] = [];
+    const duplicateAssets: MediaSignatureWithContents[] = [];
     const existingAssets: AssetMap = {};
     statuses.forEach((status) => {
       const asset = assets.find((asset) => asset.filePath === status.filePath);
@@ -825,7 +849,13 @@ export default class Upload extends ProjectCommand {
         );
       }
       if (status.isNew) {
-        newAssets.push(asset);
+        // The user may have the same asset in multiple places, but we need to
+        // only upload it once
+        if (newAssets.find((a) => a.hash === asset.hash && a.size === asset.size)) {
+          duplicateAssets.push(asset);
+        } else {
+          newAssets.push(asset);
+        }
       } else {
         if (status.existingMediaId) {
           existingAssets[asset.filePath] = status.existingMediaId;
@@ -837,6 +867,6 @@ export default class Upload extends ProjectCommand {
       }
     });
 
-    return [newAssets, existingAssets];
+    return { newAssets, duplicateAssets, existingAssets };
   }
 }

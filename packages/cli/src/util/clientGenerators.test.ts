@@ -24,7 +24,7 @@ it('retries on error', async () => {
     clientWithRetry.GetBySlug({
       slug: 'some-slug',
     })
-  ).rejects.toThrowError('Last error: Error: baz');
+  ).rejects.toThrowError('Last error: baz');
   expect(NodeFetchRPC.request).toHaveBeenCalledTimes(3);
 });
 
@@ -51,6 +51,6 @@ it('throws a hybrid error if it gets a 4xx error during a retry', async () => {
     clientWithRetry.GetBySlug({
       slug: 'some-slug',
     })
-  ).rejects.toThrowError('Last error: Error: bar');
+  ).rejects.toThrowError('Last error: bar');
   expect(NodeFetchRPC.request).toHaveBeenCalledTimes(2);
 });

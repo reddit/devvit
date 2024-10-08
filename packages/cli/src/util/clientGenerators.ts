@@ -221,9 +221,9 @@ function wrapWithRetry<
               // wasn't the first error, we should throw a new error with
               // both the first and this error.
               throw new Error(
-                `Failed after ${retries + 1} attempts.
-First error: ${StringUtil.caughtToString(firstError)}
-Last error: ${StringUtil.caughtToString(error)}`
+                `${String(prop)} failed after ${retries + 1} attempts.
+First error: ${StringUtil.caughtToString(firstError, 'message')}
+Last error: ${StringUtil.caughtToString(error, 'message')}`
               );
             }
             if (!firstError) {
@@ -235,9 +235,9 @@ Last error: ${StringUtil.caughtToString(error)}`
         }
 
         throw new Error(
-          `Failed after ${MAX_RETRIES} attempts.
-First error: ${StringUtil.caughtToString(firstError)}
-Last error: ${StringUtil.caughtToString(lastError)}`
+          `${target} failed after ${MAX_RETRIES} attempts.
+First error: ${StringUtil.caughtToString(firstError, 'message')}
+Last error: ${StringUtil.caughtToString(lastError, 'message')}`
         );
       };
     },
