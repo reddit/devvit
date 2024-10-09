@@ -57,7 +57,7 @@ const config = {
         docs: {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: require.resolve('./sidebars.js'),
-          lastVersion: '0.10',
+          lastVersion: '0.11',
         },
         blog: false,
         theme: {

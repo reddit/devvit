@@ -1,0 +1,148 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Environment setup
+
+Set up and maintain your developer environment.
+
+## Requirements
+
+Make sure you have the following software installed:
+
+- Node.js v22.2.0 or higher
+- Git v2.28.0 or higher
+
+You'll also need an editor for viewing and editing code (we recommend [VS Code](https://code.visualstudio.com/)).
+
+## Install Node.js
+
+<details>
+  <summary>Click here for instructions on installing Node.js</summary>
+  <div>
+    <div>
+    You’re going to work with TypeScript. In order for Typescript to work with Devvit, you’ll need a working Node.js environment and then the Devvit command line interface. Node.js is an open-source server environment that makes it possible to develop and run Javascript apps anywhere. Node.js lets you import and use packages (code that other people have written) into your code.
+
+**Option 1: Use node version manager (nvm)**
+
+Install or update [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) to use as a handy command-line tool for managing multiple Node.js versions on your system. This will allow you to switch between different versions easily. If you to use a different node version manager, check out these [suggestions from npmjs.org](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+For macOS or Linux:
+
+1. Run the following command line in your terminal to install nvm.
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash
+```
+
+2. Close and re-open your terminal to have nvm available.
+
+3. Install the latest version of Node.js.
+
+```bash
+nvm install node
+```
+
+For Windows:
+
+1. Download and install nvm-windows by following the instructions in the repository.
+
+2. Restart your terminal or command prompt.
+
+3. Install the latest version of Node.js.
+
+```bash
+nvm install node
+```
+
+**Option 2: Use Node.js installer from nodejs.org**
+
+1. Visit the official [Node.js website](https://nodejs.org) to download the installer for your operating system (Windows, macOS, or Linux).
+2. Run the installer and follow the prompts to install Node.js and npm (the package manager for Node.js).
+
+:::note
+If you install Node.js this way, you may experience permissions issues when trying to run Devvit, which is [documented on NPM's website](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). Both NPM and us here at Reddit highly encourage you to use nvm if possible. If that's not possible, here are some tips on how to [fix these permissions issues](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). For Windows users specifically, please use a node version manager.
+:::
+
+Check that Node.js is installed correctly by running the following commands:
+
+```bash
+node --version
+npm --version
+```
+
+You should see the version numbers for Node.js and npm as output.
+
+</div>
+    <br/>
+  </div>
+</details>
+
+## Install the Devvit CLI
+
+To download and install the Devvit CLI, run one of the following commands:
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+    ```bash $ npm install -g devvit ```
+  </TabItem>
+  <TabItem value="yarn" label="Yarn">
+    ```bash $ yarn global add devvit ```
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm" default>
+    ```bash $ pnpm add -g devvit ```
+  </TabItem>
+</Tabs>
+
+If you see permission errors, please read [npm's official guide](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally). Yarn depends on the same configuration as npm.
+
+## Login to Devvit
+
+Run this to log into your _Reddit account_ using the Devvit CLI:
+
+```bash
+$ devvit login
+```
+
+A Reddit authentication page will open in your browser (if the page doesn&apos;t open automatically, you can use the link in the command line output). The Devvit CLI advances automatically once the [authentication process](../authentication.md) completes.
+
+Once logged in you should be seeing something similar to this:
+
+```bash
+> Logged in as u/username
+```
+
+If you can't log in, make sure you are using a Reddit account that has been allowlisted for the Reddit Developer Platform.
+
+## Update the Devvit CLI
+
+As new versions of [`@devvit`](https://www.npmjs.com/package/devvit) becomes available, you can run this to update your Devvit CLI to the latest version:
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+    ```bash $ npm install -g devvit ```
+  </TabItem>
+  <TabItem value="yarn" label="Yarn">
+    ```bash $ yarn global add devvit ```
+  </TabItem>
+  <TabItem value="pnpm" label="pnpm" default>
+    ```bash $ pnpm add -g devvit ```
+  </TabItem>
+</Tabs>
+
+After updating the Devvit CLI, you can check the version by running:
+
+```bash
+$ devvit --version
+```
+
+You'll get a response like this:
+
+```bash
+> @devvit/cli/0.10.16 darwin-arm64 node-v20.2.0
+```
+
+To update the `@devvit` project dependencies to the currently installed CLI's version, run the following command from within your project directory:
+
+```bash
+$ devvit update app
+```
