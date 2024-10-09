@@ -181,9 +181,45 @@ const MyComponent = () => {
 
 - API methods related to Reddit's Post Collections functionality have been removed, as the [feature was removed from Reddit several months ago](https://www.reddit.com/r/modnews/comments/1am4b0e/deprecating_post_collections_mark_as_oc_and/).
 
-**Other Fixes**
+**Improvements and updates**
 
-- Reducing false alarms for hook errors. Previously, hook errors were firing in valid use cases. Hook rules still apply. If you see this error: `Error: Invalid hook call. Hooks can only be called at the top-level of a function component. Make sure that you are not calling hooks inside loops, conditions, or nested functions.`, it is most likely caused by an error inside of your code.
+**CLI**
+
+- Improved error messaging
+  - Pass 4xx errors up to developers
+  - Ensure stack traces have the full path in message
+  - New playtest error for app not yet existing
+  - New error for apps blocked on upload due to asset folder sizes
+- Improved image asset upload batching
+- Added retry calls from CLI to Portal that fail
+- `devvit new --help` output fixed
+
+**Context**
+
+- Set `appName` and `appVersion` on public Context
+- Added `subredditName` to Context
+- Added support for getting locale and timezone in uiEnvironment
+
+**Portal**
+
+- Improved error messaging
+- Added an error for why an app is ineligible when installation fails
+
+**Reddit API**
+
+- Added `getSubredditInfo` methods to Reddit API plugin
+- Made `redditId` and `label` optional on ModNotes
+- Correctly set `revisionDate` on WikiPage type
+- Now returns `contentHtml` on WikiPage
+- Updated subredditStyles type
+- Updated moderator permissions list to match API model
+- Fixed bugs with reddit.inviteModerator() API call
+- Added `ignoreReports()` to Comment model
+
+**Other fixes**
+
+- Added realtime channel message type errors.
+- Reduced false alarms for hook errors. Previously, hook errors were firing in valid use cases. Hook rules still apply. If you see this error: `Error: Invalid hook call. Hooks can only be called at the top-level of a function component. Make sure that you are not calling hooks inside loops, conditions, or nested functions.`, it is most likely caused by an error inside of your code.
 
 ## Devvit 0.10.25: Take two: devvit publish
 
