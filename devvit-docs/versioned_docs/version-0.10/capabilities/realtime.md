@@ -27,6 +27,8 @@ A new channel can be setup with function handlers containing custom logic to upd
 - `onUnsubscribed` - optional hook to be informed when channel has disconnected
 
 ```tsx
+import { Devvit, useChannel } from '@devvit/public-api';
+
 // Defined within render function of an experience post
 
 // Choose a channel name that works for you
@@ -34,7 +36,7 @@ A new channel can be setup with function handlers containing custom logic to upd
 // You have the flexibility to define the message data shape to be published
 // via channel.send - same shape will be received in the onMessage handler
 
-const channel = context.useChannel({
+const channel = useChannel({
   name: 'events',
   onMessage: (data) => {
     // modify local state

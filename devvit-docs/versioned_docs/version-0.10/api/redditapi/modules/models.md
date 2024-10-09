@@ -5,10 +5,10 @@
 ### Enumerations
 
 - [AboutLocations](../enums/models.AboutLocations.md)
-- [CollectionDisplayLayout](../enums/models.CollectionDisplayLayout.md)
 - [FlairType](../enums/models.FlairType.md)
 - [ModMailActionType](../enums/models.ModMailActionType.md)
 - [ModMailConversationState](../enums/models.ModMailConversationState.md)
+- [SocialLinkType](../enums/models.SocialLinkType.md)
 - [WikiPagePermissionLevel](../enums/models.WikiPagePermissionLevel.md)
 
 ### Classes
@@ -25,7 +25,6 @@
 - [ModMailService](../classes/models.ModMailService.md)
 - [ModNote](../classes/models.ModNote.md)
 - [Post](../classes/models.Post.md)
-- [PostCollection](../classes/models.PostCollection.md)
 - [PostFlairWidget](../classes/models.PostFlairWidget.md)
 - [PrivateMessage](../classes/models.PrivateMessage.md)
 - [Subreddit](../classes/models.Subreddit.md)
@@ -40,6 +39,7 @@
 ### Interfaces
 
 - [ModAction](../interfaces/models.ModAction.md)
+- [PostNotesRequest](../interfaces/models.PostNotesRequest.md)
 
 ### Type Aliases
 
@@ -119,7 +119,6 @@
 - [SubmitMediaOptions](models.md#submitmediaoptions)
 - [SubmitPostOptions](models.md#submitpostoptions)
 - [SubmitSelfPostOptions](models.md#submitselfpostoptions)
-- [SubredditCollectionsInput](models.md#subredditcollectionsinput)
 - [SubredditData](models.md#subredditdata)
 - [SubredditSettings](models.md#subredditsettings)
 - [SubredditType](models.md#subreddittype)
@@ -130,6 +129,7 @@
 - [UserFlairPageOptions](models.md#userflairpageoptions)
 - [UserNote](models.md#usernote)
 - [UserNoteLabel](models.md#usernotelabel)
+- [UserSocialLink](models.md#usersociallink)
 - [WithUserData](models.md#withuserdata)
 
 ### Functions
@@ -159,6 +159,18 @@
 ### <a id="allowableflaircontent" name="allowableflaircontent"></a> AllowableFlairContent
 
 Ƭ **AllowableFlairContent**: `"all"` \| `"emoji"` \| `"text"`
+
+---
+
+### <a id="backgroundimageposition" name="backgroundimageposition"></a> BackgroundImagePosition
+
+Ƭ **BackgroundImagePosition**: `"cover"` \| `"tiled"` \| `"centered"`
+
+---
+
+### <a id="bannerheight" name="bannerheight"></a> BannerHeight
+
+Ƭ **BannerHeight**: `"small"` \| `"medium"` \| `"large"`
 
 ---
 
@@ -228,6 +240,12 @@
 | `sendreplies?` | `boolean` |
 | `spoiler?`     | `boolean` |
 | `title`        | `string`  |
+
+---
+
+### <a id="communitynameformat" name="communitynameformat"></a> CommunityNameFormat
+
+Ƭ **CommunityNameFormat**: `"slashtag"` \| `"pretty"` \| `"hide"`
 
 ---
 
@@ -315,21 +333,6 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 
 ---
 
-### <a id="createcollectioninput" name="createcollectioninput"></a> CreateCollectionInput
-
-Ƭ **CreateCollectionInput**: `Object`
-
-#### Type declaration
-
-| Name             | Type                                                                    | Description                                                                            |
-| :--------------- | :---------------------------------------------------------------------- | :------------------------------------------------------------------------------------- |
-| `description?`   | `string`                                                                | The description of the collection.                                                     |
-| `displayLayout?` | [`CollectionDisplayLayout`](../enums/models.CollectionDisplayLayout.md) | One of: TIMELINE \| GALLERY. This determines the layout of posts in the collection UI. |
-| `subredditId?`   | `string`                                                                | The t5\_ id of the subreddit in which this collection will be created.                 |
-| `title?`         | `string`                                                                | The title of the collection.                                                           |
-
----
-
 ### <a id="createflairtemplateoptions" name="createflairtemplateoptions"></a> CreateFlairTemplateOptions
 
 Ƭ **CreateFlairTemplateOptions**: `Object`
@@ -351,7 +354,7 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 
 ### <a id="createmodnoteoptions" name="createmodnoteoptions"></a> CreateModNoteOptions
 
-Ƭ **CreateModNoteOptions**: `Prettify`\<`PostNotesRequest` & \{ `label`: [`UserNoteLabel`](models.md#usernotelabel) ; `redditId`: `T1ID` \| `T3ID` }\>
+Ƭ **CreateModNoteOptions**: `Prettify`\<[`PostNotesRequest`](../interfaces/models.PostNotesRequest.md) & \{ `label?`: [`UserNoteLabel`](models.md#usernotelabel) ; `redditId?`: `T1ID` \| `T3ID` }\>
 
 ---
 
@@ -396,6 +399,12 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 
 ---
 
+### <a id="customizationflag" name="customizationflag"></a> CustomizationFlag
+
+Ƭ **CustomizationFlag**: `"default"` \| `"custom"`
+
+---
+
 ### <a id="deletenotesoptions" name="deletenotesoptions"></a> DeleteNotesOptions
 
 Ƭ **DeleteNotesOptions**: `Prettify`\<`DeleteNotesRequest`\>
@@ -426,10 +435,12 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 
 #### Type declaration
 
-| Name             | Type      |
-| :--------------- | :-------- |
-| `enabled`        | `boolean` |
-| `usersCanAssign` | `boolean` |
+| Name                        | Type      |
+| :-------------------------- | :-------- |
+| `enabled`                   | `boolean` |
+| `usersCanAssign`            | `boolean` |
+| `userFlairBackgroundColor?` | `string`  |
+| `userFlairTextColor?`       | `string`  |
 
 ---
 
@@ -635,6 +646,12 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 
 ---
 
+### <a id="imageposition" name="imageposition"></a> ImagePosition
+
+Ƭ **ImagePosition**: `"cover"` \| `"tiled"`
+
+---
+
 ### <a id="internalsetpostflairoptions" name="internalsetpostflairoptions"></a> InternalSetPostFlairOptions
 
 Ƭ **InternalSetPostFlairOptions**: [`SetFlairOptions`](models.md#setflairoptions) & \{ `postId`: `T3ID` }
@@ -693,6 +710,12 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 | `before?`  | `string`                             |
 | `children` | `T`[]                                |
 | `more?`    | [`MoreObject`](models.md#moreobject) |
+
+---
+
+### <a id="menuposition" name="menuposition"></a> MenuPosition
+
+Ƭ **MenuPosition**: `"default"` \| `"overlay"`
 
 ---
 
@@ -843,6 +866,12 @@ Conversation participant
 | `isOp?`          | `boolean` |
 | `isParticipant?` | `boolean` |
 | `name?`          | `string`  |
+
+---
+
+### <a id="positionedimageposition" name="positionedimageposition"></a> PositionedImagePosition
+
+Ƭ **PositionedImagePosition**: `"left"` \| `"right"` \| `"centered"`
 
 ---
 
@@ -1010,18 +1039,6 @@ An individual Removal Reason object.
 
 ---
 
-### <a id="subredditcollectionsinput" name="subredditcollectionsinput"></a> SubredditCollectionsInput
-
-Ƭ **SubredditCollectionsInput**: `Object`
-
-#### Type declaration
-
-| Name           | Type     | Description                                                                 |
-| :------------- | :------- | :-------------------------------------------------------------------------- |
-| `subredditId?` | `string` | The t5\_ id of the subreddit that contains the collections to be retrieved. |
-
----
-
 ### <a id="subredditdata" name="subredditdata"></a> SubredditData
 
 Ƭ **SubredditData**: `Object`
@@ -1075,10 +1092,12 @@ An individual Removal Reason object.
 | `emojisEnabled`               | `boolean`                                            | Whether emojis are enabled on the subreddit.                                    |
 | `eventPostsEnabled`           | `boolean`                                            | Whether event posts are enabled on the subreddit.                               |
 | `headerTitle?`                | `string`                                             | The header title.                                                               |
+| `keyColor?`                   | `string`                                             | The 6-digit rgb hex color of the subreddit's key color, e.g. `#AABBCC`          |
 | `linkFlairEnabled`            | `boolean`                                            | Whether link flairs are enabled on the subreddit.                               |
 | `mobileBannerImage?`          | `string`                                             | Banner image used on mobile apps.                                               |
 | `originalContentTagEnabled`   | `boolean`                                            | Whether the Original Content tag is enabled.                                    |
 | `postFlairs`                  | [`FlairSettings`](models.md#flairsettings)           | The post flair settings for the subreddit.                                      |
+| `primaryColor?`               | `string`                                             | The 6-digit rgb hex color of the subreddit's primary color, e.g. `#AABBCC`      |
 | `restrictCommenting`          | `boolean`                                            | Whether commenting is restricted in the subreddit.                              |
 | `restrictPosting`             | `boolean`                                            | Whether posting is restricted in the subreddit.                                 |
 | `shouldArchivePosts`          | `boolean`                                            | Whether posts in the subreddit should be automatically archived after 6 months. |
@@ -1086,6 +1105,63 @@ An individual Removal Reason object.
 | `url`                         | `string`                                             | HTTP URL to the subreddit                                                       |
 | `userFlairs`                  | [`FlairSettings`](models.md#flairsettings)           | The user flair settings for the subreddit.                                      |
 | `wikiEnabled`                 | `boolean`                                            | Whether the wiki is enabled for the subreddit.                                  |
+
+---
+
+### <a id="subredditstyles" name="subredditstyles"></a> SubredditStyles
+
+Ƭ **SubredditStyles**: `Object`
+
+#### Type declaration
+
+| Name                              | Type                                                           |
+| :-------------------------------- | :------------------------------------------------------------- |
+| `backgroundColor?`                | `string`                                                       |
+| `backgroundImage?`                | `string`                                                       |
+| `backgroundImagePosition?`        | [`BackgroundImagePosition`](models.md#backgroundimageposition) |
+| `bannerBackgroundColor?`          | `string`                                                       |
+| `bannerBackgroundImage?`          | `string`                                                       |
+| `bannerBackgroundImagePosition?`  | [`ImagePosition`](models.md#imageposition)                     |
+| `bannerCommunityName?`            | `string`                                                       |
+| `bannerCommunityNameFormat?`      | [`CommunityNameFormat`](models.md#communitynameformat)         |
+| `bannerHeight?`                   | [`BannerHeight`](models.md#bannerheight)                       |
+| `bannerOverlayColor?`             | `string`                                                       |
+| `bannerPositionedImage?`          | `string`                                                       |
+| `bannerPositionedImagePosition?`  | [`PositionedImagePosition`](models.md#positionedimageposition) |
+| `bannerShowCommunityIcon?`        | [`Visibility`](models.md#visibility)                           |
+| `highlightColor?`                 | `string`                                                       |
+| `icon?`                           | `string`                                                       |
+| `legacyBannerBackgroundImage?`    | `string`                                                       |
+| `legacyPrimaryColor?`             | `string`                                                       |
+| `menuBackgroundBlur?`             | `number`                                                       |
+| `menuBackgroundColor?`            | `string`                                                       |
+| `menuBackgroundImage?`            | `string`                                                       |
+| `menuBackgroundOpacity?`          | `number`                                                       |
+| `menuLinkColorActive?`            | `string`                                                       |
+| `menuLinkColorHover?`             | `string`                                                       |
+| `menuLinkColorInactive?`          | `string`                                                       |
+| `menuPosition?`                   | [`MenuPosition`](models.md#menuposition)                       |
+| `mobileBannerImage?`              | `string`                                                       |
+| `mobileKeyColor?`                 | `string`                                                       |
+| `postBackgroundColor?`            | `string`                                                       |
+| `postBackgroundImage?`            | `string`                                                       |
+| `postBackgroundImagePosition?`    | [`ImagePosition`](models.md#imageposition)                     |
+| `postDownvoteCountColor?`         | `string`                                                       |
+| `postDownvoteIconActive?`         | `string`                                                       |
+| `postDownvoteIconInactive?`       | `string`                                                       |
+| `postPlaceholderImage?`           | `string`                                                       |
+| `postPlaceholderImagePosition?`   | [`ImagePosition`](models.md#imageposition)                     |
+| `postTitleColor?`                 | `string`                                                       |
+| `postUpvoteCountColor?`           | `string`                                                       |
+| `postUpvoteIconActive?`           | `string`                                                       |
+| `postUpvoteIconInactive?`         | `string`                                                       |
+| `postVoteIcons?`                  | [`CustomizationFlag`](models.md#customizationflag)             |
+| `primaryColor?`                   | `string`                                                       |
+| `secondaryBannerPositionedImage?` | `string`                                                       |
+| `sidebarWidgetBackgroundColor?`   | `string`                                                       |
+| `sidebarWidgetHeaderColor?`       | `string`                                                       |
+| `submenuBackgroundColor?`         | `string`                                                       |
+| `submenuBackgroundStyle?`         | [`CustomizationFlag`](models.md#customizationflag)             |
 
 ---
 
@@ -1179,11 +1255,11 @@ An individual Removal Reason object.
 
 #### Type declaration
 
-| Name       | Type                                       |
-| :--------- | :----------------------------------------- |
-| `label?`   | [`UserNoteLabel`](models.md#usernotelabel) |
-| `note?`    | `string`                                   |
-| `redditId` | `T1ID` \| `T3ID` \| `T5ID`                 |
+| Name        | Type                                       |
+| :---------- | :----------------------------------------- |
+| `label?`    | [`UserNoteLabel`](models.md#usernotelabel) |
+| `note?`     | `string`                                   |
+| `redditId?` | `T1ID` \| `T3ID` \| `T5ID`                 |
 
 ---
 
@@ -1196,6 +1272,12 @@ An individual Removal Reason object.
 ### <a id="withuserdata" name="withuserdata"></a> WithUserData
 
 Ƭ **WithUserData**: `Object`
+
+---
+
+### <a id="visibility" name="visibility"></a> Visibility
+
+Ƭ **Visibility**: `"show"` \| `"hide"`
 
 #### Type declaration
 
@@ -1219,3 +1301,54 @@ An individual Removal Reason object.
 #### Returns
 
 [`Listing`](../classes/models.Listing.md)\<[`ModAction`](../interfaces/models.ModAction.md)\>
+
+---
+
+### <a id="getsubredditleaderboard" name="getsubredditleaderboard"></a> getSubredditLeaderboard
+
+▸ **getSubredditLeaderboard**(`subredditId`, `metadata`): `Promise`\<[`SubredditLeaderboard`](models.md#subredditleaderboard)\>
+
+#### Parameters
+
+| Name          | Type                      |
+| :------------ | :------------------------ |
+| `subredditId` | `string`                  |
+| `metadata`    | `undefined` \| `Metadata` |
+
+#### Returns
+
+`Promise`\<[`SubredditLeaderboard`](models.md#subredditleaderboard)\>
+
+---
+
+### <a id="getvaultbyaddress" name="getvaultbyaddress"></a> getVaultByAddress
+
+▸ **getVaultByAddress**(`address`, `metadata`): `Promise`\<[`Vault`](models.md#vault)\>
+
+#### Parameters
+
+| Name       | Type                      |
+| :--------- | :------------------------ |
+| `address`  | `string`                  |
+| `metadata` | `undefined` \| `Metadata` |
+
+#### Returns
+
+`Promise`\<[`Vault`](models.md#vault)\>
+
+---
+
+### <a id="getvaultbyuserid" name="getvaultbyuserid"></a> getVaultByUserId
+
+▸ **getVaultByUserId**(`userId`, `metadata`): `Promise`\<[`Vault`](models.md#vault)\>
+
+#### Parameters
+
+| Name       | Type                      |
+| :--------- | :------------------------ |
+| `userId`   | \`t2\_$\{string}\`        |
+| `metadata` | `undefined` \| `Metadata` |
+
+#### Returns
+
+`Promise`\<[`Vault`](models.md#vault)\>

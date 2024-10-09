@@ -181,10 +181,12 @@ An `enum` specify how to display the image in the block. Possible values:
 A button that increments a counter
 
 ```tsx
+import { Devvit, useState } from '@devvit/public-api';
+
 Devvit.addCustomPostType({
   name: 'Say Hello',
   render: (context) => {
-    const [votes, setCounter] = context.useState(0);
+    const [votes, setCounter] = useState(0);
     return (
       <blocks>
         <vstack alignment="center middle" height="100%" width="100%">

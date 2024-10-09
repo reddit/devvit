@@ -7,6 +7,7 @@
 ### Accessors
 
 - [content](models.WikiPage.md#content)
+- [contentHtml](models.WikiPage.md#contentHtml)
 - [name](models.WikiPage.md#name)
 - [revisionAuthor](models.WikiPage.md#revisionauthor)
 - [revisionDate](models.WikiPage.md#revisiondate)
@@ -32,6 +33,18 @@
 • `get` **content**(): `string`
 
 The Markdown content of the page.
+
+#### Returns
+
+`string`
+
+---
+
+### <a id="contentHtml" name="contentHtml"></a> contentHtml
+
+• `get` **contentHtml**(): `string`
+
+The HTML content of the page.
 
 #### Returns
 

@@ -17,7 +17,7 @@ Devvit.configure({
 // use within one of our capability handlers e.g. Menu Actions, Triggers, Scheduled Job Type, etc
 async (event, context) => {
   const subreddit = await context.reddit.getSubredditById(context.subredditId);
-  context.reddit.submitPost({
+  await context.reddit.submitPost({
     subredditName: subreddit.name,
     title: 'test post',
     text: 'test body',
@@ -89,6 +89,7 @@ async (event, context) => {
 - [getSubredditById](RedditAPIClient.RedditAPIClient.md#getsubredditbyid)
 - [getSubredditByName](RedditAPIClient.RedditAPIClient.md#getsubredditbyname)
 - [getSubredditRemovalReasons](RedditAPIClient.RedditAPIClient.md#getsubredditremovalreasons)
+- [getSubredditStyles](RedditAPIClient.RedditAPIClient.md#getsubredditstyles)
 - [getTopPosts](RedditAPIClient.RedditAPIClient.md#gettopposts)
 - [getUnmoderated](RedditAPIClient.RedditAPIClient.md#getunmoderated)
 - [getUserById](RedditAPIClient.RedditAPIClient.md#getuserbyid)
@@ -376,22 +377,6 @@ Ban a user from contributing to the wiki on a subreddit.
 
 ---
 
-### <a id="createcollection" name="createcollection"></a> createCollection
-
-▸ **createCollection**(`options`): `Promise`\<[`PostCollection`](models.PostCollection.md)\>
-
-#### Parameters
-
-| Name      | Type                                                                  |
-| :-------- | :-------------------------------------------------------------------- |
-| `options` | [`CreateCollectionInput`](../modules/models.md#createcollectioninput) |
-
-#### Returns
-
-`Promise`\<[`PostCollection`](models.PostCollection.md)\>
-
----
-
 ### <a id="createpostflairtemplate" name="createpostflairtemplate"></a> createPostFlairTemplate
 
 ▸ **createPostFlairTemplate**(`options`): `Promise`\<[`FlairTemplate`](models.FlairTemplate.md)\>
@@ -631,38 +616,6 @@ A Listing of User objects.
 
 ---
 
-### <a id="getcollectionbyid" name="getcollectionbyid"></a> getCollectionById
-
-▸ **getCollectionById**(`collectionId`): `Promise`\<[`PostCollection`](models.PostCollection.md)\>
-
-#### Parameters
-
-| Name           | Type     |
-| :------------- | :------- |
-| `collectionId` | `string` |
-
-#### Returns
-
-`Promise`\<[`PostCollection`](models.PostCollection.md)\>
-
----
-
-### <a id="getcollectionsforsubreddit" name="getcollectionsforsubreddit"></a> getCollectionsForSubreddit
-
-▸ **getCollectionsForSubreddit**(`subredditId`): `Promise`\<[`PostCollection`](models.PostCollection.md)[]\>
-
-#### Parameters
-
-| Name          | Type     |
-| :------------ | :------- |
-| `subredditId` | `string` |
-
-#### Returns
-
-`Promise`\<[`PostCollection`](models.PostCollection.md)[]\>
-
----
-
 ### <a id="getcommentbyid" name="getcommentbyid"></a> getCommentById
 
 ▸ **getCommentById**(`id`): `Promise`\<[`Comment`](models.Comment.md)\>
@@ -798,7 +751,7 @@ const posts = await reddit
 
 ▸ **getCurrentSubreddit**(): `Promise`\<[`Subreddit`](models.Subreddit.md)\>
 
-Retrieves the current subreddit based on the provided metadata.
+Retrieves the current subreddit.
 
 #### Returns
 
@@ -809,7 +762,7 @@ A Promise that resolves a Subreddit object.
 **`Example`**
 
 ```ts
-const currentSubreddit = await reddit.getCurrentSubreddit(metadata);
+const currentSubreddit = await reddit.getCurrentSubreddit();
 ```
 
 ---
@@ -818,7 +771,7 @@ const currentSubreddit = await reddit.getCurrentSubreddit(metadata);
 
 ▸ **getCurrentUser**(): `Promise`\<[`User`](models.User.md)\>
 
-Get the current calling user based on the provided metadata.
+Get the current calling user.
 
 #### Returns
 
@@ -829,7 +782,7 @@ A Promise that resolves to a User object.
 **`Example`**
 
 ```ts
-const user = await reddit.getCurrentUser(metadata);
+const user = await reddit.getCurrentUser();
 ```
 
 ---
@@ -1414,11 +1367,39 @@ for (let reason of reasons) {
 
 ---
 
+### <a id="getsubredditstyles" name="getsubredditstyles"></a> getSubredditStyles
+
+▸ **getSubredditStyles**(`subredditId`): `Promise`\<[`SubredditStyles`](../modules/models.md#subredditstyles)\>
+
+Returns the styles for a given subreddit ID.
+
+#### Parameters
+
+| Name          | Type     |
+| :------------ | :------- |
+| `subredditId` | `string` |
+
+#### Returns
+
+`Promise`\<[`SubredditStyles`](../modules/models.md#subredditstyles)\>
+
+Styles for the given subreddit.
+
+**`Example`**
+
+```ts
+const styles = await reddit.getSubredditStyles('t5_2th52');
+
+console.log('Subreddit primaryColor: ' + styles.primaryColor);
+```
+
+---
+
 ### <a id="gettopposts" name="gettopposts"></a> getTopPosts
 
 ▸ **getTopPosts**(`options`): [`Listing`](models.Listing.md)\<[`Post`](models.Post.md)\>
 
-Get a list of controversial posts from a specific subreddit.
+Get a list of top posts from a specific subreddit.
 
 #### Parameters
 
@@ -1436,7 +1417,7 @@ A Listing of Post objects.
 
 ```ts
 const posts = await reddit
-  .getControversialPosts({
+  .getTopPosts({
     subredditName: 'memes',
     timeframe: 'day',
     limit: 1000,

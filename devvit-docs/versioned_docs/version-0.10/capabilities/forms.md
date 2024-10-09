@@ -414,7 +414,9 @@ const myForm = Devvit.createForm(
           defaultValue: data.username,
         },
       ],
-    };
+      // Adding `as const` helps you get accurate types in the onSubmit function below
+      // This will only work if the function does not have any branching logic
+    } as const;
   },
   (event, context) => {
     context.ui.showToast({

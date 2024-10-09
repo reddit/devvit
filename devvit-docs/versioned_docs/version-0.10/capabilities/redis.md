@@ -65,10 +65,10 @@ Not all Redis features are supported. If you would like to request a specific Re
 
 | **Command**                            | **Action**                                                            |
 | -------------------------------------- | --------------------------------------------------------------------- |
-| [get](https://redis.io/commands/Get)   | Gets the value of key.                                                |
-| [set](https://redis.io/commands/Set)   | Sets key to hold a string value.                                      |
-| [del](https://redis.io/commands/Del)   | Removes the specified keys.                                           |
-| [type](https://redis.io/commands/Type) | Returns the string representation of the type of value stored at key. |
+| [get](https://redis.io/commands/get)   | Gets the value of key.                                                |
+| [set](https://redis.io/commands/set)   | Sets key to hold a string value.                                      |
+| [del](https://redis.io/commands/del)   | Removes the specified keys.                                           |
+| [type](https://redis.io/commands/type) | Returns the string representation of the type of value stored at key. |
 
 <details><summary>Code Example</summary>
 
@@ -99,8 +99,8 @@ Type: string
 
 | **Command**                            | **Action**                                      |
 | -------------------------------------- | ----------------------------------------------- |
-| [mGet](https://redis.io/commands/MGet) | Returns the values of all specified keys.       |
-| [mSet](https://redis.io/commands/MSet) | Sets the given keys to their respective values. |
+| [mGet](https://redis.io/commands/mget) | Returns the values of all specified keys.       |
+| [mSet](https://redis.io/commands/mset) | Sets the given keys to their respective values. |
 
 <details><summary>Code Example</summary>
 
@@ -128,9 +128,9 @@ Result: Devvit,Developer
 
 | **Command**                                    | **Action**                                                                                                             |
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| [getRange](https://redis.io/commands/GetRange) | Returns the substring of the string value stored at key, determined by the offsets start and end (both are inclusive). |
-| [setRange](https://redis.io/commands/SetRange) | Overwrites part of the string stored at key, starting at the specified offset, for the entire length of value.         |
-| [strLen](https://redis.io/commands/Strlen)     | Returns the length of the string value stored at key.                                                                  |
+| [getRange](https://redis.io/commands/getrange) | Returns the substring of the string value stored at key, determined by the offsets start and end (both are inclusive). |
+| [setRange](https://redis.io/commands/setrange) | Overwrites part of the string stored at key, starting at the specified offset, for the entire length of value.         |
+| [strLen](https://redis.io/commands/strlen)     | Returns the length of the string value stored at key.                                                                  |
 
 <details><summary>Code Example</summary>
 

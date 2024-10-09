@@ -32,4 +32,4 @@ devvit playtest <your-test-subreddit-name>
 
 ![experience_post](./assets/experience-post-example.png)
 
-When you're done iterating, you can [publish](dev_guide.mdx#9publish) your experience and then make it [public](dev_guide.mdx#10gopublic)
+When you're done iterating, you can [publish](dev_guide.mdx#9publish) your experience and then make it [public](dev_guide.mdx#10gopublic).

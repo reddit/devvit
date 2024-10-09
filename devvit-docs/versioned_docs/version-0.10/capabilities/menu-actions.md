@@ -2,7 +2,7 @@
 
 Add an item to the three dot menu.
 
-You can add custom menu actions to posts and comments using the Devvit.addMenuItem() function.
+You can add custom menu actions to posts and comments using the `Devvit.addMenuItem()` function.
 
 :::note
 On new Reddit, comment menu actions in modqueue are only available in card view.
@@ -22,12 +22,12 @@ You can decide where the menu action shows up by specifying the context property
 
 ## Limitations
 
-- If there are multiple apps, there is no way to sort order of actions in the menu.
+- A sort order of actions in the context menu can't be specified.
 - The context, name, and description fields do not support dynamic logic.
 
 ## Example
 
-Here you'll use `Devvit.addMenuItem` to create a menu actions for comments, posts and subreddits.
+This example uses `Devvit.addMenuItem()` to create menu actions for comments, posts and subreddits.
 
 ```ts
 import { Devvit } from '@devvit/public-api';

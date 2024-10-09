@@ -42,14 +42,14 @@ To trigger a UI update, you need to update at least one of the state variables. 
 
 ### Example: user action
 
-```
-const onClick = ()=>{
-    const newValue = clickCount + 1;
-    setClickCount(newValue);
-}
+```ts
+const onClick = () => {
+  const newValue = clickCount + 1;
+  setClickCount(newValue);
+};
 ```
 
-You can pass this function to `onPress` handler to react to user actions. If the handler has the API request, the execution will switch to the server side
+You can pass this function to `onPress` handler to react to user actions. If the handler has the API request, the execution will switch to the server side.
 
 ### Example: external event
 
@@ -57,10 +57,12 @@ You can use intervals and realtime to trigger a UI update that is not initiated 
 
 In this countdown example, the value setter function is called inside the interval to update the UI based on a timer:
 
-```
-const [counter, setCounter] = context.useState(1000);
+```ts
+import { Devvit, useState, useInterval } from '@devvit/public-api';
 
-const updateInterval = context.useInterval(() => {
+const [counter, setCounter] = useState(1000);
+
+const updateInterval = useInterval(() => {
   setCounter((counter) => counter - 1);
 }, 1000);
 
@@ -69,15 +71,15 @@ updateInterval.start();
 
 In the synced progress bar example, the value setter function is called inside the onMessage handler to update UI based on an external event.
 
-```
+```ts
 const [progress, setProgress] = useState(0);
 
 const progressChannel = useChannel({
-    name: 'progress_state',
-    onMessage: (message) => {
-      setProgress(message.payload.progress);
-    },
-  });
+  name: 'progress_state',
+  onMessage: (message) => {
+    setProgress(message.payload.progress);
+  },
+});
 
 progressChannel.subscribe();
 ```

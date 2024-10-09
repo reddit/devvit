@@ -98,7 +98,7 @@ The `.addMenuItem(menuItem: MenuItem)` function has these parameters:
 
 **Example**
 
-```tsx
+```ts
 Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Add a poll',

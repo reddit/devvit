@@ -74,11 +74,13 @@ Devvit.addCustomPostType({
 7. Use the Reddit API to say hello to the user.
 
 ```jsx
+import { Devvit, useState } from '@devvit/public-api';
+
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
-  render: ({ useState, reddit }) => {
+  render: (context) => {
     const [currentUsername] = useState(async () => {
-      const currentUser = await reddit.getCurrentUser();
+      const currentUser = await context.reddit.getCurrentUser();
       return currentUser.username;
     });
 
@@ -95,12 +97,14 @@ Devvit.addCustomPostType({
 
 8.  Create a form to collect user input.
 
-```ts
+```tsx
+import { Devvit, useState, useForm } from '@devvit/public-api';
+
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
-  render: ({ useState, useForm, reddit, ui }) => {
+  render: (context) => {
     const [currentUsername] = useState(async () => {
-      const currentUser = await reddit.getCurrentUser();
+      const currentUser = await context.reddit.getCurrentUser();
       return currentUser.username;
     });
 
@@ -117,12 +121,12 @@ Devvit.addCustomPostType({
           },
         ],
       },
-      async ({ answer }) => {
-        ui.showToast({
+      async (data) => {
+        context.ui.showToast({
           text: 'Thanks for answering!',
           appearance: 'success',
         });
-        setAnswer(answer);
+        setAnswer(data.answer);
       }
     );
 
@@ -139,7 +143,7 @@ Devvit.addCustomPostType({
           ) : (
             <button
               onPress={() => {
-                ui.showForm(howAreYouForm);
+                context.ui.showForm(howAreYouForm);
               }}
             >
               Answer Question

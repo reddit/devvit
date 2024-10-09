@@ -75,11 +75,10 @@ function getKeyForAuthor(author: User) {
 
 ```typescript
 async function getThing(event: MenuItemOnPressEvent, context: Devvit.Context) {
-  const { location, targetId } = event;
-  if (location === 'post') {
-    return await context.reddit.getPostById(targetId);
-  } else if (location === 'comment') {
-    return await context.reddit.getCommentById(targetId);
+  if (event.location === 'post') {
+    return await context.reddit.getPostById(event.targetId);
+  } else if (event.location === 'comment') {
+    return await context.reddit.getCommentById(event.targetId);
   }
   throw 'Cannot find a post or comment with that ID';
 }
@@ -197,7 +196,6 @@ This function shows the mod where the action came from, pulls relevant data from
 ```typescript
 async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   // Use the correct term in our message based on what was acted upon
-  const { location } = event;
   const thing = await getThing(event, context);
   const author = await getAuthor(event, context);
   /**
@@ -224,7 +222,8 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
 
   // Get the current subreddit from the metadata
   const subreddit = await context.reddit.getCurrentSubreddit();
-  const { permalink } = thing;
+  const permalink = thing.permalink;
+  const location = event.location;
   switch (strikes) {
     case 1:
       // first strike, send a warning

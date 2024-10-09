@@ -18,7 +18,7 @@ Devvit.configure({
 ## Limitations
 
 - Access is only allowed to https URIs.
-- Supported HTTP methods: GET, POST, PUT, DELETE, OPTIONS and PATCH.
+- Supported HTTP methods: `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS` and `PATCH`.
 - HTTP timeout limit is 30 seconds.
 
 To request a domain to the allow-list, [please contact us via r/devvit modmail](https://www.reddit.com/message/compose/?to=r%2Fdevvit) or fill out [this form](https://forms.gle/Pn8Eq3RoPcmH1ZJJ7).

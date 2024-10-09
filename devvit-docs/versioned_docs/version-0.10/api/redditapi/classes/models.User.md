@@ -26,6 +26,7 @@ A class representing a user.
 - [getPosts](models.User.md#getposts)
 - [getSnoovatarUrl](models.User.md#getsnoovatarurl)
 - [getUserFlairBySubreddit](models.User.md#getuserflairbysubreddit)
+- [getSocialLinks](models.User.md#getsociallinks)
 - [toJSON](models.User.md#tojson)
 
 ## Accessors
@@ -255,6 +256,26 @@ const username = 'badapple';
 const subredditName = 'mysubreddit';
 const user = await reddit.getUserByUsername(username);
 const userFlair = await user.getUserFlairBySubreddit(subredditName);
+```
+
+---
+
+### <a id="getsociallinks" name="getsociallinks"></a> getSocialLinks
+
+▸ **getSocialLinks**(): `Promise`\<[`UserSocialLink`](../modules/models.md#usersociallink)[]\>
+
+Gets social links of the user
+
+#### Returns
+
+`Promise`\<[`UserSocialLink`](../modules/models.md#usersociallink)[]\>
+
+A Promise that resolves an Array of UserSocialLink objects
+
+**`Example`**
+
+```ts
+const socialLinks = await user.getSocialLinks();
 ```
 
 ---

@@ -5,8 +5,10 @@ Several APIs in Devvit only accept plain [JSON](https://www.json.org) data which
 ### Example Problem: Class and `Context.useState()`
 
 ```ts
+import { Devvit, useState } from '@devvit/public-api';
+
 class Foo {}
-const [foo, setFoo] = context.useState(new Foo()); // Error!
+const [foo, setFoo] = useState(new Foo()); // Error!
 ```
 
 ```

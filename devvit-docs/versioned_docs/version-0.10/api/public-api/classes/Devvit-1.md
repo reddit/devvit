@@ -58,11 +58,13 @@ Add a custom post type for your app.
 **`Example`**
 
 ```ts
+import { Devvit, useState } from '@devvit/public-api';
+
 Devvit.addCustomPostType({
   name: 'Counter',
   description: 'A simple click counter post.',
   render: (context) => {
-    const [counter, setCounter] = context.useState();
+    const [counter, setCounter] = useState();
 
     return (
       <vstack>
@@ -143,7 +145,7 @@ Devvit.addMenuItem({
   label: 'Check for new posts',
   location: 'location',
   onPress: async (event, context) => {
-    const jobId = await context.scheduler.runJob({
+    const checkPostsJob = await context.scheduler.runJob({
       name: 'checkNewPosts',
       when: new Date(Date.now() + 5000), // in 5 seconds
     });
