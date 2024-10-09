@@ -14,7 +14,7 @@ These platform upgrades create breaking changes for some apps. We’re releasing
 
 To get started on 0.11.0:
 
-1. Run `npm install -g devvit@next`.
+1. Run `npm install -g devvit`.
 2. Run `devvit update app` and `npm i` to update your app.
 
 **New Features**
@@ -81,7 +81,7 @@ const MyComponent = async () => {
   return <hstack></hstack>;
 };
 
-import { useState } from '@devvt/public-api';
+import { useState } from '@devvit/public-api';
 
 const MyComponent = () => {
   const [data] = useState(async () => redis.get('count'));
@@ -90,7 +90,7 @@ const MyComponent = () => {
 };
 
 // New pattern: if you want this request to be non-blocking you can use useAsync
-import { useAsync } from '@devvt/public-api';
+import { useAsync } from '@devvit/public-api';
 
 const MyComponent = () => {
   const { data, loading } = useAsync(async () => await redis.get('count'));
