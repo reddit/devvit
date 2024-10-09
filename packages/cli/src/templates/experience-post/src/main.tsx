@@ -1,5 +1,5 @@
 // Learn more at developers.reddit.com/docs
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useState } from '@devvit/public-api';
 
 Devvit.configure({
   redditAPI: true,
@@ -31,8 +31,7 @@ Devvit.addMenuItem({
 Devvit.addCustomPostType({
   name: 'Experience Post',
   height: 'regular',
-  render: (context) => {
-    const { useState } = context;
+  render: (_context) => {
     const [counter, setCounter] = useState(0);
 
     return (
