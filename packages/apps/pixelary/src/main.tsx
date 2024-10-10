@@ -112,7 +112,7 @@ const logDictionaryForm = Devvit.createForm(
     const service = new Service(context);
 
     await service.setSelectedDictionaryName(event.values.dictionary);
-    await service.getDictionary(true);
+    await service.getDictionaries(true);
     context.ui.showToast('Dictionary retrieved. Run `devvit logs` to view');
   }
 );
@@ -185,6 +185,7 @@ const selectDictionaryForm = Devvit.createForm(
           options: [
             { label: 'main', value: 'main' },
             { label: 'r/piercing', value: 'r/piercing' }, //hardcoding for r/piercing dictionary takeover 9/26/24
+            { label: 'r/NintendoSwitch', value: 'r/NintendoSwitch' }, //hardcoding for r/NintendoSwitch dictionary takeover 10/10/24
           ],
         },
       ],

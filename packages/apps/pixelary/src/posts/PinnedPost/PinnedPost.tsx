@@ -8,13 +8,15 @@ import { PixelText } from '../../components/PixelText.js';
 import { HowToPlayPage } from '../../components/HowToPlayPage.js';
 import { EditorPage } from '../../components/EditorPage.js';
 import { MyDrawingsPage } from '../../components/MyDrawingsPage.js';
+import type { Dictionary } from '../../types/Dictionary.js';
+import Settings from '../../settings.json';
 
 interface PinnedPostProps {
   data: {
     postData: PostData;
     username: string | null;
     activeFlairId: string | undefined;
-    currentDictionary: string[];
+    dictionaries: Dictionary[];
   };
   myDrawings: PostData[];
   scoreBoardData: {
@@ -32,6 +34,10 @@ export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
   const latestData = { ...props.data };
   const buttonWidth = '256px';
   const buttonHeight = '48px';
+
+  // For now we assume that there is only one takeover active at a time
+  const isTakeoverActive = props.data.dictionaries.some((d) => d.name !== 'main');
+  const dictionary = props.data.dictionaries.find((d) => d.name !== 'main');
 
   const Menu = (
     <vstack width="100%" height="100%" alignment="center middle">
@@ -57,6 +63,18 @@ export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
 
       {/* Wordmark */}
       <PixelText scale={4}>Pixelary</PixelText>
+
+      {/* Takeover banner */}
+      {isTakeoverActive && (
+        <>
+          <spacer height="16px" />
+          <PixelText
+            color={Settings.theme.secondary}
+            scale={2}
+          >{`${dictionary?.name} takeover`}</PixelText>
+        </>
+      )}
+
       <spacer grow />
 
       {/* Menu */}

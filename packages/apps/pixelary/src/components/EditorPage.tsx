@@ -3,12 +3,14 @@ import { Devvit, useState } from '@devvit/public-api';
 import { EditorPageWordStep } from './EditorPageWordStep.js';
 import { EditorPageDrawStep } from './EditorPageDrawStep.js';
 import { EditorPageReviewStep } from './EditorPageReviewStep.js';
+import type { Dictionary } from '../types/Dictionary.js';
+import type { CandidateWord } from '../types/CandidateWord.js';
 
 interface EditorPageProps {
   data: {
     username: string | null;
     activeFlairId: string | undefined;
-    currentDictionary: string[];
+    dictionaries: Dictionary[];
   };
   onCancel: () => void;
 }
@@ -16,24 +18,26 @@ interface EditorPageProps {
 export const EditorPage = (props: EditorPageProps): JSX.Element => {
   const defaultStep = 'Word';
   const [currentStep, setCurrentStep] = useState<string>(defaultStep);
-  const [word, setWord] = useState<string>('');
+  const [candidate, setCandidate] = useState<CandidateWord>({
+    dictionaryName: 'main',
+    word: '',
+  });
   const [drawing, setDrawing] = useState<number[]>([]);
 
   const steps: Record<string, JSX.Element> = {
     Word: (
       <EditorPageWordStep
         {...props}
-        onNext={(word) => {
-          setWord(word);
+        onNext={(selectedCandidate) => {
+          setCandidate(selectedCandidate);
           setCurrentStep('Editor');
         }}
-        currentDictionary={props.data.currentDictionary}
       />
     ),
     Editor: (
       <EditorPageDrawStep
         {...props}
-        word={word}
+        candidate={candidate}
         onNext={(drawing) => {
           setDrawing(drawing);
           setCurrentStep('Review');
@@ -43,7 +47,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     Review: (
       <EditorPageReviewStep
         {...props}
-        word={word}
+        candidate={candidate}
         drawing={drawing}
         onCancel={() => {
           props.onCancel();

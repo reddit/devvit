@@ -9,12 +9,13 @@ import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 import { CollectionPost } from './CollectionPost/CollectionPost.js';
 import { DrawingPost } from './DrawingPost/DrawingPost.js';
 import { PinnedPost } from './PinnedPost/PinnedPost.js';
+import type { Dictionary } from '../types/Dictionary.js';
 
 type InitialData = {
   gameSettings: GameSettings;
   postData: PostData | CollectionPostData | PinnedPostData;
   username: string | null;
-  currentDictionary: string[];
+  dictionaries: Dictionary[];
 };
 
 /*
@@ -33,6 +34,7 @@ const defaultSettings: GameSettings = {
 const defaultPostData: PostData = {
   postId: '',
   word: '',
+  dictionaryName: '',
   data: [],
   authorUsername: '',
   date: 0,
@@ -57,7 +59,7 @@ const defaultData = {
   gameSettings: defaultSettings,
   postData: defaultPostData,
   username: null,
-  currentDictionary: Words,
+  dictionaries: [{ name: 'main', words: Words }],
 };
 
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
@@ -68,12 +70,12 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         gameSettings = defaultSettings,
         rawPostData,
         username = null,
-        currentDictionary = Words,
+        dictionaries = [{ name: 'main', words: Words }],
       ] = await Promise.all([
         service.getGameSettings(),
         service.getPostData(context.postId!),
         context.reddit.getCurrentUser().then((user) => user?.username ?? null),
-        service.getDictionary(false),
+        service.getDictionaries(false),
       ]);
       let postData: PostData | CollectionPostData | PinnedPostData;
       if (rawPostData.postType === 'collection') {
@@ -87,7 +89,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         gameSettings,
         postData,
         username,
-        currentDictionary,
+        dictionaries,
       };
     } catch (error) {
       console.error('Error loading initial data', error);
@@ -162,7 +164,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
           postData: (postData ?? data.postData) as PostData,
           username: data.username,
           activeFlairId: data.gameSettings.activeFlairId,
-          currentDictionary: data.currentDictionary,
+          dictionaries: data.dictionaries,
         }}
         refetch={refetch}
       />
@@ -174,7 +176,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
           postData: (postData ?? data.postData) as PostData,
           username: data.username,
           activeFlairId: data.gameSettings.activeFlairId,
-          currentDictionary: data.currentDictionary,
+          dictionaries: data.dictionaries,
         }}
         myDrawings={myDrawings}
         scoreBoardData={scoreBoardData}

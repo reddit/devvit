@@ -5,6 +5,7 @@ import { Drawing } from './Drawing.js';
 import { LoadingState } from './LoadingState.js';
 import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';
+import type { CandidateWord } from '../types/CandidateWord.js';
 import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
 
@@ -13,7 +14,7 @@ interface EditorPageReviewStepProps {
     username: string | null;
     activeFlairId: string | undefined;
   };
-  word: string;
+  candidate: CandidateWord;
   drawing: number[];
   onCancel: () => void;
 }
@@ -78,7 +79,8 @@ export const EditorPageReviewStep = (
     });
 
     const postData = {
-      word: props.word,
+      word: props.candidate.word,
+      dictionaryName: props.candidate.dictionaryName,
       data: props.drawing,
       authorUsername: props.data.username,
       date: Date.now(),
@@ -117,7 +119,7 @@ export const EditorPageReviewStep = (
         name: 'PostExpiration',
         data: {
           postId: post.id,
-          answer: props.word,
+          answer: props.candidate.word,
         },
         runAt: new Date(Date.now() + Settings.postLiveSpan),
       }),

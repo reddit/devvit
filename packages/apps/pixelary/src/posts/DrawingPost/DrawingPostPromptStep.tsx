@@ -84,9 +84,16 @@ export const DrawingPostPromptStep = (
     }
   );
 
+  const dictionaryName = props.data.postData.dictionaryName;
+
   return (
     <vstack height="100%" width="100%" alignment="center">
       <spacer height="24px" />
+      {dictionaryName !== 'main' && (
+        <PixelText color={Settings.theme.secondary}>{`${dictionaryName} takeover`}</PixelText>
+      )}
+      <spacer grow />
+
       {/* Drawing */}
       <zstack alignment="center middle">
         <Drawing data={props.data.postData.data} size={width} />

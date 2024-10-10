@@ -9,16 +9,21 @@ import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 import { obfuscateString } from '../../utils/obfuscateString.js';
+import type { Dictionary } from '../../types/Dictionary.js';
 
 function includesCaseInsensitive(array: string[], target: string): boolean {
   return array.some((item) => item.toLowerCase() === target.toLowerCase());
+}
+
+function dictionaryContainsWord(dictionaries: Dictionary[], word: string): boolean {
+  return dictionaries.some((entry) => includesCaseInsensitive(entry.words, word));
 }
 
 interface DrawingPostResultsStepProps {
   data: {
     postData: PostData;
     username: string | null;
-    currentDictionary: string[];
+    dictionaries: Dictionary[];
   };
   rows?: number;
   feedback: boolean | null;
@@ -43,7 +48,7 @@ export const DrawingPostResultsStep = (
       const percentage = Math.round((guess.count / data.count.guesses) * 100);
       const word = guess.word.charAt(0).toUpperCase() + guess.word.slice(1);
       const isCorrect = guess.word.toLowerCase() === data.word.toLowerCase();
-      const isInDictionary = includesCaseInsensitive(props.data.currentDictionary, guess.word);
+      const isInDictionary = dictionaryContainsWord(props.data.dictionaries, guess.word);
       const isSafeToShow = guess.commentId || isCorrect || isInDictionary;
 
       return (

@@ -6,6 +6,7 @@ import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 import { DrawingPostPromptStep } from './DrawingPostPromptStep.js';
 import { DrawingPostResultsStep } from './DrawingPostResultsStep.js';
+import type { Dictionary } from '../../types/Dictionary.js';
 import { EditorPage } from '../../components/EditorPage.js';
 
 interface DrawingPostProps {
@@ -13,7 +14,7 @@ interface DrawingPostProps {
     postData: PostData;
     username: string | null;
     activeFlairId: string | undefined;
-    currentDictionary: string[];
+    dictionaries: Dictionary[];
   };
   refetch: () => void;
 }

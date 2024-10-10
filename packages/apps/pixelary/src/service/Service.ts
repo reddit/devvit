@@ -17,6 +17,7 @@ import type {
   PinnedPostData,
 } from '../types/PostData.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
+import type { Dictionary } from '../types/Dictionary.js';
 
 // Service that handles the backbone logic for the application
 // This service is responsible for:
@@ -306,6 +307,7 @@ export class Service {
       data: data.data ? JSON.parse(data.data) : [],
       date: data.date ? parseInt(data.date) : 0,
       word: data.word ? data.word : '',
+      dictionaryName: data.dictionaryName ? data.dictionaryName : '',
       expired: data.expired ? JSON.parse(data.expired) : false,
       count: {
         players: 0,
@@ -356,7 +358,7 @@ export class Service {
       const comments: { [key: string]: string } = {};
       Object.keys(data ?? {})
         .filter((key) => key.startsWith('guess-comment:'))
-        .map((key) => {
+        .forEach((key) => {
           const [_, word] = key.split(':');
           comments[word] = data[key];
         });
@@ -418,6 +420,7 @@ export class Service {
   async storePostData(data: {
     postId: string;
     word: string;
+    dictionaryName: string;
     data: number[];
     authorUsername: string;
   }): Promise<void> {
@@ -429,6 +432,7 @@ export class Service {
       date: Date.now().toString(),
       expired: 'false',
       word: data.word,
+      dictionaryName: data.dictionaryName,
     });
   }
 
@@ -474,17 +478,35 @@ export class Service {
     return { rows: uniqueNewWords.length };
   }
 
-  async getDictionary(printToLogs: boolean): Promise<string[]> {
+  async getDictionaries(printToLogs: boolean): Promise<Dictionary[]> {
+    // Determine which dictionaries to fetch
+    const defaultDictionary = 'main';
     const selectedDictionary = await this.getSelectedDictionaryName();
-    const key = this.getDictionaryKey(selectedDictionary);
-    const dictionaryJsonString = await this.redis.get(key);
-    const parsedDictionary = dictionaryJsonString ? JSON.parse(dictionaryJsonString) : [];
-
-    if (printToLogs) {
-      console.log(`${key}:`, parsedDictionary);
+    const dictionaries = [selectedDictionary];
+    if (selectedDictionary !== defaultDictionary) {
+      dictionaries.push(defaultDictionary);
     }
 
-    return parsedDictionary;
+    // Fetch and parse the dictionaries
+    const data = Promise.all(
+      dictionaries.map(async (dictionaryName) => {
+        const key = this.getDictionaryKey(dictionaryName);
+        const dictionaryJsonString = await this.redis.get(key);
+        const parsedDictionary: string[] = dictionaryJsonString
+          ? JSON.parse(dictionaryJsonString)
+          : [];
+        return {
+          name: dictionaryName,
+          words: parsedDictionary,
+        };
+      })
+    );
+
+    if (printToLogs) {
+      console.log('Dictionary: ', data);
+    }
+
+    return data;
   }
 
   async setSelectedDictionaryName(dictionaryName: string): Promise<void> {

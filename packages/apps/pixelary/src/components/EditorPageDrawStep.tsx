@@ -4,12 +4,13 @@ import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
 import { Shadow } from './Shadow.js';
 import { StyledButton } from './StyledButton.js';
+import type { CandidateWord } from '../types/CandidateWord.js';
 import Settings from '../settings.json';
 import { blankCanvas } from '../utils/blankCanvas.js';
 import { splitArray } from '../utils/splitArray.js';
 
 interface EditorPageDrawStepProps {
-  word: string;
+  candidate: CandidateWord;
   onNext: (drawing: number[]) => void;
 }
 
@@ -90,7 +91,7 @@ export const EditorPageDrawStep = (props: EditorPageDrawStepProps): JSX.Element 
       {/* Header */}
       <hstack width="100%" alignment="middle">
         <vstack alignment="top start">
-          <PixelText scale={3}>{props.word}</PixelText>
+          <PixelText scale={3}>{props.candidate.word}</PixelText>
           <spacer size="small" />
           <hstack alignment="middle" gap="small">
             <PixelSymbol type="clock" />

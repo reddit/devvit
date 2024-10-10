@@ -1,6 +1,7 @@
 // Drawing Post
 export type PostData = {
   word: string;
+  dictionaryName: string;
   data: number[];
   authorUsername: string;
   date: number;
