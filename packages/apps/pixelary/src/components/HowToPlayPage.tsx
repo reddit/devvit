@@ -1,8 +1,8 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
 
-import Settings from '../settings.json';
 import { PixelText } from './PixelText.js';
+import Settings from '../settings.json';
 import { StyledButton } from './StyledButton.js';
 
 interface HowToPlayPageProps {

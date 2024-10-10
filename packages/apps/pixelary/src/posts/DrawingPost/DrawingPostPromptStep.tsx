@@ -4,10 +4,10 @@ import { Devvit, useForm } from '@devvit/public-api';
 import { Drawing } from '../../components/Drawing.js';
 import { PixelText } from '../../components/PixelText.js';
 import { StyledButton } from '../../components/StyledButton.js';
-import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
+import { Service } from '../../service/Service.js';
 
 interface DrawingPostPromptStepProps {
   data: {

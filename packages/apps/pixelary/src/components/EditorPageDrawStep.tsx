@@ -1,12 +1,12 @@
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
-import Settings from '../settings.json';
-import { blankCanvas } from '../utils/blankCanvas.js';
-import { splitArray } from '../utils/splitArray.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
 import { Shadow } from './Shadow.js';
 import { StyledButton } from './StyledButton.js';
+import Settings from '../settings.json';
+import { blankCanvas } from '../utils/blankCanvas.js';
+import { splitArray } from '../utils/splitArray.js';
 
 interface EditorPageDrawStepProps {
   word: string;

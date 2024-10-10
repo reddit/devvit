@@ -1,9 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-
-import Settings from '../settings.json';
-import { formatNumberWithCommas } from '../utils/formatNumbers.js';
-import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
+import { PixelSymbol } from './PixelSymbol.js';
+import { formatNumberWithCommas } from '../utils/formatNumbers.js';
+import Settings from '../settings.json';
 
 export type LeaderboardRowProps = {
   rank: number;

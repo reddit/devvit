@@ -1,8 +1,8 @@
 import { Devvit, useState } from '@devvit/public-api';
 
+import { EditorPageWordStep } from './EditorPageWordStep.js';
 import { EditorPageDrawStep } from './EditorPageDrawStep.js';
 import { EditorPageReviewStep } from './EditorPageReviewStep.js';
-import { EditorPageWordStep } from './EditorPageWordStep.js';
 
 interface EditorPageProps {
   data: {

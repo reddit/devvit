@@ -1,10 +1,11 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useState } from '@devvit/public-api';
+import { Devvit, useInterval, useState } from '@devvit/public-api';
 
 import Words from '../data/words.json';
 import { Service } from '../service/Service.js';
 import type { GameSettings } from '../types/GameSettings.js';
-import type { CollectionPostData, PinnedPostData, PostData } from '../types/PostData.js';
+import type { CollectionPostData, PostData, PinnedPostData } from '../types/PostData.js';
+import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
 import { CollectionPost } from './CollectionPost/CollectionPost.js';
 import { DrawingPost } from './DrawingPost/DrawingPost.js';
 import { PinnedPost } from './PinnedPost/PinnedPost.js';
@@ -94,27 +95,90 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
     }
   });
 
+  const getScoreboard = async (): Promise<{
+    scores: ScoreBoardEntry[];
+    scoreBoardUser: {
+      rank: number;
+      score: number;
+    };
+  }> => {
+    try {
+      const [scoreBoardUser, scores] = await Promise.all([
+        service.getScoreBoardUserEntry(data.username),
+        // Keep in sync with rowCount in ScoresTab.tsx
+        service.getScoreBoard(10),
+      ]);
+
+      return {
+        scores: Array.isArray(scores) ? scores : [],
+        scoreBoardUser: scoreBoardUser || { rank: 0, score: 0 },
+      };
+    } catch (error) {
+      return {
+        scores: [],
+        scoreBoardUser: {
+          rank: 0,
+          score: 0,
+        },
+      };
+    }
+  };
+
+  const getPostData = async (): Promise<PostData | CollectionPostData | PinnedPostData> => {
+    try {
+      return service.parsePostData(await service.getPostData(data.postData.postId), data.username);
+    } catch (error) {
+      console.error('Error loading latest post data', error);
+      return data.postData;
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  const getData = async () => {
+    return Promise.all([
+      data.username ? await service.getMyDrawings(data.username) : [],
+      getScoreboard(),
+      getPostData(),
+    ]);
+  };
+
+  const [[myDrawings, scoreBoardData, postData], setData] =
+    useState<Awaited<ReturnType<typeof getData>>>(getData);
+
+  const refetchInterval = useInterval(async () => {
+    refetchInterval.stop();
+    setData(await getData());
+  }, 100);
+
+  const refetch = (): void => {
+    refetchInterval.start();
+  };
+
   const postType = data.postData.postType;
   const postTypes: Record<string, JSX.Element> = {
     drawing: (
       <DrawingPost
         data={{
-          postData: data.postData as PostData,
+          postData: (postData ?? data.postData) as PostData,
           username: data.username,
           activeFlairId: data.gameSettings.activeFlairId,
           currentDictionary: data.currentDictionary,
         }}
+        refetch={refetch}
       />
     ),
     collection: <CollectionPost collection={data.postData as CollectionPostData} />,
     pinned: (
       <PinnedPost
         data={{
-          postData: data.postData as PostData,
+          postData: (postData ?? data.postData) as PostData,
           username: data.username,
           activeFlairId: data.gameSettings.activeFlairId,
           currentDictionary: data.currentDictionary,
         }}
+        myDrawings={myDrawings}
+        scoreBoardData={scoreBoardData}
+        refetch={refetch}
       />
     ),
     // Add more post types here

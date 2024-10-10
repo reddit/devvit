@@ -1,8 +1,8 @@
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
-import Settings from '../settings.json';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
+import Settings from '../settings.json';
 
 interface EditorPageWordStepProps {
   onNext: (word: string) => void;

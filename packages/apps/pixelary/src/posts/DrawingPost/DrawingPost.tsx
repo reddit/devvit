@@ -1,12 +1,12 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
-import { EditorPage } from '../../components/EditorPage.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
 import type { PostData } from '../../types/PostData.js';
 import { DrawingPostPromptStep } from './DrawingPostPromptStep.js';
 import { DrawingPostResultsStep } from './DrawingPostResultsStep.js';
+import { EditorPage } from '../../components/EditorPage.js';
 
 interface DrawingPostProps {
   data: {
@@ -15,6 +15,7 @@ interface DrawingPostProps {
     activeFlairId: string | undefined;
     currentDictionary: string[];
   };
+  refetch: () => void;
 }
 
 export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Element => {
@@ -52,6 +53,7 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
 
     // If user guessed correctly, move to results step
     if (userGuessedCorrectly) {
+      props.refetch();
       setCurrentStep('Results');
     }
 
@@ -65,6 +67,7 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
   }
 
   function onSkipHandler(): void {
+    props.refetch();
     setCurrentStep('Results');
   }
 

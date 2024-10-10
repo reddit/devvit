@@ -1,15 +1,18 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useAsync } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 
-import { Service } from '../service/Service.js';
-import Settings from '../settings.json';
-import type { PostData } from '../types/PostData.js';
 import { PaginatedDrawings } from './PaginatedDrawings.js';
 import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';
+import Settings from '../settings.json';
+import type { PostData } from '../types/PostData.js';
 
 interface MyDrawingsPageProps {
-  username: string | null;
+  data: {
+    username: string | null;
+  };
+  myDrawings: PostData[] | null;
+  myDrawingsLoading: boolean;
   onClose: () => void;
   onDraw: () => void;
 }
@@ -17,15 +20,7 @@ interface MyDrawingsPageProps {
 export const MyDrawingsPage = (props: MyDrawingsPageProps, context: Context): JSX.Element => {
   const tileSize = 88;
 
-  const { username } = props;
-
-  const { loading, data } = useAsync(
-    async (): Promise<PostData[]> => {
-      const service = new Service(context);
-      return username ? await service.getMyDrawings(username) : [];
-    },
-    { depends: [username] }
-  );
+  const { myDrawings, myDrawingsLoading } = props;
 
   const minWidth = 128;
   const width = Math.max(minWidth, context.dimensions?.width || 0);
@@ -73,15 +68,15 @@ export const MyDrawingsPage = (props: MyDrawingsPageProps, context: Context): JS
       </hstack>
 
       {/* Loading state */}
-      {loading && loadingState}
+      {myDrawingsLoading && loadingState}
 
       {/* Empty state */}
-      {(data?.length === 0 || data === undefined) && emptyState}
+      {(myDrawings?.length === 0 || myDrawings === undefined) && emptyState}
 
       {/* Drawing tiles */}
-      {data && !loading && (
+      {myDrawings && !myDrawingsLoading && (
         <PaginatedDrawings
-          drawings={data}
+          drawings={myDrawings}
           drawingsPerRow={drawingsPerRow}
           tileSize={tileSize}
           ctaButtonEl={
