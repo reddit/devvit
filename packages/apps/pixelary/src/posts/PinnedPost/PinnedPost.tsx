@@ -1,15 +1,15 @@
 import { Devvit, useState } from '@devvit/public-api';
 
+import { EditorPage } from '../../components/EditorPage.js';
+import { HowToPlayPage } from '../../components/HowToPlayPage.js';
+import { LeaderboardPage } from '../../components/LeaderboardPage.js';
+import { MyDrawingsPage } from '../../components/MyDrawingsPage.js';
+import { PixelText } from '../../components/PixelText.js';
+import { StyledButton } from '../../components/StyledButton.js';
+import Settings from '../../settings.json';
+import type { Dictionary } from '../../types/Dictionary.js';
 import type { PostData } from '../../types/PostData.js';
 import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
-import { LeaderboardPage } from '../../components/LeaderboardPage.js';
-import { StyledButton } from '../../components/StyledButton.js';
-import { PixelText } from '../../components/PixelText.js';
-import { HowToPlayPage } from '../../components/HowToPlayPage.js';
-import { EditorPage } from '../../components/EditorPage.js';
-import { MyDrawingsPage } from '../../components/MyDrawingsPage.js';
-import type { Dictionary } from '../../types/Dictionary.js';
-import Settings from '../../settings.json';
 
 interface PinnedPostProps {
   data: {
@@ -65,7 +65,7 @@ export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
       <PixelText scale={4}>Pixelary</PixelText>
 
       {/* Takeover banner */}
-      {isTakeoverActive && (
+      {isTakeoverActive && dictionary?.name ? (
         <>
           <spacer height="16px" />
           <PixelText
@@ -73,7 +73,7 @@ export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
             scale={2}
           >{`${dictionary?.name} takeover`}</PixelText>
         </>
-      )}
+      ) : null}
 
       <spacer grow />
 
