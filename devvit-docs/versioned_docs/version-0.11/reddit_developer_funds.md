@@ -38,6 +38,7 @@ The “Qualified Install” threshold is met when your app exceeds the threshold
 
 ## Program rules
 
+- After you upload your first app (a test app counts!), you'll be sent an onboarding message to let you know you qualify for the program.
 - Apps can only qualify once for each reward tier.
 - Don’t use spam, bots, or other forms of view manipulation, which may result in your disqualification from the program
 - The community comes first. Apps should only be installed where relevant, useful, or enriching
