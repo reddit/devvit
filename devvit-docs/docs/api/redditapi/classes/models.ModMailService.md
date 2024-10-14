@@ -343,11 +343,11 @@ Marks a conversation as read for the user.
 
 #### Parameters
 
-| Name                    | Type     | Description                                          |
-| :---------------------- | :------- | :--------------------------------------------------- |
-| `params`                | `Object` | -                                                    |
-| `params.conversationId` | `string` | Id of a modmail conversation                         |
-| `params.numHours`       | `number` | For how many hous the conversation needs to be muted |
+| Name                    | Type     | Description                                                                                 |
+| :---------------------- | :------- | :------------------------------------------------------------------------------------------ |
+| `params`                | `Object` | -                                                                                           |
+| `params.conversationId` | `string` | Id of a modmail conversation                                                                |
+| `params.numHours`       | `number` | For how many hours the conversation needs to be muted. Must be one of 72, 168, or 672 hours |
 
 #### Returns
 
@@ -356,7 +356,7 @@ Marks a conversation as read for the user.
 **`Example`**
 
 ```ts
-await reddit.modMail.muteConversation({ conversationId: 'abcdef', numHours: 2 });
+await reddit.modMail.muteConversation({ conversationId: 'abcdef', numHours: 72 });
 ```
 
 ---

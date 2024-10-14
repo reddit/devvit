@@ -462,10 +462,10 @@ describe('ModMail API', () => {
       user: getFakeUserData(),
     }));
 
-    const result = await api.reddit.modMail.muteConversation({ conversationId, numHours: 42 });
+    const result = await api.reddit.modMail.muteConversation({ conversationId, numHours: 72 });
 
     expect(result).toMatchSnapshot();
-    expect(spyPlugin).toHaveBeenCalledWith({ conversationId, numHours: 42 }, api.metadata);
+    expect(spyPlugin).toHaveBeenCalledWith({ conversationId, numHours: 72 }, api.metadata);
   });
 
   test('unmuteConversation()', async () => {

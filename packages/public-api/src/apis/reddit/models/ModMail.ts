@@ -701,7 +701,7 @@ export class ModMailService {
    */
   async muteConversation(params: {
     conversationId: string;
-    numHours: number;
+    numHours: 72 | 168 | 672;
   }): Promise<ConversationResponse & WithUserData> {
     const client = Devvit.redditAPIPlugins.NewModmail;
 
