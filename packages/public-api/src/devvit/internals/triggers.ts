@@ -3,6 +3,8 @@ import {
   HandlerResult,
   OnAppInstallDefinition,
   OnAppUpgradeDefinition,
+  OnAutomoderatorFilterCommentDefinition,
+  OnAutomoderatorFilterPostDefinition,
   OnCommentCreateDefinition,
   OnCommentDeleteDefinition,
   OnCommentReportDefinition,
@@ -180,6 +182,23 @@ export function registerTriggers(config: Config): void {
         extendDevvitPrototype(
           'OnPostSpoilerUpdate',
           createCombinedHandler('PostSpoilerUpdate', Devvit.triggerOnEventHandlers.get(event))
+        );
+        break;
+      case 'AutomoderatorFilterPost':
+        config.provides(OnAutomoderatorFilterPostDefinition);
+        extendDevvitPrototype(
+          'OnAutomoderatorFilterPost',
+          createCombinedHandler('AutomoderatorFilterPost', Devvit.triggerOnEventHandlers.get(event))
+        );
+        break;
+      case 'AutomoderatorFilterComment':
+        config.provides(OnAutomoderatorFilterCommentDefinition);
+        extendDevvitPrototype(
+          'OnAutomoderatorFilterComment',
+          createCombinedHandler(
+            'AutomoderatorFilterComment',
+            Devvit.triggerOnEventHandlers.get(event)
+          )
         );
         break;
 

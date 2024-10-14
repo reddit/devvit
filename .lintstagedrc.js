@@ -1,5 +1,8 @@
 module.exports = {
-  '*.{cjs,js,jsx,mjs,cts,mts,ts,tsx}': [`npx yarn exec redlint --fix`, 'prettier --write'],
+  '!(packages/protos/src/types/**/*).{cjs,js,jsx,mjs,cts,mts,ts,tsx}': [
+    `npx yarn exec redlint --fix`,
+    'prettier --write',
+  ],
   // Note the md for running prettier markdown files!
   // https://prettier.io/blog/2017/11/07/1.8.0.html
   '*devvit-docs/**/*.{md,cjs,js,jsx,mjs,cts,mts,ts,tsx}': ['prettier --write'],

@@ -36,6 +36,10 @@ export type ModMailTrigger = 'ModMail';
 export type PostNsfwUpdate = 'PostNsfwUpdate';
 /** The event name for when a post is marked/unmarked as spoiler*/
 export type PostSpoilerUpdate = 'PostSpoilerUpdate';
+/** The event name for when a post is filtered by automoderator */
+export type AutomoderatorFilterPost = 'AutomoderatorFilterPost';
+/** The event name for when a comment is filtered by automoderator */
+export type AutomoderatorFilterComment = 'AutomoderatorFilterComment';
 
 /** Maps a TriggerEvent to a Protobuf message and type. */
 export type TriggerEventType = {
@@ -56,6 +60,10 @@ export type TriggerEventType = {
   ModMail: { type: 'ModMail' } & protos.ModMail;
   PostNsfwUpdate: { type: 'PostNsfwUpdate' } & protos.PostNsfwUpdate;
   PostSpoilerUpdate: { type: 'PostSpoilerUpdate' } & protos.PostSpoilerUpdate;
+  AutomoderatorFilterPost: { type: 'AutomoderatorFilterPost' } & protos.AutomoderatorFilterPost;
+  AutomoderatorFilterComment: {
+    type: 'AutomoderatorFilterComment';
+  } & protos.AutomoderatorFilterComment;
 };
 
 export type TriggerEvent =
@@ -75,7 +83,9 @@ export type TriggerEvent =
   | ModActionTrigger
   | ModMailTrigger
   | PostNsfwUpdate
-  | PostSpoilerUpdate;
+  | PostSpoilerUpdate
+  | AutomoderatorFilterPost
+  | AutomoderatorFilterComment;
 
 type TriggerResult = Promise<void> | void;
 
@@ -171,6 +181,16 @@ export type PostSpoilerUpdateDefinition = {
   onEvent: TriggerOnEventHandler<protos.PostSpoilerUpdate>;
 };
 
+export type OnAutomoderatorFilterPostDefinition = {
+  event: AutomoderatorFilterPost;
+  onEvent: TriggerOnEventHandler<protos.AutomoderatorFilterPost>;
+};
+
+export type OnAutomoderatorFilterCommentDefinition = {
+  event: AutomoderatorFilterComment;
+  onEvent: TriggerOnEventHandler<protos.AutomoderatorFilterComment>;
+};
+
 export type MultiTriggerDefinition<Event extends TriggerEvent> = {
   events: readonly Event[];
   onEvent: TriggerOnEventHandler<TriggerEventType[Event]>;
@@ -193,7 +213,9 @@ export type TriggerDefinition =
   | ModActionDefinition
   | ModMailDefinition
   | PostSpoilerUpdateDefinition
-  | PostNsfwUpdateDefinition;
+  | PostNsfwUpdateDefinition
+  | OnAutomoderatorFilterPostDefinition
+  | OnAutomoderatorFilterCommentDefinition;
 
 export type OnTriggerRequest =
   | protos.PostFlairUpdate
@@ -212,4 +234,6 @@ export type OnTriggerRequest =
   | protos.ModAction
   | protos.ModMail
   | protos.PostNsfwUpdate
-  | protos.PostSpoilerUpdate;
+  | protos.PostSpoilerUpdate
+  | protos.AutomoderatorFilterPost
+  | protos.AutomoderatorFilterComment;
