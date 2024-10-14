@@ -435,6 +435,8 @@ export type TxClientLike = {
   /**
    * Returns the specified range of elements in the sorted set stored at key.
    * https://redis.io/commands/zrange/
+   *
+   * When using `by: 'lex'`, the start and stop inputs will be prepended with `[` by default, unless they already begin with `[`, `(` or are one of the special values `+` or `-`.
    * @arg {} key
    * @arg {} start
    * @arg {} stop
@@ -1119,6 +1121,8 @@ export type RedisClient = {
   /**
    * Returns the specified range of elements in the sorted set stored at key.
    * https://redis.io/commands/zrange/
+   *
+   * When using `by: 'lex'`, the start and stop inputs will be prepended with `[` by default, unless they already begin with `[`, `(` or are one of the special values `+` or `-`.
    * @arg {} key
    * @arg {} start
    * @arg {} stop
