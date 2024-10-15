@@ -1131,8 +1131,10 @@ async function createModmailConversation(
     metadata
   );
 
-  if (response.ok) {
+  if (response.data?.createModmailConversationV2?.ok) {
     return response.data?.createModmailConversationV2?.conversationId;
   }
-  throw new Error('mod discussion conversation creation failed; ${response.errors[0].message}');
+  throw new Error(
+    'modmail conversation creation failed; ${response.data?.createModmailConversationV2?.errors[0].message}'
+  );
 }
