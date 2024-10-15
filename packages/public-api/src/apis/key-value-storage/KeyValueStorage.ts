@@ -17,7 +17,7 @@ export class KeyValueStorage implements KVStore {
       if (messages[key]) {
         return JSON.parse(messages[key]);
       }
-    } catch (e) {
+    } catch {
       return undefined;
     }
 

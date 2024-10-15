@@ -270,7 +270,7 @@ describe('cache works functionality', () => {
     const getSafe = async (): Promise<number | undefined> => {
       try {
         return await get();
-      } catch (error) {
+      } catch {
         // no-op
       }
     };
@@ -324,7 +324,7 @@ describe('cache works functionality', () => {
     const getSafe = async (): Promise<number | undefined> => {
       try {
         return await get();
-      } catch (error) {
+      } catch {
         // no-op
       }
     };
@@ -382,7 +382,7 @@ describe('cache works functionality', () => {
     const getSafe = async (): Promise<number | undefined> => {
       try {
         return await get();
-      } catch (error) {
+      } catch {
         // no-op
       }
     };

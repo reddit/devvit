@@ -48,7 +48,7 @@ export class Listing<T> {
   #before?: string;
   #after?: string;
   #more?: MoreObject;
-  #started: Boolean = false;
+  #started: boolean = false;
 
   pageSize: number = DEFAULT_PAGE_SIZE;
   limit: number = DEFAULT_LIMIT;

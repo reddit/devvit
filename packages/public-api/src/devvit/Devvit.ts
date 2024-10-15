@@ -706,12 +706,12 @@ export namespace Devvit {
   // Generic createElement to handle Blocks, custom elements, etc...
   export function createElement(
     type: Blocks.IntrinsicElementsType,
-    props: {} | undefined,
+    props: { [key: string]: unknown } | undefined,
     ...children: JSX.Children[]
   ): BlockElement;
   export function createElement(
     type: JSX.ComponentFunction | string | undefined,
-    props: {} | undefined,
+    props: { [key: string]: unknown } | undefined,
     ...children: JSX.Children[]
   ): ComponentFunctionValue | Promise<ComponentFunctionValue> {
     const blockElement: BlockElement = {
@@ -728,8 +728,8 @@ export namespace Devvit {
   /** The current app context of the event or render. */
   export type Context = ContextAPIClients & BaseContext;
 
-  export type BlockComponentProps<P = {}> = P & { children?: JSX.Children };
-  export type BlockComponent<P = {}> = (
+  export type BlockComponentProps<P = { [key: string]: unknown }> = P & { children?: JSX.Children };
+  export type BlockComponent<P = { [key: string]: unknown }> = (
     props: BlockComponentProps<P>,
     context: Context
   ) => JSX.Element;

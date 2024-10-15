@@ -1,4 +1,4 @@
-export function makeGettersEnumerable(obj: Object): void {
+export function makeGettersEnumerable(obj: object): void {
   // Get a list of all the properties on this class's constructor.
   const descriptors = Object.getOwnPropertyDescriptors(obj.constructor.prototype);
   // For each property on the constructor...

@@ -65,7 +65,7 @@ export default class BundleActor extends ProjectCommand {
       if (token) {
         username = await this.getUserDisplayName(token);
       }
-    } catch (err) {
+    } catch {
       // Username is unavailable.
     }
 

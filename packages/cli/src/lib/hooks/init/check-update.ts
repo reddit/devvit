@@ -29,7 +29,7 @@ const hook: Hook<'init'> = async function (options) {
     ux.action.start('Checking for updates...');
     latest = await fetchLatestPublishedVersion();
     ux.action.stop('✅');
-  } catch (e) {
+  } catch {
     this.warn(
       'There was an error checking for devvit updates. The command will proceed, but you may be using an outdated version.'
     );

@@ -38,24 +38,6 @@ export type UserNoteLabel =
   | 'SOLID_CONTRIBUTOR'
   | 'HELPFUL_USER';
 
-function validateUserNoteLabel(str: string): str is UserNoteLabel {
-  try {
-    str as UserNoteLabel;
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function validateModNoteType(str: string): str is ModNoteType {
-  try {
-    str as ModNoteType;
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export type UserNote = {
   note?: string;
   redditId?: T1ID | T3ID | T5ID;
@@ -118,14 +100,6 @@ export class ModNote {
     assertNonNull(protoModNote.userId, 'Mod note userId is null or undefined');
     assertNonNull(protoModNote.userNoteData, 'Mod note userNote is null or undefined');
     assertNonNull(protoModNote.modActionData, 'Mod note modAction is null or undefined');
-
-    // check that userNoteData label is valid
-    if (!validateUserNoteLabel(protoModNote.userNoteData?.label ?? '')) {
-      throw new Error(`Invalid user note label: ${protoModNote.userNoteData?.label}`);
-    }
-    if (!validateModNoteType(protoModNote.type)) {
-      throw new Error(`Invalid mod note type: ${protoModNote.type}`);
-    }
 
     return {
       id: protoModNote.id,

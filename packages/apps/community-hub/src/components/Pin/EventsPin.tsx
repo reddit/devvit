@@ -273,10 +273,7 @@ export const EventsPin = ({
     const { reddit } = context;
     const admin = await (await reddit.getCurrentUser())?.username;
     if (!admin) return;
-    const text = `${subscribers.map((i) => {
-      `* ${i}  
-`;
-    })}`;
+    const text = `${subscribers.map((i) => '* ${i}\n').join('')}`;
     await reddit.sendPrivateMessage({
       to: admin,
       subject: `${title} Attendees`,

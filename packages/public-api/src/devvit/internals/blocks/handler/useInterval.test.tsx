@@ -73,7 +73,8 @@ const component: Devvit.BlockComponent = () => {
       </text>
       <button
         onPress={captureHookRef(() => {
-          interval.start(), intervalAgain.start();
+          interval.start();
+          intervalAgain.start();
         }, startRef)}
       >
         Start

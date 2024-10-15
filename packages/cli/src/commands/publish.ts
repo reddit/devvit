@@ -213,7 +213,7 @@ export default class Publish extends ProjectCommand {
     if (await readLine()) {
       try {
         await open(url);
-      } catch (_err) {
+      } catch {
         this.error(`An error occurred when opening the URL: ${url}`);
       }
     }

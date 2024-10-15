@@ -179,6 +179,7 @@ export class BlocksReconciler implements EffectEmitter {
   renderState: RenderState = {};
   currentComponentKey: string[] = [];
   currentHookIndex: number = 0;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   actions: Map<string, Function> = new Map();
   forms: Map<FormKey, Form | FormFunction> = new Map();
   realtimeChannels: string[] = [];
@@ -362,6 +363,7 @@ export class BlocksReconciler implements EffectEmitter {
     const actionHandlers = ['onPress', 'onMessage'];
     for (const action of actionHandlers) {
       if (action in props) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
         const handler = props[action] as Function;
         const name = handler?.name;
         const id = this.makeUniqueActionID(`${block.type}.${name ?? action}`);

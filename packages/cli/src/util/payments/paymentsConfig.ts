@@ -65,7 +65,7 @@ function checkProductsConfig(
       );
     }
 
-    const missingAssets: String[] = [];
+    const missingAssets: string[] = [];
     if (verifyProductImgAssets) {
       // check that all product images are included in the assets
       const assets = Object.keys(bundle.assetIds);

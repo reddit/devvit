@@ -744,7 +744,7 @@ describe('BlocksHandler', () => {
           </hstack>
         );
       };
-      0;
+
       const handler = new BlocksHandler(component);
       for (let attempts = 0; attempts < 10; attempts++) {
         await handler.handle(EmptyRequest, mockMetadata);
