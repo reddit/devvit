@@ -5,6 +5,7 @@ import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.j
 import { describe, expect, test, vi } from 'vitest';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import { GraphQL } from '../graphql/GraphQL.js';
 import { Post } from '../models/Post.js';
 import { createPreview } from './utils/createTestPreview.js';
 import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
@@ -320,6 +321,46 @@ describe('Post API', () => {
           metadata
         );
       });
+    });
+  });
+
+  describe('setSuggestedCommentSort()', () => {
+    test('sets custom post preview', async () => {
+      const { metadata } = createTestRedditApiClient();
+      const selftext =
+        '# DX_Bundle:\n\n    Gm85Mzk0OTZkZi00NDBmLTQ1NDUtOTFiNC02MjM0ODczNThlODUudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYiuAQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErEBCjgvZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdBIKUmVuZGVyUG9zdCozZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLlJlbmRlclBvc3RSZXF1ZXN0MjRkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlc3BvbnNlEqEBCj8vZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdENvbnRlbnQSEVJlbmRlclBvc3RDb250ZW50KiRkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlcXVlc3QyJWRldnZpdC51aS5ibG9ja19raXQudjFiZXRhLlVJUmVzcG9uc2USowEKQC9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC9SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuIBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpgEKNi9kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXIvSGFuZGxlVUlFdmVudBINSGFuZGxlVUlFdmVudCotZGV2dml0LnVpLmV2ZW50cy52MWFscGhhLkhhbmRsZVVJRXZlbnRSZXF1ZXN0Mi5kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlc3BvbnNlGg5VSUV2ZW50SGFuZGxlcjJQEg4KBG5vZGUSBjIyLjUuMRIcCg5AZGV2dml0L3Byb3RvcxIKMC4xMS4xLWRldhIgChJAZGV2dml0L3B1YmxpYy1hcGkSCjAuMTEuMS1kZXY=\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkUKQwo+CAEqEhIHCgUNAADIQhoHCgUNAADIQhomEiQIAhIaCAIaFhoUChBBIGN1c3RvbSBwb3N0ISEhWAEiBAgBEAEQwAI=\n\n# DX_RichtextFallback:\n\n    This is a text fallback';
+
+      const mockedPost = new Post({ ...defaultPostData, selftext }, metadata);
+
+      const spyPlugin = vi.spyOn(GraphQL, 'query');
+      spyPlugin.mockImplementationOnce(async () => ({
+        data: {
+          setSuggestedSort: {
+            ok: true,
+          },
+        },
+        errors: [],
+      }));
+
+      await mockedPost.setSuggestedCommentSort('NEW');
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        'SetSuggestedSort',
+        'cf6052acc7fefaa65b710625b81dba8041f258313aafe9730e2a3dc855e5d10d',
+        {
+          postId: 't3_qwerty',
+          subredditId: 't5_abcdef',
+          sort: 'NEW',
+        },
+        {
+          'devvit-app-user': {
+            values: ['t2_appuser'],
+          },
+          'devvit-subreddit': {
+            values: ['t5_0'],
+          },
+        }
+      );
     });
   });
 });

@@ -14,6 +14,7 @@ import { fromByteArray } from 'base64-js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
 import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
+import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
@@ -136,6 +137,22 @@ export type GetPostsByUserOptions = {
   after?: string;
   before?: string;
 };
+
+export type PostSuggestedCommentSort =
+  | 'BLANK'
+  /** "Best" sort. */
+  | 'CONFIDENCE'
+  | 'CONTROVERSIAL'
+  | 'LIVE'
+  /** Sort comments by creation time. */
+  | 'NEW'
+  | 'OLD'
+  /** Similar to the "best" (confidence) sort, but specially designed for
+    Q&A-type threads to highlight good question/answer pairs. */
+  | 'QA'
+  | 'RANDOM'
+  /** Sort by top upvoted comments. */
+  | 'TOP';
 
 export type PostTextOptions =
   | {
@@ -781,6 +798,18 @@ export class Post {
     this.#edited = newPost.edited;
   }
 
+  /**
+   * Set the suggested sort for comments on a Post.
+   *
+   * @throws {Error} Throws an error if the suggested sort could not be set.
+   */
+  async setSuggestedCommentSort(suggestedSort: PostSuggestedCommentSort): Promise<void> {
+    await Post.setSuggestedCommentSort(
+      { id: this.id, subredditId: this.#subredditId, suggestedSort },
+      this.#metadata
+    );
+  }
+
   async setTextFallback(options: CustomPostTextFallbackOptions): Promise<void> {
     const newPost = await Post.setTextFallback(options, this.id, this.#metadata);
 
@@ -1055,6 +1084,29 @@ export class Post {
     // The LinksAndComments.EditUserText response is wrong and assumes that
     // the API is only used to for comments so we fetch the new post here.
     return Post.getById(id, metadata);
+  }
+
+  /** @internal */
+  static async setSuggestedCommentSort(
+    options: { suggestedSort: PostSuggestedCommentSort; id: T3ID; subredditId: T5ID },
+    metadata: Metadata | undefined
+  ): Promise<void> {
+    const operationName = 'SetSuggestedSort';
+    const persistedQueryHash = 'cf6052acc7fefaa65b710625b81dba8041f258313aafe9730e2a3dc855e5d10d';
+    const response = await GraphQL.query(
+      operationName,
+      persistedQueryHash,
+      {
+        subredditId: options.subredditId,
+        postId: options.id,
+        sort: options.suggestedSort,
+      },
+      metadata
+    );
+
+    if (!response.data?.setSuggestedSort?.ok) {
+      throw new Error('Failed to set suggested sort');
+    }
   }
 
   /** @internal */
