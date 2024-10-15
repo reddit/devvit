@@ -32,8 +32,7 @@ import { filter, map, merge, retry } from 'rxjs';
 
 import Upload from '../commands/upload.js';
 import { REDDIT_DESKTOP } from '../lib/config.js';
-import { fetchSubredditSubscriberCount } from '../lib/http/gql.js';
-import { isCurrentUserEmployee } from '../lib/http/gql.js';
+import { fetchSubredditSubscriberCount, isCurrentUserEmployee } from '../lib/http/gql.js';
 import { PlaytestServer } from '../lib/playtest-server.js';
 import type { CommandFlags } from '../lib/types/oclif.js';
 import { AppLogObserver } from '../util/app-logs/app-log-observer.js';
@@ -58,24 +57,14 @@ export default class Playtest extends Upload {
 
   static override get flags(): FlagInput {
     return {
-      connect: Flags.boolean({
-        // to-do: DX-4706 enable.
-        default: false,
-        description: 'Connect to local runtime.',
-        // to-do: DX-4706 delete.
-        hidden: true,
-      }),
+      connect: Flags.boolean({ default: true, description: 'Connect to local runtime.' }),
       'log-runtime': Flags.boolean({
         description:
           'Include executing runtime in logs. Remote logs originate from apps running on Reddit servers, local logs originate from your browser.',
-        // to-do: DX-4706 delete.
-        hidden: true,
       }),
       // to-do: delete. This only exists in case users dislike live-reload.
       'no-live-reload': Flags.boolean({
         description: 'Attempt to reload the subreddit being browsed automatically.',
-        // to-do: DX-4706 delete.
-        hidden: true,
       }),
       verbose: Flags.boolean({ default: false }),
       'employee-update': Flags.boolean({

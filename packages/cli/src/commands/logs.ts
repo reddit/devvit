@@ -55,13 +55,7 @@ export default class Logs extends DevvitCommand {
   };
 
   static override flags = {
-    connect: Flags.boolean({
-      // to-do: DX-4706 enable.
-      default: false,
-      description: 'Connect to local runtime.',
-      // to-do: DX-4706 delete.
-      hidden: true,
-    }),
+    connect: Flags.boolean({ default: true, description: 'Connect to local runtime.' }),
     dateformat: Flags.string({
       char: 'd',
       description:
@@ -76,8 +70,6 @@ export default class Logs extends DevvitCommand {
     'log-runtime': Flags.boolean({
       description:
         'Include executing runtime in logs. Remote logs originate from apps running on Reddit servers, local logs originate from your browser.',
-      // to-do: DX-4706 delete.
-      hidden: true,
     }),
     showKeepAlive: Flags.boolean({
       default: false,

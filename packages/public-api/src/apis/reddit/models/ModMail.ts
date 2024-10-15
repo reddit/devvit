@@ -1,11 +1,14 @@
-import type {
-  ConversationData as ProtosConversationData,
-  MessageData as ProtosMessageData,
-  Metadata,
-  ModActionData as ProtosModActionData,
+import {
+  type ConversationData as ProtosConversationData,
+  type MessageData as ProtosMessageData,
+  type Metadata,
+  type ModActionData as ProtosModActionData,
 } from '@devvit/protos';
+import { Header } from '@devvit/shared-types/Header.js';
+import type { T5ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import { GraphQL } from '../graphql/GraphQL.js';
 
 export type SubredditData = {
   id?: string;
@@ -482,6 +485,7 @@ export class ModMailService {
    * In this way to is a bit of a misnomer in modmail conversations.
    * What it really means is the participant of the conversation who is not a mod of the subreddit.
    *
+   * @deprecated Use {@link ModMailService.createModDiscussionConversation} or {@link ModMailService.createModInboxConversation} instead.
    * @param params.body markdown text
    * @param params.isAuthorHidden is author hidden? (default: false)
    * @param params.subredditName subreddit name
@@ -526,6 +530,76 @@ export class ModMailService {
       }),
       user: response.user,
     };
+  }
+
+  /**
+   * Creates a conversation in Mod Discussions with the moderators of the given subredditId.
+   *
+   * Note: The app must be installed in the subreddit in order to create a conversation in Mod Discussions.
+   *
+   * @param subject - The subject of the message.
+   * @param bodyMarkdown - The body of the message in markdown format, e.g. `Hello world \n\n **Have a great day**`.
+   * @param subredditId - The ID (starting with `t5_`) of the subreddit to which to send the message, e.g. `t5_2qjpg`.
+   * @returns A Promise that resolves a string representing the conversationId of the message.
+   * @example
+   * ```ts
+   * const conversationId = await reddit.modMail.createModDiscussionConversation({
+   *   subject: 'Test conversation',
+   *   bodyMarkdown: '**Hello there** \n\n _Have a great day!_',
+   *   subredditId: asT5ID(context.subredditId)
+   * });
+   * ```
+   */
+  async createModDiscussionConversation(params: {
+    subject: string;
+    bodyMarkdown: string;
+    subredditId: T5ID;
+  }): Promise<string> {
+    return createModmailConversation(
+      {
+        subject: params.subject,
+        bodyMarkdown: params.bodyMarkdown,
+        subredditId: params.subredditId,
+        isInternal: true,
+        participantType: 'MODERATOR',
+        conversationType: 'INTERNAL',
+      },
+      this.#metadata
+    );
+  }
+
+  /**
+   * Creates a conversation in the Modmail Inbox with the moderators of the given subredditId.
+   *
+   * @param subject - The subject of the message.
+   * @param bodyMarkdown - The body of the message in markdown format, e.g. `Hello world \n\n **Have a great day**`.
+   * @param subredditId - The ID (starting with `t5_`) of the subreddit to which to send the message, e.g. `t5_2qjpg`.
+   * @returns A Promise that resolves a string representing the conversationId of the message.
+   * @example
+   * ```ts
+   * const conversationId = await reddit.modMail.createModInboxConversation({
+   *   subject: 'Test conversation',
+   *   bodyMarkdown: '**Hello there** \n\n _Have a great day!_',
+   *   subredditId: asT5ID(context.subredditId)
+   * });
+   * ```
+   */
+  async createModInboxConversation(params: {
+    subject: string;
+    bodyMarkdown: string;
+    subredditId: T5ID;
+  }): Promise<string> {
+    return createModmailConversation(
+      {
+        subject: params.subject,
+        bodyMarkdown: params.bodyMarkdown,
+        subredditId: params.subredditId,
+        isInternal: false,
+        participantType: 'PARTICIPANT_USER',
+        conversationType: 'SR_USER',
+      },
+      this.#metadata
+    );
   }
 
   /**
@@ -1014,4 +1088,51 @@ export class ModMailService {
 
     return modActions;
   }
+}
+
+/**
+ * Creates a Modmail conversation with the moderators of the given subredditId.
+ * @internal
+ * @param subject - The subject of the message.
+ * @param bodyMarkdown - The body of the message in markdown format, e.g. `Hello world \n\n **Have a great day**`.
+ * @param subredditId - The ID (starting with `t5_`) of the subreddit to which to send the message, e.g. `t5_2qjpg`.
+ * @param isInternal - Indicates if the conversation should be internal or not.
+ * @param participantType - The type of participant the author is in the conversation.
+ * @param conversationType - The type of conversation to create.
+ * @returns A Promise that resolves a string representing the conversationId of the message.
+ */
+async function createModmailConversation(
+  params: {
+    subject: string;
+    bodyMarkdown: string;
+    subredditId: T5ID;
+    isInternal: boolean;
+    participantType: string;
+    conversationType: string;
+  },
+  metadata: Metadata
+): Promise<string> {
+  const appUserId = metadata[Header.AppUser]?.values[0];
+
+  const operationName = 'CreateModmailConversation';
+  const persistedQueryHash = '5f9ae20b0c7bdffcafb80241728a72e67cd4239bc09f67284b79d4aa706ee0e5';
+  const response = await GraphQL.query(
+    operationName,
+    persistedQueryHash,
+    {
+      subject: params.subject,
+      bodyMarkdown: params.bodyMarkdown,
+      subredditId: params.subredditId,
+      authorId: appUserId,
+      isInternal: params.isInternal,
+      participantType: params.participantType,
+      conversationType: params.conversationType,
+    },
+    metadata
+  );
+
+  if (response.ok) {
+    return response.data?.createModmailConversationV2?.conversationId;
+  }
+  throw new Error('mod discussion conversation creation failed; ${response.errors[0].message}');
 }

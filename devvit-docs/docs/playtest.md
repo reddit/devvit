@@ -10,12 +10,12 @@ One caveat: your test subreddit cannot have more than 50 subscribers. Once insta
 2. Open a terminal and enter this command from the root of your project.
 
 ```bash
-$ devvit playtest <test-subreddit-name>
+$ devvit playtest <test subreddit name>
 ```
 
 Once you start a playtest session, a new pre-release version of your app is automatically created and installed on your test subreddit. The pre-release version has a fourth decimal place, so if your current app is 0.0.1, the first pre-release version will be 0.0.1.1.
 
-The pre-release version is updated and uploaded to your test subreddit every time you save your app code. You’ll need to refresh your subreddit to see the updated app. This may take a couple of seconds, so be patient.
+The pre-release version is updated and uploaded to your test subreddit every time you save your app code. You'll be prompted to visit your subreddit URL like `https://www.reddit.com/r/<test subreddit name>/?playtest=<app name>`. If you have an experience post and your URL includes a `playtest=<app name>` or `playtest` query parameter, it will automatically refresh when the new version has been installed. If not, you’ll need to refresh your subreddit to see the updated app. This may take a couple of seconds, so be patient.
 
 :::note
 If you need help, run `devvit playtest —-help` for additional information.
