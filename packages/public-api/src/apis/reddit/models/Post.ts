@@ -166,6 +166,9 @@ export type CustomPostRichTextFallback = RichTextBuilder | string;
 
 export type CustomPostTextFallbackOptions =
   | {
+      /**
+       * May also include markdown. See https://www.reddit.com/r/reddit.com/wiki/markdown/
+       */
       text: string;
     }
   | {

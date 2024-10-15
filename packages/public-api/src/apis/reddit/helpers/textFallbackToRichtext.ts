@@ -7,15 +7,8 @@ export const getCustomPostRichTextFallback = (
   textFallbackOptions: CustomPostTextFallbackOptions
 ): string =>
   'text' in textFallbackOptions
-    ? textToTextFallbackString(textFallbackOptions.text)
+    ? textFallbackOptions.text
     : richTextToTextFallbackString(textFallbackOptions.richtext);
-
-const textToTextFallbackString = (textFallback: string): string =>
-  new RichTextBuilder()
-    .paragraph((p) => {
-      p.text({ text: textFallback });
-    })
-    .build();
 
 const richTextToTextFallbackString = (textFallback: CustomPostRichTextFallback): string => {
   if (textFallback instanceof RichTextBuilder) {
