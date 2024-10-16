@@ -323,6 +323,7 @@ export type GetConversationsResponse = {
  */
 export class ModMailService {
   readonly #metadata: Metadata;
+  readonly notificationSubjectPrefix = '[notification]';
 
   /**
    * @internal
@@ -592,6 +593,47 @@ export class ModMailService {
     return createModmailConversation(
       {
         subject: params.subject,
+        bodyMarkdown: params.bodyMarkdown,
+        subredditId: params.subredditId,
+        isInternal: false,
+        participantType: 'PARTICIPANT_USER',
+        conversationType: 'SR_USER',
+      },
+      this.#metadata
+    );
+  }
+
+  /**
+   * Creates a notification in the Modmail Inbox.
+   * This function is different from {@link ModMailService.createModInboxConversation} in that the conversation also appears in the "Notifications" section of Modmail.
+   *
+   * @param subject - The subject of the message.
+   * @param bodyMarkdown - The body of the message in markdown format, e.g. `Hello world \n\n **Have a great day**`.
+   * @param subredditId - The ID (starting with `t5_`) of the subreddit to which to send the message, e.g. `t5_2qjpg`.
+   * @returns A Promise that resolves a string representing the conversationId of the message.
+   * @example
+   * ```ts
+   * const conversationId = await reddit.modMail.createModNotification({
+   *   subject: 'Test notification',
+   *   bodyMarkdown: '**Hello there** \n\n _This is a notification!_',
+   *   subredditId: asT5ID(context.subredditId)
+   * });
+   * ```
+   */
+  async createModNotification(params: {
+    subject: string;
+    bodyMarkdown: string;
+    subredditId: T5ID;
+  }): Promise<string> {
+    let notificationSubject = params.subject;
+
+    if (!params.subject.startsWith(this.notificationSubjectPrefix)) {
+      notificationSubject = `${this.notificationSubjectPrefix} ${params.subject}`;
+    }
+
+    return createModmailConversation(
+      {
+        subject: notificationSubject,
         bodyMarkdown: params.bodyMarkdown,
         subredditId: params.subredditId,
         isInternal: false,
