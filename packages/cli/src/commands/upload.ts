@@ -4,6 +4,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 
 import type {
+  AppInfo,
   AppVersionInfo,
   Categories,
   MediaSignature,
@@ -12,7 +13,6 @@ import type {
 import {
   AppCapability,
   AppCreationRequest,
-  AppVersionCreationRequest,
   FullAppInfo,
   InstallationType,
   UploadNewMediaRequest,
@@ -196,7 +196,7 @@ export default class Upload extends ProjectCommand {
       // If we're creating a new app, or if we couldn't find the app
       // bundle the app now, to ensure it builds before we potentially create an app
       ux.action.start('Verifying app builds...');
-      await this.bundleActors(username, projectConfig.version, !flags.disableTypecheck);
+      await this.#bundleActors(username, projectConfig.version, !flags.disableTypecheck);
       ux.action.stop('✅');
       didVerificationBuild = true;
 
@@ -207,15 +207,19 @@ export default class Upload extends ProjectCommand {
       this.#event.devplatform.app_name = appInfo.app?.name;
     }
 
+    if (!appInfo.app) {
+      this.error(`App ${appName} is not found`);
+    }
+
     // Now, create a new version, probably prompting for the new version number
     const version = await this.getNextVersion(appInfo, flags.bump, !flags.justDoIt);
     this.#event.devplatform.app_version_number = version.toString();
     ux.action.start(didVerificationBuild ? 'Rebuilding for first upload...' : 'Building...');
-    const bundles = await this.bundleActors(username, version.toString(), !flags.disableTypecheck);
+    const bundles = await this.#bundleActors(username, version.toString(), !flags.disableTypecheck);
     ux.action.stop('✅');
 
     try {
-      await this.createVersion(appInfo, version, bundles, VersionVisibility.PRIVATE);
+      await this.createVersion(appInfo.app, version, bundles, VersionVisibility.PRIVATE);
     } catch (err) {
       if (err instanceof Error) {
         this.error(err);
@@ -397,7 +401,7 @@ export default class Upload extends ProjectCommand {
       appVersion.bumpVersion(bump);
     } else {
       // Automatically bump the version
-      const latestStoredVersion = this.getLatestPublishedVersion(appInfo.versions);
+      const latestStoredVersion = this.#getLatestPublishedVersion(appInfo.versions);
       if (appVersion.isEqual(latestStoredVersion)) {
         appVersion.bumpVersion(VersionBumpType.Patch);
         this.log('Automatically bumped app version to:', appVersion.toString());
@@ -412,7 +416,7 @@ export default class Upload extends ProjectCommand {
   }
 
   async createVersion(
-    appInfo: FullAppInfo,
+    app: AppInfo,
     appVersion: DevvitVersion,
     bundles: Bundle[],
     visibility: VersionVisibility
@@ -435,7 +439,7 @@ export default class Upload extends ProjectCommand {
 
     // Sync and upload assets
     const { assetMap, webViewAssetMap } = await this.#syncAssets(
-      appInfo.app?.capabilities.includes(AppCapability.WEBVIEW)
+      app.capabilities.includes(AppCapability.WEBVIEW)
     );
 
     // Dump these in the assets fields of the bundles
@@ -456,22 +460,20 @@ export default class Upload extends ProjectCommand {
       }
     }
 
-    // Actually create the app version
-    const appVersionCreationRequest = AppVersionCreationRequest.fromPartial({
-      appId: appInfo.app?.id ?? '',
-      visibility,
-      about,
-      validInstallTypes: [InstallationType.SUBREDDIT], // TODO: Once we have user/global installs, we'll need to ask about this.
-      majorVersion: appVersion.major,
-      minorVersion: appVersion.minor,
-      patchVersion: appVersion.patch,
-      prereleaseVersion: appVersion.prerelease,
-      actorBundles: bundles,
-    });
-
     ux.action.start(`Uploading new version "${appVersion.toString()}" to Reddit...`);
     try {
-      const appVersionInfo = await this.appVersionClient.Create(appVersionCreationRequest);
+      // Actually create the app version
+      const appVersionInfo = await this.appVersionClient.Create({
+        appId: app.id,
+        visibility,
+        about,
+        validInstallTypes: [InstallationType.SUBREDDIT], // TODO: Once we have user/global installs, we'll need to ask about this.
+        majorVersion: appVersion.major,
+        minorVersion: appVersion.minor,
+        patchVersion: appVersion.patch,
+        prereleaseVersion: appVersion.prerelease,
+        actorBundles: bundles,
+      });
       ux.action.stop(`✅`);
 
       return appVersionInfo;
@@ -480,7 +482,7 @@ export default class Upload extends ProjectCommand {
     }
   }
 
-  async bundleActors(
+  async #bundleActors(
     username: string,
     version: string,
     typecheck: boolean = true
@@ -500,7 +502,7 @@ export default class Upload extends ProjectCommand {
     }
   }
 
-  getLatestPublishedVersion(versions: AppVersionInfo[]): DevvitVersion {
+  #getLatestPublishedVersion(versions: AppVersionInfo[]): DevvitVersion {
     const versionsSorted = versions
       .map(
         (v) =>
@@ -515,7 +517,7 @@ export default class Upload extends ProjectCommand {
     appInfo: FullAppInfo,
     justDoIt: boolean | undefined
   ): Promise<DevvitVersion> {
-    const latestStoredVersion = this.getLatestPublishedVersion(appInfo.versions);
+    const latestStoredVersion = this.#getLatestPublishedVersion(appInfo.versions);
     const devvitYamlVersion = DevvitVersion.fromString((await this.getProjectConfig()).version);
 
     if (!latestStoredVersion.isEqual(devvitYamlVersion)) {
@@ -702,24 +704,6 @@ export default class Upload extends ProjectCommand {
     }, {});
   }
 
-  async #getAssetStatuses(
-    assets: MediaSignatureWithContents[],
-    webviewAssets: boolean = false
-  ): Promise<MediaSignatureStatus[]> {
-    const config = await this.getProjectConfig();
-    const res = await this.appClient.CheckIfMediaExists({
-      id: undefined,
-      slug: config.name,
-      signatures: assets.map((a) => ({
-        size: a.size,
-        hash: a.hash,
-        filePath: a.filePath,
-        isWebviewAsset: webviewAssets,
-      })),
-    });
-    return res.statuses;
-  }
-
   async #uploadNewAssets(
     assets: MediaSignatureWithContents[],
     webViewAsset: boolean = false
@@ -727,12 +711,19 @@ export default class Upload extends ProjectCommand {
     const webViewMsg = webViewAsset ? 'webview ' : '';
 
     const config = await this.getProjectConfig();
-    const statuses = await this.#getAssetStatuses(assets, webViewAsset);
+    const { statuses } = await this.appClient.CheckIfMediaExists({
+      id: undefined,
+      slug: config.name,
+      signatures: assets.map((a) => ({
+        size: a.size,
+        hash: a.hash,
+        filePath: a.filePath,
+        isWebviewAsset: webViewAsset,
+      })),
+    });
+
     ux.action.start(`Checking for new ${webViewMsg}assets`);
-    const { newAssets, duplicateAssets, existingAssets } = await this.#findNewAssets(
-      assets,
-      statuses
-    );
+    const { newAssets, duplicateAssets, existingAssets } = await this.#mapAssets(assets, statuses);
     ux.info(`Found ${assets.length} ${webViewMsg}assets (${newAssets.length} unique new assets)`);
     if (this.#verbose) {
       ux.info('New assets:');
@@ -814,7 +805,13 @@ export default class Upload extends ProjectCommand {
     }, assetMap);
   }
 
-  async #findNewAssets(
+  /**
+   * Map assets into groups based on their server status:
+   * - new assets
+   * - duplicate assets
+   * - existing assets
+   */
+  async #mapAssets(
     assets: MediaSignatureWithContents[],
     statuses: MediaSignatureStatus[]
   ): Promise<{
@@ -822,12 +819,13 @@ export default class Upload extends ProjectCommand {
     duplicateAssets: MediaSignatureWithContents[];
     existingAssets: AssetMap;
   }> {
-    // ensure everything is accounted for
+    const assetsByFilePath = Object.fromEntries(assets.map((a) => [a.filePath, a]));
+
     const newAssets: MediaSignatureWithContents[] = [];
     const duplicateAssets: MediaSignatureWithContents[] = [];
     const existingAssets: AssetMap = {};
     statuses.forEach((status) => {
-      const asset = assets.find((asset) => asset.filePath === status.filePath);
+      const asset = assetsByFilePath[status.filePath];
       if (!asset) {
         throw new Error(
           `Backend returned new asset with path ${status.filePath} that we don't know about..?`

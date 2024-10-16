@@ -355,6 +355,10 @@ export default class Playtest extends Upload {
 
     this.#lastBundle = bundle;
 
+    if (!this.#appInfo?.app) {
+      this.error(`Something went wrong: App is not found`);
+    }
+
     if (!this.#version) {
       this.error('Something went wrong: no version of this app exists.');
     }
@@ -376,7 +380,7 @@ export default class Playtest extends Upload {
     let appVersionInfo: AppVersionInfo;
     try {
       appVersionInfo = await this.createVersion(
-        this.#appInfo!,
+        this.#appInfo!.app,
         this.#version,
         [bundle],
         VersionVisibility.PRIVATE
