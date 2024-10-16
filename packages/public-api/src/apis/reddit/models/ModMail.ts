@@ -808,11 +808,11 @@ export class ModMailService {
    * Marks a conversation as read for the user.
    *
    * @param params.conversationId Id of a modmail conversation
-   * @param params.numHours For how many hous the conversation needs to be muted
+   * @param params.numHours For how many hours the conversation needs to be muted. Must be one of 72, 168, or 672 hours
    *
    * @example
    * ```ts
-   * await reddit.modMail.muteConversation({ conversationId: 'abcdef', numHours: 2 });
+   * await reddit.modMail.muteConversation({ conversationId: 'abcdef', numHours: 72 });
    * ```
    */
   async muteConversation(params: {
