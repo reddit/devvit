@@ -44,6 +44,7 @@ import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
+import { getAppBySlug } from '../util/utils.js';
 
 export default class Playtest extends Upload {
   static override description =
@@ -164,7 +165,7 @@ export default class Playtest extends Upload {
 
     const projectConfig = await this.getProjectConfig();
     const appName = projectConfig.slug ?? projectConfig.name;
-    const appInfo: FullAppInfo | undefined = await this.getAppBySlug(appName);
+    const appInfo: FullAppInfo | undefined = await getAppBySlug(this.appClient, appName);
 
     if (appInfo?.app?.owner?.displayName !== username) {
       if (flags['employee-update']) {
@@ -190,7 +191,7 @@ export default class Playtest extends Upload {
 
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
-    this.#appInfo = await this.getAppBySlug(appName);
+    this.#appInfo = await getAppBySlug(this.appClient, appName);
 
     if (!this.#appInfo) {
       this.error(

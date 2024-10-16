@@ -14,7 +14,6 @@ import {
   AppCreationRequest,
   AppVersionCreationRequest,
   FullAppInfo,
-  GetAppBySlugRequest,
   InstallationType,
   UploadNewMediaRequest,
   VersionVisibility,
@@ -65,6 +64,7 @@ import { sendEvent } from '../util/metrics.js';
 import { readPackageJSON } from '../util/package-managers/package-util.js';
 import { readAndInjectBundleProducts } from '../util/payments/paymentsConfig.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
+import { getAppBySlug } from '../util/utils.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -156,7 +156,12 @@ export default class Upload extends ProjectCommand {
       this.error("The app's devvit.yaml is misconfigured. It must have at least a 'name' field.");
     }
 
-    let appInfo: FullAppInfo | undefined = await this.getAppBySlug(appName);
+    let appInfo: FullAppInfo | undefined;
+    try {
+      appInfo = await getAppBySlug(this.appClient, appName);
+    } catch (e) {
+      this.error(StringUtil.caughtToString(e));
+    }
 
     if (!flags.justDoIt) {
       // If we're not just doing it, check and make sure there's a chance our
@@ -377,26 +382,6 @@ export default class Upload extends ProjectCommand {
         },
       ])
     ).isNSFW;
-  }
-
-  /**
-   * returns undefined if the app is not found, or if the user doesn't have permission to view the app
-   */
-  async getAppBySlug(slug: string): Promise<FullAppInfo | undefined> {
-    try {
-      const appInfo = await this.appClient.GetBySlug(GetAppBySlugRequest.fromPartial({ slug }));
-      return appInfo.app ? appInfo : undefined;
-    } catch (err) {
-      if (err instanceof TwirpError) {
-        if (err.code === TwirpErrorCode.NotFound) {
-          return undefined;
-        }
-        if (err.code === TwirpErrorCode.PermissionDenied) {
-          return undefined;
-        }
-      }
-      this.error(StringUtil.caughtToString(err));
-    }
   }
 
   async getNextVersion(
