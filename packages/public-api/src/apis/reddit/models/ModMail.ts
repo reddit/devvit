@@ -5,7 +5,7 @@ import {
   type ModActionData as ProtosModActionData,
 } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
-import type { T5ID } from '@devvit/shared-types/tid.js';
+import { asT5ID, type T5ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
 import { GraphQL } from '../graphql/GraphQL.js';
@@ -486,7 +486,7 @@ export class ModMailService {
    * In this way to is a bit of a misnomer in modmail conversations.
    * What it really means is the participant of the conversation who is not a mod of the subreddit.
    *
-   * @deprecated Use {@link ModMailService.createModDiscussionConversation} or {@link ModMailService.createModInboxConversation} instead.
+   * @deprecated Use {@link ModMailService.createModDiscussionConversation}, {@link ModMailService.createModInboxConversation}, or {@link ModMailService.createModNotification} instead.
    * @param params.body markdown text
    * @param params.isAuthorHidden is author hidden? (default: false)
    * @param params.subredditName subreddit name
@@ -547,20 +547,20 @@ export class ModMailService {
    * const conversationId = await reddit.modMail.createModDiscussionConversation({
    *   subject: 'Test conversation',
    *   bodyMarkdown: '**Hello there** \n\n _Have a great day!_',
-   *   subredditId: asT5ID(context.subredditId)
+   *   subredditId: context.subredditId
    * });
    * ```
    */
   async createModDiscussionConversation(params: {
     subject: string;
     bodyMarkdown: string;
-    subredditId: T5ID;
+    subredditId: string;
   }): Promise<string> {
     return createModmailConversation(
       {
         subject: params.subject,
         bodyMarkdown: params.bodyMarkdown,
-        subredditId: params.subredditId,
+        subredditId: asT5ID(params.subredditId),
         isInternal: true,
         participantType: 'MODERATOR',
         conversationType: 'INTERNAL',
@@ -581,20 +581,20 @@ export class ModMailService {
    * const conversationId = await reddit.modMail.createModInboxConversation({
    *   subject: 'Test conversation',
    *   bodyMarkdown: '**Hello there** \n\n _Have a great day!_',
-   *   subredditId: asT5ID(context.subredditId)
+   *   subredditId: context.subredditId
    * });
    * ```
    */
   async createModInboxConversation(params: {
     subject: string;
     bodyMarkdown: string;
-    subredditId: T5ID;
+    subredditId: string;
   }): Promise<string> {
     return createModmailConversation(
       {
         subject: params.subject,
         bodyMarkdown: params.bodyMarkdown,
-        subredditId: params.subredditId,
+        subredditId: asT5ID(params.subredditId),
         isInternal: false,
         participantType: 'PARTICIPANT_USER',
         conversationType: 'SR_USER',
@@ -616,14 +616,14 @@ export class ModMailService {
    * const conversationId = await reddit.modMail.createModNotification({
    *   subject: 'Test notification',
    *   bodyMarkdown: '**Hello there** \n\n _This is a notification!_',
-   *   subredditId: asT5ID(context.subredditId)
+   *   subredditId: context.subredditId
    * });
    * ```
    */
   async createModNotification(params: {
     subject: string;
     bodyMarkdown: string;
-    subredditId: T5ID;
+    subredditId: string;
   }): Promise<string> {
     let notificationSubject = params.subject;
 
@@ -635,7 +635,7 @@ export class ModMailService {
       {
         subject: notificationSubject,
         bodyMarkdown: params.bodyMarkdown,
-        subredditId: params.subredditId,
+        subredditId: asT5ID(params.subredditId),
         isInternal: false,
         participantType: 'PARTICIPANT_USER',
         conversationType: 'SR_USER',
