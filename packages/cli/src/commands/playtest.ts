@@ -37,7 +37,7 @@ import { PlaytestServer } from '../lib/playtest-server.js';
 import type { CommandFlags } from '../lib/types/oclif.js';
 import { AppLogObserver } from '../util/app-logs/app-log-observer.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
-import { Bundler } from '../util/Bundler.js';
+import { Bundler, type BundlerResult } from '../util/Bundler.js';
 import { checkAppNameAvailability } from '../util/checkAppNameAvailability.js';
 import { createInstallationsClient, createRemoteLoggerClient } from '../util/clientGenerators.js';
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
@@ -92,8 +92,8 @@ export default class Playtest extends Upload {
   #existingInstallInfo?: FullInstallationInfo | undefined;
   #appInfo?: FullAppInfo | undefined;
   #version?: DevvitVersion;
-  #lastBundle: undefined | Readonly<Bundle>;
-  #lastQueuedBundle: undefined | Readonly<Bundle>;
+  #lastBundles: Bundle[] | undefined;
+  #lastQueuedBundles: Bundle[] | undefined;
   #isOnWatchExecuting: boolean = false;
   #server?: PlaytestServer;
   #flags?: CommandFlags<typeof Playtest>;
@@ -230,8 +230,8 @@ export default class Playtest extends Upload {
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
 
     this.#watchAssets.on('all', () => {
-      // asset changes don't result in a code change, so just re-send the last bundle
-      void this.#onWatch(this.#lastBundle, subreddit);
+      // asset changes don't result in a code change, so just re-send the last bundles
+      void this.#onWatch({ bundles: this.#lastBundles }, subreddit);
     });
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
@@ -277,7 +277,7 @@ export default class Playtest extends Upload {
     // bundles through an asynchronous observable and only open a subscription
     // for errors. We just dispose the source (bundler) to unsubscribe.
     watchSrc
-      .pipe(map((bundle: Bundle | undefined) => this.#onWatch(bundle, subreddit)))
+      .pipe(map((result: BundlerResult) => this.#onWatch(result, subreddit)))
       .subscribe({ error: this.#onWatchError });
 
     // We don't know when the user is done. If connected to a terminal, end when
@@ -331,7 +331,7 @@ export default class Playtest extends Upload {
       );
   }
 
-  #onWatch = async (bundle: Bundle | undefined, subreddit: string): Promise<void> => {
+  #onWatch = async (result: BundlerResult, subreddit: string): Promise<void> => {
     /* We have to do this here because none of the rxjs functions fit this use case perfectly. What
      * we need is something that serializes this whole pipeline, but also discards all but the most
      * recent value once we resume processing. We would love to use one of these, but...
@@ -345,15 +345,19 @@ export default class Playtest extends Upload {
      */
     if (this.#isOnWatchExecuting) {
       // if we're already executing, queue this watch to be executed after we're done
-      this.#lastQueuedBundle = bundle;
+      this.#lastQueuedBundles = result.bundles;
       return;
     }
 
-    if (!bundle) {
+    if (!result.bundles) {
       return;
     }
 
-    this.#lastBundle = bundle;
+    this.#lastBundles = result.bundles;
+
+    if (!this.#lastBundles) {
+      return;
+    }
 
     if (!this.#appInfo?.app) {
       this.error(`Something went wrong: App is not found`);
@@ -374,7 +378,7 @@ export default class Playtest extends Upload {
     });
 
     // 3. update bundle version:
-    modifyBundleVersion(bundle, this.#version.toString());
+    modifyBundleVersions(this.#lastBundles, this.#version.toString());
 
     // 4. create new playtest version:
     let appVersionInfo: AppVersionInfo;
@@ -382,7 +386,7 @@ export default class Playtest extends Upload {
       appVersionInfo = await this.createVersion(
         this.#appInfo!.app,
         this.#version,
-        [bundle],
+        this.#lastBundles,
         VersionVisibility.PRIVATE
       );
     } catch (err) {
@@ -424,10 +428,10 @@ export default class Playtest extends Upload {
 
     this.#isOnWatchExecuting = false;
     // If there's a queued watch, execute it now.
-    if (this.#lastQueuedBundle) {
-      const newerBundle = this.#lastQueuedBundle;
-      this.#lastQueuedBundle = undefined;
-      await this.#onWatch(newerBundle, subreddit); // subreddit won't change between calls!
+    if (this.#lastQueuedBundles) {
+      const newerBundles = this.#lastQueuedBundles;
+      this.#lastQueuedBundles = undefined;
+      await this.#onWatch({ bundles: newerBundles }, subreddit); // subreddit won't change between calls!
     }
   };
 
@@ -452,11 +456,13 @@ export default class Playtest extends Upload {
   }
 }
 
-export function modifyBundleVersion(bundle: Bundle, version: string): void {
-  bundle.dependencies ??= DependencySpec.fromPartial({});
-  bundle.dependencies.actor ??= ActorSpec.fromPartial({});
+export function modifyBundleVersions(bundles: Bundle[], version: string): void {
+  for (const bundle of bundles) {
+    bundle.dependencies ??= DependencySpec.fromPartial({});
+    bundle.dependencies.actor ??= ActorSpec.fromPartial({});
 
-  bundle.dependencies.actor.version = version.toString();
+    bundle.dependencies.actor.version = version.toString();
+  }
 }
 
 function sleep(ms: number): Promise<void> {

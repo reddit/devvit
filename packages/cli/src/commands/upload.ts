@@ -3,19 +3,17 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 
-import type {
-  AppInfo,
-  AppVersionInfo,
-  Categories,
-  MediaSignature,
-  UploadNewMediaResponse,
-} from '@devvit/protos/community.js';
 import {
   AppCapability,
   AppCreationRequest,
+  type AppInfo,
+  AppVersionInfo,
+  Categories,
   FullAppInfo,
   InstallationType,
+  MediaSignature,
   UploadNewMediaRequest,
+  UploadNewMediaResponse,
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { MediaSignatureStatus } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
@@ -488,15 +486,14 @@ export default class Upload extends ProjectCommand {
     typecheck: boolean = true
   ): Promise<Bundle[]> {
     const bundler = new Bundler(typecheck);
+    const actorSpec = {
+      name: ACTOR_SRC_PRIMARY_NAME,
+      owner: username,
+      version: version,
+    };
 
     try {
-      return [
-        await bundler.bundle(this.projectRoot, {
-          name: ACTOR_SRC_PRIMARY_NAME,
-          owner: username,
-          version: version,
-        }),
-      ];
+      return await bundler.bundle(this.projectRoot, actorSpec);
     } catch (err) {
       this.error(StringUtil.caughtToString(err));
     }

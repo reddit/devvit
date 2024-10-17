@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { ActorSpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
+import { ActorSpec, TargetRuntime } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { Args } from '@oclif/core';
 
 import { getAccessToken } from '../../util/auth.js';
@@ -35,26 +35,38 @@ export default class BundleActor extends ProjectCommand {
     const username = await this.#getOwnerUsername();
     const config = await readDevvitConfig(this.projectRoot, this.configFile);
 
-    const actorName = args.name;
+    const actorSpec = ActorSpec.fromPartial({
+      name: args.name,
+      owner: username,
+      version: config.version,
+    });
 
+    await this.#makeBundles(actorSpec);
+
+    this.log(`Successfully bundled actor: ${actorSpec.name}`);
+  }
+
+  async #makeBundles(actorSpec: ActorSpec): Promise<void> {
     const actorBundler = new Bundler();
-    const bundle = await actorBundler.bundle(
-      this.projectRoot,
-      ActorSpec.fromPartial({
-        name: actorName,
-        owner: username,
-        version: config.version,
+
+    const bundles = await actorBundler.bundle(this.projectRoot, actorSpec);
+
+    await Promise.all(
+      bundles.map(async (bundle) => {
+        const target = bundle.buildInfo?.targetRuntime ?? TargetRuntime.UNIVERSAL;
+        let type = '';
+        if (target === TargetRuntime.CLIENT) {
+          type = '.client';
+        }
+        await readAndInjectBundleProducts(this.projectRoot, bundle, false);
+
+        await mkdir(path.join(this.projectRoot, distDirFilename), { recursive: true });
+        await writeFile(
+          path.join(this.projectRoot, distDirFilename, `${actorSpec.name}.bundle${type}.json`),
+          JSON.stringify(Bundle.toJSON(bundle))
+        );
       })
     );
-
-    await readAndInjectBundleProducts(this.projectRoot, bundle, false);
-
-    await mkdir(path.join(this.projectRoot, distDirFilename), { recursive: true });
-    await writeFile(
-      path.join(this.projectRoot, distDirFilename, `${actorName}.bundle.json`),
-      JSON.stringify(Bundle.toJSON(bundle))
-    );
-    this.log(`Successfully bundled actor: ${actorName}`);
   }
 
   async #getOwnerUsername(): Promise<string> {

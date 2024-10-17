@@ -27,10 +27,11 @@ test('watch touched source', async () => {
   const [init, first] = await lastValueFrom(observable.pipe(take(2), toArray()));
 
   // An empty message is sent initially.
-  expect(init).toBeUndefined();
+  expect(init).not.toBeUndefined();
+  expect(init.bundles).toHaveLength(0);
 
   expect(first).toBeDefined();
-  expect(first!.code.length).toBeGreaterThan(0);
+  expect(first!.bundles![0].code.length).toBeGreaterThan(0);
 
   // Observe a second bundle.
   const second = lastValueFrom(observable.pipe(take(1)));
