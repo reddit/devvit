@@ -813,6 +813,11 @@ export class Post {
    * Set the suggested sort for comments on a Post.
    *
    * @throws {Error} Throws an error if the suggested sort could not be set.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   * await post.setSuggestedCommentSort("NEW");
+   * ```
    */
   async setSuggestedCommentSort(suggestedSort: PostSuggestedCommentSort): Promise<void> {
     await Post.setSuggestedCommentSort(
@@ -826,6 +831,16 @@ export class Post {
    *
    * @param {JSX.ComponentFunction} ui - A JSX component function that returns a simple ui to be rendered.
    * @throws {Error} Throws an error if the preview could not be set.
+   * @example
+   * ```ts
+   * const preview = (
+   *   <vstack height="100%" width="100%" alignment="middle center">
+   *     <text size="large">An updated preview!</text>
+   *   </vstack>
+   * );
+   * const post = await reddit.getPostById(context.postId);
+   * await post.setCustomPostPreview(() => preview);
+   * ```
    */
   async setCustomPostPreview(ui: JSX.ComponentFunction): Promise<void> {
     const newPost = await Post.setCustomPostPreview(
@@ -1128,9 +1143,11 @@ export class Post {
       operationName,
       persistedQueryHash,
       {
-        subredditId: options.subredditId,
-        postId: options.id,
-        sort: options.suggestedSort,
+        input: {
+          subredditId: options.subredditId,
+          postId: options.id,
+          sort: options.suggestedSort,
+        },
       },
       metadata
     );
@@ -1206,9 +1223,11 @@ export class Post {
       operationName,
       persistedQueryHash,
       {
-        postId: options.id,
-        content: {
-          richText: postRTJson.build(),
+        input: {
+          postId: options.id,
+          content: {
+            richText: postRTJson.build(),
+          },
         },
       },
       metadata
