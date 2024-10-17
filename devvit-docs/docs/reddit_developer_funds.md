@@ -12,7 +12,9 @@ We want creative new apps that enrich the Reddit community through:
 
 ## How it works
 
-The Developer Funds program will run from July 1, 2024 - Dec 31, 2024. This program is focused on reach, and success will be measured by Qualified Views and Qualified Installs, defined as:
+The Developer Funds program will run from July 1, 2024 - Dec 31, 2024. This program is focused on reach, and success will be measured by Qualified Views, Qualified Members, and Qualified Installs, defined as:
+
+- A "Qualified Member" is a subscriber of a new app-centric community that: 1) is a real user in good standing; 2) is not a bot, alt, or programatic account; 3) has joined the community of their own volition and interest in the community.
 
 - A “Qualified View” is a view of your App that: 1) occurs after July 1, 2024; 2) lasts at least two seconds; 3) is in a subreddit that has a minimum of 1,000 members; and 4) is in a subreddit or on content that is eligible for monetization under Reddit’s Contributor Monetization Policy (e.g., that is Safe for Work).
 
@@ -22,19 +24,26 @@ Measurement and eligibility are further defined in our terms. Please reference o
 
 ## What you can get
 
+The "Qualified Members" rewards are cumulative, which means you’ll get paid for each threshold tier your app achieves.
+
+| Tier             | Threshold                                                           | Payout | Cumulative Payout |
+| :--------------- | :------------------------------------------------------------------ | :----- | :---------------- |
+| Tier 1 - Members | 1,000 qualified members prior to 12/31/24                           | $5,000 | $5,000            |
+| Tier 2 - Members | 2,000 qualified members prior to 12/31/24 & 250,000 qualified views | $5,000 | $10,000           |
+
 The “Qualified View” rewards are cumulative, which means you’ll get paid for each threshold tier your app achieves.
 
 | Tier           | Threshold                                 | Payout  | Cumulative Payout |
 | :------------- | :---------------------------------------- | :------ | :---------------- |
-| Tier 1 - Views | 100,000 qualified views within 30 days    | $500    | $500              |
-| Tier 2 - Views | 1,000,000 qualified views within 30 days  | $5,000  | $5,500            |
+| Tier 1 - Views | 10,000 qualified views within 30 days     | $500    | $500              |
+| Tier 2 - Views | 750,000 qualified views within 30 days    | $5,000  | $5,500            |
 | Tier 3 - Views | 10,000,000 qualified views within 30 days | $20,000 | $25,500           |
 
 The “Qualified Install” threshold is met when your app exceeds the threshold below and maintains that number of qualified installs for a consecutive 7-day period:
 
 | Tier     | Threshold              | Payout |
 | :------- | :--------------------- | :----- |
-| Installs | 500 qualified installs | $500   |
+| Installs | 250 qualified installs | $1000  |
 
 ## Program rules
 
