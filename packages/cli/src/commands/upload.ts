@@ -280,7 +280,9 @@ export default class Upload extends ProjectCommand {
           // Doesn't exist, we're good
           return appName;
         }
-        this.warn(`The app name "${appName}" is unavailable.`);
+        this.warn(
+          `The app name "${appName}" is unavailable. The app name must be a unique Reddit username.`
+        );
         if (isAvailableResponse.suggestions.length > 0) {
           this.log(
             `Here's some suggestions:\n  * ${isAvailableResponse.suggestions.join('\n  * ')}`
