@@ -4,8 +4,8 @@ import { LoadingState } from './components/LoadingState.js';
 import Words from './data/words.json';
 import { Router } from './posts/Router.js';
 import { Service } from './service/Service.js';
-import type { JobData } from './types/job-data.js';
 import Settings from './settings.json';
+import type { JobData } from './types/job-data.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -111,8 +111,7 @@ const logDictionaryForm = Devvit.createForm(
   async (event, context) => {
     const service = new Service(context);
 
-    await service.setSelectedDictionaryName(event.values.dictionary);
-    await service.getDictionaries(true);
+    await service.getDictionaries(event.values.dictionary, true);
     context.ui.showToast('Dictionary retrieved. Run `devvit logs` to view');
   }
 );
@@ -126,7 +125,7 @@ Devvit.addMenuItem({
   },
 });
 
-const dynamicDictionaryForm = Devvit.createForm(
+const addWordsToDictionaryForm = Devvit.createForm(
   {
     fields: [
       {
@@ -140,6 +139,7 @@ const dynamicDictionaryForm = Devvit.createForm(
         name: 'words',
         label:
           'What words do you want to add to the dictionary? (Separate multiple words with commas)',
+        required: true,
       },
     ],
   },
@@ -154,12 +154,48 @@ const dynamicDictionaryForm = Devvit.createForm(
       .split(',')
       .map((word) => service.getCapitalizedWord(word.trim()));
     const wordsAdded = await service.upsertDictionary(event.values.dictionary, words);
-    if (wordsAdded.rows === 0) {
-      context.ui.showToast(`That word already exists in the dictionary`);
-    } else if (wordsAdded.rows === 1) {
-      context.ui.showToast(`${words} added to the dictionary`);
-    } else {
-      context.ui.showToast(`${words.length} words added to the dictionary`);
+
+    const addedWordsStr = wordsAdded.uniqueNewWords.join(', ');
+    const notAddedWordsStr = wordsAdded.duplicatesNotAdded.join(', ');
+
+    if (wordsAdded.uniqueNewWords.length === 1 && wordsAdded.duplicatesNotAdded.length === 0) {
+      context.ui.showToast(`One word was added: ${addedWordsStr}`);
+    } else if (
+      wordsAdded.uniqueNewWords.length === 1 &&
+      wordsAdded.duplicatesNotAdded.length === 1
+    ) {
+      context.ui.showToast(`One word was added: ${addedWordsStr}`);
+      context.ui.showToast(`One word was already in the collection: ${notAddedWordsStr}`);
+    } else if (wordsAdded.uniqueNewWords.length === 1 && wordsAdded.duplicatesNotAdded.length > 1) {
+      context.ui.showToast(`One word was added: ${addedWordsStr}`);
+      context.ui.showToast(
+        `${wordsAdded.duplicatesNotAdded.length} words were already in the collection: ${notAddedWordsStr}`
+      );
+    } else if (wordsAdded.uniqueNewWords.length > 1 && wordsAdded.duplicatesNotAdded.length === 0) {
+      context.ui.showToast(
+        `${wordsAdded.uniqueNewWords.length} words were added: ${addedWordsStr}`
+      );
+    } else if (
+      wordsAdded.uniqueNewWords.length === 0 &&
+      wordsAdded.duplicatesNotAdded.length === 1
+    ) {
+      context.ui.showToast(`One word was already in the collection: ${notAddedWordsStr}`);
+    } else if (wordsAdded.uniqueNewWords.length === 0 && wordsAdded.duplicatesNotAdded.length > 1) {
+      context.ui.showToast(
+        `${wordsAdded.duplicatesNotAdded.length} words were already in the collection: ${notAddedWordsStr}`
+      );
+    } else if (wordsAdded.uniqueNewWords.length > 0 && wordsAdded.duplicatesNotAdded.length === 1) {
+      context.ui.showToast(
+        `${wordsAdded.uniqueNewWords.length} words were added: ${addedWordsStr}`
+      );
+      context.ui.showToast(`One word was already in the collection: ${notAddedWordsStr}`);
+    } else if (wordsAdded.uniqueNewWords.length > 0 && wordsAdded.duplicatesNotAdded.length > 1) {
+      context.ui.showToast(
+        `${wordsAdded.uniqueNewWords.length} words were added: ${addedWordsStr}`
+      );
+      context.ui.showToast(
+        `${wordsAdded.duplicatesNotAdded.length} words were already in the collection: ${notAddedWordsStr}`
+      );
     }
   }
 );
@@ -169,7 +205,7 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: (_event, context) => {
-    context.ui.showForm(dynamicDictionaryForm);
+    context.ui.showForm(addWordsToDictionaryForm);
   },
 });
 
@@ -187,6 +223,7 @@ const selectDictionaryForm = Devvit.createForm(
             { label: 'r/piercing', value: 'r/piercing' }, //hardcoding for r/piercing dictionary takeover 9/26/24
             { label: 'r/NintendoSwitch', value: 'r/NintendoSwitch' }, //hardcoding for r/NintendoSwitch dictionary takeover 10/10/24
           ],
+          defaultValue: ['main'],
         },
       ],
       title: 'Select a dictionary',
@@ -218,13 +255,88 @@ Devvit.addMenuItem({
 });
 
 Devvit.addMenuItem({
-  label: '[Pixelary] Log selected dictionary',
+  label: '[Pixelary] Log selected dictionary name',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
     const service = new Service(context);
     const selectedDictionary = await service.getSelectedDictionaryName();
     context.ui.showToast(`Current dictionary: ${selectedDictionary}`);
+  },
+});
+
+const removeWordsFromDictionaryForm = Devvit.createForm(
+  {
+    fields: [
+      {
+        type: 'string',
+        name: 'dictionary',
+        label: 'What dictionary do you want to remove a word from?',
+        defaultValue: 'main',
+      },
+      {
+        type: 'string',
+        name: 'words',
+        label:
+          'What words do you want to remove from the dictionary? (Separate multiple words with commas)',
+        required: true,
+      },
+    ],
+  },
+  async (event, context) => {
+    const service = new Service(context);
+
+    if (!event.values.words) {
+      context.ui.showToast('Please enter a word');
+      return;
+    }
+    const wordsToRemove = event.values.words
+      .split(',')
+      .map((word) => service.getCapitalizedWord(word.trim()));
+    const wordsRemoved = await service.removeWordFromDictionary(
+      event.values.dictionary,
+      wordsToRemove
+    );
+
+    const removedWordsStr = wordsRemoved.removedWords.join(', ');
+    const notFoundWordsStr = wordsRemoved.notFoundWords.join(', ');
+
+    if (wordsRemoved.removedCount === 1 && wordsRemoved.notFoundWords.length === 0) {
+      context.ui.showToast(`One word was removed: ${removedWordsStr}`);
+    } else if (wordsRemoved.removedCount === 1 && wordsRemoved.notFoundWords.length === 1) {
+      context.ui.showToast(`One word was removed: ${removedWordsStr}`);
+      context.ui.showToast(`One word was not found: ${notFoundWordsStr}`);
+    } else if (wordsRemoved.removedCount === 1 && wordsRemoved.notFoundWords.length > 1) {
+      context.ui.showToast(`One word was removed: ${removedWordsStr}`);
+      context.ui.showToast(
+        `${wordsRemoved.notFoundWords.length} words were not found: ${notFoundWordsStr}`
+      );
+    } else if (wordsRemoved.removedCount > 1 && wordsRemoved.notFoundWords.length === 0) {
+      context.ui.showToast(`${wordsRemoved.removedCount} words were removed: ${removedWordsStr}`);
+    } else if (wordsRemoved.removedCount === 0 && wordsRemoved.notFoundWords.length === 1) {
+      context.ui.showToast(`One word was not found: ${notFoundWordsStr}`);
+    } else if (wordsRemoved.removedCount === 0 && wordsRemoved.notFoundWords.length > 1) {
+      context.ui.showToast(
+        `${wordsRemoved.notFoundWords.length} words were not found: ${notFoundWordsStr}`
+      );
+    } else if (wordsRemoved.removedCount > 0 && wordsRemoved.notFoundWords.length === 1) {
+      context.ui.showToast(`${wordsRemoved.removedCount} words were removed: ${removedWordsStr}`);
+      context.ui.showToast(`One word was not found: ${notFoundWordsStr}`);
+    } else if (wordsRemoved.removedCount > 0 && wordsRemoved.notFoundWords.length > 1) {
+      context.ui.showToast(`${wordsRemoved.removedCount} words were removed: ${removedWordsStr}`);
+      context.ui.showToast(
+        `${wordsRemoved.notFoundWords.length} words were not found: ${notFoundWordsStr}`
+      );
+    }
+  }
+);
+
+Devvit.addMenuItem({
+  label: '[Pixelary] Remove words from dictionary',
+  location: 'subreddit',
+  forUserType: 'moderator',
+  onPress: (_event, context) => {
+    context.ui.showForm(removeWordsFromDictionaryForm);
   },
 });
 
@@ -582,8 +694,7 @@ Devvit.addMenuItem({
       .filter((key) => key.startsWith('guess-comment:'))
       .map((key) => {
         const commentId = data[key];
-        const isMatch = commentId === context.commentId;
-        return isMatch;
+        return commentId === context.commentId;
       })
       .includes(true);
 

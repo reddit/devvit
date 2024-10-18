@@ -9,15 +9,15 @@ import type {
 } from '@devvit/public-api';
 
 import Settings from '../settings.json';
+import type { Dictionary } from '../types/Dictionary.js';
 import type { GameSettings } from '../types/GameSettings.js';
 import type {
   CollectionData,
   CollectionPostData,
-  PostData,
   PinnedPostData,
+  PostData,
 } from '../types/PostData.js';
 import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
-import type { Dictionary } from '../types/Dictionary.js';
 
 // Service that handles the backbone logic for the application
 // This service is responsible for:
@@ -463,33 +463,55 @@ export class Service {
    * @param newWords The list of words to save to the dictionary.
    * @returns The number of words that were added to the dictionary.
    */
-  async upsertDictionary(dictionaryName: string, newWords: string[]): Promise<{ rows: number }> {
+  async upsertDictionary(
+    dictionaryName: string,
+    newWords: string[]
+  ): Promise<{ rows: number; uniqueNewWords: string[]; duplicatesNotAdded: string[] }> {
     const key = this.getDictionaryKey(dictionaryName);
     const existingJSON = await this.redis.get(key);
     const existingWords = existingJSON ? JSON.parse(existingJSON) : [];
 
     const uniqueNewWords = newWords.filter((word) => !existingWords.includes(word));
-    if (uniqueNewWords.length === 0) {
-      return { rows: 0 };
-    }
+    const duplicatesNotAdded = newWords.filter((word) => existingWords.includes(word));
 
     const updatedWordsJson = JSON.stringify(Array.from(new Set([...existingWords, ...newWords])));
     await this.redis.set(key, updatedWordsJson);
-    return { rows: uniqueNewWords.length };
+    return { rows: uniqueNewWords.length, uniqueNewWords, duplicatesNotAdded };
   }
 
-  async getDictionaries(printToLogs: boolean): Promise<Dictionary[]> {
+  async removeWordFromDictionary(
+    dictionaryName: string,
+    wordsToRemove: string[]
+  ): Promise<{ removedCount: number; removedWords: string[]; notFoundWords: string[] }> {
+    const key = this.getDictionaryKey(dictionaryName);
+    const existingJSON = await this.redis.get(key);
+    const existingWords: string[] = existingJSON ? JSON.parse(existingJSON) : [];
+    const updatedWords = existingWords.filter((word) => !wordsToRemove.includes(word));
+
+    const removedCount = existingWords.length - updatedWords.length;
+    const removedWords = wordsToRemove.filter((word) => existingWords.includes(word));
+    const notFoundWords = wordsToRemove.filter((word) => !removedWords.includes(word));
+
+    const updatedWordsJson = JSON.stringify(updatedWords);
+    await this.redis.set(key, updatedWordsJson);
+
+    return { removedCount, removedWords, notFoundWords };
+  }
+
+  async getDictionaries(
+    requestedDictionaryName: string,
+    printToLogs: boolean
+  ): Promise<Dictionary[]> {
     // Determine which dictionaries to fetch
-    const defaultDictionary = 'main';
-    const selectedDictionary = await this.getSelectedDictionaryName();
-    const dictionaries = [selectedDictionary];
-    if (selectedDictionary !== defaultDictionary) {
-      dictionaries.push(defaultDictionary);
+    const defaultDictionaryName = 'main';
+    const dictionaryNames = [requestedDictionaryName];
+    if (requestedDictionaryName !== defaultDictionaryName) {
+      dictionaryNames.push(defaultDictionaryName);
     }
 
     // Fetch and parse the dictionaries
-    const data = Promise.all(
-      dictionaries.map(async (dictionaryName) => {
+    const data = await Promise.all(
+      dictionaryNames.map(async (dictionaryName) => {
         const key = this.getDictionaryKey(dictionaryName);
         const dictionaryJsonString = await this.redis.get(key);
         const parsedDictionary: string[] = dictionaryJsonString
