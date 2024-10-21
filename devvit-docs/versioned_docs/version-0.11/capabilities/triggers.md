@@ -25,6 +25,8 @@ Event triggers let your app automatically respond to a user’s action. For exam
 - [`AppUpgrade`](#setup-triggers)
 - [`ModActions`](#mod-actions)
 - [`ModMail`](#modmail-trigger)
+- [`AutomoderatorFilterPost`](#automoderator-triggers)
+- [`AutomoderatorFilterComment`](#automoderator-triggers)
 
 This example adds event triggers that will automatically execute your app. Once a trigger is added, your app listens for the event and the event handler executes the action.
 
@@ -169,6 +171,26 @@ Devvit.addTrigger({
     if (event.action === 'BAN_USER') {
       console.log(`A new user ${event.targetUser?.name} was banned!`);
     }
+  },
+});
+```
+
+## Automoderator triggers
+
+These triggers are invoked when automoderator filters a post or a comment into the mod queue. Along with the post or comment this object also includes `removedAt` and `reason` (if available) fields.
+
+```ts
+Devvit.addTrigger({
+  event: 'AutomoderatorFilterPost',
+  onEvent: async (event) => {
+    console.log(`Received AutomoderatorFilterPost event:\n${JSON.stringify(event)}`);
+  },
+});
+
+Devvit.addTrigger({
+  event: 'AutomoderatorFilterComment',
+  onEvent: async (event) => {
+    console.log(`Received AutomoderatorFilterComment event:\n${JSON.stringify(event)}`);
   },
 });
 ```

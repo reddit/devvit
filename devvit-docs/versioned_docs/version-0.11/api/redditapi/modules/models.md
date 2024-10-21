@@ -28,6 +28,7 @@
 - [PostFlairWidget](../classes/models.PostFlairWidget.md)
 - [PrivateMessage](../classes/models.PrivateMessage.md)
 - [Subreddit](../classes/models.Subreddit.md)
+- [SubredditInfo](../classes/models.SubredditInfo.md)
 - [SubredditRulesWidget](../classes/models.SubredditRulesWidget.md)
 - [TextAreaWidget](../classes/models.TextAreaWidget.md)
 - [User](../classes/models.User.md)
@@ -47,12 +48,15 @@
 - [AddRemovalNoteOptions](models.md#addremovalnoteoptions)
 - [AddWidgetData](models.md#addwidgetdata)
 - [AllowableFlairContent](models.md#allowableflaircontent)
+- [BackgroundImagePosition](models.md#backgroundimageposition)
+- [BannerHeight](models.md#bannerheight)
 - [BanUserOptions](models.md#banuseroptions)
 - [BanWikiContributorOptions](models.md#banwikicontributoroptions)
 - [CommentMediaTypes](models.md#commentmediatypes)
 - [CommentSort](models.md#commentsort)
 - [CommentSubmissionOptions](models.md#commentsubmissionoptions)
 - [CommonSubmitPostOptions](models.md#commonsubmitpostoptions)
+- [CommunityNameFormat](models.md#communitynameformat)
 - [ConversationData](models.md#conversationdata)
 - [ConversationResponse](models.md#conversationresponse)
 - [ConversationStateFilter](models.md#conversationstatefilter)
@@ -63,6 +67,7 @@
 - [CreateRelationshipOptions](models.md#createrelationshipoptions)
 - [CreateWikiPageOptions](models.md#createwikipageoptions)
 - [CrosspostOptions](models.md#crosspostoptions)
+- [CustomizationFlag](models.md#customizationflag)
 - [DeleteNotesOptions](models.md#deletenotesoptions)
 - [EditCommentOptions](models.md#editcommentoptions)
 - [EditFlairTemplateOptions](models.md#editflairtemplateoptions)
@@ -88,11 +93,13 @@
 - [GetUserFlairBySubredditResponse](models.md#getuserflairbysubredditresponse)
 - [GetUserFlairOptions](models.md#getuserflairoptions)
 - [GetUserOverviewOptions](models.md#getuseroverviewoptions)
+- [ImagePosition](models.md#imageposition)
 - [InternalSetPostFlairOptions](models.md#internalsetpostflairoptions)
 - [LinkFlair](models.md#linkflair)
 - [ListingFetchOptions](models.md#listingfetchoptions)
 - [ListingFetchResponse](models.md#listingfetchresponse)
 - [MessageData](models.md#messagedata)
+- [MenuPosition](models.md#menuposition)
 - [ModActionData](models.md#modactiondata)
 - [ModActionTarget](models.md#modactiontarget)
 - [ModActionType](models.md#modactiontype)
@@ -102,7 +109,10 @@
 - [MoreObject](models.md#moreobject)
 - [OEmbed](models.md#oembed)
 - [Participant](models.md#participant)
+- [PositionedImagePosition](models.md#positionedimageposition)
+- [PostCapabilities](models.md#postcapabilities)
 - [PostTextOptions](models.md#posttextoptions)
+- [PostType](models.md#posttype)
 - [RedditVideo](models.md#redditvideo)
 - [RelationshipType](models.md#relationshiptype)
 - [RemovalReason](models.md#removalreason)
@@ -130,6 +140,7 @@
 - [UserNote](models.md#usernote)
 - [UserNoteLabel](models.md#usernotelabel)
 - [UserSocialLink](models.md#usersociallink)
+- [Visibility](models.md#visibility)
 - [WithUserData](models.md#withuserdata)
 
 ### Functions
@@ -159,6 +170,19 @@
 ### <a id="allowableflaircontent" name="allowableflaircontent"></a> AllowableFlairContent
 
 Ƭ **AllowableFlairContent**: `"all"` \| `"emoji"` \| `"text"`
+
+---
+
+### <a id="authorflairsettings" name="authorflairsettings"></a> AuthorFlairSettings
+
+Ƭ **AuthorFlairSettings**: `Object`
+
+#### Type declaration
+
+| Name                 | Type      |
+| :------------------- | :-------- |
+| `isEnabled?`         | `boolean` |
+| `isSelfAssignabled?` | `boolean` |
 
 ---
 
@@ -875,9 +899,34 @@ Conversation participant
 
 ---
 
+### <a id="postcapabilities" name="postcapabilities"></a> PostCapabilities
+
+Ƭ **PostCapabilities**: `"ama"`
+
+---
+
+### <a id="postflairsettings" name="postflairsettings"></a> PostFlairSettings
+
+Ƭ **PostFlairSettings**: `Object`
+
+#### Type declaration
+
+| Name                 | Type      |
+| :------------------- | :-------- |
+| `isEnabled?`         | `boolean` |
+| `isSelfAssignabled?` | `boolean` |
+
+---
+
 ### <a id="posttextoptions" name="posttextoptions"></a> PostTextOptions
 
 Ƭ **PostTextOptions**: \{ `text`: `string` } \| \{ `richtext`: `object` \| `RichTextBuilder` }
+
+---
+
+### <a id="posttype" name="posttype"></a> PostType
+
+Ƭ **PostType**: `"link"` \| `"image"` \| `"video"` \| `"text"` \| `"spoiler"` \| `"poll"` \| `"gallery"` \| `"talk"` \| `"prediction"` \| `"videogif"` \| `"streaming"` \| `"crosspost"`
 
 ---
 
@@ -1059,6 +1108,58 @@ An individual Removal Reason object.
 
 ---
 
+### <a id="subredditdescription" name="subredditdescription"></a> SubredditDescription
+
+Ƭ **SubredditDescription**: `Object`
+
+#### Type declaration
+
+| Name        | Type     |
+| :---------- | :------- |
+| `markdown?` | `string` |
+
+---
+
+### <a id="subredditinfo" name="subredditinfo"></a> SubredditInfo
+
+Ƭ **SubredditInfo**: `Object`
+
+#### Type declaration
+
+| Name                               | Type                                                       |
+| :--------------------------------- | :--------------------------------------------------------- |
+| `id?`                              | `T5ID`                                                     |
+| `name?`                            | `string`                                                   |
+| `createdAt?`                       | `Date`                                                     |
+| `type?`                            | [`SubredditType`](models.md#subreddittype)                 |
+| `title?`                           | `string`                                                   |
+| `description?`                     | [`SubredditDescription`](models.md#subredditdescription)   |
+| `detectedLanguage?`                | `string`                                                   |
+| `subscribersCount?`                | `number`                                                   |
+| `activeCount?`                     | `number`                                                   |
+| `isNsfw?`                          | `boolean`                                                  |
+| `isQuarantined?`                   | `boolean`                                                  |
+| `isDiscoveryAllowed?`              | `boolean`                                                  |
+| `isPredictionContributorsAllowed?` | `boolean`                                                  |
+| `isPredictionAllowed?`             | `boolean`                                                  |
+| `isPredictionsTournamentAllowed?`  | `boolean`                                                  |
+| `isChatPostCreationAllowed?`       | `boolean`                                                  |
+| `isChatPostFeatureEnabled?`        | `boolean`                                                  |
+| `isCrosspostingAllowed?`           | `boolean`                                                  |
+| `isEmojisEnabled?`                 | `boolean`                                                  |
+| `isCommentingRestricted?`          | `boolean`                                                  |
+| `isPostingRestricted?`             | `boolean`                                                  |
+| `isArchivePostsEnabled?`           | `boolean`                                                  |
+| `isSpoilerAvailable?`              | `boolean`                                                  |
+| `allAllowedPostTypes?`             | [`PostType[]`](models.md#posttype)                         |
+| `allowedPostCapabilities?`         | [`PostCapabilities[]`](models.md#postcapabilities)         |
+| `allowedMediaInComments?`          | [`CommentMediaTypes[]`](models.md#commentmediatypes)       |
+| `authorFlairSettings?`             | [`AuthorFlairSettings`](models.md#authorflairsettings)     |
+| `postFlairSettings?`               | [`PostFlairSettings`](models.md#postflairsettings)         |
+| `wikiSettings?`                    | [`SubredditWikiSettings`](models.md#subredditwikisettings) |
+
+---
+
 ### <a id="subredditsettings" name="subredditsettings"></a> SubredditSettings
 
 Ƭ **SubredditSettings**: `Object`
@@ -1167,7 +1268,19 @@ An individual Removal Reason object.
 
 ### <a id="subreddittype" name="subreddittype"></a> SubredditType
 
-Ƭ **SubredditType**: `"public"` \| `"private"` \| `"restricted"` \| `"employees_only"` \| `"gold_restricted"` \| `"archived"`
+Ƭ **SubredditType**: `"public"` \| `"private"` \| `"restricted"` \| `"employees_only"` \| `"gold_only"` \| `"gold_restricted"` \| `"archived"` \| `"user"`
+
+---
+
+### <a id="subredditwikisettings" name="subredditwikisettings"></a> SubredditWikiSettings
+
+Ƭ **SubredditWikiSettings**: `Object`
+
+#### Type declaration
+
+| Name            | Type                                     |
+| :-------------- | :--------------------------------------- |
+| `wikiEditMode?` | [`WikiEditMode`](models.md#wikieditmode) |
 
 ---
 
@@ -1284,6 +1397,12 @@ An individual Removal Reason object.
 | Name    | Type                                                     |
 | :------ | :------------------------------------------------------- |
 | `user?` | [`ConversationUserData`](models.md#conversationuserdata) |
+
+---
+
+### <a id="wikieditmode" name="wikieditmode"></a> WikiEditMode
+
+Ƭ **WikiEditMode**: `"disabled"` \| `"modonly"` \| `"anyone"`
 
 ## Functions
 

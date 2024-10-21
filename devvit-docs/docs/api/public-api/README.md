@@ -22,6 +22,8 @@
 - [AppInstallDefinition](README.md#appinstalldefinition)
 - [AppUpgrade](README.md#appupgrade)
 - [AppUpgradeDefinition](README.md#appupgradedefinition)
+- [AutomoderatorFilterComment](README.md#automoderatorfiltercomment)
+- [AutomoderatorFilterPost](README.md#automoderatorfilterpost)
 - [BaseContext](README.md#basecontext)
 - [BaseField](README.md#basefield)
 - [BlockElement](README.md#blockelement)
@@ -189,6 +191,22 @@ The event name for when your app is upgraded
 | :-------- | :-------------------------------------------------------------------------------- |
 | `event`   | [`AppUpgrade`](README.md#appupgrade)                                              |
 | `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AppUpgrade`\> |
+
+---
+
+### <a id="automoderatorfiltercomment" name="automoderatorfiltercomment"></a> AutomoderatorFilterComment
+
+Ƭ **AutomoderatorFilterComment**: `"AutomoderatorFilterComment"`
+
+The event name for when a comment is filtered by automoderator
+
+---
+
+### <a id="automoderatorfilterpost" name="automoderatorfilterpost"></a> AutomoderatorFilterPost
+
+Ƭ **AutomoderatorFilterPost**: `"AutomoderatorFilterPost"`
+
+The event name for when a post is filtered by automoderator
 
 ---
 
@@ -838,9 +856,35 @@ A number field
 
 ---
 
+### <a id="onautomoderatorfiltercommentdefinition" name="onautomoderatorfiltercommentdefinition"></a> OnAutomoderatorFilterCommentDefinition
+
+Ƭ **OnAutomoderatorFilterCommentDefinition**: `Object`
+
+#### Type declaration
+
+| Name      | Type                                                                                              |
+| :-------- | :------------------------------------------------------------------------------------------------ |
+| `event`   | [`AutomoderatorFilterComment`](README.md#automoderatorfiltercomment)                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AutomoderatorFilterComment`\> |
+
+---
+
+### <a id="onautomoderatorfilterpostdefinition" name="onautomoderatorfilterpostdefinition"></a> OnAutomoderatorFilterPostDefinition
+
+Ƭ **OnAutomoderatorFilterPostDefinition**: `Object`
+
+#### Type declaration
+
+| Name      | Type                                                                                           |
+| :-------- | :--------------------------------------------------------------------------------------------- |
+| `event`   | [`AutomoderatorFilterPost`](README.md#automoderatorfilterpost)                                 |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AutomoderatorFilterPost`\> |
+
+---
+
 ### <a id="ontriggerrequest" name="ontriggerrequest"></a> OnTriggerRequest
 
-Ƭ **OnTriggerRequest**: `protos.PostFlairUpdate` \| `protos.PostSubmit` \| `protos.PostCreate` \| `protos.PostUpdate` \| `protos.PostReport` \| `protos.PostDelete` \| `protos.CommentSubmit` \| `protos.CommentCreate` \| `protos.CommentUpdate` \| `protos.CommentReport` \| `protos.CommentDelete` \| `protos.AppInstall` \| `protos.AppUpgrade` \| `protos.ModAction` \| `protos.ModMail`
+Ƭ **OnTriggerRequest**: `protos.PostFlairUpdate` \| `protos.PostSubmit` \| `protos.PostCreate` \| `protos.PostUpdate` \| `protos.PostReport` \| `protos.PostDelete` \| `protos.CommentSubmit` \| `protos.CommentCreate` \| `protos.CommentUpdate` \| `protos.CommentReport` \| `protos.CommentDelete` \| `protos.AppInstall` \| `protos.AppUpgrade` \| `protos.ModAction` \| `protos.ModMail` \| `protos.PostNsfwUpdate` \| `protos.PostSpoilerUpdate` \| `protos.AutomoderatorFilterPost` \| `protos.AutomoderatorFilterComment`
 
 ---
 
@@ -1335,19 +1379,19 @@ A text field
 
 ### <a id="triggercontext" name="triggercontext"></a> TriggerContext
 
-Ƭ **TriggerContext**: `Omit`\<[`Context`](modules/Devvit.md#context), `"ui"`\>
+Ƭ **TriggerContext**: `Omit`\<[`Context`](modules/Devvit.md#context), `"ui"` \| `"dimensions"` \| `"modLog"` \| `"uiEnvironment"`\>
 
 ---
 
 ### <a id="triggerdefinition" name="triggerdefinition"></a> TriggerDefinition
 
-Ƭ **TriggerDefinition**: [`PostSubmitDefinition`](README.md#postsubmitdefinition) \| [`PostCreateDefinition`](README.md#postcreatedefinition) \| [`PostUpdateDefinition`](README.md#postupdatedefinition) \| [`PostFlairUpdateDefinition`](README.md#postflairupdatedefinition) \| [`PostReportDefinition`](README.md#postreportdefinition) \| [`PostDeleteDefinition`](README.md#postdeletedefinition) \| [`CommentSubmitDefinition`](README.md#commentsubmitdefinition) \| [`CommentCreateDefinition`](README.md#commentcreatedefinition) \| [`CommentUpdateDefinition`](README.md#commentupdatedefinition) \| [`CommentReportDefinition`](README.md#commentreportdefinition) \| [`CommentDeleteDefinition`](README.md#commentdeletedefinition) \| [`AppInstallDefinition`](README.md#appinstalldefinition) \| [`AppUpgradeDefinition`](README.md#appupgradedefinition) \| [`ModActionDefinition`](README.md#modactiondefinition) \| [`ModMailDefinition`](README.md#modmaildefinition)
+Ƭ **TriggerDefinition**: [`PostSubmitDefinition`](README.md#postsubmitdefinition) \| [`PostCreateDefinition`](README.md#postcreatedefinition) \| [`PostUpdateDefinition`](README.md#postupdatedefinition) \| [`PostFlairUpdateDefinition`](README.md#postflairupdatedefinition) \| [`PostReportDefinition`](README.md#postreportdefinition) \| [`PostDeleteDefinition`](README.md#postdeletedefinition) \| [`CommentSubmitDefinition`](README.md#commentsubmitdefinition) \| [`CommentCreateDefinition`](README.md#commentcreatedefinition) \| [`CommentUpdateDefinition`](README.md#commentupdatedefinition) \| [`CommentReportDefinition`](README.md#commentreportdefinition) \| [`CommentDeleteDefinition`](README.md#commentdeletedefinition) \| [`AppInstallDefinition`](README.md#appinstalldefinition) \| [`AppUpgradeDefinition`](README.md#appupgradedefinition) \| [`ModActionDefinition`](README.md#modactiondefinition) \| [`ModMailDefinition`](README.md#modmaildefinition) \| [`PostSpoilerUpdateDefinition`](README.md#postspoilerupdatedefinition) \| [`PostNsfwUpdateDefinition`](README.md#postnsfwupdatedefinition) \| [`OnAutomoderatorFilterPostDefinition`](README.md#onautomoderatorfilterpostdefinition) \| [`OnAutomoderatorFilterCommentDefinition`](README.md#onautomoderatorfiltercommentdefinition)
 
 ---
 
 ### <a id="triggerevent" name="triggerevent"></a> TriggerEvent
 
-Ƭ **TriggerEvent**: [`PostSubmit`](README.md#postsubmit) \| [`PostCreate`](README.md#postcreate) \| [`PostUpdate`](README.md#postupdate) \| [`PostReport`](README.md#postreport) \| [`PostDelete`](README.md#postdelete) \| [`PostFlairUpdate`](README.md#postflairupdate) \| [`CommentSubmit`](README.md#commentsubmit) \| [`CommentCreate`](README.md#commentcreate) \| [`CommentUpdate`](README.md#commentupdate) \| [`CommentReport`](README.md#commentreport) \| [`CommentDelete`](README.md#commentdelete) \| [`AppInstall`](README.md#appinstall) \| [`AppUpgrade`](README.md#appupgrade) \| [`ModActionTrigger`](README.md#modactiontrigger) \| [`ModMailTrigger`](README.md#modmailtrigger)
+Ƭ **TriggerEvent**: [`PostSubmit`](README.md#postsubmit) \| [`PostCreate`](README.md#postcreate) \| [`PostUpdate`](README.md#postupdate) \| [`PostReport`](README.md#postreport) \| [`PostDelete`](README.md#postdelete) \| [`PostFlairUpdate`](README.md#postflairupdate) \| [`CommentSubmit`](README.md#commentsubmit) \| [`CommentCreate`](README.md#commentcreate) \| [`CommentUpdate`](README.md#commentupdate) \| [`CommentReport`](README.md#commentreport) \| [`CommentDelete`](README.md#commentdelete) \| [`AppInstall`](README.md#appinstall) \| [`AppUpgrade`](README.md#appupgrade) \| [`ModActionTrigger`](README.md#modactiontrigger) \| [`ModMailTrigger`](README.md#modmailtrigger) \| [`PostNsfwUpdate`](README.md#postnsfwupdate) \| [`PostSpoilerUpdate`](README.md#postspoilerupdate) \| [`AutomoderatorFilterPost`](README.md#automoderatorfilterpost) \| [`AutomoderatorFilterComment`](README.md#automoderatorfiltercomment)
 
 ---
 
@@ -1359,23 +1403,25 @@ Maps a TriggerEvent to a Protobuf message and type.
 
 #### Type declaration
 
-| Name              | Type                                                        |
-| :---------------- | :---------------------------------------------------------- |
-| `AppInstall`      | \{ `type`: `"AppInstall"` } & `protos.AppInstall`           |
-| `AppUpgrade`      | \{ `type`: `"AppUpgrade"` } & `protos.AppUpgrade`           |
-| `CommentCreate`   | \{ `type`: `"CommentCreate"` } & `protos.CommentCreate`     |
-| `CommentDelete`   | \{ `type`: `"CommentDelete"` } & `protos.CommentDelete`     |
-| `CommentReport`   | \{ `type`: `"CommentReport"` } & `protos.CommentReport`     |
-| `CommentSubmit`   | \{ `type`: `"CommentSubmit"` } & `protos.CommentSubmit`     |
-| `CommentUpdate`   | \{ `type`: `"CommentUpdate"` } & `protos.CommentUpdate`     |
-| `ModAction`       | \{ `type`: `"ModAction"` } & `protos.ModAction`             |
-| `ModMail`         | \{ `type`: `"ModMail"` } & `protos.ModMail`                 |
-| `PostCreate`      | \{ `type`: `"PostCreate"` } & `protos.PostCreate`           |
-| `PostDelete`      | \{ `type`: `"PostDelete"` } & `protos.PostDelete`           |
-| `PostFlairUpdate` | \{ `type`: `"PostFlairUpdate"` } & `protos.PostFlairUpdate` |
-| `PostReport`      | \{ `type`: `"PostReport"` } & `protos.PostReport`           |
-| `PostSubmit`      | \{ `type`: `"PostSubmit"` } & `protos.PostSubmit`           |
-| `PostUpdate`      | \{ `type`: `"PostUpdate"` } & `protos.PostUpdate`           |
+| Name                         | Type                                                                              |
+| :--------------------------- | :-------------------------------------------------------------------------------- |
+| `AppInstall`                 | \{ `type`: `"AppInstall"` } & `protos.AppInstall`                                 |
+| `AppUpgrade`                 | \{ `type`: `"AppUpgrade"` } & `protos.AppUpgrade`                                 |
+| `AutomoderatorFilterComment` | \{ `type`: `"AutomoderatorFilterComment"` } & `protos.AutomoderatorFilterComment` |
+| `AutomoderatorFilterPost`    | \{ `type`: `"AutomoderatorFilterPost"` } & `protos.AutomoderatorFilterPost`       |
+| `CommentCreate`              | \{ `type`: `"CommentCreate"` } & `protos.CommentCreate`                           |
+| `CommentDelete`              | \{ `type`: `"CommentDelete"` } & `protos.CommentDelete`                           |
+| `CommentReport`              | \{ `type`: `"CommentReport"` } & `protos.CommentReport`                           |
+| `CommentSubmit`              | \{ `type`: `"CommentSubmit"` } & `protos.CommentSubmit`                           |
+| `CommentUpdate`              | \{ `type`: `"CommentUpdate"` } & `protos.CommentUpdate`                           |
+| `ModAction`                  | \{ `type`: `"ModAction"` } & `protos.ModAction`                                   |
+| `ModMail`                    | \{ `type`: `"ModMail"` } & `protos.ModMail`                                       |
+| `PostCreate`                 | \{ `type`: `"PostCreate"` } & `protos.PostCreate`                                 |
+| `PostDelete`                 | \{ `type`: `"PostDelete"` } & `protos.PostDelete`                                 |
+| `PostFlairUpdate`            | \{ `type`: `"PostFlairUpdate"` } & `protos.PostFlairUpdate`                       |
+| `PostReport`                 | \{ `type`: `"PostReport"` } & `protos.PostReport`                                 |
+| `PostSubmit`                 | \{ `type`: `"PostSubmit"` } & `protos.PostSubmit`                                 |
+| `PostUpdate`                 | \{ `type`: `"PostUpdate"` } & `protos.PostUpdate`                                 |
 
 ---
 
@@ -1705,16 +1751,16 @@ A helper to allow SVG functionality within image tags.
 import { Devvit, svg } from '@devvit/public-api';
 const App = () => {
   const color = 'gold';
-  return (
-    <hstack>
-      <image
-        url={svg`<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+    return (
+       <hstack>
+         <image
+           url={svg`<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
                      <circle fill="${color}" cx="5" cy="5" r="4" />
                    </svg>`}
-        imageHeight={100}
-        imageWidth={100}
-      />
-    </hstack>
+           imageHeight={100}
+           imageWidth={100}
+         />
+       </hstack>
   );
 };
 ```

@@ -16,7 +16,7 @@ Devvit.configure({
 
 // use within one of our capability handlers e.g. Menu Actions, Triggers, Scheduled Job Type, etc
 async (event, context) => {
-  const subreddit = await context.reddit.getSubredditById(context.subredditId);
+  const subreddit = await context.reddit.getSubredditInfoById(context.subredditId);
   await context.reddit.submitPost({
     subredditName: subreddit.name,
     title: 'test post',
@@ -86,8 +86,10 @@ async (event, context) => {
 - [getRisingPosts](RedditAPIClient.RedditAPIClient.md#getrisingposts)
 - [getSnoovatarUrl](RedditAPIClient.RedditAPIClient.md#getsnoovatarurl)
 - [getSpam](RedditAPIClient.RedditAPIClient.md#getspam)
-- [getSubredditById](RedditAPIClient.RedditAPIClient.md#getsubredditbyid)
-- [getSubredditByName](RedditAPIClient.RedditAPIClient.md#getsubredditbyname)
+- ~[getSubredditById](RedditAPIClient.RedditAPIClient.md#getsubredditbyid)~
+- ~[getSubredditByName](RedditAPIClient.RedditAPIClient.md#getsubredditbyname)~
+- [getSubredditInfoById](RedditAPIClient.RedditAPIClient.md#getsubredditinfobyid)
+- [getSubredditInfoByName](RedditAPIClient.RedditAPIClient.md#getsubredditinfobyname)
 - [getSubredditRemovalReasons](RedditAPIClient.RedditAPIClient.md#getsubredditremovalreasons)
 - [getSubredditStyles](RedditAPIClient.RedditAPIClient.md#getsubredditstyles)
 - [getTopPosts](RedditAPIClient.RedditAPIClient.md#gettopposts)
@@ -1285,7 +1287,11 @@ console.log('Posts: ', await listing.all());
 
 ---
 
-### <a id="getsubredditbyid" name="getsubredditbyid"></a> getSubredditById
+### <a id="getsubredditbyid" name="getsubredditbyid"></a> ~getSubredditById~
+
+:::note
+Deprecated. Use [`getSubredditInfoById()`](../classes/RedditAPIClient.RedditAPIClient.md#getsubredditinfobyid) instead.
+:::
 
 ▸ **getSubredditById**(`id`): `Promise`\<[`Subreddit`](models.Subreddit.md)\>
 
@@ -1311,7 +1317,11 @@ const memes = await reddit.getSubredditById('t5_2qjpg');
 
 ---
 
-### <a id="getsubredditbyname" name="getsubredditbyname"></a> getSubredditByName
+### <a id="getsubredditbyname" name="getsubredditbyname"></a> ~getSubredditByName~
+
+:::note
+Deprecated. Use [`getSubredditInfoByName()`](../classes/RedditAPIClient.RedditAPIClient.md#getsubredditinfobyname) instead.
+:::
 
 ▸ **getSubredditByName**(`name`): `Promise`\<[`Subreddit`](models.Subreddit.md)\>
 
@@ -1333,6 +1343,58 @@ A Promise that resolves a Subreddit object.
 
 ```ts
 const askReddit = await reddit.getSubredditByName('askReddit');
+```
+
+---
+
+### <a id="getsubredditinfobyid" name="getsubredditinfobyid"></a> getSubredditInfoById
+
+▸ **getSubredditInfoById**(`id`): `Promise`\<[`SubredditInfo`](models.SubredditInfo.md)\>
+
+Gets a [SubredditInfo](models.SubredditInfo.md) object by ID
+
+#### Parameters
+
+| Name | Type     | Description                                                             |
+| :--- | :------- | :---------------------------------------------------------------------- |
+| `id` | `string` | The ID (starting with t5\_) of the subreddit to retrieve. e.g. t5_2qjpg |
+
+#### Returns
+
+`Promise`\<[`SubredditInfo`](models.SubredditInfo.md)\>
+
+A Promise that resolves a SubredditInfo object.
+
+**`Example`**
+
+```ts
+const memes = await reddit.getSubredditInfoById('t5_2qjpg');
+```
+
+---
+
+### <a id="getsubredditinfobyname" name="getsubredditinfobyname"></a> getSubredditInfoByName
+
+▸ **getSubredditInfoByName**(`name`): `Promise`\<[`SubredditInfo`](models.SubredditInfo.md)\>
+
+Gets a [SubredditInfo](models.SubredditInfo.md) object by name
+
+#### Parameters
+
+| Name   | Type     | Description                                                        |
+| :----- | :------- | :----------------------------------------------------------------- |
+| `name` | `string` | The name of a subreddit omitting the r/. This is case insensitive. |
+
+#### Returns
+
+`Promise`\<[`SubredditInfo`](models.SubredditInfo.md)\>
+
+A Promise that resolves a SubredditInfo object.
+
+**`Example`**
+
+```ts
+const askReddit = await reddit.getSubredditInfoByName('askReddit');
 ```
 
 ---

@@ -206,11 +206,11 @@
 
 ### <a id="id" name="id"></a> id
 
-• `get` **id**(): \`t3\_$\{string}\`
+• `get` **id**(): `t3_${string}`
 
 #### Returns
 
-\`t3\_$\{string}\`
+`t3_${string}`
 
 ---
 

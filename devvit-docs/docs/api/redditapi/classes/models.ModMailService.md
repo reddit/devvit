@@ -6,12 +6,19 @@ Class providing the methods for working with Mod Mail
 
 ## Table of contents
 
+### Properties
+
+- [notificationSubjectPrefix](models.ModMailService.md#notificationsubjectprefix)
+
 ### Methods
 
 - [approveConversation](models.ModMailService.md#approveconversation)
 - [archiveConversation](models.ModMailService.md#archiveconversation)
 - [bulkReadConversations](models.ModMailService.md#bulkreadconversations)
 - [createConversation](models.ModMailService.md#createconversation)
+- [createModDiscussionConversation](models.ModMailService.md#createmoddiscussionconversation)
+- [createModInboxConversation](models.ModMailService.md#createmodinboxconversation)
+- [createModNotification](models.ModMailService.md#createmodnotification)
 - [disapproveConversation](models.ModMailService.md#disapproveconversation)
 - [getConversation](models.ModMailService.md#getconversation)
 - [getConversations](models.ModMailService.md#getconversations)
@@ -28,6 +35,12 @@ Class providing the methods for working with Mod Mail
 - [unhighlightConversation](models.ModMailService.md#unhighlightconversation)
 - [unmuteConversation](models.ModMailService.md#unmuteconversation)
 - [unreadConversations](models.ModMailService.md#unreadconversations)
+
+## Properties
+
+### <a id="notificationsubjectprefix" name="notificationsubjectprefix"></a> notificationSubjectPrefix
+
+• `Readonly` **notificationSubjectPrefix**: `"[notification]"`
 
 ## Methods
 
@@ -145,6 +158,10 @@ The to field for this endpoint is somewhat confusing. It can be:
 In this way to is a bit of a misnomer in modmail conversations.
 What it really means is the participant of the conversation who is not a mod of the subreddit.
 
+**`Deprecated`**
+
+Use [ModMailService.createModDiscussionConversation](models.ModMailService.md#createmoddiscussionconversation), [ModMailService.createModInboxConversation](models.ModMailService.md#createmodinboxconversation), or [ModMailService.createModNotification](models.ModMailService.md#createmodnotification) instead.
+
 **`Example`**
 
 ```ts
@@ -153,6 +170,108 @@ const { conversation, messages, modActions } = await reddit.modMail.createConver
   subject: 'Test conversation',
   body: 'Lorem ipsum sit amet',
   to: null,
+});
+```
+
+---
+
+### <a id="createmoddiscussionconversation" name="createmoddiscussionconversation"></a> createModDiscussionConversation
+
+▸ **createModDiscussionConversation**(`params`): `Promise`\<`string`\>
+
+Creates a conversation in Mod Discussions with the moderators of the given subredditId.
+
+Note: The app must be installed in the subreddit in order to create a conversation in Mod Discussions.
+
+#### Parameters
+
+| Name                  | Type     |
+| :-------------------- | :------- |
+| `params`              | `Object` |
+| `params.bodyMarkdown` | `string` |
+| `params.subject`      | `string` |
+| `params.subredditId`  | `string` |
+
+#### Returns
+
+`Promise`\<`string`\>
+
+A Promise that resolves a string representing the conversationId of the message.
+
+**`Example`**
+
+```ts
+const conversationId = await reddit.modMail.createModDiscussionConversation({
+  subject: 'Test conversation',
+  bodyMarkdown: '**Hello there** \n\n _Have a great day!_',
+  subredditId: context.subredditId,
+});
+```
+
+---
+
+### <a id="createmodinboxconversation" name="createmodinboxconversation"></a> createModInboxConversation
+
+▸ **createModInboxConversation**(`params`): `Promise`\<`string`\>
+
+Creates a conversation in the Modmail Inbox with the moderators of the given subredditId.
+
+#### Parameters
+
+| Name                  | Type     |
+| :-------------------- | :------- |
+| `params`              | `Object` |
+| `params.bodyMarkdown` | `string` |
+| `params.subject`      | `string` |
+| `params.subredditId`  | `string` |
+
+#### Returns
+
+`Promise`\<`string`\>
+
+A Promise that resolves a string representing the conversationId of the message.
+
+**`Example`**
+
+```ts
+const conversationId = await reddit.modMail.createModInboxConversation({
+  subject: 'Test conversation',
+  bodyMarkdown: '**Hello there** \n\n _Have a great day!_',
+  subredditId: context.subredditId,
+});
+```
+
+---
+
+### <a id="createmodnotification" name="createmodnotification"></a> createModNotification
+
+▸ **createModNotification**(`params`): `Promise`\<`string`\>
+
+Creates a notification in the Modmail Inbox.
+This function is different from [ModMailService.createModInboxConversation](models.ModMailService.md#createmodinboxconversation) in that the conversation also appears in the "Notifications" section of Modmail.
+
+#### Parameters
+
+| Name                  | Type     |
+| :-------------------- | :------- |
+| `params`              | `Object` |
+| `params.bodyMarkdown` | `string` |
+| `params.subject`      | `string` |
+| `params.subredditId`  | `string` |
+
+#### Returns
+
+`Promise`\<`string`\>
+
+A Promise that resolves a string representing the conversationId of the message.
+
+**`Example`**
+
+```ts
+const conversationId = await reddit.modMail.createModNotification({
+  subject: 'Test notification',
+  bodyMarkdown: '**Hello there** \n\n _This is a notification!_',
+  subredditId: context.subredditId,
 });
 ```
 
