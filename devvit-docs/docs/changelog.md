@@ -4,6 +4,21 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.1: New automod filter trigger, playtest connect, and other improvements
+
+**Release Date: Oct 21, 2024**
+
+0.11.1 includes [a new trigger](capabilities/triggers.md) for when posts and comments are filtered by automod. We’ve also included some other improvements including:
+
+- Playtest now defaults to using `--connect`, which sends client side logs that are in your browser into your CLI/terminal if you use the `?playtest` [parameter](playtest.md).
+- Public API changes:
+  - Updated parameters to improve modmail conversation routing:
+    - Added `createModInboxConversation()`, which sends a message from the app account to subreddit mods via Mod Inbox.
+    - Added `createModDiscussionConversation()`, which does the same thing via Mod Discussions.
+    - Deprecated `modMail.createConversation()`.
+  - Fixed [`modMail.muteConversation`](api/redditapi/classes/models.ModMailService.md) to take in proper values for numHours (defaults to 72).
+  - Fixed context that was not being properly passed in `reddit.banUser` methods (thanks to fsv for the community contribution!).
+
 ## Devvit 0.11.0: Platform updates, breaking changes, and useAsync
 
 **Release Date: October 9, 2024**

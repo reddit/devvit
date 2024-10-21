@@ -25,6 +25,14 @@ If you need help, run `devvit playtest —-help` for additional information.
 
 Playtest continuously streams logs for your app installation. This will show in the output of your terminal where the playtest is running. Check out [logs](./debug.md) to learn more.
 
+## Connect to client-side logs
+
+To enable client-side logs, add the`?playtest=<app_name>` query parameter to your subreddit URL (e.g. http://reddit.com/r/devvit?playtest=pixelary-game). This allows client side logs to stream into Devvit playtest logs and live reloads your browser when there are changes.
+
+:::note
+This url is also shown in your terminal when you start a playtest.
+:::
+
 ## End a playtest
 
 Press Ctrl + C to exit the playtest.
