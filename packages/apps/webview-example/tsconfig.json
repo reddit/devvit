@@ -1,0 +1,4 @@
+{
+  "extends": "@devvit/public-api/devvit.tsconfig.json",
+  "exclude": ["webroot"]
+}

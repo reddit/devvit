@@ -1,0 +1,41 @@
+{
+  "$schema": "../../../../shared-types/src/payments/products.schema.json",
+  "products": [
+    {
+      "sku": "hotdog",
+      "displayName": "Hot Dog",
+      "description": "a plump and juicy hot dog. 100% beef; 100% delicious",
+      "price": 50,
+      "images": {
+        "icon": "HotDog.png"
+      },
+      "metadata": {
+        "category": "sandwich"
+      },
+      "accountingType": "CONSUMABLE"
+    },
+    {
+      "sku": "pizza",
+      "displayName": "Pizza",
+      "description": "super cheesy slice of 'za. exactly 2 pepperonis",
+      "price": 100,
+      "images": {
+        "icon": "Pizza.png"
+      },
+      "metadata": {
+        "category": "not-sandwich"
+      },
+      "accountingType": "CONSUMABLE"
+    },
+    {
+      "sku": "iceream",
+      "displayName": "Ice Cream",
+      "description": "Red(dit) raspberry ice cream",
+      "price": 25,
+      "metadata": {
+        "category": "dessert"
+      },
+      "accountingType": "CONSUMABLE"
+    }
+  ]
+}
