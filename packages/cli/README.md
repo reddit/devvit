@@ -1,3 +1,7 @@
+# IF YOU ARE TRYING TO INSTALL THE CLI, THIS IS PROBABLY THE WRONG PACKAGE!!
+
+Check out [devvit](https://www.npmjs.com/package/devvit) instead!
+
 # @devvit/cli
 
 Sign up for Reddit's Developer Platform [here!](https://developers.reddit.com)
