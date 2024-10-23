@@ -298,48 +298,46 @@ Automatic updates will be supported in a future release.
 
 ## Issue a refund
 
-:::note
-Refunds are not generally supported, but they are available pending admin approval.
-:::
+Reddit may reverse transactions under certain circumstances, such as card disputes, policy violations, or technical issues. If there’s a problem with a digital good, a user can submit a request for a refund via [Reddit Help](https://support.reddithelp.com/hc/en-us/requests/new?ticket_form_id=29770197409428).
 
-If there’s a problem with a digital good, a user can submit a request for a refund via [Reddit Help](https://support.reddithelp.com/hc/en-us/requests/new?ticket_form_id=29770197409428). If an admin determines that a purchase should be refunded, your app’s `refundOrder` hook will be called to un-issue those digital goods.
+When a transaction is reversed for any reason, you may optionally revoke product functionality from the user by adding a `refundOrder` handler.
 
 **Example**
 
 ```tsx
 addPaymentHandler({
- fulfillOrder: async (order: Order, ctx: Context) => {
-   if (!order.products.some(({ sku }) => sku === EXTRA_LIVES_SKU)) {
-     // this error will be visible to your logs but not users; the order will be rejected
-     throw new Error('Unable to fulfill order: sku not found');
-   }
+  fulfillOrder: async (order: Order, ctx: Context) => {
+    if (!order.products.some(({ sku }) => sku === EXTRA_LIVES_SKU)) {
+      // this error will be visible to your logs but not users; the order will be rejected
+      throw new Error('Unable to fulfill order: sku not found');
+    }
 
-   // redis key for storing number of lives user has left
-   const livesKey = `${ctx.userId}:lives`;
+    // redis key for storing number of lives user has left
+    const livesKey = `${ctx.userId}:lives`;
 
-   // get the current life count
-   const curLives = await ctx.redis.get(livesKey);
+    // get the current life count
+    const curLives = await ctx.redis.get(livesKey);
 
-   // reject the order if the user already has more than or equal MAX_LIVES
-   if (curLives != null && Number(curLives) >= MAX_LIVES) {
-     // the reason provided here will be delivered to the `usePayments` callback function
-     // as `result.errorMessage` to optionally display to the end-user.
-     return { success: false, reason: 'Max lives exceeded' };
-   }
+    // reject the order if the user already has more than or equal MAX_LIVES
+    if (curLives != null && Number(curLives) >= MAX_LIVES) {
+      // the reason provided here will be delivered to the `usePayments` callback function
+      // as `result.errorMessage` to optionally display to the end-user.
+      return { success: false, reason: 'Max lives exceeded' };
+    }
 
-   // fulfill the order by incrementing the lives count for the user
-   await ctx.redis.incrBy(livesKey, 1);
- },
- refundOrder: async (order: Order, ctx: Context) => {
-   // check if the order contains an extra life
-   if (order.products.some(({ sku }) => sku === EXTRA_LIVES_SKU)) {
+    // fulfill the order by incrementing the lives count for the user
+    await ctx.redis.incrBy(livesKey, 1);
+  },
+  refundOrder: async (order: Order, ctx: Context) => {
+    // check if the order contains an extra life
+    if (order.products.some(({ sku }) => sku === EXTRA_LIVES_SKU)) {
       // redis key for storing number of lives user has left
-	   const livesKey = `${ctx.userId}:lives`;
+      const livesKey = `${ctx.userId}:lives`;
 
-		 // if so, decrement the number of lives
-	   await ctx.redis.incrBy(livesKey, -1);
-   }
- },
+      // if so, decrement the number of lives
+      await ctx.redis.incrBy(livesKey, -1);
+    }
+  },
 });
 ```
 

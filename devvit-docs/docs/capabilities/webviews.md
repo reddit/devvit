@@ -9,13 +9,13 @@ Webviews are components that let you display web content directly within your ap
 - Gesture recognition on mobile does not yet work, as it triggers native gestures in the Reddit app as well. We are working on a fix for this that should be available in November.
 - Assets are not tied to the app version; when a new version of assets is uploaded (even via playtest) ALL versions of that app will have access to those assets. This can cause problems if you use a single app for both development and production releases. We are working on a fix that should be available in October. In the interim, we recommend creating separate apps for development and production versions of the app.
 
-## Install Devvit Next
+## Install Devvit
 
-In order to use webviews, you’ll need to install and use Devvit Next on 0.11.
+In order to use webviews, you’ll need to install and use Devvit on 0.11.
 
 ```tsx
 
-npm install -g devvit@next
+npm install -g devvit
 
 ```
 
