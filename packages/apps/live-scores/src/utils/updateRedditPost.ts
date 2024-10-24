@@ -1,14 +1,9 @@
+import { LinkedBundle } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { Devvit, RichTextBuilder } from '@devvit/public-api';
 import * as BlocksReconciler from '@devvit/public-api/devvit/internals/blocks/BlocksReconciler.js';
 import * as b64 from 'base64-js';
 import Context = Devvit.Context;
-import {
-  Block,
-  CustomPostDefinition,
-  Definition,
-  LinkedBundle,
-  UIEventHandlerDefinition,
-} from '@devvit/protos';
+import { Block, CustomPostDefinition, Definition, UIEventHandlerDefinition } from '@devvit/protos';
 
 /**
  * This updates the actual Reddit post saved inside of Reddit. We use this to update the
