@@ -2,7 +2,7 @@ import type { Devvit } from '../devvit/Devvit.js';
 
 export type MenuItemLocation = 'subreddit' | 'post' | 'comment';
 
-export type MenuItemUserType = 'loggedOut' | 'member' | 'moderator';
+export type MenuItemUserType = 'loggedOut' | 'moderator';
 
 /**
  * You can use the "currentApp" filter to only display the menu item on custom posts that were created by your app.

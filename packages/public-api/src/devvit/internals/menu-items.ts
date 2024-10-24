@@ -43,7 +43,6 @@ async function getActions(
       },
       users: {
         loggedOut: item.forUserType?.includes('loggedOut'),
-        member: item.forUserType?.includes('member'),
         moderator: item.forUserType?.includes('moderator'),
       },
       postFilters: item.postFilter === 'currentApp' ? { currentApp: true } : undefined,

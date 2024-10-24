@@ -911,7 +911,7 @@ You can use the "currentApp" filter to only display the menu item on custom post
 
 ### <a id="menuitemusertype" name="menuitemusertype"></a> MenuItemUserType
 
-Ƭ **MenuItemUserType**: `"loggedOut"` \| `"member"` \| `"moderator"`
+Ƭ **MenuItemUserType**: `"loggedOut"` \| `"moderator"`
 
 ---
 
