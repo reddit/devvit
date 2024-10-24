@@ -26,16 +26,7 @@
 
 ### <a id="debug" name="debug"></a> debug
 
-▪ `Static` **debug**: `Object`
-
-Home for debug flags, settings, and other information.
-
-#### Type declaration
-
-| Name            | Type      | Description                                                                                                                          |
-| :-------------- | :-------- | :----------------------------------------------------------------------------------------------------------------------------------- |
-| `emitSnapshots` | `boolean` | Should debug block rendering in console.log according to the reified JSX/XML output. Example: <hstack><text>hi world</text></hstack> |
-| `emitState`     | `boolean` | Should console.log the state of the app after every event.                                                                           |
+▪ `Static` **debug**: [`DevvitDebug`](../README.md#devvitdebug) = `{}`
 
 ## Methods
 
@@ -69,9 +60,9 @@ Devvit.addCustomPostType({
     return (
       <vstack>
         <text>{counter}</text>
-        <button onPress={() => setCounter((counter) => counter + 1)}>Click me!</button>
-      </vstack>
-    );
+      <button onPress={() => setCounter((counter) => counter + 1)}>Click me!</button>
+    </vstack>
+  );
   },
 });
 ```
@@ -112,15 +103,21 @@ Devvit.addMenuItem({
 
 ### <a id="addschedulerjob" name="addschedulerjob"></a> addSchedulerJob
 
-▸ **addSchedulerJob**(`job`): `void`
+▸ **addSchedulerJob**\<`T`\>(`job`): `void`
 
 Add a scheduled job type for your app. This will allow you to schedule jobs using the `scheduler` API.
 
+#### Type parameters
+
+| Name | Type                                                           |
+| :--- | :------------------------------------------------------------- |
+| `T`  | extends `undefined` \| [`JSONObject`](../README.md#jsonobject) |
+
 #### Parameters
 
-| Name  | Type                                                | Description                    |
-| :---- | :-------------------------------------------------- | :----------------------------- |
-| `job` | [`ScheduledJobType`](../README.md#scheduledjobtype) | The scheduled job type to add. |
+| Name  | Type                                                       | Description                    |
+| :---- | :--------------------------------------------------------- | :----------------------------- |
+| `job` | [`ScheduledJobType`](../README.md#scheduledjobtype)\<`T`\> | The scheduled job type to add. |
 
 #### Returns
 
@@ -138,18 +135,18 @@ Devvit.addSchedulerJob({
         await post.remove();
       }
     }
-  },
+  }
 });
 
 Devvit.addMenuItem({
   label: 'Check for new posts',
   location: 'location',
-  onPress: async (event, context) => {
-    const checkPostsJob = await context.scheduler.runJob({
+  onPress: (event, context) => {
+    const = await context.scheduler.runJob({
       name: 'checkNewPosts',
-      when: new Date(Date.now() + 5000), // in 5 seconds
+      when: new Date(Date.now() + 5000) // in 5 seconds
     });
-  },
+  }
 });
 ```
 
@@ -198,7 +195,7 @@ Devvit.addSettings([
     label: 'Default city to show the weather for by default',
     scope: SettingScope.Installation,
     onValidate: ({ value }) => {
-      if (isValidCity(value)) {
+      if (!isValidCity(value)) {
         return 'You must ender a valid city: ${validCities.join(", ")}';
       }
     },
@@ -209,7 +206,7 @@ Devvit.addSettings([
     label: 'The number of days to show for forecast for by default',
     scope: SettingScope.Installation,
     onValidate: ({ value }) => {
-      if (value < 10 || value < 1) {
+      if (value > 10 || value < 1) {
         return 'Forecast window must be from 1 to 10 days';
       }
     },
@@ -221,16 +218,24 @@ Devvit.addSettings([
 
 ### <a id="addtrigger" name="addtrigger"></a> addTrigger
 
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
+▸ **addTrigger**\<`T`\>(`definition`): typeof [`Devvit`](../modules/Devvit.md)
 
 Add a trigger handler that will be invoked when the given event
 occurs in a subreddit where the app is installed.
 
+#### Type parameters
+
+| Name | Type                                                              |
+| :--- | :---------------------------------------------------------------- |
+| `T`  | extends keyof [`TriggerEventType`](../README.md#triggereventtype) |
+
 #### Parameters
 
-| Name                | Type                                                        | Description             |
-| :------------------ | :---------------------------------------------------------- | :---------------------- |
-| `triggerDefinition` | [`PostDeleteDefinition`](../README.md#postdeletedefinition) | The trigger definition. |
+| Name                 | Type                                                                                                                      |
+| :------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `definition`         | `Object`                                                                                                                  |
+| `definition.event`   | `T`                                                                                                                       |
+| `definition.onEvent` | [`TriggerOnEventHandler`](../README.md#triggeroneventhandler)\<[`TriggerEventType`](../README.md#triggereventtype)[`T`]\> |
 
 #### Returns
 
@@ -257,174 +262,6 @@ Devvit.addTrigger({
   },
 });
 ```
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                        |
-| :------------------ | :---------------------------------------------------------- |
-| `triggerDefinition` | [`PostSubmitDefinition`](../README.md#postsubmitdefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                        |
-| :------------------ | :---------------------------------------------------------- |
-| `triggerDefinition` | [`PostUpdateDefinition`](../README.md#postupdatedefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                        |
-| :------------------ | :---------------------------------------------------------- |
-| `triggerDefinition` | [`PostReportDefinition`](../README.md#postreportdefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                        |
-| :------------------ | :---------------------------------------------------------- |
-| `triggerDefinition` | [`PostCreateDefinition`](../README.md#postcreatedefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                                  |
-| :------------------ | :-------------------------------------------------------------------- |
-| `triggerDefinition` | [`PostFlairUpdateDefinition`](../README.md#postflairupdatedefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                              |
-| :------------------ | :---------------------------------------------------------------- |
-| `triggerDefinition` | [`CommentDeleteDefinition`](../README.md#commentdeletedefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                              |
-| :------------------ | :---------------------------------------------------------------- |
-| `triggerDefinition` | [`CommentSubmitDefinition`](../README.md#commentsubmitdefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                              |
-| :------------------ | :---------------------------------------------------------------- |
-| `triggerDefinition` | [`CommentUpdateDefinition`](../README.md#commentupdatedefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                              |
-| :------------------ | :---------------------------------------------------------------- |
-| `triggerDefinition` | [`CommentCreateDefinition`](../README.md#commentcreatedefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                              |
-| :------------------ | :---------------------------------------------------------------- |
-| `triggerDefinition` | [`CommentReportDefinition`](../README.md#commentreportdefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                        |
-| :------------------ | :---------------------------------------------------------- |
-| `triggerDefinition` | [`AppInstallDefinition`](../README.md#appinstalldefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                        |
-| :------------------ | :---------------------------------------------------------- |
-| `triggerDefinition` | [`AppUpgradeDefinition`](../README.md#appupgradedefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                      |
-| :------------------ | :-------------------------------------------------------- |
-| `triggerDefinition` | [`ModActionDefinition`](../README.md#modactiondefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
-
-▸ **addTrigger**(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
-
-#### Parameters
-
-| Name                | Type                                                  |
-| :------------------ | :---------------------------------------------------- |
-| `triggerDefinition` | [`ModMailDefinition`](../README.md#modmaildefinition) |
-
-#### Returns
-
-typeof [`Devvit`](../modules/Devvit.md)
 
 ▸ **addTrigger**\<`Event`\>(`triggerDefinition`): typeof [`Devvit`](../modules/Devvit.md)
 
@@ -477,16 +314,22 @@ Devvit.configure({
 
 ### <a id="createform" name="createform"></a> createForm
 
-▸ **createForm**(`form`, `onSubmit`): [`FormKey`](../README.md#formkey)
+▸ **createForm**\<`T`\>(`form`, `onSubmit`): [`FormKey`](../README.md#formkey)
 
 Create a form that can be opened from menu items and custom posts.
 
+#### Type parameters
+
+| Name | Type                                                                               |
+| :--- | :--------------------------------------------------------------------------------- |
+| `T`  | extends [`Form`](../README.md#form) \| [`FormFunction`](../README.md#formfunction) |
+
 #### Parameters
 
-| Name       | Type                                                                       | Description                                      |
-| :--------- | :------------------------------------------------------------------------- | :----------------------------------------------- |
-| `form`     | [`Form`](../README.md#form) \| [`FormFunction`](../README.md#formfunction) | The form or a function that returns the form.    |
-| `onSubmit` | [`FormOnSubmitEventHandler`](../README.md#formonsubmiteventhandler)        | The function to call when the form is submitted. |
+| Name       | Type                                                                                                                              | Description                                      |
+| :--------- | :-------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------- |
+| `form`     | `T`                                                                                                                               | The form or a function that returns the form.    |
+| `onSubmit` | [`FormOnSubmitEventHandler`](../README.md#formonsubmiteventhandler)\<[`FormToFormValues`](../README.md#formtoformvalues)\<`T`\>\> | The function to call when the form is submitted. |
 
 #### Returns
 

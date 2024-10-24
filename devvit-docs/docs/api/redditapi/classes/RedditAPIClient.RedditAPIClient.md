@@ -16,8 +16,8 @@ Devvit.configure({
 
 // use within one of our capability handlers e.g. Menu Actions, Triggers, Scheduled Job Type, etc
 async (event, context) => {
-  const subreddit = await context.reddit.getSubredditInfoById(context.subredditId);
-  await context.reddit.submitPost({
+  const subreddit = await context.reddit.getSubredditById(context.subredditId);
+  context.reddit.submitPost({
     subredditName: subreddit.name,
     title: 'test post',
     text: 'test body',
@@ -48,7 +48,6 @@ async (event, context) => {
 - [approveUser](RedditAPIClient.RedditAPIClient.md#approveuser)
 - [banUser](RedditAPIClient.RedditAPIClient.md#banuser)
 - [banWikiContributor](RedditAPIClient.RedditAPIClient.md#banwikicontributor)
-- [createCollection](RedditAPIClient.RedditAPIClient.md#createcollection)
 - [createPostFlairTemplate](RedditAPIClient.RedditAPIClient.md#createpostflairtemplate)
 - [createUserFlairTemplate](RedditAPIClient.RedditAPIClient.md#createuserflairtemplate)
 - [createWikiPage](RedditAPIClient.RedditAPIClient.md#createwikipage)
@@ -61,8 +60,6 @@ async (event, context) => {
 - [getApprovedUsers](RedditAPIClient.RedditAPIClient.md#getapprovedusers)
 - [getBannedUsers](RedditAPIClient.RedditAPIClient.md#getbannedusers)
 - [getBannedWikiContributors](RedditAPIClient.RedditAPIClient.md#getbannedwikicontributors)
-- [getCollectionById](RedditAPIClient.RedditAPIClient.md#getcollectionbyid)
-- [getCollectionsForSubreddit](RedditAPIClient.RedditAPIClient.md#getcollectionsforsubreddit)
 - [getCommentById](RedditAPIClient.RedditAPIClient.md#getcommentbyid)
 - [getComments](RedditAPIClient.RedditAPIClient.md#getcomments)
 - [getCommentsAndPostsByUser](RedditAPIClient.RedditAPIClient.md#getcommentsandpostsbyuser)
@@ -86,10 +83,11 @@ async (event, context) => {
 - [getRisingPosts](RedditAPIClient.RedditAPIClient.md#getrisingposts)
 - [getSnoovatarUrl](RedditAPIClient.RedditAPIClient.md#getsnoovatarurl)
 - [getSpam](RedditAPIClient.RedditAPIClient.md#getspam)
-- ~[getSubredditById](RedditAPIClient.RedditAPIClient.md#getsubredditbyid)~
-- ~[getSubredditByName](RedditAPIClient.RedditAPIClient.md#getsubredditbyname)~
+- [getSubredditById](RedditAPIClient.RedditAPIClient.md#getsubredditbyid)
+- [getSubredditByName](RedditAPIClient.RedditAPIClient.md#getsubredditbyname)
 - [getSubredditInfoById](RedditAPIClient.RedditAPIClient.md#getsubredditinfobyid)
 - [getSubredditInfoByName](RedditAPIClient.RedditAPIClient.md#getsubredditinfobyname)
+- [getSubredditLeaderboard](RedditAPIClient.RedditAPIClient.md#getsubredditleaderboard)
 - [getSubredditRemovalReasons](RedditAPIClient.RedditAPIClient.md#getsubredditremovalreasons)
 - [getSubredditStyles](RedditAPIClient.RedditAPIClient.md#getsubredditstyles)
 - [getTopPosts](RedditAPIClient.RedditAPIClient.md#gettopposts)
@@ -97,6 +95,8 @@ async (event, context) => {
 - [getUserById](RedditAPIClient.RedditAPIClient.md#getuserbyid)
 - [getUserByUsername](RedditAPIClient.RedditAPIClient.md#getuserbyusername)
 - [getUserFlairTemplates](RedditAPIClient.RedditAPIClient.md#getuserflairtemplates)
+- [getVaultByAddress](RedditAPIClient.RedditAPIClient.md#getvaultbyaddress)
+- [getVaultByUserId](RedditAPIClient.RedditAPIClient.md#getvaultbyuserid)
 - [getWidgets](RedditAPIClient.RedditAPIClient.md#getwidgets)
 - [getWikiContributors](RedditAPIClient.RedditAPIClient.md#getwikicontributors)
 - [getWikiPage](RedditAPIClient.RedditAPIClient.md#getwikipage)
@@ -197,9 +197,9 @@ Add a mod note.
 
 #### Parameters
 
-| Name      | Type                                                                                                                                                                                                              | Description             |
-| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
-| `options` | `Omit`\<`Prettify`\<`PostNotesRequest` & \{ `label`: [`UserNoteLabel`](../modules/models.md#usernotelabel) ; `redditId`: \`t1\_$\{string}\` \| \`t3\_$\{string}\` }\>, `"redditId"`\> & \{ `redditId`: `string` } | Options for the request |
+| Name      | Type                                                                                                                                                                                                                                                      | Description             |
+| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
+| `options` | `Prettify`\<`PostNotesRequest` & \{ `label?`: `"BOT_BAN"` \| `"PERMA_BAN"` \| `"BAN"` \| `"ABUSE_WARNING"` \| `"SPAM_WARNING"` \| `"SPAM_WATCH"` \| `"SOLID_CONTRIBUTOR"` \| `"HELPFUL_USER"` ; `redditId?`: \`t1\_$\{string}\` \| \`t3\_$\{string}\` }\> | Options for the request |
 
 #### Returns
 
@@ -771,15 +771,16 @@ const currentSubreddit = await reddit.getCurrentSubreddit();
 
 ### <a id="getcurrentuser" name="getcurrentuser"></a> getCurrentUser
 
-▸ **getCurrentUser**(): `Promise`\<[`User`](models.User.md)\>
+▸ **getCurrentUser**(): `Promise`\<`undefined` \| [`User`](models.User.md)\>
 
 Get the current calling user.
+Resolves to undefined for logged-out custom post renders.
 
 #### Returns
 
-`Promise`\<[`User`](models.User.md)\>
+`Promise`\<`undefined` \| [`User`](models.User.md)\>
 
-A Promise that resolves to a User object.
+A Promise that resolves to a User object or undefined
 
 **`Example`**
 
@@ -1287,11 +1288,7 @@ console.log('Posts: ', await listing.all());
 
 ---
 
-### <a id="getsubredditbyid" name="getsubredditbyid"></a> ~getSubredditById~
-
-:::note
-Deprecated. Use [`getSubredditInfoById()`](../classes/RedditAPIClient.RedditAPIClient.md#getsubredditinfobyid) instead.
-:::
+### <a id="getsubredditbyid" name="getsubredditbyid"></a> getSubredditById
 
 ▸ **getSubredditById**(`id`): `Promise`\<[`Subreddit`](models.Subreddit.md)\>
 
@@ -1309,6 +1306,10 @@ Gets a [Subreddit](models.Subreddit.md) object by ID
 
 A Promise that resolves a Subreddit object.
 
+**`Deprecated`**
+
+Use [getSubredditInfoById](../modules/models.md#getsubredditinfobyid) instead.
+
 **`Example`**
 
 ```ts
@@ -1317,11 +1318,7 @@ const memes = await reddit.getSubredditById('t5_2qjpg');
 
 ---
 
-### <a id="getsubredditbyname" name="getsubredditbyname"></a> ~getSubredditByName~
-
-:::note
-Deprecated. Use [`getSubredditInfoByName()`](../classes/RedditAPIClient.RedditAPIClient.md#getsubredditinfobyname) instead.
-:::
+### <a id="getsubredditbyname" name="getsubredditbyname"></a> getSubredditByName
 
 ▸ **getSubredditByName**(`name`): `Promise`\<[`Subreddit`](models.Subreddit.md)\>
 
@@ -1339,6 +1336,10 @@ Gets a [Subreddit](models.Subreddit.md) object by name
 
 A Promise that resolves a Subreddit object.
 
+**`Deprecated`**
+
+Use [getSubredditInfoByName](../modules/models.md#getsubredditinfobyname) instead.
+
 **`Example`**
 
 ```ts
@@ -1349,9 +1350,9 @@ const askReddit = await reddit.getSubredditByName('askReddit');
 
 ### <a id="getsubredditinfobyid" name="getsubredditinfobyid"></a> getSubredditInfoById
 
-▸ **getSubredditInfoById**(`id`): `Promise`\<[`SubredditInfo`](models.SubredditInfo.md)\>
+▸ **getSubredditInfoById**(`id`): `Promise`\<[`SubredditInfo`](../modules/models.md#subredditinfo)\>
 
-Gets a [SubredditInfo](models.SubredditInfo.md) object by ID
+Gets a [SubredditInfo](../modules/models.md#subredditinfo) object by ID
 
 #### Parameters
 
@@ -1361,7 +1362,7 @@ Gets a [SubredditInfo](models.SubredditInfo.md) object by ID
 
 #### Returns
 
-`Promise`\<[`SubredditInfo`](models.SubredditInfo.md)\>
+`Promise`\<[`SubredditInfo`](../modules/models.md#subredditinfo)\>
 
 A Promise that resolves a SubredditInfo object.
 
@@ -1375,9 +1376,9 @@ const memes = await reddit.getSubredditInfoById('t5_2qjpg');
 
 ### <a id="getsubredditinfobyname" name="getsubredditinfobyname"></a> getSubredditInfoByName
 
-▸ **getSubredditInfoByName**(`name`): `Promise`\<[`SubredditInfo`](models.SubredditInfo.md)\>
+▸ **getSubredditInfoByName**(`name`): `Promise`\<[`SubredditInfo`](../modules/models.md#subredditinfo)\>
 
-Gets a [SubredditInfo](models.SubredditInfo.md) object by name
+Gets a [SubredditInfo](../modules/models.md#subredditinfo) object by name
 
 #### Parameters
 
@@ -1387,7 +1388,7 @@ Gets a [SubredditInfo](models.SubredditInfo.md) object by name
 
 #### Returns
 
-`Promise`\<[`SubredditInfo`](models.SubredditInfo.md)\>
+`Promise`\<[`SubredditInfo`](../modules/models.md#subredditinfo)\>
 
 A Promise that resolves a SubredditInfo object.
 
@@ -1396,6 +1397,26 @@ A Promise that resolves a SubredditInfo object.
 ```ts
 const askReddit = await reddit.getSubredditInfoByName('askReddit');
 ```
+
+---
+
+### <a id="getsubredditleaderboard" name="getsubredditleaderboard"></a> getSubredditLeaderboard
+
+▸ **getSubredditLeaderboard**(`subredditId`): `Promise`\<[`SubredditLeaderboard`](../modules/models.md#subredditleaderboard)\>
+
+Returns a leaderboard for a given subreddit ID.
+
+#### Parameters
+
+| Name          | Type     | Description                                                     |
+| :------------ | :------- | :-------------------------------------------------------------- |
+| `subredditId` | `string` | ID of the subreddit for which the leaderboard is being queried. |
+
+#### Returns
+
+`Promise`\<[`SubredditLeaderboard`](../modules/models.md#subredditleaderboard)\>
+
+Leaderboard for the given subreddit.
 
 ---
 
@@ -1437,9 +1458,9 @@ Returns the styles for a given subreddit ID.
 
 #### Parameters
 
-| Name          | Type     |
-| :------------ | :------- |
-| `subredditId` | `string` |
+| Name          | Type     | Description                                            |
+| :------------ | :------- | :----------------------------------------------------- |
+| `subredditId` | `string` | ID of the subreddit from which to retrieve the styles. |
 
 #### Returns
 
@@ -1447,21 +1468,13 @@ Returns the styles for a given subreddit ID.
 
 Styles for the given subreddit.
 
-**`Example`**
-
-```ts
-const styles = await reddit.getSubredditStyles('t5_2th52');
-
-console.log('Subreddit primaryColor: ' + styles.primaryColor);
-```
-
 ---
 
 ### <a id="gettopposts" name="gettopposts"></a> getTopPosts
 
 ▸ **getTopPosts**(`options`): [`Listing`](models.Listing.md)\<[`Post`](models.Post.md)\>
 
-Get a list of top posts from a specific subreddit.
+Get a list of controversial posts from a specific subreddit.
 
 #### Parameters
 
@@ -1479,7 +1492,7 @@ A Listing of Post objects.
 
 ```ts
 const posts = await reddit
-  .getTopPosts({
+  .getControversialPosts({
     subredditName: 'memes',
     timeframe: 'day',
     limit: 1000,
@@ -1544,7 +1557,7 @@ console.log('Posts: ', await listing.all());
 
 ### <a id="getuserbyid" name="getuserbyid"></a> getUserById
 
-▸ **getUserById**(`id`): `Promise`\<[`User`](models.User.md)\>
+▸ **getUserById**(`id`): `Promise`\<`undefined` \| [`User`](models.User.md)\>
 
 Gets a [User](models.User.md) object by ID
 
@@ -1556,7 +1569,7 @@ Gets a [User](models.User.md) object by ID
 
 #### Returns
 
-`Promise`\<[`User`](models.User.md)\>
+`Promise`\<`undefined` \| [`User`](models.User.md)\>
 
 A Promise that resolves to a User object.
 
@@ -1570,7 +1583,7 @@ const user = await reddit.getUserById('t2_1qjpg');
 
 ### <a id="getuserbyusername" name="getuserbyusername"></a> getUserByUsername
 
-▸ **getUserByUsername**(`username`): `Promise`\<[`User`](models.User.md)\>
+▸ **getUserByUsername**(`username`): `Promise`\<`undefined` \| [`User`](models.User.md)\>
 
 Gets a [User](models.User.md) object by username
 
@@ -1582,14 +1595,18 @@ Gets a [User](models.User.md) object by username
 
 #### Returns
 
-`Promise`\<[`User`](models.User.md)\>
+`Promise`\<`undefined` \| [`User`](models.User.md)\>
 
-A Promise that resolves to a User object.
+A Promise that resolves to a User object or undefined if user is
+not found (user doesn't exist, account suspended, etc).
 
 **`Example`**
 
 ```ts
 const user = await reddit.getUserByUsername('devvit');
+if (user) {
+  console.log(user);
+}
 ```
 
 ---
@@ -1611,6 +1628,54 @@ Get the list of user flair templates for a subreddit.
 `Promise`\<[`FlairTemplate`](models.FlairTemplate.md)[]\>
 
 A Promise that resolves with an array of FlairTemplate objects.
+
+---
+
+### <a id="getvaultbyaddress" name="getvaultbyaddress"></a> getVaultByAddress
+
+▸ **getVaultByAddress**(`address`): `Promise`\<[`Vault`](../modules/models.md#vault)\>
+
+Gets a [Vault](../modules/models.md#vault) for the specified address.
+
+#### Parameters
+
+| Name      | Type     | Description                                  |
+| :-------- | :------- | :------------------------------------------- |
+| `address` | `string` | The address (starting with 0x) of the Vault. |
+
+#### Returns
+
+`Promise`\<[`Vault`](../modules/models.md#vault)\>
+
+**`Example`**
+
+```ts
+const vault = await reddit.getVaultByAddress('0x205ee28744456bDBf180A0Fa7De51e0F116d54Ed');
+```
+
+---
+
+### <a id="getvaultbyuserid" name="getvaultbyuserid"></a> getVaultByUserId
+
+▸ **getVaultByUserId**(`userId`): `Promise`\<[`Vault`](../modules/models.md#vault)\>
+
+Gets a [Vault](../modules/models.md#vault) for the specified user.
+
+#### Parameters
+
+| Name     | Type     | Description                                     |
+| :------- | :------- | :---------------------------------------------- |
+| `userId` | `string` | The ID (starting with t2\_) of the Vault owner. |
+
+#### Returns
+
+`Promise`\<[`Vault`](../modules/models.md#vault)\>
+
+**`Example`**
+
+```ts
+const vault = await reddit.getVaultByUserId('t2_1w72');
+```
 
 ---
 

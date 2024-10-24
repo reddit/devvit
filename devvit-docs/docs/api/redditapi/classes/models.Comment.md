@@ -7,14 +7,17 @@
 ### Accessors
 
 - [approved](models.Comment.md#approved)
+- [approvedAtUtc](models.Comment.md#approvedatutc)
 - [authorId](models.Comment.md#authorid)
 - [authorName](models.Comment.md#authorname)
+- [bannedAtUtc](models.Comment.md#bannedatutc)
 - [body](models.Comment.md#body)
 - [collapsedBecauseCrowdControl](models.Comment.md#collapsedbecausecrowdcontrol)
 - [createdAt](models.Comment.md#createdat)
 - [distinguishedBy](models.Comment.md#distinguishedby)
 - [edited](models.Comment.md#edited)
 - [id](models.Comment.md#id)
+- [ignoringReports](models.Comment.md#ignoringreports)
 - [locked](models.Comment.md#locked)
 - [modReportReasons](models.Comment.md#modreportreasons)
 - [numReports](models.Comment.md#numreports)
@@ -40,9 +43,11 @@
 - [distinguishAsAdmin](models.Comment.md#distinguishasadmin)
 - [edit](models.Comment.md#edit)
 - [getAuthor](models.Comment.md#getauthor)
+- [ignoreReports](models.Comment.md#ignorereports)
 - [isApproved](models.Comment.md#isapproved)
 - [isDistinguished](models.Comment.md#isdistinguished)
 - [isEdited](models.Comment.md#isedited)
+- [isIgnoringReports](models.Comment.md#isignoringreports)
 - [isLocked](models.Comment.md#islocked)
 - [isRemoved](models.Comment.md#isremoved)
 - [isSpam](models.Comment.md#isspam)
@@ -52,6 +57,7 @@
 - [reply](models.Comment.md#reply)
 - [toJSON](models.Comment.md#tojson)
 - [undistinguish](models.Comment.md#undistinguish)
+- [unignoreReports](models.Comment.md#unignorereports)
 - [unlock](models.Comment.md#unlock)
 
 ## Accessors
@@ -63,6 +69,16 @@
 #### Returns
 
 `boolean`
+
+---
+
+### <a id="approvedatutc" name="approvedatutc"></a> approvedAtUtc
+
+• `get` **approvedAtUtc**(): `number`
+
+#### Returns
+
+`number`
 
 ---
 
@@ -83,6 +99,16 @@
 #### Returns
 
 `string`
+
+---
+
+### <a id="bannedatutc" name="bannedatutc"></a> bannedAtUtc
+
+• `get` **bannedAtUtc**(): `number`
+
+#### Returns
+
+`number`
 
 ---
 
@@ -143,6 +169,16 @@
 #### Returns
 
 \`t1\_$\{string}\`
+
+---
+
+### <a id="ignoringreports" name="ignoringreports"></a> ignoringReports
+
+• `get` **ignoringReports**(): `boolean`
+
+#### Returns
+
+`boolean`
 
 ---
 
@@ -386,11 +422,21 @@ Add a mod note for why the comment was removed
 
 ### <a id="getauthor" name="getauthor"></a> getAuthor
 
-▸ **getAuthor**(): `Promise`\<[`User`](models.User.md)\>
+▸ **getAuthor**(): `Promise`\<`undefined` \| [`User`](models.User.md)\>
 
 #### Returns
 
-`Promise`\<[`User`](models.User.md)\>
+`Promise`\<`undefined` \| [`User`](models.User.md)\>
+
+---
+
+### <a id="ignorereports" name="ignorereports"></a> ignoreReports
+
+▸ **ignoreReports**(): `Promise`\<`void`\>
+
+#### Returns
+
+`Promise`\<`void`\>
 
 ---
 
@@ -417,6 +463,16 @@ Add a mod note for why the comment was removed
 ### <a id="isedited" name="isedited"></a> isEdited
 
 ▸ **isEdited**(): `boolean`
+
+#### Returns
+
+`boolean`
+
+---
+
+### <a id="isignoringreports" name="isignoringreports"></a> isIgnoringReports
+
+▸ **isIgnoringReports**(): `boolean`
 
 #### Returns
 
@@ -508,17 +564,27 @@ Add a mod note for why the comment was removed
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Comment`](models.Comment.md), `"subredditName"` \| `"id"` \| `"score"` \| `"url"` \| `"subredditId"` \| `"postId"` \| `"body"` \| `"spam"` \| `"replies"` \| `"permalink"` \| `"authorName"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"parentId"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
+▸ **toJSON**(): `Pick`\<[`Comment`](models.Comment.md), `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"body"` \| `"spam"` \| `"replies"` \| `"permalink"` \| `"authorName"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"parentId"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
 
 #### Returns
 
-`Pick`\<[`Comment`](models.Comment.md), `"subredditName"` \| `"id"` \| `"score"` \| `"url"` \| `"subredditId"` \| `"postId"` \| `"body"` \| `"spam"` \| `"replies"` \| `"permalink"` \| `"authorName"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"parentId"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
+`Pick`\<[`Comment`](models.Comment.md), `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"body"` \| `"spam"` \| `"replies"` \| `"permalink"` \| `"authorName"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"parentId"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
 
 ---
 
 ### <a id="undistinguish" name="undistinguish"></a> undistinguish
 
 ▸ **undistinguish**(): `Promise`\<`void`\>
+
+#### Returns
+
+`Promise`\<`void`\>
+
+---
+
+### <a id="unignorereports" name="unignorereports"></a> unignoreReports
+
+▸ **unignoreReports**(): `Promise`\<`void`\>
 
 #### Returns
 

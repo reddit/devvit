@@ -105,8 +105,7 @@ export type MuteUserOptions = {
 
  * // use within one of our capability handlers e.g. Menu Actions, Triggers, Scheduled Job Type, etc
  * async (event, context) => {
- *     const { reddit } = context
- *     const subreddit = await reddit.getSubredditById(context.subredditId);
+ *     const subreddit = await context.reddit.getSubredditById(context.subredditId);
  *     context.reddit.submitPost({
  *       subredditName: subreddit.name,
  *       title: 'test post',

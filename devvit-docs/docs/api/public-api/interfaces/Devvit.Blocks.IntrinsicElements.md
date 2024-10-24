@@ -6,11 +6,9 @@
 
 ### Properties
 
-- [animation](Devvit.Blocks.IntrinsicElements.md#animation)
 - [avatar](Devvit.Blocks.IntrinsicElements.md#avatar)
 - [blocks](Devvit.Blocks.IntrinsicElements.md#blocks)
 - [button](Devvit.Blocks.IntrinsicElements.md#button)
-- [fullsnoo](Devvit.Blocks.IntrinsicElements.md#fullsnoo)
 - [hstack](Devvit.Blocks.IntrinsicElements.md#hstack)
 - [icon](Devvit.Blocks.IntrinsicElements.md#icon)
 - [image](Devvit.Blocks.IntrinsicElements.md#image)
@@ -21,12 +19,6 @@
 - [zstack](Devvit.Blocks.IntrinsicElements.md#zstack)
 
 ## Properties
-
-### <a id="animation" name="animation"></a> animation
-
-• **animation**: [`AnimationProps`](../modules/Devvit.Blocks.md#animationprops)
-
----
 
 ### <a id="avatar" name="avatar"></a> avatar
 
@@ -43,12 +35,6 @@
 ### <a id="button" name="button"></a> button
 
 • **button**: [`ButtonProps`](../modules/Devvit.Blocks.md#buttonprops)
-
----
-
-### <a id="fullsnoo" name="fullsnoo"></a> fullsnoo
-
-• **fullsnoo**: [`FullSnooProps`](../modules/Devvit.Blocks.md#fullsnooprops)
 
 ---
 

@@ -88,13 +88,13 @@ VideoContainer
 
 ### <a id="animatedimage" name="animatedimage"></a> animatedImage
 
-▸ **animatedImage**(`opts`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **animatedImage**(`_opts`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name   | Type           |
-| :----- | :------------- |
-| `opts` | `MediaOptions` |
+| Name    | Type           |
+| :------ | :------------- |
+| `_opts` | `MediaOptions` |
 
 #### Returns
 
@@ -108,14 +108,14 @@ ImageContainer.animatedImage
 
 ### <a id="blockquote" name="blockquote"></a> blockQuote
 
-▸ **blockQuote**(`opts`, `cb`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **blockQuote**(`_opts`, `_cb`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name   | Type                                          |
-| :----- | :-------------------------------------------- |
-| `opts` | `BlockQuoteOptions`                           |
-| `cb`   | (`blockQuote`: `BlockQuoteContext`) => `void` |
+| Name    | Type                                          |
+| :------ | :-------------------------------------------- |
+| `_opts` | `BlockQuoteOptions`                           |
+| `_cb`   | (`blockQuote`: `BlockQuoteContext`) => `void` |
 
 #### Returns
 
@@ -141,14 +141,14 @@ Serializes the document to a JSON string
 
 ### <a id="codeblock" name="codeblock"></a> codeBlock
 
-▸ **codeBlock**(`opts`, `cb`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **codeBlock**(`_opts`, `_cb`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name   | Type                                        |
-| :----- | :------------------------------------------ |
-| `opts` | `CodeBlockOptions`                          |
-| `cb`   | (`codeBlock`: `CodeBlockContext`) => `void` |
+| Name    | Type                                        |
+| :------ | :------------------------------------------ |
+| `_opts` | `CodeBlockOptions`                          |
+| `_cb`   | (`codeBlock`: `CodeBlockContext`) => `void` |
 
 #### Returns
 
@@ -182,14 +182,14 @@ EmbedContainer.embed
 
 ### <a id="heading" name="heading"></a> heading
 
-▸ **heading**(`opts`, `cb`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **heading**(`_opts`, `_cb`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name   | Type                                    |
-| :----- | :-------------------------------------- |
-| `opts` | `HeadingOptions`                        |
-| `cb`   | (`heading`: `HeadingContext`) => `void` |
+| Name    | Type                                    |
+| :------ | :-------------------------------------- |
+| `_opts` | `HeadingOptions`                        |
+| `_cb`   | (`heading`: `HeadingContext`) => `void` |
 
 #### Returns
 
@@ -217,13 +217,13 @@ HorizontalRuleContainer.horizontalRule
 
 ### <a id="image" name="image"></a> image
 
-▸ **image**(`opts`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **image**(`_opts`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name   | Type           |
-| :----- | :------------- |
-| `opts` | `MediaOptions` |
+| Name    | Type           |
+| :------ | :------------- |
+| `_opts` | `MediaOptions` |
 
 #### Returns
 
@@ -237,14 +237,14 @@ ImageContainer.image
 
 ### <a id="list" name="list"></a> list
 
-▸ **list**(`opts`, `cb`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **list**(`_opts`, `_cb`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name   | Type                              |
-| :----- | :-------------------------------- |
-| `opts` | `ListOptions`                     |
-| `cb`   | (`list`: `ListContext`) => `void` |
+| Name    | Type                              |
+| :------ | :-------------------------------- |
+| `_opts` | `ListOptions`                     |
+| `_cb`   | (`list`: `ListContext`) => `void` |
 
 #### Returns
 
@@ -258,13 +258,13 @@ ListContainer.list
 
 ### <a id="paragraph" name="paragraph"></a> paragraph
 
-▸ **paragraph**(`cb`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **paragraph**(`_cb`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name | Type                                        |
-| :--- | :------------------------------------------ |
-| `cb` | (`paragraph`: `ParagraphContext`) => `void` |
+| Name  | Type                                        |
+| :---- | :------------------------------------------ |
+| `_cb` | (`paragraph`: `ParagraphContext`) => `void` |
 
 #### Returns
 
@@ -278,13 +278,13 @@ ParagraphContainer.paragraph
 
 ### <a id="table" name="table"></a> table
 
-▸ **table**(`cb`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **table**(`_cb`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name | Type                                |
-| :--- | :---------------------------------- |
-| `cb` | (`table`: `TableContext`) => `void` |
+| Name  | Type                                |
+| :---- | :---------------------------------- |
+| `_cb` | (`table`: `TableContext`) => `void` |
 
 #### Returns
 
@@ -298,13 +298,13 @@ TableContainer.table
 
 ### <a id="video" name="video"></a> video
 
-▸ **video**(`opts`): [`RichTextBuilder`](RichTextBuilder.md)
+▸ **video**(`_opts`): [`RichTextBuilder`](RichTextBuilder.md)
 
 #### Parameters
 
-| Name   | Type           |
-| :----- | :------------- |
-| `opts` | `VideoOptions` |
+| Name    | Type           |
+| :------ | :------------- |
+| `_opts` | `VideoOptions` |
 
 #### Returns
 

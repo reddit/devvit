@@ -140,11 +140,11 @@ Widget.subredditName
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`CalendarWidget`](models.CalendarWidget.md), `"googleCalendarId"` \| `"configuration"` \| `"styles"`\>
+▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`CalendarWidget`](models.CalendarWidget.md), `"googleCalendarId"` \| `"configuration"` \| `"styles"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`CalendarWidget`](models.CalendarWidget.md), `"googleCalendarId"` \| `"configuration"` \| `"styles"`\>
+`Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`CalendarWidget`](models.CalendarWidget.md), `"googleCalendarId"` \| `"configuration"` \| `"styles"`\>
 
 #### Overrides
 

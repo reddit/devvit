@@ -15,9 +15,8 @@
     "docs:write-heading-ids": "docusaurus write-heading-ids",
     "docs:write-translations": "docusaurus write-translations",
     "docusaurus": "docusaurus",
-    "gen:all": "yarn gen:cli-docs && yarn gen:api-docs && yarn gen:reddit-api-docs",
+    "gen:all": "yarn gen:api-docs && yarn gen:reddit-api-docs",
     "gen:api-docs": "./scripts/build-api-docs.sh",
-    "gen:cli-docs": "./scripts/build-cli-docs.sh",
     "gen:reddit-api-docs": "./scripts/build-reddit-api-docs.sh",
     "gen:verify": "./scripts/verify-docs.sh"
   },

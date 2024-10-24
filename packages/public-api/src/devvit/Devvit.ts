@@ -79,7 +79,7 @@ type PluginType =
  *
  * **Favor ContextDebugInfo since request-based state is preferred.**
  */
-type DevvitDebug = {
+export type DevvitDebug = {
   /**
    * Should debug block rendering in console.log according to the reified JSX/XML output. Example:
    *
@@ -203,19 +203,21 @@ export class Devvit extends Actor {
    * @param customPostType.render - A function or `Devvit.CustomPostComponent` that returns the UI for the custom post.
    * @example
    * ```ts
+   * import { Devvit, useState } from '@devvit/public-api';
+   *
    * Devvit.addCustomPostType({
    *   name: 'Counter',
    *   description: 'A simple click counter post.',
    *   render: (context) => {
-   *     const [counter, setCounter] = context.useState();
+   *     const [counter, setCounter] = useState();
    *
    *     return (
    *       <vstack>
    *         <text>{counter}</text>
-   *         <button onPress={() => setCounter(counter => counter + 1)}>Click me!</button>
-   *       </vstack>
-   *     );
-   *   }
+   *       <button onPress={() => setCounter((counter) => counter + 1)}>Click me!</button>
+   *     </vstack>
+   *   );
+   *   },
    * });
    * ```
    */
@@ -264,8 +266,7 @@ export class Devvit extends Actor {
    *   label: 'Check for new posts',
    *   location: 'location',
    *   onPress: (event, context) => {
-   *     const { scheduler } = context;
-   *     const = await scheduler.runJob({
+   *     const = await context.scheduler.runJob({
    *       name: 'checkNewPosts',
    *       when: new Date(Date.now() + 5000) // in 5 seconds
    *     });

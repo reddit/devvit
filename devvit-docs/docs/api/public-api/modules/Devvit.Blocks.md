@@ -10,12 +10,9 @@
 
 ### Type Aliases
 
+- [ActionHandlers](Devvit.Blocks.md#actionhandlers)
 - [Actionable](Devvit.Blocks.md#actionable)
 - [Alignment](Devvit.Blocks.md#alignment)
-- [AnimationDirection](Devvit.Blocks.md#animationdirection)
-- [AnimationLoop](Devvit.Blocks.md#animationloop)
-- [AnimationProps](Devvit.Blocks.md#animationprops)
-- [AnimationType](Devvit.Blocks.md#animationtype)
 - [AvatarBackground](Devvit.Blocks.md#avatarbackground)
 - [AvatarFacing](Devvit.Blocks.md#avatarfacing)
 - [AvatarProps](Devvit.Blocks.md#avatarprops)
@@ -29,8 +26,6 @@
 - [ContainerCornerRadius](Devvit.Blocks.md#containercornerradius)
 - [ContainerGap](Devvit.Blocks.md#containergap)
 - [ContainerPadding](Devvit.Blocks.md#containerpadding)
-- [FullSnooProps](Devvit.Blocks.md#fullsnooprops)
-- [FullSnooSize](Devvit.Blocks.md#fullsnoosize)
 - [HasElementChildren](Devvit.Blocks.md#haselementchildren)
 - [HasStringChildren](Devvit.Blocks.md#hasstringchildren)
 - [HorizontalAlignment](Devvit.Blocks.md#horizontalalignment)
@@ -38,10 +33,9 @@
 - [IconSize](Devvit.Blocks.md#iconsize)
 - [ImageProps](Devvit.Blocks.md#imageprops)
 - [ImageResizeMode](Devvit.Blocks.md#imageresizemode)
-- [IntrinsicAttributes](Devvit.Blocks.md#intrinsicattributes)
 - [IntrinsicElementsType](Devvit.Blocks.md#intrinsicelementstype)
-- [OnPressEvent](Devvit.Blocks.md#onpressevent)
 - [OnPressEventHandler](Devvit.Blocks.md#onpresseventhandler)
+- [OnWebViewEventHandler](Devvit.Blocks.md#onwebvieweventhandler)
 - [RootHeight](Devvit.Blocks.md#rootheight)
 - [RootProps](Devvit.Blocks.md#rootprops)
 - [SizePercent](Devvit.Blocks.md#sizepercent)
@@ -59,9 +53,16 @@
 - [TextWeight](Devvit.Blocks.md#textweight)
 - [Thickness](Devvit.Blocks.md#thickness)
 - [VerticalAlignment](Devvit.Blocks.md#verticalalignment)
+- [WebViewActionable](Devvit.Blocks.md#webviewactionable)
 - [WebViewProps](Devvit.Blocks.md#webviewprops)
 
 ## Type Aliases
+
+### <a id="actionhandlers" name="actionhandlers"></a> ActionHandlers
+
+Ƭ **ActionHandlers**: keyof [`Actionable`](Devvit.Blocks.md#actionable) & [`WebViewActionable`](Devvit.Blocks.md#webviewactionable)
+
+---
 
 ### <a id="actionable" name="actionable"></a> Actionable
 
@@ -78,30 +79,6 @@
 ### <a id="alignment" name="alignment"></a> Alignment
 
 Ƭ **Alignment**: \`$\{VerticalAlignment}\` \| \`$\{HorizontalAlignment}\` \| \`$\{VerticalAlignment} $\{HorizontalAlignment}\` \| \`$\{HorizontalAlignment} $\{VerticalAlignment}\`
-
----
-
-### <a id="animationdirection" name="animationdirection"></a> AnimationDirection
-
-Ƭ **AnimationDirection**: `"forward"` \| `"backward"`
-
----
-
-### <a id="animationloop" name="animationloop"></a> AnimationLoop
-
-Ƭ **AnimationLoop**: `"repeat"` \| `"bounce"`
-
----
-
-### <a id="animationprops" name="animationprops"></a> AnimationProps
-
-Ƭ **AnimationProps**: [`BaseProps`](Devvit.Blocks.md#baseprops) & [`Actionable`](Devvit.Blocks.md#actionable) & \{ `autoplay?`: `boolean` ; `direction?`: [`AnimationDirection`](Devvit.Blocks.md#animationdirection) ; `imageHeight`: [`SizePixels`](Devvit.Blocks.md#sizepixels) \| `number` ; `imageWidth`: [`SizePixels`](Devvit.Blocks.md#sizepixels) \| `number` ; `loop?`: `boolean` ; `loopMode?`: [`AnimationLoop`](Devvit.Blocks.md#animationloop) ; `speed?`: `number` ; `type?`: [`AnimationType`](Devvit.Blocks.md#animationtype) ; `url`: `string` }
-
----
-
-### <a id="animationtype" name="animationtype"></a> AnimationType
-
-Ƭ **AnimationType**: `"lottie"`
 
 ---
 
@@ -135,15 +112,17 @@
 
 #### Type declaration
 
-| Name         | Type                                        |
-| :----------- | :------------------------------------------ |
-| `grow?`      | `boolean`                                   |
-| `height?`    | [`SizeString`](Devvit.Blocks.md#sizestring) |
-| `maxHeight?` | [`SizeString`](Devvit.Blocks.md#sizestring) |
-| `maxWidth?`  | [`SizeString`](Devvit.Blocks.md#sizestring) |
-| `minHeight?` | [`SizeString`](Devvit.Blocks.md#sizestring) |
-| `minWidth?`  | [`SizeString`](Devvit.Blocks.md#sizestring) |
-| `width?`     | [`SizeString`](Devvit.Blocks.md#sizestring) |
+| Name         | Type                                        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| :----------- | :------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `grow?`      | `boolean`                                   | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `height?`    | [`SizeString`](Devvit.Blocks.md#sizestring) | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `id?`        | `string`                                    | This optional field provides a unique identifier for the element. This is useful for ensuring re-use of elements across renders. See the `key` field for more information. Unlike key, id is global. You cannot have two elements with the same id in the same tree.                                                                                                                                                                                                                                                                                                                                                  |
+| `key?`       | `string`                                    | This optional field provides some efficiencies around re-ordering elements in a list. Rather Than re-rendering the entire list, the client can use the key to determine if the element has changed. In the example below, if a and b were swapped, the client would know to reuse the existing elements from b, rather than re-creating an expensive tree of elements. Unlike id, key is local to the parent element. This means that the same key can be used in different parts of the tree without conflict. <hstack> <text key="a">hi world</text> <hstack key="b">...deeply nested content...</hstack> </hstack> |
+| `maxHeight?` | [`SizeString`](Devvit.Blocks.md#sizestring) | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `maxWidth?`  | [`SizeString`](Devvit.Blocks.md#sizestring) | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `minHeight?` | [`SizeString`](Devvit.Blocks.md#sizestring) | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `minWidth?`  | [`SizeString`](Devvit.Blocks.md#sizestring) | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `width?`     | [`SizeString`](Devvit.Blocks.md#sizestring) | -                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ---
 
@@ -155,13 +134,18 @@
 
 ### <a id="buttonprops" name="buttonprops"></a> ButtonProps
 
-Ƭ **ButtonProps**: [`BaseProps`](Devvit.Blocks.md#baseprops) & [`HasStringChildren`](Devvit.Blocks.md#hasstringchildren) & [`Actionable`](Devvit.Blocks.md#actionable) & \{ `appearance?`: [`ButtonAppearance`](Devvit.Blocks.md#buttonappearance) ; `darkTextColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `disabled?`: `boolean` ; `icon?`: [`IconName`](../README.md#iconname) ; `lightTextColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `onClick?`: `string` ; `size?`: [`ButtonSize`](Devvit.Blocks.md#buttonsize) ; `textColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) }
+Ƭ **ButtonProps**: [`BaseProps`](Devvit.Blocks.md#baseprops) & [`HasStringChildren`](Devvit.Blocks.md#hasstringchildren) & [`Actionable`](Devvit.Blocks.md#actionable) & \{ `appearance?`: [`ButtonAppearance`](Devvit.Blocks.md#buttonappearance) ; `darkTextColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `disabled?`: `boolean` ; `icon?`: [`IconName`](../README.md#iconname) ; `lightTextColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `size?`: [`ButtonSize`](Devvit.Blocks.md#buttonsize) ; `textColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) }
 
 ---
 
 ### <a id="buttonsize" name="buttonsize"></a> ButtonSize
 
 Ƭ **ButtonSize**: `"small"` \| `"medium"` \| `"large"`
+
+Affects the button height.
+small = 32px;
+medium = 40px;
+large = 48px;
 
 ---
 
@@ -175,11 +159,18 @@
 
 Ƭ **ContainerBorderWidth**: [`Thickness`](Devvit.Blocks.md#thickness)
 
+thin = 1px;
+thick = 2px;
+
 ---
 
 ### <a id="containercornerradius" name="containercornerradius"></a> ContainerCornerRadius
 
 Ƭ **ContainerCornerRadius**: `"none"` \| `"small"` \| `"medium"` \| `"large"` \| `"full"`
+
+small = 8px;
+medium = 16px;
+large = 24px;
 
 ---
 
@@ -187,23 +178,20 @@
 
 Ƭ **ContainerGap**: `"none"` \| `"small"` \| `"medium"` \| `"large"`
 
+small = 8px;
+medium = 16px;
+large = 32px;
+
 ---
 
 ### <a id="containerpadding" name="containerpadding"></a> ContainerPadding
 
 Ƭ **ContainerPadding**: `"none"` \| `"xsmall"` \| `"small"` \| `"medium"` \| `"large"`
 
----
-
-### <a id="fullsnooprops" name="fullsnooprops"></a> FullSnooProps
-
-Ƭ **FullSnooProps**: [`BaseProps`](Devvit.Blocks.md#baseprops) & [`Actionable`](Devvit.Blocks.md#actionable) & \{ `facing?`: [`AvatarFacing`](Devvit.Blocks.md#avatarfacing) ; `size?`: [`FullSnooSize`](Devvit.Blocks.md#fullsnoosize) ; `userId`: `string` }
-
----
-
-### <a id="fullsnoosize" name="fullsnoosize"></a> FullSnooSize
-
-Ƭ **FullSnooSize**: `"xsmall"` \| `"small"` \| `"medium"` \| `"large"` \| `"xlarge"` \| `"xxlarge"`
+xsmall = 4px;
+small = 8px;
+medium = 16px;
+large = 32px;
 
 ---
 
@@ -247,6 +235,11 @@
 
 Ƭ **IconSize**: `"xsmall"` \| `"small"` \| `"medium"` \| `"large"`
 
+xsmall = 12px;
+small = 16px;
+medium = 20px;
+large = 24px;
+
 ---
 
 ### <a id="imageprops" name="imageprops"></a> ImageProps
@@ -261,49 +254,45 @@
 
 ---
 
-### <a id="intrinsicattributes" name="intrinsicattributes"></a> IntrinsicAttributes
-
-Ƭ **IntrinsicAttributes**: `Object`
-
-#### Type declaration
-
-| Name      | Type     |
-| :-------- | :------- |
-| `onclick` | `string` |
-
----
-
 ### <a id="intrinsicelementstype" name="intrinsicelementstype"></a> IntrinsicElementsType
 
 Ƭ **IntrinsicElementsType**: keyof [`IntrinsicElements`](../interfaces/Devvit.Blocks.IntrinsicElements.md)
 
 ---
 
-### <a id="onpressevent" name="onpressevent"></a> OnPressEvent
-
-Ƭ **OnPressEvent**: `Object`
-
-#### Type declaration
-
-| Name     | Type                        |
-| :------- | :-------------------------- |
-| `state?` | [`Data`](../README.md#data) |
-
----
-
 ### <a id="onpresseventhandler" name="onpresseventhandler"></a> OnPressEventHandler
 
-Ƭ **OnPressEventHandler**: (`event`: [`OnPressEvent`](Devvit.Blocks.md#onpressevent)) => `void` \| `Promise`\<`void`\>
+Ƭ **OnPressEventHandler**: (`data`: [`JSONObject`](../README.md#jsonobject)) => `void` \| `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`event`): `void` \| `Promise`\<`void`\>
+▸ (`data`): `void` \| `Promise`\<`void`\>
 
 ##### Parameters
 
-| Name    | Type                                            |
-| :------ | :---------------------------------------------- |
-| `event` | [`OnPressEvent`](Devvit.Blocks.md#onpressevent) |
+| Name   | Type                                    |
+| :----- | :-------------------------------------- |
+| `data` | [`JSONObject`](../README.md#jsonobject) |
+
+##### Returns
+
+`void` \| `Promise`\<`void`\>
+
+---
+
+### <a id="onwebvieweventhandler" name="onwebvieweventhandler"></a> OnWebViewEventHandler
+
+Ƭ **OnWebViewEventHandler**: (`message`: [`JSONObject`](../README.md#jsonobject)) => `void` \| `Promise`\<`void`\>
+
+#### Type declaration
+
+▸ (`message`): `void` \| `Promise`\<`void`\>
+
+##### Parameters
+
+| Name      | Type                                    |
+| :-------- | :-------------------------------------- |
+| `message` | [`JSONObject`](../README.md#jsonobject) |
 
 ##### Returns
 
@@ -357,6 +346,11 @@
 
 Ƭ **SpacerSize**: `"xsmall"` \| `"small"` \| `"medium"` \| `"large"`
 
+xsmall = 4px;
+small = 8px;
+medium = 16px;
+large = 32px;
+
 ---
 
 ### <a id="stackprops" name="stackprops"></a> StackProps
@@ -369,6 +363,9 @@
 
 Ƭ **TextOutline**: [`Thickness`](Devvit.Blocks.md#thickness)
 
+thin = 1px;
+thick = 2px;
+
 ---
 
 ### <a id="textoverflow" name="textoverflow"></a> TextOverflow
@@ -379,13 +376,20 @@
 
 ### <a id="textprops" name="textprops"></a> TextProps
 
-Ƭ **TextProps**: [`BaseProps`](Devvit.Blocks.md#baseprops) & [`HasStringChildren`](Devvit.Blocks.md#hasstringchildren) & [`Actionable`](Devvit.Blocks.md#actionable) & \{ `alignment?`: [`Alignment`](Devvit.Blocks.md#alignment) ; `color?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `darkColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `lightColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `onClick?`: `string` ; `outline?`: [`TextOutline`](Devvit.Blocks.md#textoutline) ; `overflow?`: [`TextOverflow`](Devvit.Blocks.md#textoverflow) ; `selectable?`: `boolean` ; `size?`: [`TextSize`](Devvit.Blocks.md#textsize) ; `style?`: [`TextStyle`](Devvit.Blocks.md#textstyle) ; `weight?`: [`TextWeight`](Devvit.Blocks.md#textweight) ; `wrap?`: `boolean` }
+Ƭ **TextProps**: [`BaseProps`](Devvit.Blocks.md#baseprops) & [`HasStringChildren`](Devvit.Blocks.md#hasstringchildren) & [`Actionable`](Devvit.Blocks.md#actionable) & \{ `alignment?`: [`Alignment`](Devvit.Blocks.md#alignment) ; `color?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `darkColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `lightColor?`: [`ColorString`](Devvit.Blocks.md#colorstring) ; `outline?`: [`TextOutline`](Devvit.Blocks.md#textoutline) ; `overflow?`: [`TextOverflow`](Devvit.Blocks.md#textoverflow) ; `selectable?`: `boolean` ; `size?`: [`TextSize`](Devvit.Blocks.md#textsize) ; `style?`: [`TextStyle`](Devvit.Blocks.md#textstyle) ; `weight?`: [`TextWeight`](Devvit.Blocks.md#textweight) ; `wrap?`: `boolean` }
 
 ---
 
 ### <a id="textsize" name="textsize"></a> TextSize
 
 Ƭ **TextSize**: `"xsmall"` \| `"small"` \| `"medium"` \| `"large"` \| `"xlarge"` \| `"xxlarge"`
+
+xsmall = 10px;
+small = 12px;
+medium = 14px;
+large = 16px;
+xlarge = 18px;
+xxlarge = 24px;
 
 ---
 
@@ -413,6 +417,18 @@
 
 ---
 
+### <a id="webviewactionable" name="webviewactionable"></a> WebViewActionable
+
+Ƭ **WebViewActionable**: `Object`
+
+#### Type declaration
+
+| Name         | Type                                                              |
+| :----------- | :---------------------------------------------------------------- |
+| `onMessage?` | [`OnWebViewEventHandler`](Devvit.Blocks.md#onwebvieweventhandler) |
+
+---
+
 ### <a id="webviewprops" name="webviewprops"></a> WebViewProps
 
-Ƭ **WebViewProps**: [`BaseProps`](Devvit.Blocks.md#baseprops) & \{ `url`: `string` }
+Ƭ **WebViewProps**: [`BaseProps`](Devvit.Blocks.md#baseprops) & [`WebViewActionable`](Devvit.Blocks.md#webviewactionable) & \{ `state?`: [`JSONObject`](../README.md#jsonobject) ; `url`: `string` }

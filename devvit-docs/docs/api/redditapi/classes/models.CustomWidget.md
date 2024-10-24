@@ -162,11 +162,11 @@ Widget.subredditName
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`CustomWidget`](models.CustomWidget.md), `"text"` \| `"height"` \| `"images"` \| `"stylesheetUrl"` \| `"css"`\>
+▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`CustomWidget`](models.CustomWidget.md), `"text"` \| `"height"` \| `"images"` \| `"stylesheetUrl"` \| `"css"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`CustomWidget`](models.CustomWidget.md), `"text"` \| `"height"` \| `"images"` \| `"stylesheetUrl"` \| `"css"`\>
+`Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`CustomWidget`](models.CustomWidget.md), `"text"` \| `"height"` \| `"images"` \| `"stylesheetUrl"` \| `"css"`\>
 
 #### Overrides
 

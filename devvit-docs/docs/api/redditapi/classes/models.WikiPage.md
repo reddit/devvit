@@ -7,7 +7,7 @@
 ### Accessors
 
 - [content](models.WikiPage.md#content)
-- [contentHtml](models.WikiPage.md#contentHtml)
+- [contentHtml](models.WikiPage.md#contenthtml)
 - [name](models.WikiPage.md#name)
 - [revisionAuthor](models.WikiPage.md#revisionauthor)
 - [revisionDate](models.WikiPage.md#revisiondate)
@@ -40,7 +40,7 @@ The Markdown content of the page.
 
 ---
 
-### <a id="contentHtml" name="contentHtml"></a> contentHtml
+### <a id="contenthtml" name="contenthtml"></a> contentHtml
 
 • `get` **contentHtml**(): `string`
 
@@ -210,11 +210,11 @@ Revert this page to a previous revision.
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`WikiPage`](models.WikiPage.md), `"name"` \| `"subredditName"` \| `"content"` \| `"revisionId"` \| `"revisionDate"` \| `"revisionReason"`\> & \{ `revisionAuthor`: `Pick`\<[`User`](models.User.md), `"username"` \| `"id"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & \{ `modPermissionsBySubreddit`: `Record`\<`string`, [`ModeratorPermission`](../modules/models.md#moderatorpermission)[]\> } }
+▸ **toJSON**(): `Pick`\<[`WikiPage`](models.WikiPage.md), `"subredditName"` \| `"name"` \| `"content"` \| `"contentHtml"` \| `"revisionId"` \| `"revisionDate"` \| `"revisionReason"`\> & \{ `revisionAuthor`: `Pick`\<[`User`](models.User.md), `"username"` \| `"id"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & \{ `modPermissionsBySubreddit`: `Record`\<`string`, [`ModeratorPermission`](../modules/models.md#moderatorpermission)[]\> } }
 
 #### Returns
 
-`Pick`\<[`WikiPage`](models.WikiPage.md), `"name"` \| `"subredditName"` \| `"content"` \| `"revisionId"` \| `"revisionDate"` \| `"revisionReason"`\> & \{ `revisionAuthor`: `Pick`\<[`User`](models.User.md), `"username"` \| `"id"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & \{ `modPermissionsBySubreddit`: `Record`\<`string`, [`ModeratorPermission`](../modules/models.md#moderatorpermission)[]\> } }
+`Pick`\<[`WikiPage`](models.WikiPage.md), `"subredditName"` \| `"name"` \| `"content"` \| `"contentHtml"` \| `"revisionId"` \| `"revisionDate"` \| `"revisionReason"`\> & \{ `revisionAuthor`: `Pick`\<[`User`](models.User.md), `"username"` \| `"id"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & \{ `modPermissionsBySubreddit`: `Record`\<`string`, [`ModeratorPermission`](../modules/models.md#moderatorpermission)[]\> } }
 
 ---
 
