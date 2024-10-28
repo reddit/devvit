@@ -4,12 +4,7 @@ import type {
   InstallationInfo,
   MultipleInstallationsResponse,
 } from '@devvit/protos/community.js';
-import {
-  GetAllWithInstallerRequest,
-  GetAllWithInstallLocationRequest,
-  InstallationType,
-  UUID,
-} from '@devvit/protos/community.js';
+import { InstallationType } from '@devvit/protos/community.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
 
@@ -58,21 +53,17 @@ export default class ListInstalls extends DevvitCommand {
 
     if (subreddit != null) {
       // ask about installations in given subreddit
-      return await this.#installationsClient.GetAllWithInstallLocation(
-        GetAllWithInstallLocationRequest.fromPartial({
-          type: InstallationType.SUBREDDIT,
-          location: subreddit,
-        })
-      );
+      return await this.#installationsClient.GetAllWithInstallLocation({
+        location: subreddit,
+        type: InstallationType.SUBREDDIT,
+      });
     }
 
     // Not getting subreddit app installs, get all apps installed by the logged in user
     const myId = await this.getUserT2Id(token);
-    return await this.#installationsClient.GetAllWithInstaller(
-      GetAllWithInstallerRequest.fromPartial({
-        installedBy: myId,
-      })
-    );
+    return await this.#installationsClient.GetAllWithInstaller({
+      installedBy: myId,
+    });
   }
 
   async #formatAndLogInstallations(
@@ -80,7 +71,7 @@ export default class ListInstalls extends DevvitCommand {
     searchType: SearchType
   ): Promise<void> {
     const fullInstallationsInfo = await Promise.all(
-      installations.map((i) => this.#installationsClient.GetByUUID(UUID.fromPartial({ id: i.id })))
+      installations.map((i) => this.#installationsClient.GetByUUID({ id: i.id }))
     );
     if (searchType === SearchType.BY_SUB) {
       this.#formatAndLogInstallationsInSubreddit(fullInstallationsInfo);

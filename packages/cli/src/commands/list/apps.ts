@@ -1,5 +1,4 @@
 import type { AppInfo } from '@devvit/protos/community.js';
-import { GetAllWithOwnerRequest } from '@devvit/protos/community.js';
 import { ux } from '@oclif/core';
 
 import { getAccessTokenAndLoginIfNeeded } from '../../util/auth.js';
@@ -16,9 +15,7 @@ export default class ListApps extends DevvitCommand {
     const t2_id = await this.getUserT2Id(token);
 
     ux.action.start('Fetching');
-    const res = await this.#appService.GetAllWithOwner(
-      GetAllWithOwnerRequest.fromPartial({ owner: t2_id })
-    );
+    const res = await this.#appService.GetAllWithOwner({ owner: t2_id });
     ux.action.stop();
 
     this.#logApps(res.apps);

@@ -2,10 +2,7 @@ import { ESBuildPack } from '@devvit/build-pack/esbuild/ESBuildPack.js';
 import { TscTypeChecker } from '@devvit/build-pack/index.js';
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
-import {
-  type Bundle,
-  CompileParams,
-} from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+import { type Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { ActorSpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { LOCAL_HOSTNAME } from '@devvit/shared-types/HostnameUtil.js';
 import type { Observable } from 'rxjs';
@@ -32,7 +29,7 @@ export class Bundler {
 
   async bundle(root: ProjectRootDir, actorSpec: ActorSpec): Promise<Bundle[]> {
     const compiledRes = await this.#buildPack.Compile(
-      CompileParams.fromPartial({ filename: root, info: actorSpec, includeAssets: true }),
+      { filename: root, info: actorSpec, includeAssets: true, minify: 0 },
       undefined
     );
 
@@ -57,7 +54,7 @@ export class Bundler {
 
   watch(root: ProjectRootDir, actorSpec: ActorSpec): Observable<BundlerResult> {
     return this.#buildPack
-      .Watch(CompileParams.fromPartial({ filename: root, info: actorSpec }), undefined)
+      .Watch({ filename: root, info: actorSpec, includeAssets: false, minify: 0 }, undefined)
       .pipe(
         map((rsp) => {
           if (rsp.warnings.length > 0) console.warn(formatLogs(rsp.warnings));

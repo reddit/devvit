@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest, UIEventScope } from '@devvit/protos';
+import { BlockRenderEventType, UIEventScope } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 
@@ -31,9 +31,7 @@ describe('useForm', () => {
         );
         return <button onPress={() => ui.showForm(testForm)}>Open Form</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined

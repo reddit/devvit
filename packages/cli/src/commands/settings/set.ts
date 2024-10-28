@@ -1,5 +1,4 @@
 import { FormFieldType } from '@devvit/protos';
-import { SettingsValues } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, ux } from '@oclif/core';
 import inquirer from 'inquirer';
@@ -52,14 +51,15 @@ export default class SetAppSettings extends ProjectCommand {
       }
       const response = await this.#appSettingsService.UpdateSettings({
         appId: appInfo.app.id as string,
-        settings: SettingsValues.fromPartial({
+        settings: {
           settings: {
             [settingsKey]: {
               fieldType: FormFieldType.STRING,
               stringValue: settingsValue,
             },
           },
-        }),
+          version: '',
+        },
       });
       if (!response.success) {
         this.error(`${JSON.stringify(response.errors)}`);

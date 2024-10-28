@@ -49,26 +49,12 @@ exports[`useForm > emits an effect on render 1`] = `
           "fields": [
             {
               "defaultValue": {
-                "boolValue": undefined,
                 "fieldType": 0,
-                "groupValue": undefined,
-                "isSecret": undefined,
-                "listValue": undefined,
-                "numberValue": undefined,
-                "selectionValue": undefined,
                 "stringValue": undefined,
               },
               "disabled": undefined,
               "fieldConfig": {
-                "booleanConfig": undefined,
-                "groupConfig": undefined,
-                "listConfig": undefined,
-                "numberConfig": undefined,
-                "paragraphConfig": undefined,
-                "selectionConfig": undefined,
                 "stringConfig": {
-                  "maxLength": undefined,
-                  "minLength": undefined,
                   "placeholder": undefined,
                 },
               },

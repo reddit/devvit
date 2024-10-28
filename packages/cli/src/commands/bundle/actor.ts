@@ -35,11 +35,11 @@ export default class BundleActor extends ProjectCommand {
     const username = await this.#getOwnerUsername();
     const config = await readDevvitConfig(this.projectRoot, this.configFile);
 
-    const actorSpec = ActorSpec.fromPartial({
+    const actorSpec = {
       name: args.name,
       owner: username,
       version: config.version,
-    });
+    };
 
     await this.#makeBundles(actorSpec);
 

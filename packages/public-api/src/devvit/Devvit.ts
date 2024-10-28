@@ -457,6 +457,7 @@ export class Devvit extends Actor {
     for (const method of Object.values(d.methods)) {
       wrapped[method.name] = (args: UnknownMessage | undefined, metadata?: protos.Metadata) =>
         this.#uses[d.fullName].handler?.[method.name]?.(
+          // eslint-disable-next-line no-restricted-properties
           method.requestType?.fromPartial(args ?? {}),
           metadata
         );

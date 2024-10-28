@@ -35,7 +35,7 @@ export function transformFormFields(fields: readonly FormField[]): FormFieldProt
 }
 
 function transformStringField(field: StringField): FormFieldProto {
-  return FormFieldProto.fromPartial({
+  return {
     defaultValue: {
       fieldType: FormFieldType.STRING,
       stringValue: field.defaultValue,
@@ -52,22 +52,22 @@ function transformStringField(field: StringField): FormFieldProto {
     label: field.label,
     required: field.required,
     isSecret: field.isSecret,
-  });
+  };
 }
 
 function transformImageField(field: ImageField): FormFieldProto {
-  return FormFieldProto.fromPartial({
+  return {
     disabled: field.disabled,
     fieldId: field.name,
     fieldType: FormFieldType.IMAGE,
     helpText: field.helpText,
     label: field.label,
     required: field.required,
-  });
+  };
 }
 
 function transformParagraphField(field: ParagraphField): FormFieldProto {
-  return FormFieldProto.fromPartial({
+  return {
     defaultValue: {
       fieldType: FormFieldType.PARAGRAPH,
       stringValue: field.defaultValue,
@@ -84,11 +84,11 @@ function transformParagraphField(field: ParagraphField): FormFieldProto {
     helpText: field.helpText,
     label: field.label,
     required: field.required,
-  });
+  };
 }
 
 function transformNumberField(field: NumberField): FormFieldProto {
-  return FormFieldProto.fromPartial({
+  return {
     defaultValue: {
       fieldType: FormFieldType.NUMBER,
       numberValue: field.defaultValue,
@@ -102,15 +102,15 @@ function transformNumberField(field: NumberField): FormFieldProto {
     helpText: field.helpText,
     label: field.label,
     required: field.required,
-  });
+  };
 }
 
 function transformSelectField(field: SelectField): FormFieldProto {
-  return FormFieldProto.fromPartial({
+  return {
     defaultValue: {
       fieldType: FormFieldType.SELECTION,
       selectionValue: {
-        values: field.defaultValue,
+        values: field.defaultValue ?? [],
       },
     },
     disabled: field.disabled,
@@ -125,11 +125,11 @@ function transformSelectField(field: SelectField): FormFieldProto {
     helpText: field.helpText,
     label: field.label,
     required: field.required,
-  });
+  };
 }
 
 function transformBooleanField(field: BooleanField): FormFieldProto {
-  return FormFieldProto.fromPartial({
+  return {
     defaultValue: {
       fieldType: FormFieldType.BOOLEAN,
       boolValue: field.defaultValue,
@@ -139,11 +139,12 @@ function transformBooleanField(field: BooleanField): FormFieldProto {
     fieldType: FormFieldType.BOOLEAN,
     helpText: field.helpText,
     label: field.label,
-  });
+  };
 }
 
 function transformGroupField(field: FormFieldGroup): FormFieldProto {
-  return FormFieldProto.fromPartial({
+  return {
+    fieldId: '',
     fieldType: FormFieldType.GROUP,
     fieldConfig: {
       groupConfig: {
@@ -152,5 +153,5 @@ function transformGroupField(field: FormFieldGroup): FormFieldProto {
     },
     label: field.label,
     helpText: field.helpText,
-  });
+  };
 }

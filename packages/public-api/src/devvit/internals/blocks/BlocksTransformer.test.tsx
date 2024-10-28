@@ -19,7 +19,6 @@ import {
   BlockPadding,
   BlockRadius,
   BlockRenderEventType,
-  BlockRenderRequest,
   BlockSpacerSize,
   BlockStackDirection,
   BlockTextOutline,
@@ -68,9 +67,7 @@ const commonPropsTestsWithActions = (ui: Block): void => {
 async function render(element: JSX.Element) {
   const reconciler = new BlocksReconciler(
     () => null,
-    BlockRenderRequest.fromPartial({
-      type: BlockRenderEventType.RENDER_INITIAL,
-    }),
+    { type: BlockRenderEventType.RENDER_INITIAL },
     {},
     {},
     undefined

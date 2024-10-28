@@ -76,6 +76,6 @@ export async function sendEvent(
 
   // Don't await this - we don't want to block the command from running
   createEventsClient()
-    .SendEvent(Value.fromPartial({ structValue: eventWithSession }))
+    .SendEvent({ structValue: eventWithSession })
     .catch(() => {});
 }

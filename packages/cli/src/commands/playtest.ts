@@ -2,17 +2,12 @@ import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/commun
 import {
   BuildStatus,
   type FullAppInfo,
-  GetAllWithInstallLocationRequest,
-  InstallationCreationRequest,
   InstallationType,
-  InstallationUpgradeRequest,
-  UUID,
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { Severity } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
 import { RemoteLogType } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
-import { ActorSpec, DependencySpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { ASSET_DIRNAME, WEBVIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import {
   ACTOR_SRC_DIR,
@@ -100,17 +95,15 @@ export default class Playtest extends Upload {
   #watchAssets?: chokidar.FSWatcher;
 
   async #getExistingInstallInfo(subreddit: string): Promise<FullInstallationInfo | undefined> {
-    const existingInstalls = await this.#installationsClient.GetAllWithInstallLocation(
-      GetAllWithInstallLocationRequest.fromPartial({
-        type: InstallationType.SUBREDDIT,
-        location: subreddit,
-      })
-    );
+    const existingInstalls = await this.#installationsClient.GetAllWithInstallLocation({
+      location: subreddit,
+      type: InstallationType.SUBREDDIT,
+    });
     const fullInstallInfoList = await Promise.all(
       existingInstalls.installations.map((install) => {
         // TODO I'm not a fan of having to re-fetch these installs to get the app IDs
         // TODO we should update the protobuf to include the app and app version IDs
-        return this.#installationsClient.GetByUUID(UUID.fromPartial({ id: install.id }));
+        return this.#installationsClient.GetByUUID({ id: install.id });
       })
     );
 
@@ -248,14 +241,13 @@ export default class Playtest extends Upload {
 
       ux.action.start(`Installing...`);
       try {
-        this.#existingInstallInfo = await this.#installationsClient.Create(
-          InstallationCreationRequest.fromPartial({
-            appVersionId,
-            runAs: userT2Id,
-            type: InstallationType.SUBREDDIT,
-            location: subreddit,
-          })
-        );
+        this.#existingInstallInfo = await this.#installationsClient.Create({
+          appVersionId,
+          runAs: userT2Id,
+          type: InstallationType.SUBREDDIT,
+          location: subreddit,
+          upgradeStrategy: 0,
+        });
       } catch (err: unknown) {
         this.error(
           `An error occurred while installing your app: ${StringUtil.caughtToString(err)}`
@@ -415,12 +407,10 @@ export default class Playtest extends Upload {
     );
 
     ux.action.start(`Installing playtest version ${this.#version}...`);
-    await this.#installationsClient.Upgrade(
-      InstallationUpgradeRequest.fromPartial({
-        id: this.#existingInstallInfo!.installation!.id,
-        appVersionId,
-      })
-    );
+    await this.#installationsClient.Upgrade({
+      id: this.#existingInstallInfo!.installation!.id,
+      appVersionId,
+    });
     if (!this.#flags?.['no-live-reload']) this.#server?.send({ appInstalled: {} });
     ux.action.stop(
       `✅\nSuccess! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
@@ -458,9 +448,8 @@ export default class Playtest extends Upload {
 
 export function modifyBundleVersions(bundles: Bundle[], version: string): void {
   for (const bundle of bundles) {
-    bundle.dependencies ??= DependencySpec.fromPartial({});
-    bundle.dependencies.actor ??= ActorSpec.fromPartial({});
-
+    bundle.dependencies ??= { hostname: '', provides: [], uses: [] };
+    bundle.dependencies.actor ??= { name: '', owner: '', version: '' };
     bundle.dependencies.actor.version = version.toString();
   }
 }

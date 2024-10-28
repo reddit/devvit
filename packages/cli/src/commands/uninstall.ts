@@ -1,8 +1,4 @@
-import {
-  GetAllWithInstallLocationRequest,
-  InstallationType,
-  UUID,
-} from '@devvit/protos/community.js';
+import { InstallationType } from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, ux } from '@oclif/core';
 
@@ -55,22 +51,20 @@ export default class Uninstall extends DevvitCommand {
     ux.action.start(`Finding installation of the app "${appName}" in r/${subreddit}`);
     let id: string;
     try {
-      const allInstalledHere = await this.#installationsClient.GetAllWithInstallLocation(
-        GetAllWithInstallLocationRequest.fromPartial({
-          type: InstallationType.SUBREDDIT,
-          location: subreddit,
-        })
-      );
+      const allInstalledHere = await this.#installationsClient.GetAllWithInstallLocation({
+        location: subreddit,
+        type: InstallationType.SUBREDDIT,
+      });
       // TODO I do not like how I'm doing this. I think we should make a new API call for this, but this _does_ work for now.
       const installationToRemove = (
         await Promise.all(
           allInstalledHere.installations.map(async (installation) => {
-            const fullInstallInfo = await this.#installationsClient.GetByUUID(
-              UUID.fromPartial({ id: installation.id })
-            );
-            const appVersionInfo = await this.#appVersionClient.Get(
-              UUID.fromPartial({ id: fullInstallInfo.appVersion?.id ?? '' })
-            );
+            const fullInstallInfo = await this.#installationsClient.GetByUUID({
+              id: installation.id,
+            });
+            const appVersionInfo = await this.#appVersionClient.Get({
+              id: fullInstallInfo.appVersion?.id ?? '',
+            });
             if (appVersionInfo.app?.slug === appName) {
               // This is the one we want to uninstall
               return installation;
@@ -95,7 +89,7 @@ export default class Uninstall extends DevvitCommand {
 
     ux.action.start(`Uninstalling`);
     try {
-      await this.#installationsClient.Remove(UUID.fromPartial({ id }));
+      await this.#installationsClient.Remove({ id });
     } catch (err) {
       this.error(`ERROR: Unable to uninstall app: ${StringUtil.caughtToString(err)}`);
     }

@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
+import { BlockRenderEventType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -27,9 +27,7 @@ describe('BlocksReconciler', () => {
     test('concurrency bug regression', async () => {
       let reconciler = new BlocksReconciler(
         Outer,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         undefined,
         mockMetadata,
         undefined
@@ -40,9 +38,7 @@ describe('BlocksReconciler', () => {
       const lastState = reconciler.state;
       reconciler = new BlocksReconciler(
         Outer,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_EFFECT_EVENT,
-        }),
+        { type: BlockRenderEventType.RENDER_EFFECT_EVENT },
         lastState,
         mockMetadata,
         undefined
@@ -69,9 +65,7 @@ describe('BlocksReconciler', () => {
       );
       const reconciler = new BlocksReconciler(
         boxed,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         undefined,
         mockMetadata,
         undefined
@@ -80,9 +74,7 @@ describe('BlocksReconciler', () => {
 
       const flatReconciler = new BlocksReconciler(
         expectedComponent,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         undefined,
         mockMetadata,
         undefined
@@ -112,9 +104,9 @@ describe('BlocksReconciler', () => {
     );
     const reconciler = new BlocksReconciler(
       boxed,
-      BlockRenderRequest.fromPartial({
+      {
         type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      },
       undefined,
       mockMetadata,
       undefined
@@ -123,9 +115,7 @@ describe('BlocksReconciler', () => {
 
     const flatReconciler = new BlocksReconciler(
       expectedComponent,
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined
@@ -158,9 +148,7 @@ describe('BlocksReconciler', () => {
     );
     const reconciler = new BlocksReconciler(
       boxed,
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined
@@ -169,9 +157,7 @@ describe('BlocksReconciler', () => {
 
     const flatReconciler = new BlocksReconciler(
       expectedComponent,
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined
@@ -188,9 +174,9 @@ describe('BlocksReconciler', () => {
 
     const reconciler = new BlocksReconciler(
       component,
-      BlockRenderRequest.fromPartial({
+      {
         type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      },
       undefined,
       mockMetadata,
       undefined
@@ -244,9 +230,7 @@ describe('BlocksReconciler', () => {
 
       const reconciler = new BlocksReconciler(
         component,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         undefined,
         mockMetadata,
         undefined
@@ -264,10 +248,7 @@ describe('BlocksReconciler', () => {
 
       const reconciler = new BlocksReconciler(
         component,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_USER_ACTION,
-          id: `button.${callback.name}`,
-        }),
+        { id: `button.${callback.name}`, type: BlockRenderEventType.RENDER_USER_ACTION },
         {},
         mockMetadata,
         undefined
@@ -284,9 +265,7 @@ describe('BlocksReconciler', () => {
 
       const reconciler = new BlocksReconciler(
         component,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         {},
         mockMetadata,
         undefined
@@ -300,9 +279,7 @@ describe('BlocksReconciler', () => {
     test('defaults with __renderState', () => {
       const reconciler = new BlocksReconciler(
         () => null,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         undefined,
         mockMetadata,
         undefined
@@ -321,9 +298,7 @@ describe('BlocksReconciler', () => {
       };
       const reconciler = new BlocksReconciler(
         cmp,
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         undefined,
         mockMetadata,
         undefined

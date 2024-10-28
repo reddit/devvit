@@ -58,7 +58,7 @@ function createCombinedHandler<Arg>(
     const errResult = joinSettledErrors(results);
     if (errResult) throw errResult.err;
 
-    return HandlerResult.fromPartial({});
+    return {};
   };
 }
 

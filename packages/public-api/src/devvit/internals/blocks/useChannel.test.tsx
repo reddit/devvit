@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest, EffectType } from '@devvit/protos';
+import { BlockRenderEventType, EffectType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 
@@ -21,9 +21,7 @@ describe('useChannel', () => {
         channel.subscribe();
         return <button onPress={() => channel.send({})}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined

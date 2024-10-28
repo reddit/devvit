@@ -3,7 +3,7 @@ import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_c
 import { modifyBundleVersions } from '../commands/playtest.js';
 
 test('bundle has a version and is modified', () => {
-  const bundle: Bundle = Bundle.fromPartial({});
+  const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
 
   modifyBundleVersions([bundle], '1.2.3.4');
 

@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
+import { BlockRenderEventType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 
@@ -17,9 +17,7 @@ describe('useInterval', () => {
         const interval = useInterval(() => {}, 100);
         return <button onPress={() => interval.start()}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined
@@ -47,10 +45,7 @@ describe('useInterval', () => {
         const interval = useInterval(() => {}, 100);
         return <button onPress={() => interval.start()}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `button.onPress`,
-      }),
+      { id: `button.onPress`, type: BlockRenderEventType.RENDER_USER_ACTION },
       {
         __renderState: {
           'root.anonymous': [
@@ -81,10 +76,7 @@ describe('useInterval', () => {
         const interval = useInterval(() => {}, 100);
         return <button onPress={() => interval.start()}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `button.onPress`,
-      }),
+      { id: `button.onPress`, type: BlockRenderEventType.RENDER_USER_ACTION },
       {
         __renderState: {
           'root.anonymous': [
@@ -118,9 +110,7 @@ describe('useInterval', () => {
         interval.start();
         return <text>Text</text>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_EFFECT_EVENT,
-      }),
+      { type: BlockRenderEventType.RENDER_EFFECT_EVENT },
       {
         __renderState: {
           'root.anonymous': [
@@ -153,10 +143,7 @@ describe('useInterval', () => {
         const interval = useInterval(() => {}, delayMs);
         return <button onPress={() => interval.start()}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `button.onPress`,
-      }),
+      { id: `button.onPress`, type: BlockRenderEventType.RENDER_USER_ACTION },
       {
         __renderState: {
           'root.anonymous': [
@@ -188,10 +175,7 @@ describe('useInterval', () => {
         intervalTwo.start();
         return <text>Hello</text>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `button.onPress`,
-      }),
+      { id: `button.onPress`, type: BlockRenderEventType.RENDER_USER_ACTION },
       {
         __renderState: {
           'root.anonymous': [
@@ -218,10 +202,7 @@ describe('useInterval', () => {
         const interval = useInterval(() => {}, 100);
         return <button onPress={() => interval.stop()}>Stop</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `button.onPress`,
-      }),
+      { id: `button.onPress`, type: BlockRenderEventType.RENDER_USER_ACTION },
       {
         __renderState: {
           'root.anonymous': [
@@ -252,9 +233,7 @@ describe('useInterval', () => {
         const interval = useInterval(callback, 100);
         return <button onPress={() => interval.start()}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined
@@ -272,10 +251,7 @@ describe('useInterval', () => {
         const interval = useInterval(callback, 100);
         return <button onPress={() => interval.start()}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `button.onPress`,
-      }),
+      { id: `button.onPress`, type: BlockRenderEventType.RENDER_USER_ACTION },
       {
         __renderState: {
           'root.anonymous': [
@@ -306,9 +282,7 @@ describe('useInterval', () => {
         const interval = useInterval(callback, 100);
         return <button onPress={() => interval.start()}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_EFFECT_EVENT,
-      }),
+      { type: BlockRenderEventType.RENDER_EFFECT_EVENT },
       {
         __renderState: {
           'root.anonymous': [
@@ -339,9 +313,7 @@ describe('useInterval', () => {
         const interval = useInterval(callback, 100);
         return <button onPress={() => interval.start()}>Start</button>;
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_EFFECT_EVENT,
-      }),
+      { type: BlockRenderEventType.RENDER_EFFECT_EVENT },
       {
         __renderState: {
           'root.anonymous': [

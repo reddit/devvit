@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { BlockRenderEventType, BlockRenderRequest } from '@devvit/protos';
+import { BlockRenderEventType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 
@@ -17,9 +17,7 @@ describe('useState', () => {
           const [state] = useState({ foo: 'bar' });
           return <text>{state.foo}</text>;
         },
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         undefined,
         mockMetadata,
         undefined
@@ -50,9 +48,7 @@ describe('useState', () => {
           });
           return <text>{state}</text>;
         },
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_INITIAL,
-        }),
+        { type: BlockRenderEventType.RENDER_INITIAL },
         undefined,
         mockMetadata,
         undefined
@@ -80,10 +76,7 @@ describe('useState', () => {
             </vstack>
           );
         },
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_USER_ACTION,
-          id: `button.onPress`,
-        }),
+        { type: BlockRenderEventType.RENDER_USER_ACTION, id: `button.onPress` },
         {
           __renderState: {
             'root.anonymous': [5],
@@ -113,10 +106,7 @@ describe('useState', () => {
             </vstack>
           );
         },
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_USER_ACTION,
-          id: `button.onPress`,
-        }),
+        { type: BlockRenderEventType.RENDER_USER_ACTION, id: `button.onPress` },
         {
           __renderState: {
             'root.anonymous': [2],
@@ -148,10 +138,7 @@ describe('useState', () => {
             </vstack>
           );
         },
-        BlockRenderRequest.fromPartial({
-          type: BlockRenderEventType.RENDER_USER_ACTION,
-          id: `button.onPress`,
-        }),
+        { id: `button.onPress`, type: BlockRenderEventType.RENDER_USER_ACTION },
         undefined,
         mockMetadata,
         undefined
@@ -180,9 +167,7 @@ describe('useState', () => {
           </vstack>
         );
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined
@@ -206,9 +191,7 @@ describe('useState', () => {
   test('must not be used outside of a component', async () => {
     const reconciler = new BlocksReconciler(
       () => null,
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined
@@ -238,10 +221,7 @@ describe('useState', () => {
           </vstack>
         );
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_USER_ACTION,
-        id: `button.onPress`,
-      }),
+      { id: `button.onPress`, type: BlockRenderEventType.RENDER_USER_ACTION },
       {
         __renderState: {
           'root.anonymous': [0],
@@ -270,9 +250,7 @@ describe('useState', () => {
           </vstack>
         );
       },
-      BlockRenderRequest.fromPartial({
-        type: BlockRenderEventType.RENDER_INITIAL,
-      }),
+      { type: BlockRenderEventType.RENDER_INITIAL },
       undefined,
       mockMetadata,
       undefined

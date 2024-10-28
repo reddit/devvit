@@ -39,13 +39,14 @@ export class UIClient implements _UIClient {
         ? formDefinition.form(data ?? {})
         : formDefinition.form;
 
-    const form = Form.fromPartial({
+    const form: Form = {
+      fields: [],
       id: formKey,
       title: formData.title,
       acceptLabel: formData.acceptLabel,
       cancelLabel: formData.cancelLabel,
       shortDescription: formData.description,
-    });
+    };
 
     assertValidFormFields(formData.fields);
     form.fields = transformFormFields(formData.fields);

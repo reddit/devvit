@@ -4,14 +4,7 @@ import type {
   FullInstallationInfo,
   MultipleInstallationsResponse,
 } from '@devvit/protos/community.js';
-import {
-  GetAllWithInstallLocationRequest,
-  InstallationCreationRequest,
-  InstallationType,
-  InstallationUpgradeRequest,
-  NutritionCategory,
-  UUID,
-} from '@devvit/protos/community.js';
+import { InstallationType, NutritionCategory } from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
@@ -105,22 +98,19 @@ export default class Install extends DevvitCommand {
           );
           return;
         } else {
-          installationInfo = await this.#installationsClient.Upgrade(
-            InstallationUpgradeRequest.fromPartial({
-              id: existingInstallInfo.installation?.id ?? '',
-              appVersionId: appVersion.id,
-            })
-          );
+          installationInfo = await this.#installationsClient.Upgrade({
+            appVersionId: appVersion.id,
+            id: existingInstallInfo.installation?.id ?? '',
+          });
         }
       } else {
-        installationInfo = await this.#installationsClient.Create(
-          InstallationCreationRequest.fromPartial({
-            appVersionId: appVersion.id,
-            runAs: userT2Id,
-            type: InstallationType.SUBREDDIT,
-            location: subreddit,
-          })
-        );
+        installationInfo = await this.#installationsClient.Create({
+          appVersionId: appVersion.id,
+          runAs: userT2Id,
+          type: InstallationType.SUBREDDIT,
+          location: subreddit,
+          upgradeStrategy: 0,
+        });
       }
       ux.action.stop(
         `Successfully installed version ${DevvitVersion.fromProtoAppVersionInfo(
@@ -141,12 +131,10 @@ export default class Install extends DevvitCommand {
   }): Promise<FullInstallationInfo | undefined> {
     let existingInstalls: MultipleInstallationsResponse = { installations: [] };
     try {
-      existingInstalls = await this.#installationsClient.GetAllWithInstallLocation(
-        GetAllWithInstallLocationRequest.fromPartial({
-          type: InstallationType.SUBREDDIT,
-          location: subreddit,
-        })
-      );
+      existingInstalls = await this.#installationsClient.GetAllWithInstallLocation({
+        location: subreddit,
+        type: InstallationType.SUBREDDIT,
+      });
     } catch (err) {
       if (err instanceof TwirpError) {
         if (err.code === 'not_found') {
@@ -160,7 +148,7 @@ export default class Install extends DevvitCommand {
       existingInstalls.installations.map((install) => {
         // TODO I'm not a fan of having to re-fetch these installs to get the app IDs
         // TODO we should update the protobuf to include the app and app version IDs
-        return this.#installationsClient.GetByUUID(UUID.fromPartial({ id: install.id }));
+        return this.#installationsClient.GetByUUID({ id: install.id });
       })
     );
 

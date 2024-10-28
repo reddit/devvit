@@ -1,7 +1,6 @@
 import { LogEventMessage } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
 import {
   type RemoteLogMessage,
-  RemoteLogQuery,
   RemoteLogType,
 } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
@@ -80,13 +79,11 @@ export default class Events extends DevvitCommand {
     this.log(formatAppLogDivider(`streaming event logs for ${appName}`));
 
     loggerClient
-      .Tail(
-        RemoteLogQuery.fromPartial({
-          type: RemoteLogType.EVENT,
-          since: flags.since,
-          subredditAppName: { appName },
-        })
-      )
+      .Tail({
+        since: flags.since,
+        subredditAppName: { appName, subreddit: '' },
+        type: RemoteLogType.EVENT,
+      })
       .subscribe({
         complete: () => {},
         error: (err) => this.#onStreamError(err),

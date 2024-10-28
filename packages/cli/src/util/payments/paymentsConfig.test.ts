@@ -33,14 +33,14 @@ const MOCK_PRODUCTS_JSON_STRING = JSON.stringify(MOCK_PRODUCTS_JSON);
 
 describe(readAndInjectBundleProducts.name, () => {
   it('does not inject products into the bundle if products.json is not found', async () => {
-    const bundle = Bundle.fromPartial({});
+    const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
     vi.mocked(access).mockRejectedValueOnce(new Error('not found'));
     await readAndInjectBundleProducts(PROJECT_ROOT, bundle);
     expect(bundle.paymentsConfig).toBeUndefined();
   });
 
   it('does not inject products into the bundle if products.json is not formatted properly', async () => {
-    const bundle = Bundle.fromPartial({});
+    const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
     const products = [{ ...MOCK_PRODUCTS_JSON.products[0], price: 'not a number' }];
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
     await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
@@ -50,7 +50,7 @@ describe(readAndInjectBundleProducts.name, () => {
   });
 
   it('does not inject products into the bundle if the bundle does not provide a PaymentProcessor', async () => {
-    const bundle = Bundle.fromPartial({});
+    const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(MOCK_PRODUCTS_JSON_STRING);
     await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
@@ -64,20 +64,28 @@ describe(readAndInjectBundleProducts.name, () => {
     const products = {
       products: [{ ...MOCK_PRODUCTS_JSON.products[0], images: { icon: productImage } }],
     };
-    const bundle = Bundle.fromPartial({
+    const bundle: Bundle = {
+      code: '',
       dependencies: {
+        hostname: '',
         provides: [
           {
             definition: {
               fullName: PaymentProcessorDefinition.fullName,
+              methods: [],
+              name: '',
+              version: '',
             },
+            partitionsBy: [],
           },
         ],
+        uses: [],
       },
       assetIds: {
         'exists.jpg': 'abc123',
       },
-    });
+      webviewAssetIds: {},
+    };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
     await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
@@ -87,15 +95,21 @@ describe(readAndInjectBundleProducts.name, () => {
   });
 
   it('does not inject products if no products are found in products.json', async () => {
-    const bundle = Bundle.fromPartial({
+    const bundle: Bundle = {
+      assetIds: {},
+      code: '',
       dependencies: {
+        hostname: '',
+        provides: [],
         uses: [
           {
             typeName: PaymentsServiceDefinition.fullName,
+            name: '',
           },
         ],
       },
-    });
+      webviewAssetIds: {},
+    };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify({ products: [] }));
     await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
@@ -105,17 +119,26 @@ describe(readAndInjectBundleProducts.name, () => {
   });
 
   it('injects products into the bundle if products.json is found and formatted properly', async () => {
-    const bundle = Bundle.fromPartial({
+    const bundle: Bundle = {
+      assetIds: {},
+      code: '',
       dependencies: {
+        hostname: '',
         provides: [
           {
             definition: {
               fullName: PaymentProcessorDefinition.fullName,
+              methods: [],
+              name: '',
+              version: '',
             },
+            partitionsBy: [],
           },
         ],
+        uses: [],
       },
-    });
+      webviewAssetIds: {},
+    };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(MOCK_PRODUCTS_JSON_STRING);
     await readAndInjectBundleProducts(PROJECT_ROOT, bundle);
@@ -127,20 +150,28 @@ describe(readAndInjectBundleProducts.name, () => {
     const products = {
       products: [{ ...MOCK_PRODUCTS_JSON.products[0], images: { icon: productImage } }],
     };
-    const bundle = Bundle.fromPartial({
+    const bundle: Bundle = {
+      code: '',
       dependencies: {
+        hostname: '',
         provides: [
           {
             definition: {
               fullName: PaymentProcessorDefinition.fullName,
+              methods: [],
+              name: '',
+              version: '',
             },
+            partitionsBy: [],
           },
         ],
+        uses: [],
       },
       assetIds: {
         'exists.jpg': 'abc123',
       },
-    });
+      webviewAssetIds: {},
+    };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
     await readAndInjectBundleProducts(PROJECT_ROOT, bundle, false);

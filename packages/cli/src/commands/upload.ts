@@ -5,14 +5,12 @@ import path from 'node:path';
 
 import {
   AppCapability,
-  AppCreationRequest,
   type AppInfo,
   AppVersionInfo,
   Categories,
   FullAppInfo,
   InstallationType,
   MediaSignature,
-  UploadNewMediaRequest,
   UploadNewMediaResponse,
   VersionVisibility,
 } from '@devvit/protos/community.js';
@@ -330,13 +328,14 @@ export default class Upload extends ProjectCommand {
       }
     }
 
-    const appCreationRequest = AppCreationRequest.fromPartial({
+    const appCreationRequest = {
+      autogenerateName: false,
       name: projectConfig.name,
       description: description ?? '',
       isNsfw,
       categories,
       captcha: '',
-    });
+    };
 
     // Captcha not required in snoodev, but required in prod
     if (!MY_PORTAL_ENABLED) {
@@ -356,10 +355,11 @@ export default class Upload extends ProjectCommand {
         version,
       });
       ux.action.stop('Successfully created your app in Reddit!');
-      return FullAppInfo.fromPartial({
+      return {
         app: newApp,
+        versions: [],
         // There's no versions, we just made it :)
-      });
+      };
     } catch (err) {
       if (err instanceof TwirpError && err.code === TwirpErrorCode.AlreadyExists) {
         this.error(
@@ -760,16 +760,14 @@ export default class Upload extends ProjectCommand {
             batch.map(async (f) => {
               return [
                 f,
-                await this.appClient.UploadNewMedia(
-                  UploadNewMediaRequest.fromPartial({
-                    slug: config.name,
-                    size: f.size,
-                    hash: f.hash,
-                    contents: f.contents,
-                    webviewAsset: webViewAsset,
-                    filePath: f.filePath,
-                  })
-                ),
+                await this.appClient.UploadNewMedia({
+                  slug: config.name,
+                  size: f.size,
+                  hash: f.hash,
+                  contents: f.contents,
+                  webviewAsset: webViewAsset,
+                  filePath: f.filePath,
+                }),
               ] as [MediaSignatureWithContents, UploadNewMediaResponse];
             })
           )),

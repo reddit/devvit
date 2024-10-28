@@ -1,5 +1,5 @@
 import type { AppClient, AppVersionInfo } from '@devvit/protos/community.js';
-import { type FullAppInfo, GetAppBySlugRequest } from '@devvit/protos/community.js';
+import { type FullAppInfo } from '@devvit/protos/community.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 
 export async function getInfoForSlugString(
@@ -18,7 +18,7 @@ export async function getInfoForSlugString(
 
   let appInfo: FullAppInfo;
   try {
-    appInfo = await appClient.GetBySlug(GetAppBySlugRequest.fromPartial({ slug }));
+    appInfo = await appClient.GetBySlug({ slug });
   } catch (e) {
     throw new Error(`${e}. Please run 'devvit upload' and try your command again.`);
   }

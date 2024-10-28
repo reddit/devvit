@@ -1,10 +1,6 @@
-import {
-  GetByAppNameAndInstallLocationRequest,
-  InstallationType,
-} from '@devvit/protos/community.js';
+import { InstallationType } from '@devvit/protos/community.js';
 import { Severity } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
 import {
-  RemoteLogQuery,
   RemoteLogSubredditAppNameFilter,
   RemoteLogType,
 } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
@@ -93,27 +89,19 @@ export default class Logs extends DevvitCommand {
     // for every subreddit regardless of user. It's designed to test that logs are flowing through
     // the system. Long term, this will likely be removed as we build confidence in our logger.
     if (appName === 'dummy-logger') {
-      return RemoteLogSubredditAppNameFilter.fromPartial({
-        subreddit,
-        appName,
-      });
+      return { appName, subreddit };
     }
     // Call DevPortal to ensure the installation is valid and to convert
     // the subreddit name to a t5_ id.
     // TODO: move this conversion/check into Gateway
     const installationClient = createInstallationsClient();
-    const result = await installationClient.GetByAppNameAndInstallLocation(
-      GetByAppNameAndInstallLocationRequest.fromPartial({
-        slug: appName,
-        location: subreddit,
-        type: InstallationType.SUBREDDIT,
-      })
-    );
-
-    return RemoteLogSubredditAppNameFilter.fromPartial({
-      subreddit: result.installation?.location?.id ?? '',
-      appName,
+    const result = await installationClient.GetByAppNameAndInstallLocation({
+      location: subreddit,
+      slug: appName,
+      type: InstallationType.SUBREDDIT,
     });
+
+    return { appName, subreddit: result.installation?.location?.id ?? '' };
   }
 
   async run(): Promise<void> {
@@ -148,17 +136,17 @@ export default class Logs extends DevvitCommand {
   ): Subscription {
     const client = createRemoteLoggerClient();
 
-    const logsQuery = RemoteLogQuery.fromPartial({
+    const logsQuery = {
+      since: flags.since,
+      subredditAppName,
       type: RemoteLogType.LOG,
-      since: flags.since,
-      subredditAppName,
-    });
+    };
     const logs = client.Tail(logsQuery);
-    const errorsQuery = RemoteLogQuery.fromPartial({
-      type: RemoteLogType.ERROR,
+    const errorsQuery = {
       since: flags.since,
       subredditAppName,
-    });
+      type: RemoteLogType.ERROR,
+    };
     const errors = client.Tail(errorsQuery);
 
     return merge(logs, errors)
