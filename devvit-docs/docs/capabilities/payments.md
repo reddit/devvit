@@ -37,7 +37,7 @@ All products will be reviewed by the Developer Platform team to ensure complianc
 Run the following command to add payments to your app.
 
 ```bash
-devvit install @devvit/payments@next
+npm install @devvit/payments@next
 ```
 
 ### Register products

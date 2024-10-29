@@ -19,7 +19,7 @@ Karma- and gold-earning requirements are waived for developers.
 Install Payments in your app by running the following command:
 
 ```bash
-devvit install @devvit/payments@next
+npm install @devvit/payments@next
 ```
 
 ## How it works
