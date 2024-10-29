@@ -1,5 +1,9 @@
 import { Devvit } from '@devvit/public-api';
 
+Devvit.configure({
+  redditAPI: true,
+});
+
 Devvit.addMenuItem({
   label: 'Create Webview Example Post',
   location: 'subreddit',
