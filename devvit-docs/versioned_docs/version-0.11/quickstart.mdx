@@ -11,6 +11,68 @@ Here's the tl;dr for building on the Developer Platform. Apps are written in [Ty
 you get started, you'll need:
 
 - [Node.js](https://nodejs.org/) (v22.2.0+)
+
+<details>
+  <summary>Click here for instructions on installing Node.js</summary>
+  <div>
+    <div>
+    You’re going to work with TypeScript. In order for Typescript to work with Devvit, you’ll need a working Node.js environment and then the Devvit command line interface. Node.js is an open-source server environment that makes it possible to develop and run Javascript apps anywhere. Node.js lets you import and use packages (code that other people have written) into your code.
+
+**Option 1: Use node version manager (nvm)**
+
+Install or update [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) to use as a handy command-line tool for managing multiple Node.js versions on your system. This will allow you to switch between different versions easily. If you to use a different node version manager, check out these [suggestions from npmjs.org](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+For macOS or Linux:
+
+1. Run the following command line in your terminal to install nvm.
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash
+```
+
+2. Close and re-open your terminal to have nvm available.
+
+3. Install the latest version of Node.js.
+
+```bash
+nvm install node
+```
+
+For Windows:
+
+1. Download and install nvm-windows by following the instructions in the [repository](https://github.com/coreybutler/nvm-windows).
+
+2. Restart your terminal or command prompt.
+
+3. Install the latest version of Node.js.
+
+```bash
+nvm install node
+```
+
+**Option 2: Use Node.js installer from nodejs.org**
+
+1. Visit the official [Node.js website](https://nodejs.org) to download the installer for your operating system (Windows, macOS, or Linux).
+2. Run the installer and follow the prompts to install Node.js and npm (the package manager for Node.js).
+
+:::note
+If you install Node.js this way, you may experience permissions issues when trying to run Devvit, which is [documented on NPM's website](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). Additionally, when Node updates in the future, you'll need to uninstall and reinstall Node to get the latest version working. Both NPM and us here at Reddit highly encourage you to use nvm if possible. If that's not possible, here are some tips on how to [fix these permissions issues](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). For Windows users specifically, please use a node version manager.
+:::
+
+Check that Node.js is installed correctly by running the following commands:
+
+```bash
+node --version
+npm --version
+```
+
+You should see the version numbers for Node.js and npm as output.
+
+</div>
+    <br/>
+  </div>
+</details>
+
 - a [test subreddit](https://mods.reddithelp.com/hc/en-us/articles/360001766991-How-to-create-a-subreddit) that you moderate with
   less than 200 members
 - a code editor (we recommend [VS Code](https://code.visualstudio.com/))
