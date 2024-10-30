@@ -1,35 +1,43 @@
-import { Devvit, useInterval, useState } from '@devvit/public-api';
+import { Context, Devvit, useInterval, useState } from '@devvit/public-api';
 
+import Settings from '../settings.json';
+import type { CandidateWord } from '../types/CandidateWord.js';
+import { UserData } from '../types/UserData.js';
+import { blankCanvas } from '../utils/blankCanvas.js';
+import { getLevel } from '../utils/progression.js';
+import { splitArray } from '../utils/splitArray.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
 import { Shadow } from './Shadow.js';
 import { StyledButton } from './StyledButton.js';
-import type { CandidateWord } from '../types/CandidateWord.js';
-import Settings from '../settings.json';
-import { blankCanvas } from '../utils/blankCanvas.js';
-import { splitArray } from '../utils/splitArray.js';
 
 interface EditorPageDrawStepProps {
+  username?: string;
+  userData: UserData;
   candidate: CandidateWord;
   onNext: (drawing: number[]) => void;
 }
 
-export const EditorPageDrawStep = (props: EditorPageDrawStepProps): JSX.Element => {
+export const EditorPageDrawStep = (
+  props: EditorPageDrawStepProps,
+  _context: Context
+): JSX.Element => {
   const [currentColor, setCurrentColor] = useState<number>(1);
   const [drawingData, setDrawingData] = useState<number[]>(blankCanvas);
-
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState<number>(0);
+  const level = getLevel(props.userData.levelRank ?? 1);
+  const drawingTime = Settings.drawingDuration + level.extraTime;
 
   useInterval(() => {
     setElapsedTime(Date.now() - startTime);
-    const remainingTime = Settings.drawingDuration * 1000 - elapsedTime;
+    const remainingTime = drawingTime * 1000 - elapsedTime;
     if (remainingTime <= 0) props.onNext(drawingData);
   }, 5000).start();
 
   const secondsLeft = Math.max(
     0, // Ensure non-negative value
-    Math.round((Settings.drawingDuration - elapsedTime / 1000) / 5) * 5 // Round to the nearest 5 seconds
+    Math.round((drawingTime - elapsedTime / 1000) / 5) * 5 // Round to the nearest 5 seconds
   );
 
   const size = '275px';

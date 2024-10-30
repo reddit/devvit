@@ -1,19 +1,21 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useForm } from '@devvit/public-api';
+import { Devvit, useAsync, useForm } from '@devvit/public-api';
 
 import { Drawing } from '../../components/Drawing.js';
+import { LoadingState } from '../../components/LoadingState.js';
 import { PixelText } from '../../components/PixelText.js';
 import { StyledButton } from '../../components/StyledButton.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
-import type { PostData } from '../../types/PostData.js';
+import type { DrawingPostData } from '../../types/PostData.js';
+import { PostGuesses } from '../../types/PostGuesses.js';
+import { UserData } from '../../types/UserData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 
 interface DrawingPostPromptStepProps {
-  data: {
-    postData: PostData;
-    username: string | null;
-  };
+  postData: DrawingPostData;
+  userData: UserData;
+  username?: string;
   onGuess: (guess: string, userWantsToComment: boolean) => Promise<void>;
   onSkip: () => void;
   feedback: boolean | null;
@@ -24,8 +26,27 @@ export const DrawingPostPromptStep = (
   context: Context
 ): JSX.Element => {
   const service = new Service(context);
-  const playerCount = props.data.postData.count.players;
-  const winnerCount = props.data.postData.count.winners;
+
+  const { data, loading } = useAsync<PostGuesses>(async () => {
+    const empty = { playerCount: 0, wordCount: 0, guessCount: 0, guesses: {} };
+    if (!props.username) return empty;
+    try {
+      const players = await service.getPlayerCount(context.postId!);
+      const metadata = await service.getPostGuesses(context.postId!);
+      metadata.playerCount = players;
+      return metadata;
+    } catch (error) {
+      if (error) {
+        console.error('Error loading drawing meta data', error);
+      }
+      return empty;
+    }
+  });
+
+  if (loading || data === null) return <LoadingState />;
+
+  const playerCount = data?.playerCount || 0;
+  const winnerCount = props.postData.solves;
   const winPercentage =
     winnerCount > 0 && playerCount > 0 ? Math.round((winnerCount / playerCount) * 100) : 0;
 
@@ -53,14 +74,23 @@ export const DrawingPostPromptStep = (
         {
           type: 'boolean',
           name: 'comment',
-          label: "Leave a comment if you're the first to make that guess.",
-          defaultValue: true,
+          label: 'Leave a comment (optional)',
+          defaultValue: props.userData.autoComment,
         },
       ],
     },
     async (values) => {
-      const guess = values.guess.trim();
+      const guess = values.guess.trim().toLowerCase();
       const userWantsToComment = values.comment;
+
+      // Update user comment preference
+      if (userWantsToComment !== props.userData.autoComment) {
+        await service.saveUserData(props.username!, {
+          autoComment: userWantsToComment,
+        });
+      }
+
+      // Submit the guess
       await props.onGuess(guess, userWantsToComment);
     }
   );
@@ -76,15 +106,15 @@ export const DrawingPostPromptStep = (
       fields: [],
     },
     async () => {
-      if (!props.data.postData.postId || !props.data.username) {
+      if (!props.postData.postId || !props.username) {
         return;
       }
-      await service.skipPost(props.data.postData.postId, props.data.username);
+      await service.skipPost(props.postData.postId, props.username);
       props.onSkip();
     }
   );
 
-  const dictionaryName = props.data.postData.dictionaryName;
+  const dictionaryName = props.postData.dictionaryName;
 
   return (
     <vstack height="100%" width="100%" alignment="center">
@@ -96,7 +126,7 @@ export const DrawingPostPromptStep = (
 
       {/* Drawing */}
       <zstack alignment="center middle">
-        <Drawing data={props.data.postData.data} size={width} />
+        <Drawing data={props.postData.data} size={width} />
         {props.feedback === false && (
           <image
             url={'feedback-incorrect.png'}

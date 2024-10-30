@@ -6,6 +6,9 @@ import { Router } from './posts/Router.js';
 import { Service } from './service/Service.js';
 import Settings from './settings.json';
 import type { JobData } from './types/job-data.js';
+import type { Level } from './types/Level.js';
+import { capitalizeWord } from './utils/capitalizeWord.js';
+import { migrateDrawingPostEssentials, migratePinnedPostEssentials } from './utils/migration.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -29,7 +32,7 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { ui, reddit, scheduler } = context;
+    const { ui, reddit } = context;
     const service = new Service(context);
     const community = await reddit.getCurrentSubreddit();
 
@@ -50,7 +53,7 @@ Devvit.addMenuItem({
       // Pin the post
       await post.sticky(),
       // Store the post data
-      await service.storePinnedPostData(post.id),
+      await service.savePinnedPost(post.id),
       // Create the game "Active" flair for drawings
       await reddit.createPostFlairTemplate({
         subredditName: community.name,
@@ -67,15 +70,12 @@ Devvit.addMenuItem({
       }),
     ]);
 
-    await Promise.all([
-      // Store the game settings
-      await service.storeGameSettings({
-        activeFlairId: activeFlair.id,
-        endedFlairId: endedFlair.id,
-      }),
-      // Schedule minutly updates of the score board
-      await scheduler.runJob({ cron: '* * * * *', name: 'UpdateScoreBoard' }),
-    ]);
+    // Store the game settings
+    await service.storeGameSettings({
+      activeFlairId: activeFlair.id,
+      endedFlairId: endedFlair.id,
+      selectedDictionary: 'main',
+    });
 
     ui.navigateTo(post);
     ui.showToast('Installed Pixelary!');
@@ -110,8 +110,7 @@ const logDictionaryForm = Devvit.createForm(
   },
   async (event, context) => {
     const service = new Service(context);
-
-    await service.getDictionaries(event.values.dictionary, true);
+    await service.logDictionary(event.values.dictionary);
     context.ui.showToast('Dictionary retrieved. Run `devvit logs` to view');
   }
 );
@@ -150,9 +149,7 @@ const addWordsToDictionaryForm = Devvit.createForm(
       context.ui.showToast('Please enter a word');
       return;
     }
-    const words = event.values.words
-      .split(',')
-      .map((word) => service.getCapitalizedWord(word.trim()));
+    const words = event.values.words.split(',').map((word) => capitalizeWord(word.trim()));
     const wordsAdded = await service.upsertDictionary(event.values.dictionary, words);
 
     const addedWordsStr = wordsAdded.uniqueNewWords.join(', ');
@@ -240,7 +237,8 @@ const selectDictionaryForm = Devvit.createForm(
     }
 
     const service = new Service(context);
-    await service.setSelectedDictionaryName(value);
+    await service.selectDictionary(value);
+
     return context.ui.showToast(`Dictionary selected: ${event.values.dictionary[0]}`);
   }
 );
@@ -260,8 +258,8 @@ Devvit.addMenuItem({
   forUserType: 'moderator',
   onPress: async (_event, context) => {
     const service = new Service(context);
-    const selectedDictionary = await service.getSelectedDictionaryName();
-    context.ui.showToast(`Current dictionary: ${selectedDictionary}`);
+    const gameSettings = await service.getGameSettings();
+    context.ui.showToast(`Current dictionary: ${gameSettings.selectedDictionary}`);
   },
 });
 
@@ -290,9 +288,7 @@ const removeWordsFromDictionaryForm = Devvit.createForm(
       context.ui.showToast('Please enter a word');
       return;
     }
-    const wordsToRemove = event.values.words
-      .split(',')
-      .map((word) => service.getCapitalizedWord(word.trim()));
+    const wordsToRemove = event.values.words.split(',').map((word) => capitalizeWord(word.trim()));
     const wordsRemoved = await service.removeWordFromDictionary(
       event.values.dictionary,
       wordsToRemove
@@ -340,51 +336,21 @@ Devvit.addMenuItem({
   },
 });
 
-// Schedule job for updating the score board
-Devvit.addSchedulerJob({
-  name: 'UpdateScoreBoard',
-  onRun: async (_event, context) => {
-    const service = new Service(context);
-    await service.updateScoreBoard();
-  },
-});
-
-// Mod action to reveal the word
-const WordReveal = Devvit.createForm(
-  (data: { word?: string }) => {
-    return {
-      title: 'Pixelary word hidden in the post',
-      description: data.word || 'Something went wrong',
-      fields: [],
-      acceptLabel: 'Ok',
-      cancelLabel: 'Got it',
-    };
-  },
-  () => {}
-);
+/*
+ * Mod action to reveal the word
+ */
 
 Devvit.addMenuItem({
-  label: '[Pixelary] Reveal the word',
+  label: '[Pixelary] Reveal Word',
   location: 'post',
   forUserType: 'moderator',
   onPress: async (event, context) => {
-    const { postId, userId } = context;
     const service = new Service(context);
-    const gameSettings = await service.getGameSettings();
-
-    if (gameSettings.heroPostId === postId) {
-      context.ui.showToast('Nothing to reveal on main game post');
-      return;
-    }
-
-    const rawPostData = await service.getPostData(event.targetId);
-    const postData = service.parsePostData(rawPostData, userId!);
-    if (!postData) {
-      context.ui.showToast('No word is associated with this post');
-      return;
-    }
-
-    context.ui.showForm(WordReveal, { word: postData.word });
+    const postType = await service.getPostType(event.targetId);
+    // Return early for unsupported post types
+    if (postType !== 'drawing') return;
+    const data = await service.getDrawingPost(event.targetId);
+    context.ui.showToast(data.word);
   },
 });
 
@@ -394,22 +360,19 @@ Devvit.addMenuItem({
   location: 'post',
   forUserType: 'moderator',
   onPress: async (event, context) => {
-    const { scheduler, postId, ui, userId } = context;
     const service = new Service(context);
-    const rawPostData = await service.getPostData(event.targetId);
-    const postData = service.parsePostData(rawPostData, userId!);
-
-    await scheduler.runJob<JobData>({
+    const postType = await service.getPostType(event.targetId);
+    if (postType !== 'drawing') return;
+    const data = await service.getDrawingPost(event.targetId);
+    await context.scheduler.runJob<JobData>({
       name: 'PostExpiration',
       data: {
         postId: event.targetId,
-        answer: postData.word,
+        answer: data.word,
       },
       runAt: new Date(),
     });
-
-    console.log(`Expiring post: ${postId}`);
-    ui.showToast('Post expired');
+    context.ui.showToast('Post expired');
   },
 });
 
@@ -422,22 +385,16 @@ Devvit.addMenuItem({
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
-    const { ui, reddit } = context;
     const service = new Service(context);
-
-    try {
-      const community = await reddit.getCurrentSubreddit();
-      const post = await reddit.submitPost({
-        title: Settings.pinnedPost.title,
-        subredditName: community.name,
-        preview: <LoadingState />,
-      });
-      await Promise.all([await post.sticky(), await service.storePinnedPostData(post.id)]);
-      ui.navigateTo(post);
-    } catch (error) {
-      console.error('Failed to create pinned post:', error);
-      ui.showToast('Failed to create post');
-    }
+    const community = await context.reddit.getCurrentSubreddit();
+    const post = await context.reddit.submitPost({
+      title: Settings.pinnedPost.title,
+      subredditName: community.name,
+      preview: <LoadingState />,
+    });
+    await post.sticky();
+    await service.savePinnedPost(post.id);
+    context.ui.navigateTo(post);
   },
 });
 
@@ -466,61 +423,6 @@ Devvit.addSchedulerJob<JobData>({
   },
 });
 
-Devvit.addMenuItem({
-  label: '[Pixelary] Clear my history',
-  location: 'subreddit',
-  onPress: async (_event, context) => {
-    const user = await context.reddit.getCurrentUser();
-    if (!user) {
-      context.ui.showToast('Username not found');
-      return;
-    }
-    const service = new Service(context);
-    const key = service.getMyDrawingsKey(user.username);
-    await context.redis.del(key);
-    context.ui.showToast('Cleared');
-  },
-});
-
-// ADMIN ONLY
-Devvit.addMenuItem({
-  label: '[Pixelary] Clear leaderboard',
-  location: 'subreddit',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const { ui } = context;
-    const service = new Service(context);
-    await service.clearScoreBoard();
-    ui.showToast('Cleared the leaderboard');
-  },
-});
-
-// ADMIN ONLY
-Devvit.addMenuItem({
-  label: '[Pixelary] Update leaderboard',
-  location: 'subreddit',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const { ui, scheduler } = context;
-    const service = new Service(context);
-    await service.updateScoreBoard();
-    console.log(await scheduler.listJobs());
-    ui.showToast('Updated the leaderboard');
-  },
-});
-
-// ADMIN ONLY
-Devvit.addMenuItem({
-  label: '[Pixelary] Start update job',
-  location: 'subreddit',
-  forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    const { ui, scheduler } = context;
-    await scheduler.runJob({ cron: '* * * * *', name: 'UpdateScoreBoard' });
-    ui.showToast('Started cron job!');
-  },
-});
-
 /*
  * Comment Delete Trigger
  *
@@ -533,26 +435,9 @@ Devvit.addTrigger({
   event: 'CommentDelete',
   onEvent: async (event, context) => {
     const service = new Service(context);
-    const data = await service.getPostData(event.postId);
-    if (!data || !data.word) return;
-
-    // Find any guesses associated with the comment
-    const matches: string[] = Object.keys(data ?? {})
-      .filter((key) => key.startsWith('guess-comment:'))
-      .filter((key) => {
-        const commentId = data[key];
-        return commentId === event.commentId;
-      });
-    if (matches.length === 0) return;
-
-    // Remove the comment references from Redis
-    await Promise.all(
-      matches.map(async (match) => {
-        const [_, word] = match.split(':');
-        await service.removeGuessComment(event.postId, word, event.commentId);
-        console.log(`Deleted guess comment: ${event.postId} → ${word} → ${event.commentId}`);
-      })
-    );
+    const word = await service.getGuessComment(event.postId, event.commentId);
+    if (!word) return;
+    await service.removeGuessComment(event.postId, event.commentId);
   },
 });
 
@@ -607,6 +492,60 @@ Devvit.addSchedulerJob({
         await comment.distinguish(true);
       } catch (error) {
         console.error('Failed to submit TLDR comment:', error);
+      }
+    }
+  },
+});
+
+/*
+ * User Level Up Handler
+ */
+
+Devvit.addSchedulerJob({
+  name: 'USER_LEVEL_UP',
+  onRun: async (
+    event: {
+      data: {
+        username: string;
+        score: number;
+        prevLevel: Level;
+        nextLevel: Level;
+      };
+    },
+    context
+  ) => {
+    if (event.data) {
+      try {
+        const service = new Service(context);
+        const subreddit = await context.reddit.getCurrentSubreddit();
+        await context.reddit.sendPrivateMessage({
+          to: event.data.username,
+          subject: `Pixelary Level ${event.data.nextLevel.rank}!`,
+          text: `🎉 **Congratulations, Pixelary Legend!** 🎉
+
+You've officially leveled up to **Level ${event.data.nextLevel.rank}: ${event.data.nextLevel.name}!** 🥳
+
+As a Level ${event.data.nextLevel.rank} player, you now enjoy some awesome perks:
+- **Exclusive** ${event.data.nextLevel.name} user flair to showcase your status!
+- **${event.data.nextLevel.extraTime} extra seconds** for each drawing! ⏳
+- **Bragging rights** that come with your new title!
+
+Don't forget to visit r/${subreddit.name} to flaunt your new flair and keep the creativity flowing! 🎨✨
+`,
+        });
+        await context.reddit.setUserFlair({
+          subredditName: subreddit.name,
+          username: event.data.username,
+          text: event.data.nextLevel.name,
+          backgroundColor: event.data.nextLevel.backgroundColor,
+          textColor: event.data.nextLevel.textColor,
+        });
+        await service.saveUserData(event.data.username, {
+          levelRank: event.data.nextLevel.rank,
+          levelName: event.data.nextLevel.name,
+        });
+      } catch (error) {
+        console.error(`Failed to process level up for ${event.data.username}`, error);
       }
     }
   },
@@ -670,39 +609,46 @@ Devvit.addMenuItem({
 });
 
 /*
- * Mod Action to check if a comment is a guess
+ * ADMIN: Menu actions to migrate r/Pixelary to latest version
  */
+
 Devvit.addMenuItem({
-  label: '[Pixelary] Is this a guess?',
-  location: 'comment',
+  label: '[Pixelary] Stop Scoreboard Jobs',
+  location: 'subreddit',
   forUserType: 'moderator',
-  onPress: async (_event, context) => {
-    if (!context.commentId) {
-      return context.ui.showToast('No comment ID found');
-    }
+  onPress: async (_, context) => {
+    const list = await context.scheduler.listJobs();
+    context.ui.showToast(`Found ${list.length} jobs`);
+    let counter = 0;
+    list
+      .filter((job) => job.name === 'UpdateScoreBoard')
+      .forEach(async (job) => {
+        await context.scheduler.cancelJob(job.id);
+        counter++;
+      });
+    context.ui.showToast(`Stopped ${counter} jobs`);
+  },
+});
 
-    const comment = await context.reddit.getCommentById(context.commentId);
-    const postId = comment.postId;
+Devvit.addMenuItem({
+  label: 'Migrate Drawing Post',
+  location: 'post',
+  forUserType: 'moderator',
+  postFilter: 'currentApp',
+  onPress: async (event, context) => {
+    await migrateDrawingPostEssentials(event.targetId, context);
+    context.ui.showToast('Migrated drawing essentials!');
+  },
+});
 
-    const service = new Service(context);
-    const data = await service.getPostData(postId);
-    if (!data) {
-      return context.ui.showToast('No post data found');
-    }
-
-    const commentWasAutomated = Object.keys(data ?? {})
-      .filter((key) => key.startsWith('guess-comment:'))
-      .map((key) => {
-        const commentId = data[key];
-        return commentId === context.commentId;
-      })
-      .includes(true);
-
-    if (commentWasAutomated) {
-      return context.ui.showToast('Yes. Automated comment');
-    }
-
-    context.ui.showToast('No. Manual comment');
+Devvit.addMenuItem({
+  label: 'Migrate Pinned Post',
+  location: 'post',
+  forUserType: 'moderator',
+  postFilter: 'currentApp',
+  onPress: async (event, context) => {
+    await migratePinnedPostEssentials(event.targetId, context);
+    context.ui.showToast('Migrated pinned post!');
   },
 });
 

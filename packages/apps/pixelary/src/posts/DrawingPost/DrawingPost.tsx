@@ -1,33 +1,35 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
+import { EditorPage } from '../../components/EditorPage.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
-import type { PostData } from '../../types/PostData.js';
+import type { Dictionary } from '../../types/Dictionary.js';
+import type { DrawingPostData } from '../../types/PostData.js';
+import type { UserData } from '../../types/UserData.js';
 import { DrawingPostPromptStep } from './DrawingPostPromptStep.js';
 import { DrawingPostResultsStep } from './DrawingPostResultsStep.js';
-import type { Dictionary } from '../../types/Dictionary.js';
-import { EditorPage } from '../../components/EditorPage.js';
 
 interface DrawingPostProps {
-  data: {
-    postData: PostData;
-    username: string | null;
-    activeFlairId: string | undefined;
-    dictionaries: Dictionary[];
-  };
-  refetch: () => void;
+  postData: DrawingPostData;
+  userData: UserData;
+  username: string | undefined;
+  activeFlairId: string | undefined;
+  dictionaries: Dictionary[];
 }
 
 export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Element => {
   const service = new Service(context);
-  const isAuthor = props.data.postData.authorUsername === props.data.username;
-  const isExpired = props.data.postData.expired;
-  const isSolved = props.data.postData.user.solved;
-  const isSkipped = props.data.postData.user.skipped;
+  const isAuthor = props.postData.authorUsername === props.username;
+  const isExpired = props.postData.expired;
+  const isSolved = !!props.userData.solved;
+  const isSkipped = !!props.userData.skipped;
+
   const [currentStep, setCurrentStep] = useState<string>(
     isAuthor || isExpired || isSolved || isSkipped ? 'Results' : 'Prompt'
   );
+
+  const [pointsEarned, setPointsEarned] = useState(0);
 
   // Guess feedback
   const [feedback, setFeedback] = useState<boolean | null>(null);
@@ -43,32 +45,31 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
   }, 100);
 
   async function onGuessHandler(guess: string, createComment: boolean): Promise<void> {
-    if (!props.data?.postData || !props.data?.username) {
+    if (!props.postData || !props.username) {
       return;
     }
-    const userGuessedCorrectly = guess.toLowerCase() === props.data.postData.word.toLowerCase();
+    const userGuessedCorrectly = guess.toLowerCase() === props.postData.word.toLowerCase();
 
     // Give user feedback on their guess
     setFeedback(userGuessedCorrectly);
     timer.start();
 
-    // If user guessed correctly, move to results step
-    if (userGuessedCorrectly) {
-      props.refetch();
-      setCurrentStep('Results');
-    }
-
     // Submit guess to the server
-    await service.handleGuessEvent({
-      postData: props.data.postData,
-      username: props.data.username,
+    const points = await service.submitGuess({
+      postData: props.postData,
+      username: props.username,
       guess,
       createComment,
     });
+
+    // If user guessed correctly, move to results step
+    if (userGuessedCorrectly) {
+      setPointsEarned(points);
+      setCurrentStep('Results');
+    }
   }
 
   function onSkipHandler(): void {
-    props.refetch();
     setCurrentStep('Results');
   }
 
@@ -86,6 +87,7 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
       <DrawingPostResultsStep
         {...props}
         feedback={feedback}
+        pointsEarned={pointsEarned}
         onDraw={() => setCurrentStep('Editor')}
       />
     ),

@@ -1,0 +1,380 @@
+[
+  {
+    "rank": 1,
+    "min": 0,
+    "max": 2,
+    "name": "1 bit",
+    "backgroundColor": "#00aaff",
+    "textColor": "light",
+    "extraTime": 0
+  },
+  {
+    "rank": 2,
+    "min": 3,
+    "max": 4,
+    "name": "2 bit",
+    "backgroundColor": "#22a8ff",
+    "textColor": "light",
+    "extraTime": 3
+  },
+  {
+    "rank": 3,
+    "min": 5,
+    "max": 8,
+    "name": "4 bit",
+    "backgroundColor": "#35a6ff",
+    "textColor": "light",
+    "extraTime": 7
+  },
+  {
+    "rank": 4,
+    "min": 9,
+    "max": 16,
+    "name": "8 bit",
+    "backgroundColor": "#44a3ff",
+    "textColor": "light",
+    "extraTime": 10
+  },
+  {
+    "rank": 5,
+    "min": 17,
+    "max": 32,
+    "name": "16 bit",
+    "backgroundColor": "#52a1ff",
+    "textColor": "light",
+    "extraTime": 14
+  },
+  {
+    "rank": 6,
+    "min": 33,
+    "max": 64,
+    "name": "32 bit",
+    "backgroundColor": "#5f9eff",
+    "textColor": "light",
+    "extraTime": 18
+  },
+  {
+    "rank": 7,
+    "min": 65,
+    "max": 128,
+    "name": "64 bit",
+    "backgroundColor": "#6b9bff",
+    "textColor": "light",
+    "extraTime": 21
+  },
+  {
+    "rank": 8,
+    "min": 129,
+    "max": 256,
+    "name": "128 bit",
+    "backgroundColor": "#7698ff",
+    "textColor": "light",
+    "extraTime": 25
+  },
+  {
+    "rank": 9,
+    "min": 257,
+    "max": 512,
+    "name": "256 bit",
+    "backgroundColor": "#8294ff",
+    "textColor": "light",
+    "extraTime": 28
+  },
+  {
+    "rank": 10,
+    "min": 513,
+    "max": 1024,
+    "name": "512 bit",
+    "backgroundColor": "#8d91ff",
+    "textColor": "light",
+    "extraTime": 32
+  },
+  {
+    "rank": 11,
+    "min": 1025,
+    "max": 2048,
+    "name": "1 kbit",
+    "backgroundColor": "#978dff",
+    "textColor": "light",
+    "extraTime": 35
+  },
+  {
+    "rank": 12,
+    "min": 2049,
+    "max": 4096,
+    "name": "2 kbit",
+    "backgroundColor": "#a289ff",
+    "textColor": "light",
+    "extraTime": 39
+  },
+  {
+    "rank": 13,
+    "min": 4097,
+    "max": 8192,
+    "name": "4 kbit",
+    "backgroundColor": "#ac84ff",
+    "textColor": "light",
+    "extraTime": 42
+  },
+  {
+    "rank": 14,
+    "min": 8193,
+    "max": 16384,
+    "name": "8 kbit",
+    "backgroundColor": "#b680ff",
+    "textColor": "light",
+    "extraTime": 46
+  },
+  {
+    "rank": 15,
+    "min": 16385,
+    "max": 32768,
+    "name": "16 kbit",
+    "backgroundColor": "#bf7bfc",
+    "textColor": "light",
+    "extraTime": 49
+  },
+  {
+    "rank": 16,
+    "min": 32769,
+    "max": 65536,
+    "name": "32 kbit",
+    "backgroundColor": "#c876f7",
+    "textColor": "light",
+    "extraTime": 53
+  },
+  {
+    "rank": 17,
+    "min": 65537,
+    "max": 131072,
+    "name": "64 kbit",
+    "backgroundColor": "#d170f2",
+    "textColor": "light",
+    "extraTime": 56
+  },
+  {
+    "rank": 18,
+    "min": 131073,
+    "max": 262144,
+    "name": "128 kbit",
+    "backgroundColor": "#d96bec",
+    "textColor": "light",
+    "extraTime": 60
+  },
+  {
+    "rank": 19,
+    "min": 262145,
+    "max": 524288,
+    "name": "256 kbit",
+    "backgroundColor": "#e165e6",
+    "textColor": "light",
+    "extraTime": 63
+  },
+  {
+    "rank": 20,
+    "min": 524289,
+    "max": 1048576,
+    "name": "512 kbit",
+    "backgroundColor": "#e85edf",
+    "textColor": "light",
+    "extraTime": 67
+  },
+  {
+    "rank": 21,
+    "min": 1048577,
+    "max": 2097152,
+    "name": "1 kB",
+    "backgroundColor": "#ef58d8",
+    "textColor": "light",
+    "extraTime": 70
+  },
+  {
+    "rank": 22,
+    "min": 2097153,
+    "max": 4194304,
+    "name": "2 kB",
+    "backgroundColor": "#f551d0",
+    "textColor": "light",
+    "extraTime": 74
+  },
+  {
+    "rank": 23,
+    "min": 4194305,
+    "max": 8388608,
+    "name": "4 kB",
+    "backgroundColor": "#fb4ac8",
+    "textColor": "light",
+    "extraTime": 77
+  },
+  {
+    "rank": 24,
+    "min": 8388609,
+    "max": 16777216,
+    "name": "8 kB",
+    "backgroundColor": "#ff43bf",
+    "textColor": "light",
+    "extraTime": 81
+  },
+  {
+    "rank": 25,
+    "min": 16777217,
+    "max": 33554432,
+    "name": "16 kB",
+    "backgroundColor": "#ff3bb6",
+    "textColor": "light",
+    "extraTime": 84
+  },
+  {
+    "rank": 26,
+    "min": 33554433,
+    "max": 67108864,
+    "name": "32 kB",
+    "backgroundColor": "#ff34ac",
+    "textColor": "light",
+    "extraTime": 88
+  },
+  {
+    "rank": 27,
+    "min": 67108865,
+    "max": 134217728,
+    "name": "64 kB",
+    "backgroundColor": "#ff36a2",
+    "textColor": "light",
+    "extraTime": 91
+  },
+  {
+    "rank": 28,
+    "min": 134217729,
+    "max": 268435456,
+    "name": "128 kB",
+    "backgroundColor": "#ff3899",
+    "textColor": "light",
+    "extraTime": 95
+  },
+  {
+    "rank": 29,
+    "min": 268435457,
+    "max": 536870912,
+    "name": "256 kB",
+    "backgroundColor": "#ff398f",
+    "textColor": "light",
+    "extraTime": 98
+  },
+  {
+    "rank": 30,
+    "min": 536870913,
+    "max": 1073741824,
+    "name": "512 kB",
+    "backgroundColor": "#ff3a86",
+    "textColor": "light",
+    "extraTime": 102
+  },
+  {
+    "rank": 31,
+    "min": 1073741825,
+    "max": 2147483648,
+    "name": "1 MB",
+    "backgroundColor": "#ff3a7d",
+    "textColor": "light",
+    "extraTime": 105
+  },
+  {
+    "rank": 32,
+    "min": 2147483649,
+    "max": 4294967296,
+    "name": "2 MB",
+    "backgroundColor": "#ff3a73",
+    "textColor": "light",
+    "extraTime": 109
+  },
+  {
+    "rank": 33,
+    "min": 4294967297,
+    "max": 8589934592,
+    "name": "4 MB",
+    "backgroundColor": "#ff396a",
+    "textColor": "light",
+    "extraTime": 112
+  },
+  {
+    "rank": 34,
+    "min": 8589934593,
+    "max": 17179869184,
+    "name": "8 MB",
+    "backgroundColor": "#ff385f",
+    "textColor": "light",
+    "extraTime": 116
+  },
+  {
+    "rank": 35,
+    "min": 17179869185,
+    "max": 34359738368,
+    "name": "16 MB",
+    "backgroundColor": "#ff3754",
+    "textColor": "light",
+    "extraTime": 119
+  },
+  {
+    "rank": 36,
+    "min": 34359738369,
+    "max": 68719476736,
+    "name": "32 MB",
+    "backgroundColor": "#ff3648",
+    "textColor": "light",
+    "extraTime": 123
+  },
+  {
+    "rank": 37,
+    "min": 68719476737,
+    "max": 137438953472,
+    "name": "64 MB",
+    "backgroundColor": "#ff343a",
+    "textColor": "light",
+    "extraTime": 126
+  },
+  {
+    "rank": 38,
+    "min": 137438953473,
+    "max": 274877906944,
+    "name": "128 MB",
+    "backgroundColor": "#ff3529",
+    "textColor": "light",
+    "extraTime": 130
+  },
+  {
+    "rank": 39,
+    "min": 274877906945,
+    "max": 549755813888,
+    "name": "256 MB",
+    "backgroundColor": "#ff3c1a",
+    "textColor": "light",
+    "extraTime": 133
+  },
+  {
+    "rank": 40,
+    "min": 549755813889,
+    "max": 1099511627776,
+    "name": "512 MB",
+    "backgroundColor": "#ff4500",
+    "textColor": "light",
+    "extraTime": 137
+  },
+  {
+    "rank": 41,
+    "min": 1099511627777,
+    "max": 2199023255552,
+    "name": "1 GB",
+    "backgroundColor": "#ff4500",
+    "textColor": "light",
+    "extraTime": 140
+  },
+  {
+    "rank": 42,
+    "min": 2199023255553,
+    "max": 4398046511104,
+    "name": "2 GB",
+    "backgroundColor": "#ff4500",
+    "textColor": "light",
+    "extraTime": 144
+  }
+]

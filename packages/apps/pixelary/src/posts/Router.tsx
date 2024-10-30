@@ -1,22 +1,20 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useInterval, useState } from '@devvit/public-api';
+import { Devvit, useAsync } from '@devvit/public-api';
 
-import Words from '../data/words.json';
+import { LoadingState } from '../components/LoadingState.js';
 import { Service } from '../service/Service.js';
+import type { Dictionary } from '../types/Dictionary.js';
 import type { GameSettings } from '../types/GameSettings.js';
-import type { CollectionPostData, PostData, PinnedPostData } from '../types/PostData.js';
-import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
+import type {
+  CollectionPostData,
+  DrawingPostData,
+  PinnedPostData,
+  PostData,
+} from '../types/PostData.js';
+import { UserData } from '../types/UserData.js';
 import { CollectionPost } from './CollectionPost/CollectionPost.js';
 import { DrawingPost } from './DrawingPost/DrawingPost.js';
 import { PinnedPost } from './PinnedPost/PinnedPost.js';
-import type { Dictionary } from '../types/Dictionary.js';
-
-type InitialData = {
-  gameSettings: GameSettings;
-  postData: PostData | CollectionPostData | PinnedPostData;
-  username: string | null;
-  dictionaries: Dictionary[];
-};
 
 /*
  * Page Router
@@ -25,162 +23,80 @@ type InitialData = {
  * It handles the initial data loading and routing to the correct page based on the post type.
  */
 
-const defaultSettings: GameSettings = {
-  activeFlairId: undefined,
-  endedFlairId: undefined,
-  heroPostId: undefined,
-};
-
-const defaultPostData: PostData = {
-  postId: '',
-  word: '',
-  dictionaryName: '',
-  data: [],
-  authorUsername: '',
-  date: 0,
-  count: {
-    guesses: 0,
-    players: 0,
-    winners: 0,
-    words: 0,
-    skipped: 0,
-  },
-  user: {
-    guesses: 0,
-    points: 0,
-    solved: false,
-    skipped: false,
-  },
-  guesses: [],
-  postType: 'drawing',
-};
-
-const defaultData = {
-  gameSettings: defaultSettings,
-  postData: defaultPostData,
-  username: null,
-  dictionaries: [{ name: 'main', words: Words }],
-};
-
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
   const service = new Service(context);
-  const [data] = useState<InitialData>(async () => {
-    try {
-      const [
-        gameSettings = defaultSettings,
-        rawPostData,
-        username = null,
-        dictionaries = [{ name: 'main', words: Words }],
-      ] = await Promise.all([
-        service.getGameSettings(),
-        service.getPostData(context.postId!),
-        context.reddit.getCurrentUser().then((user) => user?.username ?? null),
-        service.getDictionaries(false),
-      ]);
-      let postData: PostData | CollectionPostData | PinnedPostData;
-      if (rawPostData.postType === 'collection') {
-        postData = service.parseCollectionPostData(rawPostData);
-      } else if (rawPostData.postType === 'pinned') {
-        postData = service.parsePinnedPostData(rawPostData);
-      } else {
-        postData = service.parsePostData(rawPostData, username);
-      }
-      return {
-        gameSettings,
-        postData,
-        username,
-        dictionaries,
-      };
-    } catch (error) {
-      console.error('Error loading initial data', error);
-      return defaultData;
+
+  const { data: username, loading: usernameLoading } = useAsync<string>(async () => {
+    const user = await context.reddit.getCurrentUser();
+    return user?.username ?? '';
+  });
+
+  const { data: gameSettings, loading: gameSettingsLoading } = useAsync<GameSettings>(async () => {
+    return await service.getGameSettings();
+  });
+
+  const { data: postData, loading: postDataLoading } = useAsync<
+    CollectionPostData | PinnedPostData | DrawingPostData
+  >(async () => {
+    const postType = await service.getPostType(context.postId!);
+    switch (postType) {
+      case 'collection':
+        return await service.getCollectionPost(context.postId!);
+      case 'pinned':
+        return await service.getPinnedPost(context.postId!);
+      case 'drawing':
+      default:
+        return await service.getDrawingPost(context.postId!);
     }
   });
 
-  const getScoreboard = async (): Promise<{
-    scores: ScoreBoardEntry[];
-    scoreBoardUser: {
-      rank: number;
-      score: number;
-    };
-  }> => {
-    try {
-      const [scoreBoardUser, scores] = await Promise.all([
-        service.getScoreBoardUserEntry(data.username),
-        // Keep in sync with rowCount in ScoresTab.tsx
-        service.getScoreBoard(10),
-      ]);
+  const { data: dictionaries, loading: dictionariesLoading } = useAsync<Dictionary[]>(async () => {
+    return await service.getActiveDictionaries();
+  });
 
-      return {
-        scores: Array.isArray(scores) ? scores : [],
-        scoreBoardUser: scoreBoardUser || { rank: 0, score: 0 },
-      };
-    } catch (error) {
-      return {
-        scores: [],
-        scoreBoardUser: {
-          rank: 0,
-          score: 0,
-        },
-      };
+  const { data: userData, loading: userDataLoading } = useAsync<UserData>(
+    async () => {
+      return await service.getUser(username!, context.postId!);
+    },
+    {
+      depends: [username],
     }
-  };
+  );
 
-  const getPostData = async (): Promise<PostData | CollectionPostData | PinnedPostData> => {
-    try {
-      return service.parsePostData(await service.getPostData(data.postData.postId), data.username);
-    } catch (error) {
-      console.error('Error loading latest post data', error);
-      return data.postData;
-    }
-  };
+  if (
+    username === null ||
+    usernameLoading ||
+    gameSettings === null ||
+    gameSettingsLoading ||
+    postData === null ||
+    postDataLoading ||
+    dictionaries === null ||
+    dictionariesLoading ||
+    userData === null ||
+    userDataLoading
+  ) {
+    return <LoadingState />;
+  }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  const getData = async () => {
-    return Promise.all([
-      data.username ? await service.getMyDrawings(data.username) : [],
-      getScoreboard(),
-      getPostData(),
-    ]);
-  };
-
-  const [[myDrawings, scoreBoardData, postData], setData] =
-    useState<Awaited<ReturnType<typeof getData>>>(getData);
-
-  const refetchInterval = useInterval(async () => {
-    refetchInterval.stop();
-    setData(await getData());
-  }, 100);
-
-  const refetch = (): void => {
-    refetchInterval.start();
-  };
-
-  const postType = data.postData.postType;
+  const postType = postData.postType;
   const postTypes: Record<string, JSX.Element> = {
     drawing: (
       <DrawingPost
-        data={{
-          postData: (postData ?? data.postData) as PostData,
-          username: data.username,
-          activeFlairId: data.gameSettings.activeFlairId,
-          dictionaries: data.dictionaries,
-        }}
-        refetch={refetch}
+        postData={postData as DrawingPostData}
+        username={username}
+        activeFlairId={gameSettings.activeFlairId}
+        dictionaries={dictionaries}
+        userData={userData}
       />
     ),
-    collection: <CollectionPost collection={data.postData as CollectionPostData} />,
+    collection: <CollectionPost collection={postData as CollectionPostData} />,
     pinned: (
       <PinnedPost
-        data={{
-          postData: (postData ?? data.postData) as PostData,
-          username: data.username,
-          activeFlairId: data.gameSettings.activeFlairId,
-          dictionaries: data.dictionaries,
-        }}
-        myDrawings={myDrawings}
-        scoreBoardData={scoreBoardData}
-        refetch={refetch}
+        postData={postData as PostData}
+        userData={userData}
+        username={username}
+        activeFlairId={gameSettings.activeFlairId}
+        dictionaries={dictionaries}
       />
     ),
     // Add more post types here

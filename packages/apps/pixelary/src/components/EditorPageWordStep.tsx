@@ -1,15 +1,13 @@
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
+import Settings from '../settings.json';
+import type { CandidateWord } from '../types/CandidateWord.js';
+import type { Dictionary } from '../types/Dictionary.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
-import type { Dictionary } from '../types/Dictionary.js';
-import type { CandidateWord } from '../types/CandidateWord.js';
-import Settings from '../settings.json';
 
 interface EditorPageWordStepProps {
-  data: {
-    dictionaries: Dictionary[];
-  };
+  dictionaries: Dictionary[];
   onNext: (candidateWord: CandidateWord) => void;
 }
 
@@ -50,7 +48,7 @@ const generateCandidateWords = (dictionaries: Dictionary[]): CandidateWord[] => 
 
 export const EditorPageWordStep = (props: EditorPageWordStepProps): JSX.Element => {
   const [candidateWords, setCandidateWords] = useState<CandidateWord[]>(() =>
-    generateCandidateWords(props.data.dictionaries)
+    generateCandidateWords(props.dictionaries)
   );
 
   const [startTime] = useState(Date.now());
@@ -151,9 +149,7 @@ export const EditorPageWordStep = (props: EditorPageWordStepProps): JSX.Element 
         <spacer width="12px" />
         <PixelSymbol scale={3} type="arrow-left" color={Settings.theme.tertiary} />
         <spacer grow />
-        <hstack
-          onPress={() => setCandidateWords(() => generateCandidateWords(props.data.dictionaries))}
-        >
+        <hstack onPress={() => setCandidateWords(() => generateCandidateWords(props.dictionaries))}>
           <PixelSymbol scale={3} type="undo" color={Settings.theme.secondary} />
           <spacer width="4px" />
         </hstack>

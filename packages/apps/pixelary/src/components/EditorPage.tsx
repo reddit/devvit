@@ -1,17 +1,17 @@
 import { Devvit, useState } from '@devvit/public-api';
 
-import { EditorPageWordStep } from './EditorPageWordStep.js';
+import type { CandidateWord } from '../types/CandidateWord.js';
+import type { Dictionary } from '../types/Dictionary.js';
+import type { UserData } from '../types/UserData.js';
 import { EditorPageDrawStep } from './EditorPageDrawStep.js';
 import { EditorPageReviewStep } from './EditorPageReviewStep.js';
-import type { Dictionary } from '../types/Dictionary.js';
-import type { CandidateWord } from '../types/CandidateWord.js';
+import { EditorPageWordStep } from './EditorPageWordStep.js';
 
 interface EditorPageProps {
-  data: {
-    username: string | null;
-    activeFlairId: string | undefined;
-    dictionaries: Dictionary[];
-  };
+  username?: string;
+  activeFlairId?: string;
+  dictionaries: Dictionary[];
+  userData: UserData;
   onCancel: () => void;
 }
 

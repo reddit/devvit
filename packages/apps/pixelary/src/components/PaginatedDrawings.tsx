@@ -1,12 +1,18 @@
 import { Devvit, useState } from '@devvit/public-api';
 
 import Settings from '../settings.json';
-import type { CollectionData, PostData } from '../types/PostData.js';
+import type { CollectionData } from '../types/PostData.js';
 import { Drawings } from './Drawings.js';
 import { StyledButton } from './StyledButton.js';
 
 interface PaginatedDrawingsProps {
-  drawings: PostData[] | CollectionData[] | null;
+  drawings:
+    | {
+        postId: string;
+        data: number[];
+      }[]
+    | CollectionData[]
+    | null;
   tileSize: number;
   drawingsPerRow: number;
   ctaButtonEl: JSX.Element;

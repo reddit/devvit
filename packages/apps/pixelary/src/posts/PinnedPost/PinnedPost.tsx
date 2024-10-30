@@ -1,43 +1,65 @@
-import { Devvit, useState } from '@devvit/public-api';
+import { Context, Devvit, useAsync, useState } from '@devvit/public-api';
 
 import { EditorPage } from '../../components/EditorPage.js';
 import { HowToPlayPage } from '../../components/HowToPlayPage.js';
 import { LeaderboardPage } from '../../components/LeaderboardPage.js';
+import { LevelPage } from '../../components/LevelPage.js';
+import { LoadingState } from '../../components/LoadingState.js';
 import { MyDrawingsPage } from '../../components/MyDrawingsPage.js';
+import { PixelSymbol } from '../../components/PixelSymbol.js';
 import { PixelText } from '../../components/PixelText.js';
+import { ProgressBar } from '../../components/ProgressBar.js';
 import { StyledButton } from '../../components/StyledButton.js';
+import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
 import type { Dictionary } from '../../types/Dictionary.js';
 import type { PostData } from '../../types/PostData.js';
-import type { ScoreBoardEntry } from '../../types/ScoreBoardEntry.js';
+import { UserData } from '../../types/UserData.js';
+import { getLevelByScore } from '../../utils/progression.js';
 
 interface PinnedPostProps {
-  data: {
-    postData: PostData;
-    username: string | null;
-    activeFlairId: string | undefined;
-    dictionaries: Dictionary[];
-  };
-  myDrawings: PostData[];
-  scoreBoardData: {
-    scores: ScoreBoardEntry[];
-    scoreBoardUser: {
-      rank: number;
-      score: number;
-    };
-  };
-  refetch: () => void;
+  postData: PostData;
+  userData: UserData;
+  username?: string;
+  activeFlairId?: string;
+  dictionaries: Dictionary[];
 }
 
-export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
+export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Element => {
+  const service = new Service(context);
   const [page, setPage] = useState('menu');
-  const latestData = { ...props.data };
   const buttonWidth = '256px';
   const buttonHeight = '48px';
 
+  const { data: user, loading } = useAsync<{
+    rank: number;
+    score: number;
+  }>(async () => {
+    return await service.getUserScore(props.username);
+  });
+
+  if (user === null || loading) {
+    return <LoadingState />;
+  }
+
   // For now we assume that there is only one takeover active at a time
-  const isTakeoverActive = props.data.dictionaries.some((d) => d.name !== 'main');
-  const dictionary = props.data.dictionaries.find((d) => d.name !== 'main');
+  const isTakeoverActive = props.dictionaries.some((dictionary) => dictionary.name !== 'main');
+  const dictionary = props.dictionaries.find((dictionary) => dictionary.name !== 'main');
+
+  const level = getLevelByScore(user?.score ?? 0);
+
+  // each level has a "min" and "max" score value
+  // the score can be inside or outside this range.
+
+  // I want the percentage to be calculated based on the user's score relative to the level's min and max score values.
+
+  // the score does not reset per level, so the user's score can be higher than the max score of the current level.
+
+  // If out of bounds, clip to 0 or 100.
+
+  const percentage = Math.round(
+    Math.min(100, Math.max(0, (((user?.score ?? 0) - level.min) / (level.max - level.min)) * 100))
+  );
 
   const Menu = (
     <vstack width="100%" height="100%" alignment="center middle">
@@ -110,6 +132,21 @@ export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
         />
       </vstack>
       <spacer grow />
+
+      {/* Experience Bar */}
+      <vstack alignment="center middle" onPress={() => setPage('level')}>
+        <hstack>
+          <spacer width="20px" />
+          <PixelText scale={2}>{`Level ${props.userData.levelRank}`}</PixelText>
+          <spacer width="8px" />
+          <PixelSymbol type="arrow-right" scale={2} color={Settings.theme.tertiary} />
+        </hstack>
+        <spacer height="8px" />
+
+        <ProgressBar percentage={percentage} width={256} />
+      </vstack>
+
+      <spacer grow />
     </vstack>
   );
 
@@ -119,26 +156,13 @@ export const PinnedPost = (props: PinnedPostProps): JSX.Element => {
 
   const pages: Record<string, JSX.Element> = {
     menu: Menu,
-    draw: <EditorPage data={latestData} onCancel={onClose} />,
-    'my-drawings': (
-      <MyDrawingsPage
-        data={latestData}
-        myDrawings={props.myDrawings}
-        myDrawingsLoading={false}
-        onClose={onClose}
-        onDraw={() => setPage('draw')}
-      />
-    ),
-    leaderboard: (
-      <LeaderboardPage
-        data={latestData}
-        scoreBoardData={props.scoreBoardData}
-        // TODO: Implement loading state
-        scoreBoardDataLoading={false}
-        onClose={onClose}
-      />
-    ),
+    draw: <EditorPage {...props} onCancel={onClose} />,
+    'my-drawings': <MyDrawingsPage {...props} onClose={onClose} onDraw={() => setPage('draw')} />,
+    leaderboard: <LeaderboardPage {...props} onClose={onClose} />,
     'how-to-play': <HowToPlayPage onClose={onClose} />,
+    level: (
+      <LevelPage {...props} user={user} percentage={percentage} level={level} onClose={onClose} />
+    ),
   };
 
   return pages[page] || Menu;

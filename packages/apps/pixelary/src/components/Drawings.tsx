@@ -1,10 +1,16 @@
 import { Devvit } from '@devvit/public-api';
 
-import type { CollectionData, PostData } from '../types/PostData.js';
+import type { CollectionData } from '../types/PostData.js';
 import { Drawing } from './Drawing.js';
 
 interface PaginatedDrawingsProps {
-  drawings: PostData[] | CollectionData[] | null;
+  drawings:
+    | {
+        postId: string;
+        data: number[];
+      }[]
+    | CollectionData[]
+    | null;
   tileSize: number;
   rowsPerPage: number;
   drawingsPerRow: number;

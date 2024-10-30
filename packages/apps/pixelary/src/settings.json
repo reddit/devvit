@@ -1,8 +1,6 @@
 {
     "resolution": 16,
     "postLiveSpan": 86400000,
-    "pointsPerGuess": 1,
-    "maxPointsPerDrawing": 100,
     "feedbackDuration": 15,
     "cardDrawDuration": 10,
     "drawingDuration": 60,
@@ -27,5 +25,11 @@
   },
   "pinnedPost": {
     "title": "Let's play Pixelary!"
-  }
+  },
+  "authorRewardForSubmit": 10,
+  "authorRewardForCorrectGuess": 1,
+  "guesserRewardForSolve": 2,
+  "guesserRewardForFirstSolve": 10,
+  "userRewardForCrosspost": 5,
+  "userRewardForReport": 2
 }

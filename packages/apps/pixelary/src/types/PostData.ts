@@ -1,40 +1,30 @@
-// Drawing Post
+// Base post data
 export type PostData = {
+  postId: string;
+  postType: string;
+};
+
+// Drawing post
+export type DrawingPostData = {
+  postId: string;
+  postType: string;
   word: string;
   dictionaryName: string;
   data: number[];
   authorUsername: string;
   date: number;
   expired?: boolean;
-  postId: string;
-  count: {
-    players: number;
-    winners: number;
-    skipped: number;
-    guesses: number;
-    words: number;
-  };
-  user: {
-    guesses: number;
-    solved: boolean;
-    skipped: boolean;
-    points: number;
-  };
-  guesses: {
-    word: string;
-    count: number;
-    commentId?: string;
-  }[];
-  postType: string;
+  solves: number;
+  skips: number;
 };
 
 // Collections
-export type CollectionData = Pick<PostData, 'postId' | 'data' | 'authorUsername'>;
+export type CollectionData = Pick<DrawingPostData, 'postId' | 'data' | 'authorUsername'>;
 export type CollectionPostData = {
   postId: string;
+  postType: string;
   data: CollectionData[];
   timeframe: string;
-  postType: string;
 };
 
 // Pinned post
