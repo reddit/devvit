@@ -68,6 +68,7 @@ const sidebars = {
         'app_image_assets',
         'post_size',
         'dimensions',
+        'text_fallback',
         'working_with_usestate',
         'working_with_useasync',
         'working_with_useinterval',
