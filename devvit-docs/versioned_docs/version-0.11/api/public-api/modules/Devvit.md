@@ -29,9 +29,9 @@
 
 #### Type parameters
 
-| Name | Type |
-| :--- | :--- |
-| `P`  | {}   |
+| Name | Type                             |
+| :--- | :------------------------------- |
+| `P`  | \{ `[key: string]`: `unknown`; } |
 
 #### Type declaration
 
@@ -56,9 +56,9 @@
 
 #### Type parameters
 
-| Name | Type |
-| :--- | :--- |
-| `P`  | {}   |
+| Name | Type                             |
+| :--- | :------------------------------- |
+| `P`  | \{ `[key: string]`: `unknown`; } |
 
 ---
 
@@ -123,7 +123,7 @@ The current app context of the event or render.
 | Name          | Type                                                                          |
 | :------------ | :---------------------------------------------------------------------------- |
 | `type`        | keyof [`IntrinsicElements`](../interfaces/Devvit.Blocks.IntrinsicElements.md) |
-| `props`       | `undefined` \| {}                                                             |
+| `props`       | `undefined` \| \{ `[key: string]`: `unknown`; }                               |
 | `...children` | `Children`[]                                                                  |
 
 #### Returns

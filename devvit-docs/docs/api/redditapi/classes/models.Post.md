@@ -855,15 +855,30 @@ await post.setSuggestedCommentSort('NEW');
 
 ▸ **setTextFallback**(`options`): `Promise`\<`void`\>
 
+Set a text fallback for the custom post
+
 #### Parameters
 
-| Name      | Type                                                                                  |
-| :-------- | :------------------------------------------------------------------------------------ |
-| `options` | [`CustomPostTextFallbackOptions`](../modules/models.md#customposttextfallbackoptions) |
+| Name      | Type                                                                                  | Description                                  |
+| :-------- | :------------------------------------------------------------------------------------ | :------------------------------------------- |
+| `options` | [`CustomPostTextFallbackOptions`](../modules/models.md#customposttextfallbackoptions) | A text or a richtext to render in a fallback |
 
 #### Returns
 
 `Promise`\<`void`\>
+
+**`Throws`**
+
+Throws an error if the fallback could not be set.
+
+**`Example`**
+
+```ts
+// from a menu action, form, scheduler, trigger, custom post click event, etc
+const newTextFallback = { text: 'This is an updated text fallback' };
+const post = await context.reddit.getPostById(context.postId);
+await post.setTextFallback(newTextFallback);
+```
 
 ---
 

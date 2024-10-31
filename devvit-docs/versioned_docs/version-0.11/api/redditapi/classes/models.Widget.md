@@ -101,8 +101,8 @@
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\>
+▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\>
+`Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\>

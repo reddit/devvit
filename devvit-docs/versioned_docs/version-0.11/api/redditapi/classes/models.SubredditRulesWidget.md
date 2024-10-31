@@ -119,11 +119,11 @@ Widget.subredditName
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`SubredditRulesWidget`](models.SubredditRulesWidget.md), `"rules"`\>
+▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`SubredditRulesWidget`](models.SubredditRulesWidget.md), `"rules"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`SubredditRulesWidget`](models.SubredditRulesWidget.md), `"rules"`\>
+`Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`SubredditRulesWidget`](models.SubredditRulesWidget.md), `"rules"`\>
 
 #### Overrides
 

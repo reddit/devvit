@@ -856,6 +856,19 @@ export class Post {
     this.#edited = newPost.edited;
   }
 
+  /**
+   * Set a text fallback for the custom post
+   *
+   * @param {CustomPostTextFallbackOptions} options - A text or a richtext to render in a fallback
+   * @throws {Error} Throws an error if the fallback could not be set.
+   * @example
+   * ```ts
+   * // from a menu action, form, scheduler, trigger, custom post click event, etc
+   * const newTextFallback = { text: 'This is an updated text fallback' };
+   * const post = await context.reddit.getPostById(context.postId);
+   * await post.setTextFallback(newTextFallback);
+   * ```
+   */
   async setTextFallback(options: CustomPostTextFallbackOptions): Promise<void> {
     const newPost = await Post.setTextFallback(options, this.id, this.#metadata);
 

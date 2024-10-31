@@ -1,4 +1,4 @@
-# Class: Listing<T>
+# Class: Listing\<T\>
 
 [models](../modules/models.md).Listing
 

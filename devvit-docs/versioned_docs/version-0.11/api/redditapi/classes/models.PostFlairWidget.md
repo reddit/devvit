@@ -140,11 +140,11 @@ Widget.subredditName
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`PostFlairWidget`](models.PostFlairWidget.md), `"styles"` \| `"templates"` \| `"display"`\>
+▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`PostFlairWidget`](models.PostFlairWidget.md), `"styles"` \| `"templates"` \| `"display"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`PostFlairWidget`](models.PostFlairWidget.md), `"styles"` \| `"templates"` \| `"display"`\>
+`Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`PostFlairWidget`](models.PostFlairWidget.md), `"styles"` \| `"templates"` \| `"display"`\>
 
 #### Overrides
 

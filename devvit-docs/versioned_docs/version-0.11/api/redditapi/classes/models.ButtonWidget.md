@@ -140,11 +140,11 @@ Widget.subredditName
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`ButtonWidget`](models.ButtonWidget.md), `"description"` \| `"styles"` \| `"buttons"`\>
+▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`ButtonWidget`](models.ButtonWidget.md), `"description"` \| `"styles"` \| `"buttons"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`ButtonWidget`](models.ButtonWidget.md), `"description"` \| `"styles"` \| `"buttons"`\>
+`Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`ButtonWidget`](models.ButtonWidget.md), `"description"` \| `"styles"` \| `"buttons"`\>
 
 #### Overrides
 

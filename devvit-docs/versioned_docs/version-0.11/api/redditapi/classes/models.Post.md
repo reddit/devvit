@@ -7,9 +7,11 @@
 ### Accessors
 
 - [approved](models.Post.md#approved)
+- [approvedAtUtc](models.Post.md#approvedatutc)
 - [archived](models.Post.md#archived)
 - [authorId](models.Post.md#authorid)
 - [authorName](models.Post.md#authorname)
+- [bannedAtUtc](models.Post.md#bannedatutc)
 - [body](models.Post.md#body)
 - [bodyHtml](models.Post.md#bodyhtml)
 - [comments](models.Post.md#comments)
@@ -72,6 +74,9 @@
 - [markAsNsfw](models.Post.md#markasnsfw)
 - [markAsSpoiler](models.Post.md#markasspoiler)
 - [remove](models.Post.md#remove)
+- [setCustomPostPreview](models.Post.md#setcustompostpreview)
+- [setSuggestedCommentSort](models.Post.md#setsuggestedcommentsort)
+- [setTextFallback](models.Post.md#settextfallback)
 - [sticky](models.Post.md#sticky)
 - [toJSON](models.Post.md#tojson)
 - [undistinguish](models.Post.md#undistinguish)
@@ -91,6 +96,16 @@
 #### Returns
 
 `boolean`
+
+---
+
+### <a id="approvedatutc" name="approvedatutc"></a> approvedAtUtc
+
+• `get` **approvedAtUtc**(): `number`
+
+#### Returns
+
+`number`
 
 ---
 
@@ -121,6 +136,16 @@
 #### Returns
 
 `string`
+
+---
+
+### <a id="bannedatutc" name="bannedatutc"></a> bannedAtUtc
+
+• `get` **bannedAtUtc**(): `number`
+
+#### Returns
+
+`number`
 
 ---
 
@@ -206,11 +231,11 @@
 
 ### <a id="id" name="id"></a> id
 
-• `get` **id**(): `t3_${string}`
+• `get` **id**(): \`t3\_$\{string}\`
 
 #### Returns
 
-`t3_${string}`
+\`t3\_$\{string}\`
 
 ---
 
@@ -559,11 +584,11 @@ Add a mod note for why the post was removed
 
 ### <a id="getauthor" name="getauthor"></a> getAuthor
 
-▸ **getAuthor**(): `Promise`\<[`User`](models.User.md)\>
+▸ **getAuthor**(): `Promise`\<`undefined` \| [`User`](models.User.md)\>
 
 #### Returns
 
-`Promise`\<[`User`](models.User.md)\>
+`Promise`\<`undefined` \| [`User`](models.User.md)\>
 
 ---
 
@@ -763,6 +788,100 @@ Add a mod note for why the post was removed
 
 ---
 
+### <a id="setcustompostpreview" name="setcustompostpreview"></a> setCustomPostPreview
+
+▸ **setCustomPostPreview**(`ui`): `Promise`\<`void`\>
+
+Set a lightweight UI that shows while the custom post renders
+
+#### Parameters
+
+| Name | Type                | Description                                                       |
+| :--- | :------------------ | :---------------------------------------------------------------- |
+| `ui` | `ComponentFunction` | A JSX component function that returns a simple ui to be rendered. |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+**`Throws`**
+
+Throws an error if the preview could not be set.
+
+**`Example`**
+
+```ts
+const preview = (
+  <vstack height="100%" width="100%" alignment="middle center">
+    <text size="large">An updated preview!</text>
+  </vstack>
+);
+const post = await reddit.getPostById(context.postId);
+await post.setCustomPostPreview(() => preview);
+```
+
+---
+
+### <a id="setsuggestedcommentsort" name="setsuggestedcommentsort"></a> setSuggestedCommentSort
+
+▸ **setSuggestedCommentSort**(`suggestedSort`): `Promise`\<`void`\>
+
+Set the suggested sort for comments on a Post.
+
+#### Parameters
+
+| Name            | Type                                                                        |
+| :-------------- | :-------------------------------------------------------------------------- |
+| `suggestedSort` | [`PostSuggestedCommentSort`](../modules/models.md#postsuggestedcommentsort) |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+**`Throws`**
+
+Throws an error if the suggested sort could not be set.
+
+**`Example`**
+
+```ts
+const post = await reddit.getPostById(context.postId);
+await post.setSuggestedCommentSort('NEW');
+```
+
+---
+
+### <a id="settextfallback" name="settextfallback"></a> setTextFallback
+
+▸ **setTextFallback**(`options`): `Promise`\<`void`\>
+
+Set a text fallback for the custom post
+
+#### Parameters
+
+| Name      | Type                                                                                  | Description                                  |
+| :-------- | :------------------------------------------------------------------------------------ | :------------------------------------------- |
+| `options` | [`CustomPostTextFallbackOptions`](../modules/models.md#customposttextfallbackoptions) | A text or a richtext to render in a fallback |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+**`Throws`**
+
+Throws an error if the fallback could not be set.
+
+**`Example`**
+
+```ts
+// from a menu action, form, scheduler, trigger, custom post click event, etc
+const newTextFallback = { text: 'This is an updated text fallback' };
+const post = await context.reddit.getPostById(context.postId);
+await post.setTextFallback(newTextFallback);
+```
+
+---
+
 ### <a id="sticky" name="sticky"></a> sticky
 
 ▸ **sticky**(`position?`): `Promise`\<`void`\>
@@ -771,7 +890,7 @@ Add a mod note for why the post was removed
 
 | Name        | Type                     |
 | :---------- | :----------------------- |
-| `position?` | `2` \| `1` \| `3` \| `4` |
+| `position?` | `1` \| `2` \| `3` \| `4` |
 
 #### Returns
 
@@ -781,11 +900,11 @@ Add a mod note for why the post was removed
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Post`](models.Post.md), `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"url"` \| `"subredditId"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
+▸ **toJSON**(): `Pick`\<[`Post`](models.Post.md), `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"url"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
 
 #### Returns
 
-`Pick`\<[`Post`](models.Post.md), `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"url"` \| `"subredditId"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
+`Pick`\<[`Post`](models.Post.md), `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"url"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
 
 ---
 

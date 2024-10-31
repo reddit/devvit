@@ -129,11 +129,11 @@ Widget.subredditName
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`CommunityListWidget`](models.CommunityListWidget.md), `"styles"` \| `"communities"`\>
+▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`CommunityListWidget`](models.CommunityListWidget.md), `"communities"` \| `"styles"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`CommunityListWidget`](models.CommunityListWidget.md), `"styles"` \| `"communities"`\>
+`Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`CommunityListWidget`](models.CommunityListWidget.md), `"communities"` \| `"styles"`\>
 
 #### Overrides
 

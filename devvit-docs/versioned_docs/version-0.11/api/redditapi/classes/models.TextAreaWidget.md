@@ -129,11 +129,11 @@ Widget.subredditName
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`TextAreaWidget`](models.TextAreaWidget.md), `"text"` \| `"styles"`\>
+▸ **toJSON**(): `Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`TextAreaWidget`](models.TextAreaWidget.md), `"text"` \| `"styles"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](models.Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<[`TextAreaWidget`](models.TextAreaWidget.md), `"text"` \| `"styles"`\>
+`Pick`\<[`Widget`](models.Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<[`TextAreaWidget`](models.TextAreaWidget.md), `"text"` \| `"styles"`\>
 
 #### Overrides
 

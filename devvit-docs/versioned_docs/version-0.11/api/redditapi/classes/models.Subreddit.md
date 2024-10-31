@@ -1000,11 +1000,11 @@ const userFlairList = response.users;
 
 ### <a id="tojson" name="tojson"></a> toJSON
 
-▸ **toJSON**(): `Pick`\<[`Subreddit`](models.Subreddit.md), `"name"` \| `"type"` \| `"description"` \| `"id"` \| `"title"` \| `"language"` \| `"nsfw"` \| `"settings"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
+▸ **toJSON**(): `Pick`\<[`Subreddit`](models.Subreddit.md), `"description"` \| `"type"` \| `"id"` \| `"name"` \| `"title"` \| `"settings"` \| `"language"` \| `"nsfw"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
 
 #### Returns
 
-`Pick`\<[`Subreddit`](models.Subreddit.md), `"name"` \| `"type"` \| `"description"` \| `"id"` \| `"title"` \| `"language"` \| `"nsfw"` \| `"settings"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
+`Pick`\<[`Subreddit`](models.Subreddit.md), `"description"` \| `"type"` \| `"id"` \| `"name"` \| `"title"` \| `"settings"` \| `"language"` \| `"nsfw"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
 
 ---
 

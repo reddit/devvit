@@ -1,4 +1,4 @@
-# @devvit/public-api
+# @devvit/public-api - v0.11.2-dev
 
 ## Table of contents
 
@@ -22,6 +22,10 @@
 - [AppInstallDefinition](README.md#appinstalldefinition)
 - [AppUpgrade](README.md#appupgrade)
 - [AppUpgradeDefinition](README.md#appupgradedefinition)
+- [AsyncError](README.md#asyncerror)
+- [AsyncUseStateInitializer](README.md#asyncusestateinitializer)
+- [AutomoderatorFilterComment](README.md#automoderatorfiltercomment)
+- [AutomoderatorFilterPost](README.md#automoderatorfilterpost)
 - [BaseContext](README.md#basecontext)
 - [BaseField](README.md#basefield)
 - [BlockElement](README.md#blockelement)
@@ -43,6 +47,7 @@
 - [ContextDebugInfo](README.md#contextdebuginfo)
 - [CustomPostType](README.md#customposttype)
 - [Data](README.md#data)
+- [DevvitDebug](README.md#devvitdebug)
 - [Dispatch](README.md#dispatch)
 - [Form](README.md#form)
 - [FormDefinition](README.md#formdefinition)
@@ -52,18 +57,22 @@
 - [FormKey](README.md#formkey)
 - [FormOnSubmitEvent](README.md#formonsubmitevent)
 - [FormOnSubmitEventHandler](README.md#formonsubmiteventhandler)
+- [FormToFormValues](README.md#formtoformvalues)
 - [FormValues](README.md#formvalues)
 - [IconName](README.md#iconname)
+- [ImageField](README.md#imagefield)
 - [JSONArray](README.md#jsonarray)
 - [JSONObject](README.md#jsonobject)
 - [JSONPrimitive](README.md#jsonprimitive)
 - [JSONValue](README.md#jsonvalue)
+- [JobContext](README.md#jobcontext)
 - [KVStore](README.md#kvstore)
 - [MediaAsset](README.md#mediaasset)
 - [MediaPlugin](README.md#mediaplugin)
 - [MenuItem](README.md#menuitem)
 - [MenuItemLocation](README.md#menuitemlocation)
 - [MenuItemOnPressEvent](README.md#menuitemonpressevent)
+- [MenuItemPostFilter](README.md#menuitempostfilter)
 - [MenuItemUserType](README.md#menuitemusertype)
 - [ModActionDefinition](README.md#modactiondefinition)
 - [ModActionTrigger](README.md#modactiontrigger)
@@ -71,9 +80,15 @@
 - [ModMailTrigger](README.md#modmailtrigger)
 - [MultiTriggerDefinition](README.md#multitriggerdefinition)
 - [NumberField](README.md#numberfield)
+- [OnAutomoderatorFilterCommentDefinition](README.md#onautomoderatorfiltercommentdefinition)
+- [OnAutomoderatorFilterPostDefinition](README.md#onautomoderatorfilterpostdefinition)
 - [OnTriggerRequest](README.md#ontriggerrequest)
 - [OnValidateHandler](README.md#onvalidatehandler)
 - [ParagraphField](README.md#paragraphfield)
+- [PartialJSONArray](README.md#partialjsonarray)
+- [PartialJSONObject](README.md#partialjsonobject)
+- [PartialJSONPrimitive](README.md#partialjsonprimitive)
+- [PartialJSONValue](README.md#partialjsonvalue)
 - [PluginSettings](README.md#pluginsettings)
 - [PostCreate](README.md#postcreate)
 - [PostCreateDefinition](README.md#postcreatedefinition)
@@ -81,8 +96,12 @@
 - [PostDeleteDefinition](README.md#postdeletedefinition)
 - [PostFlairUpdate](README.md#postflairupdate)
 - [PostFlairUpdateDefinition](README.md#postflairupdatedefinition)
+- [PostNsfwUpdate](README.md#postnsfwupdate)
+- [PostNsfwUpdateDefinition](README.md#postnsfwupdatedefinition)
 - [PostReport](README.md#postreport)
 - [PostReportDefinition](README.md#postreportdefinition)
+- [PostSpoilerUpdate](README.md#postspoilerupdate)
+- [PostSpoilerUpdateDefinition](README.md#postspoilerupdatedefinition)
 - [PostSubmit](README.md#postsubmit)
 - [PostSubmitDefinition](README.md#postsubmitdefinition)
 - [PostUpdate](README.md#postupdate)
@@ -117,12 +136,14 @@
 - [TxClientLike](README.md#txclientlike)
 - [UIClient](README.md#uiclient)
 - [UploadMediaOptions](README.md#uploadmediaoptions)
+- [UseAsyncResult](README.md#useasyncresult)
 - [UseChannelHook](README.md#usechannelhook)
 - [UseChannelResult](README.md#usechannelresult)
 - [UseFormHook](README.md#useformhook)
 - [UseIntervalHook](README.md#useintervalhook)
 - [UseIntervalResult](README.md#useintervalresult)
 - [UseStateHook](README.md#usestatehook)
+- [UseStateInitializer](README.md#usestateinitializer)
 - [UseStateResult](README.md#usestateresult)
 - [ValidatedBooleanField](README.md#validatedbooleanfield)
 - [ValidatedFormField](README.md#validatedformfield)
@@ -141,6 +162,11 @@
 ### Functions
 
 - [svg](README.md#svg)
+- [useAsync](README.md#useasync)
+- [useChannel](README.md#usechannel)
+- [useForm](README.md#useform)
+- [useInterval](README.md#useinterval)
+- [useState](README.md#usestate)
 
 ## Type Aliases
 
@@ -192,21 +218,73 @@ The event name for when your app is upgraded
 
 ---
 
+### <a id="asyncerror" name="asyncerror"></a> AsyncError
+
+Ƭ **AsyncError**: `Object`
+
+#### Type declaration
+
+| Name      | Type               |
+| :-------- | :----------------- |
+| `details` | `string` \| `null` |
+| `message` | `string`           |
+
+---
+
+### <a id="asyncusestateinitializer" name="asyncusestateinitializer"></a> AsyncUseStateInitializer
+
+Ƭ **AsyncUseStateInitializer**\<`S`\>: () => `Promise`\<`S`\>
+
+#### Type parameters
+
+| Name |
+| :--- |
+| `S`  |
+
+#### Type declaration
+
+▸ (): `Promise`\<`S`\>
+
+##### Returns
+
+`Promise`\<`S`\>
+
+---
+
+### <a id="automoderatorfiltercomment" name="automoderatorfiltercomment"></a> AutomoderatorFilterComment
+
+Ƭ **AutomoderatorFilterComment**: `"AutomoderatorFilterComment"`
+
+The event name for when a comment is filtered by automoderator
+
+---
+
+### <a id="automoderatorfilterpost" name="automoderatorfilterpost"></a> AutomoderatorFilterPost
+
+Ƭ **AutomoderatorFilterPost**: `"AutomoderatorFilterPost"`
+
+The event name for when a post is filtered by automoderator
+
+---
+
 ### <a id="basecontext" name="basecontext"></a> BaseContext
 
 Ƭ **BaseContext**: `Object`
 
 #### Type declaration
 
-| Name           | Type                                                               | Description                                                           |
-| :------------- | :----------------------------------------------------------------- | :-------------------------------------------------------------------- |
-| `appAccountId` | `string`                                                           | The ID of the current app's account                                   |
-| `commentId?`   | `string`                                                           | The ID of the current comment                                         |
-| `debug`        | [`ContextDebugInfo`](README.md#contextdebuginfo)                   | More useful things, but probably not for the average developer        |
-| `postId?`      | `string`                                                           | The ID of the current post                                            |
-| `subredditId`  | `string`                                                           | The ID of the current subreddit                                       |
-| `userId?`      | `string`                                                           | The current user's ID if this event was triggered by a logged in user |
-| `toJSON`       | () => `Omit`\<[`BaseContext`](README.md#basecontext), `"toJSON"`\> | Returns a JSON representation of the context                          |
+| Name             | Type                                                               | Description                                                                                                                         |
+| :--------------- | :----------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `appAccountId`   | `string`                                                           | The ID of the current app's account **`Deprecated`** Use [BaseContext.appName](README.md#appname) instead to get the app's username |
+| `appName`        | `string`                                                           | The slug of the app that is running                                                                                                 |
+| `appVersion`     | `string`                                                           | The version of the app that is running                                                                                              |
+| `commentId?`     | `string`                                                           | The ID of the current comment                                                                                                       |
+| `debug`          | [`ContextDebugInfo`](README.md#contextdebuginfo)                   | More useful things, but probably not for the average developer                                                                      |
+| `postId?`        | `string`                                                           | The ID of the current post                                                                                                          |
+| `subredditId`    | `string`                                                           | The ID of the current subreddit                                                                                                     |
+| `subredditName?` | `string`                                                           | The name of the current subreddit                                                                                                   |
+| `userId?`        | `string`                                                           | The current user's ID if this event was triggered by a logged in user                                                               |
+| `toJSON`         | () => `Omit`\<[`BaseContext`](README.md#basecontext), `"toJSON"`\> | Returns a JSON representation of the context                                                                                        |
 
 ---
 
@@ -228,8 +306,8 @@ The event name for when your app is upgraded
 | `disabled?`     | `boolean`                                        | If true the field will be disabled                                                                                                       |
 | `helpText?`     | `string`                                         | An optional help text that will be displayed below the field                                                                             |
 | `label`         | `string`                                         | The label of the field. This will be displayed to the user                                                                               |
-| `name`          | `string`                                         | The name of the field. This will be used as the key in the `values` object when the form is submitted                                    |
-| `required?`     | `boolean`                                        | If true the field will be required and the user will not be able to submit the form without filling it in                                |
+| `name`          | `string`                                         | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                   |
+| `required?`     | `boolean`                                        | If true the field will be required and the user will not be able to submit the form without filling it in.                               |
 | `scope?`        | [`SettingScopeType`](README.md#settingscopetype) | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. |
 
 ---
@@ -240,11 +318,11 @@ The event name for when your app is upgraded
 
 #### Type declaration
 
-| Name       | Type                                                                                                                                                                         |
-| :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `children` | `JSX.Children`[]                                                                                                                                                             |
-| `props`    | {} \| `undefined`                                                                                                                                                            |
-| `type`     | `JSX.ComponentFunction` \| [`BlockComponent`](modules/Devvit.md#blockcomponent) \| [`CustomPostComponent`](modules/Devvit.md#custompostcomponent) \| `string` \| `undefined` |
+| Name       | Type                                               |
+| :--------- | :------------------------------------------------- |
+| `children` | `JSX.Element`[]                                    |
+| `props`    | \{ `[key: string]`: `unknown`; } \| `undefined`    |
+| `type`     | `JSX.ComponentFunction` \| `string` \| `undefined` |
 
 ---
 
@@ -415,35 +493,31 @@ The current app context of the event or render
 
 #### Type declaration
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `assets`      | `AssetsClient`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | A client for resolving static assets to public URLs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `cache`       | `CacheHelper`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | The cache helper will let you cache JSON-able objects in your devvit apps for a limited amount of time. Under the covers, It's just Redis, so you do need to enable the redis feature. This provides a pattern for e.g. fetching remote calls without overwhelming someone's server. `ts Devvit.configure({ redis: true, // Enable access to Redis }); /// ... let component = (context) => { let cached = context.cache(async () => { let rsp = await fetch("https://google.com") return rsp.body }, { key: "some-fetch", ttl: 10_000 // millis } doSomethingWith(cached); return <text>yay</text> } ` |
-| `kvStore`     | [`KVStore`](README.md#kvstore)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | A client for the Key Value Store                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `media`       | [`MediaPlugin`](README.md#mediaplugin)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | A client for media API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `modLog`      | `ModLogClient`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | A client for the ModLog API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `realtime`    | `RealtimeClient`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | A client for Realtime API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `reddit`      | `RedditAPIClient`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | A client for the Reddit API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `redis`       | [`RedisClient`](README.md#redisclient)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | A client for the Redis API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `scheduler`   | [`Scheduler`](README.md#scheduler)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | A client for the Scheduler API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `settings`    | [`SettingsClient`](README.md#settingsclient)                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | A client for the Settings API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `ui`          | [`UIClient`](README.md#uiclient)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | A client for the User Interface API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `useChannel`  | [`UseChannelHook`](README.md#usechannelhook)                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | A hook hor managing a realtime pubsub channel between Block renders. This is only available within a Block Component.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `useForm`     | [`UseFormHook`](README.md#useformhook)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | A hook for managing a form between Block renders. This is only available within a Block Component.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `useInterval` | [`UseIntervalHook`](README.md#useintervalhook)                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | A hook for managing a callback that runs on an interval between Block renders. This is only available within a Block Component.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `useState`    | (`initialState`: `boolean` \| () => `boolean` \| `Promise`\<`boolean`\>) => [`UseStateResult`](README.md#usestateresult)\<`boolean`\>(`initialState`: `number` \| () => `number` \| `Promise`\<`number`\>) => [`UseStateResult`](README.md#usestateresult)\<`number`\>(`initialState`: `string` \| () => `string` \| `Promise`\<`string`\>) => [`UseStateResult`](README.md#usestateresult)\<`string`\>\<S\>(`initialState`: `S` \| () => `S` \| `Promise`\<`S`\>) => [`UseStateResult`](README.md#usestateresult)\<`S`\> | A hook for managing a state between Block renders. This is only available within a Block Component. Returns a tuple containing the current state and a function to update it. `ts const [counter, setCounter] = useState(0); setCounter(1); // counter = 1 setCounter((count) => count + 1) // counter = 2 `                                                                                                                                                                                                                                                                                            |
+| Name             | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `assets`         | `AssetsClient`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | A client for resolving static assets to public URLs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `cache`          | `CacheHelper`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | The cache helper will let you cache JSON-able objects in your devvit apps for a limited amount of time. Under the covers, It's just Redis, so you do need to enable the redis feature. This provides a pattern for e.g. fetching remote calls without overwhelming someone's server. `ts Devvit.configure({ redis: true, // Enable access to Redis }); /// ... let component = (context) => { let cached = context.cache(async () => { let rsp = await fetch("https://google.com") return rsp.body }, { key: "some-fetch", ttl: 10_000 // millis } doSomethingWith(cached); return <text>yay</text> } `                            |
+| `dimensions?`    | `UIDimensions`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Information about about a custom post's layout. Will be undefined for non custom post surface areas such as menu items and task schedulers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `kvStore`        | [`KVStore`](README.md#kvstore)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | A client for the Key Value Store                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `media`          | [`MediaPlugin`](README.md#mediaplugin)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | A client for media API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `modLog`         | `ModLogClient`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | A client for the ModLog API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `realtime`       | `RealtimeClient`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | A client for Realtime API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `reddit`         | `RedditAPIClient`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | A client for the Reddit API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `redis`          | [`RedisClient`](README.md#redisclient)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | A client for the Redis API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `scheduler`      | [`Scheduler`](README.md#scheduler)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | A client for the Scheduler API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `settings`       | [`SettingsClient`](README.md#settingsclient)                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | A client for the Settings API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `ui`             | [`UIClient`](README.md#uiclient)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | A client for the User Interface API                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `uiEnvironment?` | `UIEnvironment`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Additional information about client environment. Will be undefined for non-ui contexts such as task schedulers or triggers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `useChannel`     | \<Message\>(`options`: `ChannelOptions`\<`Message`\>) => [`UseChannelResult`](README.md#usechannelresult)\<`Message`\>                                                                                                                                                                                                                                                                                                                                                                                                    | A hook for managing a realtime pubsub channel between Block renders. This is only available within a Block Component. **`Deprecated`** Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api. `ts // Old: const channel = context.useChannel(...); // New: import { useChannel } from '@devvit/public-api' const channel = useChannel(...); `                                                                                                                                                                                                          |
+| `useForm`        | \<T\>(`form`: `T`, `onSubmit`: (`values`: [`FormToFormValues`](README.md#formtoformvalues)\<`T`\>) => `void` \| `Promise`\<`void`\>) => [`FormKey`](README.md#formkey)                                                                                                                                                                                                                                                                                                                                                    | A hook for managing a form between Block renders. This is only available within a Block Component. **`Deprecated`** Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api. `ts // Old: const myForm = context.useForm(...); // New: import { useForm } from '@devvit/public-api' const myForm = useForm(...); `                                                                                                                                                                                                                                        |
+| `useInterval`    | [`UseIntervalHook`](README.md#useintervalhook)                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | A hook for managing a callback that runs on an interval between Block renders. This is only available within a Block Component. **`Deprecated`** Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api. `ts // Old: const interval = context.useInterval(() => {}, 1000); // New: import { useInterval } from '@devvit/public-api' const interval = useInterval(() => {}, 1000); `                                                                                                                                                                     |
+| `useState`       | (`initialState`: `boolean` \| () => `boolean` \| `Promise`\<`boolean`\>) => [`UseStateResult`](README.md#usestateresult)\<`boolean`\>(`initialState`: `number` \| () => `number` \| `Promise`\<`number`\>) => [`UseStateResult`](README.md#usestateresult)\<`number`\>(`initialState`: `string` \| () => `string` \| `Promise`\<`string`\>) => [`UseStateResult`](README.md#usestateresult)\<`string`\>\<S\>(`initialState`: `S` \| () => `S` \| `Promise`\<`S`\>) => [`UseStateResult`](README.md#usestateresult)\<`S`\> | A hook for managing a state between Block renders. This is only available within a Block Component. Returns a tuple containing the current state and a function to update it. `ts const [counter, setCounter] = useState(0); setCounter(1); // counter = 1 setCounter((count) => count + 1) // counter = 2 ` **`Deprecated`** Using hooks from context is deprecated and will be removed in a future release. Import and use hooks directly from the public-api. `ts // Old: const [counter, setCounter] = context.useState(0); // New: import { useState } from '@devvit/public-api' const [counter, setCounter] = useState(0); ` |
 
 ---
 
 ### <a id="contextdebuginfo" name="contextdebuginfo"></a> ContextDebugInfo
 
-Ƭ **ContextDebugInfo**: `Object`
-
-#### Type declaration
-
-| Name       | Type       |
-| :--------- | :--------- |
-| `metadata` | `Metadata` |
+Ƭ **ContextDebugInfo**: \{ `effects?`: `EffectEmitter` ; `metadata`: `Metadata` } & \{ [key in AppDebug]?: string }
 
 ---
 
@@ -464,11 +538,29 @@ The current app context of the event or render
 
 ### <a id="data" name="data"></a> Data
 
-Ƭ **Data**: `Object`
+Ƭ **Data**: [`JSONObject`](README.md#jsonobject)
 
-#### Index signature
+**`Deprecated`**
 
-▪ [key: `string`]: `any`
+Use JSONObject instead.
+
+---
+
+### <a id="devvitdebug" name="devvitdebug"></a> DevvitDebug
+
+Ƭ **DevvitDebug**: `Object`
+
+Home for debug flags, settings, and other information. Any type removals
+may cause type errors but not runtime errors.
+
+**Favor ContextDebugInfo since request-based state is preferred.**
+
+#### Type declaration
+
+| Name             | Type      | Description                                                                                                                          |
+| :--------------- | :-------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| `emitSnapshots?` | `boolean` | Should debug block rendering in console.log according to the reified JSX/XML output. Example: <hstack><text>hi world</text></hstack> |
+| `emitState?`     | `boolean` | Should console.log the state of the app after every event.                                                                           |
 
 ---
 
@@ -504,32 +596,38 @@ The current app context of the event or render
 
 #### Type declaration
 
-| Name           | Type                                 | Description                                   |
-| :------------- | :----------------------------------- | :-------------------------------------------- |
-| `acceptLabel?` | `string`                             | An optional label for the submit button       |
-| `cancelLabel?` | `string`                             | An optional label for the cancel button       |
-| `description?` | `string`                             | An optional description for the form          |
-| `fields`       | [`FormField`](README.md#formfield)[] | The fields that will be displayed in the form |
-| `title?`       | `string`                             | An optional title for the form                |
+| Name           | Type                                          | Description                                   |
+| :------------- | :-------------------------------------------- | :-------------------------------------------- |
+| `acceptLabel?` | `string`                                      | An optional label for the submit button       |
+| `cancelLabel?` | `string`                                      | An optional label for the cancel button       |
+| `description?` | `string`                                      | An optional description for the form          |
+| `fields`       | readonly [`FormField`](README.md#formfield)[] | The fields that will be displayed in the form |
+| `title?`       | `string`                                      | An optional title for the form                |
 
 ---
 
 ### <a id="formdefinition" name="formdefinition"></a> FormDefinition
 
-Ƭ **FormDefinition**: `Object`
+Ƭ **FormDefinition**\<`T`\>: `Object`
+
+#### Type parameters
+
+| Name | Type                                                                                                                                                |
+| :--- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `T`  | extends [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction) = [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction) |
 
 #### Type declaration
 
-| Name       | Type                                                                 | Description                                                |
-| :--------- | :------------------------------------------------------------------- | :--------------------------------------------------------- |
-| `form`     | [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction) | A form or a function that returns a form                   |
-| `onSubmit` | [`FormOnSubmitEventHandler`](README.md#formonsubmiteventhandler)     | A callback that will be invoked when the form is submitted |
+| Name       | Type                                                                                                                        | Description                                                |
+| :--------- | :-------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------- |
+| `form`     | `T`                                                                                                                         | A form or a function that returns a form                   |
+| `onSubmit` | [`FormOnSubmitEventHandler`](README.md#formonsubmiteventhandler)\<[`FormToFormValues`](README.md#formtoformvalues)\<`T`\>\> | A callback that will be invoked when the form is submitted |
 
 ---
 
 ### <a id="formfield" name="formfield"></a> FormField
 
-Ƭ **FormField**: [`StringField`](README.md#stringfield) \| [`ParagraphField`](README.md#paragraphfield) \| [`NumberField`](README.md#numberfield) \| [`BooleanField`](README.md#booleanfield) \| [`SelectField`](README.md#selectfield) \| [`FormFieldGroup`](README.md#formfieldgroup)
+Ƭ **FormField**: [`StringField`](README.md#stringfield) \| [`ImageField`](README.md#imagefield) \| [`ParagraphField`](README.md#paragraphfield) \| [`NumberField`](README.md#numberfield) \| [`BooleanField`](README.md#booleanfield) \| [`SelectField`](README.md#selectfield) \| [`FormFieldGroup`](README.md#formfieldgroup)
 
 ---
 
@@ -541,18 +639,19 @@ A grouping of fields
 
 #### Type declaration
 
-| Name        | Type                                 | Description                                                  |
-| :---------- | :----------------------------------- | :----------------------------------------------------------- |
-| `fields`    | [`FormField`](README.md#formfield)[] | The fields that will be displayed in the group               |
-| `helpText?` | `string`                             | An optional help text that will be displayed below the group |
-| `label`     | `string`                             | The label of the group that will be displayed to the user    |
-| `type`      | `"group"`                            | -                                                            |
+| Name        | Type                                          | Description                                                  |
+| :---------- | :-------------------------------------------- | :----------------------------------------------------------- |
+| `fields`    | readonly [`FormField`](README.md#formfield)[] | The fields that will be displayed in the group               |
+| `helpText?` | `string`                                      | An optional help text that will be displayed below the group |
+| `label`     | `string`                                      | The label of the group that will be displayed to the user    |
+| `required?` | `never`                                       | -                                                            |
+| `type`      | `"group"`                                     | -                                                            |
 
 ---
 
 ### <a id="formfunction" name="formfunction"></a> FormFunction
 
-Ƭ **FormFunction**: (`data`: [`Data`](README.md#data)) => [`Form`](README.md#form)
+Ƭ **FormFunction**\<`T`\>: (`data`: `T`) => [`Form`](README.md#form)
 
 A function that returns a form. You can use this to dynamically generate a form.
 
@@ -572,15 +671,21 @@ ui.showForm(formKey, {
 });
 ```
 
+#### Type parameters
+
+| Name | Type                                            |
+| :--- | :---------------------------------------------- |
+| `T`  | extends `Object` = \{ `[key: string]`: `any`; } |
+
 #### Type declaration
 
 ▸ (`data`): [`Form`](README.md#form)
 
 ##### Parameters
 
-| Name   | Type                     |
-| :----- | :----------------------- |
-| `data` | [`Data`](README.md#data) |
+| Name   | Type |
+| :----- | :--- |
+| `data` | `T`  |
 
 ##### Returns
 
@@ -598,19 +703,31 @@ A unique key generated by `Devvit.createForm` or the `useForm` hook.
 
 ### <a id="formonsubmitevent" name="formonsubmitevent"></a> FormOnSubmitEvent
 
-Ƭ **FormOnSubmitEvent**: `Object`
+Ƭ **FormOnSubmitEvent**\<`T`\>: `Object`
+
+#### Type parameters
+
+| Name | Type                                                      |
+| :--- | :-------------------------------------------------------- |
+| `T`  | extends `Partial`\<[`JSONObject`](README.md#jsonobject)\> |
 
 #### Type declaration
 
-| Name     | Type                                 | Description                         |
-| :------- | :----------------------------------- | :---------------------------------- |
-| `values` | [`FormValues`](README.md#formvalues) | The form values that were submitted |
+| Name     | Type | Description                         |
+| :------- | :--- | :---------------------------------- |
+| `values` | `T`  | The form values that were submitted |
 
 ---
 
 ### <a id="formonsubmiteventhandler" name="formonsubmiteventhandler"></a> FormOnSubmitEventHandler
 
-Ƭ **FormOnSubmitEventHandler**: (`event`: [`FormOnSubmitEvent`](README.md#formonsubmitevent), `context`: [`Context`](modules/Devvit.md#context)) => `void` \| `Promise`\<`void`\>
+Ƭ **FormOnSubmitEventHandler**\<`Data`\>: (`event`: [`FormOnSubmitEvent`](README.md#formonsubmitevent)\<`Data`\>, `context`: [`Context`](modules/Devvit.md#context)) => `void` \| `Promise`\<`void`\>
+
+#### Type parameters
+
+| Name   | Type                                                      |
+| :----- | :-------------------------------------------------------- |
+| `Data` | extends `Partial`\<[`JSONObject`](README.md#jsonobject)\> |
 
 #### Type declaration
 
@@ -618,10 +735,10 @@ A unique key generated by `Devvit.createForm` or the `useForm` hook.
 
 ##### Parameters
 
-| Name      | Type                                               |
-| :-------- | :------------------------------------------------- |
-| `event`   | [`FormOnSubmitEvent`](README.md#formonsubmitevent) |
-| `context` | [`Context`](modules/Devvit.md#context)             |
+| Name      | Type                                                         |
+| :-------- | :----------------------------------------------------------- |
+| `event`   | [`FormOnSubmitEvent`](README.md#formonsubmitevent)\<`Data`\> |
+| `context` | [`Context`](modules/Devvit.md#context)                       |
 
 ##### Returns
 
@@ -629,15 +746,36 @@ A unique key generated by `Devvit.createForm` or the `useForm` hook.
 
 ---
 
+### <a id="formtoformvalues" name="formtoformvalues"></a> FormToFormValues
+
+Ƭ **FormToFormValues**\<`T`\>: `FormFieldsToFormValues`\<`T` extends [`FormFunction`](README.md#formfunction) ? `ReturnType`\<`T`\> : `T`[``"fields"``]\>
+
+#### Type parameters
+
+| Name | Type                                                                                                                                                |
+| :--- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `T`  | extends [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction) = [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction) |
+
+---
+
 ### <a id="formvalues" name="formvalues"></a> FormValues
 
-Ƭ **FormValues**: [`Data`](README.md#data)
+Ƭ **FormValues**: [`JSONObject`](README.md#jsonobject)
 
 ---
 
 ### <a id="iconname" name="iconname"></a> IconName
 
 Ƭ **IconName**: \`$\{AllIconName}\` \| \`$\{AllIconName}-outline\` \| \`$\{AllIconName}-fill\`
+
+---
+
+### <a id="imagefield" name="imagefield"></a> ImageField
+
+Ƭ **ImageField**: `Omit`\<[`BaseField`](README.md#basefield)\<`string`\>, `"defaultValue"`\> & \{ `type`: `"image"` }
+
+Allows a user to upload an image as part of submitting the form. The string value that's
+given back is the URL of the image.
 
 ---
 
@@ -678,6 +816,12 @@ represented losslessly in plain JSON.
 
 - https://github.com/microsoft/TypeScript/issues/1897
 - https://www.json.org
+
+---
+
+### <a id="jobcontext" name="jobcontext"></a> JobContext
+
+Ƭ **JobContext**: `Omit`\<[`Context`](modules/Devvit.md#context), `"ui"` \| `"dimensions"` \| `"modLog"` \| `"uiEnvironment"`\>
 
 ---
 
@@ -727,26 +871,20 @@ represented losslessly in plain JSON.
 
 #### Type declaration
 
-| Name           | Type                                                                                                                                                    | Description                                                                   |
-| :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------- |
-| `description?` | `string`                                                                                                                                                | An optional description for the menu item                                     |
-| `forUserType?` | [`MenuItemUserType`](README.md#menuitemusertype) \| [`MenuItemUserType`](README.md#menuitemusertype)[]                                                  | The user type(s) that the menu item should be displayed for                   |
-| `label`        | `string`                                                                                                                                                | The label of the menu item                                                    |
-| `location`     | [`MenuItemLocation`](README.md#menuitemlocation) \| [`MenuItemLocation`](README.md#menuitemlocation)[]                                                  | The location(s) where the menu item should be displayed                       |
-| `postFilter?`  | [`MenuItemPostFilter`](README.md#menuitempostfilter)                                                                                                    | The filter that applies to post menu items. Has no effect on non-post actions |
-| `onPress`      | (`event`: [`MenuItemOnPressEvent`](README.md#menuitemonpressevent), `context`: [`Context`](modules/Devvit.md#context)) => `void` \| `Promise`\<`void`\> | A function that is called when the menu item is pressed                       |
+| Name           | Type                                                                                                                                                    | Description                                                                      |
+| :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------- |
+| `description?` | `string`                                                                                                                                                | An optional description for the menu item                                        |
+| `forUserType?` | [`MenuItemUserType`](README.md#menuitemusertype) \| [`MenuItemUserType`](README.md#menuitemusertype)[]                                                  | The user type(s) that the menu item should be displayed for                      |
+| `label`        | `string`                                                                                                                                                | The label of the menu item                                                       |
+| `location`     | [`MenuItemLocation`](README.md#menuitemlocation) \| [`MenuItemLocation`](README.md#menuitemlocation)[]                                                  | The location(s) where the menu item should be displayed                          |
+| `onPress`      | (`event`: [`MenuItemOnPressEvent`](README.md#menuitemonpressevent), `context`: [`Context`](modules/Devvit.md#context)) => `void` \| `Promise`\<`void`\> | A function that is called when the menu item is pressed                          |
+| `postFilter?`  | [`MenuItemPostFilter`](README.md#menuitempostfilter)                                                                                                    | The filter that applies to post menu items and has no effect on non-post actions |
 
 ---
 
 ### <a id="menuitemlocation" name="menuitemlocation"></a> MenuItemLocation
 
 Ƭ **MenuItemLocation**: `"subreddit"` \| `"post"` \| `"comment"`
-
----
-
-### <a id="menuitempostfilter" name="menuitempostfilter"></a> MenuItemPostFilter
-
-Ƭ **MenuItemPostFilter**: `"currentApp"`
 
 ---
 
@@ -763,9 +901,17 @@ represented losslessly in plain JSON.
 
 ---
 
+### <a id="menuitempostfilter" name="menuitempostfilter"></a> MenuItemPostFilter
+
+Ƭ **MenuItemPostFilter**: `"currentApp"`
+
+You can use the "currentApp" filter to only display the menu item on custom posts that were created by your app.
+
+---
+
 ### <a id="menuitemusertype" name="menuitemusertype"></a> MenuItemUserType
 
-Ƭ **MenuItemUserType**: `"loggedOut"` \| `"member"` \| `"moderator"`
+Ƭ **MenuItemUserType**: `"loggedOut"` \| `"moderator"`
 
 ---
 
@@ -838,9 +984,35 @@ A number field
 
 ---
 
+### <a id="onautomoderatorfiltercommentdefinition" name="onautomoderatorfiltercommentdefinition"></a> OnAutomoderatorFilterCommentDefinition
+
+Ƭ **OnAutomoderatorFilterCommentDefinition**: `Object`
+
+#### Type declaration
+
+| Name      | Type                                                                                              |
+| :-------- | :------------------------------------------------------------------------------------------------ |
+| `event`   | [`AutomoderatorFilterComment`](README.md#automoderatorfiltercomment)                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AutomoderatorFilterComment`\> |
+
+---
+
+### <a id="onautomoderatorfilterpostdefinition" name="onautomoderatorfilterpostdefinition"></a> OnAutomoderatorFilterPostDefinition
+
+Ƭ **OnAutomoderatorFilterPostDefinition**: `Object`
+
+#### Type declaration
+
+| Name      | Type                                                                                           |
+| :-------- | :--------------------------------------------------------------------------------------------- |
+| `event`   | [`AutomoderatorFilterPost`](README.md#automoderatorfilterpost)                                 |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AutomoderatorFilterPost`\> |
+
+---
+
 ### <a id="ontriggerrequest" name="ontriggerrequest"></a> OnTriggerRequest
 
-Ƭ **OnTriggerRequest**: `protos.PostFlairUpdate` \| `protos.PostSubmit` \| `protos.PostCreate` \| `protos.PostUpdate` \| `protos.PostReport` \| `protos.PostDelete` \| `protos.CommentSubmit` \| `protos.CommentCreate` \| `protos.CommentUpdate` \| `protos.CommentReport` \| `protos.CommentDelete` \| `protos.AppInstall` \| `protos.AppUpgrade` \| `protos.ModAction` \| `protos.ModMail`
+Ƭ **OnTriggerRequest**: `protos.PostFlairUpdate` \| `protos.PostSubmit` \| `protos.PostCreate` \| `protos.PostUpdate` \| `protos.PostReport` \| `protos.PostDelete` \| `protos.CommentSubmit` \| `protos.CommentCreate` \| `protos.CommentUpdate` \| `protos.CommentReport` \| `protos.CommentDelete` \| `protos.AppInstall` \| `protos.AppUpgrade` \| `protos.ModAction` \| `protos.ModMail` \| `protos.PostNsfwUpdate` \| `protos.PostSpoilerUpdate` \| `protos.AutomoderatorFilterPost` \| `protos.AutomoderatorFilterComment`
 
 ---
 
@@ -876,6 +1048,48 @@ A number field
 Ƭ **ParagraphField**: `Prettify`\<[`BaseField`](README.md#basefield)\<`string`\> & `Omit`\<`FieldConfig_Paragraph`, `"maxCharacters"`\> & \{ `type`: `"paragraph"` }\>
 
 A paragraph or textarea field
+
+---
+
+### <a id="partialjsonarray" name="partialjsonarray"></a> PartialJSONArray
+
+Ƭ **PartialJSONArray**: [`PartialJSONValue`](README.md#partialjsonvalue)[]
+
+---
+
+### <a id="partialjsonobject" name="partialjsonobject"></a> PartialJSONObject
+
+Ƭ **PartialJSONObject**: `Partial`\<\{ `[key: string]`: [`PartialJSONValue`](README.md#partialjsonvalue); }\>
+
+---
+
+### <a id="partialjsonprimitive" name="partialjsonprimitive"></a> PartialJSONPrimitive
+
+Ƭ **PartialJSONPrimitive**: `boolean` \| `null` \| `number` \| `string` \| `undefined`
+
+---
+
+### <a id="partialjsonvalue" name="partialjsonvalue"></a> PartialJSONValue
+
+Ƭ **PartialJSONValue**: [`PartialJSONPrimitive`](README.md#partialjsonprimitive) \| [`PartialJSONArray`](README.md#partialjsonarray) \| [`PartialJSONObject`](README.md#partialjsonobject)
+
+Like JSONValue but deeply allow lossy undefined values that are easier to
+type but may de/serialize differently or incorrectly. For example:
+
+- `JSON.stringify({a: 1, b: 2, c: undefined, d: 3})`: `'{"a":1,"b":2,"d":3}'`.
+- `JSON.stringify([1, 2, undefined, 3])`: `'[1,2,null,3]'`.
+- `JSON.stringify(undefined)`: `undefined`.
+
+JSON.stringify() accepts an `any` input so there are no typing guards. Prefer
+plain JSONValue when possible.
+
+One mostly only cares about stringify since creating a JSON string with
+undefineds in it would require deliberate effort. These all throw errors:
+
+- `JSON.parse('{a: 1, b: 2, c: undefined, d: 3}')`.
+- `JSON.parse('[1, 2, undefined, 3]')`.
+- `JSON.parse('undefined')`.
+- `JSON.parse(undefined)` (also a typing error).
 
 ---
 
@@ -954,6 +1168,27 @@ The event name for when the flair of a post is updated
 
 ---
 
+### <a id="postnsfwupdate" name="postnsfwupdate"></a> PostNsfwUpdate
+
+Ƭ **PostNsfwUpdate**: `"PostNsfwUpdate"`
+
+The event name for when a post is marked/unmarked as nsfw
+
+---
+
+### <a id="postnsfwupdatedefinition" name="postnsfwupdatedefinition"></a> PostNsfwUpdateDefinition
+
+Ƭ **PostNsfwUpdateDefinition**: `Object`
+
+#### Type declaration
+
+| Name      | Type                                                                                  |
+| :-------- | :------------------------------------------------------------------------------------ |
+| `event`   | [`PostNsfwUpdate`](README.md#postnsfwupdate)                                          |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostNsfwUpdate`\> |
+
+---
+
 ### <a id="postreport" name="postreport"></a> PostReport
 
 Ƭ **PostReport**: `"PostReport"`
@@ -972,6 +1207,27 @@ The event name for when a post is reported
 | :-------- | :-------------------------------------------------------------------------------- |
 | `event`   | [`PostReport`](README.md#postreport)                                              |
 | `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostReport`\> |
+
+---
+
+### <a id="postspoilerupdate" name="postspoilerupdate"></a> PostSpoilerUpdate
+
+Ƭ **PostSpoilerUpdate**: `"PostSpoilerUpdate"`
+
+The event name for when a post is marked/unmarked as spoiler
+
+---
+
+### <a id="postspoilerupdatedefinition" name="postspoilerupdatedefinition"></a> PostSpoilerUpdateDefinition
+
+Ƭ **PostSpoilerUpdateDefinition**: `Object`
+
+#### Type declaration
+
+| Name      | Type                                                                                     |
+| :-------- | :--------------------------------------------------------------------------------------- |
+| `event`   | [`PostSpoilerUpdate`](README.md#postspoilerupdate)                                       |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostSpoilerUpdate`\> |
 
 ---
 
@@ -1023,47 +1279,66 @@ The event name for when a post is updated
 
 #### Type declaration
 
-| Name               | Type                                                                                                                                                                                                 | Description                                                                                                                                                                                            |
-| :----------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `global`           | `Omit`\<[`RedisClient`](README.md#redisclient), `"global"`\>                                                                                                                                         | Allows read/write operations to global keys in Redis Global redis enables apps to persist and access state across subreddit installations                                                              |
-| `del`              | (...`keys`: `string`[]) => `Promise`\<`void`\>                                                                                                                                                       | Removes the specified keys. A key is ignored if it does not exist. https://redis.io/commands/del/ **`Arg`** keys                                                                                       |
-| `expire`           | (`key`: `string`, `seconds`: `number`) => `Promise`\<`void`\>                                                                                                                                        | Set a timeout on key. https://redis.io/commands/expire/ **`Arg`** key **`Arg`** seconds                                                                                                                |
-| `expireTime`       | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the absolute Unix timestamp in seconds at which the given key will expire https://redis.io/commands/expiretime/ **`Arg`** key                                                                  |
-| `get`              | (`key`: `string`) => `Promise`\<`undefined` \| `string`\>                                                                                                                                            | Get the value of key. If the key does not exist the special value nil is returned. https://redis.io/commands/get/ **`Arg`** key                                                                        |
-| `getRange`         | (`key`: `string`, `start`: `number`, `end`: `number`) => `Promise`\<`string`\>                                                                                                                       | Returns the substring of the string value stored at key, determined by the offsets start and end (both are inclusive). https://redis.io/commands/getrange/ **`Arg`** key **`Arg`** start **`Arg`** end |
-| `hdel`             | (`key`: `string`, `fields`: `string`[]) => `Promise`\<`number`\>                                                                                                                                     | Removes the specified fields from the hash stored at key. https://redis.io/commands/hdel/ **`Arg`** key **`Arg`** fields                                                                               |
-| `hget`             | (`key`: `string`, `field`: `string`) => `Promise`\<`undefined` \| `string`\>                                                                                                                         | Returns the value associated with field in the hash stored at key. https://redis.io/commands/hget **`Arg`** key **`Arg`** field                                                                        |
-| `hgetall`          | (`key`: `string`) => `Promise`\<`undefined` \| `Record`\<`string`, `string`\>\>                                                                                                                      | Returns a map of fields and their values stored in the hash https://redis.io/commands/hgetall **`Arg`** key                                                                                            |
-| `hincrby`          | (`key`: `string`, `field`: `string`, `value`: `number`) => `Promise`\<`number`\>                                                                                                                     | Increments the number stored at field in the hash stored at key by increment. https://redis.io/commands/hincrby/ **`Arg`** key **`Arg`** field **`Arg`** value                                         |
-| `hkeys`            | (`key`: `string`) => `Promise`\<`string`[]\>                                                                                                                                                         | Returns all field names in the hash stored at key. **`Arg`** key                                                                                                                                       |
-| `hscan`            | (`key`: `string`, `cursor`: `number`, `pattern?`: `string`, `count?`: `number`) => `Promise`\<`HScanResponse`\>                                                                                      | Iterates fields of Hash types and their associated values. **`Arg`** key **`Arg`** cursor **`Arg`** pattern **`Arg`** count                                                                            |
-| `hset`             | (`key`: `string`, `fieldValues`: \{ `[field: string]`: `string`; }) => `Promise`\<`number`\>                                                                                                         | Sets the specified fields to their respective values in the hash stored at key. https://redis.io/commands/hset **`Arg`** key **`Arg`** fieldValues                                                     |
-| `incrBy`           | (`key`: `string`, `value`: `number`) => `Promise`\<`number`\>                                                                                                                                        | Increments the number stored at key by increment. https://redis.io/commands/incrby/ **`Arg`** key **`Arg`** value                                                                                      |
-| `mget`             | (`keys`: `string`[]) => `Promise`\<(`null` \| `string`)[]\>                                                                                                                                          | Returns the values of all specified keys. https://redis.io/commands/mget/ **`Arg`** keys                                                                                                               |
-| `mset`             | (`keyValues`: \{ `[key: string]`: `string`; }) => `Promise`\<`void`\>                                                                                                                                | Sets the given keys to their respective values. https://redis.io/commands/mset/ **`Arg`** keyValues                                                                                                    |
-| `set`              | (`key`: `string`, `value`: `string`, `options?`: [`SetOptions`](README.md#setoptions)) => `Promise`\<`string`\>                                                                                      | Set key to hold the string value. If key already holds a value, it is overwritten https://redis.io/commands/set/ **`Arg`** key **`Arg`** value **`Arg`** options                                       |
-| `setRange`         | (`key`: `string`, `offset`: `number`, `value`: `string`) => `Promise`\<`number`\>                                                                                                                    | Overwrites part of the string stored at key, starting at the specified offset, for the entire length of value. https://redis.io/commands/setrange/ **`Arg`** key **`Arg`** offset                      |
-| `strlen`           | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the length of the string value stored at key. An error is returned when key holds a non-string value. https://redis.io/commands/strlen/ **`Arg`** key                                          |
-| `type`             | (`key`: `string`) => `Promise`\<`string`\>                                                                                                                                                           | Returns the string representation of the type of the value stored at key https://redis.io/commands/type/ **`Arg`** key                                                                                 |
-| `watch`            | (...`keys`: `string`[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                     | Marks the given keys to be watched for conditional execution of a transaction. https://redis.io/commands/watch/ **`Arg`** keys - given keys to be watched                                              |
-| `zAdd`             | (`key`: `string`, ...`members`: [`ZMember`](README.md#zmember)[]) => `Promise`\<`number`\>                                                                                                           | Adds all the specified members with the specified scores to the sorted set stored at key. https://redis.io/commands/zadd/ **`Arg`** key                                                                |
-| `zCard`            | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the cardinality (number of elements) of the sorted set stored at key. https://redis.io/commands/zcard/ **`Arg`** key                                                                           |
-| `zIncrBy`          | (`key`: `string`, `member`: `string`, `value`: `number`) => `Promise`\<`number`\>                                                                                                                    | Increments the score of member in the sorted set stored at key by value https://redis.io/commands/zincrby/ **`Arg`** key **`Arg`** member **`Arg`** value                                              |
-| `zRange`           | (`key`: `string`, `start`: `string` \| `number`, `stop`: `string` \| `number`, `options?`: [`ZRangeOptions`](README.md#zrangeoptions)) => `Promise`\<\{ `member`: `string` ; `score`: `number` }[]\> | Returns the specified range of elements in the sorted set stored at key. https://redis.io/commands/zrange/ **`Arg`** key **`Arg`** start **`Arg`** stop **`Arg`** options                              |
-| `zRank`            | (`key`: `string`, `member`: `string`) => `Promise`\<`number`\>                                                                                                                                       | Returns the rank of member in the sorted set stored at key https://redis.io/commands/zrank/ **`Arg`** key **`Arg`** member                                                                             |
-| `zRem`             | (`key`: `string`, `members`: `string`[]) => `Promise`\<`number`\>                                                                                                                                    | Removes the specified members from the sorted set stored at key. https://redis.io/commands/zrem/ **`Arg`** key **`Arg`** members                                                                       |
-| `zRemRangeByLex`   | (`key`: `string`, `min`: `string`, `max`: `string`) => `Promise`\<`number`\>                                                                                                                         | removes all elements in the sorted set stored at key between the lexicographical range specified by min and max https://redis.io/commands/zremrangebylex/ **`Arg`** key **`Arg`** min **`Arg`** max    |
-| `zRemRangeByRank`  | (`key`: `string`, `start`: `number`, `stop`: `number`) => `Promise`\<`number`\>                                                                                                                      | Removes all elements in the sorted set stored at key with rank between start and stop. https://redis.io/commands/zremrangebyrank/ **`Arg`** key **`Arg`** start **`Arg`** stop                         |
-| `zRemRangeByScore` | (`key`: `string`, `min`: `number`, `max`: `number`) => `Promise`\<`number`\>                                                                                                                         | Removes all elements in the sorted set stored at key with a score between min and max https://redis.io/commands/zremrangebyscore/ **`Arg`** key **`Arg`** min **`Arg`** max                            |
-| `zScore`           | (`key`: `string`, `member`: `string`) => `Promise`\<`number`\>                                                                                                                                       | Returns the score of member in the sorted set at key. https://redis.io/commands/zscore/ **`Arg`** key **`Arg`** member                                                                                 |
+| Name               | Type                                                                                                                                                                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| :----------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `global`           | `Omit`\<[`RedisClient`](README.md#redisclient), `"global"`\>                                                                                                                                         | Allows read/write operations to global keys in Redis Global redis enables apps to persist and access state across subreddit installations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `del`              | (...`keys`: `string`[]) => `Promise`\<`void`\>                                                                                                                                                       | Removes the specified keys. A key is ignored if it does not exist. https://redis.io/commands/del/ **`Arg`** keys **`Example`** `ts async function delExample(context: Devvit.Context) { await context.redis.set("quantity", "5"); await context.redis.del("quantity"); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `expire`           | (`key`: `string`, `seconds`: `number`) => `Promise`\<`void`\>                                                                                                                                        | Set a timeout on key. https://redis.io/commands/expire/ **`Arg`** key **`Arg`** seconds **`Example`** `ts async function expireExample(context: Devvit.Context) { await context.redis.set("product", "milk"); await context.redis.expire("product", 60); // Set the product to expire in 60 seconds } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `expireTime`       | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the absolute Unix timestamp in seconds at which the given key will expire https://redis.io/commands/expiretime/ **`Arg`** key **`Example`** `ts async function expireTimeExample(context: Devvit.Context) { await context.redis.set("product", "milk"); const expireTime : number = await context.redis.expireTime("product"); console.log("Expire time: " + expireTime); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `get`              | (`key`: `string`) => `Promise`\<`undefined` \| `string`\>                                                                                                                                            | Get the value of key. If the key does not exist the special value nil is returned. https://redis.io/commands/get/ **`Arg`** key **`Example`** `ts async function getExample(context: Devvit.Context) { await context.redis.set("quantity", "5"); const quantity : string \| undefined = await context.redis.get("quantity"); console.log("Quantity: " + quantity); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `getRange`         | (`key`: `string`, `start`: `number`, `end`: `number`) => `Promise`\<`string`\>                                                                                                                       | Returns the substring of the string value stored at key, determined by the offsets start and end (both are inclusive). https://redis.io/commands/getrange/ **`Arg`** key **`Arg`** start **`Arg`** end **`Example`** `ts async function getRangeExample(context: Devvit.Context) { await context.redis.set("word", "tacocat"); const range : string = await context.redis.getRange("word", 0, 3) console.log("Range from index 0 to 3: " + range); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `hDel`             | (`key`: `string`, `fields`: `string`[]) => `Promise`\<`number`\>                                                                                                                                     | Removes the specified fields from the hash stored at key. https://redis.io/commands/hdel/ **`Arg`** key **`Arg`** fields **`Example`** `ts async function hDelExample(context: Devvit.Context) { await context.redis.hSet("fruits", {"apple": "5", "orange": "7", "kiwi": "9"}); const numFieldsRemoved = await context.redis.hDel("fruits", ["apple", "kiwi"]); console.log("Number of fields removed: " + numFieldsRemoved); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `hGet`             | (`key`: `string`, `field`: `string`) => `Promise`\<`undefined` \| `string`\>                                                                                                                         | Returns the value associated with field in the hash stored at key. https://redis.io/commands/hget **`Arg`** key **`Arg`** field **`Example`** `ts async function hGetExample(context: Devvit.Context) { await context.redis.hSet("fruits", {"apple": "5", "orange": "7", "kiwi": "9"}); const result : string \| undefined = await context.redis.hGet("fruits", "orange"); console.log("Value of orange: " + result); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `hGetAll`          | (`key`: `string`) => `Promise`\<`Record`\<`string`, `string`\>\>                                                                                                                                     | Returns all fields and values of the hash stored at key https://redis.io/commands/hgetall **`Arg`** key **`Example`** ``async function hGetAllExample(context: Devvit.Context) { await context.redis.hSet("groceryList", { "eggs": "12", "apples": "3", "milk": "1" }); const record : Record<string, string> = await context.redis.hGetAll("groceryList"); if (record.eggs !== undefined) { console.log(`Eggs: ${record.eggs}`); } }``                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `hIncrBy`          | (`key`: `string`, `field`: `string`, `value`: `number`) => `Promise`\<`number`\>                                                                                                                     | Increments the number stored at field in the hash stored at key by increment. https://redis.io/commands/hincrby/ **`Arg`** key **`Arg`** field **`Arg`** value **`Example`** `ts async function hIncrByExample(context: Devvit.Context) { await context.redis.hSet("user123", { "karma": "100" }); await context.redis.hIncrBy("user123", "karma", 5); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `hKeys`            | (`key`: `string`) => `Promise`\<`string`[]\>                                                                                                                                                         | Returns all field names in the hash stored at key. **`Arg`** key **`Example`** `ts async function hKeysExample(context: Devvit.Context) { await context.redis.hSet("prices", { "chair": "48", "desk": "95", "whiteboard": "23" }); const keys : string[] = await context.redis.hKeys("prices"); console.log("Keys: " + keys); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `hLen`             | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the number of fields contained in the hash stored at key. **`Arg`** key **`Example`** `ts async function hLenExample(context: Devvit.Context) { await context.redis.hSet("supplies", { "paperclips": "25", "pencils": "10", "erasers": "5", "pens": "7" }); const numberOfFields : number = await context.redis.hLen("supplies"); console.log("Number of fields: " + numberOfFields); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `hScan`            | (`key`: `string`, `cursor`: `number`, `pattern?`: `string`, `count?`: `number`) => `Promise`\<`HScanResponse`\>                                                                                      | Iterates fields of Hash types and their associated values. **`Arg`** key **`Arg`** cursor **`Arg`** pattern **`Arg`** count **`Example`** `ts async function hScanExample(context: Devvit.Context) { await context.redis.hSet("userInfo", { "name": "Bob", "startDate": "01-05-20", "totalAwards": "12" }); const hScanResponse = await context.redis.hScan("userInfo", 0); hScanResponse.fieldValues.forEach(x => { console.log("Field: '" + x.field + "', Value: '" + x.value + "'"); }); } `                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `hSet`             | (`key`: `string`, `fieldValues`: \{ `[field: string]`: `string`; }) => `Promise`\<`number`\>                                                                                                         | Sets the specified fields to their respective values in the hash stored at key. https://redis.io/commands/hset **`Arg`** key **`Arg`** fieldValues **`Example`** `ts async function hSetExample(context: Devvit.Context) { const numFieldsAdded = await context.redis.hSet("fruits", {"apple": "5", "orange": "7", "kiwi": "9"}); console.log("Number of fields added: " + numFieldsAdded); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `hdel`             | (`key`: `string`, `fields`: `string`[]) => `Promise`\<`number`\>                                                                                                                                     | Removes the specified fields from the hash stored at key. https://redis.io/commands/hdel/ **`Deprecated`** Use [RedisClient.hDel](README.md#hdel) instead. **`Arg`** key **`Arg`** fields                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `hget`             | (`key`: `string`, `field`: `string`) => `Promise`\<`undefined` \| `string`\>                                                                                                                         | Returns the value associated with field in the hash stored at key. https://redis.io/commands/hget **`Deprecated`** Use [RedisClient.hGet](README.md#hget) instead. **`Arg`** key **`Arg`** field                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `hgetall`          | (`key`: `string`) => `Promise`\<`Record`\<`string`, `string`\>\>                                                                                                                                     | Returns all fields and values of the hash stored at key https://redis.io/commands/hgetall **`Deprecated`** Use [RedisClient.hGetAll](README.md#hgetall) instead. **`Arg`** key                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `hincrby`          | (`key`: `string`, `field`: `string`, `value`: `number`) => `Promise`\<`number`\>                                                                                                                     | Increments the number stored at field in the hash stored at key by increment. https://redis.io/commands/hincrby/ **`Deprecated`** Use [RedisClient.hIncrBy](README.md#hincrby) instead. **`Arg`** key **`Arg`** field **`Arg`** value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `hkeys`            | (`key`: `string`) => `Promise`\<`string`[]\>                                                                                                                                                         | Returns all field names in the hash stored at key. **`Deprecated`** Use [RedisClient.hKeys](README.md#hkeys) instead. **`Arg`** key                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `hlen`             | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the number of fields contained in the hash stored at key. **`Deprecated`** Use [RedisClient.hLen](README.md#hlen) instead. **`Arg`** key                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `hscan`            | (`key`: `string`, `cursor`: `number`, `pattern?`: `string`, `count?`: `number`) => `Promise`\<`HScanResponse`\>                                                                                      | Iterates fields of Hash types and their associated values. **`Deprecated`** Use [RedisClient.hScan](README.md#hscan) instead. **`Arg`** key **`Arg`** cursor **`Arg`** pattern **`Arg`** count                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `hset`             | (`key`: `string`, `fieldValues`: \{ `[field: string]`: `string`; }) => `Promise`\<`number`\>                                                                                                         | Sets the specified fields to their respective values in the hash stored at key. https://redis.io/commands/hset **`Deprecated`** Use [RedisClient.hSet](README.md#hset) instead. **`Arg`** key **`Arg`** fieldValues                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `incrBy`           | (`key`: `string`, `value`: `number`) => `Promise`\<`number`\>                                                                                                                                        | Increments the number stored at key by increment. https://redis.io/commands/incrby/ **`Arg`** key **`Arg`** value **`Example`** `ts async function incrByExample(context: Devvit.Context) { await context.redis.set("totalPoints", "53") const updatedPoints : number = await context.redis.incrBy("totalPoints", 100); console.log("Updated points: " + updatedPoints); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `mGet`             | (`keys`: `string`[]) => `Promise`\<(`null` \| `string`)[]\>                                                                                                                                          | Returns the values of all specified keys. https://redis.io/commands/mget/ **`Arg`** keys **`Example`** `ts async function mGetExample(context: Devvit.Context) { await context.redis.mSet({"name": "Zeek", "occupation": "Developer"}); const result : (string \| null)[] = await context.redis.mGet(["name", "occupation"]); result.forEach(x => { console.log(x); }); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `mSet`             | (`keyValues`: \{ `[key: string]`: `string`; }) => `Promise`\<`void`\>                                                                                                                                | Sets the given keys to their respective values. https://redis.io/commands/mset/ **`Arg`** keyValues **`Example`** `ts async function mSetExample(context: Devvit.Context) { await context.redis.mSet({"name": "Zeek", "occupation": "Developer"}); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `mget`             | (`keys`: `string`[]) => `Promise`\<(`null` \| `string`)[]\>                                                                                                                                          | Returns the values of all specified keys. https://redis.io/commands/mget/ **`Deprecated`** Use [RedisClient.mGet](README.md#mget) instead. **`Arg`** keys                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `mset`             | (`keyValues`: \{ `[key: string]`: `string`; }) => `Promise`\<`void`\>                                                                                                                                | Sets the given keys to their respective values. https://redis.io/commands/mset/ **`Deprecated`** Use [RedisClient.mSet](README.md#mset) instead. **`Arg`** keyValues                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `set`              | (`key`: `string`, `value`: `string`, `options?`: [`SetOptions`](README.md#setoptions)) => `Promise`\<`string`\>                                                                                      | Set key to hold the string value. If key already holds a value, it is overwritten https://redis.io/commands/set/ **`Arg`** key **`Arg`** value **`Arg`** options **`Example`** `ts async function setExample(context: Devvit.Context) { await context.redis.set("quantity", "5"); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `setRange`         | (`key`: `string`, `offset`: `number`, `value`: `string`) => `Promise`\<`number`\>                                                                                                                    | Overwrites part of the string stored at key, starting at the specified offset, for the entire length of value. https://redis.io/commands/setrange/ **`Arg`** key **`Arg`** offset **`Example`** `ts async function setRangeExample(context: Devvit.Context) { await context.redis.set("word", "tacocat"); await context.redis.setRange("word", 0, "blue"); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `strLen`           | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the length of the string value stored at key. An error is returned when key holds a non-string value. https://redis.io/commands/strlen/ **`Arg`** key **`Example`** `ts async function strLenExample(context: Devvit.Context) { await context.redis.set("word", "tacocat"); const length : number = await context.redis.strLen("word"); console.log("Length of word: " + length); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `strlen`           | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the length of the string value stored at key. An error is returned when key holds a non-string value. https://redis.io/commands/strlen/ **`Deprecated`** Use [RedisClient.strLen](README.md#strlen) instead. **`Arg`** key                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `type`             | (`key`: `string`) => `Promise`\<`string`\>                                                                                                                                                           | Returns the string representation of the type of the value stored at key https://redis.io/commands/type/ **`Arg`** key **`Example`** `ts async function typeExample(context: Devvit.Context) { await context.redis.set("quantity", "5"); const type : string = await context.redis.type("quantity"); console.log("Key type: " + type); } `                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `watch`            | (...`keys`: `string`[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                     | Marks the given keys to be watched for conditional execution of a transaction. https://redis.io/commands/watch/ **`Arg`** keys - given keys to be watched **`Example`** `ts async function watchExample(context: Devvit.Context) { await context.redis.set("karma", "32"); const txn = await context.redis.watch("quantity"); await txn.multi(); // Begin a transaction await txn.incrBy("karma", 10); await txn.exec(); // Execute the commands in the transaction } `                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `zAdd`             | (`key`: `string`, ...`members`: [`ZMember`](README.md#zmember)[]) => `Promise`\<`number`\>                                                                                                           | Adds all the specified members with the specified scores to the sorted set stored at key. https://redis.io/commands/zadd/ **`Arg`** key **`Example`** `ts async function zAddExample(context: Devvit.Context) { const numMembersAdded : number = await context.redis.zAdd("leaderboard", {member: "louis", score: 37}, {member: "fernando", score: 10}, {member: "caesar", score: 20}, {member: "alexander", score: 25}, ); console.log("Number of members added: " + numMembersAdded); } `                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `zCard`            | (`key`: `string`) => `Promise`\<`number`\>                                                                                                                                                           | Returns the cardinality (number of elements) of the sorted set stored at key. https://redis.io/commands/zcard/ **`Arg`** key **`Example`** `ts async function zCardExample(context: Devvit.Context) { await context.redis.zAdd("leaderboard", {member: "louis", score: 37}, {member: "fernando", score: 10}, {member: "caesar", score: 20}, {member: "alexander", score: 25}, ); const cardinality : number = await context.redis.zCard("leaderboard"); console.log("Cardinality: " + cardinality); } `                                                                                                                                                                                                                                                                                                                                                                                                |
+| `zIncrBy`          | (`key`: `string`, `member`: `string`, `value`: `number`) => `Promise`\<`number`\>                                                                                                                    | Increments the score of member in the sorted set stored at key by value https://redis.io/commands/zincrby/ **`Arg`** key **`Arg`** member **`Arg`** value **`Example`** `ts async function zIncrByExample(context: Devvit.Context) { await context.redis.zAdd("animals", {member: "zebra", score: 92}, {member: "cat", score: 100}, {member: "dog", score: 95}, {member: "elephant", score: 97} ); const updatedScore : number = await context.redis.zIncrBy("animals", "dog", 10); console.log("Dog's updated score: " + updatedScore); } `                                                                                                                                                                                                                                                                                                                                                           |
+| `zRange`           | (`key`: `string`, `start`: `string` \| `number`, `stop`: `string` \| `number`, `options?`: [`ZRangeOptions`](README.md#zrangeoptions)) => `Promise`\<\{ `member`: `string` ; `score`: `number` }[]\> | Returns the specified range of elements in the sorted set stored at key. https://redis.io/commands/zrange/ When using `by: 'lex'`, the start and stop inputs will be prepended with `[` by default, unless they already begin with `[`, `(` or are one of the special values `+` or `-`. **`Arg`** key **`Arg`** start **`Arg`** stop **`Arg`** options **`Example`** `ts async function zRangeExample(context: Devvit.Context) { await context.redis.zAdd("leaderboard", {member: "louis", score: 37}, {member: "fernando", score: 10}, {member: "caesar", score: 20}, {member: "alexander", score: 25}, ); // View elements with scores between 0 and 30 inclusive, sorted by score const scores : {member : string, score : number}[] = await context.redis.zRange("leaderboard", 0, 30, { by: "score" }); scores.forEach(x => { console.log("Member: " + x.member, ", Score: " + x.score); }); } ` |
+| `zRank`            | (`key`: `string`, `member`: `string`) => `Promise`\<`undefined` \| `number`\>                                                                                                                        | Returns the rank of member in the sorted set stored at key https://redis.io/commands/zrank/ **`Arg`** key **`Arg`** member **`Example`** `ts async function zRankExample(context: Devvit.Context) { await context.redis.zAdd("animals", {member: "zebra", score: 92}, {member: "cat", score: 100}, {member: "dog", score: 95}, {member: "elephant", score: 97} ); const rank : number \| undefined = await context.redis.zRank("animals", "dog"); if(rank !== undefined) { console.log("Dog's rank: " + rank); } } `                                                                                                                                                                                                                                                                                                                                                                                   |
+| `zRem`             | (`key`: `string`, `members`: `string`[]) => `Promise`\<`number`\>                                                                                                                                    | Removes the specified members from the sorted set stored at key. https://redis.io/commands/zrem/ **`Arg`** key **`Arg`** members **`Example`** `ts async function zRemExample(context: Devvit.Context) { await context.redis.zAdd("leaderboard", {member: "louis", score: 37}, {member: "fernando", score: 10}, {member: "caesar", score: 20}, {member: "alexander", score: 25}, ); const numberOfMembersRemoved : number = await context.redis.zRem("leaderboard", ["fernando", "alexander"]); console.log("Number of members removed: " + numberOfMembersRemoved); } `                                                                                                                                                                                                                                                                                                                               |
+| `zRemRangeByLex`   | (`key`: `string`, `min`: `string`, `max`: `string`) => `Promise`\<`number`\>                                                                                                                         | removes all elements in the sorted set stored at key between the lexicographical range specified by min and max https://redis.io/commands/zremrangebylex/ **`Arg`** key **`Arg`** min **`Arg`** max **`Example`** `ts async function zRemRangeByLexExample(context: Devvit.Context) { await context.redis.zAdd("fruits", {member: "kiwi", score: 0}, {member: "mango", score: 0}, {member: "banana", score: 0}, {member: "orange", score: 0}, {member: "apple", score: 0}, ); // Remove fruits alphabetically ordered between 'kiwi' inclusive and 'orange' exclusive // Note: The symbols '[' and '(' indicate inclusive or exclusive, respectively. These must be included in the call to zRemRangeByLex(). const numFieldsRemoved : number = await context.redis.zRemRangeByLex("fruits", "[kiwi", "(orange"); console.log("Number of fields removed: " + numFieldsRemoved); } `                    |
+| `zRemRangeByRank`  | (`key`: `string`, `start`: `number`, `stop`: `number`) => `Promise`\<`number`\>                                                                                                                      | Removes all elements in the sorted set stored at key with rank between start and stop. https://redis.io/commands/zremrangebyrank/ **`Arg`** key **`Arg`** start **`Arg`** stop **`Example`** `async function zRemRangeByRankExample(context: Devvit.Context) { await context.redis.zAdd("fruits", {member: "kiwi", score: 10}, {member: "mango", score: 20}, {member: "banana", score: 30}, {member: "orange", score: 40}, {member: "apple", score: 50}, ); // Remove fruits ranked 1 through 3 inclusive const numFieldsRemoved : number = await context.redis.zRemRangeByRank("fruits", 1, 3); console.log("Number of fields removed: " + numFieldsRemoved); }`                                                                                                                                                                                                                                      |
+| `zRemRangeByScore` | (`key`: `string`, `min`: `number`, `max`: `number`) => `Promise`\<`number`\>                                                                                                                         | Removes all elements in the sorted set stored at key with a score between min and max https://redis.io/commands/zremrangebyscore/ **`Arg`** key **`Arg`** min **`Arg`** max **`Example`** `ts async function zRemRangeByScoreExample(context: Devvit.Context) { await context.redis.zAdd("fruits", {member: "kiwi", score: 10}, {member: "mango", score: 20}, {member: "banana", score: 30}, {member: "orange", score: 40}, {member: "apple", score: 50}, ); // Remove fruits scored between 30 and 50 inclusive const numFieldsRemoved : number = await context.redis.zRemRangeByScore("fruits", 30, 50); console.log("Number of fields removed: " + numFieldsRemoved); } `                                                                                                                                                                                                                           |
+| `zScan`            | (`key`: `string`, `cursor`: `number`, `pattern?`: `string`, `count?`: `number`) => `Promise`\<`ZScanResponse`\>                                                                                      | Iterates elements of Sorted Set types and their associated scores. **`Arg`** key **`Arg`** cursor **`Arg`** pattern **`Arg`** count **`Example`** `ts async function zScanExample(context: Devvit.Context) { await context.redis.zAdd("fruits", {member: "kiwi", score: 0}, {member: "mango", score: 0}, {member: "banana", score: 0}, {member: "orange", score: 0}, {member: "apple", score: 0}, ); const zScanResponse = await context.redis.zScan("fruits", 0); console.log("zScanResponse: " + JSON.stringify(zScanResponse)); } `                                                                                                                                                                                                                                                                                                                                                                 |
+| `zScore`           | (`key`: `string`, `member`: `string`) => `Promise`\<`undefined` \| `number`\>                                                                                                                        | Returns the score of member in the sorted set at key. https://redis.io/commands/zscore/ **`Arg`** key **`Arg`** member **`Example`** `ts async function zScoreExample(context: Devvit.Context) { await context.redis.zAdd("leaderboard", {member: "louis", score: 37}, {member: "fernando", score: 10}, {member: "caesar", score: 20}, {member: "alexander", score: 25}, ); const score : number = await context.redis.zScore("leaderboard", "caesar"); console.log("Caesar's score: " + score); } `                                                                                                                                                                                                                                                                                                                                                                                                   |
 
 ---
 
 ### <a id="runjob" name="runjob"></a> RunJob
 
-Ƭ **RunJob**: (`job`: [`ScheduledJobOptions`](README.md#scheduledjoboptions) \| [`ScheduledCronJobOptions`](README.md#scheduledcronjoboptions)) => `Promise`\<`string`\>
+Ƭ **RunJob**\<`Data`\>: (`job`: [`ScheduledJobOptions`](README.md#scheduledjoboptions)\<`Data`\> \| [`ScheduledCronJobOptions`](README.md#scheduledcronjoboptions)\<`Data`\>) => `Promise`\<`string`\>
 
 Schedule a new job to run at a specific time or on a cron schedule
+
+#### Type parameters
+
+| Name   | Type                                                        |
+| :----- | :---------------------------------------------------------- |
+| `Data` | extends [`JSONObject`](README.md#jsonobject) \| `undefined` |
 
 #### Type declaration
 
@@ -1071,9 +1346,9 @@ Schedule a new job to run at a specific time or on a cron schedule
 
 ##### Parameters
 
-| Name  | Type                                                                                                                     | Description         |
-| :---- | :----------------------------------------------------------------------------------------------------------------------- | :------------------ |
-| `job` | [`ScheduledJobOptions`](README.md#scheduledjoboptions) \| [`ScheduledCronJobOptions`](README.md#scheduledcronjoboptions) | The job to schedule |
+| Name  | Type                                                                                                                                         | Description         |
+| :---- | :------------------------------------------------------------------------------------------------------------------------------------------- | :------------------ |
+| `job` | [`ScheduledJobOptions`](README.md#scheduledjoboptions)\<`Data`\> \| [`ScheduledCronJobOptions`](README.md#scheduledcronjoboptions)\<`Data`\> | The job to schedule |
 
 ##### Returns
 
@@ -1087,26 +1362,32 @@ Schedule a new job to run at a specific time or on a cron schedule
 
 #### Type declaration
 
-| Name   | Type                                    | Description                                                                   |
-| :----- | :-------------------------------------- | :---------------------------------------------------------------------------- |
-| `cron` | `string`                                | The cron string of when this job should run                                   |
-| `data` | [`Data`](README.md#data) \| `undefined` | Additional data passed in by the scheduler client                             |
-| `id`   | `string`                                | ID of the scheduled job. Use this with scheduler.cancelJob to cancel the job. |
-| `name` | `string`                                | The name of the scheduled job type                                            |
+| Name    | Type                                 | Description                                                                   |
+| :------ | :----------------------------------- | :---------------------------------------------------------------------------- |
+| `cron`  | `string`                             | The cron string of when this job should run                                   |
+| `data?` | [`JSONObject`](README.md#jsonobject) | Additional data passed in by the scheduler client                             |
+| `id`    | `string`                             | ID of the scheduled job. Use this with scheduler.cancelJob to cancel the job. |
+| `name`  | `string`                             | The name of the scheduled job type                                            |
 
 ---
 
 ### <a id="scheduledcronjoboptions" name="scheduledcronjoboptions"></a> ScheduledCronJobOptions
 
-Ƭ **ScheduledCronJobOptions**: `Object`
+Ƭ **ScheduledCronJobOptions**\<`T`\>: `Object`
+
+#### Type parameters
+
+| Name | Type                                                                                                              |
+| :--- | :---------------------------------------------------------------------------------------------------------------- |
+| `T`  | extends [`JSONObject`](README.md#jsonobject) \| `undefined` = [`JSONObject`](README.md#jsonobject) \| `undefined` |
 
 #### Type declaration
 
-| Name    | Type                     | Description                                       |
-| :------ | :----------------------- | :------------------------------------------------ |
-| `cron`  | `string`                 | The cron string of when this job should run       |
-| `data?` | [`Data`](README.md#data) | Additional data passed in by the scheduler client |
-| `name`  | `string`                 | The name of the scheduled job type                |
+| Name    | Type     | Description                                       |
+| :------ | :------- | :------------------------------------------------ |
+| `cron`  | `string` | The cron string of when this job should run       |
+| `data?` | `T`      | Additional data passed in by the scheduler client |
+| `name`  | `string` | The name of the scheduled job type                |
 
 ---
 
@@ -1116,31 +1397,43 @@ Schedule a new job to run at a specific time or on a cron schedule
 
 #### Type declaration
 
-| Name    | Type                                    | Description                                                                   |
-| :------ | :-------------------------------------- | :---------------------------------------------------------------------------- |
-| `data`  | [`Data`](README.md#data) \| `undefined` | Additional data passed in by the scheduler client                             |
-| `id`    | `string`                                | ID of the scheduled job. Use this with scheduler.cancelJob to cancel the job. |
-| `name`  | `string`                                | The name of the scheduled job type                                            |
-| `runAt` | `Date`                                  | The Date of when this job should run                                          |
+| Name    | Type                                                | Description                                                                   |
+| :------ | :-------------------------------------------------- | :---------------------------------------------------------------------------- |
+| `data`  | [`JSONObject`](README.md#jsonobject) \| `undefined` | Additional data passed in by the scheduler client                             |
+| `id`    | `string`                                            | ID of the scheduled job. Use this with scheduler.cancelJob to cancel the job. |
+| `name`  | `string`                                            | The name of the scheduled job type                                            |
+| `runAt` | `Date`                                              | The Date of when this job should run                                          |
 
 ---
 
 ### <a id="scheduledjobevent" name="scheduledjobevent"></a> ScheduledJobEvent
 
-Ƭ **ScheduledJobEvent**: `Object`
+Ƭ **ScheduledJobEvent**\<`T`\>: `Object`
+
+#### Type parameters
+
+| Name | Type                                                        |
+| :--- | :---------------------------------------------------------- |
+| `T`  | extends [`JSONObject`](README.md#jsonobject) \| `undefined` |
 
 #### Type declaration
 
-| Name    | Type                     | Description                                       |
-| :------ | :----------------------- | :------------------------------------------------ |
-| `data?` | [`Data`](README.md#data) | Additional data passed in by the scheduler client |
-| `name`  | `string`                 | The name of the scheduled job                     |
+| Name   | Type     | Description                                       |
+| :----- | :------- | :------------------------------------------------ |
+| `data` | `T`      | Additional data passed in by the scheduler client |
+| `name` | `string` | The name of the scheduled job                     |
 
 ---
 
 ### <a id="scheduledjobhandler" name="scheduledjobhandler"></a> ScheduledJobHandler
 
-Ƭ **ScheduledJobHandler**: (`event`: [`ScheduledJobEvent`](README.md#scheduledjobevent), `context`: [`Context`](modules/Devvit.md#context)) => `void` \| `Promise`\<`void`\>
+Ƭ **ScheduledJobHandler**\<`Data`\>: (`event`: [`ScheduledJobEvent`](README.md#scheduledjobevent)\<`Data`\>, `context`: [`JobContext`](README.md#jobcontext)) => `void` \| `Promise`\<`void`\>
+
+#### Type parameters
+
+| Name   | Type                                                                                                              |
+| :----- | :---------------------------------------------------------------------------------------------------------------- |
+| `Data` | extends [`JSONObject`](README.md#jsonobject) \| `undefined` = [`JSONObject`](README.md#jsonobject) \| `undefined` |
 
 #### Type declaration
 
@@ -1148,10 +1441,10 @@ Schedule a new job to run at a specific time or on a cron schedule
 
 ##### Parameters
 
-| Name      | Type                                               |
-| :-------- | :------------------------------------------------- |
-| `event`   | [`ScheduledJobEvent`](README.md#scheduledjobevent) |
-| `context` | [`Context`](modules/Devvit.md#context)             |
+| Name      | Type                                                         |
+| :-------- | :----------------------------------------------------------- |
+| `event`   | [`ScheduledJobEvent`](README.md#scheduledjobevent)\<`Data`\> |
+| `context` | [`JobContext`](README.md#jobcontext)                         |
 
 ##### Returns
 
@@ -1161,28 +1454,40 @@ Schedule a new job to run at a specific time or on a cron schedule
 
 ### <a id="scheduledjoboptions" name="scheduledjoboptions"></a> ScheduledJobOptions
 
-Ƭ **ScheduledJobOptions**: `Object`
+Ƭ **ScheduledJobOptions**\<`T`\>: `Object`
+
+#### Type parameters
+
+| Name | Type                                                                                                              |
+| :--- | :---------------------------------------------------------------------------------------------------------------- |
+| `T`  | extends [`JSONObject`](README.md#jsonobject) \| `undefined` = [`JSONObject`](README.md#jsonobject) \| `undefined` |
 
 #### Type declaration
 
-| Name    | Type                     | Description                                       |
-| :------ | :----------------------- | :------------------------------------------------ |
-| `data?` | [`Data`](README.md#data) | Additional data passed in by the scheduler client |
-| `name`  | `string`                 | The name of the scheduled job type                |
-| `runAt` | `Date`                   | The Date of when this job should run              |
+| Name    | Type     | Description                                       |
+| :------ | :------- | :------------------------------------------------ |
+| `data?` | `T`      | Additional data passed in by the scheduler client |
+| `name`  | `string` | The name of the scheduled job type                |
+| `runAt` | `Date`   | The Date of when this job should run              |
 
 ---
 
 ### <a id="scheduledjobtype" name="scheduledjobtype"></a> ScheduledJobType
 
-Ƭ **ScheduledJobType**: `Object`
+Ƭ **ScheduledJobType**\<`Data`\>: `Object`
+
+#### Type parameters
+
+| Name   | Type                                                        |
+| :----- | :---------------------------------------------------------- |
+| `Data` | extends [`JSONObject`](README.md#jsonobject) \| `undefined` |
 
 #### Type declaration
 
-| Name    | Type                                                   | Description                                                       |
-| :------ | :----------------------------------------------------- | :---------------------------------------------------------------- |
-| `name`  | `string`                                               | The name of the scheduled job type                                |
-| `onRun` | [`ScheduledJobHandler`](README.md#scheduledjobhandler) | The function that will be called when the job is scheduled to run |
+| Name    | Type                                                             | Description                                                       |
+| :------ | :--------------------------------------------------------------- | :---------------------------------------------------------------- |
+| `name`  | `string`                                                         | The name of the scheduled job type                                |
+| `onRun` | [`ScheduledJobHandler`](README.md#scheduledjobhandler)\<`Data`\> | The function that will be called when the job is scheduled to run |
 
 ---
 
@@ -1195,11 +1500,11 @@ You must have the `scheduler` enabled in `Devvit.configure` to use this client.
 
 #### Type declaration
 
-| Name        | Type                                                                                                                | Description                                                                                        |
-| :---------- | :------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------- |
-| `cancelJob` | [`CancelJob`](README.md#canceljob)                                                                                  | Cancel a scheduled job **`Param`** The id of the job to cancel                                     |
-| `listJobs`  | () => `Promise`\<([`ScheduledJob`](README.md#scheduledjob) \| [`ScheduledCronJob`](README.md#scheduledcronjob))[]\> | Gets the list of all scheduled jobs.                                                               |
-| `runJob`    | [`RunJob`](README.md#runjob)                                                                                        | Schedule a new job to run at a specific time or on a cron schedule **`Param`** The job to schedule |
+| Name        | Type                                                                                                                                                                                   | Description                                                        |
+| :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------- |
+| `cancelJob` | [`CancelJob`](README.md#canceljob)                                                                                                                                                     | Cancel a scheduled job **`Param`** The id of the job to cancel     |
+| `listJobs`  | () => `Promise`\<([`ScheduledJob`](README.md#scheduledjob) \| [`ScheduledCronJob`](README.md#scheduledcronjob))[]\>                                                                    | Gets the list of all scheduled jobs.                               |
+| `runJob`    | \<Data\>(`job`: [`ScheduledJobOptions`](README.md#scheduledjoboptions)\<`Data`\> \| [`ScheduledCronJobOptions`](README.md#scheduledcronjoboptions)\<`Data`\>) => `Promise`\<`string`\> | Schedule a new job to run at a specific time or on a cron schedule |
 
 ---
 
@@ -1217,11 +1522,11 @@ A dropdown field that allows users to pick from a list of options
 
 #### Type declaration
 
-| Name          | Type      |
-| :------------ | :-------- |
-| `expiration?` | `Date`    |
-| `nx?`         | `boolean` |
-| `xx?`         | `boolean` |
+| Name          | Type      | Description                                    |
+| :------------ | :-------- | :--------------------------------------------- |
+| `expiration?` | `Date`    | -                                              |
+| `nx?`         | `boolean` | Only set the key if it does not already exist. |
+| `xx?`         | `boolean` | Only set the key if it already exists.         |
 
 ---
 
@@ -1335,19 +1640,19 @@ A text field
 
 ### <a id="triggercontext" name="triggercontext"></a> TriggerContext
 
-Ƭ **TriggerContext**: `Omit`\<[`Context`](modules/Devvit.md#context), `"ui"`\>
+Ƭ **TriggerContext**: `Omit`\<[`Context`](modules/Devvit.md#context), `"ui"` \| `"dimensions"` \| `"modLog"` \| `"uiEnvironment"`\>
 
 ---
 
 ### <a id="triggerdefinition" name="triggerdefinition"></a> TriggerDefinition
 
-Ƭ **TriggerDefinition**: [`PostSubmitDefinition`](README.md#postsubmitdefinition) \| [`PostCreateDefinition`](README.md#postcreatedefinition) \| [`PostUpdateDefinition`](README.md#postupdatedefinition) \| [`PostFlairUpdateDefinition`](README.md#postflairupdatedefinition) \| [`PostReportDefinition`](README.md#postreportdefinition) \| [`PostDeleteDefinition`](README.md#postdeletedefinition) \| [`CommentSubmitDefinition`](README.md#commentsubmitdefinition) \| [`CommentCreateDefinition`](README.md#commentcreatedefinition) \| [`CommentUpdateDefinition`](README.md#commentupdatedefinition) \| [`CommentReportDefinition`](README.md#commentreportdefinition) \| [`CommentDeleteDefinition`](README.md#commentdeletedefinition) \| [`AppInstallDefinition`](README.md#appinstalldefinition) \| [`AppUpgradeDefinition`](README.md#appupgradedefinition) \| [`ModActionDefinition`](README.md#modactiondefinition) \| [`ModMailDefinition`](README.md#modmaildefinition)
+Ƭ **TriggerDefinition**: [`PostSubmitDefinition`](README.md#postsubmitdefinition) \| [`PostCreateDefinition`](README.md#postcreatedefinition) \| [`PostUpdateDefinition`](README.md#postupdatedefinition) \| [`PostFlairUpdateDefinition`](README.md#postflairupdatedefinition) \| [`PostReportDefinition`](README.md#postreportdefinition) \| [`PostDeleteDefinition`](README.md#postdeletedefinition) \| [`CommentSubmitDefinition`](README.md#commentsubmitdefinition) \| [`CommentCreateDefinition`](README.md#commentcreatedefinition) \| [`CommentUpdateDefinition`](README.md#commentupdatedefinition) \| [`CommentReportDefinition`](README.md#commentreportdefinition) \| [`CommentDeleteDefinition`](README.md#commentdeletedefinition) \| [`AppInstallDefinition`](README.md#appinstalldefinition) \| [`AppUpgradeDefinition`](README.md#appupgradedefinition) \| [`ModActionDefinition`](README.md#modactiondefinition) \| [`ModMailDefinition`](README.md#modmaildefinition) \| [`PostSpoilerUpdateDefinition`](README.md#postspoilerupdatedefinition) \| [`PostNsfwUpdateDefinition`](README.md#postnsfwupdatedefinition) \| [`OnAutomoderatorFilterPostDefinition`](README.md#onautomoderatorfilterpostdefinition) \| [`OnAutomoderatorFilterCommentDefinition`](README.md#onautomoderatorfiltercommentdefinition)
 
 ---
 
 ### <a id="triggerevent" name="triggerevent"></a> TriggerEvent
 
-Ƭ **TriggerEvent**: [`PostSubmit`](README.md#postsubmit) \| [`PostCreate`](README.md#postcreate) \| [`PostUpdate`](README.md#postupdate) \| [`PostReport`](README.md#postreport) \| [`PostDelete`](README.md#postdelete) \| [`PostFlairUpdate`](README.md#postflairupdate) \| [`CommentSubmit`](README.md#commentsubmit) \| [`CommentCreate`](README.md#commentcreate) \| [`CommentUpdate`](README.md#commentupdate) \| [`CommentReport`](README.md#commentreport) \| [`CommentDelete`](README.md#commentdelete) \| [`AppInstall`](README.md#appinstall) \| [`AppUpgrade`](README.md#appupgrade) \| [`ModActionTrigger`](README.md#modactiontrigger) \| [`ModMailTrigger`](README.md#modmailtrigger)
+Ƭ **TriggerEvent**: [`PostSubmit`](README.md#postsubmit) \| [`PostCreate`](README.md#postcreate) \| [`PostUpdate`](README.md#postupdate) \| [`PostReport`](README.md#postreport) \| [`PostDelete`](README.md#postdelete) \| [`PostFlairUpdate`](README.md#postflairupdate) \| [`CommentSubmit`](README.md#commentsubmit) \| [`CommentCreate`](README.md#commentcreate) \| [`CommentUpdate`](README.md#commentupdate) \| [`CommentReport`](README.md#commentreport) \| [`CommentDelete`](README.md#commentdelete) \| [`AppInstall`](README.md#appinstall) \| [`AppUpgrade`](README.md#appupgrade) \| [`ModActionTrigger`](README.md#modactiontrigger) \| [`ModMailTrigger`](README.md#modmailtrigger) \| [`PostNsfwUpdate`](README.md#postnsfwupdate) \| [`PostSpoilerUpdate`](README.md#postspoilerupdate) \| [`AutomoderatorFilterPost`](README.md#automoderatorfilterpost) \| [`AutomoderatorFilterComment`](README.md#automoderatorfiltercomment)
 
 ---
 
@@ -1359,23 +1664,27 @@ Maps a TriggerEvent to a Protobuf message and type.
 
 #### Type declaration
 
-| Name              | Type                                                        |
-| :---------------- | :---------------------------------------------------------- |
-| `AppInstall`      | \{ `type`: `"AppInstall"` } & `protos.AppInstall`           |
-| `AppUpgrade`      | \{ `type`: `"AppUpgrade"` } & `protos.AppUpgrade`           |
-| `CommentCreate`   | \{ `type`: `"CommentCreate"` } & `protos.CommentCreate`     |
-| `CommentDelete`   | \{ `type`: `"CommentDelete"` } & `protos.CommentDelete`     |
-| `CommentReport`   | \{ `type`: `"CommentReport"` } & `protos.CommentReport`     |
-| `CommentSubmit`   | \{ `type`: `"CommentSubmit"` } & `protos.CommentSubmit`     |
-| `CommentUpdate`   | \{ `type`: `"CommentUpdate"` } & `protos.CommentUpdate`     |
-| `ModAction`       | \{ `type`: `"ModAction"` } & `protos.ModAction`             |
-| `ModMail`         | \{ `type`: `"ModMail"` } & `protos.ModMail`                 |
-| `PostCreate`      | \{ `type`: `"PostCreate"` } & `protos.PostCreate`           |
-| `PostDelete`      | \{ `type`: `"PostDelete"` } & `protos.PostDelete`           |
-| `PostFlairUpdate` | \{ `type`: `"PostFlairUpdate"` } & `protos.PostFlairUpdate` |
-| `PostReport`      | \{ `type`: `"PostReport"` } & `protos.PostReport`           |
-| `PostSubmit`      | \{ `type`: `"PostSubmit"` } & `protos.PostSubmit`           |
-| `PostUpdate`      | \{ `type`: `"PostUpdate"` } & `protos.PostUpdate`           |
+| Name                         | Type                                                                              |
+| :--------------------------- | :-------------------------------------------------------------------------------- |
+| `AppInstall`                 | \{ `type`: `"AppInstall"` } & `protos.AppInstall`                                 |
+| `AppUpgrade`                 | \{ `type`: `"AppUpgrade"` } & `protos.AppUpgrade`                                 |
+| `AutomoderatorFilterComment` | \{ `type`: `"AutomoderatorFilterComment"` } & `protos.AutomoderatorFilterComment` |
+| `AutomoderatorFilterPost`    | \{ `type`: `"AutomoderatorFilterPost"` } & `protos.AutomoderatorFilterPost`       |
+| `CommentCreate`              | \{ `type`: `"CommentCreate"` } & `protos.CommentCreate`                           |
+| `CommentDelete`              | \{ `type`: `"CommentDelete"` } & `protos.CommentDelete`                           |
+| `CommentReport`              | \{ `type`: `"CommentReport"` } & `protos.CommentReport`                           |
+| `CommentSubmit`              | \{ `type`: `"CommentSubmit"` } & `protos.CommentSubmit`                           |
+| `CommentUpdate`              | \{ `type`: `"CommentUpdate"` } & `protos.CommentUpdate`                           |
+| `ModAction`                  | \{ `type`: `"ModAction"` } & `protos.ModAction`                                   |
+| `ModMail`                    | \{ `type`: `"ModMail"` } & `protos.ModMail`                                       |
+| `PostCreate`                 | \{ `type`: `"PostCreate"` } & `protos.PostCreate`                                 |
+| `PostDelete`                 | \{ `type`: `"PostDelete"` } & `protos.PostDelete`                                 |
+| `PostFlairUpdate`            | \{ `type`: `"PostFlairUpdate"` } & `protos.PostFlairUpdate`                       |
+| `PostNsfwUpdate`             | \{ `type`: `"PostNsfwUpdate"` } & `protos.PostNsfwUpdate`                         |
+| `PostReport`                 | \{ `type`: `"PostReport"` } & `protos.PostReport`                                 |
+| `PostSpoilerUpdate`          | \{ `type`: `"PostSpoilerUpdate"` } & `protos.PostSpoilerUpdate`                   |
+| `PostSubmit`                 | \{ `type`: `"PostSubmit"` } & `protos.PostSubmit`                                 |
+| `PostUpdate`                 | \{ `type`: `"PostUpdate"` } & `protos.PostUpdate`                                 |
 
 ---
 
@@ -1421,26 +1730,46 @@ Maps a TriggerEvent to a Protobuf message and type.
 | `expireTime`       | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
 | `get`              | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
 | `getRange`         | (`key`: `string`, `start`: `number`, `end`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                  |
+| `hDel`             | (`key`: `string`, `fields`: `string`[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                |
+| `hGet`             | (`key`: `string`, `field`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                   |
+| `hGetAll`          | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
+| `hIncrBy`          | (`key`: `string`, `field`: `string`, `value`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                |
+| `hKeys`            | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
+| `hLen`             | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
+| `hScan`            | (`key`: `string`, `cursor`: `number`, `pattern?`: `string`, `count?`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                        |
+| `hSet`             | (`key`: `string`, `fieldValues`: \{ `[field: string]`: `string`; }) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                    |
+| `hdel`             | (`key`: `string`, `fields`: `string`[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                |
 | `hget`             | (`key`: `string`, `field`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                   |
+| `hgetall`          | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
 | `hincrby`          | (`key`: `string`, `field`: `string`, `value`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                |
+| `hkeys`            | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
+| `hlen`             | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
+| `hscan`            | (`key`: `string`, `cursor`: `number`, `pattern?`: `string`, `count?`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                        |
 | `hset`             | (`key`: `string`, `fieldValues`: \{ `[field: string]`: `string`; }) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                    |
 | `incrBy`           | (`key`: `string`, `value`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                   |
+| `mGet`             | (`keys`: `string`[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                   |
+| `mSet`             | (`keyValues`: \{ `[key: string]`: `string`; }) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                         |
 | `mget`             | (`keys`: `string`[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                   |
 | `mset`             | (`keyValues`: \{ `[key: string]`: `string`; }) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                         |
 | `multi`            | () => `Promise`\<`void`\>                                                                                                                                                                       |
 | `set`              | (`key`: `string`, `value`: `string`, `options?`: [`SetOptions`](README.md#setoptions)) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                 |
 | `setRange`         | (`key`: `string`, `offset`: `number`, `value`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                               |
+| `strLen`           | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
 | `strlen`           | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
 | `type`             | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
 | `unwatch`          | () => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                                     |
 | `watch`            | (...`keys`: `string`[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                |
 | `zAdd`             | (`key`: `string`, ...`members`: [`ZMember`](README.md#zmember)[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                      |
 | `zCard`            | (`key`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                                      |
+| `zIncrBy`          | (`key`: `string`, `member`: `string`, `value`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                               |
 | `zRange`           | (`key`: `string`, `start`: `string` \| `number`, `stop`: `string` \| `number`, `options?`: [`ZRangeOptions`](README.md#zrangeoptions)) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\> |
+| `zRank`            | (`key`: `string`, `member`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                  |
 | `zRem`             | (`key`: `string`, `members`: `string`[]) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                               |
 | `zRemRangeByLex`   | (`key`: `string`, `min`: `string`, `max`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                    |
 | `zRemRangeByRank`  | (`key`: `string`, `start`: `number`, `stop`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                 |
 | `zRemRangeByScore` | (`key`: `string`, `min`: `number`, `max`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                    |
+| `zScan`            | (`key`: `string`, `cursor`: `number`, `pattern?`: `string`, `count?`: `number`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                        |
+| `zScore`           | (`key`: `string`, `member`: `string`) => `Promise`\<[`TxClientLike`](README.md#txclientlike)\>                                                                                                  |
 
 ---
 
@@ -1458,7 +1787,7 @@ event handlers, a Form's `onSubmit` handler, and Menu items.
 | Name         | Type                                                                                                                                                                                                                                  |
 | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `navigateTo` | (`url`: `string`) => `void`(`subreddit`: `Subreddit`) => `void`(`post`: `Post`) => `void`(`comment`: `Comment`) => `void`(`user`: `User`) => `void`(`urlOrThing`: `string` \| `Subreddit` \| `Post` \| `User` \| `Comment`) => `void` |
-| `showForm`   | (`formKey`: [`FormKey`](README.md#formkey), `data?`: [`Data`](README.md#data)) => `void`                                                                                                                                              |
+| `showForm`   | (`formKey`: [`FormKey`](README.md#formkey), `data?`: [`JSONObject`](README.md#jsonobject)) => `void`                                                                                                                                  |
 | `showToast`  | (`text`: `string`) => `void`(`toast`: [`Toast`](README.md#toast)) => `void`                                                                                                                                                           |
 
 ---
@@ -1469,53 +1798,91 @@ event handlers, a Form's `onSubmit` handler, and Menu items.
 
 #### Type declaration
 
-| Name   | Type     |
-| :----- | :------- |
-| `type` | `string` |
-| `url`  | `string` |
+| Name   | Type                              |
+| :----- | :-------------------------------- |
+| `type` | `"image"` \| `"gif"` \| `"video"` |
+| `url`  | `string`                          |
+
+---
+
+### <a id="useasyncresult" name="useasyncresult"></a> UseAsyncResult
+
+Ƭ **UseAsyncResult**\<`S`\>: `Object`
+
+#### Type parameters
+
+| Name |
+| :--- |
+| `S`  |
+
+#### Type declaration
+
+| Name      | Type                                           |
+| :-------- | :--------------------------------------------- |
+| `data`    | `S` \| `null`                                  |
+| `error`   | [`AsyncError`](README.md#asyncerror) \| `null` |
+| `loading` | `boolean`                                      |
 
 ---
 
 ### <a id="usechannelhook" name="usechannelhook"></a> UseChannelHook
 
-Ƭ **UseChannelHook**: (`options`: `ChannelOptions`) => [`UseChannelResult`](README.md#usechannelresult)
+Ƭ **UseChannelHook**\<`Message`\>: (`options`: `ChannelOptions`\<`Message`\>) => [`UseChannelResult`](README.md#usechannelresult)\<`Message`\>
+
+#### Type parameters
+
+| Name      | Type                                                                            |
+| :-------- | :------------------------------------------------------------------------------ |
+| `Message` | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
 
 #### Type declaration
 
-▸ (`options`): [`UseChannelResult`](README.md#usechannelresult)
+▸ (`options`): [`UseChannelResult`](README.md#usechannelresult)\<`Message`\>
 
 ##### Parameters
 
-| Name      | Type             |
-| :-------- | :--------------- |
-| `options` | `ChannelOptions` |
+| Name      | Type                          |
+| :-------- | :---------------------------- |
+| `options` | `ChannelOptions`\<`Message`\> |
 
 ##### Returns
 
-[`UseChannelResult`](README.md#usechannelresult)
+[`UseChannelResult`](README.md#usechannelresult)\<`Message`\>
 
 ---
 
 ### <a id="usechannelresult" name="usechannelresult"></a> UseChannelResult
 
-Ƭ **UseChannelResult**: `Object`
+Ƭ **UseChannelResult**\<`Message`\>: `Object`
+
+#### Type parameters
+
+| Name      | Type                                                                            |
+| :-------- | :------------------------------------------------------------------------------ |
+| `Message` | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
 
 #### Type declaration
 
-| Name          | Type                                                      | Description                      |
-| :------------ | :-------------------------------------------------------- | :------------------------------- |
-| `send`        | (`data`: [`Data`](README.md#data)) => `Promise`\<`void`\> | Publish a message to the channel |
-| `status`      | `ChannelStatus`                                           | Current subscription status      |
-| `subscribe`   | () => `void`                                              | Subscribe to the channel         |
-| `unsubscribe` | () => `void`                                              | Unsubscribe from the channel     |
+| Name          | Type                                      | Description                      |
+| :------------ | :---------------------------------------- | :------------------------------- |
+| `status`      | `ChannelStatus`                           | Current subscription status      |
+| `send`        | (`msg`: `Message`) => `Promise`\<`void`\> | Publish a message to the channel |
+| `subscribe`   | () => `void`                              | Subscribe to the channel         |
+| `unsubscribe` | () => `void`                              | Unsubscribe from the channel     |
 
 ---
 
 ### <a id="useformhook" name="useformhook"></a> UseFormHook
 
-Ƭ **UseFormHook**: (`form`: [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction), `onSubmit`: (`values`: [`FormValues`](README.md#formvalues)) => `void` \| `Promise`\<`void`\>) => [`FormKey`](README.md#formkey)
+Ƭ **UseFormHook**\<`T`\>: (`form`: `T`, `onSubmit`: (`values`: [`FormToFormValues`](README.md#formtoformvalues)\<`T`\>) => `void` \| `Promise`\<`void`\>) => [`FormKey`](README.md#formkey)
 
 A hook that returns a form key that can be used in the `ui.showForm`
+
+#### Type parameters
+
+| Name | Type                                                                                                                                                |
+| :--- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `T`  | extends [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction) = [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction) |
 
 #### Type declaration
 
@@ -1523,10 +1890,10 @@ A hook that returns a form key that can be used in the `ui.showForm`
 
 ##### Parameters
 
-| Name       | Type                                                                              |
-| :--------- | :-------------------------------------------------------------------------------- |
-| `form`     | [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction)              |
-| `onSubmit` | (`values`: [`FormValues`](README.md#formvalues)) => `void` \| `Promise`\<`void`\> |
+| Name       | Type                                                                                                 |
+| :--------- | :--------------------------------------------------------------------------------------------------- |
+| `form`     | `T`                                                                                                  |
+| `onSubmit` | (`values`: [`FormToFormValues`](README.md#formtoformvalues)\<`T`\>) => `void` \| `Promise`\<`void`\> |
 
 ##### Returns
 
@@ -1575,6 +1942,18 @@ An object that contains functions to start and stop the interval created by the 
 ### <a id="usestatehook" name="usestatehook"></a> UseStateHook
 
 Ƭ **UseStateHook**: [`Context`](README.md#context)[``"useState"``]
+
+---
+
+### <a id="usestateinitializer" name="usestateinitializer"></a> UseStateInitializer
+
+Ƭ **UseStateInitializer**\<`S`\>: `S` \| () => `S` \| [`AsyncUseStateInitializer`](README.md#asyncusestateinitializer)\<`S`\>
+
+#### Type parameters
+
+| Name |
+| :--- |
+| `S`  |
 
 ---
 
@@ -1669,16 +2048,16 @@ A tuple containing the current state and a function to update it
 
 #### Type declaration
 
-| Name       | Type                             |
-| :--------- | :------------------------------- |
-| `by`       | `"score"` \| `"lex"` \| `"rank"` |
-| `reverse?` | `boolean`                        |
+| Name       | Type                             | Description                                                                  |
+| :--------- | :------------------------------- | :--------------------------------------------------------------------------- |
+| `by`       | `"score"` \| `"lex"` \| `"rank"` | -                                                                            |
+| `reverse?` | `boolean`                        | Reverses the sorted set, with index 0 as the element with the highest score. |
 
 ## Variables
 
 ### <a id="all_icon_names" name="all_icon_names"></a> ALL_ICON_NAMES
 
-• `Const` **ALL_ICON_NAMES**: readonly [``"activity"``, ``"add-emoji"``, ``"add"``, ``"add-media"``, ``"add-to-feed"``, ``"admin"``, ``"align-center"``, ``"align-left"``, ``"align-right"``, ``"all"``, ``"appearance"``, ``"approve"``, ``"archived"``, ``"aspect-ratio"``, ``"aspect-rectangle"``, ``"attach"``, ``"audio"``, ``"author"``, ``"avatar-style"``, ``"award"``, ``"back"``, ``"ban"``, ``"best"``, ``"binoculars"``, ``"block"``, ``"blockchain"``, ``"bold"``, ``"bot"``, ``"boost"``, ``"bounce"``, ``"browse"``, ``"browser"``, ``"cake"``, ``"calendar"``, ``"camera"``, ``"caret-down"``, ``"caret-left"``, ``"caret-right"``, ``"caret-up"``, ``"chat"``, ``"chat-group"``, ``"chat-new"``, ``"checkbox-dismiss"``, ``"checkbox"``, ``"checkmark"``, ``"chrome"``, ``"clear"``, ``"close"``, ``"closed-captioning"``, ``"code-block"``, ``"code-inline"``, ``"coins-color-old"``, ``"coins-color"``, ``"coins"``, ``"collapse-left"``, ``"collapse-right"``, ``"collection"``, ``"comment"``, ``"comments"``, ``"community"``, ``"contest"``, ``"controversial"``, ``"crop"``, ``"crosspost"``, ``"crowd-control"``, ``"custom-feed"``, ``"customize"``, ``"day"``, ``"delete"``, ``"discover"``, ``"dismiss-all"``, ``"distinguish"``, ``"down-arrow"``, ``"down"``, ``"download"``, ``"downvote"``, ``"downvotes"``, ``"drag"``, ``"drugs"``, ``"duplicate"``, ``"edit"``, ``"effect"``, ``"embed"``, ``"emoji"``, ``"end-live-chat"``, ``"error"``, ``"expand-left"``, ``"expand-right"``, ``"external"``, ``"feed-video"``, ``"filter"``, ``"format"``, ``"forward"``, ``"gif-post"``, ``"heart"``, ``"help"``, ``"hide"``, ``"history"``, ``"home"``, ``"hot"``, ``"ignore-reports"``, ``"image-post"``, ``"inbox"``, ``"info"``, ``"invite"``, ``"italic"``, ``"join"``, ``"joined"``, ``"jump-down"``, ``"jump-up"``, ``"karma"``, ``"keyboard"``, ``"kick"``, ``"language"``, ``"leave"``, ``"left"``, ``"link"``, ``"link-post"``, ``"list-bulleted"``, ``"list-numbered"``, ``"live-chat"``, ``"live"``, ``"load"``, ``"location"``, ``"lock"``, ``"logout"``, ``"loop"``, ``"mark-read"``, ``"mask"``, ``"media-gallery"``, ``"meme"``, ``"menu"``, ``"message"``, ``"mic"``, ``"mic-mute"``, ``"mod"``, ``"mod-mail"``, ``"mod-mode"``, ``"mod-mute"``, ``"mod-overflow"``, ``"mod-queue"``, ``"mod-unmute"``, ``"music"``, ``"new"``, ``"night"``, ``"notification"``, ``"notification-frequent"``, ``"notification-off"``, ``"nsfw"``, ``"nsfw-language"``, ``"nsfw-violence"``, ``"original"``, ``"overflow-caret"``, ``"overflow-horizontal"``, ``"overflow-vertical"``, ``"pause"``, ``"payment"``, ``"peace"``, ``"pending-posts"``, ``"phone"``, ``"pin"``, ``"planet"``, ``"play"``, ``"poll-post"``, ``"popular"``, ``"posts"``, ``"powerup-color-outline"``, ``"powerup-fill-color"``, ``"powerup"``, ``"predictions"``, ``"premium"``, ``"privacy"``, ``"profile"``, ``"qa"``, ``"qr-code"``, ``"quarantined"``, ``"quote"``, ``"r-slash"``, ``"radio-button"``, ``"raise-hand"``, ``"random"``, ``"ratings-everyone"``, ``"ratings-mature"``, ``"ratings-nsfw"``, ``"ratings-violence"``, ``"refresh"``, ``"remove"``, ``"reply"``, ``"report"``, ``"reverse"``, ``"right"``, ``"rising"``, ``"rotate"``, ``"rotate-image"``, ``"rpan"``, ``"rules"``, ``"safari"``, ``"save"``, ``"saved"``, ``"search"``, ``"self"``, ``"send"``, ``"settings"``, ``"share-android"``, ``"share"``, ``"share-ios"``, ``"show"``, ``"side-menu"``, ``"skipback10"``, ``"skipforward10"``, ``"sort-az"``, ``"sort"``, ``"sort-price"``, ``"sort-za"``, ``"spam"``, ``"spoiler"``, ``"sponsored"``, ``"star"``, ``"statistics"``, ``"status-live"``, ``"sticker"``, ``"strikethrough"``, ``"subtract"``, ``"superscript"``, ``"swap-camera"``, ``"swipe-back"``, ``"swipe-down"``, ``"swipe"``, ``"swipe-up"``, ``"table"``, ``"tag"``, ``"tap"``, ``"telescope"``, ``"text"``, ``"text-post"``, ``"text-size"``, ``"toggle"``, ``"tools"``, ``"top"``, ``"topic-activism"``, ``"topic-addictionsupport"``, ``"topic-advice"``, ``"topic-animals"``, ``"topic-anime"``, ``"topic-art"``, ``"topic-beauty"``, ``"topic-business"``, ``"topic-careers"``, ``"topic-cars"``, ``"topic-celebrity"``, ``"topic-craftsdiy"``, ``"topic-crypto"``, ``"topic-culture"``, ``"topic-diy"``, ``"topic-entertainment"``, ``"topic-ethics"``, ``"topic-family"``, ``"topic-fashion"``, ``"topic"``, ``"topic-fitness"``, ``"topic-food"``, ``"topic-funny"``, ``"topic-gender"``, ``"topic-health"``, ``"topic-help"``, ``"topic-history"``, ``"topic-hobbies"``, ``"topic-homegarden"``, ``"topic-internet"``, ``"topic-law"``, ``"topic-learning"``, ``"topic-lifestyle"``, ``"topic-marketplace"``, ``"topic-mature"``, ``"topic-mensfashion"``, ``"topic-menshealth"``, ``"topic-meta"``, ``"topic-military"``, ``"topic-movies"``, ``"topic-music"``, ``"topic-news"``, ``"topic-other"``, ``"topic-outdoors"``, ``"topic-pets"``, ``"topic-photography"``, ``"topic-places"``, ``"topic-podcasts"``, ``"topic-politics"``, ``"topic-programming"``, ``"topic-reading"``, ``"topic-religion"``, ``"topic-science"``, ``"topic-sexorientation"``, ``"topic-sports"``, ``"topic-style"``, ``"topic-tabletop"``, ``"topic-technology"``, ``"topic-television"``, ``"topic-traumasupport"``, ``"topic-travel"``, ``"topic-videogaming"``, ``"topic-womensfashion"``, ``"topic-womenshealth"``, ``"translate"``, ``"trim"``, ``"u-slash"``, ``"unban"``, ``"undo"``, ``"unheart"``, ``"unlock"``, ``"unmod"``, ``"unpin"``, ``"unverified"``, ``"up-arrow"``, ``"up"``, ``"upload"``, ``"upvote"``, ``"upvotes"``, ``"user"``, ``"user-note"``, ``"users"``, ``"vault"``, ``"verified"``, ``"video-camera"``, ``"video-feed"``, ``"video-live-1"``, ``"video-live-fill-1"``, ``"video-live"``, ``"video-post"``, ``"video-thread"``, ``"video-transcription"``, ``"view-card"``, ``"view-classic"``, ``"view-compact"``, ``"view-grid"``, ``"views"``, ``"volume"``, ``"volume-mute"``, ``"wallet"``, ``"warning"``, ``"wiki-ban"``, ``"wiki"``, ``"wiki-unban"``, ``"world"``]
+• `Const` **ALL_ICON_NAMES**: readonly [``"3rd-party"``, ``"activity"``, ``"add-emoji"``, ``"add"``, ``"add-media"``, ``"add-to-feed"``, ``"admin"``, ``"ads"``, ``"ai"``, ``"align-center"``, ``"align-left"``, ``"align-right"``, ``"all"``, ``"ama"``, ``"appearance"``, ``"approve"``, ``"archived"``, ``"aspect-ratio"``, ``"aspect-rectangle"``, ``"attach"``, ``"audience"``, ``"audio"``, ``"author"``, ``"automod"``, ``"avatar-style"``, ``"award"``, ``"back"``, ``"backup"``, ``"ban"``, ``"best"``, ``"block"``, ``"blockchain"``, ``"bold"``, ``"boost"``, ``"bot"``, ``"bounce"``, ``"brand-awareness"``, ``"browse"``, ``"browser"``, ``"cake"``, ``"calendar"``, ``"camera"``, ``"campaign"``, ``"caret-down"``, ``"caret-left"``, ``"caret-right"``, ``"caret-up"``, ``"chat"``, ``"chat-group"``, ``"chat-new"``, ``"chat-private"``, ``"checkbox-dismiss"``, ``"checkbox"``, ``"checkmark"``, ``"chrome"``, ``"clear"``, ``"client-list"``, ``"close"``, ``"closed-captioning"``, ``"code-block"``, ``"code-inline"``, ``"coins-color-old"``, ``"coins"``, ``"collapse-left"``, ``"collapse-right"``, ``"collectible-expressions"``, ``"collection"``, ``"comment"``, ``"comments"``, ``"communities"``, ``"community"``, ``"confidence"``, ``"contest"``, ``"controversial"``, ``"conversion"``, ``"copy-clipboard"``, ``"crop"``, ``"crosspost"``, ``"crowd-control"``, ``"custom-feed"``, ``"customize"``, ``"dashboard"``, ``"day"``, ``"delete-column"``, ``"delete"``, ``"delete-row"``, ``"devvit"``, ``"discover"``, ``"dismiss-all"``, ``"distinguish"``, ``"down-arrow"``, ``"down"``, ``"download"``, ``"downvote"``, ``"downvotes"``, ``"drag"``, ``"drugs"``, ``"duplicate"``, ``"edit"``, ``"effect"``, ``"embed"``, ``"emoji"``, ``"end-live-chat"``, ``"error"``, ``"expand-left"``, ``"expand-right"``, ``"external"``, ``"feed-video"``, ``"filter"``, ``"format"``, ``"forward"``, ``"funnel"``, ``"gif-post"``, ``"gold"``, ``"hashtag"``, ``"heart"``, ``"help"``, ``"hide"``, ``"history"``, ``"home"``, ``"hot"``, ``"ignore-reports"``, ``"image-post"``, ``"inbox"``, ``"info"``, ``"insert-column-left"``, ``"insert-column-right"``, ``"insert-row-above"``, ``"insert-row-below"``, ``"internet"``, ``"invite"``, ``"italic"``, ``"join"``, ``"joined"``, ``"jump-down"``, ``"jump-up"``, ``"karma"``, ``"keyboard"``, ``"kick"``, ``"language"``, ``"leave"``, ``"left"``, ``"link"``, ``"link-post"``, ``"list-bulleted"``, ``"list-numbered"``, ``"live-chat"``, ``"live"``, ``"load"``, ``"location"``, ``"lock"``, ``"logout"``, ``"loop"``, ``"macro"``, ``"mark-read"``, ``"marketplace"``, ``"mask"``, ``"media-gallery"``, ``"meme"``, ``"menu"``, ``"message"``, ``"mic"``, ``"mic-mute"``, ``"mod"``, ``"mod-mail"``, ``"mod-mode"``, ``"mod-mute"``, ``"mod-overflow"``, ``"mod-queue"``, ``"mod-unmute"``, ``"music"``, ``"mute"``, ``"new"``, ``"night"``, ``"no-internet"``, ``"notification"``, ``"notification-frequent"``, ``"notification-off"``, ``"nsfw"``, ``"nsfw-language"``, ``"nsfw-violence"``, ``"official"``, ``"original"``, ``"overflow-caret"``, ``"overflow-horizontal"``, ``"overflow-vertical"``, ``"pause"``, ``"payment"``, ``"peace"``, ``"pending-posts"``, ``"phone"``, ``"pin"``, ``"play"``, ``"poll-post"``, ``"popular"``, ``"posts"``, ``"powerup"``, ``"predictions"``, ``"premium"``, ``"privacy"``, ``"profile"``, ``"qa"``, ``"qr-code"``, ``"quarantined"``, ``"quote"``, ``"r-slash"``, ``"radar"``, ``"radio-button"``, ``"raise-hand"``, ``"random"``, ``"ratings-everyone"``, ``"ratings-mature"``, ``"ratings-nsfw"``, ``"ratings-violence"``, ``"recovery-phrase"``, ``"refresh"``, ``"removal-reasons"``, ``"remove"``, ``"reply"``, ``"report"``, ``"reverse"``, ``"rich-text"``, ``"right"``, ``"rising"``, ``"rotate"``, ``"rotate-image"``, ``"rpan"``, ``"rules"``, ``"safari"``, ``"save"``, ``"save-view"``, ``"saved"``, ``"saved-response"``, ``"search"``, ``"self"``, ``"send"``, ``"settings"``, ``"severity"``, ``"share"``, ``"share-new"``, ``"show"``, ``"side-menu"``, ``"skipback10"``, ``"skipforward10"``, ``"sort-az"``, ``"sort"``, ``"sort-price"``, ``"sort-za"``, ``"spam"``, ``"spoiler"``, ``"sponsored"``, ``"spreadsheet"``, ``"star"``, ``"statistics"``, ``"status-live"``, ``"sticker"``, ``"strikethrough"``, ``"subtract"``, ``"superscript"``, ``"swap-camera"``, ``"swipe-back"``, ``"swipe-down"``, ``"swipe"``, ``"swipe-up"``, ``"table"``, ``"tag"``, ``"tap"``, ``"text"``, ``"text-post"``, ``"text-size"``, ``"toggle"``, ``"tools"``, ``"top"``, ``"topic-activism"``, ``"topic-addictionsupport"``, ``"topic-advice"``, ``"topic-animals"``, ``"topic-anime"``, ``"topic-art"``, ``"topic-beauty"``, ``"topic-business"``, ``"topic-careers"``, ``"topic-cars"``, ``"topic-celebrity"``, ``"topic-craftsdiy"``, ``"topic-crypto"``, ``"topic-culture"``, ``"topic-diy"``, ``"topic-entertainment"``, ``"topic-ethics"``, ``"topic-family"``, ``"topic-fashion"``, ``"topic"``, ``"topic-fitness"``, ``"topic-food"``, ``"topic-funny"``, ``"topic-gender"``, ``"topic-health"``, ``"topic-help"``, ``"topic-history"``, ``"topic-hobbies"``, ``"topic-homegarden"``, ``"topic-internet"``, ``"topic-law"``, ``"topic-learning"``, ``"topic-lifestyle"``, ``"topic-marketplace"``, ``"topic-mature"``, ``"topic-mensfashion"``, ``"topic-menshealth"``, ``"topic-meta"``, ``"topic-military"``, ``"topic-movies"``, ``"topic-music"``, ``"topic-news"``, ``"topic-other"``, ``"topic-outdoors"``, ``"topic-pets"``, ``"topic-photography"``, ``"topic-places"``, ``"topic-podcasts"``, ``"topic-politics"``, ``"topic-programming"``, ``"topic-reading"``, ``"topic-religion"``, ``"topic-science"``, ``"topic-sexorientation"``, ``"topic-sports"``, ``"topic-style"``, ``"topic-tabletop"``, ``"topic-technology"``, ``"topic-television"``, ``"topic-traumasupport"``, ``"topic-travel"``, ``"topic-videogaming"``, ``"topic-womensfashion"``, ``"topic-womenshealth"``, ``"translate"``, ``"translation-off"``, ``"trim"``, ``"u-slash"``, ``"unban"``, ``"undo"``, ``"unheart"``, ``"unlock"``, ``"unmod"``, ``"unpin"``, ``"unstar"``, ``"unverified"``, ``"up-arrow"``, ``"up"``, ``"upload"``, ``"upvote"``, ``"upvotes"``, ``"user"``, ``"user-note"``, ``"users"``, ``"vault"``, ``"verified"``, ``"video-camera"``, ``"video-feed"``, ``"video-post"``, ``"video-thread"``, ``"video-transcription"``, ``"view-card"``, ``"view-classic"``, ``"view-compact"``, ``"view-grid"``, ``"view-sort"``, ``"views"``, ``"volume"``, ``"wallet"``, ``"warning"``, ``"webhook"``, ``"whale"``, ``"wiki-ban"``, ``"wiki"``, ``"wiki-unban"``, ``"world"``, ``"coins-color"``, ``"powerup-color"``, ``"powerup-fill-color"``, ``"share-android"``, ``"share-ios"``, ``"video-live-1"``, ``"video-live-fill-1"``, ``"video-live"``, ``"volume-mute"``, ``"binoculars"``, ``"caret-updown"``, ``"planet"``, ``"telescope"``]
 
 ## Functions
 
@@ -1704,17 +2083,164 @@ A helper to allow SVG functionality within image tags.
 ```ts
 import { Devvit, svg } from '@devvit/public-api';
 const App = () => {
-  const color = 'gold';
-  return (
-    <hstack>
-      <image
-        url={svg`<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+    const color = 'gold'
+    return (
+       <hstack>
+         <image
+           url={svg`<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
                      <circle fill="${color}" cx="5" cy="5" r="4" />
                    </svg>`}
-        imageHeight={100}
-        imageWidth={100}
-      />
-    </hstack>
-  );
-};
+           imageHeight={100}
+           imageWidth={100}
+         />
+       </hstack>
+    )
+}
 ```
+
+---
+
+### <a id="useasync" name="useasync"></a> useAsync
+
+▸ **useAsync**\<`S`\>(`initializer`, `options?`): [`UseAsyncResult`](README.md#useasyncresult)\<`S`\>
+
+This is the preferred way to handle async state in Devvit.
+
+#### Type parameters
+
+| Name | Type                                       |
+| :--- | :----------------------------------------- |
+| `S`  | extends [`JSONValue`](README.md#jsonvalue) |
+
+#### Parameters
+
+| Name          | Type                                                                    | Description                                 |
+| :------------ | :---------------------------------------------------------------------- | :------------------------------------------ |
+| `initializer` | [`AsyncUseStateInitializer`](README.md#asyncusestateinitializer)\<`S`\> | any async function that returns a JSONValue |
+| `options`     | `AsyncOptions`                                                          | -                                           |
+
+#### Returns
+
+[`UseAsyncResult`](README.md#useasyncresult)\<`S`\>
+
+UseAsyncResult<S>
+
+---
+
+### <a id="usechannel" name="usechannel"></a> useChannel
+
+▸ **useChannel**\<`Message`\>(`opts`): [`UseChannelResult`](README.md#usechannelresult)\<`Message`\>
+
+#### Type parameters
+
+| Name      | Type                                       |
+| :-------- | :----------------------------------------- |
+| `Message` | extends [`JSONValue`](README.md#jsonvalue) |
+
+#### Parameters
+
+| Name   | Type                                        |
+| :----- | :------------------------------------------ |
+| `opts` | `Readonly`\<`ChannelOptions`\<`Message`\>\> |
+
+#### Returns
+
+[`UseChannelResult`](README.md#usechannelresult)\<`Message`\>
+
+---
+
+### <a id="useform" name="useform"></a> useForm
+
+▸ **useForm**\<`T`\>(`form`, `onSubmit`): [`FormKey`](README.md#formkey)
+
+#### Type parameters
+
+| Name | Type                                                                         |
+| :--- | :--------------------------------------------------------------------------- |
+| `T`  | extends [`Form`](README.md#form) \| [`FormFunction`](README.md#formfunction) |
+
+#### Parameters
+
+| Name       | Type                                                                                                 |
+| :--------- | :--------------------------------------------------------------------------------------------------- |
+| `form`     | `T`                                                                                                  |
+| `onSubmit` | (`values`: [`FormToFormValues`](README.md#formtoformvalues)\<`T`\>) => `void` \| `Promise`\<`void`\> |
+
+#### Returns
+
+[`FormKey`](README.md#formkey)
+
+---
+
+### <a id="useinterval" name="useinterval"></a> useInterval
+
+▸ **useInterval**(`callback`, `requestedDelayMs`): [`UseIntervalResult`](README.md#useintervalresult)
+
+#### Parameters
+
+| Name               | Type                                |
+| :----------------- | :---------------------------------- |
+| `callback`         | () => `void` \| `Promise`\<`void`\> |
+| `requestedDelayMs` | `number`                            |
+
+#### Returns
+
+[`UseIntervalResult`](README.md#useintervalresult)
+
+---
+
+### <a id="usestate" name="usestate"></a> useState
+
+▸ **useState**(`initialState`): [`UseStateResult`](README.md#usestateresult)\<`boolean`\>
+
+#### Parameters
+
+| Name           | Type                                                                |
+| :------------- | :------------------------------------------------------------------ |
+| `initialState` | [`UseStateInitializer`](README.md#usestateinitializer)\<`boolean`\> |
+
+#### Returns
+
+[`UseStateResult`](README.md#usestateresult)\<`boolean`\>
+
+▸ **useState**(`initialState`): [`UseStateResult`](README.md#usestateresult)\<`number`\>
+
+#### Parameters
+
+| Name           | Type                                                               |
+| :------------- | :----------------------------------------------------------------- |
+| `initialState` | [`UseStateInitializer`](README.md#usestateinitializer)\<`number`\> |
+
+#### Returns
+
+[`UseStateResult`](README.md#usestateresult)\<`number`\>
+
+▸ **useState**(`initialState`): [`UseStateResult`](README.md#usestateresult)\<`string`\>
+
+#### Parameters
+
+| Name           | Type                                                               |
+| :------------- | :----------------------------------------------------------------- |
+| `initialState` | [`UseStateInitializer`](README.md#usestateinitializer)\<`string`\> |
+
+#### Returns
+
+[`UseStateResult`](README.md#usestateresult)\<`string`\>
+
+▸ **useState**\<`S`\>(`initialState`): [`UseStateResult`](README.md#usestateresult)\<`S`\>
+
+#### Type parameters
+
+| Name | Type                                       |
+| :--- | :----------------------------------------- |
+| `S`  | extends [`JSONValue`](README.md#jsonvalue) |
+
+#### Parameters
+
+| Name           | Type                                                          |
+| :------------- | :------------------------------------------------------------ |
+| `initialState` | [`UseStateInitializer`](README.md#usestateinitializer)\<`S`\> |
+
+#### Returns
+
+[`UseStateResult`](README.md#usestateresult)\<`S`\>
