@@ -219,7 +219,7 @@ const selectDictionaryForm = Devvit.createForm(
             { label: 'main', value: 'main' },
             { label: 'r/piercing', value: 'r/piercing' }, //hardcoding for r/piercing dictionary takeover 9/26/24
             { label: 'r/NintendoSwitch', value: 'r/NintendoSwitch' }, //hardcoding for r/NintendoSwitch dictionary takeover 10/10/24
-            { label: 'halloween', value: 'Halloween' },
+            { label: 'Halloween', value: 'Halloween' },
           ],
           defaultValue: ['main'],
         },

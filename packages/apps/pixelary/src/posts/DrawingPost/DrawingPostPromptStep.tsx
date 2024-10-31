@@ -120,7 +120,9 @@ export const DrawingPostPromptStep = (
     <vstack height="100%" width="100%" alignment="center">
       <spacer height="24px" />
       {dictionaryName && dictionaryName !== 'main' && (
-        <PixelText color={Settings.theme.secondary}>{`${dictionaryName} takeover`}</PixelText>
+        <PixelText
+          color={Settings.theme.secondary}
+        >{`${dictionaryName} ${dictionaryName.startsWith('r/') ? 'takeover' : 'event'}`}</PixelText>
       )}
       <spacer grow />
 

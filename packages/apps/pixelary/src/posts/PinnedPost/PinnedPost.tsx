@@ -93,7 +93,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
           <PixelText
             color={Settings.theme.secondary}
             scale={2}
-          >{`${dictionary?.name} takeover`}</PixelText>
+          >{`${dictionary?.name} ${dictionary?.name.startsWith('r/') ? 'takeover' : 'event'}`}</PixelText>
         </>
       ) : null}
 
