@@ -12,8 +12,8 @@ Before upgrading `@devvit/public-api` in your project, always update the CLI fir
 
 This release also includes a few API updates:
 
-- [setCustomPostPreview](./api/redditapi/classes/models.Post.md/#setcustompostpreview) lets you update and [customize the post preview](./experiences.md#customize-the-post-preview) with real content in the loading screen after the post has been created.
-- [setSuggestedCommentSort](./api/redditapi/classes/models.Post.md/#setsuggestedcommentsort) provides options for sorting comments on a post.
+- [setCustomPostPreview](./api/redditapi/classes/models.Post.md#setcustompostpreview) lets you update and [customize the post preview](./experiences.md#customize-the-post-preview) with real content in the loading screen after the post has been created.
+- [setSuggestedCommentSort](./api/redditapi/classes/models.Post.md#setsuggestedcommentsort) provides options for sorting comments on a post.
 - `forUserType: member’` has been removed from menu items. If you want a menu action to be visible to all users, omit the `forUserType` field.
 
 ## Devvit 0.11.1: New automod filter trigger, playtest connect, and other improvements
