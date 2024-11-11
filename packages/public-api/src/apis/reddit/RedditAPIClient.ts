@@ -118,6 +118,7 @@ export type MuteUserOptions = {
 export class RedditAPIClient {
   readonly #metadata: Metadata;
   readonly #modMailService: ModMailService;
+  #currentUser: Promise<User | undefined> | undefined;
 
   constructor(metadata: Metadata) {
     this.#metadata = metadata;
@@ -350,8 +351,9 @@ export class RedditAPIClient {
    * const user = await reddit.getCurrentUser();
    * ```
    */
-  getCurrentUser(): Promise<User | undefined> {
-    return User.getFromMetadata(Header.User, this.#metadata);
+  async getCurrentUser(): Promise<User | undefined> {
+    this.#currentUser ??= User.getFromMetadata(Header.User, this.#metadata);
+    return this.#currentUser;
   }
 
   /**

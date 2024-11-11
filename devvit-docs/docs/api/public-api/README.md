@@ -1786,7 +1786,7 @@ event handlers, a Form's `onSubmit` handler, and Menu items.
 
 | Name         | Type                                                                                                                                                                                                                                  |
 | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `navigateTo` | (`url`: `string`) => `void`(`subreddit`: `Subreddit`) => `void`(`post`: `Post`) => `void`(`comment`: `Comment`) => `void`(`user`: `User`) => `void`(`urlOrThing`: `string` \| `Subreddit` \| `Post` \| `User` \| `Comment`) => `void` |
+| `navigateTo` | (`url`: `string`) => `void`(`subreddit`: `Subreddit`) => `void`(`post`: `Post`) => `void`(`comment`: `Comment`) => `void`(`user`: `User`) => `void`(`urlOrThing`: `string` \| `User` \| `Subreddit` \| `Post` \| `Comment`) => `void` |
 | `showForm`   | (`formKey`: [`FormKey`](README.md#formkey), `data?`: [`JSONObject`](README.md#jsonobject)) => `void`                                                                                                                                  |
 | `showToast`  | (`text`: `string`) => `void`(`toast`: [`Toast`](README.md#toast)) => `void`                                                                                                                                                           |
 

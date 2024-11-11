@@ -197,9 +197,9 @@ Add a mod note.
 
 #### Parameters
 
-| Name      | Type                                                                                                                                                                                                                                                      | Description             |
-| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
-| `options` | `Prettify`\<`PostNotesRequest` & \{ `label?`: `"BOT_BAN"` \| `"PERMA_BAN"` \| `"BAN"` \| `"ABUSE_WARNING"` \| `"SPAM_WARNING"` \| `"SPAM_WATCH"` \| `"SOLID_CONTRIBUTOR"` \| `"HELPFUL_USER"` ; `redditId?`: \`t1\_$\{string}\` \| \`t3\_$\{string}\` }\> | Options for the request |
+| Name      | Type                                                                                                                                                            | Description             |
+| :-------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
+| `options` | `Prettify`\<`PostNotesRequest` & \{ `label?`: [`UserNoteLabel`](../modules/models.md#usernotelabel) ; `redditId?`: \`t1\_$\{string}\` \| \`t3\_$\{string}\` }\> | Options for the request |
 
 #### Returns
 
@@ -901,9 +901,9 @@ Get a list of mod notes related to a user in a subreddit.
 
 #### Parameters
 
-| Name      | Type                                                                                                                                                                                                                                                                                                                                      | Description             |
-| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
-| `options` | `Prettify`\<`Pick`\<`GetNotesRequest`, `"subreddit"` \| `"user"`\> & \{ `filter?`: `"BAN"` \| `"NOTE"` \| `"APPROVAL"` \| `"REMOVAL"` \| `"MUTE"` \| `"INVITE"` \| `"SPAM"` \| `"CONTENT_CHANGE"` \| `"MOD_ACTION"` \| `"ALL"` } & `Pick`\<[`ListingFetchOptions`](../modules/models.md#listingfetchoptions), `"before"` \| `"limit"`\>\> | Options for the request |
+| Name      | Type                                                                                                                                                                                                                                            | Description             |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------- |
+| `options` | `Prettify`\<`Pick`\<`GetNotesRequest`, `"subreddit"` \| `"user"`\> & \{ `filter?`: [`ModNoteType`](../modules/models.md#modnotetype) } & `Pick`\<[`ListingFetchOptions`](../modules/models.md#listingfetchoptions), `"before"` \| `"limit"`\>\> | Options for the request |
 
 #### Returns
 

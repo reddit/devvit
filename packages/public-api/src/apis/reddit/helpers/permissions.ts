@@ -1,6 +1,6 @@
 import type { ModeratorPermission } from '../models/User.js';
 
-export const MODERATOR_PERMISSIONS = [
+export const MODERATOR_PERMISSIONS: ModeratorPermission[] = [
   'all',
   'wiki',
   'posts',
@@ -26,6 +26,6 @@ export function formatModeratorPermissions(permissions: string[]): string {
 
 export function validModPermissions(permissions: string[]): ModeratorPermission[] {
   return permissions.filter((permission) =>
-    MODERATOR_PERMISSIONS.includes(permission)
+    MODERATOR_PERMISSIONS.includes(permission as ModeratorPermission)
   ) as ModeratorPermission[];
 }
