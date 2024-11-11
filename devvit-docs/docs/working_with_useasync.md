@@ -55,7 +55,7 @@ const { data, loading, error } = useAsync(asyncFunction, { depends: {JSON object
 ### Return values
 
 - data: the data returned from the initializer.
-- loading: aA boolean that denotes if it is loading or not.
+- loading: a boolean that denotes if it is loading or not.
 - error: an error if the request failed.
 
 **The initializer for `useAsync` (the first argument of the function) must return a valid JSON value.** This differs from React due to how Devvit components work across server and client boundaries.
