@@ -352,6 +352,28 @@ export type SecureMedia = {
   redditVideo?: RedditVideo;
 };
 
+/**
+ * Contains data about a post's thumbnail. Also contains a blurred version if the thumbnail is NSFW.
+ */
+export type EnrichedThumbnail = {
+  /** Attribution text for the thumbnail */
+  attribution?: string;
+  /** The image used for the thumbnail. May have different resolution from Post.thumbnail */
+  image: {
+    url: string;
+    height: number;
+    width: number;
+  };
+  /** Whether this thumbnail appears blurred by default */
+  isObfuscatedDefault: boolean;
+  /** The blurred image for NSFW thumbnails */
+  obfuscatedImage?: {
+    url: string;
+    height: number;
+    width: number;
+  };
+};
+
 export class Post {
   #id: T3ID;
   #authorId?: T2ID;
@@ -999,6 +1021,24 @@ export class Post {
    */
   addRemovalNote(options: { reasonId: string; modNote?: string }): Promise<void> {
     return ModNote.addRemovalNote({ itemIds: [this.#id], ...options }, this.#metadata);
+  }
+
+  /**
+   * Get a thumbnail that contains a preview image and also contains a blurred preview for
+   * NSFW images. The thumbnail returned has higher resolution than Post.thumbnail.
+   * Returns undefined if the post doesn't have a thumbnail
+   *
+   * @returns {EnrichedThumbnail | undefined}
+   * @throws {Error} Throws an error if the thumbnail could not be fetched
+   * @example
+   * ```ts
+   * // from a menu action, form, scheduler, trigger, custom post click event, etc
+   * const post = await context.reddit.getPostById(context.postId);
+   * const enrichedThumbnail = await post.getEnrichedThumbnail();
+   * ```
+   */
+  async getEnrichedThumbnail(): Promise<EnrichedThumbnail | undefined> {
+    return getThumbnailV2({ id: this.id }, this.#metadata);
   }
 
   // TODO: flair methods
@@ -1705,5 +1745,47 @@ function listingProtosToPosts(
     children,
     before: listingProto.data.before,
     after: listingProto.data.after,
+  };
+}
+
+/** @internal */
+async function getThumbnailV2(
+  options: { id: T3ID },
+  metadata: Metadata | undefined
+): Promise<EnrichedThumbnail | undefined> {
+  const operationName = 'GetThumbnailV2';
+  const persistedQueryHash = '81580ce4e23d748c5a59a1618489b559bf4518b6a73af41f345d8d074c8b2ce9';
+  const response = await GraphQL.query(
+    operationName,
+    persistedQueryHash,
+    {
+      id: options.id,
+    },
+    metadata
+  );
+
+  const thumbnail = response.data?.postInfoById?.thumbnailV2;
+
+  if (!thumbnail) {
+    throw new Error('Failed to get thumbnail');
+  } else if (!thumbnail.image) {
+    return undefined;
+  }
+
+  return {
+    attribution: thumbnail.attribution,
+    image: {
+      url: thumbnail.image.url,
+      width: thumbnail.image.dimensions.width,
+      height: thumbnail.image.dimensions.height,
+    },
+    isObfuscatedDefault: thumbnail.isObfuscatedDefault,
+    ...(thumbnail.obfuscatedImage && {
+      obfuscatedImage: {
+        url: thumbnail.obfuscatedImage.url,
+        width: thumbnail.obfuscatedImage.dimensions.width,
+        height: thumbnail.obfuscatedImage.dimensions.height,
+      },
+    }),
   };
 }

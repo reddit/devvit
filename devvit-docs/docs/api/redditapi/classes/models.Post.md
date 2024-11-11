@@ -55,6 +55,7 @@
 - [distinguishAsAdmin](models.Post.md#distinguishasadmin)
 - [edit](models.Post.md#edit)
 - [getAuthor](models.Post.md#getauthor)
+- [getEnrichedThumbnail](models.Post.md#getenrichedthumbnail)
 - [hide](models.Post.md#hide)
 - [ignoreReports](models.Post.md#ignorereports)
 - [isApproved](models.Post.md#isapproved)
@@ -589,6 +590,32 @@ Add a mod note for why the post was removed
 #### Returns
 
 `Promise`\<`undefined` \| [`User`](models.User.md)\>
+
+---
+
+### <a id="getenrichedthumbnail" name="getenrichedthumbnail"></a> getEnrichedThumbnail
+
+▸ **getEnrichedThumbnail**(): `Promise`\<`undefined` \| [`EnrichedThumbnail`](../modules/models.md#enrichedthumbnail)\>
+
+Get a thumbnail that contains a preview image and also contains a blurred preview for
+NSFW images. The thumbnail returned has higher resolution than Post.thumbnail.
+Returns undefined if the post doesn't have a thumbnail
+
+#### Returns
+
+`Promise`\<`undefined` \| [`EnrichedThumbnail`](../modules/models.md#enrichedthumbnail)\>
+
+**`Throws`**
+
+Throws an error if the thumbnail could not be fetched
+
+**`Example`**
+
+```ts
+// from a menu action, form, scheduler, trigger, custom post click event, etc
+const post = await context.reddit.getPostById(context.postId);
+const enrichedThumbnail = await post.getEnrichedThumbnail();
+```
 
 ---
 
