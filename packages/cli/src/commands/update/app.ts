@@ -3,6 +3,7 @@ import fsp, { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
+import { isDevvitDependency } from '@devvit/shared-types/isDevvitDependency.js';
 import { ux } from '@oclif/core';
 import type { Tree } from '@oclif/core/lib/cli-ux/styled/tree.js';
 import chalk from 'chalk';
@@ -331,13 +332,4 @@ function makeDepsSubtree(
     }
   }
   return tree;
-}
-
-function isDevvitDependency(dependencyName: string): boolean {
-  // @devvit/kit has an independent release cycle as a fully open-source package
-  // We don't care about its version, npm will alert the user if there is a missmatch
-  if (dependencyName === '@devvit/kit') {
-    return false;
-  }
-  return dependencyName.startsWith('@devvit/');
 }
