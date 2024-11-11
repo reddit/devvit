@@ -75,7 +75,7 @@ export class WikiPage {
   #revisionId: string;
   #revisionDate: Date;
   #revisionReason: string;
-  #revisionAuthor: User;
+  #revisionAuthor: User | undefined;
 
   #metadata: Metadata | undefined;
 
@@ -97,9 +97,9 @@ export class WikiPage {
     this.#revisionId = data.revisionId;
     this.#revisionDate = new Date(data.revisionDate * 1000); // data.revisionDate is represented in seconds, so multiply by 1000 to get milliseconds
     this.#revisionReason = data.reason ?? '';
-
-    assertNonNull(data.revisionBy?.data, 'Wiki page author details are missing');
-    this.#revisionAuthor = new User(data.revisionBy.data, metadata);
+    this.#revisionAuthor = data.revisionBy?.data
+      ? new User(data.revisionBy.data, metadata)
+      : undefined;
 
     this.#metadata = metadata;
   }
@@ -140,7 +140,7 @@ export class WikiPage {
   }
 
   /** The author of this revision. */
-  get revisionAuthor(): User {
+  get revisionAuthor(): User | undefined {
     return this.#revisionAuthor;
   }
 
@@ -154,7 +154,7 @@ export class WikiPage {
     | 'revisionDate'
     | 'revisionReason'
   > & {
-    revisionAuthor: ReturnType<User['toJSON']>;
+    revisionAuthor: ReturnType<User['toJSON']> | undefined;
   } {
     return {
       name: this.#name,
@@ -164,7 +164,7 @@ export class WikiPage {
       revisionId: this.#revisionId,
       revisionDate: this.#revisionDate,
       revisionReason: this.#revisionReason,
-      revisionAuthor: this.#revisionAuthor.toJSON(),
+      revisionAuthor: this.#revisionAuthor?.toJSON(),
     };
   }
 
