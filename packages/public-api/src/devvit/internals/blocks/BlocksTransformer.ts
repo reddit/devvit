@@ -55,7 +55,7 @@ const DATA_PREFIX = 'data-';
 const ACTION_HANDLERS: Set<Devvit.Blocks.ActionHandlers> = new Set(['onPress', 'onMessage']);
 const ACTION_TYPES: Map<Devvit.Blocks.ActionHandlers, BlockActionType> = new Map([
   ['onPress', BlockActionType.ACTION_CLICK],
-  ['onMessage', BlockActionType.ACTION_WEB_VIEW],
+  ['onMessage', BlockActionType.ACTION_WEBVIEW],
 ]);
 
 export class BlocksTransformer {
@@ -764,7 +764,7 @@ export class BlocksTransformer {
   ): Block | undefined {
     return (
       props &&
-      this.makeBlock(BlockType.BLOCK_WEB_VIEW, props, transformContext, {
+      this.makeBlock(BlockType.BLOCK_WEBVIEW, props, transformContext, {
         webviewConfig: {
           url: this.resolveAssetUrl(props.url, { webView: true }),
           state: props.state,
