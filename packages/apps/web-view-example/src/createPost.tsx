@@ -5,7 +5,7 @@ Devvit.configure({
 });
 
 Devvit.addMenuItem({
-  label: 'Create Webview Example Post',
+  label: 'Create WebView Example Post',
   location: 'subreddit',
   onPress: async (_event, context) => {
     const { reddit, ui } = context;

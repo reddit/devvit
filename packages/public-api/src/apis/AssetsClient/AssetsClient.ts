@@ -3,7 +3,7 @@ import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import { Devvit } from '../../devvit/Devvit.js';
 
 export type GetURLOptions = {
-  webview?: boolean | undefined;
+  webView?: boolean | undefined;
 };
 
 function assertValidUrl(path: string): void | never {
@@ -15,11 +15,11 @@ function assertValidUrl(path: string): void | never {
 
 export class AssetsClient {
   readonly #assetMap: AssetMap = {};
-  readonly #webviewAssetMap: AssetMap = {};
+  readonly #webViewAssetMap: AssetMap = {};
 
   constructor() {
     this.#assetMap = Devvit.assets;
-    this.#webviewAssetMap = Devvit.webviewAssets;
+    this.#webViewAssetMap = Devvit.webViewAssets;
   }
 
   /**
@@ -52,14 +52,14 @@ export class AssetsClient {
     options?: GetURLOptions | undefined
   ): string | AssetMap {
     if (typeof assetPathOrPaths === 'string') {
-      return this.#getURL(assetPathOrPaths, options ?? { webview: false });
+      return this.#getURL(assetPathOrPaths, options ?? { webView: false });
     }
-    return this.#getURLs(assetPathOrPaths, options ?? { webview: false });
+    return this.#getURLs(assetPathOrPaths, options ?? { webView: false });
   }
 
   #getURL(assetPath: string, options: GetURLOptions): string {
     // Has the assetPath already been resolved?
-    const localUrl = options.webview ? this.#webviewAssetMap[assetPath] : this.#assetMap[assetPath];
+    const localUrl = options.webView ? this.#webViewAssetMap[assetPath] : this.#assetMap[assetPath];
     if (localUrl) {
       return localUrl;
     }
@@ -80,7 +80,7 @@ export class AssetsClient {
 
     // Try and short circuit using the locally available assets list if possible, keeping a list
     // of all the paths that we couldn't find locally to ask the backend about
-    const cache = options.webview ? this.#webviewAssetMap : this.#assetMap;
+    const cache = options.webView ? this.#webViewAssetMap : this.#assetMap;
     if (cache) {
       for (const path of assetPaths) {
         if (cache[path]) {

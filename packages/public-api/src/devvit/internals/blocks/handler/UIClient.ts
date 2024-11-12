@@ -1,6 +1,5 @@
-import type { Toast as ToastProto } from '@devvit/protos';
-import { EffectType, Form, ToastAppearance } from '@devvit/protos';
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import { EffectType, Form, type Toast as ToastProto, ToastAppearance } from '@devvit/protos';
+import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Comment, Post, Subreddit, User } from '../../../../apis/reddit/models/index.js';
@@ -8,6 +7,7 @@ import { assertValidFormFields } from '../../../../apis/ui/helpers/assertValidFo
 import { transformFormFields } from '../../../../apis/ui/helpers/transformForm.js';
 import type { Toast } from '../../../../types/toast.js';
 import type { UIClient as _UIClient } from '../../../../types/ui-client.js';
+import type { WebViewUIClient } from '../../../../types/web-view-ui-client.js';
 import { _activeRenderContext } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import { getFormDefinition } from './useForm.js';
@@ -21,10 +21,21 @@ export function useUI(): _UIClient {
 }
 
 export class UIClient implements _UIClient {
-  #renderContext: RenderContext;
+  readonly #renderContext: RenderContext;
+  // Auto-incrementing count of the number of WebviewMessage effects called this frame.
+  // Used as part of the dedup key for emitEvent to prevent messages from being dedup'd.
+  #webViewMessageCount: number = 0;
+  readonly #webViewClient: WebViewUIClient;
 
   constructor(renderContext: RenderContext) {
     this.#renderContext = renderContext;
+    this.#webViewClient = {
+      postMessage: this.#webViewPostMessage,
+    };
+  }
+
+  get webView(): WebViewUIClient {
+    return this.#webViewClient;
   }
 
   showForm(formKey: FormKey, data?: JSONObject | undefined): void {
@@ -105,4 +116,19 @@ export class UIClient implements _UIClient {
       },
     });
   }
+
+  #webViewPostMessage: WebViewUIClient['postMessage'] = <T extends JSONValue>(
+    webViewId: string,
+    message: T
+  ): void => {
+    this.#renderContext.emitEffect(`postMessage${this.#webViewMessageCount++}`, {
+      type: EffectType.EFFECT_WEB_VIEW,
+      webView: {
+        postMessage: {
+          webViewId,
+          app: { message },
+        },
+      },
+    });
+  };
 }

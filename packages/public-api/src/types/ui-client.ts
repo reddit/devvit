@@ -3,6 +3,7 @@ import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Comment, Post, Subreddit, User } from '../apis/reddit/models/index.js';
 import type { Toast } from './toast.js';
+import type { WebViewUIClient } from './web-view-ui-client.js';
 
 /**
  * The UI client lets your app interact with the Reddit frontend.
@@ -11,6 +12,9 @@ import type { Toast } from './toast.js';
  * event handlers, a Form's `onSubmit` handler, and Menu items.
  */
 export type UIClient = {
+  /** Interact with WebView blocks */
+  webView: WebViewUIClient;
+
   /** Open a form in a modal */
   showForm(formKey: FormKey, data?: JSONObject | undefined): void;
   /** Show a message in a toast. */

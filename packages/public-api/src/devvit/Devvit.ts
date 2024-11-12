@@ -5,7 +5,7 @@ import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { assertValidFormFields } from '../apis/ui/helpers/assertValidFormFields.js';
@@ -110,7 +110,7 @@ export class Devvit extends Actor {
     TriggerEvent,
     TriggerOnEventHandler<OnTriggerRequest>[]
   > = new Map();
-  static #webviewAssets: AssetMap = {};
+  static #webViewAssets: AssetMap = {};
 
   static #additionallyProvides: protos.Definition[] = [];
 
@@ -643,8 +643,8 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static get webviewAssets(): AssetMap {
-    return this.#webviewAssets;
+  static get webViewAssets(): AssetMap {
+    return this.#webViewAssets;
   }
 
   /** @internal */
@@ -652,7 +652,7 @@ export class Devvit extends Actor {
     super(config);
 
     Devvit.#assets = config.assets ?? {};
-    Devvit.#webviewAssets = config.webviewAssets ?? {};
+    Devvit.#webViewAssets = config.webViewAssets ?? {};
 
     for (const fullName in Devvit.#uses) {
       const use = Devvit.#uses[fullName];
@@ -890,7 +890,7 @@ export namespace Devvit {
 
     export type OnPressEventHandler = (data: JSONObject) => void | Promise<void>;
 
-    export type OnWebViewEventHandler = (message: JSONObject) => void | Promise<void>;
+    export type OnWebViewEventHandler = <T extends JSONValue>(message: T) => void | Promise<void>;
 
     export type Actionable = {
       onPress?: OnPressEventHandler | undefined;
@@ -996,6 +996,7 @@ export namespace Devvit {
     export type WebViewProps = BaseProps &
       WebViewActionable & {
         url: string;
+        /** @deprecated use UIClient.webview.postMessage() */
         state?: JSONObject;
       };
   }

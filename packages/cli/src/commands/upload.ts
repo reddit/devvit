@@ -24,7 +24,7 @@ import {
   MAX_ASSET_GIF_SIZE,
   MAX_ASSET_NON_GIF_SIZE,
   prettyPrintSize,
-  WEBVIEW_ASSET_DIRNAME,
+  WEB_VIEW_ASSET_DIRNAME,
 } from '@devvit/shared-types/Assets.js';
 import {
   ACTOR_SRC_PRIMARY_NAME,
@@ -561,10 +561,10 @@ export default class Upload extends ProjectCommand {
     webViewAssetMap?: AssetMap;
   }> {
     const regularAssets = await this.#getAssets(ASSET_DIRNAME, ALLOWED_ASSET_EXTENSIONS);
-    let webViewAssets = await this.#getAssets(WEBVIEW_ASSET_DIRNAME, [], true);
+    let webViewAssets = await this.#getAssets(WEB_VIEW_ASSET_DIRNAME, [], true);
 
     if (!isWebViewEnabled && webViewAssets.length > 0) {
-      ux.warn('WebView is not enabled for this app. Skipping webview assets.');
+      ux.warn('WebView is not enabled for this app. Skipping WebView assets.');
       webViewAssets = [];
     }
 
@@ -591,7 +591,7 @@ export default class Upload extends ProjectCommand {
 
     // regular assets go to Media Service
     const assetMap = await this.#processRegularAssets(regularAssets);
-    // webroot assets go to webview storage
+    // webroot assets go to WebView storage
     const webViewAssetMap = await this.#processWebViewAssets(webViewAssets);
 
     return { assetMap, webViewAssetMap };
@@ -600,7 +600,7 @@ export default class Upload extends ProjectCommand {
   async #getAssets(
     folder: string,
     allowedExtensions: string[] = [],
-    webviewAssets: boolean = false
+    webViewAssets: boolean = false
   ): Promise<MediaSignatureWithContents[]> {
     if (!(await dirExists(path.join(this.projectRoot, folder)))) {
       // Return early if there isn't an assets directory
@@ -633,7 +633,7 @@ export default class Upload extends ProjectCommand {
           filePath: filename,
           size,
           hash,
-          isWebviewAsset: webviewAssets,
+          isWebviewAsset: webViewAssets,
           contents,
         };
       })
@@ -688,13 +688,13 @@ export default class Upload extends ProjectCommand {
       return {};
     }
 
-    ux.action.start(`Checking for new webview assets to upload...`);
+    ux.action.start(`Checking for new WebView assets to upload...`);
 
     const assetMap = await this.#uploadNewAssets(assets, true);
 
-    ux.action.stop(`Found ${assets.length} new webview asset${assets.length === 1 ? '' : 's'}.`);
+    ux.action.stop(`Found ${assets.length} new WebView asset${assets.length === 1 ? '' : 's'}.`);
 
-    // only return the html files for the webview assets
+    // only return the html files for the WebView assets
     return Object.keys(assetMap).reduce<AssetMap>((map, assetPath) => {
       if (assetPath.match(/\.htm(l)?$/)) {
         map[assetPath] = assetMap[assetPath];
@@ -707,7 +707,7 @@ export default class Upload extends ProjectCommand {
     assets: MediaSignatureWithContents[],
     webViewAsset: boolean = false
   ): Promise<AssetMap> {
-    const webViewMsg = webViewAsset ? 'webview ' : '';
+    const webViewMsg = webViewAsset ? 'WebView ' : '';
 
     const config = await this.getProjectConfig();
     const { statuses } = await this.appClient.CheckIfMediaExists({
@@ -778,7 +778,7 @@ export default class Upload extends ProjectCommand {
       const error = err as Error;
       const msg = `Failed to upload ${webViewMsg}assets. (${error.message})`;
       if (webViewAsset) {
-        // don't fail on webview uploads in case we just don't have the feature enabled
+        // don't fail on WebView uploads in case we just don't have the feature enabled
         ux.action.stop(msg);
         return {};
       } else {

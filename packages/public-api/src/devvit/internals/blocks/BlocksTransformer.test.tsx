@@ -531,7 +531,7 @@ describe('BlocksTransformer (JSX -> Block)', () => {
     test('outputs a valid object', async () => {
       const ui = await render(<webview url={VALID_URL} />);
 
-      expect(ui.type === BlockType.BLOCK_WEBVIEW);
+      expect(ui.type === BlockType.BLOCK_WEB_VIEW);
       expect(ui.config?.webviewConfig).not.toBeUndefined();
     });
 

@@ -1,19 +1,14 @@
 import './createPost.js';
 
-import { Devvit, type JSONObject, useState } from '@devvit/public-api';
+import { Devvit, type JSONValue } from '@devvit/public-api';
 
 Devvit.addCustomPostType({
   name: 'Webview Example',
   height: 'tall',
-  render: () => {
-    const [webviewState, setWebviewState] = useState({
-      lastUpdate: 0,
-    });
-
-    const onMessage = (msg: JSONObject): void => {
-      if (msg.type === 'ping') {
-        const newState = { ...webviewState, lastUpdate: Date.now() };
-        setWebviewState(newState);
+  render: (context) => {
+    const onMessage = (msg: JSONValue): void => {
+      if (msg === 'ping') {
+        context.ui.webView.postMessage('myWebView', 'pong');
       }
     };
 
@@ -21,7 +16,7 @@ Devvit.addCustomPostType({
       <vstack grow padding="small">
         <text>WebView Content:</text>
         <vstack border="thick" borderColor="black" grow>
-          <webview url="page.html" state={webviewState} onMessage={onMessage} grow />
+          <webview id="myWebView" url="page.html" onMessage={onMessage} grow />
         </vstack>
         <vstack grow padding="small">
           <text size="small" alignment="middle center">

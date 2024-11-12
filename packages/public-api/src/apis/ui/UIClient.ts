@@ -1,23 +1,36 @@
-import type { Effect, Toast as ToastProto } from '@devvit/protos';
-import { EffectType, Form, ToastAppearance } from '@devvit/protos';
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import {
+  type Effect,
+  EffectType,
+  Form,
+  type Toast as ToastProto,
+  ToastAppearance,
+} from '@devvit/protos';
+import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
 import type { BlocksReconciler } from '../../devvit/internals/blocks/BlocksReconciler.js';
 import type { Toast } from '../../types/toast.js';
 import type { UIClient as _UIClient } from '../../types/ui-client.js';
+import type { WebViewUIClient } from '../../types/web-view-ui-client.js';
 import type { Comment, Post, Subreddit, User } from '../reddit/models/index.js';
 import { assertValidFormFields } from './helpers/assertValidFormFields.js';
 import { transformFormFields } from './helpers/transformForm.js';
 
 export class UIClient implements _UIClient {
-  #effects: Effect[] = [];
-
-  #reconciler: BlocksReconciler | undefined;
+  readonly #effects: Effect[] = [];
+  readonly #reconciler: BlocksReconciler | undefined;
+  readonly #webViewClient: WebViewUIClient;
 
   constructor(reconciler?: BlocksReconciler) {
     this.#reconciler = reconciler;
+    this.#webViewClient = {
+      postMessage: this.#postMessage,
+    };
+  }
+
+  get webView(): WebViewUIClient {
+    return this.#webViewClient;
   }
 
   showForm(formKey: FormKey, data?: JSONObject | undefined): void {
@@ -111,6 +124,21 @@ export class UIClient implements _UIClient {
       },
     });
   }
+
+  #postMessage: WebViewUIClient['postMessage'] = <T extends JSONValue>(
+    webViewId: string,
+    message: T
+  ): void => {
+    this.#effects.push({
+      type: EffectType.EFFECT_WEB_VIEW,
+      webView: {
+        postMessage: {
+          webViewId,
+          app: { message },
+        },
+      },
+    });
+  };
 
   /** @internal */
   get __effects(): Effect[] {

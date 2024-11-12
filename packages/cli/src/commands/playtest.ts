@@ -8,7 +8,7 @@ import {
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { Severity } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
 import { RemoteLogType } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
-import { ASSET_DIRNAME, WEBVIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
+import { ASSET_DIRNAME, WEB_VIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import {
   ACTOR_SRC_DIR,
   ACTOR_SRC_PRIMARY_NAME,
@@ -210,7 +210,7 @@ export default class Playtest extends Upload {
     );
 
     const assetDir = path.join(this.projectRoot, ASSET_DIRNAME);
-    const webviewAssetDir = path.join(this.projectRoot, WEBVIEW_ASSET_DIRNAME);
+    const webViewAssetDir = path.join(this.projectRoot, WEB_VIEW_ASSET_DIRNAME);
     const productsJSON = path.join(this.projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
 
     const watchSrc = this.#bundler.watch(this.projectRoot, {
@@ -219,7 +219,7 @@ export default class Playtest extends Upload {
       version: projectConfig.version,
     });
 
-    const assetPaths = [assetDir, webviewAssetDir, productsJSON];
+    const assetPaths = [assetDir, webViewAssetDir, productsJSON];
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
 
     this.#watchAssets.on('all', () => {

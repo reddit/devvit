@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "webview-template",
+  "name": "web-view-template",
   "version": "0.11.1",
   "license": "BSD-3-Clause",
   "type": "module",

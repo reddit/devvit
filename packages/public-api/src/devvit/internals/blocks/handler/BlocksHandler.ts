@@ -495,7 +495,13 @@ export class BlocksHandler {
           initializer: ({ hookId }) => ({
             hookId,
             state: null,
-            onUIEvent: (event) => props[key](event.userAction?.data),
+            onUIEvent: (event) => {
+              if (event.userAction) {
+                return props[key](event.userAction.data);
+              } else if (event.webView?.postMessage) {
+                return props[key](event.webView.postMessage.message);
+              }
+            },
           }),
         });
         reifiedProps[key] = hook.hookId;

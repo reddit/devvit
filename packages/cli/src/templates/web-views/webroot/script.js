@@ -1,13 +1,15 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-nocheck
+
 class App {
   constructor() {
-    this.state = {};
-
-    const output = document.querySelector('#stateOutput');
+    const output = document.querySelector('#messageOutput');
     window.addEventListener('message', (ev) => {
       const { type, data } = ev.data;
 
-      if (type === 'stateUpdate') {
-        output.replaceChildren(JSON.stringify(data, undefined, 2));
+      if (type === 'devvit-message') {
+        const { message } = data;
+        output.replaceChildren(JSON.stringify(message, undefined, 2));
       }
     });
 
