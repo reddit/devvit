@@ -76,7 +76,7 @@ enum PageType {
   COUNTPAGE,
 }
 
-//useState is available in Context of the CustomPostComponent.
+//useState is available as a global import from public API.
 const App: Devvit.CustomPostComponent = ({ useState }: Devvit.Context) => {
   // set state components
   const [page, navigate] = useState(PageType.HOMEPAGE);
