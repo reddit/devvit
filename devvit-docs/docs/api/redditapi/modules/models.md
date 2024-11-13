@@ -578,10 +578,11 @@ Contains data about a post's thumbnail. Also contains a blurred version if the t
 
 #### Type declaration
 
-| Name            | Type                                                                   | Description                 |
-| :-------------- | :--------------------------------------------------------------------- | :-------------------------- |
-| `conversations` | \{ `[id: string]`: [`ConversationData`](models.md#conversationdata); } | Conversations key-value map |
-| `viewerId?`     | `string`                                                               | -                           |
+| Name              | Type                                                                   | Description                                                                                                                         |
+| :---------------- | :--------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `conversationIds` | `string`[]                                                             | Array of conversation ids, ordered by the sort parameter specified in [GetConversationsRequest](models.md#getconversationsrequest). |
+| `conversations`   | \{ `[id: string]`: [`ConversationData`](models.md#conversationdata); } | Conversations key-value map                                                                                                         |
+| `viewerId?`       | `string`                                                               | -                                                                                                                                   |
 
 ---
 
