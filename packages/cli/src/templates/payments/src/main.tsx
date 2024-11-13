@@ -57,10 +57,8 @@ const App: Devvit.CustomPostComponent = (context) => {
   });
 
   const clearGodModeFn = async () => {
-    const clearFn = () => false;
-
-    await context.redis.set(godModeRedisKey(context.userId), clearFn().toString());
-    setGodMode(clearFn);
+    await context.redis.set(godModeRedisKey(context.userId), false.toString());
+    setGodMode(false);
   };
 
   return (
