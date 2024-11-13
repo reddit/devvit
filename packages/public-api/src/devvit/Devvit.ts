@@ -652,7 +652,7 @@ export class Devvit extends Actor {
     super(config);
 
     Devvit.#assets = config.assets ?? {};
-    Devvit.#webViewAssets = config.webViewAssets ?? {};
+    Devvit.#webViewAssets = config.webviewAssets ?? {};
 
     for (const fullName in Devvit.#uses) {
       const use = Devvit.#uses[fullName];
