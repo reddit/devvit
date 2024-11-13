@@ -316,10 +316,6 @@ export type GetConversationsResponse = {
    */
   conversations: { [id: string]: ConversationData };
   viewerId?: string;
-  /**
-   * Array of conversation ids, ordered by the sort parameter specified in {@link GetConversationsRequest}.
-   */
-  conversationIds: string[];
 };
 
 /**
@@ -415,7 +411,6 @@ export class ModMailService {
     return {
       conversations,
       viewerId: response.viewerId,
-      conversationIds: response.conversationIds,
     };
   }
 

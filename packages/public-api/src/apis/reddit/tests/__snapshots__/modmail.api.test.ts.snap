@@ -841,9 +841,6 @@ exports[`ModMail API > getConversation() 1`] = `
 
 exports[`ModMail API > getConversations() > with subreddits defined 1`] = `
 {
-  "conversationIds": [
-    "fake_conversation_id",
-  ],
   "conversations": {
     "fake_conversation_id": {
       "authors": [
@@ -930,9 +927,6 @@ exports[`ModMail API > getConversations() > with subreddits defined 1`] = `
 
 exports[`ModMail API > getConversations() > with subreddits undefined 1`] = `
 {
-  "conversationIds": [
-    "fake_conversation_id",
-  ],
   "conversations": {
     "fake_conversation_id": {
       "authors": [
