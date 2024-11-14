@@ -1,30 +1,56 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-nocheck
+
 class App {
   constructor() {
-    this.state = {};
+    const output = document.querySelector('#messageOutput');
+    const increaseButton = document.querySelector('#btn-increase');
+    const decreaseButton = document.querySelector('#btn-decrease');
+    const usernameLabel = document.querySelector('#username');
+    const counterLabel = document.querySelector('#counter');
+    var counter = 0;
 
-    const stateOutput = document.querySelector('#stateOutput');
-    const stateTimestamp = document.querySelector('#stateTimestamp');
-    const messageOutput = document.querySelector('#messageOutput');
-    const messageTimestamp = document.querySelector('#messageTimestamp');
-
+    // When the Devvit app sends a message with `context.ui.webView.postMessage`, this will be triggered
     window.addEventListener('message', (ev) => {
       const { type, data } = ev.data;
 
+      // Reserved type for messages sent via `context.ui.webView.postMessage`
       if (type === 'devvit-message') {
         const { message } = data;
-        messageOutput.textContent = JSON.stringify(message, undefined, 2);
-        messageTimestamp.textContent = String(Date.now());
-      }
-      if (type === 'devvit-state') {
-        const { state } = data;
-        stateOutput.textContent = JSON.stringify(state, undefined, 2);
-        stateTimestamp.textContent = String(Date.now());
+
+        // Always output full message
+        output.replaceChildren(JSON.stringify(message, undefined, 2));
+
+        // Load initial data
+        if (message.type === 'initialData') {
+          const { username, currentCounter } = message.data;
+          console.log('Initial data:', usernameLabel, username, counterLabel, currentCounter);
+          usernameLabel.innerText = username;
+          counterLabel.innerText = counter = currentCounter;
+        }
+
+        // Update counter
+        if (message.type === 'updateCounter') {
+          const { currentCounter } = message.data;
+          counterLabel.innerText = counter = currentCounter;
+        }
       }
     });
 
-    const pingButton = document.querySelector('button');
-    pingButton.addEventListener('click', () => {
-      window.parent?.postMessage({ type: 'ping' }, '*');
+    increaseButton.addEventListener('click', () => {
+      // Sends a message to the Devvit app
+      window.parent?.postMessage(
+        { type: 'setCounter', data: { newCounter: Number(counter + 1) } },
+        '*'
+      );
+    });
+
+    decreaseButton.addEventListener('click', () => {
+      // Sends a message to the Devvit app
+      window.parent?.postMessage(
+        { type: 'setCounter', data: { newCounter: Number(counter - 1) } },
+        '*'
+      );
     });
   }
 }

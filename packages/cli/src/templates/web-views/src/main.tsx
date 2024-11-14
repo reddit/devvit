@@ -12,7 +12,6 @@ type WebViewMessage = {
   };
 };
 
-// Configure Devvit's plugins
 Devvit.configure({
   redditAPI: true,
   redis: true,
@@ -24,13 +23,13 @@ Devvit.addCustomPostType({
   height: 'tall',
   render: (context) => {
     // Load username with `useAsync` hook
-    const { data: username } = useAsync(async () => {
+    const { data: username, loading: usernameLoading } = useAsync(async () => {
       const currUser = await context.reddit.getCurrentUser();
       return currUser?.username ?? 'anon';
     });
 
     // Load latest counter from redis with `useAsync` hook
-    const { data: counter } = useAsync(async () => {
+    const { data: counter, loading: counterLoading } = useAsync(async () => {
       const redisCount = await context.redis.get(`counter_${context.postId}`);
       console.log('redisCount:', redisCount);
       return Number(redisCount ?? 0);
@@ -94,7 +93,9 @@ Devvit.addCustomPostType({
             </hstack>
           </vstack>
           <spacer />
-          <button onPress={onShowWebviewClick}>Launch App</button>
+          <button onPress={onShowWebviewClick} disabled={counterLoading || usernameLoading}>
+            Launch App
+          </button>
         </vstack>
         <vstack grow={webviewVisible} height={webviewVisible ? '100%' : '0%'}>
           <vstack border="thick" borderColor="black" height={webviewVisible ? '100%' : '0%'}>
