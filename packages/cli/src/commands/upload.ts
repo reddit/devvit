@@ -4,7 +4,6 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 
 import {
-  AppCapability,
   type AppInfo,
   AppVersionInfo,
   Categories,
@@ -438,9 +437,7 @@ export default class Upload extends ProjectCommand {
     }
 
     // Sync and upload assets
-    const { assetMap, webViewAssetMap } = await this.#syncAssets(
-      app.capabilities.includes(AppCapability.WEBVIEW)
-    );
+    const { assetMap, webViewAssetMap } = await this.#syncAssets();
 
     // Dump these in the assets fields of the bundles
     for (const bundle of bundles) {
@@ -556,17 +553,12 @@ export default class Upload extends ProjectCommand {
    * If present, WebView assets will also be synced but will not be included in
    * the asset map.
    */
-  async #syncAssets(isWebViewEnabled: boolean = false): Promise<{
+  async #syncAssets(): Promise<{
     assetMap?: AssetMap;
     webViewAssetMap?: AssetMap;
   }> {
     const regularAssets = await this.#getAssets(ASSET_DIRNAME, ALLOWED_ASSET_EXTENSIONS);
-    let webViewAssets = await this.#getAssets(WEB_VIEW_ASSET_DIRNAME, [], true);
-
-    if (!isWebViewEnabled && webViewAssets.length > 0) {
-      ux.warn('WebView is not enabled for this app. Skipping WebView assets.');
-      webViewAssets = [];
-    }
+    const webViewAssets = await this.#getAssets(WEB_VIEW_ASSET_DIRNAME, [], true);
 
     // Return early if no assets
     if (regularAssets.length + webViewAssets.length === 0) {
