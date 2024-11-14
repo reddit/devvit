@@ -47,7 +47,8 @@
         "capabilities/realtime",
         "capabilities/scheduler",
         "capabilities/secrets-storage",
-        "capabilities/triggers"
+        "capabilities/triggers",
+        "capabilities/webviews"
       ]
     },
     {

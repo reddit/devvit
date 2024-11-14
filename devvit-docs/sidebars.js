@@ -57,6 +57,7 @@ const sidebars = {
         'capabilities/scheduler',
         'capabilities/secrets-storage',
         'capabilities/triggers',
+        'capabilities/webviews',
       ],
     },
     {
