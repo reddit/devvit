@@ -1,3 +1,4 @@
 {
-  "description": "Let users add content."
+  "description": "Let users add content.",
+  "hidden": true
 }

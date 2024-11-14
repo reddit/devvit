@@ -1,3 +1,4 @@
 {
-  "description": "Add a menu action."
+  "description": "Add a menu action.",
+  "hidden": true
 }

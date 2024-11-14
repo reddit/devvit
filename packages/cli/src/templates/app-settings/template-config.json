@@ -1,3 +1,4 @@
 {
-  "description": "Add user-configured settings."
+  "description": "Add user-configured settings.",
+  "hidden": true
 }

@@ -1,3 +1,4 @@
 {
-  "description": "Use an image in your app."
+  "description": "Use an image in your app.",
+  "hidden": true
 }
