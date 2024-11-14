@@ -6,11 +6,17 @@ Add products to your app and get paid for what you sell. The payments plugin let
 Payments is a beta feature that is only available to developers in our Developer Payments Pilot Program.  
 :::
 
-To sell products in your app, you need to:
+## Prerequisites
 
-- Join the [Reddit Developer Program](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program).
-- Meet the [eligibility criteria](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program#h_01J8GCHXEG24ZNR5EZZ9SPN48S) (karma- and gold-earning requirements are waived for developers).
-- Accept and comply with our [Earn Terms](https://redditinc.com/policies/earn-terms), [Earn Policy](https://www.redditinc.com/policies/earn-policy), and all Developer Platform Policies.
+You can develop and playtest your payments-based app immediately, but you'll need to do a few things before you can publish your app and sell products:
+
+- Join the [Reddit Developer Program](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program). This program:
+
+  - guides you through the [eligibility criteria](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program#h_01J8GCHXEG24ZNR5EZZ9SPN48S)
+  - provides links to Reddit’s [Earn Terms](https://redditinc.com/policies/earn-terms) and [Earn Policy](https://www.redditinc.com/policies/earn-policy) (you’ll need to agree and comply with all terms and conditions)
+  - directs you to the contributors [verification process](https://support.reddithelp.com/hc/en-us/articles/17331636499604-What-is-the-Contributor-verification-process) you need to complete
+
+- Make sure you’re on devvit@0.11.0. See the [quickstart](quickstart.mdx) to get up and running.
 
 ## How it works
 
@@ -83,6 +89,8 @@ Product images need to meet the following requirements:
 
 If you don’t provide an image, the default Reddit product image is used.
 
+![default image](../assets/default_product_image.png)
+
 **Example**
 
 ```json
@@ -151,7 +159,7 @@ addPaymentHandler({
 
 The frontend and backend of your app coordinate order processing.
 
-![Order workflow diagram](../assets/payments_order_flow.jpg)
+![Order workflow diagram](../assets/payments_order_flow_diagram.png)
 
 To launch the payment flow, create a hook with `usePayments()` followed by `hook.purchase()` to initiate the purchase from the frontend.
 
