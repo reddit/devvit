@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//@ts-nocheck
-
 class App {
   constructor() {
     const output = document.querySelector('#messageOutput');
@@ -24,7 +21,6 @@ class App {
         // Load initial data
         if (message.type === 'initialData') {
           const { username, currentCounter } = message.data;
-          console.log('Initial data:', usernameLabel, username, counterLabel, currentCounter);
           usernameLabel.innerText = username;
           counterLabel.innerText = counter = currentCounter;
         }
