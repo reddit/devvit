@@ -96,7 +96,7 @@ preview your app. You can also follow along with the video (the tutorial starts 
 ```bash
 npm install -g devvit
 devvit login
-devvit new --template experience-post
+devvit new --template blocks-post
 cd my-project
 devvit upload
 devvit playtest <my-subreddit>
@@ -106,7 +106,7 @@ devvit playtest <my-subreddit>
 ```bash
 yarn global add devvit
 devvit login
-devvit new --template experience-post
+devvit new --template blocks-post
 cd my-project
 devvit upload
 devvit playtest <my-subreddit>
@@ -116,13 +116,17 @@ devvit playtest <my-subreddit>
 ```bash
 pnpm install -g devvit
 devvit login
-devvit new --template experience-post
+devvit new --template blocks-post
 cd my-project
 devvit upload
 devvit playtest <my-subreddit>
 ```
   </TabItem>
 </Tabs>
+
+:::note
+If you're familiar with web development, use the template `web-view-post` instead and try our experimental [webview component feature](webviews.md)
+:::
 
 Visit your subreddit and interact with your app. As you make and save code modifications, playtest will automatically build and deploy the app to your subreddit. Simply refresh the page to view the latest changes.
 

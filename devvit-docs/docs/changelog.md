@@ -8,11 +8,11 @@ Before upgrading `@devvit/public-api` in your project, always update the CLI fir
 
 **Release Date: Oct 31, 2024**
 
-0.11.2 adds [textFallback](./text_fallback.md) functionality to ensure that text in your app is accessible and functional on every surface. Old Reddit doesn't render experience posts, and this ensures that your app can have a text fallback for those cases.
+0.11.2 adds [textFallback](./text_fallback.md) functionality to ensure that text in your app is accessible and functional on every surface. Old Reddit doesn't render interactive posts, and this ensures that your app can have a text fallback for those cases.
 
 This release also includes a few API updates:
 
-- [setCustomPostPreview](./api/redditapi/classes/models.Post.md#setcustompostpreview) lets you update and [customize the post preview](./experiences.md#customize-the-post-preview) with real content in the loading screen after the post has been created.
+- [setCustomPostPreview](./api/redditapi/classes/models.Post.md#setcustompostpreview) lets you update and [customize the post preview](./interactive_posts.md#customize-the-post-preview) with real content in the loading screen after the post has been created.
 - [setSuggestedCommentSort](./api/redditapi/classes/models.Post.md#setsuggestedcommentsort) provides options for sorting comments on a post.
 - `forUserType: member’` has been removed from menu items. If you want a menu action to be visible to all users, omit the `forUserType` field.
 

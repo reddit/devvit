@@ -4,20 +4,11 @@ Include images that are 20 MB or less in your app.
 
 You can embed the image in a post or comment and use rich-text builder to format the text heading, paragraph, code block, and more. There are two ways to upload an image: using a template or starting from scratch.
 
-## Option 1: Use a template
+## How to use image upoads
 
-Use the `image-uploads` template to create a new app:
-
-1. From the terminal, navigate to a directory where you'd like to store your code.
-2. Enter the following command to create the app:
-
-```ts
-devvit new <your-app-name> --template=image-uploads
-```
-
-This will create a template that uses `Devvit.addMenuItem` to allow the user reply to a comment with the defined gif.
-
-## Option 2: Start from scratch
+:::note
+You can copy this [template](https://github.com/reddit/devvit/tree/main/packages/cli/src/templates/image-uploads) using image-upload.
+:::
 
 1. From the terminal, navigate to a directory where you'd like to store your code.
 2. Enter the following command to create the app.

@@ -1,6 +1,6 @@
 # Text fallback for older platforms
 
-Some surfaces (like old.reddit) don’t render experience posts. To remedy this, use textFallback to ensure that you can specify the text for the instances when Devvit cannot render your post. You can do this with a text string or in rich text.
+Some surfaces (like old.reddit) don’t render interactive posts. To remedy this, use textFallback to ensure that you can specify the text for the instances when Devvit cannot render your post. You can do this with a text string or in rich text.
 
 ## Use a text string
 

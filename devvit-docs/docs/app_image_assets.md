@@ -1,6 +1,6 @@
 # Adding images
 
-Add images to your experience post.
+Add images to your interactive post.
 
 You can add things like a logo for the community, a special artistic expression, or new characters to unlock in your game.
 

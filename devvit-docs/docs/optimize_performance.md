@@ -4,7 +4,7 @@ You may want to optimize your app to make it run faster, use resources more effi
 
 ## Make the initial render faster
 
-Look at the render function of this experience post.
+Look at the render function of this interactive post.
 
 ```tsx
 import { Devvit, useState } from '@devvit/public-api';

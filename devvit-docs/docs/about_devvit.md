@@ -38,7 +38,7 @@ When you update your app, every subreddit that has installed your app has to be 
 
 ## Understanding client-side apps
 
-Client-side apps run on the user’s device instead of a remote server. This increases the speed and responsiveness of the app and provides a better user experience. Devvit apps operate like most client-side apps (browser extensions, html5 games, etc). When a user visits an [experience post](experiences.md) that has a running Devvit app, the bundled source code is transmitted to the user. The app runs in the user’s client for optimal app performance, which exposes app details to clients during runtime.
+Client-side apps run on the user’s device instead of a remote server. This increases the speed and responsiveness of the app and provides a better user experience. Devvit apps operate like most client-side apps (browser extensions, html5 games, etc). When a user visits an [interactive post](interactive_posts.md) that has a running Devvit app, the bundled source code is transmitted to the user. The app runs in the user’s client for optimal app performance, which exposes app details to clients during runtime.
 
 What is available to the client:
 

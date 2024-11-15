@@ -53,7 +53,7 @@
     },
     {
       "type": "category",
-      "label": "Experiences",
+      "label": "Interactive Posts",
       "items": [
         "experiences",
         "experience_post",
