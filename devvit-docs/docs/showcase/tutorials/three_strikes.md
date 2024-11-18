@@ -354,4 +354,4 @@ When you want to use the Three Strikes app, click on the mod menu (shaped like a
 
 ## Next steps
 
-Congratulations on getting your Three Strikes app running! Next up: add [logging](../../get-started/debug.md) to your app to help you debug.
+Congratulations on getting your Three Strikes app running! Next up: add [logging](../../debug) to your app to help you debug.
