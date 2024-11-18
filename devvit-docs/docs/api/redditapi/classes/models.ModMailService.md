@@ -158,9 +158,8 @@ The to field for this endpoint is somewhat confusing. It can be:
 In this way to is a bit of a misnomer in modmail conversations.
 What it really means is the participant of the conversation who is not a mod of the subreddit.
 
-**`Deprecated`**
-
-Use [ModMailService.createModDiscussionConversation](models.ModMailService.md#createmoddiscussionconversation), [ModMailService.createModInboxConversation](models.ModMailService.md#createmodinboxconversation), or [ModMailService.createModNotification](models.ModMailService.md#createmodnotification) instead.
+If you plan to send a message to the app-account or a moderator of the subreddit, use [ModMailService.createModDiscussionConversation](models.ModMailService.md#createmoddiscussionconversation), [ModMailService.createModInboxConversation](models.ModMailService.md#createmodinboxconversation), or [ModMailService.createModNotification](models.ModMailService.md#createmodnotification) instead.
+Otherwise, messages sent to the app-account or moderator will automatically be routed to Mod Discussions.
 
 **`Example`**
 

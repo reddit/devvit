@@ -491,7 +491,8 @@ export class ModMailService {
    * In this way to is a bit of a misnomer in modmail conversations.
    * What it really means is the participant of the conversation who is not a mod of the subreddit.
    *
-   * @deprecated Use {@link ModMailService.createModDiscussionConversation}, {@link ModMailService.createModInboxConversation}, or {@link ModMailService.createModNotification} instead.
+   * If you plan to send a message to the app-account or a moderator of the subreddit, use {@link ModMailService.createModDiscussionConversation}, {@link ModMailService.createModInboxConversation}, or {@link ModMailService.createModNotification} instead.
+   * Otherwise, messages sent to the app-account or moderator will automatically be routed to Mod Discussions.
    * @param params.body markdown text
    * @param params.isAuthorHidden is author hidden? (default: false)
    * @param params.subredditName subreddit name
