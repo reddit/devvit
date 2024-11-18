@@ -1,4 +1,4 @@
-# @devvit/public-api - v0.11.2-dev
+# @devvit/public-api - v0.11.4-dev
 
 ## Table of contents
 
@@ -1784,11 +1784,12 @@ event handlers, a Form's `onSubmit` handler, and Menu items.
 
 #### Type declaration
 
-| Name         | Type                                                                                                                                                                                                                                  |
-| :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `navigateTo` | (`url`: `string`) => `void`(`subreddit`: `Subreddit`) => `void`(`post`: `Post`) => `void`(`comment`: `Comment`) => `void`(`user`: `User`) => `void`(`urlOrThing`: `string` \| `Subreddit` \| `Post` \| `User` \| `Comment`) => `void` |
-| `showForm`   | (`formKey`: [`FormKey`](README.md#formkey), `data?`: [`JSONObject`](README.md#jsonobject)) => `void`                                                                                                                                  |
-| `showToast`  | (`text`: `string`) => `void`(`toast`: [`Toast`](README.md#toast)) => `void`                                                                                                                                                           |
+| Name         | Type                                                                                                                                                                                                                                  | Description                  |
+| :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------- |
+| `webView`    | `WebViewUIClient`                                                                                                                                                                                                                     | Interact with WebView blocks |
+| `navigateTo` | (`url`: `string`) => `void`(`subreddit`: `Subreddit`) => `void`(`post`: `Post`) => `void`(`comment`: `Comment`) => `void`(`user`: `User`) => `void`(`urlOrThing`: `string` \| `User` \| `Subreddit` \| `Post` \| `Comment`) => `void` | Navigate to a URL            |
+| `showForm`   | (`formKey`: [`FormKey`](README.md#formkey), `data?`: [`JSONObject`](README.md#jsonobject)) => `void`                                                                                                                                  | Open a form in a modal       |
+| `showToast`  | (`text`: `string`) => `void`(`toast`: [`Toast`](README.md#toast)) => `void`                                                                                                                                                           | Show a message in a toast.   |
 
 ---
 

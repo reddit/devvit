@@ -47,16 +47,17 @@
         "capabilities/realtime",
         "capabilities/scheduler",
         "capabilities/secrets-storage",
-        "capabilities/triggers",
-        "capabilities/webviews"
+        "capabilities/server-side-functions",
+        "capabilities/triggers"
       ]
     },
     {
       "type": "category",
       "label": "Interactive Posts",
       "items": [
-        "experiences",
-        "experience_post",
+        "interactive_posts",
+        "interactive_post",
+        "webviews",
         "app_image_assets",
         "post_size",
         "dimensions",

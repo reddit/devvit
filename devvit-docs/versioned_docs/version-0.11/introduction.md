@@ -4,21 +4,21 @@ slug: /
 
 # Welcome to Devvit
 
-Meet Devvit: Reddit’s Developer Platform that lets you build powerful apps and experiences to enhance the communities you love.
+Meet Devvit: Reddit’s Developer Platform that lets you build powerful apps to enhance the communities you love.
 
 <iframe width="xxx" height="xxx" src="https://www.youtube.com/embed/BHtTIInycgg" title="Getting started with Reddit&#39;s Developer Platform" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Bring your imagination to life
 
-Devvit lets you create rich, immersive experiences that seamlessly integrate into Reddit’s ecosystem.
+Devvit lets you create rich, immersive posts that seamlessly integrate into Reddit’s ecosystem.
 
-Build interactive experiences that ignite your community:
+Build interactive posts that ignite your community:
 
 - [Live scoreboards](./showcase/apps#live-scores) that give your community play-by-play updates and a space for shitposting during the game.
 - [Polls](./showcase/playgrounds) to provoke spicy conversations or take the pulse of your community.
 - [Multiplayer games](./showcase/apps#bingo) played asynchronously or with other redditors in real time.
 
-Or create an entirely new community around an experience, like [r/Pixelary](https://www.reddit.com/r/Pixelary/), a multiplayer game created just for redditors to draw, guess, and compete for bragging rights.
+Or create an entirely new community around an app, like [r/Pixelary](https://www.reddit.com/r/Pixelary/), a multiplayer game created just for redditors to draw, guess, and compete for bragging rights.
 
 ## Tools at your fingertips
 
@@ -28,7 +28,7 @@ Building on Devvit is simple and comes with built-in tools to help you succeed:
 - [@devvit/kit](devvit_kit.md) – a library of UI components and backend patterns you can use to build your apps fast.
 - [Devvit CLI](devvit_cli.md) – the bridge between your codebase and Reddit.
 
-Reddit hosts your code with dedicated Redis-backed storage. The UI toolkit lets you build brand new experiences within posts, add new buttons, and create unique post layouts. Triggers let you listen to and respond to events. You only have to write code once, and it’s available on web, iOS, and Android platforms.
+Reddit hosts your code with dedicated Redis-backed storage. The UI toolkit lets you build [interactive posts](interactive_posts.md), add new buttons, and create unique post layouts. Triggers let you listen to and respond to events. You only have to write code once, and it’s available on web, iOS, and Android platforms.
 
 ## Community and support
 

@@ -74,6 +74,7 @@
 - [DeleteNotesOptions](models.md#deletenotesoptions)
 - [EditCommentOptions](models.md#editcommentoptions)
 - [EditFlairTemplateOptions](models.md#editflairtemplateoptions)
+- [EnrichedThumbnail](models.md#enrichedthumbnail)
 - [FlairBackgroundColor](models.md#flairbackgroundcolor)
 - [FlairSettings](models.md#flairsettings)
 - [FlairTextColor](models.md#flairtextcolor)
@@ -464,6 +465,29 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 
 ---
 
+### <a id="enrichedthumbnail" name="enrichedthumbnail"></a> EnrichedThumbnail
+
+Ƭ **EnrichedThumbnail**: `Object`
+
+Contains data about a post's thumbnail. Also contains a blurred version if the thumbnail is NSFW.
+
+#### Type declaration
+
+| Name                     | Type                                                          | Description                                                                         |
+| :----------------------- | :------------------------------------------------------------ | :---------------------------------------------------------------------------------- |
+| `attribution?`           | `string`                                                      | Attribution text for the thumbnail                                                  |
+| `image`                  | \{ `height`: `number` ; `url`: `string` ; `width`: `number` } | The image used for the thumbnail. May have different resolution from Post.thumbnail |
+| `image.height`           | `number`                                                      | -                                                                                   |
+| `image.url`              | `string`                                                      | -                                                                                   |
+| `image.width`            | `number`                                                      | -                                                                                   |
+| `isObfuscatedDefault`    | `boolean`                                                     | Whether this thumbnail appears blurred by default                                   |
+| `obfuscatedImage?`       | \{ `height`: `number` ; `url`: `string` ; `width`: `number` } | The blurred image for NSFW thumbnails                                               |
+| `obfuscatedImage.height` | `number`                                                      | -                                                                                   |
+| `obfuscatedImage.url`    | `string`                                                      | -                                                                                   |
+| `obfuscatedImage.width`  | `number`                                                      | -                                                                                   |
+
+---
+
 ### <a id="flairbackgroundcolor" name="flairbackgroundcolor"></a> FlairBackgroundColor
 
 Ƭ **FlairBackgroundColor**: \`#$\{string}\` \| `"transparent"`
@@ -554,10 +578,11 @@ For example, a conversation may be both 'highlighted' and 'inprogress'.
 
 #### Type declaration
 
-| Name            | Type                                                                   | Description                 |
-| :-------------- | :--------------------------------------------------------------------- | :-------------------------- |
-| `conversations` | \{ `[id: string]`: [`ConversationData`](models.md#conversationdata); } | Conversations key-value map |
-| `viewerId?`     | `string`                                                               | -                           |
+| Name              | Type                                                                   | Description                                                                                                                         |
+| :---------------- | :--------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `conversationIds` | `string`[]                                                             | Array of conversation ids, ordered by the sort parameter specified in [GetConversationsRequest](models.md#getconversationsrequest). |
+| `conversations`   | \{ `[id: string]`: [`ConversationData`](models.md#conversationdata); } | Conversations key-value map                                                                                                         |
+| `viewerId?`       | `string`                                                               | -                                                                                                                                   |
 
 ---
 

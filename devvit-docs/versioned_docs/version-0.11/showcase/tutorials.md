@@ -2,12 +2,12 @@
 
 ## [Intro to Devvit](./tutorials/intro-to-devvit.mdx)
 
-This interactive tutorial will help you get to know Devvit and help [r/Devvit](https://www.reddit.com/r/Devvit/) get to know you! You'll learn how to work with templates, run a playtest, and create an experience post on Reddit. When you're done, you'll have your own introduction post that you can share with the community.
+This interactive tutorial will help you get to know Devvit and help [r/Devvit](https://www.reddit.com/r/Devvit/) get to know you! You'll learn how to work with templates, run a playtest, and create an interactive post on Reddit. When you're done, you'll have your own introduction post that you can share with the community.
 
 **Capabilities used:**
 
 - [Templates](../templates.mdx)
-- [Experiences](../experiences.md)
+- [Interactive Posts](../interactive_posts.md)
 - [Playtest](../playtest.md)
 
 ## [Remind me](./tutorials/remind_me.md)

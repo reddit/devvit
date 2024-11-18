@@ -1,8 +1,8 @@
 # Dimensions
 
-Create responsive experience posts.
+Create responsive interactive posts.
 
-Dimensions provides a way for you to create responsive experiences by giving you the dimensions of the root node as part of the context object. This lets you write responsive interfaces based on the space available within the context object.
+Dimensions provides a way for you to create responsive interactive posts by giving you the dimensions of the root node as part of the context object. This lets you write responsive interfaces based on the space available within the context object.
 
 Dimensions are dynamic and update in real time if the device or viewport changes. You can also resize your screen as you develop to see how your posts respond in real time. This is the same post displayed on a phone (left) and a tablet (right):
 
@@ -19,8 +19,8 @@ Dimension information is specified in density-independent pixels. These pixel un
 
 | Dimension | Description                                                                                                                                                                |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Height    | The pixel unit height of the experience post. This is a fixed value that will not change based on the height property provided on `Devvit.addCustomPostType`.              |
-| Width     | The pixel width of the containing box for your experience post.                                                                                                            |
+| Height    | The pixel unit height of the interactive post. This is a fixed value that will not change based on the height property provided on `Devvit.addCustomPostType`.             |
+| Width     | The pixel width of the containing box for your interactive post.                                                                                                           |
 | Scale     | The [pixel scale](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio) that determines the resolution for how your custom post renders on the device. |
 
 ## Example

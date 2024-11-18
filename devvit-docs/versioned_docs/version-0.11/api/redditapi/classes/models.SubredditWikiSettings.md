@@ -26,4 +26,4 @@
 
 ### <a id="wikieditmode" name="wikieditmode"></a> wikiEditMode
 
-• `Optional` **wikiEditMode**: `"disabled"` \| `"modonly"` \| `"anyone"`
+• `Optional` **wikiEditMode**: [`WikiEditMode`](../modules/models.md#wikieditmode)

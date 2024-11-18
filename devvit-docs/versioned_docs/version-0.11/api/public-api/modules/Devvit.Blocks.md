@@ -282,17 +282,23 @@ large = 24px;
 
 ### <a id="onwebvieweventhandler" name="onwebvieweventhandler"></a> OnWebViewEventHandler
 
-Ƭ **OnWebViewEventHandler**: (`message`: [`JSONObject`](../README.md#jsonobject)) => `void` \| `Promise`\<`void`\>
+Ƭ **OnWebViewEventHandler**: \<T\>(`message`: `T`) => `void` \| `Promise`\<`void`\>
 
 #### Type declaration
 
-▸ (`message`): `void` \| `Promise`\<`void`\>
+▸ \<`T`\>(`message`): `void` \| `Promise`\<`void`\>
+
+##### Type parameters
+
+| Name | Type                                          |
+| :--- | :-------------------------------------------- |
+| `T`  | extends [`JSONValue`](../README.md#jsonvalue) |
 
 ##### Parameters
 
-| Name      | Type                                    |
-| :-------- | :-------------------------------------- |
-| `message` | [`JSONObject`](../README.md#jsonobject) |
+| Name      | Type |
+| :-------- | :--- |
+| `message` | `T`  |
 
 ##### Returns
 

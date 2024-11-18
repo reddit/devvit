@@ -45,15 +45,9 @@ Devvit.addMenuItem({
 });
 ```
 
-### Experience posts
+### Interactive posts
 
-You can follow this template to create an experience post containing an interactive progress bar backed by Redis.
-
-```tsx
-// start from a template
-devvit new <replace-with-your-app-name> --template=redis
-devvit playtest <your-test-subreddit>
-```
+You can copy this [template](https://github.com/reddit/devvit/tree/main/packages/cli/src/templates/redis) to create an interactive post containing an interactive progress bar backed by Redis.
 
 ## Supported Redis commands
 

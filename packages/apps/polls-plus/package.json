@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "ci-polls-plus",
-  "version": "0.11.3-dev",
+  "version": "0.11.4-dev",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.11.3-dev",
+    "@devvit/public-api": "0.11.4-dev",
     "moment": "2.29.4",
     "moment-duration-format": "2.3.2",
     "numbro": "2.3.6"

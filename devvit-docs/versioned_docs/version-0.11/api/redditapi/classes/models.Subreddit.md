@@ -988,9 +988,9 @@ const userFlairList = response.users;
 
 #### Parameters
 
-| Name      | Type                                                                                                                                                                                                                                                                                             |
-| :-------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `options` | [`SubmitLinkOptions`](../modules/models.md#submitlinkoptions) \| \{ `text`: `string` } & [`CommonSubmitPostOptions`](../modules/models.md#commonsubmitpostoptions) \| \{ `richtext`: `object` \| `RichTextBuilder` } & [`CommonSubmitPostOptions`](../modules/models.md#commonsubmitpostoptions) |
+| Name      | Type                                                                                                                                   |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| `options` | [`SubmitLinkOptions`](../modules/models.md#submitlinkoptions) \| [`SubmitSelfPostOptions`](../modules/models.md#submitselfpostoptions) |
 
 #### Returns
 

@@ -1,12 +1,12 @@
 # Realtime
 
-Create live and event-driven experience posts. Realtime provides a set of primitives that lets you build experience posts that are:
+Create live and event-driven interactive posts. Realtime provides a set of primitives that lets you build interactive posts that are:
 
-- **Live**. Users engaging with the same experience post see each others’ changes without any observable lag.
+- **Live**. Users engaging with the same interactive post see each others’ changes without any observable lag.
 - **Event-driven**. Posts render automatically in response to server events.
 - **Synced**. Using realtime with [Redis](/docs/capabilities/redis.md) lets you build persistent community experiences that are backed by high performance data synchronization.
 
-## Create a live experience post
+## Create a live interactive post
 
 #### 1. Configure realtime.
 
@@ -18,7 +18,7 @@ Devvit.configure({
 
 #### 2. Create and subscribe to a channel.
 
-`useChannel` hook allows experience posts to subscribe and send to an event stream.
+`useChannel` hook allows interactive posts to subscribe and send to an event stream.
 
 A new channel can be setup with function handlers containing custom logic to update state:
 
@@ -29,7 +29,7 @@ A new channel can be setup with function handlers containing custom logic to upd
 ```tsx
 import { Devvit, useChannel } from '@devvit/public-api';
 
-// Defined within render function of an experience post
+// Defined within render function of an interactive post
 
 // Choose a channel name that works for you
 
@@ -73,7 +73,7 @@ channel.subscribe();
 />
 ```
 
-`realtime.send` is recommended for re-rendering experience posts based on server events. This can be invoked on an event trigger, scheduled job, or after a HTTP fetch call. [Server-Push](#server-push) example illustrates how to compose scheduler and realtime together.
+`realtime.send` is recommended for re-rendering interactive posts based on server events. This can be invoked on an event trigger, scheduled job, or after a HTTP fetch call. [Server-Push](#server-push) example illustrates how to compose scheduler and realtime together.
 
 ```tsx
 // During app installation, we create a scheduled job 'publish_to_channel' that runs
@@ -89,7 +89,7 @@ Devvit.addTrigger({
   },
 });
 
-// Experience posts subscribed to the 'events' channel via useChannel hook will start
+// Interactive posts subscribed to the 'events' channel via useChannel hook will start
 // receiving messages which can processed in the onMessage handler to update local state.
 Devvit.addSchedulerJob({
   name: 'publish_to_channel',

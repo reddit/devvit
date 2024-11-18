@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "pen-template",
-  "version": "0.10.22",
+  "version": "0.11.4-dev",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.22"
+    "@devvit/public-api": "0.11.4-dev"
   },
   "devDependencies": {
     "typescript": "5.3.2"

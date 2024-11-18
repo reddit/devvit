@@ -62,7 +62,7 @@ $ devvit help
 
 ## devvit install
 
-Install an app or experience from the Apps directory to a subreddit that you moderate. You can specify a version to install or default to @latest (the latest version).
+Install an app from the Apps directory to a subreddit that you moderate. You can specify a version to install or default to @latest (the latest version).
 
 #### Usage
 
@@ -253,7 +253,7 @@ $ devvit new
 
 $ devvit new tic-tac-toe
 
-$ devvit new tic-tac-toe --template experience-post
+$ devvit new tic-tac-toe --template blocks-post
 
 $ devvit new --here
 ```

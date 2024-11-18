@@ -45,13 +45,8 @@ $ devvit new --template custom-post <project-name>
 
 ### Templates
 
-| Template        | Description                                                                                  |
-| --------------- | -------------------------------------------------------------------------------------------- |
-| `app-settings`  | Scaffolding for setting and retrieving app settings.                                         |
-| `custom-post`   | A custom post template with menu action for instantiating.                                   |
-| `empty`         | The default, boilerplate project template.                                                   |
-| `forms`         | Demonstrates how to use forms to solicit user information.                                   |
-| `image-uploads` | Demonstrates how to upload and use images in apps.                                           |
-| `menu-action`   | Illustrates the different places and configurations you can use on your custom Menu actions. |
-| `redis`         | Demonstrates how to read and persist data in redis between renders.                          |
-| `triggers`      | Demonstrates how to respond to a trigger.                                                    |
+| Template       | Description                                               |
+| -------------- | --------------------------------------------------------- |
+| `blocks-post`  | An interatcive post template using Devvit blocks.         |
+| `webview-post` | An interatcive post template using the webview comopnent. |
+| `empty`        | The default, boilerplate project template.                |

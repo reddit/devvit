@@ -8,13 +8,13 @@ A form lets your app ask users to input and submit data. Forms can be defined wi
 
 There are several ways to add a form to your app, and the method you'll use depends on what you’re doing.
 
-- For [experience posts](#experience-posts), use the `context.ui.useForm` hook.
+- For [interactive posts](#interactive-posts), use the `context.ui.useForm` hook.
 - For [menu actions](#menu-actions), use the [`devvit.createForm`](/docs/api/public-api/classes/Devvit-1.md#createform) method.
 - For [app configurations](#app-configurations), use the [`devvit.addSettings`](/docs/api/public-api/classes/Devvit-1.md#addsettings) method.
 
-### Experience posts
+### Interactive posts
 
-This example shows an experience post with a text label and a button that triggers a form. When the form is submitted, the onSubmit handler takes the form input and manipulates state with [`useState`](/docs/working_with_usestate.md). The state update triggers a rerender and the new data is displayed.
+This example shows an interactive post with a text label and a button that triggers a form. When the form is submitted, the onSubmit handler takes the form input and manipulates state with [`useState`](/docs/working_with_usestate.md). The state update triggers a rerender and the new data is displayed.
 
 ```tsx
 import { Devvit, useState, useForm } from '@devvit/public-api';
@@ -159,7 +159,7 @@ const myForm = Devvit.createForm(
 ```
 
 :::note
-Note: The `context` object is not available in onSubmit handlers within the `useForm` hook. For experience posts, you already have access to the context element via the outer function's scope.
+Note: The `context` object is not available in onSubmit handlers within the `useForm` hook. For interactive posts, you already have access to the context element via the outer function's scope.
 :::
 
 ## Supported fields types
@@ -513,7 +513,7 @@ export default Devvit;
 
 ### Multi-step forms
 
-Add a multi-step dynamic form to an experience post
+Add a multi-step dynamic form to an interactive post
 
 ```tsx
 import { Devvit, useState, useForm } from '@devvit/public-api';
@@ -611,7 +611,7 @@ Devvit.addMenuItem({
   onPress: async (_event, context) => {
     const currentSubreddit = await context.reddit.getCurrentSubreddit();
     await context.reddit.submitPost({
-      title: 'Experience post with multi-step form',
+      title: 'Interactive post with multi-step form',
       subredditName: currentSubreddit.name,
       preview: (
         <vstack width="100%" height="100%" alignment="middle center">

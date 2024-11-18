@@ -1,14 +1,14 @@
 {
   "private": true,
   "name": "app-settings-template",
-  "version": "0.10.22",
+  "version": "0.11.4-dev",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.10.22"
+    "@devvit/public-api": "0.11.4-dev"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.10.22",
+    "@devvit/tsconfig": "0.11.4-dev",
     "typescript": "4.9.3"
   }
 }
