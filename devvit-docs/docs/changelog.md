@@ -4,6 +4,22 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.3: Webviews (experimental), server-side functions, and other public API updates
+
+**Release Date: Nov 18, 2024**
+
+0.11.3 adds a new way for developers to build UI with webviews and server-side functions.
+
+**[Webviews](./webviews.md)** - is an experimental alternative to Devvit blocks, where you can build interactive posts and bring your own html/css/js into apps. This allows you to have access to standard web APIs and frameworks and access to animations and gestures not available in blocks. Note that this is an experimental feature that only works on web and is subject to significant changes over the next few months.
+
+**Server-side functions** - We heard that developers are concerned that their app code for interactive posts is exposed to clients (which is done for performance purposes). This release includes new [server-side functions](./capabilities/server-side-functions.md) so that you can run functions from a `/*.server.ts` or `/server/*.ts` file to keep your codebase private. Those functions will run server-side and trigger a re-render.
+
+We also made a few other changes to our public API in this release:
+
+- [post.getEnrichedThumbnail](./api/redditapi/classes/models.Post.md#setcustompostpreview) allows developers to get a better thumbnail
+- Community fix: Allow [WikiPage revision author](./api/redditapi/classes/models.WikiPage.md) to be undefined (Thanks PitchforkAssistant)
+- Community fix: Include conversations IDs sorted array from [modMail.getConversations](./api/redditapi/classes/models.ModMailService.md#getconversations) (Thanks Pitchfork Assistant x2!)
+
 ## Devvit 0.11.2: Text fallback and post API client changes
 
 **Release Date: Oct 31, 2024**

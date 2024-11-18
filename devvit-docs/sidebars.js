@@ -56,6 +56,7 @@ const sidebars = {
         'capabilities/realtime',
         'capabilities/scheduler',
         'capabilities/secrets-storage',
+        'capabilities/server-side-functions',
         'capabilities/triggers',
       ],
     },
