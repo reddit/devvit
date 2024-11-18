@@ -1,4 +1,4 @@
-# Getting started with Devvit
+# Getting started with {{name}}
 
 Your project has been created using a Devvit template. Follow the [tutorial to finsih updating your app](https://developers.reddit.com/docs/intro-to-devvit).
 

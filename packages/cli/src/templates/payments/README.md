@@ -1,4 +1,4 @@
-# Getting started with Devvit
+# Getting started with {{name}}
 
 Your project has been created using a Devvit template.
 
