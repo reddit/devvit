@@ -124,9 +124,11 @@ async (event, context) => {
 - [setUserFlair](RedditAPIClient.RedditAPIClient.md#setuserflair)
 - [submitComment](RedditAPIClient.RedditAPIClient.md#submitcomment)
 - [submitPost](RedditAPIClient.RedditAPIClient.md#submitpost)
+- [subscribeToCurrentSubreddit](RedditAPIClient.RedditAPIClient.md#subscribetocurrentsubreddit)
 - [unbanUser](RedditAPIClient.RedditAPIClient.md#unbanuser)
 - [unbanWikiContributor](RedditAPIClient.RedditAPIClient.md#unbanwikicontributor)
 - [unmuteUser](RedditAPIClient.RedditAPIClient.md#unmuteuser)
+- [unsubscribeFromCurrentSubreddit](RedditAPIClient.RedditAPIClient.md#unsubscribefromcurrentsubreddit)
 - [updateWikiPage](RedditAPIClient.RedditAPIClient.md#updatewikipage)
 - [updateWikiPageSettings](RedditAPIClient.RedditAPIClient.md#updatewikipagesettings)
 
@@ -2229,6 +2231,20 @@ const post = await reddit.submitPost({
 
 ---
 
+### <a id="subscribetocurrentsubreddit" name="subscribetocurrentsubreddit"></a> subscribeToCurrentSubreddit
+
+▸ **subscribeToCurrentSubreddit**(): `Promise`\<`void`\>
+
+Subscribes to the subreddit in which the app is installed. No-op if the user is already subscribed.
+This method will execute as the app account by default.
+To subscribe on behalf of a user, please contact Reddit.
+
+#### Returns
+
+`Promise`\<`void`\>
+
+---
+
 ### <a id="unbanuser" name="unbanuser"></a> unbanUser
 
 ▸ **unbanUser**(`username`, `subredditName`): `Promise`\<`void`\>
@@ -2277,6 +2293,20 @@ Unmute a user in a subreddit. Unmuting a user allows them to send modmail.
 | :-------------- | :------- | :------------------------------------------------------------ |
 | `username`      | `string` | The username of the user to unmute. e.g. 'spez'               |
 | `subredditName` | `string` | The name of the subreddit to unmute the user in. e.g. 'memes' |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+---
+
+### <a id="unsubscribefromcurrentsubreddit" name="unsubscribefromcurrentsubreddit"></a> unsubscribeFromCurrentSubreddit
+
+▸ **unsubscribeFromCurrentSubreddit**(): `Promise`\<`void`\>
+
+Unsubscribes from the subreddit in which the app is installed. No-op if the user isn't subscribed.
+This method will execute as the app account by default.
+To unsubscribe on behalf of a user, please contact Reddit.
 
 #### Returns
 

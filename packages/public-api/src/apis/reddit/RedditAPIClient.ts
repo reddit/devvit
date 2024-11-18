@@ -1643,4 +1643,46 @@ export class RedditAPIClient {
   getSubredditStyles(subredditId: string): Promise<SubredditStyles> {
     return getSubredditStyles(subredditId, this.#metadata);
   }
+
+  /**
+   * Subscribes to the subreddit in which the app is installed. No-op if the user is already subscribed.
+   * This method will execute as the app account by default.
+   * To subscribe on behalf of a user, please contact Reddit.
+   */
+  async subscribeToCurrentSubreddit(): Promise<void> {
+    const currentSubreddit = await this.getCurrentSubreddit();
+    const client = Devvit.redditAPIPlugins.Subreddits;
+
+    await client.Subscribe(
+      {
+        action: 'sub',
+        actionSource: '',
+        srName: currentSubreddit.name,
+        sr: '',
+        skipInitialDefaults: true,
+      },
+      this.#metadata
+    );
+  }
+
+  /**
+   * Unsubscribes from the subreddit in which the app is installed. No-op if the user isn't subscribed.
+   * This method will execute as the app account by default.
+   * To unsubscribe on behalf of a user, please contact Reddit.
+   */
+  async unsubscribeFromCurrentSubreddit(): Promise<void> {
+    const currentSubreddit = await this.getCurrentSubreddit();
+    const client = Devvit.redditAPIPlugins.Subreddits;
+
+    await client.Subscribe(
+      {
+        action: 'unsub',
+        actionSource: '',
+        srName: currentSubreddit.name,
+        sr: '',
+        skipInitialDefaults: false,
+      },
+      this.#metadata
+    );
+  }
 }

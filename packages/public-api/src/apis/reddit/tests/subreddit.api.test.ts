@@ -168,6 +168,80 @@ describe('Subreddit API', () => {
 
       expect(result).toEqual('uuid-abc');
     });
+
+    test('subscribe()', async () => {
+      const subreddit = new Subreddit(
+        {
+          id: subredditId,
+          displayName: 'askReddit',
+          subredditType: 'public',
+          createdUtc: Date.parse('2022-01-03'),
+          lang: 'en',
+          allowedMediaInComments: [],
+          userFlairRichtext: [],
+          submissionType: 'any',
+        },
+        api.metadata
+      );
+      vi.spyOn(Subreddit, 'getFromMetadata').mockImplementationOnce(async () => {
+        return subreddit;
+      });
+
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Subreddits, 'Subscribe');
+      spyPlugin.mockImplementationOnce(async () => {
+        return {};
+      });
+
+      await api.reddit.subscribeToCurrentSubreddit();
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        {
+          action: 'sub',
+          actionSource: '',
+          srName: 'askReddit',
+          sr: '',
+          skipInitialDefaults: true,
+        },
+        api.metadata
+      );
+    });
+
+    test('unsubscribe()', async () => {
+      const subreddit = new Subreddit(
+        {
+          id: subredditId,
+          displayName: 'askReddit',
+          subredditType: 'public',
+          createdUtc: Date.parse('2022-01-03'),
+          lang: 'en',
+          allowedMediaInComments: [],
+          userFlairRichtext: [],
+          submissionType: 'any',
+        },
+        api.metadata
+      );
+      vi.spyOn(Subreddit, 'getFromMetadata').mockImplementationOnce(async () => {
+        return subreddit;
+      });
+
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Subreddits, 'Subscribe');
+      spyPlugin.mockImplementationOnce(async () => {
+        return {};
+      });
+
+      await api.reddit.unsubscribeFromCurrentSubreddit();
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        {
+          action: 'unsub',
+          actionSource: '',
+          srName: 'askReddit',
+          sr: '',
+          skipInitialDefaults: false,
+        },
+        api.metadata
+      );
+    });
   });
 
   describe('Subreddit api model', () => {
