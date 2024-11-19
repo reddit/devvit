@@ -3,82 +3,66 @@ import TabItem from '@theme/TabItem';
 
 # Quickstart
 
-:::note
-This quickstart is _really_ quick. For step-by-step instructions, see the [**building an app guide**](dev_guide).
-:::
+This guide will help you create your first Reddit Developer Platform app in minutes. For a more detailed walkthrough, see the [**building an app guide**](dev_guide).
 
-Here's the tl;dr for building on the Developer Platform. Apps are written in [TypeScript](https://www.typescriptlang.org/). Before
-you get started, you'll need:
+## Prerequisites
+
+Before you start, you'll need:
 
 - [Node.js](https://nodejs.org/) (v22.2.0+)
+- A [test subreddit](https://mods.reddithelp.com/hc/en-us/articles/360001766991-How-to-create-a-subreddit) that you moderate (with less than 200 members)
+- A code editor (we recommend [VS Code](https://code.visualstudio.com/))
+
 
 <details>
-  <summary>Click here for instructions on installing Node.js</summary>
+  <summary>Need help installing Node.js?</summary>
   <div>
     <div>
-    You’re going to work with TypeScript. In order for Typescript to work with Devvit, you’ll need a working Node.js environment and then the Devvit command line interface. Node.js is an open-source server environment that makes it possible to develop and run Javascript apps anywhere. Node.js lets you import and use packages (code that other people have written) into your code.
+    You'll need Node.js to work with TypeScript and Devvit. Here are two ways to install it:
 
-**Option 1: Use node version manager (nvm)**
+**Option 1: Using nvm (Recommended)**
 
-Install or update [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) to use as a handy command-line tool for managing multiple Node.js versions on your system. This will allow you to switch between different versions easily. If you to use a different node version manager, check out these [suggestions from npmjs.org](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+[nvm](https://github.com/nvm-sh/nvm#installing-and-updating) lets you easily manage multiple Node.js versions.
 
-For macOS or Linux:
-
-1. Run the following command line in your terminal to install nvm.
-
+For macOS/Linux:
 ```bash
+# 1. Install nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash
-```
 
-2. Close and re-open your terminal to have nvm available.
+# 2. Close and reopen terminal
 
-3. Install the latest version of Node.js.
-
-```bash
+# 3. Install Node.js
 nvm install node
 ```
 
 For Windows:
+1. Install [nvm-windows](https://github.com/coreybutler/nvm-windows)
+2. Restart terminal
+3. Run `nvm install node`
 
-1. Download and install nvm-windows by following the instructions in the [repository](https://github.com/coreybutler/nvm-windows).
+**Option 2: Direct Installation**
 
-2. Restart your terminal or command prompt.
+1. Download from [Node.js website](https://nodejs.org)
+2. Run the installer
 
-3. Install the latest version of Node.js.
-
-```bash
-nvm install node
-```
-
-**Option 2: Use Node.js installer from nodejs.org**
-
-1. Visit the official [Node.js website](https://nodejs.org) to download the installer for your operating system (Windows, macOS, or Linux).
-2. Run the installer and follow the prompts to install Node.js and npm (the package manager for Node.js).
-
-:::note
-If you install Node.js this way, you may experience permissions issues when trying to run Devvit, which is [documented on NPM's website](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). Additionally, when Node updates in the future, you'll need to uninstall and reinstall Node to get the latest version working. Both NPM and us here at Reddit highly encourage you to use nvm if possible. If that's not possible, here are some tips on how to [fix these permissions issues](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). For Windows users specifically, please use a node version manager.
+:::caution
+Direct installation may cause permissions issues. We recommend using nvm instead.
 :::
 
-Check that Node.js is installed correctly by running the following commands:
-
+**Verify Installation**
 ```bash
 node --version
 npm --version
 ```
-
-You should see the version numbers for Node.js and npm as output.
-
 </div>
     <br/>
   </div>
 </details>
 
-- a [test subreddit](https://mods.reddithelp.com/hc/en-us/articles/360001766991-How-to-create-a-subreddit) that you moderate with
-  less than 200 members
-- a code editor (we recommend [VS Code](https://code.visualstudio.com/))
 
-Run the following commands to install the Devvit CLI, and then create, upload, and
-preview your app. You can also follow along with the video (the tutorial starts at 1:35).
+## Quick Video Tutorial
+
+Watch this video for a visual guide (tutorial starts at 1:35):
 
 <iframe
   width="xxx"
@@ -91,60 +75,74 @@ preview your app. You can also follow along with the video (the tutorial starts 
   allowfullscreen
 ></iframe>
 
+## Step-by-Step Guide
+
+1. **Install the Devvit CLI** - Choose your preferred package manager:
+
 <Tabs>
   <TabItem value="npm" label="npm" default>
 ```bash
 npm install -g devvit
-devvit login
-devvit new --template blocks-post
-cd my-project
-devvit upload
-devvit playtest <my-subreddit>
 ```
   </TabItem>
   <TabItem value="yarn" label="Yarn">
 ```bash
 yarn global add devvit
-devvit login
-devvit new --template blocks-post
-cd my-project
-devvit upload
-devvit playtest <my-subreddit>
 ```
   </TabItem>
   <TabItem value="pnpm" label="pnpm" default>
 ```bash
 pnpm install -g devvit
-devvit login
-devvit new --template blocks-post
-cd my-project
-devvit upload
-devvit playtest <my-subreddit>
 ```
   </TabItem>
 </Tabs>
 
-:::note
-If you're familiar with web development, use the template `web-view-post` instead and try our experimental [webview component feature](webviews.md)
+2. **Log in to Reddit**
+```bash
+devvit login
+```
+
+3. **Create a new project**
+```bash
+devvit new --template blocks-post
+cd my-project
+```
+:::tip Web Developer?
+If you're familiar with web development, use `--template web-view-post` instead when creating your project to try our [webview component feature](webviews.md)
 :::
 
-Visit your subreddit and interact with your app. As you make and save code modifications, playtest will automatically build and deploy the app to your subreddit. Simply refresh the page to view the latest changes.
+4. **Upload your app**
+```bash
+devvit upload
+```
 
-While the playtest is active, you will be streaming logs from the app. This is useful for debugging and gaining insights into how your app is running.
+5. **Test your app**
+```bash
+devvit playtest <my-subreddit>
+```
 
-To stop the playtest, press `Ctrl + c`.
-
-:::note
-Reddit collects usage metrics when you use the Devvit CLI. For more information, see
-[Reddit’s Developer Terms](https://www.redditinc.com/policies/developer-terms) and the
-[Reddit Privacy Policy](https://www.reddit.com/policies/privacy-policy). You can opt out at any time by
-using the `devvit metrics off` command.
+:::tip
+Replace `<my-subreddit>` with your test subreddit name (e.g., `devvit playtest r/MyTestSub`)
 :::
 
-## Next steps
+## Testing Your App
 
-Now you know how to create and deploy apps! Next up, try the following:
+1. Visit your subreddit and interact with your app
+2. As you make code changes, playtest automatically rebuilds and deploys
+3. Simply refresh the page to see your latest changes
+4. View real-time logs while playtest is active
+5. Press `Ctrl + c` to stop playtest
 
-- Check out the [showcase](/docs/showcase/apps.mdx) to see what others have created.
-- Learn how to [publish](dev_guide/#9-publish) your app and make it public in the Apps directory.
-- Follow the [Remind Me](/docs/showcase/tutorials/remind_me.md) tutorial.
+## Choose Your Path
+
+Here are the recommended next steps:
+
+- Learn about [building interacative posts](./interactive_posts.md)
+- Check out the [showcase](/docs/showcase/apps.mdx) to see example apps
+- Learn how to [publish](dev_guide/#9-publish) your app
+
+:::note
+Reddit collects usage metrics when you use the Devvit CLI. See
+[Reddit's Developer Terms](https://www.redditinc.com/policies/developer-terms) and
+[Privacy Policy](https://www.reddit.com/policies/privacy-policy). Opt out with `devvit metrics off`.
+:::

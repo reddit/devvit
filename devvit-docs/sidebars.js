@@ -74,6 +74,7 @@ const sidebars = {
         'working_with_usestate',
         'working_with_useasync',
         'working_with_useinterval',
+        'community_games',
       ],
     },
     {

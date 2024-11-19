@@ -1,89 +1,206 @@
 # Webviews
 
-The webviews component allows you to include your own html/css/javascript and have it run within your reddit app. This feature is currently in beta and is meant to be tested primarily on desktop web. Mobile support coming later this year.
+:::note
+Webviews is currently experimental and optimized for desktop web. Mobile support is coming later this year.
+:::
+
+Webviews allow you include HTML, CSS, and JavaScript and have it run within your reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
 
 # Why use webviews over blocks?
 
 Here’s a comparison between the two:
 
-| Support                                     | Webviews | Blocks |
-| ------------------------------------------- | -------- | ------ |
-| Rich Multimedia (animations, sounds, video) | Yes      | No     |
-| Gestures                                    | Yes      | Clicks |
-| Optimized for in-feed experience            | No       | Yes    |
-| Uses Reddit design system                   | No       | Yes    |
+| Feature                                    | Webviews | Blocks |
+| ------------------------------------------ | -------- | ------ |
+| Rich multimedia (animations, video, audio) | ✅       | ❌     |
+| Advanced gestures                          | ✅       | ❌     |
+| Uses Reddit design system                  | ❌       | ✅     |
+| Optimized for in-feed experience           | ❌       | ✅     |
 
-If you're a web developer and prefer to work with familiar technologies like HTML, CSS, and JavaScript, webviews might be the better choice for you. However, if you're comfortable learning a new domain-specific language with a constrained API and want to optimize for a speedy and simple app, you may want to build your app using blocks.
+**Choose Webviews if you:**
 
-# How webviews work
+- Are experienced with web development
+- Need rich multimedia or advanced interactions
+- Want full control over styling and behavior
 
-### New Devvit block: `<webview />`
+**Choose Blocks if you:**
 
-The new `<webview />` component in Devvit will display the contents of your web application and provide APIs for handling messaging and state synchronization between your web code and your Devvit code
-All of the code that will run in your webview should be contained in a special folder called `webroot/`. There you can use Javascript APIs to send and receive messages from your Devvit environment. You cannot call external services from within the webview so if you want to fetch, use redis (storage), or the reddit API client you will need to leverage one of the strategies below to communicate between your web app and your Devvit app.
+- Want a Reddit-native look and feel
+- Prefer a simpler, more constrained API
+- Need optimal feed performance
 
-See the section below on [handling state with webviews](#handling-state-between-devvit-and-webviews) to learn how to send and receive messages and state updates between your javascript app and your Devvit app.
+## Quickstart
 
-### Known limitations
+1. Create a new webview project:
 
-- Inline CSS or JS is not allowed. All JS and CSS must be contained in separate files and imported via links.
-- Gesture recognition on mobile does not yet work, as it triggers native gestures in the Reddit app as well. We are working on a fix for this that should be available in November.
-- Uploading a new asset, even in a playtest, will overwrite assets for all versions when a new version of assets is uploaded (even via playtest) ALL versions of that app will have access to those assets. This can cause problems if you use a single app for both development and production releases. We are working on a fix that should be available in October. In the interim, we recommend creating separate apps for development and production versions of the app.
-- Form submissions from within a webview are blocked for security purposes (post/get to external servers), devs can instead add a listener to the click button, read form values, and take relevant actions.
+```bash
+devvit new --template web-view-post
+cd my-project
+```
+
+2. Upload and test:
+
+```bash
+devvit upload
+devvit playtest <my-subreddit>
+```
+
+3. Create a post in your subreddit using the "Create New Devvit Post (with Web View)" option in the post menu.
+
+### Project Structure
+
+```
+my-project/
+├── webroot/           # All web content goes here
+│   ├── page.html     # Main HTML file
+│   ├── styles.css    # Stylesheets
+│   └── app.js        # JavaScript code
+└── src/
+    └── main.tsx      # Devvit app code
+```
+
+![Sample webviews post](./assets/webviews_example.png)
+
+## Examples
+
+- [React/Tailwind/Vite template](https://github.com/mwood23/devvit-webview-react)
+- Games
+  - [Fiddlesticks](https://reddit.com/r/fiddlesticks) | [Code](https://github.com/reddit/devvit-fiddlesticks)
+  - [Snoosings](https://reddit.com/r/snoosings) | [Code](https://github.com/reddit/devvit-snoosings)
+  - [Corridor](https://reddit.com/r/corridorgame) | [Code](https://github.com/reddit/devvit-corridor)
+
+## Known limitations
+
+1. **CSS/JS Requirements**
+
+   - ❌ No inline CSS or JavaScript
+   - ✅ Use separate .css and .js files
+
+2. **Mobile Gestures**
+
+   - ❌ Complex gestures may conflict with the Reddit app
+   - ✅ Use simple interactions and avoid scrolling (e.g. overflow: none)
+   - 🔄 Fix coming soon
+
+3. **Asset Versioning**
+
+   - ❌ Assets affect all versions when updated (including in a playtest)
+   - ✅ Use separate apps for development/production
+   - 🔄 Fix coming soon
+
+4. **Forms**
+   - ❌ No direct form submissions
+   - ✅ Use JavaScript to handle form data
+   - ✅ Send data via postMessage
 
 ## Best practices
 
-- The resulting webview files need to be in a folder called `webroot/` in the project directory. If you’re using a bundler for your webview app make sure that the html/css/js files build out to that directory
-- Use a "Launch App" button to change visibility of your webview to prevent flashing, like used in the template below
-- Try to rely on local storage and state, and limit the amount of passing back and forth into the Devvit app to handle changes when your webview is gets detsroyed or recreated in the feed
-- Blocks can be used to generate a fast preview of your webview content
+1. **File Organization**
 
-## Create an app with webviews
+   - Keep all web files in the `webroot/` directory
+   - Use separate files for HTML, CSS, and JavaScript
+   - Consider using a bundler for larger applications
 
-1. Create a new app.
+2. **State Management**
 
-```sh
-$ devvit new
+   - Use `localStorage` for webview-only state
+   - Use Redis storage (via Devvit) for persistent data
+   - Minimize state synchronization between webview and Devvit
 
-? Project name: my-webview-app
-? Choose a template:
- > web-view-post
+3. **Performance**
+   - Add a "Launch App" button to prevent UI flashing
+   - Use local storage to cache data when possible
+   - Create a compelling preview within Blocks
+   - Prevent scaling the viewport
 
-$ cd my-webview-app
+```html
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+/>
 ```
 
-When asked to choose a template, you can choose the `webviews-post` template to have the scaffolding auto-generated for you. Below we will provide an explanation the generated code and its functionality.
+## Communication Between Devvit and Webviews
 
-2. Upload the first version.
+Webviews let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services (Redis, fetch, scheduler, triggers) via message passing between the two contexts.
 
-```sh
-$ devvit upload
+![Sample webviews post](./assets/webviews-devvit-architecture.png)
 
-? Pick a name for your app: (my-webview-app)
-? Is the app NSFW? (y/N)
-✨ Visit https://developers.reddit.com/apps/my-webview-app to view your app!
+### From Devvit to Webview
 
+```typescript
+// In main.tsx
+context.ui.webView.postMessage('myWebView', {
+  type: 'updateData',
+  data: { count: 42 },
+});
+
+// In webroot/app.js
+window.addEventListener('message', (event) => {
+  if (event.data.type === 'devvit-message') {
+    const { message } = event.data;
+    console.log('Received from Devvit:', message);
+  }
+});
 ```
 
-3. Use Playtest to test the application in your own Subreddit
+### From Webview to Devvit
 
-```sh
-$ devvit playtest r/MyTestSubreddit
+```typescript
+// In webroot/app.js
+window.parent.postMessage({
+  type: 'userAction',
+  data: { clicked: true }
+}, '*');
 
-  Type checking is disabled.
-  ...
-  App is building remotely...... ✅
-  Installing playtest version 0.0.1...... ✅
-  Success! Please visit your test subreddit and refresh to see your latest changes:
-  ✨ https://www.reddit.com/r/mytestsubreddit?playtest=my-webview-app
-
+// In main.tsx
+<webview
+  id="myWebView"
+  url="page.html"
+  onMessage={(msg) => {
+    console.log('Received from webview:', msg);
+  }}
+/>
 ```
 
-4. Visit your Subreddit and create a new post
+### Local, webview-only state
 
-Now you can visit your subreddit to try out the new post. The application creates a new Menu Action. So clicking the ellipsis (...) button on the top right of your subreddit should open an action menu that now contains the option "Create New Devvit Post (with Web View)". Go ahead and click on that. You should see a new post coming up. Clicking on Launch app on that post will launch your webview's contents:
+The webview does not have direct access to Devvit's services such as `redis`, `realtime` and `scheduler`. Communicating with server-side logic always needs to go through the Devvit application, i.e. you need to send a `window.parent.postMessage`, capture that message in your Devvit application, and send information to the backend.
 
-![Sample webviews post](./assets/webviews_example.png)
+If you want to keep local state that does not need to be persisted to the backend you can use [`window.localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+
+Example (`webroot/app.js`)
+
+```js
+// Save data to localStorage
+localStorage.setItem('gameState', JSON.stringify(stateToSave));
+
+// Load data from localStorage
+const loadedState = localStorage.getItem('gameState');
+```
+
+## Explaining the Template App
+
+Here's how this template app behaves.
+
+Upon startup the app will:
+
+- Load the current logged in user's username
+- Load the last state of the app (counter) from Redis DB
+- Display this data in Devvit Blocks
+
+When the Launch App button is clicked, the app will:
+
+- Show the webview and hide the other Devvit blocks
+- Send an 'initialData' message from Blocks to the Webview so it can populate state
+- The user is now seeing a webview with the contents of the `/webroot` folder
+
+When the Increase/Decrease counter buttons are clicked the app will:
+
+- Send a message from the Webviews to Blocks so state can be persisted in Redis (Webviews can't communicate directly with Redis)
+- Receive a response from Blocks and update current state in the Webview
+
+In the steps below, more details will be provided about each of the above.
 
 ### Devvit blocks (`main.tsx`)
 
@@ -204,96 +321,6 @@ window.parent?.postMessage(
   },
   '*'
 );
-```
-
-## Explaining the Template App
-
-Here's how this template app behaves.
-
-Upon startup the app will:
-
-- Load the current logged in user's username
-- Load the last state of the app (counter) from Redis DB
-- Display this data in Devvit Blocks
-
-When the Launch App button is clicked, the app will:
-
-- Show the webview and hide the other Devvit blocks
-- Send an 'initialData' message from Blocks to the Webview so it can populate state
-- The user is now seeing a webview with the contents of the `/webroot` folder
-
-When the Increase/Decrease counter buttons are clicked the app will:
-
-- Send a message from the Webviews to Blocks so state can be persisted in Redis (Webviews can't communicate directly with Redis)
-- Receive a response from Blocks and update current state in the Webview
-
-In the steps below, more details will be provided about each of the above.
-
-## Handling state between Devvit and webviews
-
-### Exchanging messages with `postMessage` hooks
-
-Here's how you can send and receive messages between your webview code and your Devvit app.
-
-In your Devvit app:
-
-- `onMessage` property (message listener from webview → devvit)
-- `context.ui.webview.postMessage` (message sender from devvit → webview)
-
-Example (`main.tsx`):
-
-```ts
-// Receive Messages from the webview
-const onMessage = (msg: JSONValue): void => {
-  if (msg.type === 'stageCleared') {
-    console.log('Received message from Web View', msg.data)
-  }
-};
-
-<webview
-  id="myWebView"
-  url="page.html"
-  onMessage={handleMessage} // Attach onMessage handler to the webview block
-/>
-
-// Send messages to the webview
-context.ui.webview.postMessage("myWebView", {lives: 9, stage:3, world:1})
-```
-
-In your web app:
-
-- `window.parent.postMessage` (message sender from webview → devvit)
-- `window.onMessage` (message listener from devvit → webview)
-
-Example (`webroot/app.js`):
-
-```js
-// Send messages to the Devvit app
-window.parent.postMessage({ type: 'stageCleared', data: {stage: 3} }, '*');
-
-// Receive messages from the Devvit app
-window.addEventListener('message', (ev) => {
-  if (ev.type === 'devvit-message') {
-    console.log('Received message from Devvit', JSON.stringify(ev.data);
-  }
-});
-
-```
-
-### Local, webview-only state
-
-The webview does not have direct access to Devvit's services such as `redis`, `realtime` and `scheduler`. Communicating with server-side logic always needs to go through the Devvit application, i.e. you need to send a `window.parent.postMessage`, capture that message in your Devvit application, and send information to the backend.
-
-If you want to keep local state that does not need to be persisted to the backend you can use [`window.localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
-
-Example (`webroot/app.js`)
-
-```js
-// Save data to localStorage
-localStorage.setItem('gameState', JSON.stringify(stateToSave));
-
-// Load data from localStorage
-const loadedState = localStorage.getItem('gameState');
 ```
 
 ## Questions

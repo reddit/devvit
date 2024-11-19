@@ -1,6 +1,6 @@
 # Overview
 
-Interactive posts, like [live scoreboards](./showcase/apps.mdx#livescores), [polls](./showcase/playgrounds.mdx#polls), or [games](./showcase/apps.mdx#bingo), are pretty simple to build.
+Interactive posts allows you to build apps like [live scoreboards](./showcase/apps.mdx#livescores), [polls](./showcase/playgrounds.mdx#polls), or [community games](./community_games.md) on reddit. This guide will help you understand how to build them effectively.
 
 ## What’s supported
 
@@ -13,7 +13,7 @@ Interactive posts, like [live scoreboards](./showcase/apps.mdx#livescores), [pol
 
 ## Templates
 
-Devvit provides three interactive post templates:
+Devvit provides two interactive post templates:
 
 - `blocks-post` to create an interactive post with blocks.
 - `web-view-post` to create an interactive post that utilizes webviews [experimental]
@@ -22,7 +22,16 @@ You can also create your own interactive post from scratch.
 
 ### Devvit blocks
 
-[Devvit blocks](./blocks/overview.mdx) is a performant, declarative UI framework which allows you to make Reddit-native cross-platform apps. This framework is especially useful for simpler apps that do not need advanced interactive capabilities like gestures, animations, and sound. You can see code examples of apps built with blocks [here](./showcase/apps.mdx) or in our [playground](https://developers.reddit.com/play).
+[Blocks](./blocks/overview.mdx) is a Reddit native declarative UI framework that provides:
+
+- ✅ Reddit-styled components
+- ✅ Cross-platform compatibility
+- ✅ Optimized for performance
+- ✅ Simple, declarative syntax
+
+Perfect for: Polls, scoreboards, simple & fast interactive games
+
+You can see code examples of apps built with blocks [here](./showcase/apps.mdx) or in our [playground](https://developers.reddit.com/play).
 
 ### Webviews
 
@@ -30,22 +39,24 @@ You can also create your own interactive post from scratch.
 Webviews is an experimental feature and currently only works reliably on web.
 :::
 
-[Webviews](./webviews.md) allows developers to directly include html/css/js in a webview component and show it to users. You can look at code examples of apps built with webviews [here](https://github.com/reddit/devvit/).
+[Webviews](./webviews.md) lets you use standard web technologies:
+
+- ✅ HTML, CSS, JavaScript
+- ✅ Rich multimedia support
+- ✅ Advanced animations
+- ⚠️ Currently experimental, best on desktop
+
+Perfect for: Games, complex visualizations, rich interactions
+
+You can find some webview example games [here](./webviews.md#examples)
 
 ### Should I use blocks or webviews?
 
 Webviews provide more control over app functionality and styling. While webviews is experimental, it offers a more familiar way to build interactive web elements. Developers less familiar with web development may be better off using the blocks framework, which offers Reddit UI components and simplified app architecture. You should use either a webview component or blocks when presenting a UI. Mixing webviews and blocks in the same UI is not recommended; however, you must build a preview of your app using blocks.
 
-## Setting up an interactive post
+## Creating an Interactive Post
 
-An interactive post requires two steps:
-
-1. addCustomPostType() defines the interactive post type, which could be built in webviews or blocks (our Reddit UI-based domain specific language). You can only have one interactive post type per app, but you can use a switch or router to change views based on context
-2. submitPost() instantiates the post and defines the loading state
-
-The final post is auto-populated from the post template using `submitPost()`.
-
-### addCustomPostType
+### 1. Define Your Post Type with `addCustomPostType`
 
 The `.addCustomPostType(customPostType: CustomPostType)` function contains:
 
@@ -58,8 +69,6 @@ The `.addCustomPostType(customPostType: CustomPostType)` function contains:
 :::note
 The UI is wrapped in `<blocks>`. If you don’t include them, `<blocks>` will be automatically added.
 :::
-
-**Example**
 
 ```ts
 // webviews
@@ -95,7 +104,7 @@ Devvit.addCustomPostType({
 });
 ```
 
-### submitPost
+### 2. Create Post Submission with `submitPost`
 
 The `submitPost(options: SubmitPostOptions)` function has these parameters:
 
@@ -117,7 +126,7 @@ await reddit.submitPost({
 });
 ```
 
-### Interactive post creation flow
+### 2. Add a menu item to create your post
 
 Once the interactive post has been submitted and instantiated, it needs a place for users to call it for creation. This example uses the subreddit menu.
 
@@ -148,6 +157,8 @@ Devvit.addMenuItem({
   },
 });
 ```
+
+## Advanced Features
 
 ### Customize the post preview
 
