@@ -8,25 +8,18 @@ Payments is a beta feature that is only available to developers in our Developer
 
 ## Prerequisites
 
-You can develop and playtest your payments-based app immediately, but you'll need to do a few things before you can publish your app and sell products:
+Before you can develop and playtest your payments-based app, you will need to provide a few details in our [enrollment form](https://forms.gle/TuTV5jbUwFKTcerUA).
 
-- Join the [Reddit Developer Program](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program). This program:
+In addition, you'll need to do a few things before you can publish your app and sell products:
 
-  - guides you through the [eligibility criteria](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program#h_01J8GCHXEG24ZNR5EZZ9SPN48S)
-  - provides links to Reddit’s [Earn Terms](https://redditinc.com/policies/earn-terms) and [Earn Policy](https://www.redditinc.com/policies/earn-policy) (you’ll need to agree and comply with all terms and conditions)
-  - directs you to the contributors [verification process](https://support.reddithelp.com/hc/en-us/articles/17331636499604-What-is-the-Contributor-verification-process) you need to complete
-
-- Make sure you’re on devvit@0.11.0. See the [quickstart](quickstart.mdx) to get up and running.
+- Verify you meet the [eligibility criteria](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program#h_01J8GCHXEG24ZNR5EZZ9SPN48S).
+- Complete the [verification process](https://support.reddithelp.com/hc/en-us/articles/17331636499604-What-is-the-Contributor-verification-process).
+- Ensure you’re on devvit@0.11.3. See the [quickstart](https://developers.reddit.com/docs/next/quickstart) to get up and running.
+- Accept and comply with our [Earn Terms](https://redditinc.com/policies/earn-terms) and [Earn Policy](https://www.redditinc.com/policies/earn-policy).
 
 ## How it works
 
-You’ll set the price of the products in your app in Reddit [gold](https://support.reddithelp.com/hc/en-us/articles/17331548463764-What-is-gold-and-how-do-I-use-it). Users will make in-app purchases with gold, and that gold accumulates in your app account.
-
-The payout rate is $0.01 per Reddit gold in your app account.
-
-Payouts are calculated at the end of each calendar month and deposited into your Stripe account within 30 days. There may be an additional 5 - 7 day delay for non-US developers.
-
-## Add products to your app
+### Add products
 
 You can build things like in-game items, additional lives, or exclusive features into your app.
 
@@ -38,7 +31,19 @@ Products are tied to app versions. This means if you create a product in version
 All products will be reviewed by the Developer Platform team to ensure compliance with our content policy. Products are approved during the [app review process](../publishing.md) after you publish your app.
 :::
 
-### Install payments
+### Set the price
+
+You’ll set the price of the products in your app in Reddit [gold](https://support.reddithelp.com/hc/en-us/articles/17331548463764-What-is-gold-and-how-do-I-use-it). Users will use gold to acquire the items, and an equivalent amount of gold will accumulate in your app account.
+
+Information about payouts is located [here](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program#h_01J8GCHXEG24ZNR5EZZ9SPN48S).
+
+## Add payments to your app
+
+You can build your app with a template by running:
+
+```bash
+devvit new -template=payments
+```
 
 Run the following command to add payments to your app.
 
@@ -59,6 +64,11 @@ Each product in the products field has the following attributes:
 | `price` | An predefined integer that sets the product price in Reddit gold. See details below. |
 | `image.icon` | **(optional)** The path to the icon that represents your product in your [assets](../app_image_assets) folder. |
 | `metadata` | **(optional)** An optional object that contains additional attributes you want to use to group and filter products. Keys and values must be alphanumeric (a - Z, 0 - 9, and - ) and contain 30 characters or less. You can add up to 10 metadata keys. |
+| `accountingType` | Categories for how buyers consume your products. Possible values are:
+
+- “INSTANT” for purchased items that are used immediately and disappear.
+- “DURABLE” for purchased items that are permanently applied to the account and can be used any number of times
+- “CONSUMABLE” for items that are used over a period of time. Use a “VALID*FOR*" value to indicate the length of time the item is available. |
 
 Registered products are updated every time an app is uploaded, including when you use [Devvit playtest](../playtest).
 
@@ -98,17 +108,17 @@ If you don’t provide an image, the default Reddit product image is used.
   "$schema": "https://developers.reddit.com/schema/products.json",
   "products": [
     {
-      "sku": "extra_life",
-      "displayName": "Extra Life",
-      "description": "An extra life for the snake game",
-      "price": 10,
+      "sku": "god_mode",
+      "displayName": "God mode",
+      "description": "God mode gives you superpowers (in theory)",
+      "price": 25,
       "images": {
-        // not required, we can have default. Add guidelines on size
         "icon": "assets/products/extra_life_icon.png"
       },
       "metadata": {
         "category": "powerup"
-      }
+      },
+      "accountingType": "CONSUMABLE"
     }
   ]
 }
@@ -124,38 +134,32 @@ This example shows how to issue an "extra life" to a user when they purchase the
 
 ```ts
 import { type Context } from '@devvit/public-api';
-import { addPaymentHandler, type Order } from '@devvit/payments';
+import { addPaymentHandler } from '@devvit/payments';
+import { Devvit, useState } from '@devvit/public-api';
 
-const MAX_LIVES = 3;
-const EXTRA_LIVES_SKU = 'extra_lives';
+Devvit.configure({
+  redis: true,
+  redditAPI: true,
+});
+
+const GOD_MODE_SKU = 'god_mode';
 
 addPaymentHandler({
-  fulfillOrder: async (order: Order, ctx: Context) => {
-    if (!order.products.some(({ sku }) => sku === EXTRA_LIVES_SKU)) {
-      // this error will be visible to your logs but not users; the order will be rejected
+  fulfillOrder: async (order, ctx) => {
+    if (!order.products.some(({ sku }) => sku === GOD_MODE_SKU)) {
       throw new Error('Unable to fulfill order: sku not found');
     }
-
-    // redis key for storing number of lives user has left
-    const livesKey = `${ctx.userId}:lives`;
-
-    // get the current life count
-    const curLives = await ctx.redis.get(livesKey);
-
-    // reject the order if the user already has more than or equal MAX_LIVES
-    if (curLives != null && Number(curLives) >= MAX_LIVES) {
-      // the reason provided here will be delivered to the `usePayments` callback function
-      // as `result.errorMessage` to optionally display to the end-user.
-      return { success: false, reason: 'Max lives exceeded' };
+    if (order.status !== 'PAID') {
+      throw new Error('Becoming a god has a cost (in Reddit Gold)');
     }
 
-    // fulfill the order by incrementing the lives count for the user
-    await ctx.redis.incrBy(livesKey, 1);
+    const redisKey = godModeRedisKey(ctx.postId, ctx.userId);
+    await ctx.redis.set(redisKey, 'true');
   },
 });
 ```
 
-## Implement in-app purchases
+## Implement payments
 
 The frontend and backend of your app coordinate order processing.
 
@@ -175,9 +179,7 @@ Use the `useProducts` hook or `getProducts` function to fetch details about prod
 import { useProducts } from '@devvit/payments';
 
 export function ProductsList(context: Devvit.Context): JSX.Element {
-  const { products } = useProducts(context, {
-    skus: ['extra_life', 'cosmic_sword'],
-  });
+  const { products } = useProducts(context, {});
 
   return (
     <vstack>
@@ -196,11 +198,7 @@ You can also fetch all products using custom-defined metadata or by an array of 
 
 ```tsx
 import { getProducts } from '@devvit/payments';
-const products = await getProducts({
-  skus: ['extra_life', 'cosmic_sword'],
-  metadata: {
-    category: 'powerup',
-  },
+const products = await getProducts({,
 });
 ```
 
@@ -216,7 +214,7 @@ import { usePayments } from '@devvit/payments';
 // handles purchase results
 const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.success); });
 
-// foreach sku in products:
+// for each sku in products:
 <button onPress{payments.purchase(sku)}>Buy a {sku}</button>
 ```
 
@@ -245,20 +243,11 @@ To end your playtest, press CTRL + C in the terminal session where you started i
 
 ## Submit your app for approval
 
-All products must be approved by the Developer Platform team to ensure compliance with our content policy.
+The Developer Platform team reviews and approves apps and their products before products can be sold.
 
-Certain types of products are not allowed and will not be approved:
+To submit your app:
 
-- Explicit or suggestive content
-- Real money gambling
-- Requests for donations
-- Advertising or pay-for-promotion
-
-There is no partial approval. If one product is not approved, the app will be rejected.
-
-To submit your products and app:
-
-1. Run devvit publish.
+1. Run `devvit publish`.
 2. Select how you want your app to appear in the Apps directory:
 
 - **Unlisted** means that the app is only visible to you in the directory, and you can install your app on larger subreddits that you moderate.
@@ -267,6 +256,10 @@ To submit your products and app:
 :::note
 You can change your app visibility at any time. See [publishing an app](publishing.md) for details.
 :::
+
+### Ineligible products
+
+Any apps or products for which you wish to enable payments must comply with our [Earn Policy](http://redditinc.com/policies/earn-policy) and [Devvit Guidelines](https://developers.reddit.com/docs/guidelines).
 
 ## Accept real payments
 
@@ -319,30 +312,11 @@ When a transaction is reversed for any reason, you may optionally revoke product
 ```tsx
 addPaymentHandler({
   fulfillOrder: async (order: Order, ctx: Context) => {
-    if (!order.products.some(({ sku }) => sku === EXTRA_LIVES_SKU)) {
-      // this error will be visible to your logs but not users; the order will be rejected
-      throw new Error('Unable to fulfill order: sku not found');
-    }
-
-    // redis key for storing number of lives user has left
-    const livesKey = `${ctx.userId}:lives`;
-
-    // get the current life count
-    const curLives = await ctx.redis.get(livesKey);
-
-    // reject the order if the user already has more than or equal MAX_LIVES
-    if (curLives != null && Number(curLives) >= MAX_LIVES) {
-      // the reason provided here will be delivered to the `usePayments` callback function
-      // as `result.errorMessage` to optionally display to the end-user.
-      return { success: false, reason: 'Max lives exceeded' };
-    }
-
-    // fulfill the order by incrementing the lives count for the user
-    await ctx.redis.incrBy(livesKey, 1);
+    // Snip order fulfillment
   },
   refundOrder: async (order: Order, ctx: Context) => {
     // check if the order contains an extra life
-    if (order.products.some(({ sku }) => sku === EXTRA_LIVES_SKU)) {
+    if (order.products.some(({ sku }) => sku === GOD_MODE_SKU)) {
       // redis key for storing number of lives user has left
       const livesKey = `${ctx.userId}:lives`;
 

@@ -52,6 +52,7 @@ const sidebars = {
         'capabilities/http-fetch',
         'capabilities/image-uploads',
         'capabilities/menu-actions',
+        'capabilities/payments',
         'capabilities/redis',
         'capabilities/realtime',
         'capabilities/scheduler',
