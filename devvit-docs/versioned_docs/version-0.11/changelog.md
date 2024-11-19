@@ -16,7 +16,7 @@ Before upgrading `@devvit/public-api` in your project, always update the CLI fir
 
 We also made a few other changes to our public API in this release:
 
-- [post.getEnrichedThumbnail](./api/redditapi/classes/models.Post.md#setcustompostpreview) allows developers to get a better thumbnail
+- [post.getEnrichedThumbnail](./api/redditapi/classes/models.Post.md#getenrichedthumbnail) allows developers to get a better thumbnail
 - Community fix: Allow [WikiPage revision author](./api/redditapi/classes/models.WikiPage.md) to be undefined (Thanks PitchforkAssistant)
 - Community fix: Include conversations IDs sorted array from [modMail.getConversations](./api/redditapi/classes/models.ModMailService.md#getconversations) (Thanks Pitchfork Assistant x2!)
 

@@ -18,7 +18,7 @@ Build interactive posts that ignite your community:
 - [Polls](./showcase/playgrounds) to provoke spicy conversations or take the pulse of your community.
 - [Multiplayer games](./showcase/apps#bingo) played asynchronously or with other redditors in real time.
 
-Or create an entirely new community around an app, like [r/Pixelary](https://www.reddit.com/r/Pixelary/), a multiplayer game created just for redditors to draw, guess, and compete for bragging rights.
+Or create an entirely new [community game](./community_games.md) around an app, like [r/Pixelary](https://www.reddit.com/r/Pixelary/), a multiplayer game created just for redditors to draw, guess, and compete for bragging rights.
 
 ## Tools at your fingertips
 
