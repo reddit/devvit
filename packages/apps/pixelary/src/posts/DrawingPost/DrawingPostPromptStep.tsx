@@ -9,12 +9,10 @@ import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
 import type { DrawingPostData } from '../../types/PostData.js';
 import { PostGuesses } from '../../types/PostGuesses.js';
-import { UserData } from '../../types/UserData.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 
 interface DrawingPostPromptStepProps {
   postData: DrawingPostData;
-  userData: UserData;
   username?: string;
   onGuess: (guess: string, userWantsToComment: boolean) => Promise<void>;
   onSkip: () => void;
@@ -75,22 +73,13 @@ export const DrawingPostPromptStep = (
           type: 'boolean',
           name: 'comment',
           label: 'Leave a comment (optional)',
-          defaultValue: props.userData.autoComment,
+          defaultValue: false,
         },
       ],
     },
     async (values) => {
       const guess = values.guess.trim().toLowerCase();
       const userWantsToComment = values.comment;
-
-      // Update user comment preference
-      if (userWantsToComment !== props.userData.autoComment) {
-        await service.saveUserData(props.username!, {
-          autoComment: userWantsToComment,
-        });
-      }
-
-      // Submit the guess
       await props.onGuess(guess, userWantsToComment);
     }
   );

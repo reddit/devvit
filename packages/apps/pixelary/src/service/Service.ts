@@ -633,7 +633,6 @@ export class Service {
     const user = await this.getUserScore(username);
     const level = getLevelByScore(user.score);
     const parsedData: UserData = {
-      autoComment: data.autoComment === 'true',
       score: user.score,
       levelRank: data.levelRank ? parseInt(data.levelRank) : level.rank,
       levelName: data.levelName ?? level.name,
