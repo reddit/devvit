@@ -42,7 +42,7 @@ Information about payouts is located [here](https://support.reddithelp.com/hc/en
 You can build your app with a template by running:
 
 ```bash
-devvit new -template=payments
+devvit new --template=payments
 ```
 
 Run the following command to add payments to your app.
