@@ -1,6 +1,6 @@
 # Overview
 
-Interactive posts allows you to build apps like [live scoreboards](./showcase/apps.mdx#livescores), [polls](./showcase/playgrounds.mdx#polls), or [games](./community_games.md) on reddit. This guide will help you understand how to build them effectively.
+Interactive posts allow you to build apps like [live scoreboards](./showcase/apps.mdx#livescores), [polls](./showcase/playgrounds.mdx#polls), or [community games](./community_games.md) on Reddit. This guide will help you understand how to build them effectively.
 
 ## What’s supported
 
@@ -50,13 +50,32 @@ Perfect for: Games, complex visualizations, rich interactions
 
 You can find some webview example games [here](./webviews.md#examples)
 
-### Should I use blocks or webviews?
+# Should I use blocks or webviews?
 
-Webviews provide more control over app functionality and styling. While webviews is experimental, it offers a more familiar way to build interactive web elements. Developers less familiar with web development may be better off using the blocks framework, which offers Reddit UI components and simplified app architecture. You should use either a webview component or blocks when presenting a UI. Mixing webviews and blocks in the same UI is not recommended; however, you must build a preview of your app using blocks.
+Here’s a comparison between the two:
 
-## Creating an Interactive Post
+| Feature                                    | Webviews | Blocks |
+| ------------------------------------------ | -------- | ------ |
+| Uses Reddit design system                  | ❌       | ✅     |
+| Optimized for in-feed experience           | ❌       | ✅     |
+| Rich multimedia (animations, video, audio) | ✅       | ❌     |
+| Advanced gestures                          | ✅       | ❌     |
 
-### 1. Define Your Post Type with `addCustomPostType`
+**Choose blocks if you:**
+
+- Want a Reddit-native look and feel
+- Prefer a simpler, more constrained API
+- Need optimal feed performance
+
+**Choose webviews if you:**
+
+- Are experienced with web development
+- Need rich multimedia or advanced interactions
+- Want full control over styling and behavior
+
+## Creating an interactive post
+
+### 1. Define your post type with `addCustomPostType`
 
 The `.addCustomPostType(customPostType: CustomPostType)` function contains:
 
@@ -71,20 +90,6 @@ The UI is wrapped in `<blocks>`. If you don’t include them, `<blocks>` will be
 :::
 
 ```ts
-// webviews
-Devvit.addCustomPostType({
- name: 'My Custom Post Type',
- description: 'A big hello text.',
- render: () => {
-   return (
-     <blocks height="regular">
-       <webview page="index.html">
-     </blocks>
-   );
- },
-});
-
-
 // blocks
 Devvit.addCustomPostType({
  name: 'My Custom Post Type',
@@ -102,28 +107,20 @@ Devvit.addCustomPostType({
    );
  },
 });
-```
 
-### 2. Create Post Submission with `submitPost`
-
-The `submitPost(options: SubmitPostOptions)` function has these parameters:
-
-- title for the name of the interactive post
-- subredditName to show where the post will be instantiated
-- preview to provide a lightweight UI that shows while the post renders (required)
-
-**Example**
-
-```ts
-await reddit.submitPost({
-  title: 'My custom post',
-  subredditName: currentSubreddit.name,
-  preview: (
-    <vstack>
-      <text>Loading...</text>
-    </vstack>
-  ),
+// webviews
+Devvit.addCustomPostType({
+ name: 'My Custom Post Type',
+ description: 'A big hello text.',
+ render: () => {
+   return (
+     <blocks height="regular">
+       <webview page="index.html">
+     </blocks>
+   );
+ },
 });
+
 ```
 
 ### 2. Add a menu item to create your post
@@ -158,61 +155,33 @@ Devvit.addMenuItem({
 });
 ```
 
-## Advanced Features
+### 3. Create post submission with `submitPost`
 
-### Customize the post preview
+The `submitPost(options: SubmitPostOptions)` function has these parameters:
 
-After your app has been created, you can use `setCustomPostPreview` to update your post preview and customize the loading screen with actual content.
+- title for the name of the interactive post
+- subredditName to show where the post will be instantiated
+- preview to provide a lightweight UI that shows while the post renders (required)
 
-For example, if your post has information about a future event, you could set the preview/loading screen to say how many days away the event is.
+**Example**
 
 ```ts
-// creation of the post
-const daysAwayFromEvent = 3; // would actually be done by checking the date diff, but just hardcoding for this example
-const post = await reddit.submitPost({
-  title: 'A Countdown post',
-  subredditName: subreddit.name,
+await reddit.submitPost({
+  title: 'My custom post',
+  subredditName: currentSubreddit.name,
   preview: (
-    <zstack height="100%" width="100%" alignment="center middle">
-      <text>The event will start in {daysAwayFromEvent} days</text>
-    </zstack>
+    <vstack>
+      <text>Loading...</text>
+    </vstack>
   ),
 });
 ```
-
-Then you'd create a scheduler to run when the days away count changes:
-
-```ts
-Devvit.addSchedulerJob({
-  name: 'UpdatePostPreview',
-  onRun: async (event, context) => {
-    const { reddit } = context;
-    const { postId } = event.data!;
-
-    if (!postId) {
-      console.error('No post ID provided');
-      return;
-    }
-
-    const post = await reddit.getPostById(postId);
-    const daysAwayFromEvent = 2; // would actually be done by checking the date diff, but just hardcoding for this example
-    const newPreview = (
-      <vstack height="100%" width="100%" alignment="center middle">
-        <text>The event will start in {daysAwayFromEvent} days</text>
-      </vstack>
-    );
-
-    await post.setCustomPostPreview(() => newPreview);
-  },
-});
-```
-
-How you customize your loading screen is up to you!
 
 ## Next steps
 
 Now that you know what interactive posts can do, you can:
 
+- Try blocks, using our [quickstart to build an interactive post](./quickstart.mdx).
+  - Read our [blocks overview](./blocks/overview.mdx)
 - Check out our [webviews](webviews.md) doc if you're already familiar with web development
-- Try blocks, using this tutorial to [build an interactive post](interactive_post.md).
 - Start iterating with code in real time in the [playground](playground.md)

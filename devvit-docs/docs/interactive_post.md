@@ -1,4 +1,4 @@
-# Build an interactive post
+# Build a blocks post
 
 1. Login to Devvit.
 2. Start a new project.

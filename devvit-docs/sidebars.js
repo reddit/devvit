@@ -43,6 +43,37 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Interactive Posts',
+      items: [
+        'interactive_posts',
+        {
+          type: 'category',
+          label: 'Blocks',
+          items: [
+            'blocks/overview',
+            'blocks/stacks',
+            'blocks/text',
+            'blocks/icon',
+            'blocks/button',
+            'blocks/image',
+            'blocks/spacer',
+            'blocks/colors',
+          ],
+        },
+        'webviews',
+        'community_games',
+        'app_image_assets',
+        'post_size',
+        'dimensions',
+        'custom_post_preview',
+        'text_fallback',
+        'working_with_usestate',
+        'working_with_useasync',
+        'working_with_useinterval',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Capabilities',
       items: [
         'capabilities/app-configurations',
@@ -63,23 +94,6 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Interactive Posts',
-      items: [
-        'interactive_posts',
-        'interactive_post',
-        'webviews',
-        'app_image_assets',
-        'post_size',
-        'dimensions',
-        'text_fallback',
-        'working_with_usestate',
-        'working_with_useasync',
-        'working_with_useinterval',
-        'community_games',
-      ],
-    },
-    {
-      type: 'category',
       label: 'Developer tools',
       items: ['playground', 'playtest', 'debug', 'devvit_cli', 'devvit_kit'],
     },
@@ -87,21 +101,6 @@ const sidebars = {
       type: 'category',
       label: 'Reference docs',
       items: [
-        {
-          type: 'category',
-          label: 'Blocks',
-          items: [
-            'blocks/overview',
-            'blocks/stacks',
-            'blocks/text',
-            'blocks/icon',
-            'blocks/button',
-            'blocks/image',
-            'blocks/spacer',
-            'blocks/colors',
-          ],
-        },
-
         {
           type: 'doc',
           label: 'Devvit library',

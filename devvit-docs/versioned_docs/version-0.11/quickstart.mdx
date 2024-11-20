@@ -13,6 +13,7 @@ Before you start, you'll need:
 
 - [Node.js](https://nodejs.org/) (v22.2.0+)
 - A [test subreddit](https://mods.reddithelp.com/hc/en-us/articles/360001766991-How-to-create-a-subreddit) that you moderate (with less than 200 members)
+  - After creating a test subreddit, visit your Safety Filters under mod tools (https://www.reddit.com/mod/[your_subreddit_name]/safety) and turn off the Reputation filter
 - A code editor (we recommend [VS Code](https://code.visualstudio.com/))
 
 
@@ -62,7 +63,7 @@ npm --version
 </details>
 
 
-## Quick Video Tutorial
+## Quick video tutorial
 
 Watch this video for a visual guide (tutorial starts at 1:35):
 
@@ -118,7 +119,7 @@ If you're familiar with web development, use `--template web-view-post` instead 
 devvit upload
 ```
 
-5. **Test your app**
+5. **Playtest your app**
 ```bash
 devvit playtest <my-subreddit>
 ```
@@ -127,7 +128,7 @@ devvit playtest <my-subreddit>
 Replace `<my-subreddit>` with your test subreddit name (e.g., `devvit playtest r/MyTestSub`)
 :::
 
-## Testing Your App
+## Test your app
 
 1. Visit your subreddit
 2. In your menu actions, you should see a button that says "Add my post"
@@ -137,10 +138,14 @@ Replace `<my-subreddit>` with your test subreddit name (e.g., `devvit playtest r
 6. View realtime logs while playtest is active
 7. Press `Ctrl + c` to stop playtest
 
+:::tip
+If you don't see your post, visit your Safety Filters under mod tools (https://www.reddit.com/mod/[your_subreddit_name]/safety), turn off the Reputation filter, and try again.
+:::
+
 <img src={BlocksMenu} width="100"/>
 <img src={BlocksPost} width="500"/>
 
-## Choose Your Path
+## Choose your path
 
 Here are the recommended next steps:
 

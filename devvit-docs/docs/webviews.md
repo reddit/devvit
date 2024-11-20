@@ -4,30 +4,9 @@
 Webviews is currently experimental and optimized for desktop web. Mobile support is coming later this year.
 :::
 
-Webviews allow you include HTML, CSS, and JavaScript and have it run within your reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BhbWn8TnXvo?si=mD_Hp5H90LpPGWbn&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-# Why use webviews over blocks?
-
-Here’s a comparison between the two:
-
-| Feature                                    | Webviews | Blocks |
-| ------------------------------------------ | -------- | ------ |
-| Rich multimedia (animations, video, audio) | ✅       | ❌     |
-| Advanced gestures                          | ✅       | ❌     |
-| Uses Reddit design system                  | ❌       | ✅     |
-| Optimized for in-feed experience           | ❌       | ✅     |
-
-**Choose Webviews if you:**
-
-- Are experienced with web development
-- Need rich multimedia or advanced interactions
-- Want full control over styling and behavior
-
-**Choose Blocks if you:**
-
-- Want a Reddit-native look and feel
-- Prefer a simpler, more constrained API
-- Need optimal feed performance
+Webviews allow you include HTML, CSS, and JavaScript and have it run within your Reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
 
 ## Quickstart
 
@@ -47,7 +26,7 @@ devvit playtest <my-subreddit>
 
 3. Create a post in your subreddit using the "Create New Devvit Post (with Web View)" option in the post menu.
 
-### Project Structure
+### Project structure
 
 ```
 my-project/
@@ -104,7 +83,7 @@ my-project/
 2. **State Management**
 
    - Use `localStorage` for webview-only state
-   - Use Redis storage (via Devvit) for persistent data
+   - Use [Redis](./capabilities/redis.md) storage (via Devvit) for persistent data
    - Minimize state synchronization between webview and Devvit
 
 3. **Performance**
@@ -120,13 +99,13 @@ my-project/
 />
 ```
 
-## Communication Between Devvit and Webviews
+## Communication Between Devvit and webviews
 
-Webviews let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services (Redis, fetch, scheduler, triggers) via message passing between the two contexts.
+Webviews let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services ([Redis](./capabilities/redis.md), [fetch](./capabilities/http-fetch.md), [scheduler](./capabilities/scheduler.md), [triggers](./capabilities/triggers.md)) via message passing between the two contexts.
 
 ![Sample webviews post](./assets/webviews-devvit-architecture.png)
 
-### From Devvit to Webview
+### From Devvit to webview
 
 ```typescript
 // In main.tsx
@@ -144,7 +123,7 @@ window.addEventListener('message', (event) => {
 });
 ```
 
-### From Webview to Devvit
+### From webview to Devvit
 
 ```typescript
 // In webroot/app.js
@@ -179,7 +158,7 @@ localStorage.setItem('gameState', JSON.stringify(stateToSave));
 const loadedState = localStorage.getItem('gameState');
 ```
 
-## Explaining the Template App
+## Explaining the template app
 
 Here's how this template app behaves.
 
