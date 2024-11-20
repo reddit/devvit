@@ -337,6 +337,7 @@ export default class Upload extends ProjectCommand {
     };
 
     // Captcha not required in snoodev, but required in prod
+    // TODO We should make a development only API key; once we do, we can remove this & check captchas in dev!
     if (!MY_PORTAL_ENABLED) {
       appCreationRequest.captcha = await getCaptcha({ copyPaste });
     }
