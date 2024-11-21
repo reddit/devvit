@@ -1,7 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import type { IntervalDetails, UIRequest, UIResponse } from '@devvit/protos';
+import type { IntervalDetails, UIResponse } from '@devvit/protos';
 import { EffectType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
@@ -9,12 +9,10 @@ import { describe, expect, test } from 'vitest';
 import { Devvit } from '../../../Devvit.js';
 import { BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
-import { generatePressRequest, generateTimerRequest } from './test-helpers.js';
+import { generatePressRequest, generateTimerRequest, getEmptyRequest } from './test-helpers.js';
 import type { HookRef } from './types.js';
 import { useInterval } from './useInterval.js';
 import { useState } from './useState.js';
-
-const EmptyRequest: UIRequest = { events: [] };
 
 const counterRef: HookRef = {};
 const intervalRef: HookRef = {};
@@ -109,7 +107,7 @@ function timerEffectsIn(response: UIResponse, ref: HookRef): (IntervalDetails | 
 describe('useInterval', () => {
   test('initial state is stopped', async () => {
     const handler = new BlocksHandler(component);
-    const response = await handler.handle(EmptyRequest, mockMetadata);
+    const response = await handler.handle(getEmptyRequest(), mockMetadata);
 
     expect(response.state).toMatchSnapshot();
     console.log(response.effects);
@@ -118,7 +116,7 @@ describe('useInterval', () => {
 
   test('you can start inside the render', async () => {
     const handler = new BlocksHandler(startInRender);
-    const response = await handler.handle(EmptyRequest, mockMetadata);
+    const response = await handler.handle(getEmptyRequest(), mockMetadata);
 
     expect(response.state).toMatchSnapshot();
     expect(response.effects.length).toBe(1);
@@ -130,7 +128,7 @@ describe('useInterval', () => {
 
   test('you can start from an event', async () => {
     const handler = new BlocksHandler(component);
-    let response = await handler.handle(EmptyRequest, mockMetadata);
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
     expect(response.effects.length).toBe(0);
 
     const req = generatePressRequest(startRef);
@@ -140,7 +138,7 @@ describe('useInterval', () => {
 
   test('you can start and stop from an event', async () => {
     const handler = new BlocksHandler(component);
-    let response = await handler.handle(EmptyRequest, mockMetadata);
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
     expect(response.effects.length).toBe(0);
 
     const req = generatePressRequest(startRef);
@@ -152,7 +150,7 @@ describe('useInterval', () => {
 
   test('you can start and stop from an event', async () => {
     const handler = new BlocksHandler(component);
-    let response = await handler.handle(EmptyRequest, mockMetadata);
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
     expect(response.effects.length).toBe(0);
 
     const req = generatePressRequest(stopRef);
@@ -164,7 +162,7 @@ describe('useInterval', () => {
 
   test('multiple timers', async () => {
     const handler = new BlocksHandler(component);
-    let response = await handler.handle(EmptyRequest, mockMetadata);
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
     expect(response.effects.length).toBe(0);
     const req = generatePressRequest(startRef);
     response = await handler.handle(req, mockMetadata);
@@ -174,7 +172,7 @@ describe('useInterval', () => {
 
   test('stops timer if unmounted', async () => {
     const handler = new BlocksHandler(MountUnmount);
-    let response = await handler.handle(EmptyRequest, mockMetadata);
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
     expect(response.effects.length).toBe(1);
     expect(timerEffectsIn(response, intervalRef)).toEqual([oneSecond]);
     let req = generatePressRequest(stopRef);

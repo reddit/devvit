@@ -6,7 +6,12 @@ import type { UseStateResult } from '../../../../index.js';
 import { Devvit } from '../../../Devvit.js';
 import { BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
-import { EmptyRequest, findHookState, generatePressRequest, mockMetadata } from './test-helpers.js';
+import {
+  findHookState,
+  generatePressRequest,
+  getEmptyRequest,
+  mockMetadata,
+} from './test-helpers.js';
 import type { HookRef } from './types.js';
 import { useState } from './useState.js';
 
@@ -103,7 +108,7 @@ describe('useState', () => {
       'uses the given initial state',
       async (c) => {
         const handler = new BlocksHandler(c);
-        const response = await handler.handle(EmptyRequest, mockMetadata);
+        const response = await handler.handle(getEmptyRequest(), mockMetadata);
 
         expect(response.state).toMatchSnapshot();
         expect(JSON.stringify(response.state)).toContain('foo');
@@ -113,12 +118,12 @@ describe('useState', () => {
 
     test('state isnt null while async request in flight ', async () => {
       const handler = new BlocksHandler(objectComponent);
-      await handler.handle(EmptyRequest, mockMetadata);
+      await handler.handle(getEmptyRequest(), mockMetadata);
     });
 
     test('async initializer resolves', async () => {
       const handler = new BlocksHandler(asyncComponent);
-      const response = await handler.handle(EmptyRequest, mockMetadata);
+      const response = await handler.handle(getEmptyRequest(), mockMetadata);
 
       expect(JSON.stringify(response.blocks ?? '')).toContain('hello world');
     });
@@ -132,7 +137,9 @@ describe('useState', () => {
       };
 
       const handler = new BlocksHandler(component);
-      await expect(handler.handle(EmptyRequest, mockMetadata)).rejects.toThrow('Unknown error'); // to-do: toThrow('message').
+      await expect(handler.handle(getEmptyRequest(), mockMetadata)).rejects.toThrow(
+        'Unknown error'
+      ); // to-do: toThrow('message').
     });
 
     test('async initializer that throws fails', async () => {
@@ -144,7 +151,7 @@ describe('useState', () => {
       };
 
       const handler = new BlocksHandler(component);
-      await expect(handler.handle(EmptyRequest, mockMetadata)).rejects.toThrow('message');
+      await expect(handler.handle(getEmptyRequest(), mockMetadata)).rejects.toThrow('message');
     });
   });
 });
@@ -152,7 +159,7 @@ describe('useState', () => {
 describe('state setter', () => {
   test('updates the value given a new value', async () => {
     const handler = new BlocksHandler(counterComponent);
-    await handler.handle(EmptyRequest, mockMetadata);
+    await handler.handle(getEmptyRequest(), mockMetadata);
     expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded', error: null });
     let req = generatePressRequest(counterButtonRef);
     await handler.handle(req, mockMetadata);
@@ -167,7 +174,7 @@ describe('state setter', () => {
 
   test('can be used multiple times in a component', async () => {
     const handler = new BlocksHandler(multiComponent);
-    const response = await handler.handle(EmptyRequest, mockMetadata);
+    const response = await handler.handle(getEmptyRequest(), mockMetadata);
     expect(response.state).toMatchSnapshot();
     expect(JSON.stringify(response.state)).toContain('0');
     expect(JSON.stringify(response.state)).toContain('bar');
@@ -183,7 +190,7 @@ describe('state setter', () => {
   });
   test('handles void or undefined values properly', async () => {
     const handler = new BlocksHandler(conditionalComponent);
-    await handler.handle(EmptyRequest, mockMetadata);
+    await handler.handle(getEmptyRequest(), mockMetadata);
     expect(findHookState(counterRef)).toEqual({ value: 0, load_state: 'loaded', error: null });
     for (let i = 0; i < 15; i++) {
       const req = generatePressRequest(counterButtonRef);

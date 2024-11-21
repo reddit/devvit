@@ -8,7 +8,7 @@ import type { JSONValue } from '@devvit/shared-types/json.js';
 import { Devvit, useState } from '../../../../index.js';
 import { BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
-import { EmptyRequest, findHookState, mockMetadata } from './test-helpers.js';
+import { findHookState, getEmptyRequest, mockMetadata } from './test-helpers.js';
 import type { HookRef } from './types.js';
 import { useAsync } from './useAsync.js';
 let shouldThrow = false;
@@ -68,7 +68,7 @@ describe('regressions', () => {
     shouldThrow = true;
     const handler = new BlocksHandler(NullApp);
 
-    let response = await handler.handle(EmptyRequest, mockMetadata);
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
     expect(JSON.stringify(response.blocks)).toContain('loading');
     expect(response.state).toMatchInlineSnapshot(`
       {
@@ -111,9 +111,32 @@ describe('regressions', () => {
     expect(response.events.length).toEqual(0);
   });
 
+  test('getting an undefined data is ok', async () => {
+    shouldThrow = true;
+    const handler = new BlocksHandler(NullApp);
+
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
+    const event = {
+      scope: UIEventScope.ALL,
+      asyncResponse: {
+        requestId: (asyncRef.id ?? '') + '-1',
+        error: { message: 'some error', details: 'some details' },
+      },
+      hook: asyncRef.id,
+    };
+
+    const request: UIRequest = { events: [event], state: response.state };
+    response = await handler.handle(request, mockMetadata);
+
+    /**
+     * This is a regression test to ensure that the state & data is not set to undefined
+     */
+    expect(response.state!['NullApp.useAsync-0'].data).toMatchInlineSnapshot(`null`);
+  });
+
   test('event-driven state changes are reflected', async () => {
     const handler = new BlocksHandler(App);
-    let request: UIRequest = EmptyRequest;
+    let request: UIRequest = getEmptyRequest();
     let response = await handler.handle(request, mockMetadata);
 
     request = {
@@ -132,7 +155,7 @@ describe('regressions', () => {
 
   test("error response doesn't requeue", async () => {
     const handler = new BlocksHandler(App);
-    let request: UIRequest = EmptyRequest;
+    let request: UIRequest = getEmptyRequest();
     let response = await handler.handle(request, mockMetadata);
 
     const rspEvent = asyncResponseEvent(asyncRef);
@@ -145,7 +168,7 @@ describe('regressions', () => {
     expect(response.state).toMatchInlineSnapshot(`
       {
         "App.useAsync-1": {
-          "data": undefined,
+          "data": null,
           "depends": 1,
           "error": {
             "details": "some details",
@@ -183,7 +206,7 @@ describe('regressions', () => {
     };
 
     const handler = new BlocksHandler(AppUseAsyncs);
-    const request1: UIRequest = EmptyRequest;
+    const request1: UIRequest = getEmptyRequest();
     const response1 = await handler.handle(request1, mockMetadata);
 
     expect(response1.state).toMatchInlineSnapshot(`
@@ -280,7 +303,7 @@ describe('circuit breaking', () => {
   test('circuit breaking doesnt return the error, it breaks', async () => {
     shouldThrow = true;
     const handler = new BlocksHandler(App);
-    let request: UIRequest = EmptyRequest;
+    let request: UIRequest = getEmptyRequest();
     const response = await handler.handle(request, mockMetadata);
 
     request = { events: [asyncRequestEvent(asyncRef)], state: response.state };
@@ -293,7 +316,7 @@ describe('circuit breaking', () => {
 describe('invalidation', () => {
   test('changing ids', async () => {
     const handler = new BlocksHandler(App);
-    let request: UIRequest = EmptyRequest;
+    let request: UIRequest = getEmptyRequest();
     let response = await handler.handle(request, mockMetadata);
     expect(response.state).toMatchInlineSnapshot(`
       {
@@ -333,7 +356,7 @@ describe('invalidation', () => {
 
   test('mismatched responses', async () => {
     const handler = new BlocksHandler(App);
-    let request: UIRequest = EmptyRequest;
+    let request: UIRequest = getEmptyRequest();
     let response = await handler.handle(request, mockMetadata);
     const initialState = response.state;
 
@@ -363,7 +386,7 @@ describe.each([true, false])(`when circuit-breaking: %s`, (circuitBreaking) => {
     shouldThrow = circuitBreaking;
     const handler = new BlocksHandler(App);
 
-    const response = await handler.handle(EmptyRequest, mockMetadata);
+    const response = await handler.handle(getEmptyRequest(), mockMetadata);
 
     expect(JSON.stringify(response.blocks)).toContain('loading');
     expect(response.events.length).toEqual(1);
@@ -374,7 +397,7 @@ describe.each([true, false])(`when circuit-breaking: %s`, (circuitBreaking) => {
     shouldThrow = false;
     const handler = new BlocksHandler(App);
 
-    let response = await handler.handle(EmptyRequest, mockMetadata);
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
 
     const request: UIRequest = { events: [asyncRequestEvent(asyncRef)], state: response.state };
     expect(response.state).toMatchSnapshot();
@@ -389,7 +412,7 @@ describe.each([true, false])(`when circuit-breaking: %s`, (circuitBreaking) => {
     shouldThrow = true;
     const handler = new BlocksHandler(App);
 
-    let response = await handler.handle(EmptyRequest, mockMetadata);
+    let response = await handler.handle(getEmptyRequest(), mockMetadata);
     expect(JSON.stringify(response.blocks)).toContain('loading');
 
     const request: UIRequest = { events: [asyncResponseEvent(asyncRef)], state: response.state };

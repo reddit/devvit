@@ -21,7 +21,9 @@ export const getLatestBlocksState = (): BlocksState => {
   return _latestBlocksHandler?._latestRenderContext?._state ?? {};
 };
 
-export const EmptyRequest: UIRequest = { events: [] };
+export function getEmptyRequest(): UIRequest {
+  return { events: [] };
+}
 
 export const generatePressRequest = (ref: HookRef): UIRequest => {
   const event: UIEvent = {

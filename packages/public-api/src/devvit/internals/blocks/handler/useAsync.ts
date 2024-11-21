@@ -127,13 +127,19 @@ class AsyncHook<S extends JSONValue> implements Hook {
       if (event.asyncResponse.requestId === anticipatedRequestId) {
         this.state = {
           ...this.state,
-          data: event.asyncResponse.data?.value as S | null,
+          data: (event.asyncResponse.data?.value as S | undefined) ?? null,
           error: event.asyncResponse.error ?? null,
           load_state: event.asyncResponse.error ? 'error' : 'loaded',
         };
         this.#invalidate();
       } else {
-        if (this.#debug) console.debug('[useAsync] onResp skip, stale event');
+        if (this.#debug)
+          console.debug(
+            '[useAsync] onResp skip, stale event',
+            event.asyncResponse.requestId,
+            ' !== ',
+            anticipatedRequestId
+          );
       }
     } else {
       throw new Error('Unknown event type');

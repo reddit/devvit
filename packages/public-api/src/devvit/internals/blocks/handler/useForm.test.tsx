@@ -8,7 +8,7 @@ import { describe, expect, test } from 'vitest';
 import { Devvit } from '../../../Devvit.js';
 import { BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
-import { EmptyRequest, generatePressRequest, mockMetadata } from './test-helpers.js';
+import { generatePressRequest, getEmptyRequest, mockMetadata } from './test-helpers.js';
 import type { HookRef } from './types.js';
 import { useUI } from './UIClient.js';
 import { hookRefToFormKey, useForm } from './useForm.js';
@@ -55,7 +55,7 @@ const App = (): JSX.Element => {
 describe('useForm', () => {
   test('emits an effect on render', async () => {
     const handler = new BlocksHandler(App);
-    await handler.handle(EmptyRequest, mockMetadata);
+    await handler.handle(getEmptyRequest(), mockMetadata);
     const response = await handler.handle(generatePressRequest(buttonRef), mockMetadata);
     expect(response).toMatchSnapshot();
     expect(response.effects).toHaveLength(1);
@@ -65,7 +65,7 @@ describe('useForm', () => {
   test('calls onSubmit when a form is submitted', async () => {
     submitCount = 0;
     const handler = new BlocksHandler(App);
-    await handler.handle(EmptyRequest, mockMetadata);
+    await handler.handle(getEmptyRequest(), mockMetadata);
     const response = await handler.handle(generatePressRequest(buttonRef), mockMetadata);
     const event: UIEvent = {
       scope: UIEventScope.ALL,
@@ -122,7 +122,7 @@ describe('useForm', () => {
     };
 
     const handler = new BlocksHandler(App);
-    await handler.handle(EmptyRequest, mockMetadata);
+    await handler.handle(getEmptyRequest(), mockMetadata);
     const pressRsp = await handler.handle(generatePressRequest(buttonRef), mockMetadata);
     const event: UIEvent = {
       scope: UIEventScope.ALL,

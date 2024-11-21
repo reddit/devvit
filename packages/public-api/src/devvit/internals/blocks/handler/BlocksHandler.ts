@@ -118,6 +118,11 @@ export function registerHook<H extends Hook>({
 export let _latestBlocksHandler: BlocksHandler | null = null;
 
 /**
+ * Limit the number of render cycles to prevent infinite loops.
+ */
+const MaxIterations = 64;
+
+/**
  * Replacing BlocksReconciler, the model is now less of a "reconciliation", and more
  * of a handling a request/response lifecycle.
  *
@@ -178,7 +183,12 @@ export class BlocksHandler {
     }
 
     if (this.#debug) console.debug('[blocks] starting processing events');
+
+    let iterations = 0;
     while (eventsToProcess.length > 0) {
+      if (iterations++ > MaxIterations) {
+        throw new Error(`Exceeded maximum iterations of ${MaxIterations}`);
+      }
       if (this.#debug)
         console.debug('[blocks] processing events loop iteration', eventsToProcess.length);
       /**

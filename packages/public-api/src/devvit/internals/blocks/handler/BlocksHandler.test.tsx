@@ -6,13 +6,13 @@ import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
 import { describe, expect, test, vi } from 'vitest';
 
 import { Devvit } from '../../../Devvit.js';
-import { assertValidNamespace, BlocksHandler } from './BlocksHandler.js';
+import { _activeRenderContext, assertValidNamespace, BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
 import {
-  EmptyRequest,
   findHookId,
   findHookValue,
   generatePressRequest,
+  getEmptyRequest,
   getLatestBlocksState,
   mockMetadata,
 } from './test-helpers.js';
@@ -32,6 +32,11 @@ const positiveRef: HookRef = {};
 const negativeRef: HookRef = {};
 const counter1Ref: HookRef = {};
 const counter2Ref: HookRef = {};
+
+const InfiniteLoopComponent = (): JSX.Element => {
+  _activeRenderContext?.addToRequeueEvents({ asyncResponse: { requestId: '1' } });
+  return <hstack />;
+};
 
 const SomeAsyncComponent = (): JSX.Element => {
   const { data, error, loading } = captureHookRef(useAsync(loader), funnyRef);
@@ -159,21 +164,33 @@ const AsyncStateComponent = (): JSX.Element => {
 
 describe('BlocksHandler', () => {
   describe('regressions', () => {
+    test('infinitely looping component should be terminated', async () => {
+      const handler = new BlocksHandler(InfiniteLoopComponent);
+      try {
+        await handler.handle(getEmptyRequest(), mockMetadata);
+        expect(false).toBe(true);
+      } catch (e) {
+        expect(e).toMatchInlineSnapshot(`[Error: Exceeded maximum iterations of 64]`);
+      }
+    });
+
     test('async initializer should only fire once, because the state is already there in the second request', async () => {
+      console.log();
       expect(!vi.isFakeTimers());
       n = 0;
       const handler = new BlocksHandler(AsyncStateComponent);
-      const rsp = await handler.handle(EmptyRequest, mockMetadata);
+
+      const rsp = await handler.handle(getEmptyRequest(), mockMetadata);
       expect(n).toBe(1);
 
-      const req = { ...EmptyRequest, state: rsp.state };
+      const req = { ...getEmptyRequest(), state: rsp.state };
       await handler.handle(req, mockMetadata);
       expect(n).toBe(1);
     });
 
     test('conditional components should not throw (bonus test)', async () => {
       const handler = new BlocksHandler(ConditionalComponent);
-      await handler.handle(EmptyRequest, mockMetadata);
+      await handler.handle(getEmptyRequest(), mockMetadata);
     });
 
     test('remounting should reset', async () => {
@@ -182,7 +199,7 @@ describe('BlocksHandler', () => {
         const req = generatePressRequest(ref);
         await handler.handle(req, mockMetadata);
       }
-      await handler.handle(EmptyRequest, mockMetadata);
+      await handler.handle(getEmptyRequest(), mockMetadata);
       expect(findHookValue(stateARef)).toEqual(0);
       await press(pressARef);
       expect(findHookValue(stateARef)).toEqual(1);
@@ -301,7 +318,7 @@ describe('BlocksHandler', () => {
 
       const handler = new BlocksHandler(Parent);
       await expect(() =>
-        handler.handle(EmptyRequest, mockMetadata)
+        handler.handle(getEmptyRequest(), mockMetadata)
       ).rejects.toThrowErrorMatchingInlineSnapshot(
         `[Error: Components (found: AsyncChild) cannot be async. To use data from an async endpoint, please use "const [data] = useState(async () => {/** your async code */})".]`
       );
@@ -322,7 +339,7 @@ describe('BlocksHandler', () => {
       };
 
       const handler = new BlocksHandler(Root);
-      const resp = await handler.handle(EmptyRequest, mockMetadata);
+      const resp = await handler.handle(getEmptyRequest(), mockMetadata);
 
       expect(JSON.stringify(resp.blocks)).toContain('state: foo');
     });
@@ -342,7 +359,7 @@ describe('BlocksHandler', () => {
       };
 
       const handler = new BlocksHandler(Root);
-      const resp = await handler.handle(EmptyRequest, mockMetadata);
+      const resp = await handler.handle(getEmptyRequest(), mockMetadata);
 
       expect(JSON.stringify(resp.blocks)).toContain('state: foo');
     });
@@ -374,7 +391,7 @@ describe('BlocksHandler', () => {
       };
 
       const handler = new BlocksHandler(Root);
-      const resp = await handler.handle(EmptyRequest, mockMetadata);
+      const resp = await handler.handle(getEmptyRequest(), mockMetadata);
 
       expect(JSON.stringify(resp.blocks)).toContain('state: foo');
     });
@@ -400,7 +417,7 @@ describe('BlocksHandler', () => {
       };
 
       const handler = new BlocksHandler(Root);
-      await handler.handle(EmptyRequest, mockMetadata);
+      await handler.handle(getEmptyRequest(), mockMetadata);
 
       const req = generatePressRequest(pressRef);
       const resp = await handler.handle(req, mockMetadata);
@@ -417,7 +434,7 @@ describe('BlocksHandler', () => {
       };
 
       const handler: BlocksHandler = new BlocksHandler(component);
-      const response = await handler.handle(EmptyRequest, mockMetadata);
+      const response = await handler.handle(getEmptyRequest(), mockMetadata);
       expect(response.blocks?.type).toEqual(BlockType.BLOCK_ROOT);
       expect(response).toMatchSnapshot();
       expect(callback).not.toHaveBeenCalled();
@@ -426,7 +443,7 @@ describe('BlocksHandler', () => {
   describe('event shortcuts', () => {
     test('should emit effects in normal operation', async () => {
       const handler = new BlocksHandler(SomeAsyncComponent);
-      const response = await handler.handle(EmptyRequest, mockMetadata);
+      const response = await handler.handle(getEmptyRequest(), mockMetadata);
       expect(JSON.stringify(response.blocks)).toContain('loading');
 
       expect(response.events.length).toEqual(1);
@@ -446,7 +463,7 @@ describe('BlocksHandler', () => {
 
     test('should be able to batch events and make progress', async () => {
       const handler = new BlocksHandler(SuccessFail);
-      await handler.handle(EmptyRequest, mockMetadata);
+      await handler.handle(getEmptyRequest(), mockMetadata);
       expect(findHookValue(counter1Ref)).toEqual(0);
       const req = generatePressRequest(positiveRef);
       req.events.push(structuredClone(req.events[0]));
@@ -459,7 +476,7 @@ describe('BlocksHandler', () => {
 
     test('should be able to make partial progress', async () => {
       const handler = new BlocksHandler(SuccessFail);
-      await handler.handle(EmptyRequest, mockMetadata);
+      await handler.handle(getEmptyRequest(), mockMetadata);
       expect(findHookValue(counter1Ref)).toEqual(0);
       let req = generatePressRequest(negativeRef);
       const nay = req.events[0];
@@ -482,7 +499,7 @@ describe('BlocksHandler', () => {
 
     test('should fail if the first event fails', async () => {
       const handler = new BlocksHandler(SuccessFail);
-      await handler.handle(EmptyRequest, mockMetadata);
+      await handler.handle(getEmptyRequest(), mockMetadata);
       expect(findHookValue(counter1Ref)).toEqual(0);
       let req = generatePressRequest(negativeRef);
       const nay = req.events[0];
@@ -516,7 +533,7 @@ describe('BlocksHandler', () => {
       );
 
       const handler: BlocksHandler = new BlocksHandler(boxed);
-      const request = EmptyRequest;
+      const request = getEmptyRequest();
       await handler.handle(request, mockMetadata);
       expect(new Set(Object.keys(handler._latestRenderContext?._generated ?? {}))).toEqual(
         new Set([
@@ -539,7 +556,7 @@ describe('BlocksHandler', () => {
           </hstack>
         );
       });
-      const request = EmptyRequest;
+      const request = getEmptyRequest();
       await handler.handle(request, mockMetadata);
 
       expect(new Set(Object.keys(handler._latestRenderContext?._generated ?? {}))).toEqual(
@@ -560,7 +577,7 @@ describe('BlocksHandler', () => {
           </hstack>
         );
       });
-      const request = EmptyRequest;
+      const request = getEmptyRequest();
       await handler.handle(request, mockMetadata);
 
       expect(new Set(Object.keys(handler._latestRenderContext?._generated ?? {}))).toEqual(
@@ -581,7 +598,7 @@ describe('BlocksHandler', () => {
           </hstack>
         );
       });
-      const request = EmptyRequest;
+      const request = getEmptyRequest();
       await handler.handle(request, mockMetadata);
 
       expect(new Set(Object.keys(handler._latestRenderContext?._generated ?? {}))).toEqual(
@@ -600,7 +617,7 @@ describe('BlocksHandler', () => {
 
       {
         // initial.
-        const rsp = await handler.handle(EmptyRequest, mockMetadata);
+        const rsp = await handler.handle(getEmptyRequest(), mockMetadata);
         expect(rsp.state![findHookId(counter1Ref)]).toEqual({
           value: 0,
           load_state: 'loaded',
@@ -656,7 +673,7 @@ describe('BlocksHandler', () => {
 
     test('partial progress responses should only contain state changed', async () => {
       const handler = new BlocksHandler(SuccessFail);
-      await handler.handle(EmptyRequest, mockMetadata);
+      await handler.handle(getEmptyRequest(), mockMetadata);
       expect(findHookValue(counter1Ref)).toEqual(0);
       let req = generatePressRequest(negativeRef);
       const nay = req.events[0];
@@ -747,7 +764,7 @@ describe('BlocksHandler', () => {
 
       const handler = new BlocksHandler(component);
       for (let attempts = 0; attempts < 10; attempts++) {
-        await handler.handle(EmptyRequest, mockMetadata);
+        await handler.handle(getEmptyRequest(), mockMetadata);
         const req = generatePressRequest(funnyRef);
         await handler.handle(req, mockMetadata);
         expect(Object.keys(handler._latestRenderContext?._generated ?? {}).sort()).toEqual(
@@ -794,7 +811,7 @@ describe('BlocksHandler', () => {
       const handler = new BlocksHandler(component);
 
       for (let attempts = 0; attempts < 10; attempts++) {
-        await handler.handle(EmptyRequest, mockMetadata);
+        await handler.handle(getEmptyRequest(), mockMetadata);
         const req = generatePressRequest(funnyRef);
         expect(req.events[0].hook).toEqual('one.onPress');
         await handler.handle(req, mockMetadata);
