@@ -24,6 +24,11 @@ const sidebars = {
       id: 'quickstart',
     },
     {
+      type: 'doc',
+      label: 'Ask AI',
+      id: 'ask_ai'
+    },
+    {
       type: 'category',
       label: 'Learn Devvit',
       items: [

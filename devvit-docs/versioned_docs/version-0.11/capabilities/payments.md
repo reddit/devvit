@@ -13,7 +13,7 @@ Before you can develop and playtest your payments-based app, you will need to pr
 In addition, you'll need to do a few things before you can publish your app and sell products:
 
 - Verify you meet the [eligibility criteria](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program#h_01J8GCHXEG24ZNR5EZZ9SPN48S).
-- Complete the [verification process](https://support.reddithelp.com/hc/en-us/articles/17331636499604-What-is-the-Contributor-verification-process).
+- Complete the [verification process](https://www.reddit.com/contributor-program).
 - Ensure you’re on devvit@0.11.3. See the [quickstart](https://developers.reddit.com/docs/next/quickstart) to get up and running.
 - Accept and comply with our [Earn Terms](https://redditinc.com/policies/earn-terms) and [Earn Policy](https://www.redditinc.com/policies/earn-policy).
 
