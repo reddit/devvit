@@ -23,6 +23,27 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
     };
   }
 
+  // Group pixels by color
+  const colorGroups: { [colorIndex: number]: { x: number; y: number }[] } = {};
+  data.forEach((colorIndex, pixelIndex) => {
+    if (colorIndex > 0) {
+      colorGroups[colorIndex] ??= [];
+      colorGroups[colorIndex].push(indexToXY(pixelIndex, Settings.resolution));
+    }
+  });
+
+  // Create paths for each color group
+  const paths = Object.entries(colorGroups).map(([colorIndex, pixels]) => {
+    const pathData = pixels.map(({ x, y }) => `M${x},${y}h1v1h-1z`).join(' ');
+    return `<path d="${pathData}" fill="${Settings.colors[parseInt(colorIndex)]}" />`;
+  });
+
+  const svgString = `data:image/svg+xml,
+<svg width="${Settings.resolution}" height="${Settings.resolution}" viewBox="0 0 ${Settings.resolution} ${Settings.resolution}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${Settings.resolution}" height="${Settings.resolution}" fill="white" />
+  ${paths}
+</svg>`;
+
   return (
     <zstack height={height} width={width} onPress={onPress}>
       {/* Shadow */}
@@ -44,28 +65,7 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
             width={`${size}px`}
             description="Drawing"
             resizeMode="fill"
-            url={`data:image/svg+xml,
-            <svg
-              width="${Settings.resolution}"
-              height="${Settings.resolution}"
-              viewBox="0 0 ${Settings.resolution} ${Settings.resolution}"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="white"
-            >
-              ${data.map((pixel, index) => {
-                const { x, y } = indexToXY(index, Settings.resolution);
-                return `
-                  <rect
-                    x="${x}"
-                    y="${y}"
-                    width="1"
-                    height="1"
-                    fill="${Settings.colors[pixel] || '#ffffff'}"
-                  />
-                `;
-              })}
-            </svg>
-          `}
+            url={svgString}
           />
           <spacer width="4px" />
         </hstack>
