@@ -2,14 +2,15 @@ import { Devvit, useState } from '@devvit/public-api';
 
 import type { CandidateWord } from '../types/CandidateWord.js';
 import type { Dictionary } from '../types/Dictionary.js';
+import { GameSettings } from '../types/GameSettings.js';
 import type { UserData } from '../types/UserData.js';
 import { EditorPageDrawStep } from './EditorPageDrawStep.js';
 import { EditorPageReviewStep } from './EditorPageReviewStep.js';
 import { EditorPageWordStep } from './EditorPageWordStep.js';
 
 interface EditorPageProps {
-  username?: string;
-  activeFlairId?: string;
+  username: string | null;
+  gameSettings: GameSettings;
   dictionaries: Dictionary[];
   userData: UserData;
   onCancel: () => void;

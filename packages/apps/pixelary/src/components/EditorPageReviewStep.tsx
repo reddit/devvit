@@ -4,14 +4,15 @@ import { Devvit, useForm } from '@devvit/public-api';
 import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
 import type { CandidateWord } from '../types/CandidateWord.js';
+import { GameSettings } from '../types/GameSettings.js';
 import { Drawing } from './Drawing.js';
 import { LoadingState } from './LoadingState.js';
 import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';
 
 interface EditorPageReviewStepProps {
-  username?: string;
-  activeFlairId?: string;
+  username: string | null;
+  gameSettings: GameSettings;
   candidate: CandidateWord;
   drawing: number[];
   onCancel: () => void;
@@ -43,7 +44,7 @@ export const EditorPageReviewStep = (
   );
 
   async function onPostHandler(): Promise<void> {
-    if (!props.username || !props.activeFlairId) {
+    if (!props.username || !props.gameSettings.activeFlairId) {
       context.ui.showToast('Please log in to post');
       return;
     }
@@ -60,12 +61,10 @@ export const EditorPageReviewStep = (
       expiration: new Date(Date.now() + lockoutPeriod),
     });
 
-    const subreddit = await context.reddit.getCurrentSubreddit();
-
     // The back-end is configured to run this app's submitPost calls as the user
     const post = await context.reddit.submitPost({
       title: 'What is this?',
-      subredditName: subreddit.name,
+      subredditName: props.gameSettings.subredditName,
       preview: <LoadingState />,
     });
 
@@ -75,8 +74,8 @@ export const EditorPageReviewStep = (
       dictionaryName: props.candidate.dictionaryName,
       data: props.drawing,
       authorUsername: props.username,
-      subreddit: subreddit.name,
-      flairId: props.activeFlairId,
+      subreddit: props.gameSettings.subredditName,
+      flairId: props.gameSettings.activeFlairId,
     });
     context.ui.navigateTo(post);
   }

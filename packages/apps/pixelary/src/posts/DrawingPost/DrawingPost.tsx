@@ -5,6 +5,7 @@ import { EditorPage } from '../../components/EditorPage.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
 import type { Dictionary } from '../../types/Dictionary.js';
+import { GameSettings } from '../../types/GameSettings.js';
 import type { DrawingPostData } from '../../types/PostData.js';
 import type { UserData } from '../../types/UserData.js';
 import { DrawingPostPromptStep } from './DrawingPostPromptStep.js';
@@ -13,8 +14,8 @@ import { DrawingPostResultsStep } from './DrawingPostResultsStep.js';
 interface DrawingPostProps {
   postData: DrawingPostData;
   userData: UserData;
-  username: string | undefined;
-  activeFlairId: string | undefined;
+  username: string | null;
+  gameSettings: GameSettings;
   dictionaries: Dictionary[];
 }
 

@@ -24,7 +24,7 @@ function dictionaryContainsWord(dictionaries: Dictionary[], word: string): boole
 
 interface DrawingPostResultsStepProps {
   postData: DrawingPostData;
-  username?: string;
+  username: string | null;
   dictionaries: Dictionary[];
   feedback: boolean | null;
   pointsEarned?: number;

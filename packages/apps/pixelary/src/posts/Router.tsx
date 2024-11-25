@@ -26,10 +26,28 @@ import { PinnedPost } from './PinnedPost/PinnedPost.js';
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
   const service = new Service(context);
 
-  const { data: username, loading: usernameLoading } = useAsync<string>(async () => {
-    const user = await context.reddit.getCurrentUser();
-    return user?.username ?? '';
-  });
+  const { data: username, loading: usernameLoading } = useAsync(
+    async () => {
+      if (!context.userId) return null; // Return early if no userId
+      const cacheKey = 'cache:userId-username';
+      const cache = await context.redis.hGet(cacheKey, context.userId);
+      if (cache) {
+        return cache;
+      } else {
+        const user = await context.reddit.getUserById(context.userId);
+        if (user) {
+          await context.redis.hSet(cacheKey, {
+            [context.userId]: user.username,
+          });
+          return user.username;
+        }
+      }
+      return null;
+    },
+    {
+      depends: [],
+    }
+  );
 
   const { data: gameSettings, loading: gameSettingsLoading } = useAsync<GameSettings>(async () => {
     return await service.getGameSettings();
@@ -64,7 +82,6 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
   );
 
   if (
-    username === null ||
     usernameLoading ||
     gameSettings === null ||
     gameSettingsLoading ||
@@ -84,7 +101,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
       <DrawingPost
         postData={postData as DrawingPostData}
         username={username}
-        activeFlairId={gameSettings.activeFlairId}
+        gameSettings={gameSettings}
         dictionaries={dictionaries}
         userData={userData}
       />
@@ -95,7 +112,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         postData={postData as PostData}
         userData={userData}
         username={username}
-        activeFlairId={gameSettings.activeFlairId}
+        gameSettings={gameSettings}
         dictionaries={dictionaries}
       />
     ),

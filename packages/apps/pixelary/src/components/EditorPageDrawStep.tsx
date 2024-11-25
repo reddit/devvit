@@ -12,7 +12,7 @@ import { Shadow } from './Shadow.js';
 import { StyledButton } from './StyledButton.js';
 
 interface EditorPageDrawStepProps {
-  username?: string;
+  username: string | null;
   userData: UserData;
   candidate: CandidateWord;
   onNext: (drawing: number[]) => void;

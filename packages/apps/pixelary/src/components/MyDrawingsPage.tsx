@@ -8,7 +8,7 @@ import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';
 
 interface MyDrawingsPageProps {
-  username?: string;
+  username: string | null;
   onClose: () => void;
   onDraw: () => void;
 }

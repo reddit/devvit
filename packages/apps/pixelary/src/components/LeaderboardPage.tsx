@@ -61,7 +61,7 @@ const Layout = (props: { children: JSX.Element; onClose: () => void }): JSX.Elem
 );
 
 interface LeaderboardPageProps {
-  username?: string;
+  username: string | null;
   onClose: () => void;
 }
 

@@ -198,7 +198,7 @@ export class Service {
     return await this.redis.zRange(this.scoresKey, 0, maxLength - 1, options);
   }
 
-  async getUserScore(username?: string): Promise<{
+  async getUserScore(username: string | null): Promise<{
     rank: number;
     score: number;
   }> {
@@ -441,23 +441,14 @@ export class Service {
     return 'game-settings';
   }
 
-  async storeGameSettings(settings: GameSettings): Promise<void> {
+  async storeGameSettings(settings: { [field: string]: string }): Promise<void> {
     const key = this.getGameSettingsKey();
     await this.redis.hSet(key, settings);
   }
 
   async getGameSettings(): Promise<GameSettings> {
-    try {
-      const key = this.getGameSettingsKey();
-      return (await this.redis.hGetAll(key)) as GameSettings;
-    } catch (error) {
-      if (error) {
-        console.error('Error fetching game settings:', error);
-      }
-      return {
-        selectedDictionary: 'main',
-      };
-    }
+    const key = this.getGameSettingsKey();
+    return (await this.redis.hGetAll(key)) as GameSettings;
   }
 
   // Dynamic dictionary

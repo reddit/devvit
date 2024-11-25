@@ -5,16 +5,33 @@ import Words from './data/words.json';
 import { Router } from './posts/Router.js';
 import { Service } from './service/Service.js';
 import Settings from './settings.json';
+import { appUpgrade } from './triggers/appUpgrade.js';
+import { commentDelete } from './triggers/commentDelete.js';
 import type { JobData } from './types/job-data.js';
 import type { Level } from './types/Level.js';
 import { capitalizeWord } from './utils/capitalizeWord.js';
 import { migrateDrawingPostEssentials, migratePinnedPostEssentials } from './utils/migration.js';
+
+/*
+ * Plugins
+ */
 
 Devvit.configure({
   redditAPI: true,
   redis: true,
   media: true,
 });
+
+/*
+ * Triggers
+ */
+
+Devvit.addTrigger(appUpgrade);
+Devvit.addTrigger(commentDelete);
+
+/*
+ * Define a custom post type
+ */
 
 Devvit.addCustomPostType({
   name: 'Pixelary',
@@ -72,6 +89,7 @@ Devvit.addMenuItem({
 
     // Store the game settings
     await service.storeGameSettings({
+      subredditName: community.name,
       activeFlairId: activeFlair.id,
       endedFlairId: endedFlair.id,
       selectedDictionary: 'main',
@@ -421,24 +439,6 @@ Devvit.addSchedulerJob<JobData>({
       });
       await comment.distinguish(true);
     }
-  },
-});
-
-/*
- * Comment Delete Trigger
- *
- * If a comment representing a guess has been deleted,
- * we need to remove it from Redis so that it no longer
- * appears up in the results tab.
- */
-
-Devvit.addTrigger({
-  event: 'CommentDelete',
-  onEvent: async (event, context) => {
-    const service = new Service(context);
-    const word = await service.getGuessComment(event.postId, event.commentId);
-    if (!word) return;
-    await service.removeGuessComment(event.postId, event.commentId);
   },
 });
 

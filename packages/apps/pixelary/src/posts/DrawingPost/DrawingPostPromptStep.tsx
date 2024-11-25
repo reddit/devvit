@@ -13,7 +13,7 @@ import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 
 interface DrawingPostPromptStepProps {
   postData: DrawingPostData;
-  username?: string;
+  username: string | null;
   onGuess: (guess: string, userWantsToComment: boolean) => Promise<void>;
   onSkip: () => void;
   feedback: boolean | null;
