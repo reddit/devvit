@@ -6,8 +6,6 @@ import {
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { Severity } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
-import { RemoteLogType } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import { ASSET_DIRNAME, WEB_VIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import {
   ACTOR_SRC_DIR,
@@ -23,23 +21,24 @@ import chalk from 'chalk';
 import chokidar from 'chokidar';
 import path from 'path';
 import type { Subscription } from 'rxjs';
-import { filter, map, merge, retry } from 'rxjs';
+import { map } from 'rxjs';
 
 import Upload from '../commands/upload.js';
 import { REDDIT_DESKTOP } from '../lib/config.js';
 import { fetchSubredditSubscriberCount, isCurrentUserEmployee } from '../lib/http/gql.js';
 import { PlaytestServer } from '../lib/playtest-server.js';
 import type { CommandFlags } from '../lib/types/oclif.js';
-import { AppLogObserver } from '../util/app-logs/app-log-observer.js';
+import { makeLogSubscription } from '../util/app-logs/make-log-subscription.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { Bundler, type BundlerResult } from '../util/Bundler.js';
 import { checkAppNameAvailability } from '../util/checkAppNameAvailability.js';
-import { createInstallationsClient, createRemoteLoggerClient } from '../util/clientGenerators.js';
+import { createInstallationsClient } from '../util/clientGenerators.js';
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
 import { getAppBySlug } from '../util/utils.js';
+import Logs from './logs.js';
 
 export default class Playtest extends Upload {
   static override description =
@@ -53,16 +52,11 @@ export default class Playtest extends Upload {
 
   static override get flags(): FlagInput {
     return {
-      connect: Flags.boolean({ default: true, description: 'Connect to local runtime.' }),
-      'log-runtime': Flags.boolean({
-        description:
-          'Include executing runtime in logs. Remote logs originate from apps running on Reddit servers, local logs originate from your browser.',
-      }),
+      ...Logs.flags,
       // to-do: delete. This only exists in case users dislike live-reload.
       'no-live-reload': Flags.boolean({
         description: 'Attempt to reload the subreddit being browsed automatically.',
       }),
-      verbose: Flags.boolean({ default: false }),
       'employee-update': Flags.boolean({
         name: 'employee-update',
         description:
@@ -257,11 +251,13 @@ export default class Playtest extends Upload {
       ux.action.stop(`Found!`);
     }
 
-    this.#appLogSub = this.#newAppLogSub(
-      appName,
-      flags['log-runtime'],
-      this.#existingInstallInfo.installation!.location!.id,
-      flags.verbose
+    this.#appLogSub = makeLogSubscription(
+      {
+        subreddit: this.#existingInstallInfo.installation!.location!.id,
+        appName,
+      },
+      this,
+      flags as CommandFlags<typeof Logs>
     );
 
     // Async subscribers are
@@ -279,48 +275,6 @@ export default class Playtest extends Upload {
     if (process.stdin.isTTY) {
       await new Promise((resolve) => process.stdin.once('close', resolve));
     }
-  }
-
-  #newAppLogSub(
-    appName: string,
-    logRuntime: boolean,
-    subreddit: string,
-    verbose: boolean
-  ): Subscription {
-    const client = createRemoteLoggerClient();
-    const subredditAppName = { appName, subreddit };
-    const now = new Date();
-
-    const logsQuery = {
-      type: RemoteLogType.LOG,
-      subredditAppName,
-      since: now,
-    };
-    const logs = client.Tail(logsQuery);
-    const errorsQuery = {
-      type: RemoteLogType.ERROR,
-      subredditAppName,
-      since: now,
-    };
-    const errors = client.Tail(errorsQuery);
-
-    return merge(logs, errors)
-      .pipe(retry({ count: 5, delay: 1_000, resetOnSuccess: true }))
-      .pipe(filter((log) => verbose || log.log?.severity !== Severity.VERBOSE))
-      .subscribe(
-        new AppLogObserver(
-          {
-            dateFormat: undefined,
-            json: false,
-            runtime: logRuntime,
-            showKeepAlive: false,
-            verbose,
-          },
-          this,
-          logsQuery,
-          errorsQuery
-        )
-      );
   }
 
   #onWatch = async (result: BundlerResult, subreddit: string): Promise<void> => {

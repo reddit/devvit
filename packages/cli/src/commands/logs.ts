@@ -1,24 +1,18 @@
 import { InstallationType } from '@devvit/protos/community.js';
-import { Severity } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
-import {
-  RemoteLogSubredditAppNameFilter,
-  RemoteLogType,
-} from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
+import { RemoteLogSubredditAppNameFilter } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import { Args, Flags } from '@oclif/core';
 import { sub } from 'date-fns';
-import type { Subscription } from 'rxjs';
-import { filter, merge, retry } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { PlaytestServer } from '../lib/playtest-server.js';
-import type { CommandFlags } from '../lib/types/oclif.js';
-import { AppLogObserver } from '../util/app-logs/app-log-observer.js';
 import {
   defaultAppLogDateFormat,
   formatAppLogDivider,
   parseAppLogDuration,
   supportedDurationFormats,
 } from '../util/app-logs/app-log-util.js';
-import { createInstallationsClient, createRemoteLoggerClient } from '../util/clientGenerators.js';
+import { makeLogSubscription } from '../util/app-logs/make-log-subscription.js';
+import { createInstallationsClient } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 
@@ -49,7 +43,6 @@ export default class Logs extends DevvitCommand {
       parse: toLowerCaseArgParser,
     }),
   };
-
   static override flags = {
     connect: Flags.boolean({ default: true, description: 'Connect to local runtime.' }),
     dateformat: Flags.string({
@@ -127,45 +120,7 @@ export default class Logs extends DevvitCommand {
       this.log(formatAppLogDivider(`streaming logs for ${appName} on r/${subreddit}`));
     }
 
-    this.#appLogSub = this.#newAppLogSub(subredditAppName, flags);
-  }
-
-  #newAppLogSub(
-    subredditAppName: RemoteLogSubredditAppNameFilter,
-    flags: CommandFlags<typeof Logs>
-  ): Subscription {
-    const client = createRemoteLoggerClient();
-
-    const logsQuery = {
-      since: flags.since,
-      subredditAppName,
-      type: RemoteLogType.LOG,
-    };
-    const logs = client.Tail(logsQuery);
-    const errorsQuery = {
-      since: flags.since,
-      subredditAppName,
-      type: RemoteLogType.ERROR,
-    };
-    const errors = client.Tail(errorsQuery);
-
-    return merge(logs, errors)
-      .pipe(retry({ count: 3, delay: 1000, resetOnSuccess: true }))
-      .pipe(filter((log) => flags.verbose || log.log?.severity !== Severity.VERBOSE))
-      .subscribe(
-        new AppLogObserver(
-          {
-            dateFormat: flags.dateformat,
-            json: flags.json,
-            runtime: flags['log-runtime'],
-            showKeepAlive: flags.showKeepAlive,
-            verbose: flags.verbose,
-          },
-          this,
-          logsQuery,
-          errorsQuery
-        )
-      );
+    this.#appLogSub = makeLogSubscription(subredditAppName, this, flags);
   }
 
   #onExit(): void {
