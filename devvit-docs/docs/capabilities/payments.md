@@ -63,7 +63,7 @@ Each product in the products field has the following attributes:
 | `description` | A text string that describes the product and is displayed in purchase confirmation screens. The description must be fewer than 150 characters, including spaces. |
 | `price` | An predefined integer that sets the product price in Reddit gold. See details below. |
 | `image.icon` | **(optional)** The path to the icon that represents your product in your [assets](../app_image_assets) folder. |
-| `metadata` | **(optional)** An optional object that contains additional attributes you want to use to group and filter products. Keys and values must be alphanumeric (a - Z, 0 - 9, and - ) and contain 30 characters or less. You can add up to 10 metadata keys. Metadata keys cannot start with "devvit-". |
+| `metadata` | **(optional)** An optional object that contains additional attributes you want to use to group and filter products. Keys and values must be alphanumeric (a - Z, 0 - 9, and - ) and contain 30 characters or less. You can add up to 10 metadata keys. |
 | `accountingType` | Categories for how buyers consume your products. Possible values are:
 
 - “INSTANT” for purchased items that are used immediately and disappear.
