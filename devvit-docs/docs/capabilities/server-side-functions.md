@@ -25,7 +25,7 @@ Client-side Code (index.tsx):
 
 ```tsx
 import { Devvit, useState } from '@devvit/public-api';
-import { getRandomNumber } from './server/randomNumber.ts;
+import { getRandomNumber } from './server/randomNumber.ts';
 
 Devvit.configure({
   http: true,
