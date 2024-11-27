@@ -16,7 +16,6 @@ Before you start, you'll need:
   - After creating a test subreddit, visit your Safety Filters under mod tools (https://www.reddit.com/mod/[your_subreddit_name]/safety) and turn off the Reputation filter
 - A code editor (we recommend [VS Code](https://code.visualstudio.com/))
 
-
 <details>
   <summary>Need help installing Node.js?</summary>
   <div>
@@ -28,6 +27,7 @@ Before you start, you'll need:
 [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) lets you easily manage multiple Node.js versions.
 
 For macOS/Linux:
+
 ```bash
 # 1. Install nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.6/install.sh | bash
@@ -39,6 +39,7 @@ nvm install node
 ```
 
 For Windows:
+
 1. Install [nvm-windows](https://github.com/coreybutler/nvm-windows)
 2. Restart terminal
 3. Run `nvm install node`
@@ -53,19 +54,20 @@ Direct installation may cause permissions issues. We recommend using nvm instead
 :::
 
 **Verify Installation**
+
 ```bash
 node --version
 npm --version
 ```
+
 </div>
     <br/>
   </div>
 </details>
 
+## Video tutorial
 
-## Quick Video Tutorial
-
-Watch this video for a visual guide (tutorial starts at 1:35):
+Watch this video and see how easy it is to create an app. The tutorial starts at 1:35.
 
 <iframe
   width="xxx"
@@ -78,54 +80,55 @@ Watch this video for a visual guide (tutorial starts at 1:35):
   allowfullscreen
 ></iframe>
 
-## Step-by-Step Guide
+## Step-by-step guide
+
+Follow these steps to install Devvit and create your first app.
 
 1. **Install the Devvit CLI** - Choose your preferred package manager:
 
 <Tabs>
   <TabItem value="npm" label="npm" default>
-```bash
-npm install -g devvit
-```
+    ```bash npm install -g devvit ```
   </TabItem>
   <TabItem value="yarn" label="Yarn">
-```bash
-yarn global add devvit
-```
+    ```bash yarn global add devvit ```
   </TabItem>
   <TabItem value="pnpm" label="pnpm" default>
-```bash
-pnpm install -g devvit
-```
+    ```bash pnpm install -g devvit ```
   </TabItem>
 </Tabs>
 
 2. **Log in to Reddit**
+
 ```bash
 devvit login
 ```
 
 3. **Create a new project**
+
 ```bash
 devvit new --template blocks-post
 cd my-project
 ```
-:::tip Web Developer?
-If you're familiar with web development, use `--template web-view-post` instead when creating your project to try our [webview component feature](webviews.md)
+
+:::tip Pro tip
+If you're already a savvy web developer, use `--template web-view-post` (instead of the `blocks-post` template in step 3) to use the [webview component features](webviews.md).
 :::
 
 4. **Upload your app**
+
 ```bash
 devvit upload
 ```
 
 5. **Playtest your app**
+
 ```bash
 devvit playtest <my-subreddit>
 ```
 
 :::tip
-Replace `<my-subreddit>` with your test subreddit name (e.g., `devvit playtest r/MyTestSub`)
+Replace `<my-subreddit>` with your test subreddit name (e.g., `devvit playtest r/MyTestSub`).
 :::
 
 ## Test your app
@@ -142,8 +145,8 @@ Replace `<my-subreddit>` with your test subreddit name (e.g., `devvit playtest r
 If you don't see your post, visit your Safety Filters under mod tools (https://www.reddit.com/mod/[your_subreddit_name]/safety), turn off the Reputation filter, and try again.
 :::
 
-<img src={BlocksMenu} width="100"/>
-<img src={BlocksPost} width="500"/>
+<img src={BlocksMenu} width="100" />
+<img src={BlocksPost} width="500" />
 
 ## Choose your path
 
