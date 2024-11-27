@@ -21,7 +21,17 @@
     "weak": "#B2B2B2",
     "background": "#56CCF2",
     "shadow": "rgba(0,0,0,0.2)",
-    "orangered": "#FF4500" 
+    "orangered": "#FF4500"
+  },
+  "flair": {
+    "active": {
+      "textColor": "dark",
+      "backgroundColor": "#46D160"
+    },
+    "ended": {
+      "textColor": "light",
+      "backgroundColor": "#EA0027"
+    }
   },
   "pinnedPost": {
     "title": "Let's play Pixelary!"

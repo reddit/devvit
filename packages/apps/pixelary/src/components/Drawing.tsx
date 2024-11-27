@@ -1,17 +1,15 @@
 import { Devvit } from '@devvit/public-api';
 
 import Settings from '../settings.json';
-import { generateRandomArray } from '../utils/generateRandomArray.js';
 
 interface DrawingProps {
-  data?: number[];
+  data: number[];
   size?: number;
   onPress?: Devvit.Blocks.OnPressEventHandler;
 }
 
 export const Drawing = (props: DrawingProps): JSX.Element => {
-  const dummyData = generateRandomArray(Settings.resolution * Settings.resolution);
-  const { data = dummyData, size = 288, onPress } = props;
+  const { data, size = 288, onPress } = props;
   const shadowOffset = 4;
   const height: Devvit.Blocks.SizeString = `${size + shadowOffset}px`;
   const width: Devvit.Blocks.SizeString = `${size + shadowOffset}px`;
@@ -38,39 +36,27 @@ export const Drawing = (props: DrawingProps): JSX.Element => {
     return `<path d="${pathData}" fill="${Settings.colors[parseInt(colorIndex)]}" />`;
   });
 
-  const svgString = `data:image/svg+xml,
-<svg width="${Settings.resolution}" height="${Settings.resolution}" viewBox="0 0 ${Settings.resolution} ${Settings.resolution}" xmlns="http://www.w3.org/2000/svg">
-  <rect width="${Settings.resolution}" height="${Settings.resolution}" fill="white" />
-  ${paths}
-</svg>`;
+  // Create SVG string
+  const background = `<rect width="${Settings.resolution}" height="${Settings.resolution}" fill="white" />`;
+  const svgString = `<svg width="${Settings.resolution}" height="${Settings.resolution}" viewBox="0 0 ${Settings.resolution} ${Settings.resolution}" xmlns="http://www.w3.org/2000/svg">${background}${paths}</svg>`;
 
   return (
-    <zstack height={height} width={width} onPress={onPress}>
+    <zstack height={height} width={width} onPress={onPress} alignment="top start">
       {/* Shadow */}
-      <vstack height={height} width={width}>
-        <spacer height="4px" />
-        <hstack grow>
-          <spacer width="4px" />
-          <hstack grow backgroundColor={Settings.theme.shadow} />
-        </hstack>
+      <vstack height={height} width={width} alignment="bottom end">
+        <hstack height={`${size}px`} width={`${size}px`} backgroundColor={Settings.theme.shadow} />
       </vstack>
 
-      {/* Card */}
-      <vstack height={height} width={width}>
-        <hstack grow>
-          <image
-            imageWidth={size}
-            imageHeight={size}
-            height={`${size}px`}
-            width={`${size}px`}
-            description="Drawing"
-            resizeMode="fill"
-            url={svgString}
-          />
-          <spacer width="4px" />
-        </hstack>
-        <spacer height="4px" />
-      </vstack>
+      {/* Drawing */}
+      <image
+        imageWidth={size}
+        imageHeight={size}
+        height={`${size}px`}
+        width={`${size}px`}
+        description="Drawing"
+        resizeMode="fill"
+        url={`data:image/svg+xml,${svgString}`}
+      />
     </zstack>
   );
 };

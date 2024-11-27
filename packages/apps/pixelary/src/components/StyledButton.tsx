@@ -1,9 +1,23 @@
 import { Devvit } from '@devvit/public-api';
-import { PixelText } from './PixelText.js';
+
+import Settings from '../settings.json';
 import type { SupportedGlyphs } from './PixelSymbol.js';
 import { PixelSymbol } from './PixelSymbol.js';
+import { PixelText } from './PixelText.js';
 import { Shadow } from './Shadow.js';
-import Settings from '../settings.json';
+
+const disabledStyles = {
+  primary: {
+    backgroundColor: Settings.theme.tertiary,
+    borderColor: Settings.theme.tertiary,
+    color: Settings.theme.background,
+  },
+  secondary: {
+    backgroundColor: Settings.theme.background,
+    borderColor: Settings.theme.tertiary,
+    color: Settings.theme.tertiary,
+  },
+};
 
 const styles = {
   primary: {
@@ -19,7 +33,7 @@ const styles = {
 };
 
 interface StyledButtonProps {
-  onPress: () => void | Promise<void>;
+  onPress?: () => void | Promise<void>;
   leadingIcon?: SupportedGlyphs;
   label?: string;
   trailingIcon?: SupportedGlyphs;
@@ -39,7 +53,8 @@ export const StyledButton = (props: StyledButtonProps): JSX.Element => {
     height = '40px',
   } = props;
 
-  const style = styles[appearance || 'primary'];
+  const refererenceStyle = onPress === undefined ? disabledStyles : styles;
+  const style = refererenceStyle[appearance || 'primary'];
   return (
     <Shadow height={height} width={width}>
       <hstack

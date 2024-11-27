@@ -22,7 +22,7 @@ function dictionaryContainsWord(dictionaries: Dictionary[], word: string): boole
   return dictionaries.some((entry) => includesCaseInsensitive(entry.words, word));
 }
 
-interface DrawingPostResultsStepProps {
+interface ResultsScreenProps {
   postData: DrawingPostData;
   username: string | null;
   dictionaries: Dictionary[];
@@ -31,10 +31,7 @@ interface DrawingPostResultsStepProps {
   onDraw: () => void;
 }
 
-export const DrawingPostResultsStep = (
-  props: DrawingPostResultsStepProps,
-  context: Context
-): JSX.Element => {
+export const ResultsScreen = (props: ResultsScreenProps, context: Context): JSX.Element => {
   const rowCount = 6;
   const rowHeight: Devvit.Blocks.SizeString = `${100 / rowCount}%`;
   const service = new Service(context);

@@ -11,7 +11,7 @@ import type { DrawingPostData } from '../../types/PostData.js';
 import { PostGuesses } from '../../types/PostGuesses.js';
 import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 
-interface DrawingPostPromptStepProps {
+interface GuessScreenProps {
   postData: DrawingPostData;
   username: string | null;
   onGuess: (guess: string, userWantsToComment: boolean) => Promise<void>;
@@ -19,10 +19,7 @@ interface DrawingPostPromptStepProps {
   feedback: boolean | null;
 }
 
-export const DrawingPostPromptStep = (
-  props: DrawingPostPromptStepProps,
-  context: Context
-): JSX.Element => {
+export const GuessScreen = (props: GuessScreenProps, context: Context): JSX.Element => {
   const service = new Service(context);
 
   const { data, loading } = useAsync<PostGuesses>(async () => {

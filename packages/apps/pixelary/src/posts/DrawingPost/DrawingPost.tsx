@@ -8,8 +8,8 @@ import type { Dictionary } from '../../types/Dictionary.js';
 import { GameSettings } from '../../types/GameSettings.js';
 import type { DrawingPostData } from '../../types/PostData.js';
 import type { UserData } from '../../types/UserData.js';
-import { DrawingPostPromptStep } from './DrawingPostPromptStep.js';
-import { DrawingPostResultsStep } from './DrawingPostResultsStep.js';
+import { GuessScreen } from './GuessScreen.js';
+import { ResultsScreen } from './ResultsScreen.js';
 
 interface DrawingPostProps {
   postData: DrawingPostData;
@@ -77,15 +77,10 @@ export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Elem
   // Steps map
   const steps: Record<string, JSX.Element> = {
     Prompt: (
-      <DrawingPostPromptStep
-        {...props}
-        feedback={feedback}
-        onGuess={onGuessHandler}
-        onSkip={onSkipHandler}
-      />
+      <GuessScreen {...props} feedback={feedback} onGuess={onGuessHandler} onSkip={onSkipHandler} />
     ),
     Results: (
-      <DrawingPostResultsStep
+      <ResultsScreen
         {...props}
         feedback={feedback}
         pointsEarned={pointsEarned}

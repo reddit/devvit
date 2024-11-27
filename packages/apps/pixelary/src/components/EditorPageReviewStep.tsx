@@ -1,12 +1,12 @@
 import type { Context } from '@devvit/public-api';
 import { Devvit, useForm } from '@devvit/public-api';
 
+import { GuessScreenSkeleton } from '../posts/DrawingPost/GuessScreenSkeleton.js';
 import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
 import type { CandidateWord } from '../types/CandidateWord.js';
 import { GameSettings } from '../types/GameSettings.js';
 import { Drawing } from './Drawing.js';
-import { LoadingState } from './LoadingState.js';
 import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';
 
@@ -65,7 +65,12 @@ export const EditorPageReviewStep = (
     const post = await context.reddit.submitPost({
       title: 'What is this?',
       subredditName: props.gameSettings.subredditName,
-      preview: <LoadingState />,
+      preview: (
+        <GuessScreenSkeleton
+          drawing={props.drawing}
+          dictionaryName={props.candidate.dictionaryName}
+        />
+      ),
     });
 
     service.submitDrawing({

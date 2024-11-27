@@ -350,8 +350,17 @@ export class Service {
     };
   }
 
-  async getDrawingPosts(postIds: string[]): Promise<DrawingPostData[]> {
-    return await Promise.all(postIds.map((postId) => this.getDrawingPost(postId)));
+  async getDrawingPosts(postIds: string[]): Promise<Pick<DrawingPostData, 'postId' | 'data'>[]> {
+    return await Promise.all(
+      postIds.map(async (postId) => {
+        const key = this.#postDataKey(postId);
+        const stringifiedData = await this.redis.hGet(key, 'data');
+        return {
+          postId,
+          data: stringifiedData ? JSON.parse(stringifiedData) : [],
+        };
+      })
+    );
   }
 
   async expirePost(postId: string): Promise<void> {
