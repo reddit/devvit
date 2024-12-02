@@ -37,14 +37,13 @@ export default class UpdateApp extends ProjectCommand {
       // `this.exit` never returns, but it's typed as `void` not `never`, so we need to return for type safety
       return;
     }
-    this.log('Update successful!');
 
     await this.doUpdatesSince(result.oldestVersion);
   }
 
   async doUpdatesSince(oldestVersion: semver.SemVer): Promise<void> {
     let isFirstAction = true;
-    const chalkCommand = chalk.cyan('`npm i` or `yarn`');
+    let isSuccess = true;
 
     for (const action of UPDATE_ACTIONS) {
       if (await action.shouldRun(oldestVersion)) {
@@ -55,8 +54,9 @@ export default class UpdateApp extends ProjectCommand {
           }
           ux.action.start(`Attempting to ${action.description}...`);
           await action.run(this);
-          ux.action.stop(`done!\nPlease run ${chalkCommand} to install the updated dependencies.`);
+          ux.action.stop('done!');
         } catch (err) {
+          isSuccess = false;
           this.warn(`An error occurred while attempting to ${action.description}:`);
           this.warn(err as Error);
           this.warn(
@@ -65,6 +65,11 @@ export default class UpdateApp extends ProjectCommand {
         }
       }
     }
+    if (!isSuccess) {
+      return;
+    }
+    this.log('Update successful!');
+    this.log(`Please run ${chalk.cyan('`npm i` or `yarn`')} to install the updated dependencies.`);
   }
 
   async run(): Promise<void> {}
