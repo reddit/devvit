@@ -38,7 +38,7 @@ export type AsyncOptions<S extends JSONValue> = {
   finally?: (data: S | null, error: Error | null) => void;
 };
 
-export type LoadState = 'initial' | 'loading' | 'loaded' | 'error' | 'disabled';
+export type LoadState = 'initial' | 'loading' | 'loaded' | 'error';
 
 /**
  * This tries to save an error into the state.  If the error is a circuit breaker, it will throw the error instead,
@@ -101,9 +101,6 @@ class AsyncHook<S extends JSONValue> implements Hook {
    * After we look at our state, we need to decide if we need to dispatch a request to load the data.
    */
   onStateLoaded(): void {
-    if (this.state.load_state === 'disabled') {
-      return;
-    }
     if (this.#debug) console.debug('[useAsync] async onLoad ', this.#hookId, this.state);
     if (this.#debug)
       console.debug('[useAsync] async onLoad have ', this.localDepends, 'and', this.state.depends);
