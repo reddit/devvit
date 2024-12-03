@@ -13,7 +13,6 @@ export type DrawingPostData = {
   data: number[];
   authorUsername: string;
   date: number;
-  expired?: boolean;
   solves: number;
   skips: number;
 };

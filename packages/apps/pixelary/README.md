@@ -14,10 +14,6 @@ This app demonstrates how to:
 
 - Use assets like GIFs within an interactive post.
 
-## Prerequisites
-
-Pixelary relies on post flairs. Please enable post flair in mod tools before you install the game.
-
 ## Redis Data Schema
 
 ### `user-guess-counter:${postId}`
@@ -103,8 +99,7 @@ A sorted set for tracking all drawings submitted by a user.
 
 A hashmap for storing game settings:
 
-- `activeFlairId`
-- `endedFlairId`
+- `subredditName`
 - `selectedDictionary`: Defaults to `main`
 
 #### Queries:

@@ -4,7 +4,6 @@
  */
 import './jobs/firstSolveComment.js';
 import './jobs/newDrawingPinnedComment.js';
-import './jobs/postExpiration.js';
 import './jobs/userLeveledUp.js';
 
 import { Devvit } from '@devvit/public-api';
@@ -14,7 +13,6 @@ import { Devvit } from '@devvit/public-api';
  */
 import { addWordsToDictionary } from './actions/addWordsToDictionary.js';
 import { createTopWeeklyDrawingPost } from './actions/createTopWeeklyDrawingsPost.js';
-import { expirePost } from './actions/expirePost.js';
 import { installGame } from './actions/installGame.js';
 import { logDictionary } from './actions/logDictionary.js';
 import { logSelectedDictionaryName } from './actions/logSelectedDictionaryName.js';
@@ -81,8 +79,7 @@ Devvit.addMenuItem(newPinnedPost);
 Devvit.addMenuItem(migrateDrawingPost); // Admin
 Devvit.addMenuItem(migratePinnedPost); // Admin
 Devvit.addMenuItem(logSelectedDictionaryName); // Mod
-Devvit.addMenuItem(revealWord);
-Devvit.addMenuItem(expirePost); // Mod
+Devvit.addMenuItem(revealWord); // Mod
 
 /*
  * Triggers

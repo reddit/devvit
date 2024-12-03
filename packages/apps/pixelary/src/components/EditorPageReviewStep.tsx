@@ -44,13 +44,13 @@ export const EditorPageReviewStep = (
   );
 
   async function onPostHandler(): Promise<void> {
-    if (!props.username || !props.gameSettings.activeFlairId) {
+    if (!props.username) {
       context.ui.showToast('Please log in to post');
       return;
     }
 
     // Add a temporary lock key to prevent duplicate posting.
-    // This lock will expire after 10 seconds.
+    // This lock will expire after 20 seconds.
     // If the lock is already set return early.
     const lockKey = `locked:${props.username}`;
     const locked = await context.redis.get(lockKey);
@@ -80,7 +80,6 @@ export const EditorPageReviewStep = (
       data: props.drawing,
       authorUsername: props.username,
       subreddit: props.gameSettings.subredditName,
-      flairId: props.gameSettings.activeFlairId,
     });
     context.ui.navigateTo(post);
   }

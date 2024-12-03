@@ -343,7 +343,6 @@ export class Service {
       date: parseInt(postData.date),
       word: postData.word,
       dictionaryName: postData.dictionaryName,
-      expired: JSON.parse(postData.expired),
       solves: solvedCount,
       skips: skippedCount,
       postType: postData.postType,
@@ -361,11 +360,6 @@ export class Service {
         };
       })
     );
-  }
-
-  async expirePost(postId: string): Promise<void> {
-    const key = this.#postDataKey(postId);
-    await this.redis.hSet(key, { expired: 'true' });
   }
 
   async skipPost(postId: string, username: string): Promise<void> {
@@ -386,7 +380,6 @@ export class Service {
     data: number[];
     authorUsername: string;
     subreddit: string;
-    flairId: string;
   }): Promise<void> {
     if (!this.scheduler || !this.reddit) {
       console.error('submitDrawing: Scheduler/Reddit API client not available');
@@ -400,7 +393,6 @@ export class Service {
       data: JSON.stringify(data.data),
       authorUsername: data.authorUsername,
       date: Date.now().toString(),
-      expired: 'false',
       word: data.word,
       dictionaryName: data.dictionaryName,
       postType: 'drawing',
@@ -418,16 +410,6 @@ export class Service {
       score: Date.now(),
     });
 
-    // Schedule post expiration
-    this.scheduler.runJob({
-      name: 'PostExpiration',
-      data: {
-        postId: data.postId,
-        answer: data.word,
-      },
-      runAt: new Date(Date.now() + Settings.postLiveSpan),
-    });
-
     // Schedule a job to pin the TLDR comment
     await this.scheduler.runJob({
       name: 'DRAWING_PINNED_TLDR_COMMENT',
@@ -437,12 +419,6 @@ export class Service {
 
     // Give points to the user for posting
     this.incrementUserScore(data.authorUsername, Settings.authorRewardForSubmit);
-
-    this.reddit.setPostFlair({
-      subredditName: data.subreddit,
-      postId: data.postId,
-      flairTemplateId: data.flairId,
-    });
   }
 
   // Game settings

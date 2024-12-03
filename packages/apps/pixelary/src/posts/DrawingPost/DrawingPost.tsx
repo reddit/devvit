@@ -22,12 +22,11 @@ interface DrawingPostProps {
 export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Element => {
   const service = new Service(context);
   const isAuthor = props.postData.authorUsername === props.username;
-  const isExpired = props.postData.expired;
   const isSolved = !!props.userData.solved;
   const isSkipped = !!props.userData.skipped;
 
   const [currentStep, setCurrentStep] = useState<string>(
-    isAuthor || isExpired || isSolved || isSkipped ? 'Results' : 'Prompt'
+    isAuthor || isSolved || isSkipped ? 'Results' : 'Prompt'
   );
 
   const [pointsEarned, setPointsEarned] = useState(0);
