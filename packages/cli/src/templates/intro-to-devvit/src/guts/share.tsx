@@ -40,6 +40,8 @@ export const confirmationForm = Devvit.createForm(
     } as const;
   },
   async ({ values }, context) => {
+    context.ui.showToast("Submitting your post - upon completion you'll navigate there.");
+
     const creator = await context.redis.get('hell0_user');
     const currentUser = await context.reddit.getCurrentUser();
     if (creator !== currentUser?.username) {

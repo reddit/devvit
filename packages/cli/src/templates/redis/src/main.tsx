@@ -59,8 +59,10 @@ Devvit.addMenuItem({
   label: 'Create a Progress Bar',
   onPress: async (_, context) => {
     const { reddit, ui } = context;
+    ui.showToast("Submitting your post - upon completion you'll navigate there.");
+
     const currentSubreddit = await reddit.getCurrentSubreddit();
-    await reddit.submitPost({
+    const post = await reddit.submitPost({
       title: 'Interactive Progress Bar',
       subredditName: currentSubreddit.name,
       preview: (
@@ -71,7 +73,7 @@ Devvit.addMenuItem({
         </vstack>
       ),
     });
-    ui.showToast(`Created new post in r/${currentSubreddit.name}!`);
+    ui.navigateTo(post);
   },
 });
 

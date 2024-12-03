@@ -7,13 +7,15 @@ Devvit.addMenuItem({
   label: 'New Planet Post',
   location: 'subreddit', // Show in the subreddit overflow menu.
   onPress: async (_, ctx) => {
+    ctx.ui.showToast("Submitting your post - upon completion you'll navigate there.");
+
     const subreddit = await ctx.reddit.getCurrentSubreddit();
-    await ctx.reddit.submitPost({
+    const post = await ctx.reddit.submitPost({
       preview: PlanetPostPreview(),
       title: 'What planet are you from?',
       subredditName: subreddit.name,
     });
-    ctx.ui.showToast({ text: 'Planet created.', appearance: 'success' });
+    ctx.ui.navigateTo(post);
   },
 });
 

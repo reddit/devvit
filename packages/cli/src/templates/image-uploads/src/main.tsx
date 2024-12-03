@@ -36,6 +36,8 @@ Devvit.addMenuItem({
   label: 'Post with GIF',
   onPress: async (event, context) => {
     try {
+      context.ui.showToast("Submitting your post - upon completion you'll navigate there.");
+
       // Upload external media
       const response = await context.media.upload({
         url: 'https://media2.giphy.com/media/xTiN0CNHgoRf1Ha7CM/giphy.gif',
@@ -46,11 +48,12 @@ Devvit.addMenuItem({
       const subreddit = await context.reddit.getSubredditById(event.targetId);
 
       // Create a post with media
-      await context.reddit.submitPost({
+      const post = await context.reddit.submitPost({
         subredditName: subreddit.name,
         title: 'Hello World with Media',
         richtext: new RichTextBuilder().image({ mediaId: response.mediaId }),
       });
+      context.ui.navigateTo(post);
     } catch (err) {
       throw new Error(`Error uploading media: ${err}`);
     }

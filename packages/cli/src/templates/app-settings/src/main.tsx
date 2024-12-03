@@ -32,8 +32,10 @@ Devvit.addMenuItem({
   label: 'Devvit Jokes',
   location: 'subreddit',
   onPress: async (_, { reddit, ui }) => {
+    ui.showToast("Submitting your post - upon completion you'll navigate there.");
+
     const subreddit = await reddit.getCurrentSubreddit();
-    await reddit.submitPost({
+    const post = await reddit.submitPost({
       preview: (
         <blocks>
           <vstack padding="medium" cornerRadius="medium" alignment="middle center">
@@ -47,10 +49,7 @@ Devvit.addMenuItem({
       subredditName: subreddit.name,
     });
 
-    ui.showToast({
-      text: `Look for the Devvit Jokes post.`,
-      appearance: 'success',
-    });
+    ui.navigateTo(post);
   },
 });
 

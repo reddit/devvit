@@ -105,6 +105,8 @@ Devvit.addMenuItem({
   label: 'Create a post to show off how purchasing works.',
   onPress: async (_, context) => {
     const { reddit, ui } = context;
+    ui.showToast("Submitting your post - upon completion you'll navigate there.");
+
     const currentSubreddit = context.subredditName;
     if (currentSubreddit !== undefined) {
       const newPost = await reddit.submitPost({

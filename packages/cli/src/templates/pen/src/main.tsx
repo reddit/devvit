@@ -21,12 +21,14 @@ Devvit.addMenuItem({
    * to using context.reddit and context.ui
    */
   onPress: async (_, { reddit, ui }) => {
+    ui.showToast("Submitting your post - upon completion you'll navigate there.");
+
     const subreddit = await reddit.getCurrentSubreddit();
 
     /*
      * Submits the post to the specified subreddit
      */
-    await reddit.submitPost({
+    const post = await reddit.submitPost({
       // This will show while your post is loading
       preview: (
         <vstack padding="medium" cornerRadius="medium">
@@ -39,9 +41,6 @@ Devvit.addMenuItem({
       subredditName: subreddit.name,
     });
 
-    ui.showToast({
-      text: `Successfully created a Hello World post!`,
-      appearance: 'success',
-    });
+    ui.navigateTo(post);
   },
 });
