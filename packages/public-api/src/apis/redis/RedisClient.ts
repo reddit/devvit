@@ -103,6 +103,8 @@ export class TxClient implements TxClientLike {
         output.push(result.values.values);
       } else if (result.str !== undefined) {
         output.push(result.str);
+      } else if (result.dbl !== undefined) {
+        output.push(result.dbl);
       }
     }
     return output;
