@@ -5,19 +5,13 @@ import type {
   SubmitRequest,
   SubmitResponse,
 } from '@devvit/protos';
-import {
-  Block,
-  CustomPostDefinition,
-  Definition,
-  UIEventHandlerDefinition,
-  UIResponse,
-} from '@devvit/protos';
-import { LinkedBundle } from '@devvit/protos/types/devvit/runtime/bundle.js';
+import { type SetCustomPostPreviewRequest_BodyType } from '@devvit/protos';
+import { Block, UIResponse } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
-import { fromByteArray, toByteArray } from 'base64-js';
+import { fromByteArray } from 'base64-js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
 import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
@@ -229,6 +223,15 @@ export type SubmitPostOptions = (
 ) & {
   subredditName: string;
 };
+
+const SetCustomPostPreviewRequestBodyType = {
+  NONE: 0,
+  BLOCKS: 1,
+  UNRECOGNIZED: -1,
+} as const;
+
+type SetCustomPostPreviewRequestBodyType =
+  (typeof SetCustomPostPreviewRequest_BodyType)[keyof typeof SetCustomPostPreviewRequest_BodyType];
 
 export type CrosspostOptions = CommonSubmitPostOptions & {
   subredditName: string;
@@ -865,17 +868,13 @@ export class Post {
    * ```
    */
   async setCustomPostPreview(ui: JSX.ComponentFunction): Promise<void> {
-    const newPost = await Post.setCustomPostPreview(
+    await Post.setCustomPostPreview(
       {
         id: this.id,
-        body: this.body,
         ui,
       },
       this.#metadata
     );
-
-    this.#body = newPost.body;
-    this.#edited = newPost.edited;
   }
 
   /**
@@ -1212,85 +1211,28 @@ export class Post {
 
   /** @internal */
   static async setCustomPostPreview(
-    options: { id: T3ID; body: string | undefined; ui: JSX.ComponentFunction },
+    options: { id: T3ID; ui: JSX.ComponentFunction },
     metadata: Metadata | undefined
-  ): Promise<Post> {
+  ): Promise<void> {
     if (!metadata) {
       throw new Error('Failed to set custom post preview. Metadata not found');
     }
 
-    // Get skinny bundle from post
-    const bundleMatches = new RegExp(/DX_Bundle:\n\n {4}(?<bundle>[^\n]*)/g).exec(
-      options.body ?? ''
-    );
-    if (!bundleMatches?.groups?.['bundle']) {
-      throw new Error(
-        `Failed to set custom post preview. Couldn't find bundle in post ${options.id}`
-      );
-    }
-
-    const origBundle = toByteArray(bundleMatches.groups['bundle']);
-    const myBundle = LinkedBundle.decode(origBundle);
-    // Ensure we have all the correct definitions
-    myBundle.provides = [CustomPostDefinition, UIEventHandlerDefinition].map((d) =>
-      Definition.toSerializable(d)
-    );
-    const newBundle = fromByteArray(LinkedBundle.encode(myBundle).finish());
-
-    // Get fallback text from post, if it exists
-    const fallbackMatches = new RegExp(/DX_RichtextFallback:\n\n {4}(?<fallback>[^\n]*)/g).exec(
-      options.body ?? ''
-    );
-    const textFallback = fallbackMatches?.groups?.['fallback'];
+    const client = Devvit.redditAPIPlugins.LinksAndComments;
 
     const handler = new BlocksHandler(options.ui);
     const handlerResponse = UIResponse.fromJSON(await handler.handle({ events: [] }, metadata));
     const block = handlerResponse.blocks as Block;
-    const cached = fromByteArray(Block.encode(block).finish());
+    const blocksRenderContent = fromByteArray(Block.encode(block).finish());
 
-    const postRTJson = new RichTextBuilder()
-      .heading({ level: 1 }, (h) => h.rawText('DX_Bundle:'))
-      .codeBlock({ language: '' }, (c) => {
-        c.rawText(newBundle);
-      })
-      .heading({ level: 1 }, (h) => h.rawText('DX_Config:'))
-      .codeBlock({ language: '' }, (c) => {
-        c.rawText('EgA=');
-      })
-      .heading({ level: 1 }, (h) => h.rawText('DX_Cached:'))
-      .codeBlock({ language: '' }, (c) => {
-        c.rawText(cached);
-      });
-
-    if (textFallback) {
-      postRTJson
-        .heading({ level: 1 }, (h) => h.rawText('DX_RichtextFallback:'))
-        .codeBlock({ language: '' }, (c) => {
-          c.rawText(textFallback);
-        });
-    }
-
-    const operationName = 'UpdatePost';
-    const persistedQueryHash = 'ccc5f1da31a8d8c518b6607e81c2903a46f922cb6562c8b47fcc8988f0611360';
-    const response = await GraphQL.query(
-      operationName,
-      persistedQueryHash,
+    await client.SetCustomPostPreview(
       {
-        input: {
-          postId: options.id,
-          content: {
-            richText: postRTJson.build(),
-          },
-        },
+        thingId: options.id,
+        bodyType: SetCustomPostPreviewRequestBodyType.BLOCKS,
+        blocksRenderContent,
       },
       metadata
     );
-
-    if (!response.data?.updatePost?.ok) {
-      throw new Error('Failed to set custom post preview');
-    }
-
-    return Post.getById(options.id, metadata);
   }
 
   /** @internal */
