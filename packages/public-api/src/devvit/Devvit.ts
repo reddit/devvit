@@ -126,7 +126,7 @@ export class Devvit extends Actor {
    * Devvit.configure({
    *   http: true,
    *   redditAPI: true,
-   *   kvStore: true,
+   *   redis: true,
    *   media: true
    * });
    * ```
@@ -214,9 +214,9 @@ export class Devvit extends Actor {
    *     return (
    *       <vstack>
    *         <text>{counter}</text>
-   *       <button onPress={() => setCounter((counter) => counter + 1)}>Click me!</button>
-   *     </vstack>
-   *   );
+   *         <button onPress={() => setCounter((counter) => counter + 1)}>Click me!</button>
+   *       </vstack>
+   *     );
    *   },
    * });
    * ```
