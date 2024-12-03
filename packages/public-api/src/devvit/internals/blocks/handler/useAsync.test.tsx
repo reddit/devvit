@@ -1,9 +1,9 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import { type UIEvent, UIEventScope, type UIRequest } from '@devvit/protos';
+import { type UIEvent, UIEventScope, type UIRequest, UIResponse } from '@devvit/protos';
 import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 
 import { Devvit, useState } from '../../../../index.js';
 import { BlocksHandler } from './BlocksHandler.js';
@@ -296,6 +296,49 @@ describe('regressions', () => {
         "__cache": {},
       }
     `);
+  });
+});
+
+describe('AsyncOptions', () => {
+  test('then should execute after async', async () => {
+    const AppWithThen: Devvit.BlockComponent = () => {
+      const [depends, setDepends] = useState(1);
+      const [_count, setCount] = useState(1337);
+      const then = (_data: JSONValue | Error) => {
+        setCount((c) => c + 1);
+      };
+      const { data, error, loading } = useAsync(loader, { depends, finally: then });
+      return (
+        <hstack>
+          <text>{loading ? 'loading' : data || (error ?? 'none').toString()}</text>
+          <button onPress={captureHookRef(() => setDepends((d) => d + 1), buttonRef)} />
+        </hstack>
+      );
+    };
+
+    shouldThrow = false;
+    const handler = new BlocksHandler(AppWithThen);
+    let state: JSONObject = {};
+
+    const exhaust = async (request: UIRequest) => {
+      let i = 0;
+      let response: UIResponse = { events: [], state: {}, effects: [] };
+      do {
+        if (i++ > 50) {
+          throw new Error('infinite loop');
+        }
+        response = await handler.handle(request, mockMetadata);
+        state = { ...state, ...response.state };
+        request = { events: response.events, state: structuredClone(state) };
+      } while (response.events.length > 0);
+      return response;
+    };
+
+    await exhaust(getEmptyRequest());
+
+    expect(typeof state['AppWithThen.useState-1']).toBe('object');
+    const useState1 = state['AppWithThen.useState-1'] as JSONObject;
+    expect(useState1.value).toBe(1338);
   });
 });
 

@@ -9,11 +9,33 @@ import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
 
-export type AsyncOptions = {
+export type AsyncOptions<S extends JSONValue> = {
   /**
    * The data loader will re-run if the value of `depends` changes.
    */
   depends?: JSONValue;
+
+  /**
+   * A callback that will be called after the data is loaded, regardless of whether it succeeds or fails.
+   * This is a good place to run setStates or other side effects, because calling a setState in the main
+   * body is not allowed.
+   *
+   *    useAsync(async () => {
+   *        const response = await fetch(`https://date.api/today?timezone=${timezone}`);
+   *        return response.json();
+   *    }, {
+   *        depends: [timezone],
+   *        finally: (data, error) => {
+   *            if (error) {
+   *                console.error("Failed to load date data:", error);
+   *            } else {
+   *                setTodayDate(data['currentDate']);
+   *            }
+   *        },
+   *    });
+   *
+   */
+  finally?: (data: S | null, error: Error | null) => void;
 };
 
 export type LoadState = 'initial' | 'loading' | 'loaded' | 'error' | 'disabled';
@@ -57,8 +79,13 @@ class AsyncHook<S extends JSONValue> implements Hook {
   #invalidate: () => void;
   #ctx: RenderContext;
   localDepends: JSONValue;
+  #options: AsyncOptions<S>;
 
-  constructor(initializer: AsyncUseStateInitializer<S>, options: AsyncOptions, params: HookParams) {
+  constructor(
+    initializer: AsyncUseStateInitializer<S>,
+    options: AsyncOptions<S>,
+    params: HookParams
+  ) {
     this.#debug = !!params.context.devvitContext.debug.useAsync;
     if (this.#debug) console.debug('[useAsync] v1', options);
     this.state = { data: null, load_state: 'initial', error: null, depends: null };
@@ -67,6 +94,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
     this.#invalidate = params.invalidate;
     this.#ctx = params.context;
     this.localDepends = options.depends ?? null;
+    this.#options = options;
   }
 
   /**
@@ -131,6 +159,12 @@ class AsyncHook<S extends JSONValue> implements Hook {
           error: event.asyncResponse.error ?? null,
           load_state: event.asyncResponse.error ? 'error' : 'loaded',
         };
+        if (this.#options.finally) {
+          await this.#options.finally(
+            this.state.data,
+            this.state.error ? new Error(this.state.error?.message ?? 'Unknown error') : null
+          );
+        }
         this.#invalidate();
       } else {
         if (this.#debug)
@@ -155,7 +189,7 @@ class AsyncHook<S extends JSONValue> implements Hook {
  */
 export function useAsync<S extends JSONValue>(
   initializer: AsyncUseStateInitializer<S>,
-  options: AsyncOptions = {}
+  options: AsyncOptions<S> = {}
 ): UseAsyncResult<S> {
   const hook = registerHook({
     namespace: 'useAsync',

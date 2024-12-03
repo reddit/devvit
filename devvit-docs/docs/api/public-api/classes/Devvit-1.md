@@ -60,9 +60,9 @@ Devvit.addCustomPostType({
     return (
       <vstack>
         <text>{counter}</text>
-        <button onPress={() => setCounter((counter) => counter + 1)}>Click me!</button>
-      </vstack>
-    );
+      <button onPress={() => setCounter((counter) => counter + 1)}>Click me!</button>
+    </vstack>
+  );
   },
 });
 ```
@@ -305,7 +305,7 @@ To use certain APIs and features of Devvit, you must enable them using this func
 Devvit.configure({
   http: true,
   redditAPI: true,
-  redis: true,
+  kvStore: true,
   media: true,
 });
 ```
