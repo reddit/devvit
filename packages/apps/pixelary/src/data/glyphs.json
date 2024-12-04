@@ -433,5 +433,10 @@
     "path": "M1 6H4V5H1V2H3V3H2V4H5V1H4V2H3V1H1V2H0V5H1V6Z",
     "width": 5,
     "height": 7
+  },
+  "•": {
+    "path": "M3 1H1V2H0V4H1V5H3V4H4V2H3V1Z",
+    "width": 4,
+    "height": 7
   }
 }

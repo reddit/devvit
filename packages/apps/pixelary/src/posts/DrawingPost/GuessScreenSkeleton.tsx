@@ -1,21 +1,19 @@
 import { Devvit } from '@devvit/public-api';
 
 import { Drawing } from '../../components/Drawing.js';
+import { HeroButton } from '../../components/HeroButton.js';
 import { PixelText } from '../../components/PixelText.js';
-import { StyledButton } from '../../components/StyledButton.js';
 import Settings from '../../settings.json';
-import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
 
 interface GuessScreenSkeletonProps {
   drawing: number[];
   playerCount?: number;
-  winPercentage?: number;
   dictionaryName?: string;
 }
 
 export const GuessScreenSkeleton = (props: GuessScreenSkeletonProps): JSX.Element => {
-  const { playerCount = 0, winPercentage = 0, dictionaryName = 'main' } = props;
-  const width = 256;
+  const { playerCount = 0, dictionaryName = 'main' } = props;
+  const width = 295;
 
   return (
     <blocks height="tall">
@@ -29,40 +27,48 @@ export const GuessScreenSkeleton = (props: GuessScreenSkeletonProps): JSX.Elemen
           description="Striped blue background"
           resizeMode="cover"
         />
-        <vstack height="100%" width="100%" alignment="center middle">
-          <spacer height="24px" />
-          {dictionaryName && dictionaryName !== 'main' && (
-            <PixelText
-              color={Settings.theme.secondary}
-            >{`${dictionaryName} ${dictionaryName.startsWith('r/') ? 'takeover' : 'event'}`}</PixelText>
-          )}
-          <spacer grow />
-          <Drawing data={props.drawing} size={width} />
-          <spacer grow />
 
-          <PixelText
-            color={Settings.theme.primary}
-          >{`${abbreviateNumber(playerCount)} player${playerCount === 1 ? '' : 's'} tried`}</PixelText>
-          {playerCount > 0 && (
-            <>
-              <spacer height="4px" />
-              <PixelText
-                color={Settings.theme.secondary}
-              >{`${winPercentage}% got it right`}</PixelText>
-            </>
-          )}
-          <spacer grow />
-          {/* Footer */}
-          <StyledButton
-            width={`${width}px`}
-            height="32px"
-            label="GUESS THE WORD"
-            appearance="primary"
-          />
-          <spacer width="8px" />
-          <StyledButton width={`${width}px`} height="32px" label="GIVE UP" appearance="secondary" />
-          <spacer height="20px" />
-        </vstack>
+        <zstack height="100%" width="100%">
+          <vstack height="100%" width="100%" alignment="center middle">
+            <Drawing data={props.drawing} size={width} shadowOffset={8} />
+            <spacer height="8px" />
+            <HeroButton label="LOADING ..." />
+            <spacer height="16px" />
+
+            {/* Metadata */}
+            <PixelText color={Settings.theme.secondary}>
+              {playerCount > 0
+                ? `${playerCount.toLocaleString()} have guessed`
+                : 'Make the first guess!'}
+            </PixelText>
+          </vstack>
+
+          {/* Overlay */}
+          <vstack height="100%" width="100%" alignment="center top">
+            <spacer height="16px" />
+
+            {/* Dictionary */}
+            {dictionaryName && dictionaryName !== 'main' && (
+              <hstack alignment="middle center">
+                <image
+                  url={`data:image/svg+xml,
+                <svg width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M6 4H4V6H2V8H0V12H2V14H6V12H8V10H10V8H12V6H14V0H8V2H6V4ZM10 2H12V4H10V2Z" fill="${Settings.theme.secondary}" />
+</svg>
+                `}
+                  imageHeight={14}
+                  imageWidth={14}
+                  height="14px"
+                  width="14px"
+                />
+                <spacer width="8px" />
+                <PixelText
+                  color={Settings.theme.secondary}
+                >{`${dictionaryName} ${dictionaryName.startsWith('r/') ? 'takeover' : 'event'}`}</PixelText>
+              </hstack>
+            )}
+          </vstack>
+        </zstack>
       </zstack>
     </blocks>
   );

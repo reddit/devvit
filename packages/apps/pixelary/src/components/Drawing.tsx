@@ -6,11 +6,12 @@ interface DrawingProps {
   data: number[];
   size?: number;
   onPress?: Devvit.Blocks.OnPressEventHandler;
+  shadowOffset?: number;
 }
 
 export const Drawing = (props: DrawingProps): JSX.Element => {
   const { data, size = 288, onPress } = props;
-  const shadowOffset = 4;
+  const shadowOffset = props.shadowOffset ?? 4;
   const height: Devvit.Blocks.SizeString = `${size + shadowOffset}px`;
   const width: Devvit.Blocks.SizeString = `${size + shadowOffset}px`;
 

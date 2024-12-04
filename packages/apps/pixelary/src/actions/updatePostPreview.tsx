@@ -25,13 +25,10 @@ export const updatePostPreview: MenuItem = {
       context.reddit.getPostById(event.targetId),
     ]);
 
-    const winPercentage = Math.round((drawing.solves / playerCount) * 100);
-
     const preview = () => (
       <GuessScreenSkeleton
         drawing={drawing.data}
         playerCount={playerCount}
-        winPercentage={winPercentage}
         dictionaryName={drawing.dictionaryName}
       />
     );

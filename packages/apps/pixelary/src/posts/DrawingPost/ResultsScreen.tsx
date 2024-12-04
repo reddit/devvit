@@ -2,10 +2,10 @@ import type { Context } from '@devvit/public-api';
 import { Devvit, useAsync } from '@devvit/public-api';
 
 import { Drawing } from '../../components/Drawing.js';
+import { HeroButton } from '../../components/HeroButton.js';
 import { LoadingState } from '../../components/LoadingState.js';
 import { PixelText } from '../../components/PixelText.js';
 import { PointsToast } from '../../components/PointsToast.js';
-import { StyledButton } from '../../components/StyledButton.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
 import type { Dictionary } from '../../types/Dictionary.js';
@@ -94,7 +94,7 @@ export const ResultsScreen = (props: ResultsScreenProps, context: Context): JSX.
           <hstack height="100%" width="100%" alignment="start middle">
             <spacer width="12px" />
             <PixelText
-              color={isSafeToShow ? Settings.theme.primary : Settings.theme.secondary}
+              color={isSafeToShow ? Settings.theme.primary : Settings.theme.tertiary}
               scale={2}
             >
               {isSafeToShow ? capitalizeWord(word) : obfuscateString(word)}
@@ -151,21 +151,27 @@ export const ResultsScreen = (props: ResultsScreenProps, context: Context): JSX.
         <spacer height="24px" />
 
         {/* Metadata */}
-        <PixelText
-          scale={1.5}
-          color={Settings.theme.secondary}
-        >{`${abbreviateNumber(data?.guessCount)} guess${data.guessCount === 1 ? '' : 'es'} by ${abbreviateNumber(data.playerCount)} player${data.playerCount === 1 ? '' : 's'}`}</PixelText>
-        <spacer height="24px" />
+        <hstack alignment="middle center">
+          <PixelText
+            scale={1.5}
+            color={Settings.theme.secondary}
+          >{`${abbreviateNumber(data.playerCount)} player${data.playerCount === 1 ? '' : 's'}`}</PixelText>
+          <spacer width="12px" />
+          <PixelText scale={1.5} color={Settings.theme.tertiary}>
+            •
+          </PixelText>
+          <spacer width="12px" />
+          <PixelText
+            scale={1.5}
+            color={Settings.theme.secondary}
+          >{`${abbreviateNumber(data?.guessCount)} guess${data.guessCount === 1 ? '' : 'es'}`}</PixelText>
+        </hstack>
+
+        <spacer height="14px" />
 
         {/* Call to action */}
-        <StyledButton
-          leadingIcon="+"
-          label="DRAW"
-          onPress={() => props.onDraw()}
-          width="128px"
-          height="32px"
-        />
-        <spacer height="20px" />
+        <HeroButton label="DRAW SOMETHING" onPress={() => props.onDraw()} />
+        <spacer height="16px" />
       </vstack>
 
       {/* Feedback */}

@@ -4,4 +4,5 @@ export type UserData = {
   skipped: boolean; // Has the user skipped this post?
   levelRank: number;
   levelName: string;
+  guessCount: number;
 };

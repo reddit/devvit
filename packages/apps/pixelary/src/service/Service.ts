@@ -605,6 +605,8 @@ export class Service {
     const data = await this.redis.hGetAll(this.#userDataKey(username));
     const solved = !!(await this.redis.zScore(this.#postSolvedKey(postId), username));
     const skipped = !!(await this.redis.zScore(this.#postSkippedKey(postId), username));
+    const guessCount =
+      (await this.redis.zScore(this.#postUserGuessCounterKey(postId), username)) ?? 0;
 
     const user = await this.getUserScore(username);
     const level = getLevelByScore(user.score);
@@ -614,6 +616,7 @@ export class Service {
       levelName: data.levelName ?? level.name,
       solved,
       skipped,
+      guessCount,
     };
     return parsedData;
   }
