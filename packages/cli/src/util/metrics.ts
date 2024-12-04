@@ -74,8 +74,9 @@ export async function sendEvent(
     },
   };
 
-  // Don't await this - we don't want to block the command from running
-  createEventsClient()
+  // We unfortunately do need to await this, as we want to make sure the event
+  // is sent, even if the process is killed immediately after.
+  await createEventsClient()
     .SendEvent({ structValue: eventWithSession })
-    .catch(() => {});
+    .catch(() => {}); // But we don't want or need to whine about it failing.
 }
