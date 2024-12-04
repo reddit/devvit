@@ -126,15 +126,17 @@ export class UIClient implements _UIClient {
   }
 
   #postMessage: WebViewUIClient['postMessage'] = <T extends JSONValue>(
-    webViewId: string,
-    message: T
+    webViewIdOrMessage: string | T,
+    message?: T | undefined
   ): void => {
+    const webViewId = message !== undefined ? (webViewIdOrMessage as string) : '';
+    const msg = message !== undefined ? message : webViewIdOrMessage;
     this.#effects.push({
       type: EffectType.EFFECT_WEB_VIEW,
       webView: {
         postMessage: {
           webViewId,
-          app: { message },
+          app: { message: msg },
         },
       },
     });

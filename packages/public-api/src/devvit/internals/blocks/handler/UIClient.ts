@@ -118,15 +118,17 @@ export class UIClient implements _UIClient {
   }
 
   #webViewPostMessage: WebViewUIClient['postMessage'] = <T extends JSONValue>(
-    webViewId: string,
-    message: T
+    webViewIdOrMessage: string | T,
+    message?: T | undefined
   ): void => {
+    const webViewId = message !== undefined ? (webViewIdOrMessage as string) : '';
+    const msg = message !== undefined ? message : webViewIdOrMessage;
     this.#renderContext.emitEffect(`postMessage${this.#webViewMessageCount++}`, {
       type: EffectType.EFFECT_WEB_VIEW,
       webView: {
         postMessage: {
           webViewId,
-          app: { message },
+          app: { message: msg },
         },
       },
     });
