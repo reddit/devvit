@@ -101,6 +101,8 @@ export default class Events extends DevvitCommand {
   }
 
   #onStreamError(err: unknown): void {
-    this.error(chalk.red(`error while fetching logs: ${StringUtil.caughtToString(err)}`));
+    this.error(
+      chalk.red(`error while fetching logs: ${StringUtil.caughtToString(err, 'message')}`)
+    );
   }
 }

@@ -36,7 +36,7 @@ export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2ID>> {
     return Result.Err(`Failed to fetch user id as string. Got: ${fetchUserRes.value}`);
   }
   if (userId === '') {
-    return Result.Err(`Failed to fetch user id - got an empty string somehow...`);
+    return Result.Err(`Failed to fetch user id - got an empty string somehow.`);
   }
   if (!userId.startsWith('t2_')) {
     userId = 't2_' + userId;

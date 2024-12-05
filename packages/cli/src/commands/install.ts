@@ -79,7 +79,7 @@ export default class Install extends DevvitCommand {
       ux.action.stop(
         `Currently on version ${DevvitVersion.fromProtoAppVersionInfo(
           existingInstallInfo.appVersion!
-        ).toString()} ✅`
+        ).toString()}`
       );
     }
 
@@ -94,7 +94,7 @@ export default class Install extends DevvitCommand {
           ux.action.stop(
             `Version ${DevvitVersion.fromProtoAppVersionInfo(
               existingInstallInfo.appVersion!
-            ).toString()} has already been installed ✅`
+            ).toString()} has already been installed.`
           );
           return;
         } else {
@@ -115,10 +115,13 @@ export default class Install extends DevvitCommand {
       ux.action.stop(
         `Successfully installed version ${DevvitVersion.fromProtoAppVersionInfo(
           installationInfo.appVersion!
-        ).toString()} ✅`
+        ).toString()}!`
       );
     } catch (err: unknown) {
-      this.error(`An error occurred while installing your app: ${StringUtil.caughtToString(err)}`);
+      ux.action.stop('Error');
+      this.error(
+        `An error occurred while installing your app: ${StringUtil.caughtToString(err, 'message')}`
+      );
     }
   }
 

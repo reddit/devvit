@@ -45,7 +45,7 @@ export default class SetAppSettings extends ProjectCommand {
       const appInfo = await getAppBySlug(this.#appService, appName);
       if (!appInfo?.app?.id) {
         ux.action.stop(
-          `❌ Your app doesn't exist yet - you'll need to run 'devvit upload' before you can set settings.`
+          "Error: Your app doesn't exist yet - you'll need to run 'devvit upload' before you can set settings."
         );
         return;
       }
@@ -64,18 +64,22 @@ export default class SetAppSettings extends ProjectCommand {
       if (!response.success) {
         this.error(`${JSON.stringify(response.errors)}`);
       }
-      ux.action.stop(`✅ Successfully added app settings for ${settingsKey}!`);
+      ux.action.stop(`Successfully added app settings for ${settingsKey}!`);
     } catch (err) {
       if (err instanceof TwirpError) {
         if (err.code === TwirpErrorCode.NotFound) {
           const msg = err.message.includes('addSettings')
-            ? `Unable to lookup the setting key: ${settingsKey}, please verify Devvit.addSettings was used in your app and the setting's scope is set to SettingScope.App.`
-            : 'Please install your app before listing settings.';
-          ux.action.stop(`❌ ${msg}`);
+            ? `Error: Unable to lookup the setting key: ${settingsKey}, please verify Devvit.addSettings was used in your app and the setting's scope is set to SettingScope.App.`
+            : 'Error: Please install your app before listing settings.';
+          ux.action.stop(msg);
           return;
+        } else {
+          ux.action.stop('Error');
         }
+      } else {
+        ux.action.stop('Error');
       }
-      this.error(StringUtil.caughtToString(err));
+      this.error(StringUtil.caughtToString(err, 'message'));
     }
   }
 }

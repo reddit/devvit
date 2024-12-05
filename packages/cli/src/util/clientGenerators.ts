@@ -235,7 +235,7 @@ Last error: ${StringUtil.caughtToString(error, 'message')}`
         }
 
         throw new Error(
-          `${target} failed after ${MAX_RETRIES} attempts.
+          `${JSON.stringify(prop)} failed after ${MAX_RETRIES} attempts.
 First error: ${StringUtil.caughtToString(firstError, 'message')}
 Last error: ${StringUtil.caughtToString(lastError, 'message')}`
         );

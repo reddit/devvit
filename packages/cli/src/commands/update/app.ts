@@ -33,9 +33,7 @@ export default class UpdateApp extends ProjectCommand {
     const result = await matchDevvitPackageVersions(this.projectRoot, devvitVersion!, true);
 
     if (!result.success) {
-      this.exit(1);
-      // `this.exit` never returns, but it's typed as `void` not `never`, so we need to return for type safety
-      return;
+      process.exit(1);
     }
 
     await this.doUpdatesSince(result.oldestVersion);
@@ -52,10 +50,11 @@ export default class UpdateApp extends ProjectCommand {
             this.log('Performing update actions:');
             isFirstAction = false;
           }
-          ux.action.start(`Attempting to ${action.description}...`);
+          ux.action.start(`Attempting to ${action.description}`);
           await action.run(this);
-          ux.action.stop('done!');
+          ux.action.stop();
         } catch (err) {
+          ux.action.stop('Error');
           isSuccess = false;
           this.warn(`An error occurred while attempting to ${action.description}:`);
           this.warn(err as Error);

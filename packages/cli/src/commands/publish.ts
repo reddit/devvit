@@ -79,9 +79,9 @@ export default class Publish extends ProjectCommand {
     await this.checkIfUserLoggedIn();
     await this.checkDeveloperAccount();
 
-    ux.action.start(`Finding ${appWithVersion}...`);
+    ux.action.start(`Finding ${appWithVersion}`);
     const { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);
-    ux.action.stop(`✅`);
+    ux.action.stop();
 
     const devvitVersion = new DevvitVersion(
       appVersion.majorVersion,
@@ -196,13 +196,14 @@ export default class Publish extends ProjectCommand {
       pool: 0, // Don't change the pool
     };
 
-    ux.action.start(`Publishing version "${devvitVersion.toString()}" to Reddit...`);
+    ux.action.start(`Publishing version "${devvitVersion.toString()}" to Reddit`);
     try {
       const appVersionInfo = await this.#appVersionClient.Update(appVersionUpdateRequest);
-      ux.action.stop('✅');
+      ux.action.stop();
 
       return appVersionInfo;
     } catch (error) {
+      ux.action.stop('Error');
       return handleTwirpError(error, (message: string) => this.error(message));
     }
   }
@@ -217,7 +218,7 @@ export default class Publish extends ProjectCommand {
         this.error(`An error occurred when opening the URL: ${url}`);
       }
     }
-    process.exit();
+    process.exit(0);
   }
 
   async #submitForReview(
@@ -225,16 +226,17 @@ export default class Publish extends ProjectCommand {
     devvitVersion: DevvitVersion,
     visibility: AppPublishRequestVisibility
   ): Promise<void> {
-    ux.action.start(`Submitting version "${devvitVersion.toString()}" for review...`);
+    ux.action.start(`Submitting version "${devvitVersion.toString()}" for review`);
     try {
       await this.#appPRClient.Submit({ appVersionId, visibility });
-      ux.action.stop('✅');
+      ux.action.stop();
       return;
     } catch (err) {
+      ux.action.stop('Error');
       if (err && typeof err === 'object' && 'code' in err && err.code === 'already_exists') {
         this.error('This version has already been submitted for review.');
       }
-      this.error(StringUtil.caughtToString(err));
+      this.error(StringUtil.caughtToString(err, 'message'));
     }
   }
 

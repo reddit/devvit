@@ -155,7 +155,7 @@ export default class Upload extends ProjectCommand {
     try {
       appInfo = await getAppBySlug(this.appClient, appName);
     } catch (e) {
-      this.error(StringUtil.caughtToString(e));
+      this.error(StringUtil.caughtToString(e, 'message'));
     }
 
     if (!flags.justDoIt) {
@@ -190,9 +190,9 @@ export default class Upload extends ProjectCommand {
     if (shouldCreateNewApp || !appInfo) {
       // If we're creating a new app, or if we couldn't find the app
       // bundle the app now, to ensure it builds before we potentially create an app
-      ux.action.start('Verifying app builds...');
+      ux.action.start('Verifying app builds');
       await this.#bundleActors(username, projectConfig.version, !flags.disableTypecheck);
-      ux.action.stop('✅');
+      ux.action.stop();
       didVerificationBuild = true;
 
       appInfo = await this.createNewApp(projectConfig, flags.copyPaste, flags.justDoIt);
@@ -209,9 +209,9 @@ export default class Upload extends ProjectCommand {
     // Now, create a new version, probably prompting for the new version number
     const version = await this.getNextVersion(appInfo, flags.bump, !flags.justDoIt);
     this.#event.devplatform.app_version_number = version.toString();
-    ux.action.start(didVerificationBuild ? 'Rebuilding for first upload...' : 'Building...');
+    ux.action.start(didVerificationBuild ? 'Rebuilding for first upload' : 'Building');
     const bundles = await this.#bundleActors(username, version.toString(), !flags.disableTypecheck);
-    ux.action.stop('✅');
+    ux.action.stop();
 
     try {
       await this.createVersion(appInfo.app, version, bundles, VersionVisibility.PRIVATE);
@@ -231,7 +231,7 @@ export default class Upload extends ProjectCommand {
 
     await this.#sendEventIfNotSent();
 
-    process.exit();
+    process.exit(0);
   }
 
   #canImportPublicAPI(): Promise<boolean> {
@@ -347,7 +347,7 @@ export default class Upload extends ProjectCommand {
     this.#event.devplatform.app_name = projectConfig.name;
 
     try {
-      ux.action.start('Creating app...');
+      ux.action.start('Creating app');
       // let's eliminate the "slug" field and just update the "name" directly
       const newApp = await this.appClient.Create(appCreationRequest);
       await updateDevvitConfig(this.projectRoot, this.configFile, {
@@ -361,12 +361,19 @@ export default class Upload extends ProjectCommand {
         // There's no versions, we just made it :)
       };
     } catch (err) {
-      if (err instanceof TwirpError && err.code === TwirpErrorCode.AlreadyExists) {
-        this.error(
-          `An app account with the name "${projectConfig.name}" already exists. Please change the "name" field of devvit.yaml and try again.`
-        );
+      ux.action.stop('Error');
+      if (err instanceof TwirpError) {
+        if (err.code === TwirpErrorCode.AlreadyExists) {
+          this.error(
+            `An app account with the name "${projectConfig.name}" already exists. Please change the "name" field of devvit.yaml and try again.`
+          );
+        } else {
+          this.error(StringUtil.caughtToString(err, 'message'));
+        }
       } else {
-        this.error(StringUtil.caughtToString(err));
+        this.error(
+          'Your app could not be uploaded because we encountered an issue creating your app account. This may happen because of a network issue on our end. Please try again.'
+        );
       }
     }
   }
@@ -458,7 +465,7 @@ export default class Upload extends ProjectCommand {
       }
     }
 
-    ux.action.start(`Uploading new version "${appVersion.toString()}" to Reddit...`);
+    ux.action.start(`Uploading new version "${appVersion.toString()}" to Reddit`);
     try {
       // Actually create the app version
       const appVersionInfo = await this.appVersionClient.Create({
@@ -472,10 +479,12 @@ export default class Upload extends ProjectCommand {
         prereleaseVersion: appVersion.prerelease,
         actorBundles: bundles,
       });
-      ux.action.stop(`✅`);
+      ux.action.stop();
 
       return appVersionInfo;
     } catch (error) {
+      ux.action.stop('Error');
+
       return handleTwirpError(error, (message: string) => this.error(message));
     }
   }
@@ -495,7 +504,7 @@ export default class Upload extends ProjectCommand {
     try {
       return await bundler.bundle(this.projectRoot, actorSpec);
     } catch (err) {
-      this.error(StringUtil.caughtToString(err));
+      this.error(StringUtil.caughtToString(err, 'message'));
     }
   }
 
@@ -666,10 +675,8 @@ export default class Upload extends ProjectCommand {
       }
     }
 
-    ux.action.start(`Checking for new assets to upload...`);
-
+    ux.action.start(`Checking for new assets to upload`);
     const assetMap = await this.#uploadNewAssets(assets);
-
     ux.action.stop(`Found ${assets.length} new asset${assets.length === 1 ? '' : 's'}.`);
 
     return assetMap;
@@ -681,10 +688,8 @@ export default class Upload extends ProjectCommand {
       return {};
     }
 
-    ux.action.start(`Checking for new WebView assets to upload...`);
-
+    ux.action.start(`Checking for new WebView assets to upload`);
     const assetMap = await this.#uploadNewAssets(assets, true);
-
     ux.action.stop(`Found ${assets.length} new WebView asset${assets.length === 1 ? '' : 's'}.`);
 
     // only return the html files for the WebView assets
@@ -740,7 +745,7 @@ export default class Upload extends ProjectCommand {
     }
 
     // Upload everything, giving back pairs of the assets & their upload response
-    ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining...`);
+    ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining`);
     let uploadResults: [MediaSignatureWithContents, UploadNewMediaResponse][] = [];
     try {
       // Do this in batches - we don't want to upload everything at once and
@@ -765,11 +770,12 @@ export default class Upload extends ProjectCommand {
             })
           )),
         ];
-        ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining...`);
+        ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining`);
       }
     } catch (err) {
       const error = err as Error;
       const msg = `Failed to upload ${webViewMsg}assets. (${error.message})`;
+      ux.action.stop(msg);
       if (webViewAsset) {
         // don't fail on WebView uploads in case we just don't have the feature enabled
         ux.action.stop(msg);

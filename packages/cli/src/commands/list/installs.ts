@@ -35,7 +35,7 @@ export default class ListInstalls extends DevvitCommand {
   async run(): Promise<void> {
     const { args } = await this.parse(ListInstalls);
 
-    ux.action.start('loading');
+    ux.action.start('Loading installations');
     const results = await this.#fetchInstalls(args.subreddit);
     ux.action.stop();
     this.log(); // newline

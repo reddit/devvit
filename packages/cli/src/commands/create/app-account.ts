@@ -55,7 +55,7 @@ export default class CreateApp extends DevvitCommand {
         this.warn(response.errors);
       }
     } catch (err) {
-      this.error(`Something went wrong: ${StringUtil.caughtToString(err)}`);
+      this.error(`Something went wrong: ${StringUtil.caughtToString(err, 'message')}`);
     }
   }
 }

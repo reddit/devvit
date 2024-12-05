@@ -18,6 +18,6 @@ export async function getAppBySlug(
         return undefined;
       }
     }
-    throw StringUtil.caughtToString(err);
+    throw StringUtil.caughtToString(err, 'message');
   }
 }

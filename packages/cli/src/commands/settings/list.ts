@@ -21,7 +21,7 @@ export default class ListAppSettings extends ProjectCommand {
       const appInfo = await getAppBySlug(this.#appService, appName);
       if (!appInfo?.app?.id) {
         ux.action.stop(
-          `❌ Your app doesn't exist yet - you'll need to run 'devvit upload' before you can list settings.`
+          "Error: Your app doesn't exist yet - you'll need to run 'devvit upload' before you can list settings."
         );
         return;
       }
@@ -35,17 +35,18 @@ export default class ListAppSettings extends ProjectCommand {
     } catch (err) {
       if (err instanceof TwirpError) {
         if (err.code === TwirpErrorCode.NotFound) {
-          ux.action.stop(`❌ Please install your app before listing settings.`);
+          ux.action.stop(`Please install your app before listing settings.`);
           return;
         } else if (err.message.includes('does not provide method')) {
           ux.action.stop(
-            `❌ Unable to fetch settings. Please verify Devvit.addSettings was used in your app.`
+            `Unable to fetch settings. Please verify Devvit.addSettings was used in your app.`
           );
           return;
         }
+      } else {
+        ux.action.stop('Error');
       }
-      ux.action.stop(`❌`);
-      this.error(StringUtil.caughtToString(err));
+      this.error(StringUtil.caughtToString(err, 'message'));
     }
   }
 

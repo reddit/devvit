@@ -31,7 +31,7 @@ export default class Icons extends ProjectCommand {
       return;
     }
 
-    ux.action.start('Creating icons map...');
+    ux.action.start('Creating icons map');
     const iconsMap = this.#createIconsMap(svgAssets);
     await fsp.writeFile(outputFile, iconsMap);
     ux.action.stop(`Created icons map at ${outputFile}!`);

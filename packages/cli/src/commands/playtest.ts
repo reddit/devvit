@@ -106,8 +106,8 @@ export default class Playtest extends Upload {
     });
   }
 
-  async checkVersionBuildStatus(appVersionInfo: AppVersionInfo): Promise<boolean> {
-    ux.action.start('App is building remotely...');
+  async #checkVersionBuildStatus(appVersionInfo: AppVersionInfo): Promise<boolean> {
+    ux.action.start('App is building remotely');
     for (let i = 0; i < 20 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
       // version is still building: wait and try again
       await sleep(2000);
@@ -124,7 +124,7 @@ export default class Playtest extends Upload {
       }
     }
     if (appVersionInfo.buildStatus === BuildStatus.READY) {
-      ux.action.stop(`✅`);
+      ux.action.stop();
     } else {
       this.warn('Something went wrong: the previous version did not build successfully.');
     }
@@ -171,7 +171,7 @@ export default class Playtest extends Upload {
 
         // App doesn't exist - tell the user to run `devvit upload` first
         this.error(
-          `Your app doesn't exist yet - you'll need to run 'devvit upload' once before you can playtest your app.`
+          "Your app doesn't exist yet - you'll need to run 'devvit upload' once before you can playtest your app."
         );
       }
     }
@@ -182,7 +182,7 @@ export default class Playtest extends Upload {
 
     if (!this.#appInfo) {
       this.error(
-        `Your app doesn't exist yet - you'll need to run 'devvit upload' before you can playtest your app.`
+        "Your app doesn't exist yet - you'll need to run 'devvit upload' before you can playtest your app."
       );
     }
 
@@ -225,7 +225,7 @@ export default class Playtest extends Upload {
     const appWithVersion = `${appName}@${this.#version}`;
     const appVersionId = await slugVersionStringToUUID(appWithVersion, this.appClient);
 
-    ux.action.start(`Checking for existing installation...`);
+    ux.action.start(`Checking for existing installation`);
     this.#existingInstallInfo = await this.#getExistingInstallInfo(subreddit);
 
     if (!this.#existingInstallInfo) {
@@ -233,7 +233,7 @@ export default class Playtest extends Upload {
 
       const userT2Id = await this.getUserT2Id(token);
 
-      ux.action.start(`Installing...`);
+      ux.action.start(`Installing`);
       try {
         this.#existingInstallInfo = await this.#installationsClient.Create({
           appVersionId,
@@ -243,10 +243,12 @@ export default class Playtest extends Upload {
           upgradeStrategy: 0,
         });
       } catch (err: unknown) {
+        ux.action.stop('Error');
         this.error(
-          `An error occurred while installing your app: ${StringUtil.caughtToString(err)}`
+          `An error occurred while installing your app: ${StringUtil.caughtToString(err, 'message')}`
         );
       }
+      ux.action.stop();
     } else {
       ux.action.stop(`Found!`);
     }
@@ -336,9 +338,9 @@ export default class Playtest extends Upload {
         VersionVisibility.PRIVATE
       );
     } catch (err) {
+      ux.action.stop(chalk.red('Error'));
       if (err instanceof Error) {
-        // Don't log as error so we don't exit the process.
-        this.log(chalk.red(`\n${err}\n`));
+        this.log(chalk.red(`\n${StringUtil.caughtToString(err, 'message')}\n`)); // Don't log as error so we don't exit the process.
       } else {
         this.error(`An unknown error occurred when creating the app version.\n${err}`);
       }
@@ -347,7 +349,7 @@ export default class Playtest extends Upload {
     }
 
     // 5. confirm new version has finished building:
-    if (!(await this.checkVersionBuildStatus(appVersionInfo))) {
+    if (!(await this.#checkVersionBuildStatus(appVersionInfo))) {
       this.error('App version did not build successfully.');
     }
 
@@ -360,14 +362,16 @@ export default class Playtest extends Upload {
       }`
     );
 
-    ux.action.start(`Installing playtest version ${this.#version}...`);
+    ux.action.start(`Installing playtest version ${this.#version}`);
     await this.#installationsClient.Upgrade({
       id: this.#existingInstallInfo!.installation!.id,
       appVersionId,
     });
-    if (!this.#flags?.['no-live-reload']) this.#server?.send({ appInstalled: {} });
+    if (!this.#flags?.['no-live-reload']) {
+      this.#server?.send({ appInstalled: {} });
+    }
     ux.action.stop(
-      `✅\nSuccess! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
+      `Success! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
     );
 
     this.#isOnWatchExecuting = false;
@@ -380,7 +384,7 @@ export default class Playtest extends Upload {
   };
 
   #onWatchError = (err: unknown): void => {
-    this.error(`watch error: ${StringUtil.caughtToString(err)}`);
+    this.error(`watch error: ${StringUtil.caughtToString(err, 'message')}`);
   };
 
   async #onExit(): Promise<void> {

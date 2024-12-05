@@ -81,18 +81,20 @@ export default class Uninstall extends DevvitCommand {
       }
       id = installationToRemove.id;
     } catch (err) {
+      ux.action.stop('Error');
       this.error(
-        `Error while trying to find installation to remove: ${StringUtil.caughtToString(err)}`
+        `Error while trying to find installation to remove: ${StringUtil.caughtToString(err, 'message')}`
       );
     }
-    ux.action.stop(`✅`);
+    ux.action.stop();
 
     ux.action.start(`Uninstalling`);
     try {
       await this.#installationsClient.Remove({ id });
     } catch (err) {
-      this.error(`ERROR: Unable to uninstall app: ${StringUtil.caughtToString(err)}`);
+      ux.action.stop('Error');
+      this.error(`ERROR: Unable to uninstall app: ${StringUtil.caughtToString(err, 'message')}`);
     }
-    ux.action.stop('✅');
+    ux.action.stop();
   }
 }

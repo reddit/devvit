@@ -64,7 +64,9 @@ export class AppLogObserver implements Observer<RemoteLogMessage> {
   }
 
   error(err: unknown): void {
-    this.#logger.error(chalk.red(`error while fetching logs: ${StringUtil.caughtToString(err)}`));
+    this.#logger.error(
+      chalk.red(`error while fetching logs: ${StringUtil.caughtToString(err, 'message')}`)
+    );
   }
 
   #logError(error: LogErrorMessage): void {

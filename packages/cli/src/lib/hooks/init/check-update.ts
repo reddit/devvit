@@ -26,10 +26,11 @@ const hook: Hook<'init'> = async function (options) {
 
   let latest: SemVer;
   try {
-    ux.action.start('Checking for updates...');
+    ux.action.start('Checking for updates');
     latest = await fetchLatestPublishedVersion();
-    ux.action.stop('✅');
+    ux.action.stop();
   } catch {
+    ux.action.stop('Error');
     this.warn(
       'There was an error checking for devvit updates. The command will proceed, but you may be using an outdated version.'
     );
