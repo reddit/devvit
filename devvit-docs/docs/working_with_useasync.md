@@ -46,11 +46,12 @@ This example displays “Loading…” immediately while fetching the data.
 ### Syntax
 
 ```ts
-const { data, loading, error } = useAsync(asyncFunction, { depends: {JSON object} });
+const { data, loading, error } = useAsync(asyncFunction, { depends: {JSON object}, finally: () => { function }  });
 ```
 
-- asyncFunction: an asynchronous function that must return a valid JSON value.
+- asyncFunction: an asynchronous function that must return a valid JSON value. Note that setState is not allowed in this function. Use the finally parameter if you need to use setState (see the example below).
 - depends (optional): a JSON object or array of JSON objects that, when changed, will cause the asyncFunction to re-execute.
+- finally (optional): a callback function that runs after the async operation completes regardless of success or failure. Ideal for state updates (i.e. calls to setState) and side effects.
 
 ### Return values
 
@@ -59,6 +60,27 @@ const { data, loading, error } = useAsync(asyncFunction, { depends: {JSON object
 - error: an error if the request failed.
 
 **The initializer for `useAsync` (the first argument of the function) must return a valid JSON value.** This differs from React due to how Devvit components work across server and client boundaries.
+
+### Example: fetching the time and setting state
+
+```ts
+useAsync(
+  async () => {
+    const response = await fetch(`https://date.api/today?timezone=${timezone}`);
+    return response.json();
+  },
+  {
+    depends: [timezone],
+    finally: (data, error) => {
+      if (error) {
+        console.error('Failed to load date data:', error);
+      } else {
+        setTodayDate(data['currentDate']);
+      }
+    },
+  }
+);
+```
 
 ### Example: fetching user data
 
