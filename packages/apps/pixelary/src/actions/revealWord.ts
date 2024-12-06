@@ -1,6 +1,7 @@
 import type { MenuItem } from '@devvit/public-api';
 
 import { Service } from '../service/Service.js';
+import type { PostId } from '../types/Id.js';
 
 export const revealWord: MenuItem = {
   label: '[Pixelary] Reveal Word',
@@ -8,10 +9,13 @@ export const revealWord: MenuItem = {
   forUserType: 'moderator',
   onPress: async (event, context) => {
     const service = new Service(context);
-    const postType = await service.getPostType(event.targetId);
-    // Return early for unsupported post types
-    if (postType !== 'drawing') return;
-    const data = await service.getDrawingPost(event.targetId);
+    const postId = event.targetId as PostId;
+    const postType = await service.getPostType(postId);
+    if (postType !== 'drawing') {
+      context.ui.showToast('Unknown post type');
+      return;
+    }
+    const data = await service.getDrawingPost(postId);
     context.ui.showToast(data.word);
   },
 };

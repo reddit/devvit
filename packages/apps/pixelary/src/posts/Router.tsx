@@ -5,6 +5,7 @@ import { LoadingState } from '../components/LoadingState.js';
 import { Service } from '../service/Service.js';
 import type { Dictionary } from '../types/Dictionary.js';
 import type { GameSettings } from '../types/GameSettings.js';
+import type { PostId } from '../types/Id.js';
 import type {
   CollectionPostData,
   DrawingPostData,
@@ -24,6 +25,7 @@ import { PinnedPost } from './PinnedPost/PinnedPost.js';
  */
 
 export const Router: Devvit.CustomPostComponent = (context: Context) => {
+  const postId = context.postId as PostId;
   const service = new Service(context);
 
   const { data: username, loading: usernameLoading } = useAsync(
@@ -56,15 +58,15 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
   const { data: postData, loading: postDataLoading } = useAsync<
     CollectionPostData | PinnedPostData | DrawingPostData
   >(async () => {
-    const postType = await service.getPostType(context.postId!);
+    const postType = await service.getPostType(postId);
     switch (postType) {
       case 'collection':
-        return await service.getCollectionPost(context.postId!);
+        return await service.getCollectionPost(postId);
       case 'pinned':
-        return await service.getPinnedPost(context.postId!);
+        return await service.getPinnedPost(postId);
       case 'drawing':
       default:
-        return await service.getDrawingPost(context.postId!);
+        return await service.getDrawingPost(postId);
     }
   });
 
@@ -74,7 +76,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
 
   const { data: userData, loading: userDataLoading } = useAsync<UserData>(
     async () => {
-      return await service.getUser(username!, context.postId!);
+      return await service.getUser(username!, postId);
     },
     {
       depends: [username],

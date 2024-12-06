@@ -32,9 +32,9 @@ interface ResultsScreenProps {
 }
 
 export const ResultsScreen = (props: ResultsScreenProps, context: Context): JSX.Element => {
+  const service = new Service(context);
   const rowCount = 6;
   const rowHeight: Devvit.Blocks.SizeString = `${100 / rowCount}%`;
-  const service = new Service(context);
 
   const { data, loading } = useAsync<{
     guesses: { [guess: string]: number };
@@ -46,9 +46,9 @@ export const ResultsScreen = (props: ResultsScreenProps, context: Context): JSX.
     const empty = { playerCount: 0, wordCount: 0, guessCount: 0, guesses: {}, comments: {} };
     if (!props.username) return empty;
     try {
-      const playerCount = await service.getPlayerCount(context.postId!);
-      const guesses = await service.getPostGuesses(context.postId!);
-      const comments = await service.getGuessComments(context.postId!);
+      const playerCount = await service.getPlayerCount(props.postData.postId);
+      const guesses = await service.getPostGuesses(props.postData.postId);
+      const comments = await service.getGuessComments(props.postData.postId);
       return {
         playerCount,
         wordCount: guesses.wordCount,
@@ -175,7 +175,6 @@ export const ResultsScreen = (props: ResultsScreenProps, context: Context): JSX.
       </vstack>
 
       {/* Feedback */}
-      {/* TODO: Include firstSolve bonus check */}
       {props.feedback === true && (
         <PointsToast value={props.pointsEarned ?? Settings.guesserRewardForSolve} />
       )}

@@ -1,7 +1,7 @@
-// import { updatePostPreview } from './actions/updatePostPreview.js';
 /*
  * Jobs
  */
+
 import './jobs/firstSolveComment.js';
 import './jobs/newDrawingPinnedComment.js';
 import './jobs/userLeveledUp.js';
@@ -12,6 +12,8 @@ import { Devvit } from '@devvit/public-api';
  * Menu Actions
  */
 import { addWordsToDictionary } from './actions/addWordsToDictionary.js';
+//import { stopScoreboardJobs } from './actions/stopScoreboardJobs.js';
+import { createDictionary } from './actions/createDictionary.js';
 import { createTopWeeklyDrawingPost } from './actions/createTopWeeklyDrawingsPost.js';
 import { installGame } from './actions/installGame.js';
 import { logDictionary } from './actions/logDictionary.js';
@@ -21,10 +23,11 @@ import { migratePinnedPost } from './actions/migratePinnedPost.js';
 import { newPinnedPost } from './actions/newPinnedPost.js';
 import { removeWordsFromDictionary } from './actions/removeWordsFromDictionary.js';
 import { revealWord } from './actions/revealWord.js';
-import { saveDictionaryToRedis } from './actions/saveDictionaryToRedis.js';
+//import { saveDictionaryToRedis } from './actions/saveDictionaryToRedis.js';
 import { selectDictionary } from './actions/selectDictionary.js';
-import { stopScoreboardJobs } from './actions/stopScoreboardJobs.js';
+import { updateDrawingPostPreview } from './actions/updateDrawingPostPreview.js';
 import { addWordsToDictionaryForm } from './forms/addWordsToDictionaryForm.js';
+import { createDictionaryForm } from './forms/createDictionaryForm.js';
 /*
  * Forms
  */
@@ -64,22 +67,23 @@ Devvit.addCustomPostType({
  */
 
 // Subreddit
-Devvit.addMenuItem(installGame); // Mod
-Devvit.addMenuItem(stopScoreboardJobs); // Admin
-Devvit.addMenuItem(createTopWeeklyDrawingPost); // Mod
-Devvit.addMenuItem(saveDictionaryToRedis); // Admin
-Devvit.addMenuItem(addWordsToDictionary(addWordsToDictionaryForm)); // Mod
-Devvit.addMenuItem(logDictionary(logDictionaryForm)); // Mod
-Devvit.addMenuItem(selectDictionary(selectDictionaryForm)); // Mod
+Devvit.addMenuItem(installGame);
+//Devvit.addMenuItem(stopScoreboardJobs);
+Devvit.addMenuItem(createTopWeeklyDrawingPost);
+//Devvit.addMenuItem(saveDictionaryToRedis);
+Devvit.addMenuItem(addWordsToDictionary(addWordsToDictionaryForm));
+Devvit.addMenuItem(logDictionary(logDictionaryForm));
+Devvit.addMenuItem(selectDictionary(selectDictionaryForm));
 Devvit.addMenuItem(removeWordsFromDictionary(removeWordsFromDictionaryForm));
 Devvit.addMenuItem(newPinnedPost);
+Devvit.addMenuItem(createDictionary(createDictionaryForm));
 
 // Posts
-// Devvit.addMenuItem(updatePostPreview);
-Devvit.addMenuItem(migrateDrawingPost); // Admin
-Devvit.addMenuItem(migratePinnedPost); // Admin
-Devvit.addMenuItem(logSelectedDictionaryName); // Mod
-Devvit.addMenuItem(revealWord); // Mod
+Devvit.addMenuItem(updateDrawingPostPreview);
+Devvit.addMenuItem(migrateDrawingPost);
+Devvit.addMenuItem(migratePinnedPost);
+Devvit.addMenuItem(logSelectedDictionaryName);
+Devvit.addMenuItem(revealWord);
 
 /*
  * Triggers

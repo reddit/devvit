@@ -1,27 +1,42 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, FormOnSubmitEvent } from '@devvit/public-api';
 
 import { Service } from '../service/Service.js';
 import { capitalizeWord } from '../utils/capitalizeWord.js';
 
 export const removeWordsFromDictionaryForm = Devvit.createForm(
-  {
+  (data: { dictionaries?: string[]; selectedDictionary?: string }) => ({
+    title: 'Remove words',
+    description: 'Remove one to many words from a given dictionary',
     fields: [
       {
-        type: 'string',
+        type: 'select',
         name: 'dictionary',
-        label: 'What dictionary do you want to remove a word from?',
-        defaultValue: 'main',
-      },
-      {
-        type: 'string',
-        name: 'words',
-        label:
-          'What words do you want to remove from the dictionary? (Separate multiple words with commas)',
+        label: 'Dictionary',
+        options: data.dictionaries!.map((dictionary) => ({
+          value: dictionary,
+          label: dictionary,
+        })),
+        defaultValue: [data.selectedDictionary ?? 'main'],
         required: true,
       },
+      {
+        type: 'paragraph',
+        name: 'words',
+        label: 'Words',
+        required: true,
+        helpText: 'Separate by commas',
+      },
     ],
-  },
-  async (event, context) => {
+    acceptLabel: 'Remove',
+    cancelLabel: 'Cancel',
+  }),
+  async (
+    event: FormOnSubmitEvent<{
+      dictionary?: string[];
+      words?: string;
+    }>,
+    context
+  ) => {
     const service = new Service(context);
 
     if (!event.values.words) {
@@ -30,7 +45,7 @@ export const removeWordsFromDictionaryForm = Devvit.createForm(
     }
     const wordsToRemove = event.values.words.split(',').map((word) => capitalizeWord(word.trim()));
     const wordsRemoved = await service.removeWordFromDictionary(
-      event.values.dictionary,
+      event.values.dictionary?.[0]!,
       wordsToRemove
     );
 

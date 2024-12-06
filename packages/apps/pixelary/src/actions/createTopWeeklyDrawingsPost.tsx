@@ -5,7 +5,7 @@ import { LoadingState } from '../components/LoadingState.js';
 import { Service } from '../service/Service.js';
 
 export const createTopWeeklyDrawingPost: MenuItem = {
-  label: '[Pixelary] Create Top Weekly Drawings Post',
+  label: '[Pixelary] Create top weekly drawings post',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {

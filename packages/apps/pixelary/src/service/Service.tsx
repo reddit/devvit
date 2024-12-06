@@ -1,15 +1,17 @@
 import type {
-  Comment,
   Post,
   RedditAPIClient,
   RedisClient,
   Scheduler,
   ZRangeOptions,
 } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
 
+import { GuessScreenSkeleton } from '../posts/DrawingPost/GuessScreenSkeleton.js';
 import Settings from '../settings.json';
 import type { Dictionary } from '../types/Dictionary.js';
 import type { GameSettings } from '../types/GameSettings.js';
+import type { CommentId, PostId } from '../types/Id.js';
 import type {
   CollectionData,
   CollectionPostData,
@@ -40,6 +42,26 @@ export class Service {
     this.scheduler = context.scheduler;
   }
 
+  readonly tags = {
+    scores: 'default',
+  };
+
+  readonly keys = {
+    dictionary: (dictionaryName: string) => `dictionary:${dictionaryName}`,
+    dictionaries: 'dictionaries',
+    gameSettings: 'game-settings',
+    guessComments: (postId: PostId) => `guess-comments:${postId}`,
+    postData: (postId: PostId) => `post:${postId}`,
+    postGuesses: (postId: PostId) => `guesses:${postId}`,
+    postSkipped: (postId: PostId) => `skipped:${postId}`,
+    postSolved: (postId: PostId) => `solved:${postId}`,
+    postUserGuessCounter: (postId: PostId) => `user-guess-counter:${postId}`,
+    scores: `pixels:${this.tags.scores}`,
+    userData: (username: string) => `users:${username}`,
+    userDrawings: (username: string) => `user-drawings:${username}`,
+    wordDrawings: (word: string) => `word-drawings:${word}`,
+  };
+
   /*
    * Submit Guess
    */
@@ -55,35 +77,17 @@ export class Service {
       return 0;
     }
 
-    // Comment guess
-    let comment: Comment | undefined;
-    if (event.createComment) {
-      try {
-        comment = await this.reddit.submitComment({
-          id: event.postData.postId,
-          text: `I tried **${event.guess}**`,
-        });
-      } catch (error) {
-        if (error) {
-          console.error('Failed to submit comment:', error);
-        }
-        comment = undefined;
-      }
-    }
-
-    // Increment the counter for this guess
-    const guessCount = await this.redis.zIncrBy(
-      this.#postGuessesKey(event.postData.postId),
-      event.guess,
-      1
-    );
-
-    // Increment how many guesses the user has made for this post
-    await this.redis.zIncrBy(
-      this.#postUserGuessCounterKey(event.postData.postId),
-      event.username,
-      1
-    );
+    const [comment, guessCount] = await Promise.all([
+      // Comment guess
+      event.createComment
+        ? this.reddit.submitComment({
+            id: event.postData.postId,
+            text: `I tried **${event.guess}**`,
+          })
+        : Promise.resolve(undefined),
+      // Increment the counter for this guess
+      this.redis.zIncrBy(this.keys.postGuesses(event.postData.postId), event.guess, 1),
+    ]);
 
     const isCorrect = event.postData.word.toLowerCase() === event.guess;
     const isFirstSolve = isCorrect && guessCount === 1;
@@ -93,109 +97,107 @@ export class Service {
         : Settings.guesserRewardForSolve
       : 0;
 
+    const promises: Promise<unknown>[] = [
+      // Increment the user's guess count
+      this.redis.zIncrBy(this.keys.postUserGuessCounter(event.postData.postId), event.username, 1),
+    ];
+
     // Save guess comment
     if (comment) {
-      await this.saveGuessComment(event.postData.postId, event.guess, comment.id);
+      promises.push(this.saveGuessComment(event.postData.postId, event.guess, comment.id));
     }
 
     if (isCorrect) {
-      // Persist that the user has solved the post
-      await this.redis.zAdd(this.#postSolvedKey(event.postData.postId), {
-        member: event.username,
-        score: Date.now(),
-      });
-
-      // Give points to drawer
-      // TODO: Consider a cap on the number of points a drawer can earn from a single post
-      await this.incrementUserScore(
-        event.postData.authorUsername,
-        Settings.authorRewardForCorrectGuess
+      // Persist that the user has solved the post and give points to drawer and guesser
+      promises.push(
+        this.redis.zAdd(this.keys.postSolved(event.postData.postId), {
+          member: event.username,
+          score: Date.now(),
+        }),
+        this.incrementUserScore(
+          event.postData.authorUsername,
+          Settings.authorRewardForCorrectGuess
+        ),
+        this.incrementUserScore(event.username, userPoints)
       );
-
-      // Give points to guesser
-      await this.incrementUserScore(event.username, userPoints);
     }
 
-    // Leave a comment to give props to the first solver.
-    // Delayed 5 minutes to reduce spoiling risk.
+    // Comment to credit the first solver
     if (isFirstSolve) {
       const in5Min = new Date(Date.now() + 5 * 60 * 1000);
-      await this.scheduler.runJob({
-        name: 'FIRST_SOLVER_COMMENT',
-        data: {
-          postId: event.postData.postId,
-          username: event.username,
-        },
-        runAt: in5Min,
-      });
+      promises.push(
+        this.scheduler.runJob({
+          name: 'FIRST_SOLVER_COMMENT',
+          data: {
+            postId: event.postData.postId,
+            username: event.username,
+          },
+          runAt: in5Min,
+        })
+      );
     }
 
+    await Promise.all(promises);
     return userPoints;
   }
 
   /*
    * Post User Guess Counter
-   *
-   * A sorted set that tracks how many guesses each user has made.
-   * Mainly used to count how many players there are.
+   * A sorted set with the number of guesses made by each player
+   * - Member: Username
+   * - Score: Number of guesses made
    */
 
-  readonly #postUserGuessCounterKey = (postId: string) => `user-guess-counter:${postId}`;
-
-  async getPlayerCount(postId: string): Promise<number> {
-    return await this.redis.zCard(this.#postUserGuessCounterKey(postId));
+  async getPlayerCount(postId: PostId): Promise<number> {
+    const key = this.keys.postUserGuessCounter(postId);
+    return await this.redis.zCard(key);
   }
 
   /*
-   * Post guess comments
-   *
+   * Post Guess Comments
    * A hash map of guesses with the commentIds backing them.
    */
 
-  readonly #guessCommentsKey = (postId: string) => `guess-comments:${postId}`;
-
-  async getGuessComments(postId: string): Promise<{ [guess: string]: string[] }> {
-    const key = this.#guessCommentsKey(postId);
+  async getGuessComments(postId: PostId): Promise<{ [guess: string]: string[] }> {
+    const key = this.keys.guessComments(postId);
     const data = await this.redis.hGetAll(key);
-    const parsedData: { [guess: string]: string[] } = {};
+    // TODO: Update this so it doesn't blow up at scale
+    const parsedData: { [guess: string]: CommentId[] } = {};
     Object.entries(data).forEach(([guess, commentId]) => {
       if (!parsedData[guess]) {
         parsedData[guess] = [];
       }
-      parsedData[guess].push(commentId);
+      parsedData[guess].push(commentId as CommentId);
     });
 
     return parsedData;
   }
 
-  async getGuessComment(postId: string, commentId: string): Promise<string | undefined> {
-    const key = this.#guessCommentsKey(postId);
+  async getGuessComment(postId: PostId, commentId: CommentId): Promise<string | undefined> {
+    const key = this.keys.guessComments(postId);
     return await this.redis.hGet(key, commentId);
   }
 
-  async saveGuessComment(postId: string, guess: string, commentId: string): Promise<void> {
-    await this.redis.hSet(this.#guessCommentsKey(postId), { [guess]: commentId });
+  async saveGuessComment(postId: PostId, guess: string, commentId: string): Promise<void> {
+    await this.redis.hSet(this.keys.guessComments(postId), { [guess]: commentId });
   }
 
-  async removeGuessComment(postId: string, commentId: string): Promise<void> {
-    const key = this.#guessCommentsKey(postId);
+  async removeGuessComment(postId: PostId, commentId: CommentId): Promise<void> {
+    const key = this.keys.guessComments(postId);
     await this.redis.hDel(key, [commentId]);
   }
 
   /*
-   * Pixels management
+   * Pixels
    *
    * A sorted set for the in-game currency and scoreboard unit
    * - Member: Username
    * - Score: Number of pixels currently held
    */
 
-  readonly scoresKeyTag: string = 'default';
-  readonly scoresKey: string = `pixels:${this.scoresKeyTag}`;
-
   async getScores(maxLength: number = 10): Promise<ScoreBoardEntry[]> {
     const options: ZRangeOptions = { reverse: true, by: 'rank' };
-    return await this.redis.zRange(this.scoresKey, 0, maxLength - 1, options);
+    return await this.redis.zRange(this.keys.scores, 0, maxLength - 1, options);
   }
 
   async getUserScore(username: string | null): Promise<{
@@ -206,9 +208,9 @@ export class Service {
     if (!username) return defaultValue;
     try {
       const [rank, score] = await Promise.all([
-        this.redis.zRank(this.scoresKey, username),
+        this.redis.zRank(this.keys.scores, username),
         // TODO: Remove .zScore when .zRank supports the WITHSCORE option
-        this.redis.zScore(this.scoresKey, username),
+        this.redis.zScore(this.keys.scores, username),
       ]);
       return {
         rank: rank === undefined ? -1 : rank,
@@ -227,7 +229,7 @@ export class Service {
       console.error('Scheduler not available in Service');
       return 0;
     }
-    const key = this.scoresKey;
+    const key = this.keys.scores;
     const prevScore = (await this.redis.zScore(key, username)) ?? 0;
     const nextScore = await this.redis.zIncrBy(key, username, amount);
     const prevLevel = getLevelByScore(prevScore);
@@ -256,10 +258,8 @@ export class Service {
    * - Score: Count
    */
 
-  readonly #postGuessesKey = (postId: string) => `guesses:${postId}`;
-
-  async getPostGuesses(postId: string): Promise<PostGuesses> {
-    const key = this.#postGuessesKey(postId);
+  async getPostGuesses(postId: PostId): Promise<PostGuesses> {
+    const key = this.keys.postGuesses(postId);
     const data = await this.redis.zRange(key, 0, -1);
 
     const parsedData: PostGuesses = {
@@ -286,8 +286,6 @@ export class Service {
    * - Score: Unix epoch time
    */
 
-  readonly #userDrawingsKey = (username: string) => `user-drawings:${username}`;
-
   async getUserDrawings(
     username: string,
     options?: {
@@ -296,7 +294,7 @@ export class Service {
     }
   ): Promise<string[]> {
     try {
-      const key = this.#userDrawingsKey(username);
+      const key = this.keys.userDrawings(username);
       const start = options?.min ?? 0;
       const stop = options?.max ?? -1;
       const data = await this.redis.zRange(key, start, stop, {
@@ -316,10 +314,9 @@ export class Service {
   /*
    * Post data
    */
-  readonly #postDataKey = (postId: string): string => `post:${postId}`;
 
-  async getPostType(postId: string): Promise<string> {
-    const key = this.#postDataKey(postId);
+  async getPostType(postId: PostId): Promise<string> {
+    const key = this.keys.postData(postId);
     const postType = await this.redis.hGet(key, 'postType');
     const defaultPostType = 'drawing';
     return postType ?? defaultPostType;
@@ -329,13 +326,13 @@ export class Service {
    * Drawing Post data
    */
 
-  readonly #postSolvedKey = (postId: string): string => `solved:${postId}`;
-  readonly #postSkippedKey = (postId: string): string => `skipped:${postId}`;
-
-  async getDrawingPost(postId: string): Promise<DrawingPostData> {
-    const postData = await this.redis.hGetAll(this.#postDataKey(postId));
-    const solvedCount = await this.redis.zCard(this.#postSolvedKey(postId));
-    const skippedCount = await this.redis.zCard(this.#postSkippedKey(postId));
+  async getDrawingPost(postId: PostId): Promise<DrawingPostData> {
+    const [postData, solvedCount, skippedCount] = await Promise.all([
+      // TODO: Use hMGet to only fetch needed fields when available
+      this.redis.hGetAll(this.keys.postData(postId)),
+      this.redis.zCard(this.keys.postSolved(postId)),
+      this.redis.zCard(this.keys.postSkipped(postId)),
+    ]);
     return {
       postId: postId,
       authorUsername: postData.authorUsername,
@@ -349,10 +346,10 @@ export class Service {
     };
   }
 
-  async getDrawingPosts(postIds: string[]): Promise<Pick<DrawingPostData, 'postId' | 'data'>[]> {
+  async getDrawingPosts(postIds: PostId[]): Promise<Pick<DrawingPostData, 'postId' | 'data'>[]> {
     return await Promise.all(
       postIds.map(async (postId) => {
-        const key = this.#postDataKey(postId);
+        const key = this.keys.postData(postId);
         const stringifiedData = await this.redis.hGet(key, 'data');
         return {
           postId,
@@ -362,19 +359,44 @@ export class Service {
     );
   }
 
-  async skipPost(postId: string, username: string): Promise<void> {
-    const key = this.#postSkippedKey(postId);
+  async updateDrawingPostPreview(
+    postId: PostId,
+    drawing: number[],
+    playerCount: number,
+    dictionaryName: string
+  ): Promise<void> {
+    const post = await this.reddit?.getPostById(postId);
+    try {
+      await post?.setCustomPostPreview(() => (
+        <GuessScreenSkeleton
+          drawing={drawing}
+          playerCount={playerCount}
+          dictionaryName={dictionaryName}
+        />
+      ));
+    } catch (error) {
+      console.error('Failed updating drawing preview', error);
+    }
+  }
+
+  /*
+   * Skip Post
+   */
+
+  async skipPost(postId: PostId, username: string): Promise<void> {
+    const key = this.keys.postSkipped(postId);
     await this.redis.zAdd(key, {
       member: username,
       score: Date.now(),
     });
   }
 
-  // TODO: Move to where it is used
-  readonly #wordDrawingsKey = (word: string) => `word-drawings:${word}`;
+  /*
+   * Handle drawing submissions
+   */
 
   async submitDrawing(data: {
-    postId: string;
+    postId: PostId;
     word: string;
     dictionaryName: string;
     data: number[];
@@ -385,61 +407,56 @@ export class Service {
       console.error('submitDrawing: Scheduler/Reddit API client not available');
       return;
     }
-    const key = this.#postDataKey(data.postId);
-
-    // Save post object
-    await this.redis.hSet(key, {
-      postId: data.postId,
-      data: JSON.stringify(data.data),
-      authorUsername: data.authorUsername,
-      date: Date.now().toString(),
-      word: data.word,
-      dictionaryName: data.dictionaryName,
-      postType: 'drawing',
-    });
-
-    // Save the post to the user's drawings
-    await this.redis.zAdd(this.#userDrawingsKey(data.authorUsername), {
-      member: data.postId,
-      score: Date.now(),
-    });
-
-    // Save the post to the word's drawings
-    await this.redis.zAdd(this.#wordDrawingsKey(data.word), {
-      member: data.postId,
-      score: Date.now(),
-    });
-
-    // Schedule a job to pin the TLDR comment
-    await this.scheduler.runJob({
-      name: 'DRAWING_PINNED_TLDR_COMMENT',
-      data: { postId: data.postId },
-      runAt: new Date(Date.now()),
-    });
-
-    // Give points to the user for posting
-    this.incrementUserScore(data.authorUsername, Settings.authorRewardForSubmit);
+    const key = this.keys.postData(data.postId);
+    await Promise.all([
+      // Save post object
+      this.redis.hSet(key, {
+        postId: data.postId,
+        data: JSON.stringify(data.data),
+        authorUsername: data.authorUsername,
+        date: Date.now().toString(),
+        word: data.word,
+        dictionaryName: data.dictionaryName,
+        postType: 'drawing',
+      }),
+      // Save the post to the user's drawings
+      this.redis.zAdd(this.keys.userDrawings(data.authorUsername), {
+        member: data.postId,
+        score: Date.now(),
+      }),
+      // Save the post to the word's drawings
+      this.redis.zAdd(this.keys.wordDrawings(data.word), {
+        member: data.postId,
+        score: Date.now(),
+      }),
+      // Schedule a job to pin the TLDR comment
+      this.scheduler.runJob({
+        name: 'DRAWING_PINNED_TLDR_COMMENT',
+        data: { postId: data.postId },
+        runAt: new Date(Date.now()),
+      }),
+      // Give points to the user for posting
+      this.incrementUserScore(data.authorUsername, Settings.authorRewardForSubmit),
+    ]);
   }
 
-  // Game settings
-  getGameSettingsKey(): string {
-    return 'game-settings';
-  }
+  /*
+   * Game settings
+   */
 
   async storeGameSettings(settings: { [field: string]: string }): Promise<void> {
-    const key = this.getGameSettingsKey();
+    const key = this.keys.gameSettings;
     await this.redis.hSet(key, settings);
   }
 
   async getGameSettings(): Promise<GameSettings> {
-    const key = this.getGameSettingsKey();
+    const key = this.keys.gameSettings;
     return (await this.redis.hGetAll(key)) as GameSettings;
   }
 
-  // Dynamic dictionary
-  getDictionaryKey(dictionaryName: string): string {
-    return `dictionary:${dictionaryName}`;
-  }
+  /*
+   * Dictionary
+   */
 
   /**
    * Saves a list of words to the specified dictionary. If the dictionary does not exist, it will be created.
@@ -452,7 +469,7 @@ export class Service {
     dictionaryName: string,
     newWords: string[]
   ): Promise<{ rows: number; uniqueNewWords: string[]; duplicatesNotAdded: string[] }> {
-    const key = this.getDictionaryKey(dictionaryName);
+    const key = this.keys.dictionary(dictionaryName);
     const existingJSON = await this.redis.get(key);
     const existingWords = existingJSON ? JSON.parse(existingJSON) : [];
 
@@ -461,6 +478,10 @@ export class Service {
 
     const updatedWordsJson = JSON.stringify(Array.from(new Set([...existingWords, ...newWords])));
     await this.redis.set(key, updatedWordsJson);
+    await this.redis.zAdd(this.keys.dictionaries, {
+      member: dictionaryName,
+      score: Date.now(),
+    });
     return { rows: uniqueNewWords.length, uniqueNewWords, duplicatesNotAdded };
   }
 
@@ -468,7 +489,7 @@ export class Service {
     dictionaryName: string,
     wordsToRemove: string[]
   ): Promise<{ removedCount: number; removedWords: string[]; notFoundWords: string[] }> {
-    const key = this.getDictionaryKey(dictionaryName);
+    const key = this.keys.dictionary(dictionaryName);
     const existingJSON = await this.redis.get(key);
     const existingWords: string[] = existingJSON ? JSON.parse(existingJSON) : [];
     const updatedWords = existingWords.filter((word) => !wordsToRemove.includes(word));
@@ -479,6 +500,10 @@ export class Service {
 
     const updatedWordsJson = JSON.stringify(updatedWords);
     await this.redis.set(key, updatedWordsJson);
+    await this.redis.zAdd(this.keys.dictionaries, {
+      member: dictionaryName,
+      score: Date.now(),
+    });
 
     return { removedCount, removedWords, notFoundWords };
   }
@@ -495,7 +520,7 @@ export class Service {
     // Fetch and parse the dictionaries
     return await Promise.all(
       dictionaries.map(async (dictionaryName) => {
-        const key = this.getDictionaryKey(dictionaryName);
+        const key = this.keys.dictionary(dictionaryName);
         const dictionaryJsonString = await this.redis.get(key);
         const parsedDictionary: string[] = dictionaryJsonString
           ? JSON.parse(dictionaryJsonString)
@@ -512,11 +537,60 @@ export class Service {
     const gameSettings = await this.getGameSettings();
     gameSettings.selectedDictionary = dictionaryName;
     await this.storeGameSettings(gameSettings);
+    await this.redis.zAdd(this.keys.dictionaries, {
+      member: dictionaryName,
+      score: Date.now(),
+    });
   }
 
-  async logDictionary(dictionaryName: string): Promise<void> {
-    const data = await this.redis.get(this.getDictionaryKey(dictionaryName));
-    console.log('Dictionary: ', data);
+  async logDictionary(dictionaryName: string, username: string): Promise<void> {
+    const data = await this.redis.get(this.keys.dictionary(dictionaryName));
+    if (!data) return;
+    const parsedData: string[] = JSON.parse(data);
+    await this.reddit?.sendPrivateMessage({
+      to: username,
+      subject: `Dictionary: ${dictionaryName}`,
+      text: `# Dictionary
+
+#### **Details**
+- Name: ${dictionaryName}
+- Word Count: ${parsedData.length}
+
+#### **Words**
+${parsedData.map((word) => `- ${word}`).join('\n')}
+`,
+    });
+  }
+
+  async getAllDictionaryNames(): Promise<string[]> {
+    const data =
+      (await this.redis.zRange(this.keys.dictionaries, 0, -1, {
+        by: 'rank',
+        reverse: true,
+      })) ?? [];
+    return data.map((value) => value.member);
+  }
+
+  async registerDictionary(dictionaryName: string): Promise<void> {
+    await this.redis.zAdd(this.keys.dictionaries, {
+      member: dictionaryName,
+      score: Date.now(),
+    });
+  }
+
+  async deleteDictionary(dictionaryName: string): Promise<void> {
+    const defaultDictionary = 'main';
+    if (!dictionaryName || dictionaryName === defaultDictionary) return;
+    const currentDictionary = await this.redis.hGet(this.keys.gameSettings, 'selectedDictionary');
+    await Promise.all([
+      await this.redis.del(this.keys.dictionary(dictionaryName)),
+      await this.redis.zRem(this.keys.dictionaries, [dictionaryName]),
+      currentDictionary === dictionaryName
+        ? await this.redis.hSet(this.keys.gameSettings, {
+            selectedDictionary: defaultDictionary,
+          })
+        : Promise.resolve(undefined),
+    ]);
   }
 
   /*
@@ -538,12 +612,12 @@ export class Service {
   }
 
   async storeCollectionPostData(data: {
-    postId: string;
+    postId: PostId;
     data: CollectionData[];
     timeframe: string;
     postType: string;
   }): Promise<void> {
-    const key = this.#postDataKey(data.postId);
+    const key = this.keys.postData(data.postId);
     await this.redis.hSet(key, {
       postId: data.postId,
       data: JSON.stringify(data.data),
@@ -552,11 +626,11 @@ export class Service {
     });
   }
 
-  async getCollectionPost(postId: string): Promise<CollectionPostData> {
-    const key = this.#postDataKey(postId);
+  async getCollectionPost(postId: PostId): Promise<CollectionPostData> {
+    const key = this.keys.postData(postId);
     const post = await this.redis.hGetAll(key);
     return {
-      postId: post.postId,
+      postId,
       postType: 'collection',
       data: JSON.parse(post.data),
       timeframe: post.timeframe,
@@ -567,19 +641,19 @@ export class Service {
    * Pinned Post
    */
 
-  async savePinnedPost(postId: string): Promise<void> {
-    const key = this.#postDataKey(postId);
+  async savePinnedPost(postId: PostId): Promise<void> {
+    const key = this.keys.postData(postId);
     await this.redis.hSet(key, {
-      postId: postId,
+      postId,
       postType: 'pinned',
     });
   }
 
-  async getPinnedPost(postId: string): Promise<PinnedPostData> {
-    const key = this.#postDataKey(postId);
+  async getPinnedPost(postId: PostId): Promise<PinnedPostData> {
+    const key = this.keys.postData(postId);
     const postType = await this.redis.hGet(key, 'postType');
     return {
-      postId: postId,
+      postId,
       postType: postType ?? 'pinned',
     };
   }
@@ -588,25 +662,23 @@ export class Service {
    * User Data and State Persistence
    */
 
-  readonly #userDataKey = (username: string) => `users:${username}`;
-
   async saveUserData(
     username: string,
     data: { [field: string]: string | number | boolean }
   ): Promise<void> {
-    const key = this.#userDataKey(username);
+    const key = this.keys.userData(username);
     const stringConfig = Object.fromEntries(
       Object.entries(data).map(([key, value]) => [key, String(value)])
     );
     await this.redis.hSet(key, stringConfig);
   }
 
-  async getUser(username: string, postId: string): Promise<UserData> {
-    const data = await this.redis.hGetAll(this.#userDataKey(username));
-    const solved = !!(await this.redis.zScore(this.#postSolvedKey(postId), username));
-    const skipped = !!(await this.redis.zScore(this.#postSkippedKey(postId), username));
+  async getUser(username: string, postId: PostId): Promise<UserData> {
+    const data = await this.redis.hGetAll(this.keys.userData(username));
+    const solved = !!(await this.redis.zScore(this.keys.postSolved(postId), username));
+    const skipped = !!(await this.redis.zScore(this.keys.postSkipped(postId), username));
     const guessCount =
-      (await this.redis.zScore(this.#postUserGuessCounterKey(postId), username)) ?? 0;
+      (await this.redis.zScore(this.keys.postUserGuessCounter(postId), username)) ?? 0;
 
     const user = await this.getUserScore(username);
     const level = getLevelByScore(user.score);

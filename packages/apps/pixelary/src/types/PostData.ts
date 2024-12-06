@@ -1,12 +1,14 @@
+import type { PostId } from './Id.js';
+
 // Base post data
 export type PostData = {
-  postId: string;
+  postId: PostId;
   postType: string;
 };
 
 // Drawing post
 export type DrawingPostData = {
-  postId: string;
+  postId: PostId;
   postType: string;
   word: string;
   dictionaryName: string;
@@ -20,7 +22,7 @@ export type DrawingPostData = {
 // Collections
 export type CollectionData = Pick<DrawingPostData, 'postId' | 'data' | 'authorUsername'>;
 export type CollectionPostData = {
-  postId: string;
+  postId: PostId;
   postType: string;
   data: CollectionData[];
   timeframe: string;
@@ -28,6 +30,6 @@ export type CollectionPostData = {
 
 // Pinned post
 export type PinnedPostData = {
-  postId: string;
+  postId: PostId;
   postType: string;
 };

@@ -2,11 +2,12 @@ import type { MenuItem } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
 
 import { LoadingState } from '../components/LoadingState.js';
+import Words from '../data/words.json';
 import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
 
 export const installGame: MenuItem = {
-  label: '[Pixelary] Install Game',
+  label: '[Pixelary] Install game',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {
@@ -31,6 +32,7 @@ export const installGame: MenuItem = {
         subredditName: community.name,
         selectedDictionary: 'main',
       }),
+      service.upsertDictionary('main', Words),
     ]);
 
     ui.navigateTo(post);

@@ -6,7 +6,7 @@ import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
 
 export const newPinnedPost: MenuItem = {
-  label: '[Pixelary] New Pinned Post',
+  label: '[Pixelary] New pinned post',
   location: 'subreddit',
   forUserType: 'moderator',
   onPress: async (_event, context) => {

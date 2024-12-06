@@ -27,8 +27,8 @@ export const GuessScreen = (props: GuessScreenProps, context: Context): JSX.Elem
     const empty = { playerCount: 0, wordCount: 0, guessCount: 0, guesses: {} };
     if (!props.username) return empty;
     try {
-      const players = await service.getPlayerCount(context.postId!);
-      const metadata = await service.getPostGuesses(context.postId!);
+      const players = await service.getPlayerCount(props.postData.postId);
+      const metadata = await service.getPostGuesses(props.postData.postId);
       metadata.playerCount = players;
       return metadata;
     } catch (error) {

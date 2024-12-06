@@ -1,159 +1,35 @@
 # Pixelary
 
-A competitive async MMO pixel drawing and guessing game built on the Reddit Developer Platform.
+**Draw, Guess, and Laugh Your Way to the Top!**
 
-This app demonstrates how to:
+Pixelary is a fun and interactive drawing and guessing game where you can compete with friends and other players to earn points, unlock rewards, and rise up the leaderboard.
 
-- Use Reddit Blocks to create an interactive post (i.e. a canvas with a clickable color pallate that can be used to draw).
+## How to Earn Points
 
-- Use Redis to create a leaderboard.
+- **Drawers**
 
-- Use Devvit forms to capture user input (in this case, guesses as to what the picture is).
+  - **10 points** for posting a drawing
+  - **1 point** for each correct guess made by others
 
-- Use useInterval to crete a countdown timer.
+- **Guessers**
+  - **2 points** for each correct guess
+  - **Bonus**: **10 extra points** for being the first to guess correctly
 
-- Use assets like GIFs within an interactive post.
+As you accumulate points, you’ll automatically level up and unlock exciting perks. Keep an eye on your progress by checking the progress bar in the pinned post in the community!
 
-## Redis Data Schema
+## Level Up & Unlock Perks
 
-### `user-guess-counter:${postId}`
+Levels in Pixelary follow powers of two, and each level will take progressively longer to reach. As you level up, you’ll unlock awesome rewards like:
 
-A sorted set for tracking how many guesses each user has made on a drawing.
+- **Extra Drawing Time** (+3 seconds per level)
+- **Exclusive User Flair**
+- And more perks coming soon! (Feel free to suggest new perks you'd like to see!)
 
-- Member: `username` (string)
-- Score: `guesses` (number)
+## Join the Community
 
-#### Queries:
-
-### `guess-comments:${postId}`
-
-A hashmap with guesses and an array of commentIds that have made that guess.
-
-- Field: `guess` (string) What what guessed in lower case
-- Value: Stringified array of commentIds for this guess
-
-### `pixels:${this.scoresKeyTag}`
-
-A sorted set for holding the point balance for players.
-
-- Member: `username` (string)
-- Score: `pixels` (number)
-
-The tag is can be changed to have new and/or multiple concurrent point balanances. The current tag is `default`.
-
-### `guesses:${postId}`
-
-A sorted set for tracking how many times each unique guess has been made.
-
-- Member: `guess` (string) What was guessed in lowercase
-- Score: `guessCount` (number) How many times was this guessed?
-
-#### Queries:
-
-- `redis.zRange(key, 0, -1)` to get counts for all words, and to calculate the total number of guesses for a post.
-
-### `post-${postId}`
-
-A hashmap for storing the basic post data.
-
-- `postId` (string)
-- `authorUsername` (string)
-- `data` (number[])
-- `date` (number)
-- `word` (string)
-- `dictionaryName` (string)
-- `expired` (boolean)
-- `postType` (string)
-
-#### Queries:
-
-- `redis.hGetAll` to get full post data object
-- `redis.hInctBy` to increment solves/skips counters
-- `redis.hAdd` to update `expired` field
-
-### `user-drawings:${username}`
-
-A sorted set for tracking all drawings submitted by a user.
-
-- Member: `postId` (string)
-- Score: `date` (number)
-
-#### Queries:
-
-- `redis.zAdd` to append.
-- `redis.zRange(key, 0, -1)` when viewing "my drawings". We can paginate
-
-### `word-drawings:${word}`
-
-A sorted set for tracking all drawings submitted by a user.
-
-- Member: `postId` (string)
-- Score: `date` (number)
-
-#### Queries:
-
-- `redis.zAdd` to append.
-- No consumption yet
-
-### `game-settings`
-
-A hashmap for storing game settings:
-
-- `subredditName`
-- `selectedDictionary`: Defaults to `main`
-
-#### Queries:
-
-- `redis.hGetAll` to get all settings
-- `redis.hSet` to set
-
-### `dictionary:${dictionaryName}`
-
-A stringified list of words.
-
-Can have hundreds of words.
-
-#### Queries:
-
-- `redis.get` for getting current dictionary name
-- `redis.set` for setting current dictionary name
-
-### `users:${username}`
-
-A hashmap for user settings
-
-- `autoComment` (boolean)
-- `levelRank` (number)
-- `levelName` (string)
-
-### `solved:${postId}`
-
-A sorted set tracking those that have solved the drawing
-
-- Member: `username` (string)
-- Score: `date` (number)
-
-#### Queries:
-
-- `redis.zAdd` to add a user
-- `redis.zScore` to check if current user has solved
-- `redis.zCard` for number of solves
-
-### `skipped:${postId}`
-
-A sorted set tracking those that have skipped the drawing
-
-- Member: `username` (string)
-- Score: `date` (number)
-
-#### Queries:
-
-- `redis.zAdd` to add a user
-- `redis.zScore` to check if current user has skipped
-- `redis.zCard` for number of solved
-
-## Links
+Stay connected and share your Pixelary experience with fellow players:
 
 - [r/Pixelary community](https://www.reddit.com/r/Pixelary/)
-- [App details page](https://developers.reddit.com/apps/pixelary-game/)
-- [Source code](https://github.com/reddit/devvit/tree/main/packages/apps/pixelary)
+- [Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/pixelary)
+
+May the best artist win!
