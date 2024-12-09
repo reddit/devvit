@@ -126,5 +126,7 @@ export default class Logs extends DevvitCommand {
   #onExit(): void {
     this.#appLogSub?.unsubscribe();
     this.#playtest?.close();
+
+    process.exit(0);
   }
 }

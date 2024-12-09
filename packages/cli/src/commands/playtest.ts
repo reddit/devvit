@@ -401,6 +401,8 @@ export default class Playtest extends Upload {
     this.log(
       `\nYour playtest session has ended, but your playtest version is still installed. To revert back to the latest non-playtest version of the app, run: \n${revertCommand}`
     );
+
+    process.exit(0);
   }
 }
 
