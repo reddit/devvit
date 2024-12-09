@@ -1,12 +1,12 @@
 {
   "private": true,
   "name": "payments-example",
-  "version": "0.11.4-dev",
+  "version": "0.11.5-dev",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/payments": "0.11.4-dev",
-    "@devvit/public-api": "0.11.4-dev"
+    "@devvit/payments": "0.11.5-dev",
+    "@devvit/public-api": "0.11.5-dev"
   },
   "devDependencies": {
     "typescript": "5.3.2"

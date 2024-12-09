@@ -33,14 +33,14 @@ Community games are asynchronous multiplayer experiences built specifically for 
 
 Reddit posts naturally decay after a few days. Your game needs a strategy to stay relevant:
 
-**Option A: scheduled content**
+**Option A: Scheduled content**
 
 - Daily/weekly challenges
 - Automated post creation
 - Regular tournaments or events
 - Example: [r/Sections](https://reddit.com/r/sections) posts a new puzzle every day
 
-**Option B: player-generated content**
+**Option B: Player-generated content**
 
 - Players create content through gameplay
 - Each play creates new posts/comments

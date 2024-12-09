@@ -2118,7 +2118,7 @@ This is the preferred way to handle async state in Devvit.
 | Name          | Type                                                                    | Description                                 |
 | :------------ | :---------------------------------------------------------------------- | :------------------------------------------ |
 | `initializer` | [`AsyncUseStateInitializer`](README.md#asyncusestateinitializer)\<`S`\> | any async function that returns a JSONValue |
-| `options`     | `AsyncOptions`                                                          | -                                           |
+| `options`     | `AsyncOptions`\<`S`\>                                                   | -                                           |
 
 #### Returns
 

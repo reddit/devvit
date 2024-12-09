@@ -7,15 +7,15 @@
     },
     {
       "type": "doc",
+      "label": "Quickstart",
+      "id": "quickstart"
+    },
+    {
+      "type": "doc",
       "label": "Ask AI",
       "id": "ask_ai"
     },
     {
-      "type": "doc",
-      "label": "Quickstart",
-      "id": "quickstart"
-    },
-       {
       "type": "category",
       "label": "Learn Devvit",
       "items": [

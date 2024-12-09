@@ -4,7 +4,7 @@
 Webviews is currently experimental and optimized for desktop web. Mobile support is coming later this year.
 :::
 
-<iframe width="xxx" height="xxx" src="https://www.youtube.com/embed/BhbWn8TnXvo?si=mD_Hp5H90LpPGWbn&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BhbWn8TnXvo?si=mD_Hp5H90LpPGWbn&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 Webviews allow you include HTML, CSS, and JavaScript and have it run within your Reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
 
@@ -83,7 +83,7 @@ my-project/
 2. **State Management**
 
    - Use `localStorage` for webview-only state
-   - Use Redis storage (via Devvit) for persistent data
+   - Use [Redis](./capabilities/redis.md) storage (via Devvit) for persistent data
    - Minimize state synchronization between webview and Devvit
 
 3. **Performance**
@@ -99,9 +99,9 @@ my-project/
 />
 ```
 
-## Communication between Devvit and webviews
+## Communication Between Devvit and webviews
 
-Webviews let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services (Redis, fetch, scheduler, triggers) via message passing between the two contexts.
+Webviews let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services ([Redis](./capabilities/redis.md), [fetch](./capabilities/http-fetch.md), [scheduler](./capabilities/scheduler.md), [triggers](./capabilities/triggers.md)) via message passing between the two contexts.
 
 ![Sample webviews post](./assets/webviews-devvit-architecture.png)
 
