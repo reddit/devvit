@@ -317,6 +317,14 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
+  async hMGet(key: string, fields: string[]): Promise<TxClientLike> {
+    await this.#storage.HMGet(
+      { key: key, fields: fields, transactionId: this.#transactionId },
+      this.#metadata
+    );
+    return this;
+  }
+
   async hset(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike> {
     return this.hSet(key, fieldValues);
   }
@@ -684,6 +692,11 @@ export class RedisClient implements RedisClientLike {
 
       throw e;
     }
+  }
+
+  async hMGet(key: string, fields: string[]): Promise<(string | null)[]> {
+    const response = await this.storage.HMGet({ key, fields, scope: this.scope }, this.#metadata);
+    return response !== null ? response.values.map((value) => value || null) : response;
   }
 
   async hset(key: string, fieldValues: { [field: string]: string }): Promise<number> {

@@ -614,6 +614,22 @@ export type TxClientLike = {
    */
   hGet(key: string, field: string): Promise<TxClientLike>;
   /**
+   * Returns the values associated with fields in the hash stored at key.
+   * https://redis.io/commands/hmget
+   * @arg {} key
+   * @arg {} fields
+   * @returns values associated with each field in the order they appear in fields
+   * @example
+   * ```ts
+   * async function hMGetExample(context: Devvit.Context) {
+   *  await context.redis.hSet("fruits", {"apple": "5", "orange": "7", "kiwi": "9"});
+   *  const result : string[] | undefined = await context.redis.hMGet("fruits", "orange", "grape", "apple");
+   *  console.log("Value of fields: " + result); // "Value of fields: ["7", undefined, "5"]
+   * }
+   * ```
+   */
+  hMGet(key: string, fields: string[]): Promise<TxClientLike>;
+  /**
    * Returns all fields and values of the hash stored at key
    * https://redis.io/commands/hgetall
    * @deprecated Use {@link TxClientLike.hGetAll} instead.
@@ -1326,6 +1342,22 @@ export type RedisClient = {
    * ```
    */
   hGet(key: string, field: string): Promise<string | undefined>;
+  /**
+   * Returns the values associated with fields in the hash stored at key.
+   * https://redis.io/commands/hmget
+   * @arg {} key
+   * @arg {} fields
+   * @returns values associated with each field in the order they appear in fields
+   * @example
+   * ```ts
+   * async function hMGetExample(context: Devvit.Context) {
+   *  await context.redis.hSet("fruits", {"apple": "5", "orange": "7", "kiwi": "9"});
+   *  const result : string[] | undefined = await context.redis.hMGet("fruits", "orange", "grape", "apple");
+   *  console.log("Value of fields: " + result); // "Value of fields: ["7", undefined, "5"]
+   * }
+   * ```
+   */
+  hMGet(key: string, fields: string[]): Promise<(string | null)[]>;
   /**
    * Returns all fields and values of the hash stored at key
    * https://redis.io/commands/hgetall
