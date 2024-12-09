@@ -22,6 +22,7 @@ import { migrateDrawingPost } from './actions/migrateDrawingPost.js';
 import { migratePinnedPost } from './actions/migratePinnedPost.js';
 import { newPinnedPost } from './actions/newPinnedPost.js';
 import { removeWordsFromDictionary } from './actions/removeWordsFromDictionary.js';
+import { replaceDictionary } from './actions/replaceDictionary.js';
 import { revealWord } from './actions/revealWord.js';
 //import { saveDictionaryToRedis } from './actions/saveDictionaryToRedis.js';
 import { selectDictionary } from './actions/selectDictionary.js';
@@ -33,6 +34,7 @@ import { createDictionaryForm } from './forms/createDictionaryForm.js';
  */
 import { logDictionaryForm } from './forms/logDictionaryForm.js';
 import { removeWordsFromDictionaryForm } from './forms/removeWordsFromDictionaryForm.js';
+import { replaceDictionaryForm } from './forms/replaceDictionaryForm.js';
 import { selectDictionaryForm } from './forms/selectDictionaryForm.js';
 import { Router } from './posts/Router.js';
 /*
@@ -77,6 +79,7 @@ Devvit.addMenuItem(selectDictionary(selectDictionaryForm));
 Devvit.addMenuItem(removeWordsFromDictionary(removeWordsFromDictionaryForm));
 Devvit.addMenuItem(newPinnedPost);
 Devvit.addMenuItem(createDictionary(createDictionaryForm));
+Devvit.addMenuItem(replaceDictionary(replaceDictionaryForm));
 
 // Posts
 Devvit.addMenuItem(updateDrawingPostPreview);

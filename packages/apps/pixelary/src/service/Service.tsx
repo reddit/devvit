@@ -477,11 +477,7 @@ export class Service {
     const duplicatesNotAdded = newWords.filter((word) => existingWords.includes(word));
 
     const updatedWordsJson = JSON.stringify(Array.from(new Set([...existingWords, ...newWords])));
-    await this.redis.set(key, updatedWordsJson);
-    await this.redis.zAdd(this.keys.dictionaries, {
-      member: dictionaryName,
-      score: Date.now(),
-    });
+    await this.saveDictionary(dictionaryName, JSON.parse(updatedWordsJson));
     return { rows: uniqueNewWords.length, uniqueNewWords, duplicatesNotAdded };
   }
 
@@ -498,13 +494,7 @@ export class Service {
     const removedWords = wordsToRemove.filter((word) => existingWords.includes(word));
     const notFoundWords = wordsToRemove.filter((word) => !removedWords.includes(word));
 
-    const updatedWordsJson = JSON.stringify(updatedWords);
-    await this.redis.set(key, updatedWordsJson);
-    await this.redis.zAdd(this.keys.dictionaries, {
-      member: dictionaryName,
-      score: Date.now(),
-    });
-
+    await this.saveDictionary(dictionaryName, updatedWords);
     return { removedCount, removedWords, notFoundWords };
   }
 
@@ -590,6 +580,18 @@ ${parsedData.map((word) => `- ${word}`).join('\n')}
             selectedDictionary: defaultDictionary,
           })
         : Promise.resolve(undefined),
+    ]);
+  }
+
+  async saveDictionary(dictionaryName: string, words: string[]): Promise<void> {
+    const json = JSON.stringify(words);
+    const key = this.keys.dictionary(dictionaryName);
+    await Promise.all([
+      this.redis.set(key, json),
+      this.redis.zAdd(this.keys.dictionaries, {
+        member: dictionaryName,
+        score: Date.now(),
+      }),
     ]);
   }
 

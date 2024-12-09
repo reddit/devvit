@@ -36,13 +36,3 @@ export const selectDictionaryForm = Devvit.createForm(
     return context.ui.showToast('Selected dictionary');
   }
 );
-
-/*
-[
-    { label: 'main', value: 'main' },
-    { label: 'r/piercing', value: 'r/piercing' }, //hardcoding for r/piercing dictionary takeover 9/26/24
-    { label: 'r/NintendoSwitch', value: 'r/NintendoSwitch' }, //hardcoding for r/NintendoSwitch dictionary takeover 10/10/24
-    { label: 'Halloween', value: 'Halloween' },
-    { label: 'Thanksgiving', value: 'Thanksgiving' },
-]
-*/
