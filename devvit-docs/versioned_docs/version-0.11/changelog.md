@@ -4,13 +4,33 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
-## Devvit 0.11.3: Webviews (experimental), server-side functions, and other public API updates
+## Devvit 0.11.4: Payments (pilot) and more
+
+**Release Date: Dec 9, 2024**
+
+Release 0.11.4 introduces [payments](./capabilities/payments.md)! This pilot program lets you add products to your app and get paid for what you sell. The payments plugin enables the capability for users to purchase in-app products, like additional lives in a game or custom flair.
+
+Since this is a pilot program, you'll need to submit an [enrollment form](https://forms.gle/TuTV5jbUwFKTcerUA) before developing and playtesting payments in your app. Before you publish your app, you’ll need to complete additional steps outlined in the payments documentation.
+
+We’ve also added a new [template](https://developers.reddit.com/docs/capabilities/payments#add-payments-to-your-app) to help you set up payments functionality without needing to code a full app from scratch.
+
+**New features**
+This release also includes:
+
+- A `finally:` parameter for [useAsync](./working_with_useasync.md) that lets your app setState when an async response is returned.
+- The ability to use runAs with [setCustomPostPreview](https://developers.reddit.com/docs/api/redditapi/classes/models.Post#-setcustompostpreview).
+- Experimental [web views](./webviews.md) functionality on the latest iOS and Android clients.
+
+**Fixes**
+Release 0.11.4 corrected issues with duplicate logs and fixed the 502 error that was occurring during Redis transactions.
+
+## Devvit 0.11.3: Web views (experimental), server-side functions, and other public API updates
 
 **Release Date: Nov 18, 2024**
 
-0.11.3 adds a new way for developers to build UI with webviews and server-side functions.
+0.11.3 adds a new way for developers to build UI with web views and server-side functions.
 
-**[Webviews](./webviews.md)** - is an experimental alternative to Devvit blocks, where you can build interactive posts and bring your own html/css/js into apps. This allows you to have access to standard web APIs and frameworks and access to animations and gestures not available in blocks. Note that this is an experimental feature that only works on web and is subject to significant changes over the next few months.
+**[Web views](./webviews.md)** - is an experimental alternative to Devvit blocks, where you can build interactive posts and bring your own html/css/js into apps. This allows you to have access to standard web APIs and frameworks and access to animations and gestures not available in blocks. Note that this is an experimental feature that only works on web and is subject to significant changes over the next few months.
 
 **Server-side functions** - We heard that developers are concerned that their app code for interactive posts is exposed to clients (which is done for performance purposes). This release includes new [server-side functions](./capabilities/server-side-functions.md) so that you can run functions from a `/*.server.ts` or `/server/*.ts` file to keep your codebase private. Those functions will run server-side and trigger a re-render.
 
