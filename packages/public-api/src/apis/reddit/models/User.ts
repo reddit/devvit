@@ -439,9 +439,16 @@ export class User {
     metadata: Metadata | undefined
   ): Promise<User | undefined> {
     const client = Devvit.redditAPIPlugins.Users;
-    const response = await client.UserAbout({ username }, metadata);
-    // suspended accounts 404.
-    if (response.data?.id) return new User(response.data, metadata);
+    try {
+      const response = await client.UserAbout({ username }, metadata);
+      // suspended accounts 404.
+      if (response.data?.id) return new User(response.data, metadata);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404 Not Found')) {
+        return undefined;
+      }
+      throw error;
+    }
   }
 
   /** @internal */
