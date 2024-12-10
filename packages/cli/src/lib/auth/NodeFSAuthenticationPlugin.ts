@@ -83,7 +83,8 @@ export class NodeFSAuthenticationPlugin {
         return token;
       }
     } catch (err) {
-      console.error(`Validation error: ${StringUtil.caughtToString(err)}`);
+      console.error(StringUtil.caughtToString(err, 'message'));
+      console.warn(`Authentication required`);
     }
   }
 

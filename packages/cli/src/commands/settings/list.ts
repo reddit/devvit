@@ -46,6 +46,7 @@ export default class ListAppSettings extends ProjectCommand {
       } else {
         ux.action.stop('Error');
       }
+
       this.error(StringUtil.caughtToString(err, 'message'));
     }
   }

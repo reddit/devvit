@@ -26,6 +26,7 @@ import { map } from 'rxjs';
 import Upload from '../commands/upload.js';
 import { REDDIT_DESKTOP } from '../lib/config.js';
 import { fetchSubredditSubscriberCount, isCurrentUserEmployee } from '../lib/http/gql.js';
+import { playLockCheck, playLockRemove, playLockWrite } from '../lib/playtest-lockfile.js';
 import { PlaytestServer } from '../lib/playtest-server.js';
 import type { CommandFlags } from '../lib/types/oclif.js';
 import { makeLogSubscription } from '../util/app-logs/make-log-subscription.js';
@@ -64,6 +65,12 @@ export default class Playtest extends Upload {
         required: false,
         hidden: true,
       }),
+      'no-lockfile': Flags.boolean({
+        name: 'no-lockfile',
+        description: 'Disable process checking and lockfile generation.',
+        required: false,
+        hidden: true,
+      }),
     };
   }
 
@@ -78,7 +85,7 @@ export default class Playtest extends Upload {
   readonly #installationsClient = createInstallationsClient();
   #appLogSub?: Subscription;
   readonly #bundler: Bundler = new Bundler(true);
-  #existingInstallInfo?: FullInstallationInfo | undefined;
+  #installationInfo?: FullInstallationInfo | undefined;
   #appInfo?: FullAppInfo | undefined;
   #version?: DevvitVersion;
   #lastBundles: Bundle[] | undefined;
@@ -87,6 +94,9 @@ export default class Playtest extends Upload {
   #server?: PlaytestServer;
   #flags?: CommandFlags<typeof Playtest>;
   #watchAssets?: chokidar.FSWatcher;
+
+  #subreddit?: string;
+  #appName?: string;
 
   async #getExistingInstallInfo(subreddit: string): Promise<FullInstallationInfo | undefined> {
     const existingInstalls = await this.#installationsClient.GetAllWithInstallLocation({
@@ -133,10 +143,21 @@ export default class Playtest extends Upload {
 
   override async run(): Promise<void> {
     // Despite the name, finally() is only invoked on successful termination.
-    process.on('SIGINT', () => void this.#onExit());
+    process.on('SIGINT', () => {
+      void this.#onExit();
+    });
 
     const { args, flags } = await this.parse(Playtest);
     this.#flags = flags;
+    this.#subreddit = args.subreddit;
+
+    const projectConfig = await this.getProjectConfig();
+    this.#appName = projectConfig.slug ?? projectConfig.name;
+
+    if (!this.#flags?.['no-lockfile']) {
+      await playLockCheck();
+      await playLockWrite(this.#appName);
+    }
 
     if (flags.connect) {
       this.#server = new PlaytestServer(
@@ -150,9 +171,7 @@ export default class Playtest extends Upload {
     const username = await this.getUserDisplayName(token);
     await this.checkDeveloperAccount();
 
-    const projectConfig = await this.getProjectConfig();
-    const appName = projectConfig.slug ?? projectConfig.name;
-    const appInfo: FullAppInfo | undefined = await getAppBySlug(this.appClient, appName);
+    const appInfo: FullAppInfo | undefined = await getAppBySlug(this.appClient, this.#appName);
 
     if (appInfo?.app?.owner?.displayName !== username) {
       if (flags['employee-update']) {
@@ -164,7 +183,7 @@ export default class Playtest extends Upload {
         this.warn(`Overriding ownership check because you're an employee and told me to!`);
       } else {
         // Check if the app name is available, implying this is a first run
-        const appExists = await checkAppNameAvailability(this.appClient, appName);
+        const appExists = await checkAppNameAvailability(this.appClient, this.#appName);
         if (appExists.exists) {
           this.error(`That app already exists, and you can't playtest someone else's app!`);
         }
@@ -178,7 +197,7 @@ export default class Playtest extends Upload {
 
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
-    this.#appInfo = await getAppBySlug(this.appClient, appName);
+    this.#appInfo = await getAppBySlug(this.appClient, this.#appName);
 
     if (!this.#appInfo) {
       this.error(
@@ -222,20 +241,20 @@ export default class Playtest extends Upload {
     });
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
-    const appWithVersion = `${appName}@${this.#version}`;
+    const appWithVersion = `${this.#appName}@${this.#version}`;
     const appVersionId = await slugVersionStringToUUID(appWithVersion, this.appClient);
 
     ux.action.start(`Checking for existing installation`);
-    this.#existingInstallInfo = await this.#getExistingInstallInfo(subreddit);
+    this.#installationInfo = await this.#getExistingInstallInfo(subreddit);
 
-    if (!this.#existingInstallInfo) {
+    if (!this.#installationInfo) {
       ux.action.stop(`No existing installation.`);
 
       const userT2Id = await this.getUserT2Id(token);
 
       ux.action.start(`Installing`);
       try {
-        this.#existingInstallInfo = await this.#installationsClient.Create({
+        this.#installationInfo = await this.#installationsClient.Create({
           appVersionId,
           runAs: userT2Id,
           type: InstallationType.SUBREDDIT,
@@ -255,8 +274,8 @@ export default class Playtest extends Upload {
 
     this.#appLogSub = makeLogSubscription(
       {
-        subreddit: this.#existingInstallInfo.installation!.location!.id,
-        appName,
+        subreddit: this.#installationInfo.installation!.location!.id,
+        appName: this.#appName,
       },
       this,
       flags as CommandFlags<typeof Logs>
@@ -342,7 +361,9 @@ export default class Playtest extends Upload {
       if (err instanceof Error) {
         this.log(chalk.red(`\n${StringUtil.caughtToString(err, 'message')}\n`)); // Don't log as error so we don't exit the process.
       } else {
-        this.error(`An unknown error occurred when creating the app version.\n${err}`);
+        this.error(
+          `An unknown error occurred when creating the app version.\n${StringUtil.caughtToString(err, 'message')}`
+        );
       }
       this.#isOnWatchExecuting = false;
       return;
@@ -364,12 +385,14 @@ export default class Playtest extends Upload {
 
     ux.action.start(`Installing playtest version ${this.#version}`);
     await this.#installationsClient.Upgrade({
-      id: this.#existingInstallInfo!.installation!.id,
+      id: this.#installationInfo!.installation!.id,
       appVersionId,
     });
+
     if (!this.#flags?.['no-live-reload']) {
       this.#server?.send({ appInstalled: {} });
     }
+
     ux.action.stop(
       `Success! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
     );
@@ -388,19 +411,26 @@ export default class Playtest extends Upload {
   };
 
   async #onExit(): Promise<void> {
-    const revertCommand = chalk.blue(
-      `devvit install ${this.#existingInstallInfo!.installation!.location!.name} ${
-        this.#appInfo!.app!.slug
-      }@latest`
-    );
+    ux.action.stop('Stopped');
 
     this.#appLogSub?.unsubscribe();
     await this.#bundler.dispose();
     this.#server?.close();
     await this.#watchAssets?.close();
-    this.log(
-      `\nYour playtest session has ended, but your playtest version is still installed. To revert back to the latest non-playtest version of the app, run: \n${revertCommand}`
-    );
+    await playLockRemove();
+
+    this.log('Playtest session has ended.');
+
+    // If this.#installationInfo exists that means a playtest version has already been installed
+    if (this.#installationInfo) {
+      const revertCommand = chalk.green(
+        `devvit install ${this.#subreddit} ${this.#appName}@latest`
+      );
+
+      this.log(
+        `To revert back to the latest non-playtest version of the app, run: \n${revertCommand}`
+      );
+    }
 
     process.exit(0);
   }
