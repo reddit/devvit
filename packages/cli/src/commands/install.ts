@@ -191,4 +191,5 @@ const nutritionCategoryToString: Readonly<Record<NutritionCategory, string>> = {
   [NutritionCategory.UI]: 'Appear in subreddit, post, and comment menu entries, and custom posts.',
   [NutritionCategory.UNRECOGNIZED]: 'Use unknown permissions.',
   [NutritionCategory.WEBVIEW]: 'Embed webapps to display rich content.',
+  [NutritionCategory.CUSTOM_POST]: 'Can create a custom post.',
 };

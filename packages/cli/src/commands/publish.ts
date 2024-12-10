@@ -1,13 +1,14 @@
-import type { AppVersionUpdateRequest, FullAppVersionInfo } from '@devvit/protos/community.js';
+import {
+  type AppVersionUpdateRequest,
+  type FullAppVersionInfo,
+  NutritionCategory,
+} from '@devvit/protos/community.js';
 import {
   AppPublishRequestVisibility,
   InstallationType,
   VersionVisibility,
 } from '@devvit/protos/community.js';
-import {
-  appCapabilitiesFromLinkedBundle,
-  AppCapability,
-} from '@devvit/shared-types/AppCapabilities.js';
+import { appCapabilitiesFromLinkedBundle } from '@devvit/shared-types/AppCapabilities.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, Flags, ux } from '@oclif/core';
@@ -27,11 +28,11 @@ import { readLine } from '../util/input-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
 
 const appCapabilityToReviewRequirementMessage: Record<
-  AppCapability.CustomPost | AppCapability.Payments,
+  NutritionCategory.CUSTOM_POST | NutritionCategory.PAYMENTS,
   string
 > = {
-  [AppCapability.CustomPost]: 'Creates custom posts',
-  [AppCapability.Payments]: 'Sells digital goods or services',
+  [NutritionCategory.CUSTOM_POST]: 'Creates custom posts',
+  [NutritionCategory.PAYMENTS]: 'Sells digital goods or services',
 };
 
 export default class Publish extends ProjectCommand {
@@ -133,7 +134,7 @@ export default class Publish extends ProjectCommand {
     const appSettingsURL = `${appDetailsUrl}/developer-settings`;
 
     if (
-      appCapabilities.includes(AppCapability.HTTP) &&
+      appCapabilities.includes(NutritionCategory.HTTP) &&
       (!appInfo.app.termsAndConditions || !appInfo.app.privacyPolicy)
     ) {
       this.log(
@@ -142,7 +143,7 @@ export default class Publish extends ProjectCommand {
       await this.#promptOpenURL(appSettingsURL);
     }
 
-    if (appCapabilities.includes(AppCapability.Payments) && !appInfo.app.termsAndConditions) {
+    if (appCapabilities.includes(NutritionCategory.PAYMENTS) && !appInfo.app.termsAndConditions) {
       this.log(
         'Apps that sell goods must have terms & conditions linked before publishing. Add this link on the app details page and run `devvit publish` again.'
       );
@@ -153,7 +154,7 @@ export default class Publish extends ProjectCommand {
 
     const appCapabilitiesForReview = appCapabilities.filter(
       (capability): capability is keyof typeof appCapabilityToReviewRequirementMessage =>
-        capability === AppCapability.CustomPost || capability === AppCapability.Payments
+        capability === NutritionCategory.CUSTOM_POST || capability === NutritionCategory.PAYMENTS
     );
 
     if (appCapabilitiesForReview.length > 0) {
