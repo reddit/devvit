@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { PageType, PollProps } from '../PollModels.js';
-import { formatCount } from '../PollHelpers.js';
 import moment from 'moment';
+
+import { formatCount } from '../PollHelpers.js';
+import { PageType, PollProps } from '../PollModels.js';
 
 type ResultProps = {
   option: string;
@@ -53,7 +54,7 @@ const PollResult = ({ option, votes, total, winner }: ResultProps): JSX.Element 
   );
 };
 
-export const ResultsPage: Devvit.BlockComponent<PollProps> = async (
+export const ResultsPage: Devvit.BlockComponent<PollProps> = (
   {
     reset,
     finish,

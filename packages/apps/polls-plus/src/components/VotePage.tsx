@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { PageType, PollProps } from '../PollModels.js';
-import { KeyType, key, userKey } from '../PollHelpers.js';
 import moment from 'moment';
+
+import { key, KeyType, userKey } from '../PollHelpers.js';
+import { PageType, PollProps } from '../PollModels.js';
 
 // const props = { option, index, selectedOption, setSelectedOption }
 export const PollOption = ({
@@ -34,7 +35,7 @@ export const PollOption = ({
   );
 };
 
-export const VotePage: Devvit.BlockComponent<PollProps> = async (
+export const VotePage: Devvit.BlockComponent<PollProps> = (
   {
     options,
     shuffledOptions,

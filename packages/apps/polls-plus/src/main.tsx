@@ -1,10 +1,11 @@
 import { Devvit } from '@devvit/public-api';
-import { VotePage } from './components/VotePage.js';
-import { ResultsPage } from './components/ResultsPage.js';
-import { PageType, PollProps } from './PollModels.js';
-import { addPoll } from './components/CreatePoll.js';
-import { KeyType, key, userKey, resetRedis, shuffle } from './PollHelpers.js';
+
 import { ConfirmPage } from './components/ConfirmPage.js';
+import { addPoll } from './components/CreatePoll.js';
+import { ResultsPage } from './components/ResultsPage.js';
+import { VotePage } from './components/VotePage.js';
+import { key, KeyType, resetRedis, shuffle, userKey } from './PollHelpers.js';
+import { PageType, PollProps } from './PollModels.js';
 
 // Devvit.debug.emitSnapshots = true;
 
@@ -13,7 +14,7 @@ Devvit.configure({
   redditAPI: true,
 });
 
-const App: Devvit.CustomPostComponent = async (context) => {
+const App: Devvit.CustomPostComponent = (context) => {
   const useState = context.useState;
   const redis = context.redis;
   const postId = context.postId;

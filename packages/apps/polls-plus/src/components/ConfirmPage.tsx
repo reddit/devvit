@@ -1,8 +1,9 @@
 import { Devvit } from '@devvit/public-api';
-import { PageType, PollProps } from '../PollModels.js';
-import { KeyType, key, userKey } from '../PollHelpers.js';
 
-export const ConfirmPage: Devvit.BlockComponent<PollProps> = async (
+import { key, KeyType, userKey } from '../PollHelpers.js';
+import { PageType, PollProps } from '../PollModels.js';
+
+export const ConfirmPage: Devvit.BlockComponent<PollProps> = (
   { votes, setVotes, navigate },
   { redis, userId, postId }
 ) => {
