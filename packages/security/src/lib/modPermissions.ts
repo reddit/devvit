@@ -3,11 +3,17 @@ import { Header } from '@devvit/shared-types/Header.js';
 
 // Internal function for getting the current user's moderator permissions in the current subreddit
 async function getPermissions(context: Context): Promise<Set<ModeratorPermission>> {
-  const metadataPermissions = context.debug.metadata[Header.ModPermissions]?.values as
-    | ModeratorPermission[]
-    | undefined;
+  const metadataPermissions = context.debug.metadata[Header.ModPermissions]?.values as string[];
   if (metadataPermissions) {
-    return new Set(metadataPermissions);
+    // For each permission header value, parse and add to the permission set
+    return metadataPermissions.reduce((out, permission) => {
+      // Split the header by comma, trim whitespace,
+      // and add each element to the permission set
+      return permission
+        .split(',')
+        .map((p) => p.trim())
+        .reduce((o, p) => o.add(p as ModeratorPermission), out);
+    }, new Set<ModeratorPermission>());
   }
 
   const user = await context.reddit.getCurrentUser();
