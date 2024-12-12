@@ -141,3 +141,23 @@ A sorted set tracking those that have skipped the drawing
 - `redis.zAdd` to add a user
 - `redis.zScore` to check if current user has skipped
 - `redis.zCard` for number of solved
+
+## `word-selection-events`
+
+A sorted set for tracking events related to word selection
+
+- Member: stringified event object
+- Score: Epoch time + 3 random digits
+
+```
+{
+    userId: string;
+    postId: string;
+    options: { word: string; dictionaryName: string }[];
+    word: string | null;
+}
+```
+
+## Queries:
+
+- `redis.zAdd` to add new event

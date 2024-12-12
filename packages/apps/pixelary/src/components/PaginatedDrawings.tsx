@@ -1,7 +1,7 @@
 import { Devvit, useState } from '@devvit/public-api';
 
 import Settings from '../settings.json';
-import type { CollectionData } from '../types/PostData.js';
+import type { CollectionData } from '../types.js';
 import { Drawings } from './Drawings.js';
 import { StyledButton } from './StyledButton.js';
 

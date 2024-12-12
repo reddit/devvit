@@ -1,6 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 
-import type { CollectionData } from '../types/PostData.js';
+import type { CollectionData } from '../types.js';
 import { Drawing } from './Drawing.js';
 
 interface PaginatedDrawingsProps {

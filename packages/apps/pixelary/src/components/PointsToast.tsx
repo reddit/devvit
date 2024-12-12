@@ -1,7 +1,6 @@
 import { Devvit } from '@devvit/public-api';
 
 import Settings from '../settings.json';
-import { formatNumberWithCommas } from '../utils/formatNumbers.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
 
@@ -24,7 +23,7 @@ export const PointsToast = (props: PointsToastProps): JSX.Element => {
           padding="medium"
           gap="medium"
         >
-          <PixelText scale={4}>{`+ ${formatNumberWithCommas(value)}`}</PixelText>
+          <PixelText scale={4}>{`+ ${value.toLocaleString()}`}</PixelText>
           <PixelSymbol scale={4} type="star" />
         </hstack>
         <spacer width="4px" />

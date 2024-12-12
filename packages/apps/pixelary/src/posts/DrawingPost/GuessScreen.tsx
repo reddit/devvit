@@ -7,9 +7,7 @@ import { LoadingState } from '../../components/LoadingState.js';
 import { PixelText } from '../../components/PixelText.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
-import type { DrawingPostData } from '../../types/PostData.js';
-import { PostGuesses } from '../../types/PostGuesses.js';
-import { UserData } from '../../types/UserData.js';
+import type { DrawingPostData, PostGuesses, UserData } from '../../types.js';
 
 interface GuessScreenProps {
   postData: DrawingPostData;

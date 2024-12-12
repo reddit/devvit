@@ -3,9 +3,8 @@ import { Devvit, useState } from '@devvit/public-api';
 
 import Levels from '../data/levels.json';
 import Settings from '../settings.json';
-import { Level } from '../types/Level.js';
-import type { UserData } from '../types/UserData.js';
-import { abbreviateNumber } from '../utils/abbreviateNumber.js';
+import type { Level, UserData } from '../types.js';
+import { abbreviateNumber } from '../utils.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
 import { ProgressBar } from './ProgressBar.js';

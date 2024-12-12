@@ -8,11 +8,8 @@ import { PixelText } from '../../components/PixelText.js';
 import { PointsToast } from '../../components/PointsToast.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
-import type { Dictionary } from '../../types/Dictionary.js';
-import type { DrawingPostData } from '../../types/PostData.js';
-import { abbreviateNumber } from '../../utils/abbreviateNumber.js';
-import { capitalizeWord } from '../../utils/capitalizeWord.js';
-import { obfuscateString } from '../../utils/obfuscateString.js';
+import type { Dictionary, DrawingPostData } from '../../types.js';
+import { abbreviateNumber, capitalize, obfuscateString } from '../../utils.js';
 
 function includesCaseInsensitive(array: string[], target: string): boolean {
   return array.some((item) => item.toLowerCase() === target.toLowerCase());
@@ -97,7 +94,7 @@ export const ResultsScreen = (props: ResultsScreenProps, context: Context): JSX.
               color={isSafeToShow ? Settings.theme.primary : Settings.theme.tertiary}
               scale={2}
             >
-              {isSafeToShow ? capitalizeWord(word) : obfuscateString(word)}
+              {isSafeToShow ? capitalize(word) : obfuscateString(word)}
             </PixelText>
           </hstack>
           {/* Metadata */}

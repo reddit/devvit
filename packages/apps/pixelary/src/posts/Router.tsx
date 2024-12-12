@@ -3,16 +3,16 @@ import { Devvit, useAsync } from '@devvit/public-api';
 
 import { LoadingState } from '../components/LoadingState.js';
 import { Service } from '../service/Service.js';
-import type { Dictionary } from '../types/Dictionary.js';
-import type { GameSettings } from '../types/GameSettings.js';
-import type { PostId } from '../types/Id.js';
 import type {
   CollectionPostData,
+  Dictionary,
   DrawingPostData,
+  GameSettings,
   PinnedPostData,
   PostData,
-} from '../types/PostData.js';
-import { UserData } from '../types/UserData.js';
+  PostId,
+  UserData,
+} from '../types.js';
 import { CollectionPost } from './CollectionPost/CollectionPost.js';
 import { DrawingPost } from './DrawingPost/DrawingPost.js';
 import { PinnedPost } from './PinnedPost/PinnedPost.js';

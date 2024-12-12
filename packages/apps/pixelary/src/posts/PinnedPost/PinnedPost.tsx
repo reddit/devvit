@@ -12,11 +12,8 @@ import { ProgressBar } from '../../components/ProgressBar.js';
 import { StyledButton } from '../../components/StyledButton.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
-import type { Dictionary } from '../../types/Dictionary.js';
-import { GameSettings } from '../../types/GameSettings.js';
-import type { PostData } from '../../types/PostData.js';
-import { UserData } from '../../types/UserData.js';
-import { getLevelByScore } from '../../utils/progression.js';
+import type { Dictionary, GameSettings, PostData, UserData } from '../../types.js';
+import { getLevelByScore } from '../../utils.js';
 
 interface PinnedPostProps {
   postData: PostData;

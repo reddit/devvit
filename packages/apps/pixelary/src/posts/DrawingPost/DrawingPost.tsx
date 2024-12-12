@@ -4,10 +4,7 @@ import { Devvit, useInterval, useState } from '@devvit/public-api';
 import { EditorPage } from '../../components/EditorPage.js';
 import { Service } from '../../service/Service.js';
 import Settings from '../../settings.json';
-import type { Dictionary } from '../../types/Dictionary.js';
-import { GameSettings } from '../../types/GameSettings.js';
-import type { DrawingPostData } from '../../types/PostData.js';
-import type { UserData } from '../../types/UserData.js';
+import type { Dictionary, DrawingPostData, GameSettings, UserData } from '../../types.js';
 import { GuessScreen } from './GuessScreen.js';
 import { ResultsScreen } from './ResultsScreen.js';
 

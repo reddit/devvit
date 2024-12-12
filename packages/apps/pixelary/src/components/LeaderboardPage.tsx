@@ -3,7 +3,7 @@ import { Devvit, useAsync } from '@devvit/public-api';
 
 import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
-import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
+import type { ScoreBoardEntry } from '../types.js';
 import { LeaderboardRow } from './LeaderboardRow.js';
 import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';

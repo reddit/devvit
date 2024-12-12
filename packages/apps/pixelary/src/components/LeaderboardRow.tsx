@@ -1,8 +1,8 @@
 import { Devvit } from '@devvit/public-api';
-import { PixelText } from './PixelText.js';
-import { PixelSymbol } from './PixelSymbol.js';
-import { formatNumberWithCommas } from '../utils/formatNumbers.js';
+
 import Settings from '../settings.json';
+import { PixelSymbol } from './PixelSymbol.js';
+import { PixelText } from './PixelText.js';
 
 export type LeaderboardRowProps = {
   rank: number;
@@ -40,7 +40,7 @@ export const LeaderboardRow = (props: LeaderboardRowProps): JSX.Element => {
         {/* Background to cover long names */}
         <hstack backgroundColor="white" height="100%" alignment="middle">
           <spacer width="8px" />
-          <PixelText color={Settings.theme.primary}>{formatNumberWithCommas(score)}</PixelText>
+          <PixelText color={Settings.theme.primary}>{score.toLocaleString()}</PixelText>
           <spacer width="8px" />
           <PixelSymbol color={Settings.theme.primary} type="star" />
           <spacer width="12px" />

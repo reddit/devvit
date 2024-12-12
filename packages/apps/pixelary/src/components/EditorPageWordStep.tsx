@@ -1,63 +1,24 @@
 import { Devvit, useInterval, useState } from '@devvit/public-api';
 
 import Settings from '../settings.json';
-import type { CandidateWord } from '../types/CandidateWord.js';
-import type { Dictionary } from '../types/Dictionary.js';
+import type { CandidateWord } from '../types.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
 
 interface EditorPageWordStepProps {
-  dictionaries: Dictionary[];
-  onNext: (candidateWord: CandidateWord) => void;
+  candidates: CandidateWord[];
+  onNext: (candidateIndex: number, selectionEventType: 'refresh' | 'manual' | 'auto') => void;
+  onRefreshCandidates: () => void;
 }
-
-/**
- * Shuffles an array of words using the Fisher-Yates algorithm. Uses i-- to ensure each element is swapped only once, moving backward.
- * (Math.random() * (i + 1)) limits the random index to unshuffled elements so no previously shuffled elements are reswapped.
- *
- * @param words List of words to shuffle.
- * @returns string[] Shuffled list.
- */
-
-function shuffle(words: string[]) {
-  const shuffledWords = [...words];
-  for (let i = shuffledWords.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffledWords[i], shuffledWords[j]] = [shuffledWords[j], shuffledWords[i]];
-  }
-  return shuffledWords;
-}
-
-const generateCandidateWords = (dictionaries: Dictionary[]): CandidateWord[] => {
-  const candidates: CandidateWord[] = [];
-  const isTakeoverActive = dictionaries.length > 1;
-  dictionaries.forEach((dictionary) => {
-    const isMainDictionary = dictionary.name === 'main';
-    const shuffledWords = shuffle(dictionary.words);
-    const count = isMainDictionary ? (isTakeoverActive ? 2 : 3) : 1;
-    const words = shuffledWords.slice(0, Math.min(shuffledWords.length, count));
-    words.forEach((word) => {
-      candidates.push({
-        dictionaryName: dictionary.name,
-        word,
-      });
-    });
-  });
-  return candidates;
-};
 
 export const EditorPageWordStep = (props: EditorPageWordStepProps): JSX.Element => {
-  const [candidateWords, setCandidateWords] = useState<CandidateWord[]>(() =>
-    generateCandidateWords(props.dictionaries)
-  );
-
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedtime] = useState(0);
   const timer = useInterval(() => {
     setElapsedtime(Date.now() - startTime);
     if (elapsedTime > Settings.cardDrawDuration * 1000) {
       // Timer is up
-      props.onNext(candidateWords[0]);
+      props.onNext(0, 'auto');
     }
   }, 900);
 
@@ -65,12 +26,12 @@ export const EditorPageWordStep = (props: EditorPageWordStepProps): JSX.Element 
 
   const secondsLeft = Math.round(Settings.cardDrawDuration - elapsedTime / 1000);
 
-  const options = candidateWords.map((candidate, index) => (
+  const options = props.candidates.map((candidate, index) => (
     <zstack
       alignment="start top"
       height="33.33%"
       width="288px"
-      onPress={() => props.onNext(candidate)}
+      onPress={() => props.onNext(index, 'manual')}
     >
       {/* Shadow */}
       <vstack width="100%" height="100%">
@@ -149,7 +110,7 @@ export const EditorPageWordStep = (props: EditorPageWordStepProps): JSX.Element 
         <spacer width="12px" />
         <PixelSymbol scale={3} type="arrow-left" color={Settings.theme.tertiary} />
         <spacer grow />
-        <hstack onPress={() => setCandidateWords(() => generateCandidateWords(props.dictionaries))}>
+        <hstack onPress={props.onRefreshCandidates}>
           <PixelSymbol scale={3} type="undo" color={Settings.theme.secondary} />
           <spacer width="4px" />
         </hstack>

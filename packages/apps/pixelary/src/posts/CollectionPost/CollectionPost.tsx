@@ -5,7 +5,7 @@ import { PaginatedDrawings } from '../../components/PaginatedDrawings.js';
 import { PixelText } from '../../components/PixelText.js';
 import { StyledButton } from '../../components/StyledButton.js';
 import Settings from '../../settings.json';
-import type { CollectionPostData } from '../../types/PostData.js';
+import type { CollectionPostData } from '../../types.js';
 
 export const CollectionPost = (
   props: {

@@ -1,7 +1,7 @@
 import type { MenuItem } from '@devvit/public-api';
 
 import { Service } from '../service/Service.js';
-import type { PostId } from '../types/Id.js';
+import type { PostId } from '../types.js';
 
 export const revealWord: MenuItem = {
   label: '[Pixelary] Reveal Word',

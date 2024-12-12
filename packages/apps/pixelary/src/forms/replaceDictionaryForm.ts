@@ -1,7 +1,7 @@
 import { Devvit, FormOnSubmitEvent } from '@devvit/public-api';
 
 import { Service } from '../service/Service.js';
-import { capitalizeWord } from '../utils/capitalizeWord.js';
+import { capitalize } from '../utils.js';
 
 export const replaceDictionaryForm = Devvit.createForm(
   (data: { dictionaries?: string[]; selectedDictionary?: string }) => ({
@@ -45,7 +45,7 @@ export const replaceDictionaryForm = Devvit.createForm(
     }
 
     const dictionaryName = event.values.dictionary?.[0]!;
-    const words = event.values.words.split(',').map((word: string) => capitalizeWord(word.trim()));
+    const words = event.values.words.split(',').map((word: string) => capitalize(word.trim()));
 
     const isValid = words.every((word) => /^[a-zA-Z ]+$/.test(word));
     if (!isValid) {

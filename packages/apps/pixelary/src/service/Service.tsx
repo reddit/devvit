@@ -9,19 +9,21 @@ import { Devvit } from '@devvit/public-api';
 
 import { GuessScreenSkeleton } from '../posts/DrawingPost/GuessScreenSkeleton.js';
 import Settings from '../settings.json';
-import type { Dictionary } from '../types/Dictionary.js';
-import type { GameSettings } from '../types/GameSettings.js';
-import type { CommentId, PostId } from '../types/Id.js';
 import type {
   CollectionData,
   CollectionPostData,
+  CommentId,
+  Dictionary,
   DrawingPostData,
+  GameSettings,
   PinnedPostData,
-} from '../types/PostData.js';
-import type { PostGuesses } from '../types/PostGuesses.js';
-import type { ScoreBoardEntry } from '../types/ScoreBoardEntry.js';
-import type { UserData } from '../types/UserData.js';
-import { getLevelByScore } from '../utils/progression.js';
+  PostGuesses,
+  PostId,
+  ScoreBoardEntry,
+  UserData,
+  WordSelectionEvent,
+} from '../types.js';
+import { getLevelByScore } from '../utils.js';
 
 // Service that handles the backbone logic for the application
 // This service is responsible for:
@@ -60,6 +62,7 @@ export class Service {
     userData: (username: string) => `users:${username}`,
     userDrawings: (username: string) => `user-drawings:${username}`,
     wordDrawings: (word: string) => `word-drawings:${word}`,
+    wordSelectionEvents: 'word-selection-events',
   };
 
   /*
@@ -292,7 +295,7 @@ export class Service {
       min?: number;
       max?: number;
     }
-  ): Promise<string[]> {
+  ): Promise<PostId[]> {
     try {
       const key = this.keys.userDrawings(username);
       const start = options?.min ?? 0;
@@ -302,7 +305,7 @@ export class Service {
         by: 'rank',
       });
       if (!data || data === undefined) return [];
-      return data.map((value) => value.member);
+      return data.map((value) => value.member as PostId);
     } catch (error) {
       if (error) {
         console.error('Error fetching user drawings:', error);
@@ -693,5 +696,23 @@ ${parsedData.map((word) => `- ${word}`).join('\n')}
       guessCount,
     };
     return parsedData;
+  }
+
+  /*
+   * Collect gameplay metrics to improve the game
+   */
+
+  async emitWordSelectionEvent(data: WordSelectionEvent): Promise<number> {
+    const key = this.keys.wordSelectionEvents;
+    return await this.redis.zAdd(key, {
+      member: JSON.stringify(data),
+      score: Date.now(),
+    });
+  }
+
+  async getRecentWordSelectionEvents(count: number): Promise<WordSelectionEvent[]> {
+    const key = this.keys.wordSelectionEvents;
+    const data = await this.redis.zRange(key, 0, count - 1, { reverse: true, by: 'rank' });
+    return data.map((value) => JSON.parse(value.member));
   }
 }

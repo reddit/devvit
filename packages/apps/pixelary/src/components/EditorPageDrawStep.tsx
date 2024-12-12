@@ -1,11 +1,8 @@
 import { Context, Devvit, useInterval, useState } from '@devvit/public-api';
 
 import Settings from '../settings.json';
-import type { CandidateWord } from '../types/CandidateWord.js';
-import { UserData } from '../types/UserData.js';
-import { blankCanvas } from '../utils/blankCanvas.js';
-import { getLevel } from '../utils/progression.js';
-import { splitArray } from '../utils/splitArray.js';
+import type { CandidateWord, UserData } from '../types.js';
+import { blankCanvas, getLevel, splitArray } from '../utils.js';
 import { PixelSymbol } from './PixelSymbol.js';
 import { PixelText } from './PixelText.js';
 import { Shadow } from './Shadow.js';

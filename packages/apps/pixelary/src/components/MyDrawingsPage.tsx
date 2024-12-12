@@ -3,6 +3,7 @@ import { Devvit, useAsync } from '@devvit/public-api';
 
 import { Service } from '../service/Service.js';
 import Settings from '../settings.json';
+import { PostId } from '../types.js';
 import { PaginatedDrawings } from './PaginatedDrawings.js';
 import { PixelText } from './PixelText.js';
 import { StyledButton } from './StyledButton.js';
@@ -28,7 +29,7 @@ export const MyDrawingsPage = (props: MyDrawingsPageProps, context: Context): JS
   const tileSize = 88;
   const { data, loading } = useAsync<
     {
-      postId: string;
+      postId: PostId;
       data: number[];
     }[]
   >(async () => {

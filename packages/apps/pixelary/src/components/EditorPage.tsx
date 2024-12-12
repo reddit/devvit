@@ -1,9 +1,16 @@
-import { Devvit, useState } from '@devvit/public-api';
+import { Context, Devvit, useAsync, useState } from '@devvit/public-api';
 
-import type { CandidateWord } from '../types/CandidateWord.js';
-import type { Dictionary } from '../types/Dictionary.js';
-import { GameSettings } from '../types/GameSettings.js';
-import type { UserData } from '../types/UserData.js';
+import { Service } from '../service/Service.js';
+import type {
+  CandidateWord,
+  Dictionary,
+  GameSettings,
+  PostId,
+  UserData,
+  UserId,
+  WordSelectionEvent,
+} from '../types.js';
+import { getCandidates } from '../utils.js';
 import { EditorPageDrawStep } from './EditorPageDrawStep.js';
 import { EditorPageReviewStep } from './EditorPageReviewStep.js';
 import { EditorPageWordStep } from './EditorPageWordStep.js';
@@ -16,21 +23,56 @@ interface EditorPageProps {
   onCancel: () => void;
 }
 
-export const EditorPage = (props: EditorPageProps): JSX.Element => {
+export const EditorPage = (props: EditorPageProps, context: Context): JSX.Element => {
+  const service = new Service(context);
   const defaultStep = 'Word';
   const [currentStep, setCurrentStep] = useState<string>(defaultStep);
-  const [candidate, setCandidate] = useState<CandidateWord>({
-    dictionaryName: 'main',
-    word: '',
-  });
   const [drawing, setDrawing] = useState<number[]>([]);
+  const [candidate, setCandidate] = useState<CandidateWord | null>(null);
+  const [candidates, setCandidates] = useState<CandidateWord[]>(() =>
+    getCandidates(props.dictionaries)
+  );
+  const [wordSelectionEvent, setWordSelectionEvent] = useState<WordSelectionEvent | null>(null);
+
+  // Emit word selection events
+  useAsync(
+    async () => {
+      if (!wordSelectionEvent) return null;
+      setWordSelectionEvent(null);
+      return await service.emitWordSelectionEvent(wordSelectionEvent);
+    },
+    {
+      depends: [wordSelectionEvent],
+    }
+  );
+
+  const baseEvent = {
+    userId: context.userId as UserId,
+    postId: context.postId as PostId,
+  };
 
   const steps: Record<string, JSX.Element> = {
     Word: (
       <EditorPageWordStep
         {...props}
-        onNext={(selectedCandidate) => {
-          setCandidate(selectedCandidate);
+        candidates={candidates}
+        onRefreshCandidates={() => {
+          setWordSelectionEvent({
+            ...baseEvent,
+            options: JSON.parse(JSON.stringify(candidates)),
+            type: 'refresh',
+          });
+          const options = getCandidates(props.dictionaries);
+          setCandidates(options);
+        }}
+        onNext={(candidateIndex, selectionEventType) => {
+          setWordSelectionEvent({
+            ...baseEvent,
+            options: JSON.parse(JSON.stringify(candidates)),
+            word: candidates[candidateIndex].word,
+            type: selectionEventType,
+          });
+          setCandidate(candidates[candidateIndex]);
           setCurrentStep('Editor');
         }}
       />
@@ -38,7 +80,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     Editor: (
       <EditorPageDrawStep
         {...props}
-        candidate={candidate}
+        candidate={candidate!}
         onNext={(drawing) => {
           setDrawing(drawing);
           setCurrentStep('Review');
@@ -48,7 +90,7 @@ export const EditorPage = (props: EditorPageProps): JSX.Element => {
     Review: (
       <EditorPageReviewStep
         {...props}
-        candidate={candidate}
+        candidate={candidate!}
         drawing={drawing}
         onCancel={() => {
           props.onCancel();

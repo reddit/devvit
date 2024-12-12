@@ -1,7 +1,7 @@
 import { Devvit } from '@devvit/public-api';
 
 import { Service } from '../service/Service.js';
-import type { Level } from '../types/Level.js';
+import type { Level } from '../types.js';
 
 export const userLeveledUp = Devvit.addSchedulerJob({
   name: 'USER_LEVEL_UP',

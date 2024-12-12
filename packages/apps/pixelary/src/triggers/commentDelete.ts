@@ -1,7 +1,7 @@
 import type { CommentDeleteDefinition } from '@devvit/public-api';
 
 import { Service } from '../service/Service.js';
-import type { CommentId, PostId } from '../types/Id.js';
+import type { CommentId, PostId } from '../types.js';
 
 export const commentDelete: CommentDeleteDefinition = {
   event: 'CommentDelete',
