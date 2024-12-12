@@ -156,7 +156,7 @@ export const GuessScreen = (props: GuessScreenProps, context: Context): JSX.Elem
         <spacer grow />
 
         {/* Give up button */}
-        {guessCount > 2 && (
+        {guessCount > 0 && (
           <image
             imageHeight="34px"
             imageWidth="144px"
