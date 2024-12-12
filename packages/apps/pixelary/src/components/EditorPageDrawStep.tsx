@@ -10,7 +10,7 @@ import { StyledButton } from './StyledButton.js';
 
 interface EditorPageDrawStepProps {
   username: string | null;
-  userData: UserData;
+  userData: UserData | null;
   candidate: CandidateWord;
   onNext: (drawing: number[]) => void;
 }
@@ -23,7 +23,7 @@ export const EditorPageDrawStep = (
   const [drawingData, setDrawingData] = useState<number[]>(blankCanvas);
   const [startTime] = useState(Date.now());
   const [elapsedTime, setElapsedTime] = useState<number>(0);
-  const level = getLevel(props.userData.levelRank ?? 1);
+  const level = getLevel(props.userData?.levelRank ?? 1);
   const drawingTime = Settings.drawingDuration + level.extraTime;
 
   useInterval(() => {

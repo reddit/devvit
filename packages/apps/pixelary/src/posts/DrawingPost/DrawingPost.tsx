@@ -10,7 +10,7 @@ import { ResultsScreen } from './ResultsScreen.js';
 
 interface DrawingPostProps {
   postData: DrawingPostData;
-  userData: UserData;
+  userData: UserData | null;
   username: string | null;
   gameSettings: GameSettings;
   dictionaries: Dictionary[];
@@ -19,8 +19,8 @@ interface DrawingPostProps {
 export const DrawingPost = (props: DrawingPostProps, context: Context): JSX.Element => {
   const service = new Service(context);
   const isAuthor = props.postData.authorUsername === props.username;
-  const isSolved = !!props.userData.solved;
-  const isSkipped = !!props.userData.skipped;
+  const isSolved = !!props.userData?.solved;
+  const isSkipped = !!props.userData?.skipped;
 
   const [currentStep, setCurrentStep] = useState<string>(
     isAuthor || isSolved || isSkipped ? 'Results' : 'Prompt'

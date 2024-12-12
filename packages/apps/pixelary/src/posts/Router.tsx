@@ -1,7 +1,6 @@
 import type { Context } from '@devvit/public-api';
-import { Devvit, useAsync } from '@devvit/public-api';
+import { Devvit, useState } from '@devvit/public-api';
 
-import { LoadingState } from '../components/LoadingState.js';
 import { Service } from '../service/Service.js';
 import type {
   CollectionPostData,
@@ -13,6 +12,7 @@ import type {
   PostId,
   UserData,
 } from '../types.js';
+import { PostType } from '../types.js';
 import { CollectionPost } from './CollectionPost/CollectionPost.js';
 import { DrawingPost } from './DrawingPost/DrawingPost.js';
 import { PinnedPost } from './PinnedPost/PinnedPost.js';
@@ -28,94 +28,86 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
   const postId = context.postId as PostId;
   const service = new Service(context);
 
-  const { data: username, loading: usernameLoading } = useAsync(
-    async () => {
-      if (!context.userId) return null; // Return early if no userId
-      const cacheKey = 'cache:userId-username';
-      const cache = await context.redis.hGet(cacheKey, context.userId);
-      if (cache) {
-        return cache;
-      } else {
-        const user = await context.reddit.getUserById(context.userId);
-        if (user) {
-          await context.redis.hSet(cacheKey, {
-            [context.userId]: user.username,
-          });
-          return user.username;
-        }
+  const getUsername = async () => {
+    if (!context.userId) return null; // Return early if no userId
+    const cacheKey = 'cache:userId-username';
+    const cache = await context.redis.hGet(cacheKey, context.userId);
+    if (cache) {
+      return cache;
+    } else {
+      const user = await context.reddit.getUserById(context.userId);
+      if (user) {
+        await context.redis.hSet(cacheKey, {
+          [context.userId]: user.username,
+        });
+        return user.username;
       }
-      return null;
-    },
-    {
-      depends: [],
     }
-  );
+    return null;
+  };
 
-  const { data: gameSettings, loading: gameSettingsLoading } = useAsync<GameSettings>(async () => {
-    return await service.getGameSettings();
-  });
-
-  const { data: postData, loading: postDataLoading } = useAsync<
-    CollectionPostData | PinnedPostData | DrawingPostData
-  >(async () => {
-    const postType = await service.getPostType(postId);
+  function getPostData(
+    postType: PostType,
+    postId: PostId
+  ): Promise<DrawingPostData | CollectionPostData | PinnedPostData> {
     switch (postType) {
-      case 'collection':
-        return await service.getCollectionPost(postId);
-      case 'pinned':
-        return await service.getPinnedPost(postId);
-      case 'drawing':
+      case PostType.COLLECTION:
+        return service.getCollectionPost(postId);
+      case PostType.PINNED:
+        return service.getPinnedPost(postId);
+      case PostType.DRAWING:
       default:
-        return await service.getDrawingPost(postId);
+        return service.getDrawingPost(postId);
     }
-  });
-
-  const { data: dictionaries, loading: dictionariesLoading } = useAsync<Dictionary[]>(async () => {
-    return await service.getActiveDictionaries();
-  });
-
-  const { data: userData, loading: userDataLoading } = useAsync<UserData>(
-    async () => {
-      return await service.getUser(username!, postId);
-    },
-    {
-      depends: [username],
-    }
-  );
-
-  if (
-    usernameLoading ||
-    gameSettings === null ||
-    gameSettingsLoading ||
-    postData === null ||
-    postDataLoading ||
-    dictionaries === null ||
-    dictionariesLoading ||
-    userData === null ||
-    userDataLoading
-  ) {
-    return <LoadingState />;
   }
 
-  const postType = postData.postType;
+  const [data] = useState<{
+    gameSettings: GameSettings;
+    postData: DrawingPostData | CollectionPostData | PinnedPostData;
+    postType: PostType;
+    dictionaries: Dictionary[];
+    userData: UserData | null;
+    username: string | null;
+  }>(async () => {
+    // First batch
+    const [postType, username] = await Promise.all([service.getPostType(postId), getUsername()]);
+
+    // Second batch
+    const [postData, gameSettings, dictionaries, userData] = await Promise.all([
+      getPostData(postType, postId),
+      service.getGameSettings(),
+      service.getActiveDictionaries(),
+      service.getUser(username, postId),
+    ]);
+
+    return {
+      gameSettings,
+      postData,
+      postType,
+      dictionaries,
+      userData,
+      username,
+    };
+  });
+
   const postTypes: Record<string, JSX.Element> = {
     drawing: (
       <DrawingPost
-        postData={postData as DrawingPostData}
-        username={username}
-        gameSettings={gameSettings}
-        dictionaries={dictionaries}
-        userData={userData}
+        postData={data.postData as DrawingPostData}
+        username={data.username}
+        gameSettings={data.gameSettings}
+        dictionaries={data.dictionaries}
+        userData={data.userData}
       />
     ),
-    collection: <CollectionPost collection={postData as CollectionPostData} />,
+    collection: <CollectionPost collection={data.postData as CollectionPostData} />,
     pinned: (
       <PinnedPost
-        postData={postData as PostData}
-        userData={userData}
-        username={username}
-        gameSettings={gameSettings}
-        dictionaries={dictionaries}
+        postData={data.postData as PostData}
+        userData={data.userData}
+        username={data.username}
+        gameSettings={data.gameSettings}
+        dictionaries={data.dictionaries}
       />
     ),
     // Add more post types here
@@ -136,7 +128,7 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
         description="Striped blue background"
         resizeMode="cover"
       />
-      {postTypes[postType] || (
+      {postTypes[data.postType] || (
         <vstack alignment="center middle" grow>
           <text>Error: Unknown post type</text>
         </vstack>

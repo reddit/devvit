@@ -19,6 +19,7 @@ import type {
   PinnedPostData,
   PostGuesses,
   PostId,
+  PostType,
   ScoreBoardEntry,
   UserData,
   WordSelectionEvent,
@@ -318,11 +319,11 @@ export class Service {
    * Post data
    */
 
-  async getPostType(postId: PostId): Promise<string> {
+  async getPostType(postId: PostId) {
     const key = this.keys.postData(postId);
     const postType = await this.redis.hGet(key, 'postType');
     const defaultPostType = 'drawing';
-    return postType ?? defaultPostType;
+    return (postType ?? defaultPostType) as PostType;
   }
 
   /*
@@ -678,7 +679,8 @@ ${parsedData.map((word) => `- ${word}`).join('\n')}
     await this.redis.hSet(key, stringConfig);
   }
 
-  async getUser(username: string, postId: PostId): Promise<UserData> {
+  async getUser(username: string | null, postId: PostId): Promise<UserData | null> {
+    if (!username) return null;
     const data = await this.redis.hGetAll(this.keys.userData(username));
     const solved = !!(await this.redis.zScore(this.keys.postSolved(postId), username));
     const skipped = !!(await this.redis.zScore(this.keys.postSkipped(postId), username));

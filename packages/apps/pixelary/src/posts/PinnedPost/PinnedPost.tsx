@@ -17,7 +17,7 @@ import { getLevelByScore } from '../../utils.js';
 
 interface PinnedPostProps {
   postData: PostData;
-  userData: UserData;
+  userData: UserData | null;
   username: string | null;
   gameSettings: GameSettings;
   dictionaries: Dictionary[];
@@ -135,7 +135,7 @@ export const PinnedPost = (props: PinnedPostProps, context: Context): JSX.Elemen
       <vstack alignment="center middle" onPress={() => setPage('level')}>
         <hstack>
           <spacer width="20px" />
-          <PixelText scale={2}>{`Level ${props.userData.levelRank}`}</PixelText>
+          <PixelText scale={2}>{`Level ${props.userData?.levelRank ?? 1}`}</PixelText>
           <spacer width="8px" />
           <PixelSymbol type="arrow-right" scale={2} color={Settings.theme.tertiary} />
         </hstack>

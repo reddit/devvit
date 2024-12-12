@@ -11,7 +11,7 @@ import { ProgressBar } from './ProgressBar.js';
 import { StyledButton } from './StyledButton.js';
 
 interface LevelPageProps {
-  userData: UserData;
+  userData: UserData | null;
   user: {
     rank: number;
     score: number;

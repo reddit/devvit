@@ -11,7 +11,7 @@ import type { DrawingPostData, PostGuesses, UserData } from '../../types.js';
 
 interface GuessScreenProps {
   postData: DrawingPostData;
-  userData: UserData;
+  userData: UserData | null;
   username: string | null;
   onGuess: (guess: string, userWantsToComment: boolean) => Promise<void>;
   onSkip: () => void;
@@ -37,7 +37,7 @@ export const GuessScreen = (props: GuessScreenProps, context: Context): JSX.Elem
     }
   });
 
-  const [guessCount, setGuessCount] = useState(props.userData.guessCount);
+  const [guessCount, setGuessCount] = useState(props.userData?.guessCount ?? 0);
 
   if (loading || data === null) return <LoadingState />;
 

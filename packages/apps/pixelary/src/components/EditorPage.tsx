@@ -19,7 +19,7 @@ interface EditorPageProps {
   username: string | null;
   gameSettings: GameSettings;
   dictionaries: Dictionary[];
-  userData: UserData;
+  userData: UserData | null;
   onCancel: () => void;
 }
 

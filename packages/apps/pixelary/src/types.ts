@@ -15,6 +15,12 @@ export type GameSettings = {
   selectedDictionary: string;
 };
 
+export enum PostType {
+  DRAWING = 'drawing',
+  COLLECTION = 'collection',
+  PINNED = 'pinned',
+}
+
 /*
  * Thing Identifiers
  */
