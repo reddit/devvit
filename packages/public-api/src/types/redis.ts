@@ -623,7 +623,7 @@ export type TxClientLike = {
    * ```ts
    * async function hMGetExample(context: Devvit.Context) {
    *  await context.redis.hSet("fruits", {"apple": "5", "orange": "7", "kiwi": "9"});
-   *  const result : string[] | undefined = await context.redis.hMGet("fruits", "orange", "grape", "apple");
+   *  const result : string[] | undefined = await context.redis.hMGet("fruits", ["orange", "grape", "apple"]);
    *  console.log("Value of fields: " + result); // "Value of fields: ["7", undefined, "5"]
    * }
    * ```
@@ -1352,7 +1352,7 @@ export type RedisClient = {
    * ```ts
    * async function hMGetExample(context: Devvit.Context) {
    *  await context.redis.hSet("fruits", {"apple": "5", "orange": "7", "kiwi": "9"});
-   *  const result : string[] | undefined = await context.redis.hMGet("fruits", "orange", "grape", "apple");
+   *  const result : string[] | undefined = await context.redis.hMGet("fruits", ["orange", "grape", "apple"]);
    *  console.log("Value of fields: " + result); // "Value of fields: ["7", undefined, "5"]
    * }
    * ```
