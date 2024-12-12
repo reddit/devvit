@@ -45,7 +45,12 @@ const App: Devvit.CustomPostComponent = (context) => {
     return orders.orders.length;
   });
 
-  const { products } = useProducts(context, {});
+  // Only grab products with the category "powerup".
+  const { products } = useProducts(context, {
+    metadata: {
+      category: 'powerup',
+    },
+  });
 
   // Client side code invoked after a purchase is made. This should be used to update
   // app state based on orders.

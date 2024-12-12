@@ -179,7 +179,13 @@ Use the `useProducts` hook or `getProducts` function to fetch details about prod
 import { useProducts } from '@devvit/payments';
 
 export function ProductsList(context: Devvit.Context): JSX.Element {
-  const { products } = useProducts(context, {});
+  // Only query for products with the metadata "category" of value "powerup".
+  // The metadata field can be empty - if it is, useProducts will not filter on metadata.
+  const { products } = useProducts(context, {
+    metadata: {
+      category: 'powerup',
+    },
+  });
 
   return (
     <vstack>
