@@ -40,7 +40,7 @@ Make sure to fork the repository and create a new branch when making changes to 
 
 ## When changes are reviewed
 
-We'll try to review your PR as soon as possible within one business week of submission. Small changes or updates to our documention will be faster than changes made to other projects, especially apps. Please note that all not PRs will be accepted and review times may vary.
+We'll try to review your PR as soon as possible within one business week of submission. Small changes or updates to our documentation will be faster than changes made to other projects, especially apps. Please note that all not PRs will be accepted and review times may vary.
 
 # reddit-devplatform-monorepo
 
