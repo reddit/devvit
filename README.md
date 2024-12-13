@@ -30,7 +30,7 @@ Security issues take special priority and are handled separately from our public
 ## How to make a pull request
 Make sure to fork the repository and create a new branch when making changes to a project. Full instructions on setting up dependencies from your branch off our monorepo are detailed below. If you need to brush up on the process of creating a PR, [learn more here](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project).
 
-## Best Practices
+## Best practices
 
 * Keep PRs small and as specific to a feature or file as possible
 * Review the code structure and patterns prior to making changes
@@ -74,7 +74,7 @@ maintain that lockfile internally, so you don't need to worry about it in this r
 
 ### Running commands for a specific workspace
 
-- Top level `yarn <foo>` commands run through [turborepo](https://github.com/vercel/turborepo for
+- Top level `yarn <foo>` commands run through [turborepo](https://github.com/vercel/turborepo) for
   all packages
 - `yarn workspace <package-name> foo` will do `yarn run foo`only for the package with matching
   `<package-name>`field from a specific `package.json`
