@@ -4,7 +4,7 @@ Your app may go through several iterations on a subreddit. Here are a few proced
 
 ## Adding an app to your subreddit
 
-To add an app to your subreddit, find it on [apps page](https://developers.reddit.com/apps). Click into the app details screen, and click the "Add to community" button.
+To add an app to your subreddit, find it on the [apps page](https://developers.reddit.com/apps). Click into the app details screen, and click the "Add to community" button.
 
 ![Post](./assets/install-app-button.png)
 
