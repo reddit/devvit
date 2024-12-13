@@ -138,7 +138,9 @@ export class Devvit extends Actor {
       this.use(protos.HTTPDefinition);
     }
 
-    if (pluginIsEnabled(config.kvStore) || pluginIsEnabled(config.redis)) {
+    // We're now defaulting this to on.
+    const redisNotSpecified = config.redis === undefined;
+    if (redisNotSpecified || pluginIsEnabled(config.kvStore) || pluginIsEnabled(config.redis)) {
       this.use(protos.KVStoreDefinition);
       this.use(protos.RedisAPIDefinition);
     }

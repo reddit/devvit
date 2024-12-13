@@ -11,6 +11,7 @@ import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUICl
 import type { MenuItem, MenuItemOnPressEvent } from '../../types/index.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
+import { addCSRFTokenToContext } from './csrf.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 
 const getActionId = (index: number): string => {
@@ -86,6 +87,8 @@ async function onAction(
       },
     }
   );
+
+  await addCSRFTokenToContext(context, req);
 
   await menuItem.onPress(event, context);
 

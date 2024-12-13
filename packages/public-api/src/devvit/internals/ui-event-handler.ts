@@ -13,6 +13,7 @@ import { getFormValues } from '../../apis/ui/helpers/getFormValues.js';
 import { Devvit } from '../Devvit.js';
 import { BlocksReconciler } from './blocks/BlocksReconciler.js';
 import { getContextFromMetadata } from './context.js';
+import { validateCSRFToken } from './csrf.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 import { getMenuItemById } from './menu-items.js';
 
@@ -81,6 +82,8 @@ async function handleUIEvent(
         },
       }
     );
+
+    await validateCSRFToken(context, req);
 
     await formDefinition.onSubmit(
       {
