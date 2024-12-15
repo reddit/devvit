@@ -41,6 +41,7 @@ import { Router } from './posts/Router.js';
  * Triggers
  */
 import { appUpgrade } from './triggers/appUpgrade.js';
+import { commentCreate } from './triggers/commentCreate.js';
 import { commentDelete } from './triggers/commentDelete.js';
 
 /*
@@ -94,5 +95,6 @@ Devvit.addMenuItem(revealWord);
 
 Devvit.addTrigger(appUpgrade);
 Devvit.addTrigger(commentDelete);
+Devvit.addTrigger(commentCreate);
 
 export default Devvit;
