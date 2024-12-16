@@ -64,11 +64,7 @@ Each product in the products field has the following attributes:
 | `price` | An predefined integer that sets the product price in Reddit gold. See details below. |
 | `image.icon` | **(optional)** The path to the icon that represents your product in your [assets](../app_image_assets) folder. |
 | `metadata` | **(optional)** An optional object that contains additional attributes you want to use to group and filter products. Keys and values must be alphanumeric (a - Z, 0 - 9, and - ) and contain 30 characters or less. You can add up to 10 metadata keys. |
-| `accountingType` | Categories for how buyers consume your products. Possible values are:
-
-- “INSTANT” for purchased items that are used immediately and disappear.
-- “DURABLE” for purchased items that are permanently applied to the account and can be used any number of times
-- “CONSUMABLE” for items that are used over a period of time. Use a “VALID*FOR*" value to indicate the length of time the item is available. |
+| `accountingType` | Categories for how buyers consume your products. Possible values are: <ul><li>`INSTANT` for purchased items that are used immediately and disappear.</li><li>`DURABLE` for purchased items that are permanently applied to the account and can be used any number of times.</li><li>`CONSUMABLE` for items that can be used at a later date but are removed once they are used.</li><li>`VALID_FOR_` values indicate a product can be used throughout a period of time after it is purchased.</li></ul> |
 
 Registered products are updated every time an app is uploaded, including when you use [Devvit playtest](../playtest).
 
