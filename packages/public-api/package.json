@@ -1,6 +1,6 @@
 {
   "name": "@devvit/public-api",
-  "version": "0.11.5-dev",
+  "version": "0.11.4",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -38,8 +38,8 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "11.4.0",
-    "@devvit/shared-types": "11.4.0",
+    "@devvit/protos": "0.11.4",
+    "@devvit/shared-types": "0.11.4",
     "base64-js": "1.5.1",
     "clone-deep": "4.0.1",
     "core-js": "3.27.2",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
     
-    "@devvit/tsconfig": "11.4.0",
+    "@devvit/tsconfig": "0.11.4",
     "@microsoft/api-extractor": "7.41.0",
     "@reddit/faceplate-ui": "18.0.1",
     "@types/clone-deep": "4.0.1",

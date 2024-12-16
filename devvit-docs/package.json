@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "devvit-docs",
-  "version": "0.11.5-dev",
+  "version": "0.11.4",
   "scripts": {
     "clean": "rm -rf .turbo static/@devvit",
     "clobber": "yarn clean && rm -rf node_modules",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@cmfcmf/docusaurus-search-local": "1.1.0",
-    "@devvit/protos": "11.4.0",
+    "@devvit/protos": "0.11.4",
     "@docusaurus/core": "3.1.1",
     "@docusaurus/plugin-content-docs": "3.1.1",
     "@docusaurus/preset-classic": "3.1.1",
