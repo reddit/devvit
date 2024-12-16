@@ -42,11 +42,11 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@devvit/build-pack": "0.11.5-dev",
+    "@devvit/build-pack": "11.4.0",
     "@devvit/play": "0.0.43",
-    "@devvit/protos": "0.11.5-dev",
-    "@devvit/public-api": "0.11.5-dev",
-    "@devvit/shared-types": "0.11.5-dev",
+    "@devvit/protos": "11.4.0",
+    "@devvit/public-api": "11.4.0",
+    "@devvit/shared-types": "11.4.0",
     "@improbable-eng/grpc-web": "0.15.0",
     "@improbable-eng/grpc-web-node-http-transport": "0.15.0",
     "@oclif/core": "2.9.4",
@@ -78,8 +78,8 @@
     "ws": "8.18.0"
   },
   "devDependencies": {
-    "@devvit/repo-tools": "0.11.5-dev",
-    "@devvit/tsconfig": "0.11.5-dev",
+    
+    "@devvit/tsconfig": "11.4.0",
     "@types/file-type": "10.9.1",
     "@types/inquirer": "9.0.3",
     "@types/js-yaml": "4.0.5",

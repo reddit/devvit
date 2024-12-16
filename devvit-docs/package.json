@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@cmfcmf/docusaurus-search-local": "1.1.0",
-    "@devvit/protos": "0.11.5-dev",
+    "@devvit/protos": "11.4.0",
     "@docusaurus/core": "3.1.1",
     "@docusaurus/plugin-content-docs": "3.1.1",
     "@docusaurus/preset-classic": "3.1.1",

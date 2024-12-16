@@ -5,7 +5,7 @@
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.11.5-dev",
+    "@devvit/public-api": "11.4.0",
     "moment": "2.29.4",
     "moment-duration-format": "2.3.2",
     "numbro": "2.3.6"
