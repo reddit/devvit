@@ -56,7 +56,13 @@ type OrderListItemProps = {
 
 export function OrderListItem({ order }: OrderListItemProps): JSX.Element {
   return (
-    <vstack gap="small" padding="small" cornerRadius="small" borderColor="neutral-content-strong">
+    <vstack
+      width="100%"
+      gap="small"
+      padding="small"
+      cornerRadius="small"
+      borderColor="neutral-content-strong"
+    >
       <text size="large">{order.id}</text>
       <text size="xsmall">
         {order.status}

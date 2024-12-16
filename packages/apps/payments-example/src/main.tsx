@@ -3,13 +3,12 @@ import './createPostMenuItem.js';
 import {
   addPaymentHandler,
   type OnPurchaseResult,
-  type Order,
   OrderResultStatus,
   useOrders,
   usePayments,
   useProducts,
 } from '@devvit/payments';
-import { Devvit } from '@devvit/public-api';
+import { Devvit, useState } from '@devvit/public-api';
 
 import { OrderListItem, ProductListItem, TitledList } from './Payments.js';
 
@@ -31,13 +30,16 @@ enum Tab {
   Orders = 'Orders',
 }
 
+const ORDERS_PAGE_SIZE = 3;
+
 Devvit.addCustomPostType({
   name: 'Devvit Snack Bar',
   description: 'Custom post to test payments API',
+  height: 'tall',
   render: (context) => {
-    const [selectedTab, setSelectedTab] = context.useState(Tab.Products);
+    const [selectedTab, setSelectedTab] = useState(Tab.Products);
     const { products } = useProducts(context);
-    const { orders } = useOrders(context);
+    const { orders, nextPage: nextPageOrders } = useOrders(context, { limit: ORDERS_PAGE_SIZE });
 
     const payments = usePayments((result: OnPurchaseResult) => {
       if (result.status === OrderResultStatus.Success) {
@@ -52,7 +54,7 @@ Devvit.addCustomPostType({
       }
     });
     return (
-      <vstack alignment="center" height="100%" padding="medium" width="100%">
+      <vstack alignment="center" padding="medium" width="100%">
         <hstack alignment="center middle" gap="small">
           {Object.entries(Tab).map(([label, value]) => (
             <button onPress={() => setSelectedTab(value as Tab)} disabled={value === selectedTab}>
@@ -77,10 +79,11 @@ Devvit.addCustomPostType({
         {selectedTab === Tab.Orders && (
           <TitledList title="Orders">
             {Array.isArray(orders) && orders.length > 0 ? (
-              orders.map((order) => <OrderListItem order={order as Order} />)
+              orders.map((order) => <OrderListItem order={order} />)
             ) : (
               <text>No orders found</text>
             )}
+            {nextPageOrders ? <button onPress={nextPageOrders}>Next Page</button> : <></>}
           </TitledList>
         )}
       </vstack>
