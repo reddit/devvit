@@ -53,6 +53,7 @@ import {
   Comment,
   Flair,
   FlairTemplate,
+  getCurrentUsernameFromMetadata,
   getModerationLog,
   getSubredditInfoById,
   getSubredditInfoByName,
@@ -119,6 +120,7 @@ export class RedditAPIClient {
   readonly #metadata: Metadata;
   readonly #modMailService: ModMailService;
   #currentUser: Promise<User | undefined> | undefined;
+  #currentUsername: Promise<string | undefined> | undefined;
 
   constructor(metadata: Metadata) {
     this.#metadata = metadata;
@@ -342,6 +344,21 @@ export class RedditAPIClient {
   }
 
   /**
+   * Get the current calling user's username.
+   * Resolves to undefined for logged-out custom post renders.
+   *
+   * @returns A Promise that resolves to a string representing the username or undefined
+   * @example
+   * ```ts
+   * const username = await reddit.getCurrentUsername();
+   * ```
+   */
+  async getCurrentUsername(): Promise<string | undefined> {
+    this.#currentUsername ??= getCurrentUsernameFromMetadata(this.#metadata);
+    return this.#currentUsername;
+  }
+
+  /**
    * Get the current calling user.
    * Resolves to undefined for logged-out custom post renders.
    *
@@ -352,7 +369,9 @@ export class RedditAPIClient {
    * ```
    */
   async getCurrentUser(): Promise<User | undefined> {
-    this.#currentUser ??= User.getFromMetadata(Header.User, this.#metadata);
+    this.#currentUser ??= this.getCurrentUsername().then((username) =>
+      username ? User.getByUsername(username, this.#metadata) : undefined
+    );
     return this.#currentUser;
   }
 

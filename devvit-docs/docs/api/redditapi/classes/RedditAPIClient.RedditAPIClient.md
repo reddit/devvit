@@ -67,6 +67,7 @@ async (event, context) => {
 - [getControversialPosts](RedditAPIClient.RedditAPIClient.md#getcontroversialposts)
 - [getCurrentSubreddit](RedditAPIClient.RedditAPIClient.md#getcurrentsubreddit)
 - [getCurrentUser](RedditAPIClient.RedditAPIClient.md#getcurrentuser)
+- [getCurrentUsername](RedditAPIClient.RedditAPIClient.md#getcurrentusername)
 - [getEdited](RedditAPIClient.RedditAPIClient.md#getedited)
 - [getHotPosts](RedditAPIClient.RedditAPIClient.md#gethotposts)
 - [getMessages](RedditAPIClient.RedditAPIClient.md#getmessages)
@@ -788,6 +789,27 @@ A Promise that resolves to a User object or undefined
 
 ```ts
 const user = await reddit.getCurrentUser();
+```
+
+---
+
+### <a id="getcurrentusername" name="getcurrentusername"></a> getCurrentUsername
+
+▸ **getCurrentUsername**(): `Promise`\<`undefined` \| `string`\>
+
+Get the current calling user's username.
+Resolves to undefined for logged-out custom post renders.
+
+#### Returns
+
+`Promise`\<`undefined` \| `string`\>
+
+A Promise that resolves to a string representing the username or undefined
+
+**`Example`**
+
+```ts
+const username = await reddit.getCurrentUsername();
 ```
 
 ---

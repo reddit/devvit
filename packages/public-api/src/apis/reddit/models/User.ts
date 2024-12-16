@@ -5,6 +5,7 @@ import type {
   UserDataByAccountIdsResponse,
   UserDataByAccountIdsResponse_UserAccountData,
 } from '@devvit/protos';
+import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
@@ -424,11 +425,7 @@ export class User {
 
   /** @internal */
   static async getById(id: T2ID, metadata: Metadata | undefined): Promise<User | undefined> {
-    const client = Devvit.redditAPIPlugins.Users;
-
-    const response = await client.UserDataByAccountIds({ ids: id }, metadata);
-
-    const username = response?.users?.[id]?.name;
+    const username = await getUsernameById(id, metadata);
 
     return username == null ? undefined : User.getByUsername(username, metadata);
   }
@@ -692,4 +689,34 @@ async function listingProtosToUsers(
     before: listingProto.data.before,
     after: listingProto.data.after,
   };
+}
+
+/** @internal */
+async function getUsernameById(
+  id: string,
+  metadata: Metadata | undefined
+): Promise<string | undefined> {
+  const client = Devvit.redditAPIPlugins.Users;
+
+  const response = await client.UserDataByAccountIds({ ids: id }, metadata);
+
+  return response?.users?.[id]?.name;
+}
+
+/** @internal */
+export async function getCurrentUsernameFromMetadata(
+  metadata: Metadata | undefined
+): Promise<string | undefined> {
+  assertNonNull(metadata);
+  const username = metadata?.[Header.Username]?.values[0];
+  if (username) {
+    return username;
+  }
+
+  const userId = metadata?.[Header.User]?.values[0];
+  if (!userId) {
+    return undefined;
+  }
+
+  return getUsernameById(userId, metadata);
 }
