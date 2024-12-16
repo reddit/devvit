@@ -36,11 +36,11 @@ Make sure to fork the repository and create a new branch when making changes to 
 * Review the code structure and patterns prior to making changes
 * Keep your contributions consistent with the existing codebase
 * Consider where to add helpful in-line comments or sample code
-* Use langauge that is clear, concice, and simple
+* Use language that is clear, concise, and simple
 
 ## When changes are reviewed
 
-We'll try to review your PR as soon as possible within one business week of submission. Small changes or updates to our documentation will be faster than changes made to other projects, especially apps. Please note that all not PRs will be accepted and review times may vary.
+We'll try to review your PR as soon as possible within one business week of submission. Small changes or updates to our documentation will be faster than changes made to other projects, especially apps. Please note that not all PRs will be accepted and review times may vary.
 
 # reddit-devplatform-monorepo
 
