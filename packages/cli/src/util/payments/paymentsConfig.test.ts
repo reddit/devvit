@@ -145,6 +145,50 @@ describe(readAndInjectBundleProducts.name, () => {
     expect(bundle.paymentsConfig).toStrictEqual(makePaymentsConfig(MOCK_PRODUCTS_JSON.products));
   });
 
+  it('throws error if a product has metadata starting with "devvit-"', async () => {
+    const invalidProduct = {
+      sku: 'product-1',
+      displayName: 'Product 1',
+      price: 25,
+      accountingType: AccountingType.INSTANT,
+      metadata: {
+        'devvit-invalid': 'this breaks upload',
+      },
+    };
+
+    const products = {
+      products: [{ ...invalidProduct }],
+    };
+    const bundle: Bundle = {
+      code: '',
+      dependencies: {
+        hostname: '',
+        provides: [
+          {
+            definition: {
+              fullName: PaymentProcessorDefinition.fullName,
+              methods: [],
+              name: '',
+              version: '',
+            },
+            partitionsBy: [],
+          },
+        ],
+        uses: [],
+      },
+      assetIds: {
+        'exists.jpg': 'abc123',
+      },
+      webviewAssetIds: {},
+    };
+
+    vi.mocked(access).mockResolvedValueOnce();
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
+    await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
+      'Products metadata cannot start with "devvit-". Invalid keys: devvit-invalid'
+    );
+  });
+
   it('ignores product image asset verification if option is set to false', async () => {
     const productImage = 'doesnotexist.jpg';
     const products = {

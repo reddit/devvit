@@ -13,6 +13,7 @@ import type {
 } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
+import { filterToReservedDevvitMetadataKeys } from '@devvit/shared-types/filterToReservedDevvitMetadataKeys.js';
 import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/index.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
@@ -63,6 +64,18 @@ function checkProductsConfig(
       throw new Error(
         'You have a `products.json` with products, but your app does not handle payment processing of those products. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation to enable the payments feature.'
       );
+    }
+
+    for (const product of products) {
+      const invalidKeys = filterToReservedDevvitMetadataKeys(Object.keys(product.metadata));
+
+      // Enforced here on the CLI and also on the server. Server processing is done too late for error
+      // messages to reach the end user, so doing here prior to upload.
+      if (invalidKeys.length > 0) {
+        throw new Error(
+          `Products metadata cannot start with "devvit-". Invalid keys: ${invalidKeys.join(', ')}`
+        );
+      }
     }
 
     const missingAssets: string[] = [];
