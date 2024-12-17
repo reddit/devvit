@@ -1,7 +1,7 @@
 # Web views
 
 :::note
-Web views is currently experimental and optimized for desktop web. Mobile support is coming later this year.
+Web views is currently experimental. Web view apps will be publishable early next year.
 :::
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/BhbWn8TnXvo?si=mD_Hp5H90LpPGWbn&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
