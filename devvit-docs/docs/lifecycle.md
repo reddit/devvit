@@ -99,7 +99,7 @@ Your app will need to be **manually updated to each new version** you upload on 
 - Log into your allowlisted Reddit Developer account at [https://www.reddit.com](https://www.reddit.com)
 - Go to [https://developers.reddit.com/my-apps](https://developers.reddit.com/my-apps)
 - Click on your app's listing
-- You wil see a Communities section showing the subreddits on which your app has been installed along with the version installed on each
+- You will see a Communities section showing the subreddits on which your app has been installed along with the version installed on each
 - If a new version of an app is available for a given subreddit, you will see a blue "Upgrade" button
 - Click the button and follow the prompts to upgrade each installation
 
