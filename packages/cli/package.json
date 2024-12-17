@@ -78,7 +78,6 @@
     "ws": "8.18.0"
   },
   "devDependencies": {
-    
     "@devvit/tsconfig": "0.11.4",
     "@types/file-type": "10.9.1",
     "@types/inquirer": "9.0.3",

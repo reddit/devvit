@@ -18,7 +18,6 @@
   ],
   "scripts": {
     "build": "yarn && yarn build:semantic-colors && tsc && cp -af devvit.tsconfig.json dist/ && yarn build:types && yarn build:min && yarn build:unmin",
-    
     "build:min": "esbuild --bundle --sourcemap=linked --target=es2020 --format=esm  --metafile=dist/meta.min.json --outfile=dist/public-api.min.js --external:@devvit/protos --minify src/index.ts",
     "build:semantic-colors": "node scripts/make-semantic-colors.js",
     "build:types": "api-extractor run && sed -ne '/declare global {/,$ p' src/devvit/Devvit.ts >> dist/public-api.d.ts",
@@ -47,7 +46,6 @@
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
-    
     "@devvit/tsconfig": "0.11.4",
     "@microsoft/api-extractor": "7.41.0",
     "@reddit/faceplate-ui": "18.0.1",
