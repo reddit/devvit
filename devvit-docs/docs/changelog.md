@@ -4,6 +4,28 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.5: @devvit/security and some smaller updates
+
+**Release Date: Dec 17, 2024**
+
+We've identified a security vulnerability with forms that use the `forUserType: 'moderator'`. Apps that have mod-only actions should update to the latest version of the public API by January 15, 2025. Once updated, we will help you upgrade installations across subreddits that use your app. To update your app, run:
+
+```
+npm install -g devvit@latest // or package manager of choice
+devvit update app
+npm install
+```
+
+**New features**
+
+- Added an [`hMGet`](./capabilities/redis.md#hash) method to Redis to get the value of multiple keys from a hash.
+- Redis is available to all apps now, so you don't have to define `redis: true` within the configuration object.
+
+**Fixes**
+
+- Updated `reddit.getCurrentUserByUserName` to return undefined when a user is not found instead of throwing an error.
+- Fixed the hanging process when `devvit playtest` got stuck installing a playtest version.
+
 ## Devvit 0.11.4: Payments (pilot) and more
 
 **Release Date: Dec 9, 2024**

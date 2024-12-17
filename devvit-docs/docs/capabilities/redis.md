@@ -18,16 +18,6 @@ Each app version installed on a subreddit is namespaced, which means Redis data 
 
 All limits are applied at a per-installation granularity.
 
-## Add Redis to your app
-
-When creating an app, enable the plugin in `Devvit.configure`.
-
-```tsx
-Devvit.configure({
-  redis: true,
-});
-```
-
 ## Examples
 
 ### Menu items
@@ -161,6 +151,7 @@ Redis hashes can store up to ~ 4.2 billion key-value pairs. We recommend using h
 | **Command**                                   | **Action**                                                                      |
 | --------------------------------------------- | ------------------------------------------------------------------------------- |
 | [hGet](https://redis.io/commands/hget)        | Returns the value associated with field in the hash stored at key.              |
+| [hMGet](https://redis.io/commands/hmget)      | Returns the value of all specified field in the hash stored at multiple keys.   |
 | [hSet](https://redis.io/commands/hset/)       | Sets the specified fields to their respective values in the hash stored at key. |
 | [hDel](https://redis.io/commands/hdel/)       | Removes the specified fields from the hash stored at key.                       |
 | [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash.                    |
@@ -187,6 +178,9 @@ async function hashExample1(context: Devvit.Context) {
   // Get the value of 'shield' from 'inventory'
   console.log('Shield count: ' + await context.redis.hGet('inventory', 'shield'));
 
+  // Get the values of both of 'shield' and 'potion' from 'inventory'
+  console.log('Shield and potion count: ' + await context.redis.hMGet('inventory', ['shield', 'potion']));
+
   // Delete some fields from 'inventory'
   console.log(
     'Number of fields deleted: ' +
@@ -197,6 +191,7 @@ async function hashExample1(context: Devvit.Context) {
 
 ```bash
 Shield count: 2
+Shield and potion count: 2,4
 Number of fields deleted: 3
 ```
 
