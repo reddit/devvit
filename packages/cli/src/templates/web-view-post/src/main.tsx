@@ -24,7 +24,7 @@ Devvit.configure({
 
 // Add a custom post type to Devvit
 Devvit.addCustomPostType({
-  name: 'Webview Example',
+  name: 'Web View Example',
   height: 'tall',
   render: (context) => {
     // Load username with `useAsync` hook
@@ -40,7 +40,7 @@ Devvit.addCustomPostType({
     });
 
     // Create a reactive state for web view visibility
-    const [webviewVisible, setWebviewVisible] = useState(false);
+    const [webViewVisible, setWebViewVisible] = useState(false);
 
     // When the web view invokes `window.parent.postMessage` this function is called
     const onMessage = async (msg: WebViewMessage) => {
@@ -65,8 +65,8 @@ Devvit.addCustomPostType({
     };
 
     // When the button is clicked, send initial data to web view and show it
-    const onShowWebviewClick = () => {
-      setWebviewVisible(true);
+    const onShowWebViewClick = () => {
+      setWebViewVisible(true);
       context.ui.webView.postMessage('myWebView', {
         type: 'initialData',
         data: {
@@ -80,8 +80,8 @@ Devvit.addCustomPostType({
     return (
       <vstack grow padding="small">
         <vstack
-          grow={!webviewVisible}
-          height={webviewVisible ? '0%' : '100%'}
+          grow={!webViewVisible}
+          height={webViewVisible ? '0%' : '100%'}
           alignment="middle center"
         >
           <text size="xlarge" weight="bold">
@@ -105,17 +105,19 @@ Devvit.addCustomPostType({
             </hstack>
           </vstack>
           <spacer />
-          <button onPress={onShowWebviewClick}>Launch App</button>
+          <button onPress={onShowWebViewClick}>Launch App</button>
         </vstack>
-        <vstack grow={webviewVisible} height={webviewVisible ? '100%' : '0%'}>
-          <vstack border="thick" borderColor="black" height={webviewVisible ? '100%' : '0%'}>
-            <webview
-              id="myWebView"
-              url="page.html"
-              onMessage={(msg) => onMessage(msg as WebViewMessage)}
-              grow
-              height={webviewVisible ? '100%' : '0%'}
-            />
+        <vstack grow={webViewVisible} height={webViewVisible ? '100%' : '0%'}>
+          <vstack border="thick" borderColor="black" height={webViewVisible ? '100%' : '0%'}>
+            {webViewVisible ? (
+              <webview
+                id="myWebView"
+                url="page.html"
+                onMessage={(msg) => onMessage(msg as WebViewMessage)}
+                grow
+                height={webViewVisible ? '100%' : '0%'}
+              />
+            ) : null}
           </vstack>
         </vstack>
       </vstack>
