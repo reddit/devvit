@@ -39,13 +39,13 @@ Information about payouts is located [here](https://support.reddithelp.com/hc/en
 
 ## Add payments to your app
 
-You can build your app with a template by running:
+You can build your app with a template by selecting the payments template when you create a new project or by running:
 
 ```bash
 devvit new --template=payments
 ```
 
-Run the following command to add payments to your app.
+To add payments functionality to an existing app, run:
 
 ```bash
 npm install @devvit/payments@next

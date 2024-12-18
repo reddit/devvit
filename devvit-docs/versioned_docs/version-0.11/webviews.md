@@ -1,16 +1,16 @@
-# Webviews
+# Web views
 
 :::note
-Webviews is currently experimental and optimized for desktop web. Mobile support is coming later this year.
+Web views is currently experimental. Web view apps will be publishable early next year.
 :::
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/BhbWn8TnXvo?si=mD_Hp5H90LpPGWbn&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-Webviews allow you include HTML, CSS, and JavaScript and have it run within your Reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
+Web views allow you include HTML, CSS, and JavaScript and have it run within your Reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
 
 ## Quickstart
 
-1. Create a new webview project:
+1. Create a new web view project:
 
 ```bash
 devvit new --template web-view-post
@@ -38,7 +38,7 @@ my-project/
     └── main.tsx      # Devvit app code
 ```
 
-![Sample webviews post](./assets/webviews_example.png)
+![Sample web views post](./assets/webviews_example.png)
 
 ## Examples
 
@@ -50,18 +50,18 @@ my-project/
 
 ## Known limitations
 
-1. **CSS/JS Requirements**
+1. **CSS/JS requirements**
 
    - ❌ No inline CSS or JavaScript
    - ✅ Use separate .css and .js files
 
-2. **Mobile Gestures**
+2. **Mobile gestures**
 
    - ❌ Complex gestures may conflict with the Reddit app
    - ✅ Use simple interactions and avoid scrolling (e.g. overflow: none)
    - 🔄 Fix coming soon
 
-3. **Asset Versioning**
+3. **Asset versioning**
 
    - ❌ Assets affect all versions when updated (including in a playtest)
    - ✅ Use separate apps for development/production
@@ -74,17 +74,17 @@ my-project/
 
 ## Best practices
 
-1. **File Organization**
+1. **File organization**
 
    - Keep all web files in the `webroot/` directory
    - Use separate files for HTML, CSS, and JavaScript
    - Consider using a bundler for larger applications
 
-2. **State Management**
+2. **State management**
 
-   - Use `localStorage` for webview-only state
+   - Use `localStorage` for web view only state
    - Use [Redis](./capabilities/redis.md) storage (via Devvit) for persistent data
-   - Minimize state synchronization between webview and Devvit
+   - Minimize state synchronization between web view and Devvit
 
 3. **Performance**
    - Add a "Launch App" button to prevent UI flashing
@@ -99,13 +99,13 @@ my-project/
 />
 ```
 
-## Communication Between Devvit and webviews
+## Communication Between Devvit and web view
 
-Webviews let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services ([Redis](./capabilities/redis.md), [fetch](./capabilities/http-fetch.md), [scheduler](./capabilities/scheduler.md), [triggers](./capabilities/triggers.md)) via message passing between the two contexts.
+Web views let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services ([Redis](./capabilities/redis.md), [fetch](./capabilities/http-fetch.md), [scheduler](./capabilities/scheduler.md), [triggers](./capabilities/triggers.md)) via message passing between the two contexts.
 
-![Sample webviews post](./assets/webviews-devvit-architecture.png)
+![Sample web views post](./assets/webviews-devvit-architecture.png)
 
-### From Devvit to webview
+### From Devvit to web view
 
 ```typescript
 // In main.tsx
@@ -123,14 +123,17 @@ window.addEventListener('message', (event) => {
 });
 ```
 
-### From webview to Devvit
+### From web view to Devvit
 
 ```typescript
 // In webroot/app.js
-window.parent.postMessage({
-  type: 'userAction',
-  data: { clicked: true }
-}, '*');
+window.parent.postMessage(
+  {
+    type: 'userAction',
+    data: { clicked: true },
+  },
+  '*'
+);
 
 // In main.tsx
 <webview
@@ -139,12 +142,12 @@ window.parent.postMessage({
   onMessage={(msg) => {
     console.log('Received from webview:', msg);
   }}
-/>
+/>;
 ```
 
-### Local, webview-only state
+### Local, web view only state
 
-The webview does not have direct access to Devvit's services such as `redis`, `realtime` and `scheduler`. Communicating with server-side logic always needs to go through the Devvit application, i.e. you need to send a `window.parent.postMessage`, capture that message in your Devvit application, and send information to the backend.
+The web view does not have direct access to Devvit's services, including `redis`, `realtime` and `scheduler`. Communicating with server-side logic always needs to go through the Devvit application (i.e. you need to send a `window.parent.postMessage`, capture that message in your Devvit application, and send information to the backend).
 
 If you want to keep local state that does not need to be persisted to the backend you can use [`window.localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 
@@ -170,14 +173,14 @@ Upon startup the app will:
 
 When the Launch App button is clicked, the app will:
 
-- Show the webview and hide the other Devvit blocks
+- Show the web view and hide the other Devvit blocks
 - Send an 'initialData' message from Blocks to the Webview so it can populate state
-- The user is now seeing a webview with the contents of the `/webroot` folder
+- The user is now seeing a web view with the contents of the `/webroot` folder
 
 When the Increase/Decrease counter buttons are clicked the app will:
 
-- Send a message from the Webviews to Blocks so state can be persisted in Redis (Webviews can't communicate directly with Redis)
-- Receive a response from Blocks and update current state in the Webview
+- Send a message from the web view to blocks so state can be persisted in Redis (web views can't communicate directly with Redis)
+- Receive a response from blocks and update current state in the web view
 
 In the steps below, more details will be provided about each of the above.
 
@@ -211,7 +214,7 @@ const {
 _Send Initial data and show Webview_
 
 ```tsx
-// When the Launch App button is clicked, send initial data to webview and show it
+// When the Launch App button is clicked, send initial data to web view and show it
 const onShowWebviewClick = () => {
   setWebviewVisible(true);
   context.ui.webView.postMessage('myWebView', {
@@ -224,7 +227,7 @@ const onShowWebviewClick = () => {
 };
 ```
 
-_Define the webviews component within blocks_
+_Define the web view component within blocks_
 
 ```tsx
 <vstack grow={webviewVisible} height={webviewVisible ? '100%' : '0%'}>
@@ -243,7 +246,7 @@ _Define the webviews component within blocks_
 _Respond to messages from Webview changing data in Redis DB_
 
 ```tsx
-// When the webview invokes `window.parent.postMessage` this function is called
+// When the web view invokes `window.parent.postMessage` this function is called
 const onMessage = async (msg: WebViewMessage) => {
   if (msg?.type === 'setCounter') {
     // Get new counter value from the message
@@ -304,4 +307,4 @@ window.parent?.postMessage(
 
 ## Questions
 
-Don't forget to join our [Discord](https://discord.gg/Cd43ExtEFS) if you have any additional questions
+Don't forget to join our [Discord](https://discord.gg/Cd43ExtEFS) if you have any additional questions.

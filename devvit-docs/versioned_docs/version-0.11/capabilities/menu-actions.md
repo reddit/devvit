@@ -20,6 +20,10 @@ You can decide where the menu action shows up by specifying the context property
 | postFilter (optional)  | `currentApp`                   | Shows the action created by your app. The default is no filtering.              |
 | forUserType (optional) | `moderator`                    | Specifies the user types that can see the menu action. The default is everyone. |
 
+:::note
+For moderator permission security, when opening a form from a menu action with `forUserType: moderator`, the user initiating the action must complete all actions within 10 minutes.
+:::
+
 ## Limitations
 
 - A sort order of actions in the context menu can't be specified.

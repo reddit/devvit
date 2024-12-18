@@ -53,12 +53,12 @@ Otherwise, you can safely continue`,
         type: 'list',
         choices: [
           {
-            name: 'Continue anyway',
-            value: 'continue',
-          },
-          {
             name: 'Exit',
             value: 'exit',
+          },
+          {
+            name: 'Continue anyway',
+            value: 'continue',
           },
         ],
       },
