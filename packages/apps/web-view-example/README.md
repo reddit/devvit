@@ -1,6 +1,6 @@
 # Web View Example app
 
-This app shows hot to integrate the `<webview />` block into Devvit.
+This app shows how to integrate the `<webview />` block into Devvit.
 A full video tutorial explaining this source code is available [here](https://www.youtube.com/watch?v=BhbWn8TnXvo).
 You can also read explanations about the source code in [our documentation](https://developers.reddit.com/docs/webviews)
 
@@ -10,7 +10,7 @@ You can also read explanations about the source code in [our documentation](http
    `npm install --save @devvit/public-api@0.11.3`
 
 2. Change Devvit project configuration
-   Eddit `devvit.yaml` to give a unique name to your project
+   Edit `devvit.yaml` to give a unique name to your project
 
 3. Install dependencies
    `npm install`
