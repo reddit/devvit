@@ -47,6 +47,6 @@ $ devvit new --template custom-post <project-name>
 
 | Template       | Description                                               |
 | -------------- | --------------------------------------------------------- |
-| `blocks-post`  | An interatcive post template using Devvit blocks.         |
-| `webview-post` | An interatcive post template using the webview comopnent. |
+| `blocks-post`  | An interactive post template using Devvit blocks.         |
+| `webview-post` | An interactive post template using the webview component. |
 | `empty`        | The default, boilerplate project template.                |
