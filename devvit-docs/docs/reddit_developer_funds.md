@@ -14,7 +14,7 @@ We want creative new apps that enrich the Reddit community through:
 
 The Developer Funds program will run from July 1, 2024 - Dec 31, 2024. This program is focused on reach, and success will be measured by Qualified Views, Qualified Members, and Qualified Installs, defined as:
 
-- A "Qualified Member" is a subscriber of a new app-centric community that: 1) is a real user in good standing; 2) is not a bot, alt, or programatic account; 3) has joined the community of their own volition and interest in the community.
+- A "Qualified Member" is a subscriber of a new app-centric community that: 1) is a real user in good standing; 2) is not a bot, alt, or programmatic account; 3) has joined the community of their own volition and interest in the community.
 
 - A “Qualified View” is a view of your App that: 1) occurs after July 1, 2024; 2) lasts at least two seconds; 3) is in a subreddit that has a minimum of 1,000 members; and 4) is in a subreddit or on content that is eligible for monetization under Reddit’s Contributor Monetization Policy (e.g., that is Safe for Work).
 

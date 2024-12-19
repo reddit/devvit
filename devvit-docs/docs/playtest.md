@@ -1,6 +1,6 @@
 # Playtest
 
-Playtest lets your test your app while it's still in development. Playtest installs your app to a test subreddit and uploads a new version whenever you save changes to your app code. You can see your app changes and logs in real time using real data.
+Playtest lets you test your app while it's still in development. Playtest installs your app to a test subreddit and uploads a new version whenever you save changes to your app code. You can see your app changes and logs in real time using real data.
 
 One caveat: your test subreddit cannot have more than 50 subscribers. Once installed, your playtest app will be visible to other users on the subreddit.
 
