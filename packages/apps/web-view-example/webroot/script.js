@@ -7,6 +7,10 @@ class App {
     const counterLabel = document.querySelector('#counter');
     var counter = 0;
 
+    window.onload = function () {
+      window.parent?.postMessage({ type: 'webViewReady' }, '*');
+    };
+
     // When the Devvit app sends a message with `context.ui.webView.postMessage`, this will be triggered
     window.addEventListener('message', (ev) => {
       const { type, data } = ev.data;

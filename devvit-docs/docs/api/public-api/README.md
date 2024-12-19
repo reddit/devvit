@@ -145,6 +145,9 @@
 - [UseStateHook](README.md#usestatehook)
 - [UseStateInitializer](README.md#usestateinitializer)
 - [UseStateResult](README.md#usestateresult)
+- [UseWebViewOnMessage](README.md#usewebviewonmessage)
+- [UseWebViewOptions](README.md#usewebviewoptions)
+- [UseWebViewResult](README.md#usewebviewresult)
 - [ValidatedBooleanField](README.md#validatedbooleanfield)
 - [ValidatedFormField](README.md#validatedformfield)
 - [ValidatedNumberField](README.md#validatednumberfield)
@@ -167,6 +170,7 @@
 - [useForm](README.md#useform)
 - [useInterval](README.md#useinterval)
 - [useState](README.md#usestate)
+- [useWebView](README.md#usewebview)
 
 ## Type Aliases
 
@@ -1974,6 +1978,66 @@ A tuple containing the current state and a function to update it
 
 ---
 
+### <a id="usewebviewonmessage" name="usewebviewonmessage"></a> UseWebViewOnMessage
+
+Ƭ **UseWebViewOnMessage**\<`T`\>: (`message`: `T`, `hook`: [`UseWebViewResult`](README.md#usewebviewresult)) => `void` \| `Promise`\<`void`\>
+
+#### Type parameters
+
+| Name | Type                                                                            |
+| :--- | :------------------------------------------------------------------------------ |
+| `T`  | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
+
+#### Type declaration
+
+▸ (`message`, `hook`): `void` \| `Promise`\<`void`\>
+
+##### Parameters
+
+| Name      | Type                                             |
+| :-------- | :----------------------------------------------- |
+| `message` | `T`                                              |
+| `hook`    | [`UseWebViewResult`](README.md#usewebviewresult) |
+
+##### Returns
+
+`void` \| `Promise`\<`void`\>
+
+---
+
+### <a id="usewebviewoptions" name="usewebviewoptions"></a> UseWebViewOptions
+
+Ƭ **UseWebViewOptions**\<`T`\>: `Object`
+
+#### Type parameters
+
+| Name | Type                                                                            |
+| :--- | :------------------------------------------------------------------------------ |
+| `T`  | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
+
+#### Type declaration
+
+| Name         | Type                                                                                        | Description                                                                                                                                                                                                                           |
+| :----------- | :------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `onMessage`  | [`UseWebViewOnMessage`](README.md#usewebviewonmessage)\<`T`\>                               | Handle UI events originating from the web view to be handled by a Devvit app                                                                                                                                                          |
+| `onUnmount?` | (`hook`: [`UseWebViewResult`](README.md#usewebviewresult)) => `void` \| `Promise`\<`void`\> | The callback to run when the web view has been unmounted. Might be used to set state, stop or resume timers, or perform other tasks now that the web view is no longer visible. **`Deprecated`** use the page visibility API for now. |
+| `url?`       | `string`                                                                                    | Relative HTML asset filename like `foo/bar.html`. Defaults to index.html if omitted.                                                                                                                                                  |
+
+---
+
+### <a id="usewebviewresult" name="usewebviewresult"></a> UseWebViewResult
+
+Ƭ **UseWebViewResult**: `Object`
+
+#### Type declaration
+
+| Name          | Type                            |
+| :------------ | :------------------------------ |
+| `mount`       | () => `void`                    |
+| `postMessage` | \<T\>(`message`: `T`) => `void` |
+
+---
+
 ### <a id="validatedbooleanfield" name="validatedbooleanfield"></a> ValidatedBooleanField
 
 Ƭ **ValidatedBooleanField**: `Prettify`\<[`ValidatedFormField`](README.md#validatedformfield)\<[`BooleanField`](README.md#booleanfield), `boolean`\>\>
@@ -2247,3 +2311,27 @@ UseAsyncResult<S>
 #### Returns
 
 [`UseStateResult`](README.md#usestateresult)\<`S`\>
+
+---
+
+### <a id="usewebview" name="usewebview"></a> useWebView
+
+▸ **useWebView**\<`T`\>(`options`): [`UseWebViewResult`](README.md#usewebviewresult)
+
+Use this hook to handle a web view's visibility state and any messages sent to your app.
+
+#### Type parameters
+
+| Name | Type                                                                            |
+| :--- | :------------------------------------------------------------------------------ |
+| `T`  | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
+
+#### Parameters
+
+| Name      | Type                                                      |
+| :-------- | :-------------------------------------------------------- |
+| `options` | [`UseWebViewOptions`](README.md#usewebviewoptions)\<`T`\> |
+
+#### Returns
+
+[`UseWebViewResult`](README.md#usewebviewresult)

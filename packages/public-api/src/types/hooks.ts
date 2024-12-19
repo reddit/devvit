@@ -34,6 +34,7 @@ export const Hook = Object.freeze({
   FORM: 1, // useForm hook
   STATE: 2, // useState hook
   CHANNEL: 3, // useChannel hook
+  WEB_VIEW: 4, // useWebView hook
 });
 
 /** @internal */
@@ -137,4 +138,28 @@ export type UseChannelResult<Message extends JSONValue = JSONValue> = {
   send(msg: Message): Promise<void>;
   /** Current subscription status */
   status: ChannelStatus;
+};
+
+export type UseWebViewOnMessage<T extends JSONValue = JSONValue> = (
+  message: T,
+  hook: UseWebViewResult
+) => void | Promise<void>;
+export type UseWebViewOptions<T extends JSONValue = JSONValue> = {
+  /** Relative HTML asset filename like `foo/bar.html`. Defaults to index.html if omitted. */
+  url?: string;
+  /** Handle UI events originating from the web view to be handled by a Devvit app */
+  onMessage: UseWebViewOnMessage<T>;
+  /**
+   * The callback to run when the web view has been unmounted. Might be used to
+   * set state, stop or resume timers, or perform other tasks now that the web view is no longer visible.
+   * @deprecated use the page visibility API for now.
+   */
+  onUnmount?: (hook: UseWebViewResult) => void | Promise<void>;
+};
+
+export type UseWebViewResult = {
+  /** Send a message to the web view */
+  postMessage<T extends JSONValue = JSONValue>(message: T): void;
+  /** Initiate a request for the web view to open */
+  mount(): void;
 };

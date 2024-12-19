@@ -1,9 +1,18 @@
 import './createPost.js';
 
-import { Devvit, useState } from '@devvit/public-api';
+import {
+  Devvit,
+  useState,
+  useWebView,
+  UseWebViewOnMessage,
+  UseWebViewResult,
+} from '@devvit/public-api';
 
 // Defines the messages that are exchanged between Devvit and Web View
 type WebViewMessage =
+  | {
+      type: 'webViewReady';
+    }
   | {
       type: 'initialData';
       data: { username: string; currentCounter: number };
@@ -39,51 +48,52 @@ Devvit.addCustomPostType({
       return Number(redisCount ?? 0);
     });
 
-    // Create a reactive state for web view visibility
-    const [webviewVisible, setWebviewVisible] = useState(false);
-
-    // When the web view invokes `window.parent.postMessage` this function is called
-    const onMessage = async (msg: WebViewMessage) => {
-      switch (msg.type) {
-        case 'setCounter':
-          await context.redis.set(`counter_${context.postId}`, msg.data.newCounter.toString());
-          context.ui.webView.postMessage('myWebView', {
-            type: 'updateCounter',
+    const onMessage: UseWebViewOnMessage<WebViewMessage> = async (
+      message: WebViewMessage,
+      webView: UseWebViewResult
+    ) => {
+      switch (message.type) {
+        case 'webViewReady':
+          webView.postMessage<WebViewMessage>({
+            type: 'initialData',
             data: {
-              currentCounter: msg.data.newCounter,
+              username: username,
+              currentCounter: counter,
             },
           });
-          setCounter(msg.data.newCounter);
+          break;
+        case 'setCounter':
+          await context.redis.set(`counter_${context.postId}`, message.data.newCounter.toString());
+          setCounter(message.data.newCounter);
+
+          webView.postMessage<WebViewMessage>({
+            type: 'updateCounter',
+            data: {
+              currentCounter: message.data.newCounter,
+            },
+          });
           break;
         case 'initialData':
         case 'updateCounter':
           break;
 
         default:
-          throw new Error(`Unknown message type: ${msg satisfies never}`);
+          throw new Error(`Unknown message type: ${message satisfies never}`);
       }
     };
 
-    // When the button is clicked, send initial data to web view and show it
-    const onShowWebviewClick = () => {
-      setWebviewVisible(true);
-      context.ui.webView.postMessage('myWebView', {
-        type: 'initialData',
-        data: {
-          username: username,
-          currentCounter: counter,
-        },
-      });
-    };
+    const { mount } = useWebView<WebViewMessage>({
+      url: 'page.html',
+      onMessage,
+      onUnmount: () => {
+        context.ui.showToast('Web view closed!');
+      },
+    });
 
     // Render the custom post type
     return (
       <vstack grow padding="small">
-        <vstack
-          grow={!webviewVisible}
-          height={webviewVisible ? '0%' : '100%'}
-          alignment="middle center"
-        >
+        <vstack grow alignment="middle center">
           <text size="xlarge" weight="bold">
             Example App
           </text>
@@ -105,18 +115,7 @@ Devvit.addCustomPostType({
             </hstack>
           </vstack>
           <spacer />
-          <button onPress={onShowWebviewClick}>Launch App</button>
-        </vstack>
-        <vstack grow={webviewVisible} height={webviewVisible ? '100%' : '0%'}>
-          <vstack border="thick" borderColor="black" height={webviewVisible ? '100%' : '0%'}>
-            <webview
-              id="myWebView"
-              url="page.html"
-              onMessage={(msg) => onMessage(msg as WebViewMessage)}
-              grow
-              height={webviewVisible ? '100%' : '0%'}
-            />
-          </vstack>
+          <button onPress={mount}>Launch App</button>
         </vstack>
       </vstack>
     );
