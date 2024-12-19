@@ -4,7 +4,7 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
-## Devvit 0.11.5: @devvit/security and some smaller updates
+## Devvit 0.11.5: A security fix and some smaller updates
 
 **Release Date: Dec 17, 2024**
 
@@ -15,6 +15,10 @@ npm install -g devvit@latest // or package manager of choice
 devvit update app
 npm install
 ```
+
+:::note
+You may notice additional logs about CSRF tokens. These will be removed in the next version of the public API.
+:::
 
 **New features**
 
