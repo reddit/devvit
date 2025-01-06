@@ -66,6 +66,7 @@ async (event, context) => {
 - [getCommentsByUser](RedditAPIClient.RedditAPIClient.md#getcommentsbyuser)
 - [getControversialPosts](RedditAPIClient.RedditAPIClient.md#getcontroversialposts)
 - [getCurrentSubreddit](RedditAPIClient.RedditAPIClient.md#getcurrentsubreddit)
+- [getCurrentSubredditName](RedditAPIClient.RedditAPIClient.md#getcurrentsubredditname)
 - [getCurrentUser](RedditAPIClient.RedditAPIClient.md#getcurrentuser)
 - [getCurrentUsername](RedditAPIClient.RedditAPIClient.md#getcurrentusername)
 - [getEdited](RedditAPIClient.RedditAPIClient.md#getedited)
@@ -772,6 +773,26 @@ const currentSubreddit = await reddit.getCurrentSubreddit();
 
 ---
 
+### <a id="getcurrentsubredditname" name="getcurrentsubredditname"></a> getCurrentSubredditName
+
+▸ **getCurrentSubredditName**(): `Promise`\<`string`\>
+
+Retrieves the name of the current subreddit.
+
+#### Returns
+
+`Promise`\<`string`\>
+
+A Promise that resolves a string representing the current subreddit's name.
+
+**`Example`**
+
+```ts
+const currentSubredditName = await reddit.getCurrentSubredditName();
+```
+
+---
+
 ### <a id="getcurrentuser" name="getcurrentuser"></a> getCurrentUser
 
 ▸ **getCurrentUser**(): `Promise`\<`undefined` \| [`User`](models.User.md)\>
@@ -1314,7 +1335,7 @@ console.log('Posts: ', await listing.all());
 
 ### <a id="getsubredditbyid" name="getsubredditbyid"></a> getSubredditById
 
-▸ **getSubredditById**(`id`): `Promise`\<[`Subreddit`](models.Subreddit.md)\>
+▸ **getSubredditById**(`id`): `Promise`\<`undefined` \| [`Subreddit`](models.Subreddit.md)\>
 
 Gets a [Subreddit](models.Subreddit.md) object by ID
 
@@ -1326,7 +1347,7 @@ Gets a [Subreddit](models.Subreddit.md) object by ID
 
 #### Returns
 
-`Promise`\<[`Subreddit`](models.Subreddit.md)\>
+`Promise`\<`undefined` \| [`Subreddit`](models.Subreddit.md)\>
 
 A Promise that resolves a Subreddit object.
 

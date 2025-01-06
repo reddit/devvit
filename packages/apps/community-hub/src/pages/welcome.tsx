@@ -80,7 +80,7 @@ const Step2 = ({
     async (data) => {
       const { reddit } = context;
 
-      const subname = await (await reddit.getSubredditById(context.subredditId!)).name;
+      const subname = await reddit.getCurrentSubredditName();
 
       const submittedUserName = data.newOwner as string;
 

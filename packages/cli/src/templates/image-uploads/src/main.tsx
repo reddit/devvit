@@ -34,7 +34,7 @@ Devvit.addMenuItem({
 Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Post with GIF',
-  onPress: async (event, context) => {
+  onPress: async (_, context) => {
     try {
       context.ui.showToast("Submitting your post - upon completion you'll navigate there.");
 
@@ -44,12 +44,12 @@ Devvit.addMenuItem({
         type: 'gif',
       });
 
-      // Get Subreddit
-      const subreddit = await context.reddit.getSubredditById(event.targetId);
+      // Get Subreddit name
+      const subName = await context.reddit.getCurrentSubredditName();
 
       // Create a post with media
       const post = await context.reddit.submitPost({
-        subredditName: subreddit.name,
+        subredditName: subName,
         title: 'Hello World with Media',
         richtext: new RichTextBuilder().image({ mediaId: response.mediaId }),
       });
@@ -67,7 +67,7 @@ Devvit.addMenuItem({
   onPress: async (event, context) => {
     console.log(`Invoked action on subreddit ${event.targetId}`);
     try {
-      const subreddit = await context.reddit.getSubredditById(event.targetId);
+      const subName = await context.reddit.getCurrentSubredditName();
       const response = await context.media.upload({
         url: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Boulevard_du_Temple_by_Daguerre.jpg',
         type: 'image',
@@ -76,7 +76,7 @@ Devvit.addMenuItem({
       // In the future, we will support video and videogif types
       // Similar to https://www.reddit.com/dev/api/#POST_api_submit
       await context.reddit.submitPost({
-        subredditName: subreddit.name,
+        subredditName: subName,
         title: 'Hello World with Media',
         kind: 'image',
         url: response.mediaUrl,

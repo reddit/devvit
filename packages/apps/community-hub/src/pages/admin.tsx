@@ -62,7 +62,7 @@ export const AdminPage = ({
 
       const newOwners = new Set([...pinPost.owners]);
 
-      const subname = await (await reddit.getSubredditById(context.subredditId!)).name;
+      const subname = await reddit.getCurrentSubredditName();
       if (addData) {
         const add = standardizeUsername(addData);
         if (newOwners.has(add)) {

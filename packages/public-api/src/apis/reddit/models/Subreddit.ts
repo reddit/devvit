@@ -1291,20 +1291,24 @@ export class Subreddit {
   }
 
   /** @internal */
-  static async getFromMetadata(metadata: Metadata | undefined): Promise<Subreddit> {
+  static async getFromMetadata(metadata: Metadata | undefined): Promise<Subreddit | undefined> {
     assertNonNull(metadata);
+    const subredditName = metadata?.[Header.SubredditName]?.values[0];
+    if (subredditName) {
+      return Subreddit.getByName(subredditName, metadata);
+    }
+
     const subredditId = metadata?.[Header.Subreddit]?.values[0];
     assertNonNull<string | undefined>(subredditId);
     return Subreddit.getById(asT5ID(subredditId), metadata);
   }
 
   /** @internal */
-  static async getById(id: T5ID, metadata: Metadata | undefined): Promise<Subreddit> {
-    const client = Devvit.redditAPIPlugins.LinksAndComments;
-
-    const response = await client.Info({ thingIds: [id], subreddits: [] }, metadata);
-    const subredditName = response.data?.children[0]?.data?.displayName;
-    assertNonNull(subredditName);
+  static async getById(id: T5ID, metadata: Metadata | undefined): Promise<Subreddit | undefined> {
+    const subredditName = await getSubredditNameById(id, metadata);
+    if (!subredditName) {
+      return;
+    }
 
     return Subreddit.getByName(subredditName, metadata);
   }
@@ -1503,4 +1507,15 @@ function parseListing(
       return null;
     }
   }
+}
+
+/** @internal */
+export async function getSubredditNameById(
+  id: T5ID,
+  metadata: Metadata | undefined
+): Promise<string | undefined> {
+  const client = Devvit.redditAPIPlugins.LinksAndComments;
+
+  const response = await client.Info({ thingIds: [id], subreddits: [] }, metadata);
+  return response.data?.children[0]?.data?.displayName;
 }

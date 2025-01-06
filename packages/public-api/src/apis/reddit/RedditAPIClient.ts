@@ -1,7 +1,7 @@
 import type { JsonStatus, Metadata } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT3ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
+import { asT3ID, asT5ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
 import type {
@@ -58,6 +58,7 @@ import {
   getSubredditInfoById,
   getSubredditInfoByName,
   getSubredditLeaderboard,
+  getSubredditNameById,
   getSubredditStyles,
   getVaultByAddress,
   getVaultByUserId,
@@ -153,7 +154,7 @@ export class RedditAPIClient {
    * const memes = await reddit.getSubredditById('t5_2qjpg');
    * ```
    */
-  getSubredditById(id: string): Promise<Subreddit> {
+  getSubredditById(id: string): Promise<Subreddit | undefined> {
     return Subreddit.getById(asTID<T5ID>(id), this.#metadata);
   }
 
@@ -253,6 +254,29 @@ export class RedditAPIClient {
   }
 
   /**
+   * Retrieves the name of the current subreddit.
+   *
+   * @returns {Promise<string>} A Promise that resolves a string representing the current subreddit's name.
+   * @example
+   * ```ts
+   * const currentSubredditName = await reddit.getCurrentSubredditName();
+   * ```
+   */
+  async getCurrentSubredditName(): Promise<string> {
+    const nameFromMetadata = this.#metadata?.[Header.SubredditName]?.values[0];
+    if (nameFromMetadata) {
+      return nameFromMetadata;
+    }
+
+    const subredditId = this.#metadata?.[Header.Subreddit]?.values[0];
+    const nameFromId = await getSubredditNameById(asT5ID(subredditId), this.#metadata);
+    if (!nameFromId) {
+      throw new Error("Couldn't get current subreddit's name");
+    }
+    return nameFromId;
+  }
+
+  /**
    * Retrieves the current subreddit.
    *
    * @returns {Promise<Subreddit>} A Promise that resolves a Subreddit object.
@@ -261,8 +285,12 @@ export class RedditAPIClient {
    * const currentSubreddit = await reddit.getCurrentSubreddit();
    * ```
    */
-  getCurrentSubreddit(): Promise<Subreddit> {
-    return Subreddit.getFromMetadata(this.#metadata);
+  async getCurrentSubreddit(): Promise<Subreddit> {
+    const currentSubreddit = await Subreddit.getFromMetadata(this.#metadata);
+    if (!currentSubreddit) {
+      throw new Error("Couldn't get current subreddit");
+    }
+    return currentSubreddit;
   }
 
   /**
