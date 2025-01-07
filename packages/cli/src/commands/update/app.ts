@@ -3,7 +3,10 @@ import fsp, { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
-import { isDevvitDependency } from '@devvit/shared-types/isDevvitDependency.js';
+import {
+  isDependencyManagedByDevvit,
+  isDevvitDependency,
+} from '@devvit/shared-types/isDevvitDependency.js';
 import { ux } from '@oclif/core';
 import type { Tree } from '@oclif/core/lib/cli-ux/styled/tree.js';
 import chalk from 'chalk';
@@ -189,7 +192,7 @@ export async function matchDevvitPackageVersions(
 
   console.log(
     chalk.bold(
-      `Found devvit dependencies that need to be synced to the local devvit version (${devvitVersion.version}): `
+      `Found dependencies that need to be synced to the local devvit version (${devvitVersion.version}): `
     )
   );
   tree.display();
@@ -277,13 +280,17 @@ function overwriteDependencies(
   forceUpdate: boolean,
   dependencies: { [packageName: string]: string }
 ): void {
-  const devvitDependencies = Object.entries(dependencies).filter(([depName]) =>
-    isDevvitDependency(depName)
+  const dependenciesWeManage = Object.entries(dependencies).filter(([depName]) =>
+    isDependencyManagedByDevvit(depName)
   );
 
-  for (const [depName, version] of devvitDependencies) {
-    if (forceUpdate || needsSync(version, devvitVersion)) {
-      dependencies![depName] = devvitVersion.version;
+  for (const [depName, version] of dependenciesWeManage) {
+    const newSemVer = getTargetSemVer(devvitVersion, depName);
+
+    if (isDevvitDependency(depName) || forceUpdate || needsSync(version, newSemVer)) {
+      // If this is an @devvit dependency, or we're forcing an update, or the version needs to be
+      // updated, update the version.
+      dependencies![depName] = newSemVer.version;
     }
   }
 }
@@ -317,23 +324,46 @@ function makeDepsSubtree(
 ): Tree {
   const tree = ux.tree();
   for (const [dep, v] of Object.entries(dependencies)) {
-    if (isDevvitDependency(dep)) {
-      if (v === devvitVersion.version) {
-        return tree;
+    if (isDependencyManagedByDevvit(dep)) {
+      // For most dependencies, we want to target the version of devvit that the CLI is using
+      const targetSemVer = getTargetSemVer(devvitVersion, dep);
+
+      if (v === targetSemVer.version) {
+        continue;
       }
 
-      if (forceUpdate || needsSync(v, devvitVersion)) {
+      if (forceUpdate || needsSync(v, targetSemVer)) {
         const vAsSemver = semver.parse(v);
 
         if (!vAsSemver) {
           // version was a range that's not parsable
-          tree.insert(`${dep} (${chalk.gray(v)}) -> (${chalk.green(devvitVersion)})`);
+          tree.insert(`${dep} (${chalk.gray(v)}) -> (${chalk.green(targetSemVer)})`);
         } else {
-          const warnColor = semver.gt(vAsSemver, devvitVersion) ? chalk.red : chalk.yellow;
-          tree.insert(`${dep} (${warnColor(vAsSemver)}) -> (${chalk.green(devvitVersion)})`);
+          const warnColor = semver.gt(vAsSemver, targetSemVer) ? chalk.red : chalk.yellow;
+          tree.insert(`${dep} (${warnColor(vAsSemver)}) -> (${chalk.green(targetSemVer)})`);
         }
       }
     }
   }
   return tree;
+}
+
+function getTargetSemVer(devvitVersion: SemVer, dep: string): SemVer {
+  // For `@devvit` dependencies, we want to target the version of devvit that the CLI is using
+  if (isDevvitDependency(dep)) {
+    return devvitVersion;
+  }
+
+  // But this is a managed dependency that isn't a devvit one - target the version that the CLI is using
+  const parsedSemVer = semver.parse(
+    cliPackageJSON.dependencies[dep] ?? cliPackageJSON.devDependencies[dep]
+  );
+  if (!parsedSemVer) {
+    throw new Error(
+      "Couldn't find the CLI's dependency for " +
+        dep +
+        " in `@devvit/cli`'s package.json - this should never happen, tell a Reddit dev!"
+    );
+  }
+  return parsedSemVer;
 }
