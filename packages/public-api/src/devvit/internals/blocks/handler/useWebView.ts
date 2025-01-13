@@ -1,5 +1,5 @@
 import { EffectType, type UIEvent } from '@devvit/protos';
-import { WebViewVisibility } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
+import { WebViewVisibility } from '@devvit/protos';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 
 import type {
