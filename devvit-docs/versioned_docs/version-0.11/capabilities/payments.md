@@ -86,6 +86,15 @@ Product prices are predefined and must be one of the following gold values:
 - 1000 gold ($20)
 - 2500 gold ($50)
 
+## Design your purchase experience
+
+You’ll need to clearly identify paid products or services. Here are some best practices to follow:
+
+- Use a short name, description, and image for each product.
+- Don’t overwhelm users with too many items.
+- Try to keep purchases in a consistent location or use a consistent visual pattern.
+- Only use the gold icon to indicate purchases for Reddit gold.
+
 ### Add an image
 
 Product images need to meet the following requirements:
@@ -120,7 +129,23 @@ If you don’t provide an image, the default Reddit product image is used.
 }
 ```
 
-### Complete the payment flow
+### Add purchase buttons (required)
+
+Use Reddit’s primary, secondary, or bordered button component and gold icon in one of the following formats:
+
+![default image](../assets/payments_button_purchase.png)
+
+### Add your product component
+
+Use a consistent and clear product component to display paid goods or services to your users. Product components can be customized to fit your app, like the examples below.
+
+![default image](../assets/payments_component_button.png)
+
+![default image](../assets/payments_component_list.png)
+
+![default image](../assets/payments_component_tile.png)
+
+## Complete the payment flow
 
 Use `addPaymentHandler` to specify the function that is called during the order flow. This customizes how your app fulfills product orders and provides the ability for you to reject an order.
 
