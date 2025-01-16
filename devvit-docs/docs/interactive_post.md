@@ -7,7 +7,7 @@
 devvit new <my-project>
 ```
 
-3. Select the `blocks-post` template. (if you're familar with webviews, you can use `webview-post`)
+3. Select the `blocks-post` template. (if you're familiar with webviews, you can use `webview-post`)
 4. Navigate to your project directory.
 
 ```tsx
