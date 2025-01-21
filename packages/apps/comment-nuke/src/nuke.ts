@@ -50,7 +50,7 @@ async function removeComment(context: Devvit.Context, user: any, targetId: strin
 }
 
 export async function handleNukePost(props: NukePostProps, context: Devvit.Context) {
-  const startTime = new Date();
+  const startTime = Date.now();
   let success = true;
   let message: string;
 
@@ -107,8 +107,9 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
 
     success = true;
     message = `Comments ${verbage}! Refresh the page to see the cleanup.`;
-    const finishTime = new Date();
-    console.info(`Operation completed in ${(finishTime.getTime() - startTime.getTime()) / 1000} seconds.`);
+    const finishTime = Date.now();
+    const timeElapsed = (finishTime - startTime) / 1000;
+    console.info(`Operation completed in ${timeElapsed} seconds.`);
   } catch (err: any) {
     success = false;
     message = 'Mop failed! Please try again later.';
@@ -119,7 +120,7 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
 }
 
 export async function handleNuke(props: NukeProps, context: Devvit.Context) {
-  const startTime = new Date();
+  const startTime = Date.now();
   let success = true;
   let message: string;
 
@@ -174,8 +175,9 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
 
     success = true;
     message = `Comments ${verbage}! Refresh the page to see the cleanup.`;
-    const finishTime = new Date();
-    console.info(`Operation completed in ${(finishTime.getTime() - startTime.getTime()) / 1000} seconds.`);
+    const finishTime = Date.now();
+    const timeElapsed = (finishTime - startTime) / 1000;
+    console.info(`Operation completed in ${timeElapsed} seconds.`);
   } catch (err: any) {
     success = false;
     message = 'Mop failed! Please try again later.';
