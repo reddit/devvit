@@ -72,23 +72,18 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
       };
     }
 
-    const lockPromises: Promise<void>[] = [];
-    const removePromises: Promise<void>[] = [];
-
+    const comments: Comment[] = [];
     for await (const eachComment of getAllCommentsInPost(post, skipDistinguished)) {
-      if (shouldLock && !eachComment.locked) {
-        lockPromises.push(eachComment.lock());
-      }
-
-      if (shouldRemove && !eachComment.removed) {
-        removePromises.push(eachComment.remove());
-      }
+      comments.push(eachComment);
     }
 
-    await Promise.all([...removePromises, ...lockPromises]).catch((err) => {
-      console.error('Failed to remove or lock a comment.');
-      console.error(err);
-    });
+    if (shouldLock) {
+      await Promise.all(comments.map(comment => comment.locked || comment.lock()));
+    }
+
+    if (shouldRemove) {
+      await Promise.all(comments.map(comment => comment.removed || comment.remove()));
+    }
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
@@ -155,23 +150,18 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
       };
     }
 
-    const lockPromises: Promise<void>[] = [];
-    const removePromises: Promise<void>[] = [];
-
+    const comments: Comment[] = [];
     for await (const eachComment of getAllCommentsInThread(comment, skipDistinguished)) {
-      if (shouldLock && !eachComment.locked) {
-        lockPromises.push(eachComment.lock());
-      }
-
-      if (shouldRemove && !eachComment.removed) {
-        removePromises.push(eachComment.remove());
-      }
+      comments.push(eachComment);
     }
 
-    await Promise.all([...removePromises, ...lockPromises]).catch((err) => {
-      console.error('Failed to remove or lock a comment.');
-      console.error(err);
-    });
+    if (shouldLock) {
+      await Promise.all(comments.map(comment => comment.locked || comment.lock()));
+    }
+
+    if (shouldRemove) {
+      await Promise.all(comments.map(comment => comment.removed || comment.remove()));
+    }
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
