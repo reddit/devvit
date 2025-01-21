@@ -41,10 +41,6 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
   const shouldRemove = props.remove;
   const skipDistinguished = props.skipDistinguished;
 
-  if (!shouldLock && !shouldRemove) {
-    return { message: 'You must select either lock or remove.', success: false };
-  }
-
   try {
     const post = await context.reddit.getPostById(props.postId);
     const user = await context.reddit.getCurrentUser();
@@ -64,7 +60,6 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
         success: false,
       };
     }
-    
 
     const lockPromises: Promise<any>[] = [];
     const removePromises: Promise<any>[] = [];
@@ -131,10 +126,6 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
   const shouldLock = props.lock;
   const shouldRemove = props.remove;
   const skipDistinguished = props.skipDistinguished;
-
-  if (!shouldLock && !shouldRemove) {
-    return { message: 'You must select either lock or remove.', success: false };
-  }
 
   try {
     const comment = await context.reddit.getCommentById(props.commentId);
