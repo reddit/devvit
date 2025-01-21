@@ -67,8 +67,8 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
       };
     }
 
-    const lockPromises: Promise<any>[] = [];
-    const removePromises: Promise<any>[] = [];
+    const lockPromises: Promise<void>[] = [];
+    const removePromises: Promise<void>[] = [];
 
     for await (const eachComment of getAllCommentsInPost(post, skipDistinguished)) {
       if (shouldLock && !eachComment.locked) {
@@ -80,14 +80,10 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
       }
     }
 
-    const responses = await Promise.all([...removePromises, ...lockPromises]);
-
-    for (const r of responses) {
-      if (r && r.status === 'rejected') {
-        console.error('Failed to remove or lock a comment.');
-        console.info(r.reason);
-      }
-    }
+    await Promise.all([...removePromises, ...lockPromises]).catch((error) => {
+      console.error('Failed to remove or lock a comment.');
+      console.info(error.message);
+    });
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
@@ -149,8 +145,8 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
       };
     }
 
-    const lockPromises: Promise<any>[] = [];
-    const removePromises: Promise<any>[] = [];
+    const lockPromises: Promise<void>[] = [];
+    const removePromises: Promise<void>[] = [];
 
     for await (const eachComment of getAllCommentsInThread(comment, skipDistinguished)) {
       if (shouldLock && !eachComment.locked) {
@@ -162,14 +158,10 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
       }
     }
 
-    const responses = await Promise.all([...removePromises, ...lockPromises]);
-
-    for (const r of responses) {
-      if (r && r.status === 'rejected') {
-        console.error('Failed to remove or lock a comment.');
-        console.info(r.reason);
-      }
-    }
+    await Promise.all([...removePromises, ...lockPromises]).catch((error) => {
+      console.error('Failed to remove or lock a comment.');
+      console.info(error.message);
+    });
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
@@ -198,4 +190,4 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
   }
 
   return { success, message };
-} 
+}
