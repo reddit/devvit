@@ -42,8 +42,10 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
   const skipDistinguished = props.skipDistinguished;
 
   try {
-    const post = await context.reddit.getPostById(props.postId);
-    const user = await context.reddit.getCurrentUser();
+    const [user, post] = await Promise.all([
+      context.reddit.getCurrentUser(),
+      context.reddit.getPostById(props.postId)
+    ]);
     const modPermissions = await user.getModPermissionsForSubreddit(post.subredditName);
     const canManagePosts = modPermissions.includes('all') || modPermissions.includes('posts');
 
