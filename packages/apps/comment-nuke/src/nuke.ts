@@ -85,12 +85,10 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
       }
     }
 
-    try {
-      await Promise.all([...removePromises, ...lockPromises]);
-    } catch (err) {
+    await Promise.all([...removePromises, ...lockPromises]).catch((err) => {
       console.error('Failed to remove or lock a comment.');
-      console.info(err);
-    }
+      console.error(err);
+    });
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
@@ -170,14 +168,10 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
       }
     }
 
-    const responses = await Promise.allSettled([...removePromises, ...lockPromises]);
-
-    for (const r of responses) {
-      if (r.status === 'rejected') {
-        console.error('Failed to remove or lock a comment.');
-        console.info(r.reason);
-      }
-    }
+    await Promise.all([...removePromises, ...lockPromises]).catch((err) => {
+      console.error('Failed to remove or lock a comment.');
+      console.error(err);
+    });
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
