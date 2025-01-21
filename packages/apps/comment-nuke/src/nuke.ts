@@ -36,6 +36,19 @@ async function* getAllCommentsInPost(post: Post, skipDistinguished: boolean): As
   }
 }
 
+async function removeComment(context: Devvit.Context, user: any, targetId: string, verbage: string) {
+  try {
+    await context.modLog.add({
+      action: 'removecomment',
+      target: targetId,
+      details: 'comment-mop app',
+      description: `u/${user.username} used comment-mop to ${verbage} this comment and all child comments.`,
+    });
+  } catch (e: any) {
+    console.error(`Failed to add modlog for comment: ${targetId}.`, e.message);
+  }
+}
+
 export async function handleNukePost(props: NukePostProps, context: Devvit.Context) {
   const startTime = new Date();
   let success = true;
@@ -89,16 +102,7 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
 
     if (shouldRemove) {
-      /* try {
-        await context.modLog.add({
-          action: 'removecomment',
-          target: props.postId,
-          details: 'comment-mop app',
-          description: `u/${user.username} used comment-mop to ${verbage} all comments of this post.`,
-        });
-      } catch (e: any) {
-        console.error(`Failed to add modlog for post: ${props.postId}.`, e.message);
-      } */
+      await removeComment(context, user, props.postId, verbage);
     }
 
     success = true;
@@ -165,16 +169,7 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
 
     if (shouldRemove) {
-      /* try {
-        await context.modLog.add({
-          action: 'removecomment',
-          target: props.commentId,
-          details: 'comment-mop app',
-          description: `u/${user.username} used comment-mop to ${verbage} this comment and all child comments.`,
-        });
-      } catch (e: any) {
-        console.error(`Failed to add modlog for comment: ${props.commentId}.`, e.message);
-      } */
+      await removeComment(context, user, props.commentId, verbage);
     }
 
     success = true;
