@@ -44,8 +44,8 @@ async function removeComment(context: Devvit.Context, user: any, targetId: strin
       details: 'comment-mop app',
       description: `u/${user.username} used comment-mop to ${verbage} this comment and all child comments.`,
     });
-  } catch (e: any) {
-    console.error(`Failed to add modlog for comment: ${targetId}.`, e.message);
+  } catch (e: unknown) {
+    console.error(`Failed to add modlog for comment: ${targetId}.`, (e as Error).message);
   }
 }
 
@@ -109,8 +109,8 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
     message = `Comments ${verbage}! Refresh the page to see the cleanup.`;
     const finishTime = Date.now();
     const timeElapsed = (finishTime - startTime) / 1000;
-    console.info(`Operation completed in ${timeElapsed} seconds.`);
-  } catch (err: any) {
+    console.info(`${comments.length} comment(s) handled in ${timeElapsed} seconds.`);
+  } catch (err: unknown) {
     success = false;
     message = 'Mop failed! Please try again later.';
     console.error(err);
@@ -177,8 +177,8 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
     message = `Comments ${verbage}! Refresh the page to see the cleanup.`;
     const finishTime = Date.now();
     const timeElapsed = (finishTime - startTime) / 1000;
-    console.info(`Operation completed in ${timeElapsed} seconds.`);
-  } catch (err: any) {
+    console.info(`${comments.length} comment(s) handled in ${timeElapsed} seconds.`);
+  } catch (err: unknown) {
     success = false;
     message = 'Mop failed! Please try again later.';
     console.error(err);
