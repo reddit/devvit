@@ -16,19 +16,23 @@ export type NukePostProps = {
   subredditId: string;
 };
 
-async function* getAllCommentsInThread(comment: Comment): AsyncGenerator<Comment> {
+async function* getAllCommentsInThread(comment: Comment, skipDistinguished: boolean): AsyncGenerator<Comment> {
   const replies = await comment.replies.all();
   for (const reply of replies) {
-    yield* getAllCommentsInThread(reply);
-    yield reply;
+    if (!skipDistinguished || !reply.isDistinguished()) {
+      yield* getAllCommentsInThread(reply, skipDistinguished);
+      yield reply;
+    }
   }
 }
 
-async function* getAllCommentsInPost(post: Post): AsyncGenerator<Comment> {
+async function* getAllCommentsInPost(post: Post, skipDistinguished: boolean): AsyncGenerator<Comment> {
   const comments = await post.comments.all();
   for (const comment of comments) {
-    yield* getAllCommentsInThread(comment);
-    yield comment;
+    if (!skipDistinguished || !comment.isDistinguished()) {
+      yield* getAllCommentsInThread(comment, skipDistinguished);
+      yield comment;
+    }
   }
 }
 
@@ -66,11 +70,7 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
     const lockPromises: Promise<any>[] = [];
     const removePromises: Promise<any>[] = [];
 
-    for await (const eachComment of getAllCommentsInPost(post)) {
-      if (skipDistinguished && eachComment.isDistinguished()) {
-        continue;
-      }
-
+    for await (const eachComment of getAllCommentsInPost(post, skipDistinguished)) {
       if (shouldLock && !eachComment.locked) {
         lockPromises.push(eachComment.lock());
       }
@@ -152,11 +152,7 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
     const lockPromises: Promise<any>[] = [];
     const removePromises: Promise<any>[] = [];
 
-    for await (const eachComment of getAllCommentsInThread(comment)) {
-      if (skipDistinguished && eachComment.isDistinguished()) {
-        continue;
-      }
-
+    for await (const eachComment of getAllCommentsInThread(comment, skipDistinguished)) {
       if (shouldLock && !eachComment.locked) {
         lockPromises.push(eachComment.lock());
       }
@@ -202,5 +198,4 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
   }
 
   return { success, message };
-}
-
+} 
