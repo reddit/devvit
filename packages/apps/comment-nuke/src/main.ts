@@ -3,7 +3,7 @@ import { handleNuke, handleNukePost } from './nuke.js';
  
 Devvit.configure({
   redditAPI: true,
-  modLog: true,
+  // modLog: true,
 });
  
 const nukeForm = Devvit.createForm(
