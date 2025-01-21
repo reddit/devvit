@@ -50,6 +50,11 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
       context.reddit.getCurrentUser(),
       context.reddit.getPostById(props.postId)
     ]);
+
+    if (!user) {
+      return { success: false, message: "Can't get user" };
+    }
+
     const modPermissions = await user.getModPermissionsForSubreddit(post.subredditName);
     const canManagePosts = modPermissions.includes('all') || modPermissions.includes('posts');
 
@@ -80,10 +85,12 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
       }
     }
 
-    await Promise.all([...removePromises, ...lockPromises]).catch((error) => {
+    try {
+      await Promise.all([...removePromises, ...lockPromises]);
+    } catch (err) {
       console.error('Failed to remove or lock a comment.');
-      console.info(error.message);
-    });
+      console.info(err);
+    }
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
@@ -128,6 +135,11 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
   try {
     const comment = await context.reddit.getCommentById(props.commentId);
     const user = await context.reddit.getCurrentUser();
+
+    if (!user) {
+      return { success: false, message: "Can't get user" };
+    }
+
     const modPermissions = await user.getModPermissionsForSubreddit(comment.subredditName);
     const canManagePosts = modPermissions.includes('all') || modPermissions.includes('posts');
 
@@ -158,10 +170,14 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
       }
     }
 
-    await Promise.all([...removePromises, ...lockPromises]).catch((error) => {
-      console.error('Failed to remove or lock a comment.');
-      console.info(error.message);
-    });
+    const responses = await Promise.allSettled([...removePromises, ...lockPromises]);
+
+    for (const r of responses) {
+      if (r.status === 'rejected') {
+        console.error('Failed to remove or lock a comment.');
+        console.info(r.reason);
+      }
+    }
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
