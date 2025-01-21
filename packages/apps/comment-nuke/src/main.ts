@@ -1,11 +1,11 @@
 import { Devvit } from '@devvit/public-api';
-import { handleNuke, handleNukePost } from './nuke.js'; 
- 
+import { handleNuke, handleNukePost } from './nuke.js';
+
 Devvit.configure({
   redditAPI: true,
   // modLog: true,
 });
- 
+
 const nukeForm = Devvit.createForm(
   () => {
     return {
@@ -34,8 +34,12 @@ const nukeForm = Devvit.createForm(
       cancelLabel: 'Cancel',
     };
   },
- 
   async ({ values }, context) => {
+    if (!values.lock && !values.remove) {
+      context.ui.showToast('You must select either lock or remove.');
+      return;
+    }
+
     if (context.commentId) {
       const result = await handleNuke(
         {
@@ -54,7 +58,7 @@ const nukeForm = Devvit.createForm(
     }
   }
 );
- 
+
 Devvit.addMenuItem({
   label: 'Mop comments',
   description: 'Remove this comment and all child comments. This might take a few seconds to run.',
@@ -64,9 +68,7 @@ Devvit.addMenuItem({
     context.ui.showForm(nukeForm);
   },
 });
- 
-// Another form for nuking all comments of a post
- 
+
 const nukePostForm = Devvit.createForm(
   () => {
     return {
@@ -96,6 +98,11 @@ const nukePostForm = Devvit.createForm(
     };
   },
   async ({ values }, context) => {
+    if (!values.lock && !values.remove) {
+      context.ui.showToast('You must select either lock or remove.');
+      return;
+    }
+
     if (context.postId) {
       const result = await handleNukePost(
         {
@@ -114,7 +121,7 @@ const nukePostForm = Devvit.createForm(
     }
   }
 );
- 
+
 Devvit.addMenuItem({
   label: 'Mop post comments',
   description: 'Remove all comments of this post. This might take a few seconds to run.',
@@ -124,6 +131,5 @@ Devvit.addMenuItem({
     context.ui.showForm(nukePostForm);
   },
 });
- 
- 
+
 export default Devvit;
