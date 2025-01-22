@@ -27,7 +27,7 @@ async function* getAllCommentsInThread(comment: Comment, skipDistinguished: bool
   }
 }
 
-// Depth-first traversal to get all comments in a thread
+// Depth-first traversal to get all comments in a post
 async function* getAllCommentsInPost(post: Post, skipDistinguished: boolean): AsyncGenerator<Comment> {
   const comments = await post.comments.all();
   for (const comment of comments) {
@@ -35,19 +35,6 @@ async function* getAllCommentsInPost(post: Post, skipDistinguished: boolean): As
       yield* getAllCommentsInThread(comment, skipDistinguished);
       yield comment;
     }
-  }
-}
-
-async function removeComment(context: Devvit.Context, user: any, targetId: string, verbage: string) {
-  try {
-    await context.modLog.add({
-      action: 'removecomment',
-      target: targetId,
-      details: 'comment-mop app',
-      description: `u/${user.username} used comment-mop to ${verbage} this comment and all child comments.`,
-    });
-  } catch (e: unknown) {
-    console.error(`Failed to add modlog for comment: ${targetId}.`, (e as Error).message);
   }
 }
 
