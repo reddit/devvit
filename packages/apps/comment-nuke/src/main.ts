@@ -1,4 +1,4 @@
-import { Devvit } from '@devvit/public-api';
+import { Devvit, FormField } from '@devvit/public-api';
 import { handleNuke, handleNukePost } from './nuke.js';
 
 Devvit.configure({
@@ -6,29 +6,31 @@ Devvit.configure({
   modLog: true,
 });
 
+const nukeFields: FormField[] = [
+  {
+    name: 'remove',
+    label: 'Remove comments',
+    type: 'boolean',
+    defaultValue: true,
+  },
+  {
+    name: 'lock',
+    label: 'Lock comments',
+    type: 'boolean',
+    defaultValue: false,
+  },
+  {
+    name: 'skipDistinguished',
+    label: 'Skip distinguished comments',
+    type: 'boolean',
+    defaultValue: false,
+  },
+] as const;
+
 const nukeForm = Devvit.createForm(
   () => {
     return {
-      fields: [
-        {
-          name: 'remove',
-          label: 'Remove comments',
-          type: 'boolean',
-          defaultValue: true,
-        },
-        {
-          name: 'lock',
-          label: 'Lock comments',
-          type: 'boolean',
-          defaultValue: false,
-        },
-        {
-          name: 'skipDistinguished',
-          label: 'Skip distinguished comments',
-          type: 'boolean',
-          defaultValue: false,
-        },
-      ],
+      fields: nukeFields,
       title: 'Mop Comments',
       acceptLabel: 'Mop',
       cancelLabel: 'Cancel',
@@ -72,26 +74,7 @@ Devvit.addMenuItem({
 const nukePostForm = Devvit.createForm(
   () => {
     return {
-      fields: [
-        {
-          name: 'remove',
-          label: 'Remove comments',
-          type: 'boolean',
-          defaultValue: true,
-        },
-        {
-          name: 'lock',
-          label: 'Lock comments',
-          type: 'boolean',
-          defaultValue: false,
-        },
-        {
-          name: 'skipDistinguished',
-          label: 'Skip distinguished comments',
-          type: 'boolean',
-          defaultValue: false,
-        },
-      ],
+      fields: nukeFields,
       title: 'Mop Post Comments',
       acceptLabel: 'Mop',
       cancelLabel: 'Cancel',
