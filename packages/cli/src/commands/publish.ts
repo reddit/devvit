@@ -8,6 +8,7 @@ import {
   InstallationType,
   VersionVisibility,
 } from '@devvit/protos/community.js';
+import { PaymentsVerificationStatus } from '@devvit/protos/types/devvit/dev_portal/payments/payments_verification.js';
 import { appCapabilitiesFromLinkedBundle } from '@devvit/shared-types/AppCapabilities.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
@@ -20,6 +21,7 @@ import {
   createAppClient,
   createAppPublishRequestClient,
   createAppVersionClient,
+  createDeveloperSettingsClient,
 } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
@@ -34,6 +36,8 @@ const appCapabilityToReviewRequirementMessage: Record<
   [NutritionCategory.CUSTOM_POST]: 'Creates custom posts',
   [NutritionCategory.PAYMENTS]: 'Sells digital goods or services',
 };
+
+const DEVELOPER_SETTINGS_PATH = `${DEVVIT_PORTAL_URL}/my/settings`;
 
 export default class Publish extends ProjectCommand {
   static override description =
@@ -72,6 +76,7 @@ export default class Publish extends ProjectCommand {
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();
   readonly #appPRClient = createAppPublishRequestClient();
+  readonly #developerSettingsClient = createDeveloperSettingsClient();
 
   async run(): Promise<void> {
     const { args, flags } = await this.parse(Publish);
@@ -143,11 +148,31 @@ export default class Publish extends ProjectCommand {
       await this.#promptOpenURL(appSettingsURL);
     }
 
-    if (appCapabilities.includes(NutritionCategory.PAYMENTS) && !appInfo.app.termsAndConditions) {
-      this.log(
-        'Apps that sell goods must have terms & conditions linked before publishing. Add this link on the app details page and run `devvit publish` again.'
-      );
-      await this.#promptOpenURL(appSettingsURL);
+    if (appCapabilities.includes(NutritionCategory.PAYMENTS)) {
+      if (!appInfo.app.termsAndConditions) {
+        this.log(
+          'Apps that sell goods must have terms & conditions linked before publishing. Add this link on the app details page and run `devvit publish` again.'
+        );
+        await this.#promptOpenURL(appSettingsURL);
+      }
+
+      const verificationStatusResp =
+        await this.#developerSettingsClient.GetPaymentsVerificationStatus({});
+
+      const verificationErrorPrefix = 'This app sells goods. ';
+      if (verificationStatusResp.status === PaymentsVerificationStatus.VERIFICATION_PENDING) {
+        this.log(
+          `${verificationErrorPrefix}Your payments verification is pending. Please wait for it to complete before publishing.`
+        );
+        return;
+      }
+
+      if (verificationStatusResp.status !== PaymentsVerificationStatus.VERIFICATION_SUCCESS) {
+        this.log(
+          `${verificationErrorPrefix}You need to complete payments verification or remove payments features before you can publish your app. Verify your account here: `
+        );
+        await this.#promptOpenURL(DEVELOPER_SETTINGS_PATH);
+      }
     }
 
     await this.#submitForReview(appVersion.id, devvitVersion, visibility);

@@ -11,12 +11,16 @@ import {
   AppClientJSON,
   AppVersionClientJSON,
   DevPortalAppSettingsClientJSON,
+  DevPortalDeveloperSettingsClientJSON,
   EventsClientJSON,
   FeedbackClientJSON,
   InstallationsClientJSON,
   WaitlistClientJSON,
 } from '@devvit/protos/community.js';
-import type { DevPortalAppPublishRequestClient } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
+import type {
+  DevPortalAppPublishRequestClient,
+  DevPortalDeveloperSettingsClient,
+} from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 import { DevPortalAppPublishRequestClientJSON } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 import {
   type RemoteLogConsumer,
@@ -72,6 +76,7 @@ const WAITLIST_PATH = 'waitlist';
 const APP_SETTINGS_PATH = 'app-settings';
 const EVENTS_PATH = 'events';
 const PUBLISH_REQUEST_PATH = 'app-publish-request';
+const DEVELOPER_SETTINGS_PATH = 'developer-settings';
 
 export function createAppClient(): AppClient {
   return wrapWithRetry(
@@ -173,6 +178,18 @@ export function createAppPublishRequestClient(): DevPortalAppPublishRequestClien
     new DevPortalAppPublishRequestClientJSON(
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${PUBLISH_REQUEST_PATH}`,
+        getToken: getAccessToken,
+        headers: getHeaders(),
+      })
+    )
+  );
+}
+
+export function createDeveloperSettingsClient(): DevPortalDeveloperSettingsClient {
+  return wrapWithRetry(
+    new DevPortalDeveloperSettingsClientJSON(
+      NodeFetchRPC({
+        baseUrl: `${DEVVIT_PORTAL_API}/${DEVELOPER_SETTINGS_PATH}`,
         getToken: getAccessToken,
         headers: getHeaders(),
       })
