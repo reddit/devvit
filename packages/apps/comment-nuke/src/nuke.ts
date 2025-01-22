@@ -17,7 +17,10 @@ export type NukePostProps = {
 };
 
 // Depth-first traversal to get all comments in a thread
-async function* getAllCommentsInThread(comment: Comment, skipDistinguished: boolean): AsyncGenerator<Comment> {
+async function* getAllCommentsInThread(
+  comment: Comment,
+  skipDistinguished: boolean
+): AsyncGenerator<Comment> {
   const replies = await comment.replies.all();
   for (const reply of replies) {
     if (!skipDistinguished || !reply.isDistinguished()) {
@@ -28,7 +31,10 @@ async function* getAllCommentsInThread(comment: Comment, skipDistinguished: bool
 }
 
 // Depth-first traversal to get all comments in a post
-async function* getAllCommentsInPost(post: Post, skipDistinguished: boolean): AsyncGenerator<Comment> {
+async function* getAllCommentsInPost(
+  post: Post,
+  skipDistinguished: boolean
+): AsyncGenerator<Comment> {
   const comments = await post.comments.all();
   for (const comment of comments) {
     if (!skipDistinguished || !comment.isDistinguished()) {
@@ -50,7 +56,7 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
   try {
     const [user, post] = await Promise.all([
       context.reddit.getCurrentUser(),
-      context.reddit.getPostById(props.postId)
+      context.reddit.getPostById(props.postId),
     ]);
 
     if (!user) {
@@ -67,7 +73,9 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
     );
 
     if (!canManagePosts) {
-      console.info('A user without the correct mod permissions tried to nuke all comments of a post.');
+      console.info(
+        'A user without the correct mod permissions tried to nuke all comments of a post.'
+      );
       return {
         message: 'You do not have the correct mod permissions to do this.',
         success: false,
@@ -80,11 +88,11 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
     }
 
     if (shouldLock) {
-      await Promise.all(comments.map(comment => comment.locked || comment.lock()));
+      await Promise.all(comments.map((comment) => comment.locked || comment.lock()));
     }
 
     if (shouldRemove) {
-      await Promise.all(comments.map(comment => comment.removed || comment.remove()));
+      await Promise.all(comments.map((comment) => comment.removed || comment.remove()));
     }
 
     const verbage =
@@ -157,11 +165,11 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
     }
 
     if (shouldLock) {
-      await Promise.all(comments.map(comment => comment.locked || comment.lock()));
+      await Promise.all(comments.map((comment) => comment.locked || comment.lock()));
     }
 
     if (shouldRemove) {
-      await Promise.all(comments.map(comment => comment.removed || comment.remove()));
+      await Promise.all(comments.map((comment) => comment.removed || comment.remove()));
     }
 
     const verbage =
@@ -176,7 +184,10 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
           description: `u/${user.username} used comment-mop to ${verbage} this comment and all child comments.`,
         });
       } catch (e: unknown) {
-        console.error(`Failed to add modlog for comment: ${props.commentId}.`, (e as Error).message);
+        console.error(
+          `Failed to add modlog for comment: ${props.commentId}.`,
+          (e as Error).message
+        );
       }
     }
 

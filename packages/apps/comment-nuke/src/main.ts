@@ -1,4 +1,5 @@
-import { Devvit, FormField } from '@devvit/public-api';
+import { Devvit, type FormField } from '@devvit/public-api';
+
 import { handleNuke, handleNukePost } from './nuke.js';
 
 Devvit.configure({
