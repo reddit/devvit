@@ -16,6 +16,7 @@ export type NukePostProps = {
   subredditId: string;
 };
 
+// Depth-first traversal to get all comments in a thread
 async function* getAllCommentsInThread(comment: Comment, skipDistinguished: boolean): AsyncGenerator<Comment> {
   const replies = await comment.replies.all();
   for (const reply of replies) {
@@ -26,6 +27,7 @@ async function* getAllCommentsInThread(comment: Comment, skipDistinguished: bool
   }
 }
 
+// Depth-first traversal to get all comments in a thread
 async function* getAllCommentsInPost(post: Post, skipDistinguished: boolean): AsyncGenerator<Comment> {
   const comments = await post.comments.all();
   for (const comment of comments) {
