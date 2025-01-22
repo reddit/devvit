@@ -3,7 +3,7 @@ import { Comment, Devvit, Post } from '@devvit/public-api';
 export type NukeProps = {
   remove: boolean;
   lock: boolean;
-  skipDistinguished: boolean;
+  skipDistinguished: boolean; // When true, distinguished comments and their children are not processed
   commentId: string;
   subredditId: string;
 };
@@ -11,7 +11,7 @@ export type NukeProps = {
 export type NukePostProps = {
   remove: boolean;
   lock: boolean;
-  skipDistinguished: boolean;
+  skipDistinguished: boolean; // When true, distinguished comments and their children are not processed
   postId: string;
   subredditId: string;
 };
