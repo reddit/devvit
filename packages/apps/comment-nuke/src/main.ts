@@ -86,22 +86,22 @@ const nukePostForm = Devvit.createForm(
       return;
     }
 
-    if (context.postId) {
-      const result = await handleNukePost(
-        {
-          remove: values.remove,
-          lock: values.lock,
-          skipDistinguished: values.skipDistinguished,
-          postId: context.postId,
-          subredditId: context.subredditId,
-        },
-        context
-      );
-      console.log(`Mop result - ${result.success ? 'success' : 'fail'} - ${result.message}`);
-      context.ui.showToast(`${result.success ? 'Success' : 'Failed'} : ${result.message}`);
-    } else {
-      context.ui.showToast(`Mop failed! Please try again later.`);
+    if (!context.postId) {
+      throw new Error('No post ID');
     }
+
+    const result = await handleNukePost(
+      {
+        remove: values.remove,
+        lock: values.lock,
+        skipDistinguished: values.skipDistinguished,
+        postId: context.postId,
+        subredditId: context.subredditId,
+      },
+      context
+    );
+    console.log(`Mop result - ${result.success ? 'success' : 'fail'} - ${result.message}`);
+    context.ui.showToast(`${result.success ? 'Success' : 'Failed'} : ${result.message}`);
   }
 );
 
