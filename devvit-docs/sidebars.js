@@ -79,6 +79,17 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Payments',
+      items: [
+        'payments/payments_overview',
+        'payments/payments_add',
+        'payments/payments_test',
+        'payments/payments_publish',
+        'payments/payments_manage',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Capabilities',
       items: [
         'capabilities/app-configurations',
@@ -88,7 +99,6 @@ const sidebars = {
         'capabilities/http-fetch',
         'capabilities/image-uploads',
         'capabilities/menu-actions',
-        'capabilities/payments',
         'capabilities/redis',
         'capabilities/realtime',
         'capabilities/scheduler',
