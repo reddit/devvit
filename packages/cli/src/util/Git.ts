@@ -1,11 +1,14 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import git, { Errors as GitErrors, TREE } from 'isomorphic-git';
 
-const __dirname = fileURLToPath(path.join(import.meta.url, '..'));
+// Note: This is a Release candidate feature. It's been around since v21.2.0
+// and v20.11.0, but technically still in experimental status, and may break.
+// If `devvit new` suddenly stops appearing as a valid command, this may be why.
+// https://nodejs.org/api/esm.html#importmetadirname
+const __dirname = import.meta.dirname;
 
 export type IGit = {
   rootDir: string;
