@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { ActorSpec, TargetRuntime } from '@devvit/protos/types/devvit/runtime/bundle.js';
-import { Args } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 
 import { getAccessToken } from '../../util/auth.js';
 import { Bundler } from '../../util/Bundler.js';
@@ -27,10 +27,17 @@ export default class BundleActor extends ProjectCommand {
     }),
   };
 
+  static override flags = {
+    metafile: Flags.boolean({
+      description: 'Produce a metafile to analyze the size of the bundle',
+      required: false,
+    }),
+  };
+
   static override hidden = true;
 
   async run(): Promise<void> {
-    const { args } = await this.parse(BundleActor);
+    const { args, flags } = await this.parse(BundleActor);
 
     const username = await this.#getOwnerUsername();
     const config = await readDevvitConfig(this.projectRoot, this.configFile);
@@ -41,15 +48,15 @@ export default class BundleActor extends ProjectCommand {
       version: config.version,
     };
 
-    await this.#makeBundles(actorSpec);
+    await this.#makeBundles(actorSpec, flags.metafile);
 
     this.log(`Successfully bundled actor: ${actorSpec.name}`);
   }
 
-  async #makeBundles(actorSpec: ActorSpec): Promise<void> {
+  async #makeBundles(actorSpec: ActorSpec, includeMetafile: boolean): Promise<void> {
     const actorBundler = new Bundler();
 
-    const bundles = await actorBundler.bundle(this.projectRoot, actorSpec);
+    const bundles = await actorBundler.bundle(this.projectRoot, actorSpec, includeMetafile);
 
     await Promise.all(
       bundles.map(async (bundle) => {
@@ -65,6 +72,13 @@ export default class BundleActor extends ProjectCommand {
           path.join(this.projectRoot, distDirFilename, `${actorSpec.name}.bundle${type}.json`),
           JSON.stringify(Bundle.toJSON(bundle))
         );
+
+        if (bundle.metafile) {
+          await writeFile(
+            path.join(this.projectRoot, distDirFilename, `${actorSpec.name}.metafile${type}.json`),
+            bundle.metafile
+          );
+        }
       })
     );
   }
