@@ -1,4 +1,4 @@
 {
-  "extends": "@devvit/public-api/devvit.tsconfig.json",
-  "exclude": ["webroot"]
+  "files": [], // only build references.
+  "references": [{ "path": "src" }, { "path": "webroot" }],
 }

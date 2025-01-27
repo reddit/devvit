@@ -140,26 +140,39 @@ export type UseChannelResult<Message extends JSONValue = JSONValue> = {
   status: ChannelStatus;
 };
 
-export type UseWebViewOnMessage<T extends JSONValue = JSONValue> = (
-  message: T,
-  hook: UseWebViewResult
-) => void | Promise<void>;
-export type UseWebViewOptions<T extends JSONValue = JSONValue> = {
+/**
+ * @template From Message from web view to Devvit Blocks app.
+ * @template To Message from Devvit Blocks app to web view.
+ */
+export type UseWebViewOnMessage<
+  From extends JSONValue = JSONValue,
+  To extends JSONValue = JSONValue,
+> = (message: From, hook: UseWebViewResult<To>) => void | Promise<void>;
+
+/**
+ * @template From Message from web view to Devvit Blocks app.
+ * @template To Message from Devvit Blocks app to web view.
+ */
+export type UseWebViewOptions<
+  From extends JSONValue = JSONValue,
+  To extends JSONValue = JSONValue,
+> = {
   /** Relative HTML asset filename like `foo/bar.html`. Defaults to index.html if omitted. */
   url?: string;
   /** Handle UI events originating from the web view to be handled by a Devvit app */
-  onMessage: UseWebViewOnMessage<T>;
+  onMessage: UseWebViewOnMessage<From, To>;
   /**
    * The callback to run when the web view has been unmounted. Might be used to
    * set state, stop or resume timers, or perform other tasks now that the web view is no longer visible.
    * @deprecated use the page visibility API for now.
    */
-  onUnmount?: (hook: UseWebViewResult) => void | Promise<void>;
+  onUnmount?: (hook: UseWebViewResult<To>) => void | Promise<void>;
 };
 
-export type UseWebViewResult = {
+/** @template To Message from Devvit Blocks app to web view. */
+export type UseWebViewResult<To extends JSONValue = JSONValue> = {
   /** Send a message to the web view */
-  postMessage<T extends JSONValue = JSONValue>(message: T): void;
+  postMessage(message: To): void;
   /** Initiate a request for the web view to open */
   mount(): void;
 };

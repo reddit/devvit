@@ -1,30 +1,8 @@
 import './createPost.js';
 
-import {
-  Devvit,
-  useState,
-  useWebView,
-  UseWebViewOnMessage,
-  UseWebViewResult,
-} from '@devvit/public-api';
+import { Devvit, useState, useWebView } from '@devvit/public-api';
 
-// Defines the messages that are exchanged between Devvit and Web View
-type WebViewMessage =
-  | {
-      type: 'webViewReady';
-    }
-  | {
-      type: 'initialData';
-      data: { username: string; currentCounter: number };
-    }
-  | {
-      type: 'setCounter';
-      data: { newCounter: number };
-    }
-  | {
-      type: 'updateCounter';
-      data: { currentCounter: number };
-    };
+import type { DevvitMessage, WebViewMessage } from './message.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -38,8 +16,7 @@ Devvit.addCustomPostType({
   render: (context) => {
     // Load username with `useAsync` hook
     const [username] = useState(async () => {
-      const currUser = await context.reddit.getCurrentUser();
-      return currUser?.username ?? 'anon';
+      return (await context.reddit.getCurrentUsername()) ?? 'anon';
     });
 
     // Load latest counter from redis with `useAsync` hook
@@ -48,44 +25,37 @@ Devvit.addCustomPostType({
       return Number(redisCount ?? 0);
     });
 
-    const onMessage: UseWebViewOnMessage<WebViewMessage> = async (
-      message: WebViewMessage,
-      webView: UseWebViewResult
-    ) => {
-      switch (message.type) {
-        case 'webViewReady':
-          webView.postMessage<WebViewMessage>({
-            type: 'initialData',
-            data: {
-              username: username,
-              currentCounter: counter,
-            },
-          });
-          break;
-        case 'setCounter':
-          await context.redis.set(`counter_${context.postId}`, message.data.newCounter.toString());
-          setCounter(message.data.newCounter);
+    const webView = useWebView<WebViewMessage, DevvitMessage>({
+      async onMessage(message, webView) {
+        switch (message.type) {
+          case 'webViewReady':
+            webView.postMessage({
+              type: 'initialData',
+              data: {
+                username: username,
+                currentCounter: counter,
+              },
+            });
+            break;
+          case 'setCounter':
+            await context.redis.set(
+              `counter_${context.postId}`,
+              message.data.newCounter.toString()
+            );
+            setCounter(message.data.newCounter);
 
-          webView.postMessage<WebViewMessage>({
-            type: 'updateCounter',
-            data: {
-              currentCounter: message.data.newCounter,
-            },
-          });
-          break;
-        case 'initialData':
-        case 'updateCounter':
-          break;
-
-        default:
-          throw new Error(`Unknown message type: ${message satisfies never}`);
-      }
-    };
-
-    const { mount } = useWebView<WebViewMessage>({
-      url: 'page.html',
-      onMessage,
-      onUnmount: () => {
+            webView.postMessage({
+              type: 'updateCounter',
+              data: {
+                currentCounter: message.data.newCounter,
+              },
+            });
+            break;
+          default:
+            throw new Error(`Unknown message type: ${message satisfies never}`);
+        }
+      },
+      onUnmount() {
         context.ui.showToast('Web view closed!');
       },
     });
@@ -115,7 +85,7 @@ Devvit.addCustomPostType({
             </hstack>
           </vstack>
           <spacer />
-          <button onPress={mount}>Launch App</button>
+          <button onPress={() => webView.mount()}>Launch App</button>
         </vstack>
       </vstack>
     );

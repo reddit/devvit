@@ -11,7 +11,7 @@ import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
 
-class WebViewHook<T extends JSONValue> implements Hook {
+class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook {
   state: {
     // Auto-incrementing count of the number of WebviewMessage effects called this frame.
     // Used as part of the dedup key for emitEvent to prevent messages from being dedup'd.
@@ -21,11 +21,11 @@ class WebViewHook<T extends JSONValue> implements Hook {
   // This url is the path to the asset that will be loaded in the web view.
   // It is ensured to be a valid path prior to the effect being emitted.
   #url: string;
-  #onMessage: UseWebViewOnMessage<T>;
+  #onMessage: UseWebViewOnMessage<From, To>;
   #onUnmount?: (hook: UseWebViewResult) => void | Promise<void>;
   #renderContext: RenderContext;
 
-  constructor(params: HookParams, options: UseWebViewOptions<T>) {
+  constructor(params: HookParams, options: UseWebViewOptions<From, To>) {
     // Default to index.html if there is no URL provided.
     this.#url = options.url ?? 'index.html';
     this.#hookId = params.hookId;
@@ -51,7 +51,7 @@ class WebViewHook<T extends JSONValue> implements Hook {
   /**
    * Send a message from a Devvit app to a web view.
    */
-  postMessage = <Message extends JSONValue = JSONValue>(message: Message): void => {
+  postMessage = (message: To): void => {
     // Handle messages sent from Devvit app -> web view
     this.#renderContext.emitEffect(`postMessage${this.state.messageCount++}`, {
       type: EffectType.EFFECT_WEB_VIEW,
@@ -93,12 +93,12 @@ class WebViewHook<T extends JSONValue> implements Hook {
 /**
  * Use this hook to handle a web view's visibility state and any messages sent to your app.
  * */
-export function useWebView<T extends JSONValue = JSONValue>(
-  options: UseWebViewOptions<T>
-): UseWebViewResult {
+export function useWebView<From extends JSONValue = JSONValue, To extends JSONValue = JSONValue>(
+  options: UseWebViewOptions<From, To>
+): UseWebViewResult<To> {
   const hook = registerHook({
     namespace: 'useWebView',
-    initializer: (params) => new WebViewHook<T>(params, options),
+    initializer: (params) => new WebViewHook(params, options),
   });
   return {
     postMessage: hook.postMessage,

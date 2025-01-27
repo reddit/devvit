@@ -1,0 +1,7 @@
+{
+  "extends": "@devvit/public-api/devvit.tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../dist",
+    "types": [] // no types needed.
+  },
+}

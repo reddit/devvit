@@ -1,58 +1,77 @@
+/** @typedef {import('../src/message.ts').DevvitSystemMessage} DevvitSystemMessage */
+/** @typedef {import('../src/message.ts').WebViewMessage} WebViewMessage */
+/* to-do: @import {DevvitSystemMessage, WebViewMessage} from '../src/message.ts' */
+
 class App {
   constructor() {
-    const output = document.querySelector('#messageOutput');
-    const increaseButton = document.querySelector('#btn-increase');
-    const decreaseButton = document.querySelector('#btn-decrease');
-    const usernameLabel = document.querySelector('#username');
-    const counterLabel = document.querySelector('#counter');
-    var counter = 0;
+    this.output = /** @type {HTMLPreElement} */ (document.querySelector('#messageOutput'));
+    this.increaseButton = /** @type {HTMLButtonElement} */ (
+      document.querySelector('#btn-increase')
+    );
+    this.decreaseButton = /** @type {HTMLButtonElement} */ (
+      document.querySelector('#btn-decrease')
+    );
+    this.usernameLabel = /** @type {HTMLSpanElement} */ (document.querySelector('#username'));
+    this.counterLabel = /** @type {HTMLSpanElement} */ (document.querySelector('#counter'));
+    this.counter = 0;
 
-    window.addEventListener('load', () => {
-      window.parent?.postMessage({ type: 'webViewReady' }, '*');
+    // When the Devvit app sends a message with `postMessage()`, this will be triggered
+    addEventListener('message', this.#onMessage);
+
+    addEventListener('load', () => {
+      postWebViewMessage({ type: 'webViewReady' });
     });
 
-    // When the Devvit app sends a message with `context.ui.webView.postMessage`, this will be triggered
-    window.addEventListener('message', (ev) => {
-      const { type, data } = ev.data;
-
-      // Reserved type for messages sent via `context.ui.webView.postMessage`
-      if (type === 'devvit-message') {
-        const { message } = data;
-
-        // Always output full message
-        output.replaceChildren(JSON.stringify(message, undefined, 2));
-
-        // Load initial data
-        if (message.type === 'initialData') {
-          const { username, currentCounter } = message.data;
-          usernameLabel.innerText = username;
-          counterLabel.innerText = counter = currentCounter;
-        }
-
-        // Update counter
-        if (message.type === 'updateCounter') {
-          const { currentCounter } = message.data;
-          counterLabel.innerText = counter = currentCounter;
-        }
-      }
+    this.increaseButton.addEventListener('click', () => {
+      postWebViewMessage({ type: 'setCounter', data: { newCounter: this.counter + 1 } });
     });
 
-    increaseButton.addEventListener('click', () => {
-      // Sends a message to the Devvit app
-      window.parent?.postMessage(
-        { type: 'setCounter', data: { newCounter: Number(counter + 1) } },
-        '*'
-      );
-    });
-
-    decreaseButton.addEventListener('click', () => {
-      // Sends a message to the Devvit app
-      window.parent?.postMessage(
-        { type: 'setCounter', data: { newCounter: Number(counter - 1) } },
-        '*'
-      );
+    this.decreaseButton.addEventListener('click', () => {
+      postWebViewMessage({ type: 'setCounter', data: { newCounter: this.counter - 1 } });
     });
   }
+
+  /**
+   * @arg {MessageEvent<DevvitSystemMessage>} ev
+   * @return {void}
+   */
+  #onMessage = (ev) => {
+    if (ev.data.type !== 'devvit-message') return;
+    const { message } = ev.data.data;
+
+    // Always output full message
+    this.output.replaceChildren(JSON.stringify(message, undefined, 2));
+
+    switch (message.type) {
+      case 'initialData': {
+        // Load initial data
+        const { username, currentCounter } = message.data;
+        this.usernameLabel.innerText = username;
+        this.counter = currentCounter;
+        this.counterLabel.innerText = `${this.counter}`;
+        break;
+      }
+      case 'updateCounter': {
+        const { currentCounter } = message.data;
+        this.counter = currentCounter;
+        this.counterLabel.innerText = `${this.counter}`;
+        break;
+      }
+      default:
+        /** to-do: @satisifes {never} */
+        const _ = message;
+        break;
+    }
+  };
+}
+
+/**
+ * Sends a message to the Devvit app.
+ * @arg {WebViewMessage} msg
+ * @return {void}
+ */
+function postWebViewMessage(msg) {
+  parent.postMessage(msg, '*');
 }
 
 new App();
