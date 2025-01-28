@@ -4,6 +4,22 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.6: Performance updates and some small fixes
+
+**Release Date: Jan 28, 2025**
+
+**New features**
+
+Some apps at scale were running into performance bottlenecks, calling for the full subreddit or user object when the app only needed the current subreddit name or current username. Two new methods will speed this up and improve performance:
+
+- `reddit.getCurrentSubredditName()` returns only the name of the current subreddit, instead of an entire subreddit object.
+- `reddit.getCurrentUsername()` fetches only the username of the current user instead of an entire user object.
+
+**Fixes**
+
+- `devvit new` now works on Windows devices on node v22.13+.
+- `devvit update app` will also update typescript versions, if applicable.
+
 ## Devvit 0.11.5: A security fix and some smaller updates
 
 **Release Date: Dec 17, 2024**

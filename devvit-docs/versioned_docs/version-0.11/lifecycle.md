@@ -4,11 +4,11 @@ Your app may go through several iterations on a subreddit. Here are a few proced
 
 ## Adding an app to your subreddit
 
-To add an app to your subreddit, find it on developers.reddit.com/apps. Click into the app details screen, and click the "Install" button.
+To add an app to your subreddit, find it on the [apps page](https://developers.reddit.com/apps). Click into the app details screen, and click the "Add to community" button.
 
 ![Post](./assets/install-app-button.png)
 
-This will give you a list of subreddits that will allow you to add the app. Generally, you can only add an app to subreddits that you moderate. Select a subreddit to install the app.
+This will give you a list of subreddits that will allow you to add the app. Generally, you can only add an app to subreddits that you moderate. Select a subreddit where you wish to install the app.
 
 ![Post](./assets/communities-install-list.png)
 
