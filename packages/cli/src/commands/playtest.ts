@@ -26,7 +26,6 @@ import { map } from 'rxjs';
 import Upload from '../commands/upload.js';
 import { REDDIT_DESKTOP } from '../lib/config.js';
 import { fetchSubredditSubscriberCount, isCurrentUserEmployee } from '../lib/http/gql.js';
-import { playLockCheck, playLockRemove, playLockWrite } from '../lib/playtest-lockfile.js';
 import { PlaytestServer } from '../lib/playtest-server.js';
 import type { CommandFlags } from '../lib/types/oclif.js';
 import { makeLogSubscription } from '../util/app-logs/make-log-subscription.js';
@@ -62,12 +61,6 @@ export default class Playtest extends Upload {
         name: 'employee-update',
         description:
           "I'm an employee and I want to update someone else's app. (This will only work if you're an employee.)",
-        required: false,
-        hidden: true,
-      }),
-      'no-lockfile': Flags.boolean({
-        name: 'no-lockfile',
-        description: 'Disable process checking and lockfile generation.',
         required: false,
         hidden: true,
       }),
@@ -153,11 +146,6 @@ export default class Playtest extends Upload {
 
     const projectConfig = await this.getProjectConfig();
     this.#appName = projectConfig.slug ?? projectConfig.name;
-
-    if (!this.#flags?.['no-lockfile']) {
-      await playLockCheck();
-      await playLockWrite(this.#appName);
-    }
 
     if (flags.connect) {
       this.#server = new PlaytestServer(
@@ -417,7 +405,6 @@ export default class Playtest extends Upload {
     await this.#bundler.dispose();
     this.#server?.close();
     await this.#watchAssets?.close();
-    await playLockRemove();
 
     this.log('Playtest session has ended.');
 
