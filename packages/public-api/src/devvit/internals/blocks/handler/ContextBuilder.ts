@@ -59,6 +59,7 @@ export class ContextBuilder {
         timezone: metadata[Header.Timezone]?.values[0],
         locale: metadata[Header.Language]?.values[0],
         dimensions: request.env?.dimensions,
+        colorScheme: request.env?.colorScheme,
       },
     };
 
