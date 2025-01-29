@@ -17,6 +17,8 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import open from 'open';
 
+import { isCurrentUserEmployee } from '../lib/http/gql.js';
+import { getAccessToken } from '../util/auth.js';
 import {
   createAppClient,
   createAppPublishRequestClient,
@@ -156,22 +158,28 @@ export default class Publish extends ProjectCommand {
         await this.#promptOpenURL(appSettingsURL);
       }
 
-      const verificationStatusResp =
-        await this.#developerSettingsClient.GetPaymentsVerificationStatus({});
+      const token = await getAccessToken();
+      const isEmployee = token && (await isCurrentUserEmployee(token));
 
-      const verificationErrorPrefix = 'This app sells goods. ';
-      if (verificationStatusResp.status === PaymentsVerificationStatus.VERIFICATION_PENDING) {
-        this.log(
-          `${verificationErrorPrefix}Your payments verification is pending. Please wait for it to complete before publishing.`
-        );
-        return;
-      }
+      // If the user is not an employee, check if they have completed payments verification.
+      if (!isEmployee) {
+        const verificationStatusResp =
+          await this.#developerSettingsClient.GetPaymentsVerificationStatus({});
 
-      if (verificationStatusResp.status !== PaymentsVerificationStatus.VERIFICATION_SUCCESS) {
-        this.log(
-          `${verificationErrorPrefix}You need to complete payments verification or remove payments features before you can publish your app. Verify your account here: `
-        );
-        await this.#promptOpenURL(DEVELOPER_SETTINGS_PATH);
+        const verificationErrorPrefix = 'This app sells products.';
+        if (verificationStatusResp.status === PaymentsVerificationStatus.VERIFICATION_PENDING) {
+          this.log(
+            `${verificationErrorPrefix} Your payments verification is pending. Please wait for it to complete before publishing.`
+          );
+          return;
+        }
+
+        if (verificationStatusResp.status !== PaymentsVerificationStatus.VERIFICATION_SUCCESS) {
+          this.log(
+            `${verificationErrorPrefix} You need to complete payments verification or remove payments features before you can publish your app. Verify your account here: `
+          );
+          await this.#promptOpenURL(DEVELOPER_SETTINGS_PATH);
+        }
       }
     }
 
