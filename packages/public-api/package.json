@@ -41,8 +41,7 @@
     "@devvit/shared-types": "0.11.5",
     "base64-js": "1.5.1",
     "clone-deep": "4.0.1",
-    "core-js": "3.27.2",
-    "lodash.isequal": "4.5.0"
+    "moderndash": "4.0.0"
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
@@ -50,8 +49,6 @@
     "@microsoft/api-extractor": "7.41.0",
     "@reddit/faceplate-ui": "18.0.1",
     "@types/clone-deep": "4.0.1",
-    "@types/core-js": "2.5.6",
-    "@types/lodash.isequal": "4.5.6",
     "@vitest/coverage-c8": "0.32.0",
     "chokidar-cli": "3.0.0",
     "esbuild": "0.23.0",
@@ -64,8 +61,8 @@
   },
   "filesize": {
     "dist/public-api.min.js": {
-      "gzip": "80 KB",
-      "none": "261 KB"
+      "gzip": "60 KB",
+      "none": "211 KB"
     }
   },
   "source": "./src/index.ts"

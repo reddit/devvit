@@ -2,7 +2,7 @@ import { type AsyncResponse, type UIEvent, UIEventScope } from '@devvit/protos';
 import { CIRCUIT_BREAKER_MSG } from '@devvit/shared-types/CircuitBreaker.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import isEqual from 'lodash.isequal';
+import { isEqual } from 'moderndash';
 
 import type { AsyncUseStateInitializer, UseAsyncResult } from '../../../../types/hooks.js';
 import { registerHook } from './BlocksHandler.js';

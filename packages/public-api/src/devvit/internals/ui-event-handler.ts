@@ -5,7 +5,7 @@ import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 import cloneDeep from 'clone-deep';
-import isEqual from 'lodash.isequal';
+import { isEqual } from 'moderndash';
 
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';
