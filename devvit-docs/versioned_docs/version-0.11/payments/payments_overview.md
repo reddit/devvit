@@ -19,7 +19,6 @@ Information about payouts is located [here](https://support.reddithelp.com/hc/en
 You can use the sandbox to build and test payments, but before you can publish your app and sell products, you’ll need to:
 
 - Verify you meet the [eligibility criteria](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program#h_01J8GCHXEG24ZNR5EZZ9SPN48S).
-- Fill out the [enrollment form](https://forms.gle/TuTV5jbUwFKTcerUA).
 - Complete the verification process. You can start the process and check the status of your verification via your [settings page](https://developers.reddit.com/my/settings).
 - Accept and comply with our [Earn Terms](https://redditinc.com/policies/earn-terms) and [Earn Policy](https://www.redditinc.com/policies/earn-policy).
 
