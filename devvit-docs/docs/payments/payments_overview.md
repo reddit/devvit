@@ -5,7 +5,7 @@ Add products to your app and get paid for what you sell. The payments plugin let
 ![Sample payment app screen](../assets/payments_example.png)
 
 :::note
-Payments is a beta feature that is only available to developers in our Developer Payments Pilot Program.  
+Payments is a beta feature.  
 :::
 
 ## How to get paid

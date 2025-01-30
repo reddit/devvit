@@ -15,7 +15,7 @@ npm install @devvit/payments@next
 ```
 
 :::note
-Make sure you’re on devvit@0.11.3. See the [quickstart](https://developers.reddit.com/docs/next/quickstart) to get up and running.
+Make sure you’re on Devvit 0.11.3 or higher. See the [quickstart](https://developers.reddit.com/docs/next/quickstart) to get up and running.
 :::
 
 ## Register products

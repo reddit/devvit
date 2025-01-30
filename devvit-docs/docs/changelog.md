@@ -4,6 +4,18 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Special Devvit Announcement: Payments
+
+We’ve got a big update for our [payments pilot](./payments/payments_overview.md) that makes [testing payments](./payments/payments_test.md) in your apps even easier!
+
+- **Instant Access to Sandbox Testing** – Now, all developers can immediately test sandbox payment products in their apps without needing to request allowlist access first. This means you can start experimenting with in-app purchasing right away! (You'll still need to complete the [verification process](./payments/payments_overview.md#prerequisites) before submitting your app for approval.)
+
+- **New Developer Showcase** – We’re highlighting how fellow developers are using payments in their apps! First up: [Dark Dungeon](./showcase/payments_examples.md), a game with in-app purchasing thoughtfully integrated in. Check it out for inspiration on what’s possible!
+
+We can’t wait to see what you build! If you have questions or feedback, drop questions here or in the [Payments Discord channel](https://discord.com/channels/1050224141732687912/1295856497917431879).
+
+Happy coding!
+
 ## Devvit 0.11.6: Performance updates and some small fixes
 
 **Release Date: Jan 28, 2025**

@@ -1,4 +1,4 @@
-# Test your app
+# Test payments
 
 Use the payments sandbox environment to simulate payment transactions. All apps automatically start in the payments sandbox.
 
