@@ -14,6 +14,10 @@ To add payments functionality to an existing app, run:
 npm install @devvit/payments@next
 ```
 
+:::note
+Make sure you’re on devvit@0.11.3. See the [quickstart](https://developers.reddit.com/docs/next/quickstart) to get up and running.
+:::
+
 ## Register products
 
 Register products in the src/products.json file in your local app. The JSON schema for the file format is available at https://developers.reddit.com/schema/products.json.

@@ -33,6 +33,7 @@
       "label": "Showcase",
       "items": [
         "showcase/apps",
+        "showcase/payments_examples",
         "showcase/playgrounds",
         "showcase/tutorials"
       ]

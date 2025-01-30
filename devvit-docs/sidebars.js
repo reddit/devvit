@@ -44,7 +44,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Showcase',
-      items: ['showcase/apps', 'showcase/playgrounds', 'showcase/tutorials'],
+      items: ['showcase/apps', 'showcase/payments_examples', 'showcase/playgrounds', 'showcase/tutorials'],
     },
     {
       type: 'category',

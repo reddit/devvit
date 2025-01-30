@@ -16,13 +16,11 @@ Information about payouts is located [here](https://support.reddithelp.com/hc/en
 
 ## Prerequisites
 
-Before you can develop and playtest your payments-based app, you will need to provide a few details in our [enrollment form](https://forms.gle/TuTV5jbUwFKTcerUA).
-
-In addition, you'll need to do a few things before you can publish your app and sell products:
+You can use the sandbox to build and test payments, but before you can publish your app and sell products, you’ll need to:
 
 - Verify you meet the [eligibility criteria](https://support.reddithelp.com/hc/en-us/articles/30641905617428-Developer-Program#h_01J8GCHXEG24ZNR5EZZ9SPN48S).
-- Complete the [verification process](https://www.reddit.com/contributor-program).
-- Ensure you’re on devvit@0.11.3. See the [quickstart](https://developers.reddit.com/docs/next/quickstart) to get up and running.
+- Fill out the [enrollment form](https://forms.gle/TuTV5jbUwFKTcerUA).
+- Complete the verification process. You can start the process and check the status of your verification via your [settings page](https://developers.reddit.com/my/settings).
 - Accept and comply with our [Earn Terms](https://redditinc.com/policies/earn-terms) and [Earn Policy](https://www.redditinc.com/policies/earn-policy).
 
 All products will be reviewed by the Developer Platform team to ensure compliance with our content policy. Products are approved during the [app review process](../publishing.md) after you publish your app.
