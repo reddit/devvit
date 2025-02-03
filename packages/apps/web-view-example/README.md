@@ -1,7 +1,6 @@
 # Web View Example app
 
-This app shows hot to integrate the `<webview />` block into Devvit.
-A full video tutorial explaining this source code is available [here](https://www.youtube.com/watch?v=BhbWn8TnXvo).
+This app shows hot to use a fullscreen web view with Devvit.
 You can also read explanations about the source code in [our documentation](https://developers.reddit.com/docs/webviews)
 
 ## Instructions
