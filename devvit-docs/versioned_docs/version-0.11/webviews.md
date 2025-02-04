@@ -6,6 +6,12 @@ Web views is currently experimental. Web view apps will be publishable soon.
 
 Web views allow you to include HTML, CSS, and JavaScript and have it run within your Reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
 
+Supported platforms:
+
+- iOS (v2025.05)
+- Android (v2025.05)
+- Web
+
 ## Getting started
 
 Create a new web view project:
@@ -19,7 +25,7 @@ Your project structure will look like this.
 
 ```
 my-project/
-├── webroot/           # All web content goes here
+├── webroot/          # All web content goes here
 │   ├── page.html     # Main HTML file
 │   ├── styles.css    # Stylesheets
 │   └── app.js        # JavaScript code
@@ -29,42 +35,53 @@ my-project/
 
 ## useWebView
 
-The `useWebViewHook` integrates web views into your Devvit app. It will open a large viewport (full screen on mobile and a modal on web) and provides a clean interface for managing webview lifecycle and communication.
+The `useWebViewHook` integrates web views into your Devvit app. This opens a large viewport (full screen on mobile and a modal on web) and provides a clean interface for managing the web view lifecycle and communication.
 
 ### Syntax
 
 ```typescript
-const { mount } = useWebView({
-  url: string,
-  onMessage: (message: any, webView: UseWebViewResult) => void,
-  onUnmount?: () => void
+/** Message from Devvit to the web view. */
+export type DevvitMessage =
+  | { type: 'initialData'; data: { username: string; currentCounter: number } }
+  | { type: 'updateCounter'; data: { currentCounter: number } };
+
+/** Message from the web view to Devvit. */
+export type WebViewMessage =
+  | { type: 'webViewReady' }
+  | { type: 'setCounter'; data: { newCounter: number } };
+
+const { mount, postMessage } = useWebView<Message>({
+  url: 'page.html',
+  onMessage: (message, webView) => {},
+  onUnmount: () => {},
 });
 ```
 
 - url: the path to your HTML file relative to the webroot directory
-- onMessage: callback function that handles messages received from the webview. Receives two parameters:
-  - message: the data sent from the webview via postMessage
-  - webView: an object containing methods to interact with the webview
-- onUnmount (optional): callback function that runs when the webview is closed
+- onMessage: callback function that handles messages received from the web view; it receives two parameters:
+  - message: the data sent from the web view via postMessage
+  - webView: an object containing methods to interact with the web view
+- onUnmount (optional): callback function that runs when the web view is closed
 
 Return values:
 
-- mount: function to programmatically open the webview
+- mount: function to programmatically open the web view
+- postMessage: function to send a message to the web view
 
 ### Basic example
 
 ```typescript
 const App = () => {
   const { mount } = useWebView({
-    // URL of your webview content
+    // URL of your web view content
     url: 'page.html',
 
-    // Handle messages from webview
+    // Handle messages from web view
     onMessage: (message) => {
       console.log('Received from webview:', message);
     },
 
-    // Cleanup when webview closes
+    // Cleanup when web view closes
     onUnmount: () => {
       console.log('Webview closed');
     },
@@ -74,26 +91,32 @@ const App = () => {
 };
 ```
 
+Be sure to call `mount` after some user interaction, like a button press, so that it's clear to the user what initiated the fullscreen presentation.
+
+:::note
+Web views that are presented in fullscreen without user interaction will not be approved.
+:::
+
 ## Migration guide
 
 <details>
-  <summary>Click here for instructions on how to migrate from the webview component to the new useWebView hook.</summary>
+  <summary>Click here for instructions on how to migrate from the web view component to the new useWebView hook.</summary>
   <div>
     <div>
 
-This migration guide helps you migrate from using the webview component with visibility toggle, as used in our web-view-post template, to using the new useWebView hook. This will give you access to more gestures and sounds, and make sure your apps are performant in Reddit feeds.
+This migration guide helps you migrate from using the web view component with visibility toggle, as used in our web-view-post template, to using the new useWebView hook. This will give you access to more gestures and sounds, and make sure your apps are performant in Reddit feeds.
 
 **Overview**
 
-The `useWebView` hook simplifies webview management with three main parameters:
+The `useWebView` hook simplifies web view management with three main parameters:
 
-- url: The URL of your webview content
-- onMessage: Handler for messages from the webview
-- onUnmount: Cleanup function that runs when the webview is closed
+- url: The URL of your web view content
+- onMessage: Handler for messages from the web view
+- onUnmount: Cleanup function that runs when the web view is closed
 
-Instead of managing visibility with state, you'll use the mount function returned by the hook to open the webview.
+Instead of managing visibility with state, you'll use the mount function returned by the hook to open the web view.
 
-**Before (webview component)**
+**Before (web view component)**
 
 ```ts
 // Managing visibility with state
@@ -133,7 +156,7 @@ const { mount } = useWebView({
     }
   },
 
-  // Cleanup when webview is closed
+  // Cleanup when web view is closed
   onUnmount: () => {
     context.ui.showToast('Web view closed!');
   },
@@ -150,7 +173,7 @@ return (
 
 1. Opening the web view
 
-Old: Webview component was open immediately
+Old: Web view component was open immediately
 The old web-view-post template toggled visibility with state (setWebViewVisible(true))
 
 New: Use mount function from the hook
@@ -172,17 +195,21 @@ New: onUnmount parameter handles callback after cleanup
 
 ## Best practices
 
-### Performance
+### UI/UX patterns
 
-- Cache data in localStorage where appropriate
-- Minimize state synchronization between webview and Devvit
 - Handle responsive views across mobile and desktop devices
+- Call mount only after user interaction (e.g. onPress)
 
 ### File organization
 
 - Keep all web files in the webroot/ directory
 - Use separate files for HTML, CSS, and JavaScript
 - Consider using a bundler for larger applications
+
+### Data Synchronization
+
+- Cache data in localStorage where appropriate
+- Wait to send messages to the web view until the web view is fully loaded
 
 ## Known limitations
 
@@ -205,7 +232,7 @@ Web views let you build custom UIs with HTML/CSS/JS while accessing Devvit's bac
 
 ### From web view to Devvit
 
-In your webview JavaScript:
+In your web view JavaScript:
 
 ```javascript
 // app.js
@@ -234,7 +261,18 @@ const { mount } = useWebView({
 
 ### From Devvit to web view
 
-Your webview code needs to listen for messages:
+In your Devvit app:
+
+```typescript
+// main.tsx
+const { mount, postMessage } = useWebView({
+  url: 'page.html',
+  onMessage: (message) => {  }
+});
+postMessage({ data: “hello, from devvit” })
+```
+
+In your web view JavaScript:
 
 ```javascript
 // app.js
@@ -248,9 +286,41 @@ window.addEventListener('message', (event) => {
 
 ## Managing state
 
+### Handling initial state
+
+Use `postMessage` to inject the initial state from the Devvit app into the web view after it is mounted. To ensure the web view is loaded before sending messages to it, send a message to the Devvit app requesting the initial state.
+
+#### From web view to Devvit
+
+In your web view JavaScript:
+
+```javascript
+// app.js
+// Inform the Devvit app that the web view is ready to receive messages
+addEventListener('load', (event) => {
+  window.parent?.postMessage({ type: 'webViewReady' }, '*');
+});
+```
+
+In your Devvit app:
+
+```typescript
+// main.tsx
+const { mount } = useWebView({
+  url: 'page.html',
+  onMessage: (message, webView) => {
+    if (message.type === webViewReady) {
+      webView.postMessage({ data: { score: 44 } });
+    }
+  },
+});
+```
+
 ### Local state
 
-Webviews can use localStorage for client-side persistence:
+Persist local state using `localStorage`, which is fast, secure, and available on all platforms.
+
+Web views can use `localStorage` for client-side persistence:
 
 ```javascript
 // Save data
@@ -262,7 +332,7 @@ const savedState = localStorage.getItem('gameState');
 
 ### Server state
 
-For data that needs to persist or sync with Devvit's backend:
+To allow for state to sync across devices, data should be persisted using Redis within the Devvit app. It's recommended to frequently store state using `localStorage`, which is faster and uses Redis less frequently.
 
 ```typescript
 const App = () => {

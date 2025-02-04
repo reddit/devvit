@@ -48,7 +48,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Interactive Posts',
+      label: 'Interactive posts',
       items: [
         'interactive_posts',
         {
