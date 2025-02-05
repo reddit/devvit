@@ -47,6 +47,7 @@ export async function getTelemetrySessionId(): Promise<string> {
   }
 
   const sessionId = crypto.randomUUID();
+  await fs.mkdir(DOT_DEVVIT_DIR_FILENAME, { recursive: true });
   await fs.writeFile(sessionIdFilename, sessionId, 'utf-8');
   return sessionId;
 }
