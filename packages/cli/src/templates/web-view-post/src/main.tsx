@@ -1,21 +1,8 @@
 import './createPost.js';
 
-import { Devvit, useState } from '@devvit/public-api';
+import { Devvit, useState, useWebView } from '@devvit/public-api';
 
-// Defines the messages that are exchanged between Devvit and Web View
-type WebViewMessage =
-  | {
-      type: 'initialData';
-      data: { username: string; currentCounter: number };
-    }
-  | {
-      type: 'setCounter';
-      data: { newCounter: number };
-    }
-  | {
-      type: 'updateCounter';
-      data: { currentCounter: number };
-    };
+import type { DevvitMessage, WebViewMessage } from './message.js';
 
 Devvit.configure({
   redditAPI: true,
@@ -29,8 +16,7 @@ Devvit.addCustomPostType({
   render: (context) => {
     // Load username with `useAsync` hook
     const [username] = useState(async () => {
-      const currUser = await context.reddit.getCurrentUser();
-      return currUser?.username ?? 'anon';
+      return (await context.reddit.getCurrentUsername()) ?? 'anon';
     });
 
     // Load latest counter from redis with `useAsync` hook
@@ -39,51 +25,46 @@ Devvit.addCustomPostType({
       return Number(redisCount ?? 0);
     });
 
-    // Create a reactive state for web view visibility
-    const [webViewVisible, setWebViewVisible] = useState(false);
+    const webView = useWebView<WebViewMessage, DevvitMessage>({
+      // Handle messages sent from the web view
+      async onMessage(message, webView) {
+        switch (message.type) {
+          case 'webViewReady':
+            webView.postMessage({
+              type: 'initialData',
+              data: {
+                username: username,
+                currentCounter: counter,
+              },
+            });
+            break;
+          case 'setCounter':
+            await context.redis.set(
+              `counter_${context.postId}`,
+              message.data.newCounter.toString()
+            );
+            setCounter(message.data.newCounter);
 
-    // When the web view invokes `window.parent.postMessage` this function is called
-    const onMessage = async (msg: WebViewMessage) => {
-      switch (msg.type) {
-        case 'setCounter':
-          await context.redis.set(`counter_${context.postId}`, msg.data.newCounter.toString());
-          context.ui.webView.postMessage('myWebView', {
-            type: 'updateCounter',
-            data: {
-              currentCounter: msg.data.newCounter,
-            },
-          });
-          setCounter(msg.data.newCounter);
-          break;
-        case 'initialData':
-        case 'updateCounter':
-          break;
-
-        default:
-          throw new Error(`Unknown message type: ${msg satisfies never}`);
-      }
-    };
-
-    // When the button is clicked, send initial data to web view and show it
-    const onShowWebViewClick = () => {
-      setWebViewVisible(true);
-      context.ui.webView.postMessage('myWebView', {
-        type: 'initialData',
-        data: {
-          username: username,
-          currentCounter: counter,
-        },
-      });
-    };
+            webView.postMessage({
+              type: 'updateCounter',
+              data: {
+                currentCounter: message.data.newCounter,
+              },
+            });
+            break;
+          default:
+            throw new Error(`Unknown message type: ${message satisfies never}`);
+        }
+      },
+      onUnmount() {
+        context.ui.showToast('Web view closed!');
+      },
+    });
 
     // Render the custom post type
     return (
       <vstack grow padding="small">
-        <vstack
-          grow={!webViewVisible}
-          height={webViewVisible ? '0%' : '100%'}
-          alignment="middle center"
-        >
+        <vstack grow alignment="middle center">
           <text size="xlarge" weight="bold">
             Example App
           </text>
@@ -105,20 +86,7 @@ Devvit.addCustomPostType({
             </hstack>
           </vstack>
           <spacer />
-          <button onPress={onShowWebViewClick}>Launch App</button>
-        </vstack>
-        <vstack grow={webViewVisible} height={webViewVisible ? '100%' : '0%'}>
-          <vstack border="thick" borderColor="black" height={webViewVisible ? '100%' : '0%'}>
-            {webViewVisible ? (
-              <webview
-                id="myWebView"
-                url="page.html"
-                onMessage={(msg) => onMessage(msg as WebViewMessage)}
-                grow
-                height={webViewVisible ? '100%' : '0%'}
-              />
-            ) : null}
-          </vstack>
+          <button onPress={() => webView.mount()}>Launch App</button>
         </vstack>
       </vstack>
     );

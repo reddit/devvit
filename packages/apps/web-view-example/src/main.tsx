@@ -11,7 +11,7 @@ Devvit.configure({
 
 // Add a custom post type to Devvit
 Devvit.addCustomPostType({
-  name: 'Webview Example',
+  name: 'Web View Example',
   height: 'tall',
   render: (context) => {
     // Load username with `useAsync` hook
