@@ -1,101 +1,10 @@
 # Web views
 
 :::note
-Web views is currently experimental. Web view apps will be publishable soon.
+Web views is currently experimental. Web view apps will be publishable once they are using focus mode and the `useWebView` hook.
 :::
 
 Web views allow you to include HTML, CSS, and JavaScript and have it run within your Reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
-
-Supported platforms:
-
-- iOS (v2025.05)
-- Android (v2025.05)
-- Web
-
-## Getting started
-
-Create a new web view project:
-
-```bash
-devvit new --template web-view-post
-cd my-project
-```
-
-Your project structure will look like this.
-
-```
-my-project/
-├── webroot/          # All web content goes here
-│   ├── page.html     # Main HTML file
-│   ├── styles.css    # Stylesheets
-│   └── app.js        # JavaScript code
-└── src/
-    └── main.tsx      # Devvit app code
-```
-
-## useWebView
-
-The `useWebViewHook` integrates web views into your Devvit app. This opens a large viewport (full screen on mobile and a modal on web) and provides a clean interface for managing the web view lifecycle and communication.
-
-### Syntax
-
-```typescript
-/** Message from Devvit to the web view. */
-export type DevvitMessage =
-  | { type: 'initialData'; data: { username: string; currentCounter: number } }
-  | { type: 'updateCounter'; data: { currentCounter: number } };
-
-/** Message from the web view to Devvit. */
-export type WebViewMessage =
-  | { type: 'webViewReady' }
-  | { type: 'setCounter'; data: { newCounter: number } };
-
-const { mount, postMessage } = useWebView<WebViewMessage, DevvitMessage>({
-  url: 'page.html',
-  onMessage: (message, webView) => {},
-  onUnmount: () => {},
-});
-```
-
-- url: the path to your HTML file relative to the webroot directory
-- onMessage: callback function that handles messages received from the web view; it receives two parameters:
-  - message: the data sent from the web view via postMessage
-  - webView: an object containing methods to interact with the web view
-- onUnmount (optional): callback function that runs when the web view is closed
-
-Return values:
-
-- mount: function to programmatically open the web view
-- postMessage: function to send a message to the web view
-
-### Basic example
-
-```typescript
-const App = () => {
-  const { mount } = useWebView({
-    // URL of your web view content
-    url: 'page.html',
-
-    // Handle messages from web view
-    onMessage: (message) => {
-      console.log('Received from web view:', message);
-    },
-
-    // Cleanup when web view closes
-    onUnmount: () => {
-      console.log('Web view closed');
-    },
-  });
-
-  return <button onPress={mount}>Launch App</button>;
-};
-```
-
-Be sure to call `mount` after some user interaction, like a button press, so that it's clear to the user what initiated the fullscreen presentation.
-
-:::note
-Web views that are presented in fullscreen without user interaction will not be approved.
-:::
 
 ## Migration guide
 
@@ -192,6 +101,97 @@ New: onUnmount parameter handles callback after cleanup
     <br/>
   </div>
 </details>
+
+Supported platforms:
+
+- iOS (v2025.05)
+- Android (v2025.05)
+- Web
+
+## Getting started
+
+Create a new web view project:
+
+```bash
+devvit new --template web-view-post
+cd my-project
+```
+
+Your project structure will look like this.
+
+```
+my-project/
+├── webroot/          # All web content goes here
+│   ├── page.html     # Main HTML file
+│   ├── styles.css    # Stylesheets
+│   └── app.js        # JavaScript code
+└── src/
+    └── main.tsx      # Devvit app code
+```
+
+## useWebView
+
+The `useWebViewHook` integrates web views into your Devvit app. This opens a large viewport (full screen on mobile and a modal on web) and provides a clean interface for managing the web view lifecycle and communication.
+
+### Syntax
+
+```typescript
+/** Message from Devvit to the web view. */
+export type DevvitMessage =
+  | { type: 'initialData'; data: { username: string; currentCounter: number } }
+  | { type: 'updateCounter'; data: { currentCounter: number } };
+
+/** Message from the web view to Devvit. */
+export type WebViewMessage =
+  | { type: 'webViewReady' }
+  | { type: 'setCounter'; data: { newCounter: number } };
+
+const { mount, postMessage } = useWebView<WebViewMessage, DevvitMessage>({
+  url: 'page.html',
+  onMessage: (message, webView) => {},
+  onUnmount: () => {},
+});
+```
+
+- url: the path to your HTML file relative to the webroot directory (defaults to ‘index.html’ if unspecified)
+- onMessage: callback function that handles messages received from the web view; it receives two parameters:
+  - message: the data sent from the web view via postMessage
+  - webView: an object containing methods to interact with the web view
+- onUnmount (optional): callback function that runs when the web view is closed. This does not fire on navigation or closing the browser tab.
+
+Return values:
+
+- mount: function to programmatically open the web view
+- postMessage: function to send a message to the web view
+
+### Basic example
+
+```typescript
+const App = () => {
+  const { mount } = useWebView({
+    // URL of your web view content
+    url: 'page.html',
+
+    // Handle messages from web view
+    onMessage: (message) => {
+      console.log('Received from web view:', message);
+    },
+
+    // Cleanup when web view closes
+    onUnmount: () => {
+      console.log('Web view closed');
+    },
+  });
+
+  return <button onPress={mount}>Launch App</button>;
+};
+```
+
+Be sure to call `mount` after some user interaction, like a button press, so that it's clear to the user what initiated the fullscreen presentation.
+
+:::note
+Web views that are presented in fullscreen without user interaction will not be approved.
+:::
 
 ## Best practices
 
