@@ -1119,7 +1119,7 @@ An individual Removal Reason object.
 
 ### <a id="submitmediaoptions" name="submitmediaoptions"></a> SubmitMediaOptions
 
-Ƭ **SubmitMediaOptions**: [`CommonSubmitPostOptions`](models.md#commonsubmitpostoptions) & \{ `kind`: `"image"` \| `"video"` \| `"videogif"` ; `videoPosterUrl`: `string` }
+Ƭ **SubmitMediaOptions**: [`CommonSubmitPostOptions`](models.md#commonsubmitpostoptions) & \{ `imageUrls?`: [`string`] ; `kind`: `"image"` \| `"video"` \| `"videogif"` ; `videoPosterUrl`: `string` }
 
 ---
 

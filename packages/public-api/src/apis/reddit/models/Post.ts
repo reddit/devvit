@@ -193,6 +193,9 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
   // If `kind` is "video" or "videogif" this must be set to the thumbnail URL
   // https://www.reddit.com/dev/api/#POST_api_submit
   videoPosterUrl: string;
+  // If `kind` is "image" this must be set to the image URL
+  // Currently Devvit only supports posts with a single image
+  imageUrls?: [string];
 };
 
 export type SubmitSelfPostOptions = PostTextOptions & CommonSubmitPostOptions;
