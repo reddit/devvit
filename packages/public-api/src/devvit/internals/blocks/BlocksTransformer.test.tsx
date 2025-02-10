@@ -441,24 +441,6 @@ describe('BlocksTransformer (JSX -> Block)', () => {
       expect(image.description).toEqual('bar');
       expect(image.resizeMode).toEqual(BlockImageResizeMode.IMAGE_RESIZE_COVER);
     });
-
-    test('encodes special characters in the url to prevent attacks like DX-7176', async () => {
-      const ui = await render(
-        <image
-          url={'http://redd.it\n.YOUR_DOMAIN_NAME.cloudns.biz/test.pn'}
-          imageWidth={1}
-          imageHeight={2}
-          description={'bar'}
-          resizeMode={'cover'}
-          {...commonPropsWithActions}
-        />
-      );
-
-      commonPropsTestsWithActions(ui);
-      const image = ui.config!.imageConfig!;
-      console.log(image.url);
-      expect(image.url).toEqual('http://redd.it%0A.YOUR_DOMAIN_NAME.cloudns.biz/test.pn');
-    });
   });
 
   describe('<spacer>', () => {

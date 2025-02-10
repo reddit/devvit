@@ -67,7 +67,7 @@ export class AssetsClient {
     try {
       assertValidUrl(assetPath);
       // URL is valid
-      return encodeURI(assetPath);
+      return assetPath;
     } catch {
       // Not a fully qualified URL, not an asset, return an empty string
       return '';
@@ -88,7 +88,7 @@ export class AssetsClient {
         } else {
           try {
             assertValidUrl(path);
-            retval[path] = encodeURI(path);
+            retval[path] = path;
           } catch {
             // invalid URL, missing from cache
             missingPaths.push(path);
