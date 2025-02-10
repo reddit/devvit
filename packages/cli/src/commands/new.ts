@@ -312,7 +312,12 @@ export default class New extends DevvitCommand {
   #syncDependenciesToCurrentCliVersion(deps: Record<string, string>): void {
     for (const dep of Object.keys(deps)) {
       if (dep.startsWith('@devvit')) {
-        deps[dep] = `${CLI_VERSION}`;
+        if (CLI_VERSION.prerelease.includes('dev')) {
+          // if we are in a dev version, we want to use a path to the neighboring copy of this dependency
+          deps[dep] = path.resolve(import.meta.dirname, '../../../', dep.replace('@devvit/', ''));
+        } else {
+          deps[dep] = `${CLI_VERSION}`;
+        }
       }
     }
   }
