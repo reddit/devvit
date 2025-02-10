@@ -4,6 +4,34 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.7: The next step for web views
+
+We’re impressed by the adoption of web views and the powerful apps the developer community has built with it. It’s exciting to see so many devs embrace this experimental feature!
+
+We think you’ll love the next step for web views: focus mode.
+
+![Web views example](./assets/webviews_snakepit_mobile_example.png)
+
+Focus mode enables web view apps that:
+
+- Take full advantage of native webview gestures and advanced capabilities (e.g. scroll, zoom, sound, etc).
+- Are performant on all Reddit clients.
+- Provide a consistent experience for redditors.
+
+![Web views example](./assets/webviews_snakepit_example.png)
+
+The <webview> component is being deprecated in favor of the new useWebView hook. Please follow the [migration guide](./webviews.md#migration-guide) to migrate over your existing web view apps and check out the updated[web view docs](./webviews.md). Apps using the <webview> component are no longer publishable.
+
+Once your web view app is migrated to useWebView and works on all platforms, publish your app!
+
+**New Feature**
+
+- We added support for `context.uiEnvironment.colorScheme` (e.g. “light” or “dark”).
+
+**Fix**
+
+- The playtest lockfile feature was removed based on your feedback.
+
 ## Special Devvit Announcement: Payments
 
 We’ve got a big update for our [payments pilot](./payments/payments_overview.md) that makes [testing payments](./payments/payments_test.md) in your apps even easier!

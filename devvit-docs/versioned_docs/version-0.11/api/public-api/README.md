@@ -1980,13 +1980,14 @@ A tuple containing the current state and a function to update it
 
 ### <a id="usewebviewonmessage" name="usewebviewonmessage"></a> UseWebViewOnMessage
 
-Ƭ **UseWebViewOnMessage**\<`T`\>: (`message`: `T`, `hook`: [`UseWebViewResult`](README.md#usewebviewresult)) => `void` \| `Promise`\<`void`\>
+Ƭ **UseWebViewOnMessage**\<`From`, `To`\>: (`message`: `From`, `hook`: [`UseWebViewResult`](README.md#usewebviewresult)\<`To`\>) => `void` \| `Promise`\<`void`\>
 
 #### Type parameters
 
-| Name | Type                                                                            |
-| :--- | :------------------------------------------------------------------------------ |
-| `T`  | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
+| Name   | Type                                                                            | Description                                 |
+| :----- | :------------------------------------------------------------------------------ | :------------------------------------------ |
+| `From` | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) | Message from web view to Devvit Blocks app. |
+| `To`   | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) | Message from Devvit Blocks app to web view. |
 
 #### Type declaration
 
@@ -1994,10 +1995,10 @@ A tuple containing the current state and a function to update it
 
 ##### Parameters
 
-| Name      | Type                                             |
-| :-------- | :----------------------------------------------- |
-| `message` | `T`                                              |
-| `hook`    | [`UseWebViewResult`](README.md#usewebviewresult) |
+| Name      | Type                                                     |
+| :-------- | :------------------------------------------------------- |
+| `message` | `From`                                                   |
+| `hook`    | [`UseWebViewResult`](README.md#usewebviewresult)\<`To`\> |
 
 ##### Returns
 
@@ -2007,34 +2008,41 @@ A tuple containing the current state and a function to update it
 
 ### <a id="usewebviewoptions" name="usewebviewoptions"></a> UseWebViewOptions
 
-Ƭ **UseWebViewOptions**\<`T`\>: `Object`
+Ƭ **UseWebViewOptions**\<`From`, `To`\>: `Object`
 
 #### Type parameters
 
-| Name | Type                                                                            |
-| :--- | :------------------------------------------------------------------------------ |
-| `T`  | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
+| Name   | Type                                                                            | Description                                 |
+| :----- | :------------------------------------------------------------------------------ | :------------------------------------------ |
+| `From` | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) | Message from web view to Devvit Blocks app. |
+| `To`   | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) | Message from Devvit Blocks app to web view. |
 
 #### Type declaration
 
-| Name         | Type                                                                                        | Description                                                                                                                                                                                                                           |
-| :----------- | :------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `onMessage`  | [`UseWebViewOnMessage`](README.md#usewebviewonmessage)\<`T`\>                               | Handle UI events originating from the web view to be handled by a Devvit app                                                                                                                                                          |
-| `onUnmount?` | (`hook`: [`UseWebViewResult`](README.md#usewebviewresult)) => `void` \| `Promise`\<`void`\> | The callback to run when the web view has been unmounted. Might be used to set state, stop or resume timers, or perform other tasks now that the web view is no longer visible. **`Deprecated`** use the page visibility API for now. |
-| `url?`       | `string`                                                                                    | Relative HTML asset filename like `foo/bar.html`. Defaults to index.html if omitted.                                                                                                                                                  |
+| Name         | Type                                                                                                | Description                                                                                                                                                                                                                           |
+| :----------- | :-------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `onMessage`  | [`UseWebViewOnMessage`](README.md#usewebviewonmessage)\<`From`, `To`\>                              | Handle UI events originating from the web view to be handled by a Devvit app                                                                                                                                                          |
+| `onUnmount?` | (`hook`: [`UseWebViewResult`](README.md#usewebviewresult)\<`To`\>) => `void` \| `Promise`\<`void`\> | The callback to run when the web view has been unmounted. Might be used to set state, stop or resume timers, or perform other tasks now that the web view is no longer visible. **`Deprecated`** use the page visibility API for now. |
+| `url?`       | `string`                                                                                            | Relative HTML asset filename like `foo/bar.html`. Defaults to index.html if omitted.                                                                                                                                                  |
 
 ---
 
 ### <a id="usewebviewresult" name="usewebviewresult"></a> UseWebViewResult
 
-Ƭ **UseWebViewResult**: `Object`
+Ƭ **UseWebViewResult**\<`To`\>: `Object`
+
+#### Type parameters
+
+| Name | Type                                                                            | Description                                 |
+| :--- | :------------------------------------------------------------------------------ | :------------------------------------------ |
+| `To` | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) | Message from Devvit Blocks app to web view. |
 
 #### Type declaration
 
-| Name          | Type                            |
-| :------------ | :------------------------------ |
-| `mount`       | () => `void`                    |
-| `postMessage` | \<T\>(`message`: `T`) => `void` |
+| Name          | Type                        |
+| :------------ | :-------------------------- |
+| `mount`       | () => `void`                |
+| `postMessage` | (`message`: `To`) => `void` |
 
 ---
 
@@ -2316,22 +2324,23 @@ UseAsyncResult<S>
 
 ### <a id="usewebview" name="usewebview"></a> useWebView
 
-▸ **useWebView**\<`T`\>(`options`): [`UseWebViewResult`](README.md#usewebviewresult)
+▸ **useWebView**\<`From`, `To`\>(`options`): [`UseWebViewResult`](README.md#usewebviewresult)\<`To`\>
 
 Use this hook to handle a web view's visibility state and any messages sent to your app.
 
 #### Type parameters
 
-| Name | Type                                                                            |
-| :--- | :------------------------------------------------------------------------------ |
-| `T`  | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
+| Name   | Type                                                                            |
+| :----- | :------------------------------------------------------------------------------ |
+| `From` | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
+| `To`   | extends [`JSONValue`](README.md#jsonvalue) = [`JSONValue`](README.md#jsonvalue) |
 
 #### Parameters
 
-| Name      | Type                                                      |
-| :-------- | :-------------------------------------------------------- |
-| `options` | [`UseWebViewOptions`](README.md#usewebviewoptions)\<`T`\> |
+| Name      | Type                                                               |
+| :-------- | :----------------------------------------------------------------- |
+| `options` | [`UseWebViewOptions`](README.md#usewebviewoptions)\<`From`, `To`\> |
 
 #### Returns
 
-[`UseWebViewResult`](README.md#usewebviewresult)
+[`UseWebViewResult`](README.md#usewebviewresult)\<`To`\>
