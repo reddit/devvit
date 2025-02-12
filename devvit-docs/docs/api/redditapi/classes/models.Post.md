@@ -917,7 +917,7 @@ await post.setTextFallback(newTextFallback);
 
 | Name        | Type                     |
 | :---------- | :----------------------- |
-| `position?` | `1` \| `2` \| `3` \| `4` |
+| `position?` | `1` \| `3` \| `4` \| `2` |
 
 #### Returns
 

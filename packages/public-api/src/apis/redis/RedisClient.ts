@@ -1,4 +1,5 @@
 import type {
+  BitfieldCommand as BitfieldCommandProto,
   HScanRequest,
   HScanResponse,
   Metadata,
@@ -8,10 +9,11 @@ import type {
   ZScanRequest,
   ZScanResponse,
 } from '@devvit/protos';
-import { RedisKeyScope } from '@devvit/protos';
+import { BitfieldOverflowBehavior, RedisKeyScope } from '@devvit/protos';
 
 import { Devvit } from '../../devvit/Devvit.js';
 import type {
+  BitfieldCommand,
   RedisClient as RedisClientLike,
   SetOptions,
   TxClientLike,
@@ -777,5 +779,102 @@ export class RedisClient implements RedisClientLike {
       scope: this.scope,
     });
     return response.value;
+  }
+
+  async bitfield(
+    key: string,
+    ...cmds:
+      | []
+      | BitfieldCommand
+      | [...BitfieldCommand, ...BitfieldCommand]
+      | [...BitfieldCommand, ...BitfieldCommand, ...BitfieldCommand, ...(number | string)[]]
+  ): Promise<number[]> {
+    const commands: BitfieldCommandProto[] = [];
+    for (let argIndex = 0; argIndex < cmds.length; ) {
+      const currentArg = cmds[argIndex];
+      const command: BitfieldCommandProto = {};
+
+      switch (currentArg) {
+        case 'get': {
+          if (argIndex + 2 >= cmds.length) {
+            throw Error(`bitfield command parse failed; not enough arguments for 'get' command`);
+          }
+          command.get = {
+            encoding: cmds[argIndex + 1] as string,
+            offset: cmds[argIndex + 2].toString(),
+          };
+
+          argIndex += 3;
+          break;
+        }
+        case 'set': {
+          if (argIndex + 3 >= cmds.length) {
+            throw Error(`bitfield command parse failed; not enough arguments for 'set' command`);
+          }
+          command.set = {
+            encoding: cmds[argIndex + 1] as string,
+            offset: cmds[argIndex + 2].toString(),
+            value: cmds[argIndex + 3].toString(),
+          };
+
+          argIndex += 4;
+          break;
+        }
+        case 'incrBy': {
+          if (argIndex + 3 >= cmds.length) {
+            throw Error(`bitfield command parse failed; not enough arguments for 'incrBy' command`);
+          }
+          command.incrBy = {
+            encoding: cmds[argIndex + 1] as string,
+            offset: cmds[argIndex + 2].toString(),
+            increment: cmds[argIndex + 3].toString(),
+          };
+
+          argIndex += 4;
+          break;
+        }
+        case 'overflow': {
+          if (argIndex + 1 >= cmds.length) {
+            throw Error(
+              `bitfield command parse failed; not enough arguments for 'overflow' command`
+            );
+          }
+          const behavior = cmds[argIndex + 1].toString();
+          command.overflow = {
+            behavior: toBehaviorProto(behavior),
+          };
+
+          argIndex += 2;
+          break;
+        }
+        default: {
+          throw Error(
+            `bitfield command parse failed; ${currentArg} unrecognized (must be 'get', 'set', 'incrBy', or 'overflow')`
+          );
+        }
+      }
+      commands.push(command);
+    }
+
+    const response = await this.storage.Bitfield({
+      key,
+      commands,
+    });
+
+    return response.results;
+  }
+}
+
+function toBehaviorProto(behavior: string): BitfieldOverflowBehavior {
+  const lowercase = behavior.toLowerCase();
+  switch (lowercase) {
+    case 'wrap':
+      return BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_WRAP;
+    case 'sat':
+      return BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_SAT;
+    case 'fail':
+      return BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_FAIL;
+    default:
+      throw Error(`unknown bitfield overflow behavior: ${lowercase}`);
   }
 }

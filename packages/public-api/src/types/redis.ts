@@ -1532,7 +1532,45 @@ export type RedisClient = {
    * ```
    */
   hLen(key: string): Promise<number>;
-
+  /**
+   * Performs operations on a redis string treating it as an array of bits.
+   * Operations available:
+   *   - get <encoding> <offset> -- Returns the specified bit field.
+   *   - set <encoding> <offset> <value> -- Sets the specified bit field and returns its old value.
+   *   - incrBy <encoding> <offset> <increment> -- Increments or decrements (if a negative increment is given) the specified bit field and returns the new value.
+   *   - overflow [wrap|sat|fail] -- Alters the overflow behavior of subsequent set's and incrBy's until the next overflow command
+   * https://redis.io/docs/latest/commands/bitfield/
+   * @arg {} key the redis key containing the string to operate on
+   * @arg {} cmds the commands to perform on the string
+   * @returns an array with the result of each command, in order
+   * @example
+   * ```ts
+   * async function bitfieldExample(context: Devvit.Context) {
+   *  const fooResults : number[] =
+   *    await context.redis.bitfield('foo', 'incrBy', 'i5', 100, 1, 'get', 'u4' 0);
+   *  console.log("fooResults: " + fooResults); // [1, 0]
+   *
+   *  const barResults : number[] =
+   *    await context.redis.bitfield('bar',
+   *      'set', 'u2', 0, 3,
+   *      'get', 'u2', 0,
+   *      'incrBy', 'u2', 0, 1,
+   *      'overflow', 'sat',
+   *      'get', 'u2', 0,
+   *      'set, 'u2', 0, 3,
+   *      'incrBy', 'u2', 0, 1);
+   *  console.log("barResults: " + barResults); // [0, 3, 0, 0, 3, 3]
+   * }
+   * ```
+   */
+  bitfield(
+    key: string,
+    ...cmds:
+      | []
+      | BitfieldCommand
+      | [...BitfieldCommand, ...BitfieldCommand]
+      | [...BitfieldCommand, ...BitfieldCommand, ...BitfieldCommand, ...(number | string)[]]
+  ): Promise<number[]>;
   /**
    * Allows read/write operations to global keys in Redis
    * Global redis enables apps to persist and access state across subreddit installations
@@ -1568,3 +1606,56 @@ export type ZRangeByScoreOptions = {
     count: number;
   };
 };
+
+export type BitfieldCommand = BitfieldGet | BitfieldSet | BitfieldIncrBy | BitfieldOverflow;
+
+/**
+ * Represents a 'get' operation in a bitfield command
+ */
+type BitfieldGet = [get: 'get', encoding: BitfieldEncoding, offset: BitfieldOffset];
+
+/**
+ * Represents a 'set' operation in a bitfield command
+ */
+type BitfieldSet = [
+  set: 'set',
+  encoding: BitfieldEncoding,
+  offset: BitfieldOffset,
+  /**
+   * Value to set the bitfield to
+   */
+  value: number | `${number}`,
+];
+
+/**
+ * Represents an 'incrBy' operation in a bitfield command
+ */
+type BitfieldIncrBy = [
+  incrBy: 'incrBy',
+  encoding: BitfieldEncoding,
+  offset: BitfieldOffset,
+  /**
+   * Value to increment (or decrement if given a negative increment) the bitfield by
+   */
+  increment: number | `${number}`,
+];
+
+/**
+ * Represents an 'overflow' operation in a bitfield command
+ */
+type BitfieldOverflow = [overflow: 'overflow', behavior: 'wrap' | 'sat' | 'fail'];
+
+/**
+ * Encoding for operations in a bitfield command
+ * Prefix with 'u' to encode as unsigned integers (e.g. 'u4' is a 4-bit unsigned integer)
+ * Prefix with 'i' to encode as signed integers (e.g. 'i6' is a 6-bit signed integer)
+ * Up to 64 bits for signed integers, and up to 63 bits for unsigned integers
+ */
+type BitfieldEncoding = `${'i' | 'u'}${number}`;
+
+/**
+ * Offset to operate on for an operation in a bitfield command
+ * If given a number without any prefix, it is used just as a zero based bit offset inside the string
+ * if given a number prefixed with a # character, the specified offset is multiplied by the integer encoding's width
+ */
+type BitfieldOffset = number | string | `#${number}`;
