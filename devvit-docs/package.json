@@ -17,6 +17,7 @@
     "docusaurus": "docusaurus",
     "gen:all": "yarn gen:api-docs && yarn gen:reddit-api-docs && prettier --write '**/*.md'",
     "gen:api-docs": "./scripts/build-api-docs.sh",
+    "gen:payments-api-docs": "./scripts/build-payments-api-docs.sh",
     "gen:reddit-api-docs": "./scripts/build-reddit-api-docs.sh",
     "gen:verify": "./scripts/verify-docs.sh"
   },
