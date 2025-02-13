@@ -1093,8 +1093,10 @@ export type RedisClient = {
    * https://redis.io/commands/zrank/
    * @arg {} key
    * @arg {} member
-   * @returns rank of the member. The rank (or index) is 0-based
-   * which means that the member with the lowest score has rank 0
+   * @arg {} opts pass opts.withScore = true to return a {rank, score} pair instead of only rank
+   * @returns rank of the member if opts is undefined or opts.withScore = false,
+   * or returns { rank, score } of the member if opts.withScore = true. The rank (or index)
+   * is 0-based which means that the member with the lowest score has rank 0
    * @example
    * ```ts
    * async function zRankExample(context: Devvit.Context) {
@@ -1104,14 +1106,30 @@ export type RedisClient = {
    *    {member: "dog", score: 95},
    *    {member: "elephant", score: 97}
    *  );
-   *  const rank : number | undefined = await context.redis.zRank("animals", "dog");
-   *  if(rank !== undefined) {
-   *    console.log("Dog's rank: " + rank);
+   *  const dogRank : number | undefined = await context.redis.zRank("animals", "dog");
+   *  if(dogRank !== undefined) {
+   *    console.log("Dog's rank: " + dogRank);
+   *  }
+   *  const catPair : { rank: number, score: number} | undefined =
+   *    await context.redis.zRank("animals", "dog", { withScore = true });
+   *  if(catPair !== undefined) {
+   *    console.log("Cat's rank: " + catPair.rank);
+   *    console.log("Cat's score: " + catPair.score);
    *  }
    * }
    * ```
    */
-  zRank(key: string, member: string): Promise<number | undefined>;
+  zRank(key: string, member: string, opts?: { withScore: false }): Promise<number | undefined>;
+  zRank(
+    key: string,
+    member: string,
+    opts: { withScore: true }
+  ): Promise<{ rank: number; score: number } | undefined>;
+  zRank(
+    key: string,
+    member: string,
+    opts?: ZRankOptions
+  ): Promise<{ rank: number; score: number } | number | undefined>;
   /**
    * Increments the score of member in the sorted set stored at key by value
    * https://redis.io/commands/zincrby/
@@ -1597,6 +1615,14 @@ export type ZRangeOptions = {
    */
   reverse?: boolean;
   by: 'score' | 'lex' | 'rank';
+};
+
+/**
+ * If the withScore option is set to true, zRank returns a pair of { rank, score } for the given member in key
+ * instead of only the rank
+ */
+export type ZRankOptions = {
+  withScore: boolean;
 };
 
 export type ZRangeByScoreOptions = {

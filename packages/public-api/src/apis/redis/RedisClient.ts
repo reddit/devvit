@@ -18,6 +18,7 @@ import type {
   SetOptions,
   TxClientLike,
   ZRangeOptions,
+  ZRankOptions,
 } from '../../types/redis.js';
 
 function isRedisNilError(e: unknown): boolean {
@@ -202,7 +203,7 @@ export class TxClient implements TxClientLike {
 
   async zRank(key: string, member: string): Promise<TxClientLike> {
     await this.#storage.ZRank(
-      { key: { key, transactionId: this.#transactionId }, member },
+      { key: { key, transactionId: this.#transactionId }, member, withScore: false },
       this.#metadata
     );
     return this;
@@ -608,16 +609,31 @@ export class RedisClient implements RedisClientLike {
     }
   }
 
-  async zRank(key: string, member: string): Promise<number | undefined> {
+  async zRank(
+    key: string,
+    member: string,
+    opts?: { withScore: false }
+  ): Promise<number | undefined>;
+  async zRank(
+    key: string,
+    member: string,
+    opts: { withScore: true }
+  ): Promise<{ rank: number; score: number } | undefined>;
+  async zRank(
+    key: string,
+    member: string,
+    opts?: ZRankOptions
+  ): Promise<{ rank: number; score: number } | number | undefined> {
+    const withScore = opts?.withScore || false;
     try {
       const response = await this.storage.ZRank(
-        { key: { key }, member, scope: this.scope },
+        { key: { key }, member, withScore, scope: this.scope },
         {
           ...this.#metadata,
           'throw-redis-nil': { values: ['true'] },
         }
       );
-      return response !== null ? response.value : response;
+      return response !== null ? (withScore ? response.rankScorePair : response.value) : response;
     } catch (e) {
       if (isRedisNilError(e)) {
         return undefined;
