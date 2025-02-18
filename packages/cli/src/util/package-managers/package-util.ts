@@ -10,6 +10,14 @@ export type PackageJSON = {
   version?: string;
   dependencies?: DependencyMap;
   devDependencies?: DependencyMap;
+  devvit?: DevvitPackageConfig;
+};
+
+/** Configuration provided in the `devvit` property of a project's package.json */
+export type DevvitPackageConfig = {
+  playtest?: {
+    debounceConfigMs?: number;
+  };
 };
 
 /** Read and parse the package.json in dir. Throws if missing. */

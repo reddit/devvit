@@ -1,5 +1,6 @@
 import type { DevvitConfig } from '../devvitConfig.js';
 import { readDevvitConfig } from '../devvitConfig.js';
+import { type PackageJSON, readPackageJSON } from '../package-managers/package-util.js';
 import { findProjectRoot } from '../project-util.js';
 import { DevvitCommand } from './DevvitCommand.js';
 
@@ -20,6 +21,10 @@ export abstract class ProjectCommand extends DevvitCommand {
 
   protected async getProjectConfig(): Promise<DevvitConfig> {
     return readDevvitConfig(this.projectRoot, this.configFile);
+  }
+
+  protected async getRootPackageJson(): Promise<PackageJSON> {
+    return await readPackageJSON(this.projectRoot);
   }
 
   // checks that the command is run in a devvit project

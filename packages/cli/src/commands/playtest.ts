@@ -13,6 +13,7 @@ import {
   MAX_ALLOWED_SUBSCRIBER_COUNT,
   PRODUCTS_JSON_FILE,
 } from '@devvit/shared-types/constants.js';
+import { debounce } from '@devvit/shared-types/debounce.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import { Args, Flags, ux } from '@oclif/core';
@@ -64,6 +65,11 @@ export default class Playtest extends Upload {
         required: false,
         hidden: true,
       }),
+      debounce: Flags.integer({
+        name: 'debounce',
+        description: 'Debounce time in milliseconds for file changes',
+        required: false,
+      }),
     };
   }
 
@@ -87,6 +93,7 @@ export default class Playtest extends Upload {
   #server?: PlaytestServer;
   #flags?: CommandFlags<typeof Playtest>;
   #watchAssets?: chokidar.FSWatcher;
+  #debounceMs: number = 300;
 
   #subreddit?: string;
   #appName?: string;
@@ -143,6 +150,17 @@ export default class Playtest extends Upload {
     const { args, flags } = await this.parse(Playtest);
     this.#flags = flags;
     this.#subreddit = args.subreddit;
+
+    // Set the debounce delay from either the CLI or the package.json
+    const rootPackageJson = await this.getRootPackageJson();
+    if (flags['debounce']) {
+      // If the CLI flag is set, use that
+      this.#debounceMs = flags['debounce'];
+    } else if (rootPackageJson.devvit?.playtest?.debounceConfigMs != null) {
+      // Else, if the package.json has it set, use that
+      this.#debounceMs = rootPackageJson.devvit.playtest.debounceConfigMs;
+    }
+    // Else use the default which we already set
 
     const projectConfig = await this.getProjectConfig();
     this.#appName = projectConfig.slug ?? projectConfig.name;
@@ -225,7 +243,7 @@ export default class Playtest extends Upload {
 
     this.#watchAssets.on('all', () => {
       // asset changes don't result in a code change, so just re-send the last bundles
-      void this.#onWatch({ bundles: this.#lastBundles }, subreddit);
+      this.#onWatch({ bundles: this.#lastBundles }, subreddit);
     });
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
@@ -286,7 +304,14 @@ export default class Playtest extends Upload {
     }
   }
 
-  #onWatch = async (result: BundlerResult, subreddit: string): Promise<void> => {
+  #onWatch = debounce(
+    (result: BundlerResult, subreddit: string) => {
+      void this.#onWatchActual(result, subreddit);
+    },
+    () => this.#debounceMs // Use a lambda here, because value won't be set at class construction time
+  );
+
+  #onWatchActual = async (result: BundlerResult, subreddit: string): Promise<void> => {
     /* We have to do this here because none of the rxjs functions fit this use case perfectly. What
      * we need is something that serializes this whole pipeline, but also discards all but the most
      * recent value once we resume processing. We would love to use one of these, but...
@@ -390,7 +415,7 @@ export default class Playtest extends Upload {
     if (this.#lastQueuedBundles) {
       const newerBundles = this.#lastQueuedBundles;
       this.#lastQueuedBundles = undefined;
-      await this.#onWatch({ bundles: newerBundles }, subreddit); // subreddit won't change between calls!
+      this.#onWatch({ bundles: newerBundles }, subreddit); // subreddit won't change between calls!
     }
   };
 
@@ -405,6 +430,7 @@ export default class Playtest extends Upload {
     await this.#bundler.dispose();
     this.#server?.close();
     await this.#watchAssets?.close();
+    this.#onWatch.clear();
 
     this.log('Playtest session has ended.');
 
