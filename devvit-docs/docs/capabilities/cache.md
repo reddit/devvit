@@ -21,12 +21,10 @@ Devvit.configure({
 
 ## Parameters
 
-| **Parameters** | **Description**                                                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `key`          | This is a string that identifies a cached response. Instead of making a real request, the app gets the cached response with the key you provide. |
-
-Make sure to use different keys for different data. For example, if you’re saving post-specific data, add the postId to the cache key, like this: `post_data_${postId})`. |
-| `ttl` | Time to live is the number of milliseconds the cached response is expected to be relevant.
+| **Parameters** | **Description**                                                                                                                                                                                                                                                                                                            |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `key`          | This is a string that identifies a cached response. Instead of making a real request, the app gets the cached response with the key you provide. Make sure to use different keys for different data. For example, if you’re saving post-specific data, add the postId to the cache key, like this: `post_data_${postId})`. |
+| `ttl`          | Time to live is the number of milliseconds the cached response is expected to be relevant.                                                                                                                                                                                                                                 |
 
 Once it expires, the cached response will be voided and a real request is made to populate the cache again. You can treat it as a threshold, where ttl of 30000 would mean that a request is done no more than once per 30 seconds. |
 
