@@ -37,7 +37,7 @@ import { CricketEventStatusType, CricketQualifierType } from '../CricketModels.j
 const tournament: CricketTournament = {
   id: 'id',
   name: 'name',
-  type: 'type',
+  type: 'T20',
 };
 
 const venue: CricketVenue = {
@@ -489,8 +489,6 @@ test('Get ordinalsuffixof method', async () => {
 
 /// test getSecondLine
 test('Get second line of bottomBar method', async () => {
-  cricketMatch.sport_event.tournament.type = 't20';
-
   expect(getSecondLine(cricketMatch, '2', '20')).toEqual('T20 2 of 20');
   expect(getSecondLine(cricketMatch, undefined, '20')).toEqual('T20');
   expect(getSecondLine(cricketMatch, '20', undefined)).toEqual('T20');

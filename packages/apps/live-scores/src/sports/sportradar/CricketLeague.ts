@@ -22,5 +22,12 @@ export function infoForCricketLeague(league: League): CricketLeague {
       league: League.IPL,
     };
   }
+  if (league === League.ICCCT) {
+    return {
+      tournamentId: 'sr:tournament:15331',
+      seasonId: 'sr:season:127467',
+      league: League.ICCCT,
+    };
+  }
   return { tournamentId: 'unknown', seasonId: 'unknown', league: League.UNKNOWN };
 }

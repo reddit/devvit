@@ -1,12 +1,13 @@
 import { Devvit } from '@devvit/public-api';
+
 import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
 import type {
   CricketMatchScoreInfo,
   CricketScoreInfoStats,
 } from '../sports/sportradar/CricketModels.js';
 import { CricketQualifierType } from '../sports/sportradar/CricketModels.js';
-import { ScoreboardPage } from './Scoreboard.js';
 import type { ScoreboardProps } from './Scoreboard.js';
+import { ScoreboardPage } from './Scoreboard.js';
 
 export type CricketScoreboardProps = ScoreboardProps & {
   scoreInfo: CricketMatchScoreInfo;
@@ -17,7 +18,6 @@ enum CricketColor {
   topBarLightColor = '#181C1F',
   topBarDarkColor = '#82959B',
   statsLightColor = '#576F76',
-  statsDarkColor = '#82959B',
   iconLightColor = '#0F1A1C',
   iconDarkColor = '#F2F4F5',
   borderLightColor = '#EEF1F3',
@@ -142,6 +142,8 @@ function CricketTeamBlock({
   state,
   isBattingTeam,
   stats,
+  hasWon,
+  isSuperOver,
 }: {
   name: string;
   logo: string;
@@ -149,8 +151,14 @@ function CricketTeamBlock({
   state: EventState;
   isBattingTeam: boolean;
   stats: CricketScoreInfoStats;
+  hasWon: boolean;
+  isSuperOver: boolean;
 }): JSX.Element {
   const [firstLine, secondLine] = splitNameInTwoLines(name);
+
+  const textWeight = hasWon ? 'bold' : 'regular';
+
+  const scoreTextWeight = isSuperOver || hasWon ? 'bold' : 'regular';
 
   return (
     <vstack padding="small" height={`72px`} width={'100%'} alignment={'middle'}>
@@ -159,11 +167,11 @@ function CricketTeamBlock({
         <image url={logo} imageHeight={32} imageWidth={32} />
         <spacer size="medium" />
         <vstack alignment={'start middle'}>
-          <text size="large" weight="bold" wrap={true}>
+          <text size="large" weight={textWeight} wrap={true}>
             {firstLine}
           </text>
           {secondLine !== '' ? (
-            <text size="large" weight="bold" wrap={true}>
+            <text size="large" weight={textWeight} wrap={true}>
               {secondLine}
             </text>
           ) : null}
@@ -171,21 +179,21 @@ function CricketTeamBlock({
         <spacer grow />
         <vstack>
           <hstack alignment={'bottom end'}>
-            <text size="xlarge" weight="bold">
+            <text size="xlarge" weight={scoreTextWeight}>
               {state === EventState.PRE ? '0' : (score ?? 0).toString()}
             </text>
             <spacer size="xsmall" />
-            <text size="medium" weight="bold">
+            <text size="medium" weight={scoreTextWeight}>
               ({stats.displayOvers})
             </text>
           </hstack>
           {stats.battingStats !== null ? (
             <text
               size="xsmall"
-              weight="bold"
+              weight={scoreTextWeight}
               alignment="end"
               lightColor={CricketColor.statsLightColor}
-              darkColor={CricketColor.statsDarkColor}
+              darkColor={CricketColor.topBarDarkColor}
             >
               {stats.battingStats}
             </text>
@@ -193,10 +201,10 @@ function CricketTeamBlock({
           {stats.bowlingStats !== null ? (
             <text
               size="xsmall"
-              weight="bold"
+              weight={scoreTextWeight}
               alignment="end"
               lightColor={CricketColor.statsLightColor}
-              darkColor={CricketColor.statsDarkColor}
+              darkColor={CricketColor.topBarDarkColor}
             >
               {stats.bowlingStats}
             </text>
@@ -229,6 +237,8 @@ function ScoreComponent(props: CricketScoreboardProps): JSX.Element {
     state: scoreInfo.event.state,
     isBattingTeam: scoreInfo.currentBattingQualifier === CricketQualifierType.Home,
     stats: scoreInfo.homeInfoStats,
+    hasWon: scoreInfo.winnerQualifier === CricketQualifierType.Home,
+    isSuperOver: scoreInfo.isSuperOver,
   });
 
   const awayTeamBlock = CricketTeamBlock({
@@ -238,6 +248,8 @@ function ScoreComponent(props: CricketScoreboardProps): JSX.Element {
     state: scoreInfo.event.state,
     isBattingTeam: scoreInfo.currentBattingQualifier === CricketQualifierType.Away,
     stats: scoreInfo.awayInfoStats,
+    hasWon: scoreInfo.winnerQualifier === CricketQualifierType.Away,
+    isSuperOver: scoreInfo.isSuperOver,
   });
 
   return (
@@ -279,7 +291,7 @@ function BottomBar(props: CricketScoreboardProps): JSX.Element {
           weight="bold"
           alignment="center"
           lightColor={CricketColor.statsLightColor}
-          darkColor={CricketColor.statsDarkColor}
+          darkColor={CricketColor.topBarDarkColor}
         >
           {scoreInfo.bottomBarSecondLine}
         </text>

@@ -45,6 +45,7 @@ export enum League {
   NCAAMB = 'ncaamb',
   IPL = 'ipl',
   ICCT20 = 'icc_t20',
+  ICCCT = 'icc_ct',
   UEFAEURO = 'uefa_euro',
 }
 
@@ -164,6 +165,10 @@ export function leaguesSupported(service: APIService): { label: string; value: s
   } else if (service === APIService.SRCricket) {
     return [
       {
+        label: getDisplayNameFromLeague(League.ICCCT),
+        value: League.ICCCT,
+      },
+      {
         label: getDisplayNameFromLeague(League.ICCT20),
         value: League.ICCT20,
       },
@@ -249,6 +254,9 @@ export function getLeagueFromString(str: string): League {
   if (str.toLowerCase() === 'icc_t20') {
     return League.ICCT20;
   }
+  if (str.toLowerCase() === 'icc_ct') {
+    return League.ICCCT;
+  }
   if (str.toLowerCase() === 'uefa_euro') {
     return League.UEFAEURO;
   }
@@ -291,6 +299,7 @@ export function getSportFromLeague(league: League): Sport {
       return Sport.SOCCER;
     case League.IPL:
     case League.ICCT20:
+    case League.ICCCT:
       return Sport.CRICKET;
     default:
       return Sport.UNKNOWN;
@@ -344,9 +353,11 @@ export function getDisplayNameFromLeague(league: League): string {
     case League.NCAAMB:
       return `NCAA Men's Basketball`;
     case League.IPL:
-      return 'Indian Premier League';
+      return 'Indian Premier League 2024';
     case League.ICCT20:
       return 'T20 World Cup 2024';
+    case League.ICCCT:
+      return 'ICC Champions Trophy 2025';
     default:
       return '';
   }

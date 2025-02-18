@@ -1,20 +1,21 @@
 import type { Devvit } from '@devvit/public-api';
+
+import type { TeamInfo } from '../GameEvent.js';
+import { EventState } from '../GameEvent.js';
 import { APIService, League } from '../Sports.js';
 import { APIKey } from './APIKeys.js';
-import { EventState } from '../GameEvent.js';
-import type { TeamInfo } from '../GameEvent.js';
 import type {
+  BasicCricketMatchInfo,
   BattingResult,
+  CricketCompetitor,
+  CricketInning,
   CricketMatch,
   CricketMatchScoreInfo,
-  CricketCompetitor,
-  CricketScoreInfoStats,
   CricketPlayer,
+  CricketScoreInfoStats,
   CricketTeam,
-  CricketInning,
-  BasicCricketMatchInfo,
 } from './CricketModels.js';
-import { CricketQualifierType, CricketEventStatusType } from './CricketModels.js';
+import { CricketEventStatusType, CricketQualifierType } from './CricketModels.js';
 
 export async function fetchCricketMatch(
   league: string,
@@ -133,6 +134,11 @@ export function cricketMatchInfo(
     sortedBattingResults
   );
 
+  let isSuperOver = false;
+  if (notEmpty(cricketMatch.statistics.innings)) {
+    isSuperOver = cricketMatch.statistics.innings.length > 2;
+  }
+
   return {
     event: {
       id: event.id,
@@ -159,6 +165,7 @@ export function cricketMatchInfo(
     location: cricketMatch.sport_event.venue?.city_name ?? undefined,
     firstBattingQualifier: getFirstBattingQualifier(sortedBattingResults),
     currentBattingQualifier: currentBattingQualifier,
+    winnerQualifier: winningQualifier,
     bottomBarFirstLine: firstLine,
     bottomBarSecondLine: getSecondLine(
       cricketMatch,
@@ -168,6 +175,7 @@ export function cricketMatchInfo(
     homeInfoStats: homeStats,
     awayInfoStats: awayStats,
     chatUrl: basicCricketMatchInfo?.chatUrl,
+    isSuperOver: isSuperOver,
   };
 }
 
@@ -192,6 +200,9 @@ export function getAbbreviatedLeagueName(leagueString: string): string {
   if (leagueString === League.IPL) {
     return 'IPL';
   }
+  if (leagueString === League.ICCCT) {
+    return 'CT2025';
+  }
   return '';
 }
 
@@ -201,7 +212,7 @@ export function getInfoStats(
 ): CricketScoreInfoStats {
   let displayOvers = 0;
 
-  if (battingResult !== undefined) {
+  if (battingResult !== undefined && notEmpty(cricketMatch.statistics.innings)) {
     let currentInning: CricketInning | undefined = undefined;
     if (cricketMatch.sport_event_status.current_inning === 1) {
       currentInning = cricketMatch.statistics.innings[0];
@@ -235,10 +246,14 @@ export function getInfoStats(
         ) {
           displayOvers = partnerships[partnerships.length - 1].end;
         } else {
-          displayOvers = cricketMatch.sport_event_status.allotted_overs;
+          if (cricketMatch.sport_event_status.allotted_overs !== undefined) {
+            displayOvers = cricketMatch.sport_event_status.allotted_overs;
+          }
         }
       } else {
-        displayOvers = cricketMatch.sport_event_status.allotted_overs;
+        if (cricketMatch.sport_event_status.allotted_overs !== undefined) {
+          displayOvers = cricketMatch.sport_event_status.allotted_overs;
+        }
       }
     }
   }
@@ -250,6 +265,9 @@ export function getInfoStats(
 }
 
 function getTeamStatistics(cricketMatch: CricketMatch, teamId: string | undefined): CricketTeam[] {
+  if (!notEmpty(cricketMatch.statistics.innings)) {
+    return [];
+  }
   return cricketMatch.statistics.innings.flatMap((inning) => {
     return inning.teams.filter((team) => {
       return team.id === teamId;
@@ -634,8 +652,32 @@ export function getFirstLine(
           : awayTeam.abbreviation;
       return losingTeamName + ' need ' + deltaScore + runsString + ' to win';
     }
+
+    // SuperOver handling for match live
+    return 'Match tied';
   }
-  // match ended scenarios
+
+  // Match Ended Scenarios
+
+  // SuperOver handling for match ended case
+  // "Match tied (TEAM INITIAL won the super over)"
+  if (battingResults.length > 2) {
+    let winnerTeamName = undefined;
+    const winner_id = cricketMatch.sport_event_status.winner_id;
+
+    if (cricketMatch.sport_event.competitors[0].id === winner_id) {
+      winnerTeamName = cricketMatch.sport_event.competitors[0].abbreviation;
+    } else if (cricketMatch.sport_event.competitors[1].id === winner_id) {
+      winnerTeamName = cricketMatch.sport_event.competitors[1].abbreviation;
+    }
+
+    if (winnerTeamName !== undefined) {
+      return 'Match tied (' + winnerTeamName + ' won the super over)';
+    } else {
+      return 'Match tied';
+    }
+  }
+
   // after saving the winner result, then sort batting results by last inning to first
   battingResults.sort((a, b) => b.inningNumber - a.inningNumber);
 
@@ -683,6 +725,9 @@ export function getSecondLine(
   matchNumber: string | undefined,
   totalMatches: string | undefined
 ): string | undefined {
+  if (cricketMatch.sport_event.tournament === undefined) {
+    return undefined;
+  }
   let suffix = '';
   if (matchNumber !== undefined && totalMatches !== undefined) {
     suffix = ' ' + matchNumber + ' of ' + totalMatches;

@@ -8,11 +8,13 @@ export type CricketMatchScoreInfo = GeneralGameScoreInfo & {
   location?: string;
   firstBattingQualifier: CricketQualifierType;
   currentBattingQualifier: CricketQualifierType | undefined;
+  winnerQualifier: CricketQualifierType | undefined;
   bottomBarFirstLine: string;
   bottomBarSecondLine?: string;
   homeInfoStats: CricketScoreInfoStats;
   awayInfoStats: CricketScoreInfoStats;
   chatUrl: string | undefined;
+  isSuperOver: boolean;
 };
 
 export type BasicCricketMatchInfo = {
@@ -32,7 +34,7 @@ export type CricketMatch = {
   sport_event: CricketSportEvent;
   sport_event_status: CricketSportEventStatus;
   statistics: {
-    innings: CricketInning[];
+    innings?: CricketInning[];
   };
 };
 
@@ -41,7 +43,7 @@ export type CricketSportEvent = {
   id: string;
   scheduled: string;
   start_time_tbd: boolean;
-  tournament: CricketTournament;
+  tournament?: CricketTournament;
   competitors: CricketCompetitor[];
   venue?: CricketVenue;
   matchNumber?: string;
@@ -133,7 +135,7 @@ export type CricketSportEventStatus = {
   current_inning: number;
   display_overs: number;
   run_rate: number;
-  allotted_overs: number;
+  allotted_overs?: number;
   period_scores?: CricketPeriodScore[];
 };
 
