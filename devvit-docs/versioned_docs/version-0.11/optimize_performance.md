@@ -1,10 +1,65 @@
 # Optimizing performance
 
-You may want to optimize your app to make it run faster, use resources more efficiently, or just create a better user experience. Here are some ways to improve performance.
+You can optimize your app to make it run faster, use resources more efficiently, and create a better user experience. Here’s how.
 
-## Make the initial render faster
+## Always use the latest public-api
 
-Look at the render function of this interactive post.
+To update your app to use the latest version of the public API:
+
+1. Run `npm install -g devvit` to update the Devvit CLI globally.
+
+2. In your project directory, run the following commands:
+
+- `devvit update app`
+- `npm install`
+
+:::note
+You must update the CLI before you upgrade @devvit/public-api in your project.
+:::
+
+## Write performant requests
+
+These best practices will optimize your app.
+
+### Get as much data as possible from the context
+
+If you only need the name of the current user:
+
+- Avoid requests like `context.reddit.getCurrentUser()` or `context.reddit.getUserById(context.userId)`.
+- Use `context.reddit.getCurrentUsername()` instead.
+
+If you only need the subreddit name:
+
+- Don’t request the whole Subreddit model with `context.reddit.getCurrentSubreddit()`.
+- Use `context.reddit.getCurrentSubredditName()` instead.
+
+### Cache requests to RedditAPI or external resources
+
+Use `context.cache` to reduce the amount of requests to optimize performance and running costs of your application. See [cache helper](./capabilities/cache.md) for details and examples.
+
+### Leverage scheduled jobs to fetch or update data
+
+Use [scheduler](./capabilities/scheduler.md) to make large data requests in the background and store it in [Redis](./capabilities/redis.md) for later use. You can also [fetch data for multiple users](#how-to-use-the-cache-helper​).
+
+### Batch API calls to make parallel requests
+
+Every request defined in `useState` is blocking the render function. You can improve app performance by [making parallel requests](#how-to-make-parallel-requests).
+
+## Ensure your app has a lightweight first view
+
+The faster the first view appears on the user’s screen, the better the user experience. You can minimize and delay the data loading necessary for your app to display the first view. To do this:
+
+- Use [setCustomPostPreview](./custom_post_preview.md) to make a dynamic, compelling preview that loads quickly.
+- Use [useAysnc](./working_with_useasync.md) to load the necessary data without blocking the rendering process.
+- Import [useState](./working_with_usestate.md) or [useAysnc](./working_with_useasync.md) to load the data needed for the specific component only when that component is rendered.
+
+## How to: make parallel requests
+
+In Devvit, the first [render](./rendering_apps.md) happens on the server side. Parallel fetch requests will speed up the first render.
+
+### Before optimization: individual fetch requests
+
+In the render function of this interactive post, the app fetches data about the post, the user, the weather, and the leaderboard stats.
 
 ```tsx
 import { Devvit, useState } from '@devvit/public-api';
@@ -30,22 +85,22 @@ render: (context) => {
 };
 ```
 
-You can see that the app fetches data about the post, the user, the weather, and the leaderboard stats. In Devvit, the first [render](rendering_apps.md) happens on the server side, and all four data requests need to be resolved before the app can be rendered for the user.
+If each request takes roughly 250 ms, then four requests will take around 1 second to resolve. If we change the example to make those requests in parallel, it would take 250 ms to resolve all four!
 
-If each request takes roughly 250 ms, then four requests will take around 1 second to resolve. But, If we make these requests in parallel, it’ll take 250 ms to resolve all four!
+### After optimization: parallel fetch requests
 
-To achieve this, you can:
+You can do this in two ways:
 
-- use [`useAsync`](/docs/working_with_useasync.md) to make everything non-blocking
-- use [Promise.all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) inside of one `useState` to get all of the information as once
+- Use [useAsync](./working_with_useasync.md) to make everything non-blocking.
+- Use [Promise.all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) inside one [useState](./working_with_usestate.md) method to get all of the information at once.
 
 :::note
-The difference between these two methods is that `useState` will block render until it is resolved whereas `useAsync` will allow the app to render immediately. By rendering the app immediately, you will need to add `loading` states while the requests resolve.
-
-`useAsync` is the best choice for performance as it allows you to render parts of your application while others may still be loading.
+The main difference between these two methods is that `useState` blocks render until it is resolved, and `useAsync` allows the app to render immediately and requires loading states while the requests resolve.
 :::
 
-Here’s how the optimized version looks for `useAsync`:
+#### useAsync
+
+This is the best choice for performance because it allows you to render parts of your application while others may still be loading. Here’s how the same example looks for useAsync:
 
 ```tsx
 import { Devvit, useAsync } from '@devvit/public-api';
@@ -67,7 +122,9 @@ const { data: leaderboardStats, loading: leaderboardStatsLoading } = useAsync(as
 });
 ```
 
-and for `useState`:
+#### useState
+
+This is the same example using useState.
 
 ```tsx
 import { Devvit, useState } from '@devvit/public-api';
@@ -97,50 +154,101 @@ render: (context) => {
 You can see the app gets the same variables from the state object, which means that you won’t need to change the way you access the data from the state in the rest of the app.
 
 :::note
-If you need to update one of the state props, instead of
-`setPostInfo(newPostInfo)` you’ll need to do `setAppState({...appState, postInfo: newPostInfo})`.
+If you need to update one of the state props, you’ll need to do `setAppState({...appState, postInfo: newPostInfo})` instead of `setPostInfo(newPostInfo)`.
 :::
 
-## Fetch data for multiple users
+## How to: cache data
 
-Imagine your app needs to get data from an external resource, such as a weather API. The code would look like this:
+The following example shows how unoptimized code for fetching data from an external resource, like a weather API, looks:
 
 ```tsx
 import { Devvit, useState } from '@devvit/public-api';
 
-const [externalData] = useState(async (async) => {
+// naive, non-optimal way of fetching that kind of data
+const [externalData] = useState(async () => {
   const response = await fetch('https://external.weather.com');
 
   return await response.json();
 });
 ```
 
-### Request overload
+### Problem: request overload
 
-The [state](rendering_apps.md#state-variables) is initialized for each user that sees the app. This means that in a large subreddit, where thousands of users can see the post at the same time, your app would make thousands of requests to the external resource. This can put unnecessary pressure on the external resource or drain your request quota for the resource (if there is one). Some requests are just slow by their nature, so you might want to minimize the amount of duplicate requests to external resources.
+In this case, [state](./rendering_apps.md) is initialized for each user that sees the app. This means that in a large subreddit where thousands of users can see the post at the same time, your app would make thousands of requests to the external resource. If you request the data in an interval, like to get a game score or stock market information, then the load repeats on each interval tick. This is not ideal.
 
-This situation gets even worse if you request the data in an interval, like to get a game score or stock market information, because the load repeats on each interval tick.
+### Solution: make one request
 
-### Use cache helper
+You can use a [cache helper](./capabilities/cache.md) to make one request for data, save the response, and provide this response to all users requesting the same data. The cache lives at the subreddit level (not the app level).
 
-To address these issues, you can use the [cache helper](./capabilities/cache.md). This lets the app make one request for the data, saves the response and provides this response to all users requesting the same data.
+**Example: fetch weather data every 2 hours with cache helper**
 
-In addition to the request you’d like to optimize, cache helper needs two parameters:
+```tsx
+import { Devvit, useState } from '@devvit/public-api';
 
-- `key` is a string that is used to distinguish between different cached responses. Instead of making a real request, the app gets the response from cache using the key you provide. Just make sure to use different keys for different data (like if you’re saving post-specific data, add the postId to the cache key like `post_data_${postId}`).
-- `ttl` (time to live) is the number of milliseconds during which the cached response is expected to be relevant. Once it expires, the cached response will be voided and a real request is made to populate the cache again. You can treat it as a threshold, where `ttl` of 30000 would mean that a request is done no more than once per 30 seconds.
+// optimized, performant way of fetching that kind of data
+const [externalData] = useState(async () => {
+  return context.cache(
+    async () => {
+      const response = await fetch('https://external.weather.com');
+      return await response.json();
+    },
+    {
+      key: `weather_data`,
+      ttl: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
+    }
+  );
+});
+```
 
 :::note
-**Do not cache sensitive information**. Cache helper randomly selects one user to make the real request and saves the response to the cache for others to use. You should only use cache helper for non-personalized fetches, since the same response is available to all users.
+Do not cache sensitive information. Cache helper randomly selects one user to make the real request and saves the response to the cache for others to use. You should only use cache helper for non-personalized fetches, since the same response is available to all users.
 :::
 
-## Update the client state without intervals
+### Solution: schedule a job
 
-Imagine you have a game with a leaderboard. When a user wins and their score is saved, the leaderboard needs to update immediately for all active sessions. One way to achieve this is to set an interval to fetch leaderboard stats as often as possible, but making a request in the interval would trigger the circuit breaker and affect the performance of the app. In addition, each time a user viewed the app, it would spam the leaderboard database in an attempt to get the latest data.
+Alternatively, you can use [scheduler](./capabilities/scheduler.md) to make the request in background, save the response to [Redis](./capabilities/redis.md), and avoid unnecessary requests to the external resource.
 
-To achieve the best performance in this scenario, you can use [realtime](./capabilities/realtime.md) to send the leaderboard stats to all users directly.
+**Example: fetch weather data every 2 hours with a scheduled job**
 
-### Without realtime
+```tsx
+import { Devvit } from '@devvit/public-api';
+
+Devvit.addSchedulerJob({
+  name: 'fetch_weather_data',
+  onRun: async (_, context) => {
+    const response = await fetch('https://external.weather.com');
+    const responseData = await response.json();
+    await context.redis.set('weather_data', JSON.stringify(responseData));
+  },
+});
+
+Devvit.addTrigger({
+  event: 'AppInstall',
+  onEvent: async (_, context) => {
+    await context.scheduler.runJob({
+      cron: '0 */2 * * *', // runs at the top of every second hour
+      name: 'fetch_weather_data',
+    });
+  },
+});
+
+// inside the render method
+const [externalData] = useState(async () => {
+  return context.redis.get('fetch_weather_data');
+});
+
+export default Devvit;
+```
+
+## How to: update the client state without intervals​
+
+If you have a game with a leaderboard, scores need to be updated immediately for all active sessions.
+
+One way to achieve this is to set an interval to fetch leaderboard stats as often as possible, but making a request in the interval would [switch the execution to server environment](./rendering_apps.md#clientserver-environments) and affect the performance of the app. In addition, each time a user viewed the app, it would spam the leaderboard database in an attempt to get the latest data.
+
+To optimize performance, use [realtime](./capabilities/realtime.md) to send the leaderboard stats to all users directly.
+
+### Without realtime​
 
 Before using realtime, the leaderboard fetching code looked like this:
 
@@ -159,24 +267,27 @@ const leaderboardInterval = useInterval(async () => {
   const newLeaderboard = await getLeaderboard();
   setLeaderboard(newLeaderboard);
 }, 1000);
+
+leaderboardInterval.start();
 ```
 
-And code for setting the leaderboard looked like this:
+And code for updating the leaderboard looked like this:
 
 ```tsx
-await context.redis.zAdd('leaderboard', { member: `${username}:${datetime}`, score: gameScore });
+await context.redis.zAdd('leaderboard', { member: username, score: gameScore });
 ```
 
-### With realtime
+### With realtime​
 
 Using realtime, you can fetch the leaderboard during the initial render and emit the new leaderboard state when the user completes the game.
 
 This is the updated game completion code:
 
 ```tsx
-await context.redis.zAdd('leaderboard', { member: `${username}:${datetime}`, score: gameScore }); // stays as is
-const newLeaderboard = await getLeaderboard();
-context.realtime.send('leaderboard_updates', newLeaderboard);
+// stays as is
+await context.redis.zAdd('leaderboard', { member: username, score: gameScore });
+// new code
+context.realtime.send('leaderboard_updates', { member: username, score: gameScore });
 ```
 
 Now replace the interval with the realtime subscription:
@@ -188,10 +299,98 @@ const [leaderboard, setLeaderboard] = useState(async () => {
 
 const channel = useChannel({
   name: 'leaderboard_updates',
-  onMessage: (newLeaderboard) => {
-    setLeaderboard(newLeaderboard);
+  onMessage: (newLeaderboardEntry) => {
+    const newLeaderBoard = [...leaderboard, newMember] // append new entry
+      .sort((a, b) => b.score - a.score) // sort by score
+      .slice(0, 5); // leave top 5
+    setLeaderboard(newLeaderboard); // update the state
   },
 });
+
+channel.subscribe();
 ```
 
 Using realtime ensures that extra requests will not impact your app’s performance, and the app only emits the event when the data has changed.
+
+## How to: measure your app’s performance
+
+You can use `console.log` to calculate the operation time of your app.
+
+This example shows the render function of a basic post that fetches the number of subreddit members.
+
+```tsx
+const [subscriberCount] = useState<number>(async () => {
+  const devvitSubredditInfo = await context.reddit.getSubredditInfoByName('devvit');
+  return devvitSubredditInfo.subscribersCount || 0;
+});
+
+return (
+  // app markup goes here
+);
+```
+
+### Add a console log
+
+Before the above post can be rendered, two pieces of data need to be requested:
+subreddit subscribers count and user avatar url. You can measure the amount of time it takes to request data inside the `useState` hook.
+
+To do this, you can add:
+
+- A variable that stores the timestamp of the operation start.
+- A console log between the operation end and the return statement that prints the difference between the start and end in milliseconds.
+
+```tsx
+const [subscriberCount] = useState<number>(async () => {
+  const startSubscribersRequest = Date.now(); // a reference point for the request start
+  const devvitSubredditInfo = await context.reddit.getSubredditInfoByName('devvit');
+
+  console.log(`subscribers request took: ${Date.now() - startSubscribersRequest} milliseconds`);
+
+  return devvitSubredditInfo.subscribersCount || 0;
+});
+```
+
+Alternatively, you can measure the whole data collection step. On the first line of the render method you can declare a state variable:
+
+```tsx
+const [performanceStartRender] = useState(Date.now()); // a reference point for the render start
+```
+
+Add a console.log before the return statement:
+
+```tsx
+console.log(`Getting the data took: ${Date.now() - performanceStartRender} milliseconds`);
+```
+
+All of that put together will look like this:
+
+```tsx
+const [performanceStartRender] = useState(Date.now()); // a reference point for the render start
+
+const [subscriberCount] = useState<number>(async () => {
+  const startSubscribersRequest = Date.now(); // a reference point for the request start
+  const devvitSubredditInfo = await context.reddit.getSubredditInfoByName('devvit');
+
+  console.log(`subscribers request took: ${Date.now() - startSubscribersRequest} milliseconds`);
+
+  return devvitSubredditInfo.subscribersCount || 0;
+});
+
+console.log(`Getting the data took: ${Date.now() - performanceStartRender} milliseconds`);
+
+return (
+  // app markup goes here
+);
+```
+
+### Review your data
+
+Once you’ve set up your data collection, you can expect something like that in your logs:
+
+```
+subscribers request took: 106 milliseconds
+getting user avatar url took: 203 milliseconds
+getting the data took: 310 milliseconds
+```
+
+This will help you find the operations that affect your app’s performance.
