@@ -76,7 +76,12 @@ export function cricketMatchInfo(
   const homeTeam = getTeam(cricketMatch.sport_event.competitors, CricketQualifierType.Home);
   const awayTeam = getTeam(cricketMatch.sport_event.competitors, CricketQualifierType.Away);
 
-  if (homeTeam === undefined || awayTeam === undefined) {
+  if (
+    homeTeam === undefined ||
+    awayTeam === undefined ||
+    event.scheduled === undefined ||
+    cricketMatch.sport_event.scheduled === undefined
+  ) {
     return null;
   }
 
@@ -86,7 +91,12 @@ export function cricketMatchInfo(
 
   const matchTime = isLive
     ? 'LIVE'
-    : getMatchTimeString(cricketMatch, new Date(), basicCricketMatchInfo?.timezone);
+    : getMatchTimeString(
+        cricketMatch.sport_event.scheduled,
+        cricketMatch,
+        new Date(),
+        basicCricketMatchInfo?.timezone
+      );
 
   let matchNumberString: string | undefined = undefined;
   if (basicCricketMatchInfo?.matchNumber !== undefined) {
@@ -135,8 +145,8 @@ export function cricketMatchInfo(
   );
 
   let isSuperOver = false;
-  if (notEmpty(cricketMatch.statistics.innings)) {
-    isSuperOver = cricketMatch.statistics.innings.length > 2;
+  if (notEmpty(cricketMatch.statistics) && notEmpty(cricketMatch.statistics.innings)) {
+    isSuperOver = cricketMatch.statistics?.innings.length > 2;
   }
 
   return {
@@ -181,10 +191,10 @@ export function cricketMatchInfo(
 
 export function getCurrentBattingQualifier(
   isLive: boolean,
-  currentInning: number,
+  currentInning: number | undefined,
   battingResults: BattingResult[]
 ): CricketQualifierType | undefined {
-  if (!isLive) {
+  if (!isLive || currentInning === undefined) {
     return undefined;
   }
   const battingQualifiers = battingResults.filter((result) => {
@@ -212,7 +222,11 @@ export function getInfoStats(
 ): CricketScoreInfoStats {
   let displayOvers = 0;
 
-  if (battingResult !== undefined && notEmpty(cricketMatch.statistics.innings)) {
+  if (
+    battingResult !== undefined &&
+    notEmpty(cricketMatch.statistics) &&
+    notEmpty(cricketMatch.statistics.innings)
+  ) {
     let currentInning: CricketInning | undefined = undefined;
     if (cricketMatch.sport_event_status.current_inning === 1) {
       currentInning = cricketMatch.statistics.innings[0];
@@ -222,7 +236,8 @@ export function getInfoStats(
 
     if (
       currentInning !== undefined &&
-      currentInning.batting_team === battingResult?.battingTeamId
+      currentInning.batting_team === battingResult?.battingTeamId &&
+      cricketMatch.sport_event_status.display_overs !== undefined
     ) {
       displayOvers = cricketMatch.sport_event_status.display_overs;
     } else {
@@ -231,29 +246,25 @@ export function getInfoStats(
           return inning.batting_team === battingResult.battingTeamId;
         })
         .find(Boolean);
-      if (battingInning) {
+      if (battingInning && battingInning.teams !== undefined) {
         const teamResults = battingInning.teams
           .filter((team) => {
             return team.id === battingResult?.battingTeamId;
           })
           .find(Boolean);
-        const partnerships = teamResults?.statistics.batting?.partnerships;
+        const partnerships = teamResults?.statistics?.batting?.partnerships;
         if (
-          partnerships &&
+          partnerships !== undefined &&
           partnerships.length > 0 &&
           partnerships[partnerships.length - 1].wicket_number === 10 &&
-          partnerships[partnerships.length - 1].end
+          partnerships[partnerships.length - 1].end !== undefined
         ) {
-          displayOvers = partnerships[partnerships.length - 1].end;
-        } else {
-          if (cricketMatch.sport_event_status.allotted_overs !== undefined) {
-            displayOvers = cricketMatch.sport_event_status.allotted_overs;
-          }
-        }
-      } else {
-        if (cricketMatch.sport_event_status.allotted_overs !== undefined) {
+          displayOvers = partnerships[partnerships.length - 1].end!;
+        } else if (cricketMatch.sport_event_status.allotted_overs !== undefined) {
           displayOvers = cricketMatch.sport_event_status.allotted_overs;
         }
+      } else if (cricketMatch.sport_event_status.allotted_overs !== undefined) {
+        displayOvers = cricketMatch.sport_event_status.allotted_overs;
       }
     }
   }
@@ -265,13 +276,16 @@ export function getInfoStats(
 }
 
 function getTeamStatistics(cricketMatch: CricketMatch, teamId: string | undefined): CricketTeam[] {
-  if (!notEmpty(cricketMatch.statistics.innings)) {
+  if (!notEmpty(cricketMatch.statistics) || !notEmpty(cricketMatch.statistics.innings)) {
     return [];
   }
   return cricketMatch.statistics.innings.flatMap((inning) => {
-    return inning.teams.filter((team) => {
-      return team.id === teamId;
-    });
+    if (inning.teams) {
+      return inning.teams.filter((team) => {
+        return team.id === teamId;
+      });
+    }
+    return [];
   });
 }
 
@@ -293,19 +307,19 @@ export function getBattingStats(
 
   const battingPlayers = teamStatistics
     .flatMap((stat) => {
-      return stat.statistics.batting?.players;
+      return stat.statistics?.batting?.players;
     })
     .filter(notEmpty);
 
   const sortedRunners = battingPlayers
     .map((item, index) => ({ index, item }))
     .sort((a, b) => {
-      const aRuns = a.item.statistics.runs !== undefined ? a.item.statistics.runs : Infinity;
-      const bRuns = b.item.statistics.runs !== undefined ? b.item.statistics.runs : Infinity;
+      const aRuns = a.item.statistics?.runs !== undefined ? a.item.statistics.runs : Infinity;
+      const bRuns = b.item.statistics?.runs !== undefined ? b.item.statistics.runs : Infinity;
       return bRuns - aRuns || b.index - a.index;
     });
 
-  if (sortedRunners.length === 0 || sortedRunners[0].item.statistics.runs === undefined) {
+  if (sortedRunners.length === 0 || sortedRunners[0].item.statistics?.runs === undefined) {
     return undefined;
   }
 
@@ -315,7 +329,7 @@ export function getBattingStats(
   equalRunPlayers.push(sortedRunners[0].item);
 
   sortedRunners.forEach((item) => {
-    if (item.index !== 0 && item.item.statistics.runs === topRunnerRuns) {
+    if (item.index !== 0 && item.item.statistics?.runs === topRunnerRuns) {
       equalRunPlayers.push(item.item);
     }
   });
@@ -324,11 +338,20 @@ export function getBattingStats(
     .map((item, index) => ({ index, item }))
     .sort((a, b) => {
       const aRuns =
-        a.item.statistics.balls_faced !== undefined ? a.item.statistics.balls_faced : Infinity;
+        a.item.statistics?.balls_faced !== undefined ? a.item.statistics.balls_faced : Infinity;
       const bRuns =
-        b.item.statistics.balls_faced !== undefined ? b.item.statistics.balls_faced : Infinity;
+        b.item.statistics?.balls_faced !== undefined ? b.item.statistics.balls_faced : Infinity;
       return aRuns - bRuns || a.index - b.index;
     });
+
+  if (
+    sortedEqualRunnersByLessBalls.length === 0 ||
+    sortedEqualRunnersByLessBalls[0].item === undefined ||
+    sortedEqualRunnersByLessBalls[0].item.name === undefined ||
+    sortedEqualRunnersByLessBalls[0].item.statistics?.runs === undefined
+  ) {
+    return undefined;
+  }
 
   return (
     getPlayerName(sortedEqualRunnersByLessBalls[0].item.name) +
@@ -355,19 +378,19 @@ export function getBowlingStats(
 
   const bowlingPlayers = teamStatistics
     .flatMap((stat) => {
-      return stat.statistics.bowling?.players;
+      return stat.statistics?.bowling?.players;
     })
     .filter(notEmpty);
 
   const sortedTopBowlerByWickets = bowlingPlayers.sort((a, b) => {
-    const aWickets = a.statistics.wickets !== undefined ? a.statistics.wickets : Infinity;
-    const bWickets = b.statistics.wickets !== undefined ? b.statistics.wickets : Infinity;
+    const aWickets = a.statistics?.wickets !== undefined ? a.statistics.wickets : Infinity;
+    const bWickets = b.statistics?.wickets !== undefined ? b.statistics.wickets : Infinity;
     return bWickets - aWickets;
   });
 
   if (
     sortedTopBowlerByWickets.length === 0 ||
-    sortedTopBowlerByWickets[0].statistics.wickets === undefined ||
+    sortedTopBowlerByWickets[0].statistics?.wickets === undefined ||
     sortedTopBowlerByWickets[0].statistics.wickets === 0
   ) {
     return undefined;
@@ -379,15 +402,23 @@ export function getBowlingStats(
   equalWicketPlayers.push(sortedTopBowlerByWickets[0]);
 
   sortedTopBowlerByWickets.forEach((item, index) => {
-    if (index !== 0 && item.statistics.wickets === topBowlerWickets) {
+    if (index !== 0 && item.statistics?.wickets === topBowlerWickets) {
       equalWicketPlayers.push(item);
     }
   });
   const sortedEqualWicketPlayersByLessRuns = equalWicketPlayers.sort((a, b) => {
-    const aRuns = a.statistics.conceded_runs !== undefined ? a.statistics.conceded_runs : Infinity;
-    const bRuns = b.statistics.conceded_runs !== undefined ? b.statistics.conceded_runs : Infinity;
+    const aRuns = a.statistics?.conceded_runs !== undefined ? a.statistics.conceded_runs : Infinity;
+    const bRuns = b.statistics?.conceded_runs !== undefined ? b.statistics.conceded_runs : Infinity;
     return aRuns - bRuns;
   });
+
+  if (
+    sortedEqualWicketPlayersByLessRuns[0] === undefined ||
+    sortedEqualWicketPlayersByLessRuns[0].name === undefined ||
+    sortedEqualWicketPlayersByLessRuns[0].statistics === undefined
+  ) {
+    return undefined;
+  }
 
   const stat = sortedEqualWicketPlayersByLessRuns[0].statistics;
   return (
@@ -425,10 +456,17 @@ export function getSortedBattingResults(
 
   return cricketMatch.statistics.innings
     .map((inning) => {
-      const battingTeams = inning.teams.filter((team) => {
+      if (
+        inning.batting_team === undefined ||
+        inning.bowling_team === undefined ||
+        inning.number === undefined
+      ) {
+        return null;
+      }
+      const battingTeams = inning.teams?.filter((team) => {
         return team.id === inning.batting_team;
       });
-      if (battingTeams.length === 0) {
+      if (battingTeams === undefined || battingTeams?.length === 0) {
         return null;
       }
 
@@ -436,16 +474,16 @@ export function getSortedBattingResults(
 
       const qualifierType =
         inning.batting_team === homeTeam.id ? CricketQualifierType.Home : CricketQualifierType.Away;
-      const runs = battingTeam.statistics.batting?.runs ?? 0;
-      const wicketsLost = battingTeam.statistics.batting?.wickets_lost ?? 0;
+      const runs = battingTeam.statistics?.batting?.runs ?? 0;
+      const wicketsLost = battingTeam.statistics?.batting?.wickets_lost ?? 0;
 
       return {
         battingTeamId: inning.batting_team,
         bowlingTeamId: inning.bowling_team,
         inningNumber: inning.number,
-        oversRemaning: battingTeam.statistics.batting?.overs_remaining,
-        oversCompleted: inning.overs_completed,
-        ballsRemaning: battingTeam.statistics.batting?.balls_remaining,
+        oversRemaning: battingTeam.statistics?.batting?.overs_remaining,
+        oversCompleted: inning.overs_completed ?? 0,
+        ballsRemaning: battingTeam.statistics?.batting?.balls_remaining,
         wicketsLost: wicketsLost,
         runs: runs,
         qualifierType: qualifierType,
@@ -457,13 +495,19 @@ export function getSortedBattingResults(
 }
 
 export function getTeam(
-  competitors: CricketCompetitor[],
+  competitors: CricketCompetitor[] | undefined,
   type: CricketQualifierType
 ): CricketCompetitor | undefined {
+  if (competitors === undefined) {
+    return undefined;
+  }
   return competitors.filter((competitor) => competitor.qualifier === type).find(Boolean);
 }
 
-export function eventState(status: CricketEventStatusType): EventState {
+export function eventState(status: CricketEventStatusType | undefined): EventState {
+  if (status === undefined) {
+    return EventState.UNKNOWN;
+  }
   switch (status) {
     case CricketEventStatusType.NOT_STARTED:
     case CricketEventStatusType.CREATED:
@@ -523,11 +567,12 @@ export function getWinningQualifier(
 }
 
 export function getMatchTimeString(
+  scheduledDate: string,
   cricketMatch: CricketMatch,
   todaysDate: Date,
   timezone?: string
 ): string {
-  const matchDate = new Date(cricketMatch.sport_event.scheduled);
+  const matchDate = new Date(scheduledDate);
 
   if (
     cricketMatch.sport_event_status.status === CricketEventStatusType.CLOSED ||
@@ -576,6 +621,15 @@ export function getFirstLine(
   todaysDate: Date,
   timezone?: string
 ): string {
+  if (
+    cricketMatch.sport_event_status.status === undefined ||
+    cricketMatch.sport_event.scheduled === undefined ||
+    cricketMatch.sport_event.competitors === undefined ||
+    cricketMatch.sport_event.competitors.length < 2
+  ) {
+    return '';
+  }
+
   if (isMatchInAbnormalState(cricketMatch)) {
     const status = cricketMatch.sport_event_status.status;
     return status.charAt(0).toUpperCase() + status.slice(1);
@@ -725,7 +779,7 @@ export function getSecondLine(
   matchNumber: string | undefined,
   totalMatches: string | undefined
 ): string | undefined {
-  if (cricketMatch.sport_event.tournament === undefined) {
+  if (cricketMatch.sport_event.tournament?.type === undefined) {
     return undefined;
   }
   let suffix = '';

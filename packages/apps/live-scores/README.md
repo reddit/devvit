@@ -1,29 +1,14 @@
 An interactive post-type for sports games developed by Reddit! Install the app, create individual game posts for upcoming games, and pin the thread for more engaging game day threads! The posts include pre-game, live game, and post-game game overviews. Per-play updates are rendered during the game and allow communities to react to key plays.
 
 ### Soccer
-**Supported Leagues**
-
-* Bundesliga
-* English Premier League
-* English Championship 
-* English League One
-* English League Two
-* La Liga
-* Liga Mx
-* MLS
-* Serie A
-* Super Lig
-* UEFA Champions League
-* Croatian Football League
+Please use our new dedicated [soccer app](https://developers.reddit.com/apps/scoreboard-app)
 
 ### American Football
 **Supported Leagues**
 * NFL
 
 ### Basketball
-**Supported Leagues**
-* NBA
-* NCAA Mens
+Please use our new dedicated [basketball app](https://developers.reddit.com/apps/basketball-app)
 
 ### Cricket
 **Supported Leagues**

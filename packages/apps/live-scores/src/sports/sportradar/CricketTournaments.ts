@@ -1,8 +1,9 @@
 import type { Devvit } from '@devvit/public-api';
+
+import { getRelativeDate } from '../Timezones.js';
+import { APIKey } from './APIKeys.js';
 import type { CricketLeague } from './CricketLeague.js';
 import type { CricketSportEvent } from './CricketModels.js';
-import { APIKey } from './APIKeys.js';
-import { getRelativeDate } from '../Timezones.js';
 
 export type CricketTournaments = {
   generated_at: string;
@@ -62,7 +63,7 @@ function filterMatches(games: CricketSportEvent[]): CricketSportEvent[] {
 
   // Filter the games based on start_time
   return games.filter((game) => {
-    if (game.start_time_tbd) {
+    if (game.start_time_tbd || game.scheduled === undefined) {
       return false;
     }
     const gameDate = new Date(game.scheduled);

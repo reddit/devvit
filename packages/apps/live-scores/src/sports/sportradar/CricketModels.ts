@@ -33,7 +33,7 @@ export type CricketScoreInfoStats = {
 export type CricketMatch = {
   sport_event: CricketSportEvent;
   sport_event_status: CricketSportEventStatus;
-  statistics: {
+  statistics?: {
     innings?: CricketInning[];
   };
 };
@@ -41,10 +41,10 @@ export type CricketMatch = {
 // CricketSportEvent
 export type CricketSportEvent = {
   id: string;
-  scheduled: string;
-  start_time_tbd: boolean;
+  scheduled?: string;
+  start_time_tbd?: boolean;
   tournament?: CricketTournament;
-  competitors: CricketCompetitor[];
+  competitors?: CricketCompetitor[];
   venue?: CricketVenue;
   matchNumber?: string;
 };
@@ -52,7 +52,7 @@ export type CricketSportEvent = {
 export type CricketTournament = {
   id: string;
   name: string;
-  type: string;
+  type?: string;
 };
 
 export type CricketCompetitor = {
@@ -61,7 +61,7 @@ export type CricketCompetitor = {
   country?: string;
   country_code?: string;
   abbreviation: string;
-  qualifier: CricketQualifierType;
+  qualifier?: CricketQualifierType;
   gender?: string;
 };
 
@@ -74,48 +74,48 @@ export type CricketVenue = {
   id: string;
   name: string;
   city_name?: string;
-  country_name: string;
-  country_code: string;
+  country_name?: string;
+  country_code?: string;
 };
 
 export type CricketInning = {
-  number: number;
-  batting_team: string;
-  bowling_team: string;
-  overs_completed: number;
-  teams: CricketTeam[];
+  number?: number;
+  batting_team?: string;
+  bowling_team?: string;
+  overs_completed?: number;
+  teams?: CricketTeam[];
 };
 
 export type CricketTeam = {
   id: string;
   name: string;
   abbreviation: string;
-  statistics: CricketTeamStatistics;
+  statistics?: CricketTeamStatistics;
 };
 
 export type CricketTeamStatistics = {
   batting?: {
-    runs: number;
-    balls_remaining: number;
-    overs_remaining: number;
-    wickets_lost: number;
-    players: CricketPlayer[];
-    partnerships: CricketPartnership[];
+    runs?: number;
+    balls_remaining?: number;
+    overs_remaining?: number;
+    wickets_lost?: number;
+    players?: CricketPlayer[];
+    partnerships?: CricketPartnership[];
   };
   bowling?: {
-    players: CricketPlayer[];
+    players?: CricketPlayer[];
   };
 };
 
 export type CricketPartnership = {
-  wicket_number: number;
-  end: number;
+  wicket_number?: number;
+  end?: number;
 };
 
 export type CricketPlayer = {
-  id: string;
-  name: string;
-  statistics: CricketPlayerStatistic;
+  id?: string;
+  name?: string;
+  statistics?: CricketPlayerStatistic;
 };
 
 export type CricketPlayerStatistic = {
@@ -126,28 +126,28 @@ export type CricketPlayerStatistic = {
 };
 
 export type CricketSportEventStatus = {
-  match_status: string;
-  status: CricketEventStatusType;
-  display_score: string;
+  match_status?: string;
+  status?: CricketEventStatusType;
+  display_score?: string;
   winner_id?: string;
-  toss_won_by: string;
-  toss_decision: string;
-  current_inning: number;
-  display_overs: number;
-  run_rate: number;
+  toss_won_by?: string;
+  toss_decision?: string;
+  current_inning?: number;
+  display_overs?: number;
+  run_rate?: number;
   allotted_overs?: number;
   period_scores?: CricketPeriodScore[];
 };
 
 export type CricketPeriodScore = {
-  home_score: number;
-  away_score: number;
+  home_score?: number;
+  away_score?: number;
   type: string;
   number: number;
-  allotted_overs: number;
+  allotted_overs?: number;
   home_wickets?: number;
   away_wickets?: number;
-  display_score: string;
+  display_score?: string;
 };
 
 export enum CricketEventStatusType {

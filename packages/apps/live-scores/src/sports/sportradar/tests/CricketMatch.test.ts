@@ -47,12 +47,26 @@ const venue: CricketVenue = {
   country_code: 'code',
 };
 
+const homeTeam: CricketCompetitor = {
+  id: 'home_id',
+  abbreviation: 'home_abbreviation',
+  name: 'home_name',
+  qualifier: CricketQualifierType.Home,
+};
+
+const awayTeam: CricketCompetitor = {
+  id: 'away_id',
+  abbreviation: 'away_abbreviation',
+  name: 'away_name',
+  qualifier: CricketQualifierType.Away,
+};
+
 const sportEvent: CricketSportEvent = {
   id: 'id',
   scheduled: '2024-03-22T14:30:00+00:00',
   start_time_tbd: false,
   tournament: tournament,
-  competitors: [],
+  competitors: [homeTeam, awayTeam],
   venue: venue,
   matchNumber: '1',
 };
@@ -85,39 +99,25 @@ test.skip('Get match time string', async () => {
   cricketMatch.sport_event.scheduled = '2024-03-22T14:30:00+00:00';
 
   let currentDate = new Date('2024-03-21T14:30:00+00:00');
-  let matchTime = getMatchTimeString(cricketMatch, currentDate);
+  let matchTime = getMatchTimeString(cricketMatch.sport_event.scheduled, cricketMatch, currentDate);
   expect(matchTime).toEqual('Tomorrow');
 
   currentDate = new Date('2024-03-23T14:30:00+00:00');
-  matchTime = getMatchTimeString(cricketMatch, currentDate);
+  matchTime = getMatchTimeString(cricketMatch.sport_event.scheduled, cricketMatch, currentDate);
   expect(matchTime).toEqual('Yesterday');
 
   currentDate = new Date('2024-03-22T14:30:00+00:00');
-  matchTime = getMatchTimeString(cricketMatch, currentDate);
+  matchTime = getMatchTimeString(cricketMatch.sport_event.scheduled, cricketMatch, currentDate);
   expect(matchTime).toEqual('10:30 AM');
 
   currentDate = new Date('2024-03-20T14:30:00+00:00');
-  matchTime = getMatchTimeString(cricketMatch, currentDate);
+  matchTime = getMatchTimeString(cricketMatch.sport_event.scheduled, cricketMatch, currentDate);
   expect(matchTime).toEqual('March 22, 2024');
 
   currentDate = new Date('2024-03-24T14:30:00+00:00');
-  matchTime = getMatchTimeString(cricketMatch, currentDate);
+  matchTime = getMatchTimeString(cricketMatch.sport_event.scheduled, cricketMatch, currentDate);
   expect(matchTime).toEqual('March 22, 2024');
 });
-
-const homeTeam: CricketCompetitor = {
-  id: 'home_id',
-  abbreviation: 'home_abbreviation',
-  name: 'home_name',
-  qualifier: CricketQualifierType.Home,
-};
-
-const awayTeam: CricketCompetitor = {
-  id: 'away_id',
-  abbreviation: 'away_abbreviation',
-  name: 'away_name',
-  qualifier: CricketQualifierType.Away,
-};
 
 const battingResults: BattingResult[] = [];
 
@@ -387,7 +387,7 @@ test('Get batting results for no batting teams', async () => {
       teams: [],
     },
   ];
-  cricketMatch.statistics.innings = innings;
+  cricketMatch.statistics!.innings = innings;
 
   const sortedBattingResults = getSortedBattingResults(cricketMatch, homeTeamInfo);
   expect(sortedBattingResults).toEqual([]);
@@ -404,7 +404,7 @@ test('Get batting results for actual statistics 1 inning', async () => {
       teams: [homeCricketTeam, awayCricketTeam],
     },
   ];
-  cricketMatch.statistics.innings = innings;
+  cricketMatch.statistics!.innings = innings;
 
   const sortedBattingResults = getSortedBattingResults(cricketMatch, homeTeamInfo);
   const expectedBattingResults: BattingResult[] = [
@@ -442,7 +442,7 @@ test('Get batting results for actual statistics 2 innings', async () => {
       teams: [homeCricketTeam, awayCricketTeam],
     },
   ];
-  cricketMatch.statistics.innings = innings;
+  cricketMatch.statistics!.innings = innings;
 
   const expectedBattingResults: BattingResult[] = [
     {
@@ -1444,26 +1444,26 @@ test('Get validChatURL', async () => {
 /// test getBattingStats
 test('Get getBattingStats', async () => {
   cricketMatch.sport_event_status.status = CricketEventStatusType.COMPLETE;
-  cricketMatch.statistics.innings = statsInnings;
+  cricketMatch.statistics!.innings = statsInnings;
   expect(getBattingStats(cricketMatch, 'home_id')).toBe('player_3_name: 10');
 });
 
 /// test getBowlingStats
 test('Get getBowlingStats', async () => {
   cricketMatch.sport_event_status.status = CricketEventStatusType.COMPLETE;
-  cricketMatch.statistics.innings = statsInnings;
+  cricketMatch.statistics!.innings = statsInnings;
   expect(getBowlingStats(cricketMatch, 'away_id')).toBe('player_8_name: 3/19');
 });
 
 test('Get getBowlingStats for a live match', async () => {
   cricketMatch.sport_event_status.status = CricketEventStatusType.LIVE;
-  cricketMatch.statistics.innings = statsInnings;
+  cricketMatch.statistics!.innings = statsInnings;
   expect(getBowlingStats(cricketMatch, 'away_id')).toBe(undefined);
 });
 
 test('Get getBowlingStats for empty innings', async () => {
   cricketMatch.sport_event_status.status = CricketEventStatusType.COMPLETE;
-  cricketMatch.statistics.innings = [];
+  cricketMatch.statistics!.innings = [];
   expect(getBowlingStats(cricketMatch, 'away_id')).toBe(undefined);
 });
 
