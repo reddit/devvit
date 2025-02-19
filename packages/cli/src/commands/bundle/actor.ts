@@ -11,7 +11,7 @@ import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { distDirFilename } from '../../util/config.js';
 import { readDevvitConfig } from '../../util/devvitConfig.js';
-import { readAndInjectBundleProducts } from '../../util/payments/paymentsConfig.js';
+import { getPaymentsConfig, readProducts } from '../../util/payments/paymentsConfig.js';
 
 export default class BundleActor extends ProjectCommand {
   static override description = 'Bundle an actor into bundle.json';
@@ -40,7 +40,7 @@ export default class BundleActor extends ProjectCommand {
     const { args, flags } = await this.parse(BundleActor);
 
     const username = await this.#getOwnerUsername();
-    const config = await readDevvitConfig(this.projectRoot, this.configFile);
+    const config = await readDevvitConfig(this.projectRoot, this.configFileName);
 
     const actorSpec = {
       name: args.name,
@@ -57,6 +57,9 @@ export default class BundleActor extends ProjectCommand {
     const actorBundler = new Bundler();
 
     const bundles = await actorBundler.bundle(this.projectRoot, actorSpec, includeMetafile);
+    const products = await readProducts(this.projectRoot);
+
+    await mkdir(path.join(this.projectRoot, distDirFilename), { recursive: true });
 
     await Promise.all(
       bundles.map(async (bundle) => {
@@ -65,9 +68,11 @@ export default class BundleActor extends ProjectCommand {
         if (target === TargetRuntime.CLIENT) {
           type = '.client';
         }
-        await readAndInjectBundleProducts(this.projectRoot, bundle, false);
 
-        await mkdir(path.join(this.projectRoot, distDirFilename), { recursive: true });
+        if (products) {
+          bundle.paymentsConfig = await getPaymentsConfig(bundle, products, false);
+        }
+
         await writeFile(
           path.join(this.projectRoot, distDirFilename, `${actorSpec.name}.bundle${type}.json`),
           JSON.stringify(Bundle.toJSON(bundle))

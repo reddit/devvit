@@ -176,7 +176,7 @@ export default class New extends DevvitCommand {
     await this.#copyProjectTemplate();
 
     // Make devvit.yaml (we put in the app name as is without a unique suffix)
-    await generateDevvitConfig(this.#projectPath, this.configFile, {
+    await generateDevvitConfig(this.#projectPath, this.configFileName, {
       name: this.#createAppParams.appName,
       version: DevvitVersion.fromString('0.0.0').toString(),
     });

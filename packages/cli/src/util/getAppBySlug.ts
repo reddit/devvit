@@ -1,13 +1,13 @@
-import type { AppClient, FullAppInfo } from '@devvit/protos/community.js';
+import type { AppClient, FullAppInfo, GetAppBySlugRequest } from '@devvit/protos/community.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 
 export async function getAppBySlug(
   appClient: AppClient,
-  slug: string
+  request: GetAppBySlugRequest
 ): Promise<FullAppInfo | undefined> {
   try {
-    const appInfo = await appClient.GetBySlug({ slug });
+    const appInfo = await appClient.GetBySlug(request);
     return appInfo.app ? appInfo : undefined;
   } catch (err) {
     if (err instanceof TwirpError) {

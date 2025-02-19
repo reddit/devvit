@@ -24,24 +24,29 @@ import path from 'path';
 import type { Subscription } from 'rxjs';
 import { map } from 'rxjs';
 
-import Upload from '../commands/upload.js';
 import { REDDIT_DESKTOP } from '../lib/config.js';
 import { fetchSubredditSubscriberCount, isCurrentUserEmployee } from '../lib/http/gql.js';
 import { PlaytestServer } from '../lib/playtest-server.js';
 import type { CommandFlags } from '../lib/types/oclif.js';
 import { makeLogSubscription } from '../util/app-logs/make-log-subscription.js';
+import { AppVersionUploader } from '../util/AppVersionUploader.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { Bundler, type BundlerResult } from '../util/Bundler.js';
 import { checkAppNameAvailability } from '../util/checkAppNameAvailability.js';
-import { createInstallationsClient } from '../util/clientGenerators.js';
+import {
+  createAppClient,
+  createAppVersionClient,
+  createInstallationsClient,
+} from '../util/clientGenerators.js';
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
+import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
 import { updateDevvitConfig } from '../util/devvitConfig.js';
-import { getAppBySlug } from '../util/utils.js';
+import { getAppBySlug } from '../util/getAppBySlug.js';
 import Logs from './logs.js';
 
-export default class Playtest extends Upload {
+export default class Playtest extends ProjectCommand {
   static override description =
     'Installs your app to your test subreddit and starts a playtest session where a new version is installed whenever you save changes to your app code, and logs are continuously streamed';
 
@@ -81,7 +86,11 @@ export default class Playtest extends Upload {
     }),
   };
 
+  // API Clients
   readonly #installationsClient = createInstallationsClient();
+  readonly #appClient = createAppClient();
+  readonly #appVersionClient = createAppVersionClient();
+
   #appLogSub?: Subscription;
   readonly #bundler: Bundler = new Bundler(true);
   #installationInfo?: FullInstallationInfo | undefined;
@@ -121,7 +130,7 @@ export default class Playtest extends Upload {
     for (let i = 0; i < 20 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
       // version is still building: wait and try again
       await sleep(2000);
-      const info = await this.appVersionClient.Get({ id: appVersionInfo.id });
+      const info = await this.#appVersionClient.Get({ id: appVersionInfo.id });
 
       if (!info.appVersion) {
         this.error('Something went wrong, no app version available.');
@@ -177,7 +186,9 @@ export default class Playtest extends Upload {
     const username = await this.getUserDisplayName(token);
     await this.checkDeveloperAccount();
 
-    const appInfo: FullAppInfo | undefined = await getAppBySlug(this.appClient, this.#appName);
+    const appInfo: FullAppInfo | undefined = await getAppBySlug(this.#appClient, {
+      slug: this.#appName,
+    });
 
     if (appInfo?.app?.owner?.displayName !== username) {
       if (flags['employee-update']) {
@@ -189,7 +200,7 @@ export default class Playtest extends Upload {
         this.warn(`Overriding ownership check because you're an employee and told me to!`);
       } else {
         // Check if the app name is available, implying this is a first run
-        const appExists = await checkAppNameAvailability(this.appClient, this.#appName);
+        const appExists = await checkAppNameAvailability(this.#appClient, this.#appName);
         if (appExists.exists) {
           this.error(`That app already exists, and you can't playtest someone else's app!`);
         }
@@ -203,7 +214,7 @@ export default class Playtest extends Upload {
 
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
-    this.#appInfo = await getAppBySlug(this.appClient, this.#appName);
+    this.#appInfo = await getAppBySlug(this.#appClient, { slug: this.#appName });
 
     if (!this.#appInfo) {
       this.error(
@@ -248,7 +259,7 @@ export default class Playtest extends Upload {
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
     const appWithVersion = `${this.#appName}@${this.#version}`;
-    const appVersionId = await slugVersionStringToUUID(appWithVersion, this.appClient);
+    const appVersionId = await slugVersionStringToUUID(appWithVersion, this.#appClient);
 
     ux.action.start(`Checking for existing installation`);
     this.#installationInfo = await this.#getExistingInstallInfo(subreddit);
@@ -353,7 +364,7 @@ export default class Playtest extends Upload {
     this.#version.bumpVersion(VersionBumpType.Prerelease);
 
     // 2. update devvit yaml:
-    await updateDevvitConfig(this.projectRoot, this.configFile, {
+    await updateDevvitConfig(this.projectRoot, this.configFileName, {
       version: this.#version.toString(),
     });
 
@@ -363,11 +374,18 @@ export default class Playtest extends Upload {
     // 4. create new playtest version:
     let appVersionInfo: AppVersionInfo;
     try {
-      appVersionInfo = await this.createVersion(
-        this.#appInfo!.app,
-        this.#version,
-        this.#lastBundles,
-        VersionVisibility.PRIVATE
+      const appVersionCreator = new AppVersionUploader(this, {
+        verbose: Boolean(this.#flags?.verbose),
+      });
+
+      appVersionInfo = await appVersionCreator.createVersion(
+        {
+          appId: this.#appInfo.app.id,
+          appSlug: this.#appInfo.app.slug,
+          appSemver: this.#version,
+          visibility: VersionVisibility.PRIVATE,
+        },
+        this.#lastBundles
       );
     } catch (err) {
       ux.action.stop(chalk.red('Error'));
@@ -389,7 +407,7 @@ export default class Playtest extends Upload {
 
     // 6. install playtest version to specified subreddit:
     const appWithVersion = `${this.#appInfo!.app!.slug}@${this.#version}`;
-    const appVersionId = await slugVersionStringToUUID(appWithVersion, this.appClient);
+    const appVersionId = await slugVersionStringToUUID(appWithVersion, this.#appClient);
     const playtestUrl = chalk.bold.green(
       `${REDDIT_DESKTOP}/r/${subreddit}${
         this.#flags?.connect ? `?playtest=${this.#appInfo!.app!.slug}` : ''

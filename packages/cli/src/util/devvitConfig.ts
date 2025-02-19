@@ -31,9 +31,9 @@ export const DEVVIT_CONFIG_SCHEMA = {
 
 export async function readDevvitConfig(
   projectPath: string,
-  configFile: string
+  configFileName: string
 ): Promise<DevvitConfig> {
-  const configFilePath = getConfigFilepath(projectPath, configFile);
+  const configFilePath = getConfigFilepath(projectPath, configFileName);
   if (!(await isFile(configFilePath))) {
     throw new Error(`Devvit.yaml does not exist`);
   }
@@ -60,10 +60,10 @@ export async function readDevvitConfig(
 
 export async function updateDevvitConfig(
   projectPath: string,
-  configFile: string,
+  configFileName: string,
   updates: Partial<DevvitConfig>
 ): Promise<void> {
-  const config = await readDevvitConfig(projectPath, configFile);
+  const config = await readDevvitConfig(projectPath, configFileName);
   if (updates.name != null) {
     config.name = updates.name.toLowerCase();
   }
@@ -79,7 +79,7 @@ export async function updateDevvitConfig(
   validateConfig(config as unknown as JSONObject, DEVVIT_CONFIG_SCHEMA);
 
   const newConfigYaml = dumpJsonToYaml(config);
-  await writeFile(getConfigFilepath(projectPath, configFile), newConfigYaml);
+  await writeFile(getConfigFilepath(projectPath, configFileName), newConfigYaml);
 }
 
 export async function generateDevvitConfig(

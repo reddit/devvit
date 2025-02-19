@@ -21,17 +21,10 @@ import { imageSize } from 'image-size';
 import type { ISizeCalculationResult } from 'image-size/dist/types/interface.js';
 
 /**
- * reads src/products.json and injects products into bundle. Will throw an error if
- * 1. products.json is malformed
- * 2. payment handlers are not registered if a products.json is detected
- * note: this method is intentionally called outside of `this.createVersion` because it includes
- * validation steps that should exit early should errors be thrown
+ * Reads Products from src/products.json
+ * @throws if products.json is malformed
  */
-export async function readAndInjectBundleProducts(
-  projectRoot: string,
-  bundle: Bundle,
-  verifyProductImgAssets: boolean = true
-): Promise<void> {
+export async function readProducts(projectRoot: string): Promise<Product[] | undefined> {
   const productsJSONFile = path.join(projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
   try {
     await access(productsJSONFile);
@@ -40,9 +33,23 @@ export async function readAndInjectBundleProducts(
   }
 
   const fileJSON = await readFile(productsJSONFile, 'utf-8');
-  const products = parseProductsFileJSON(fileJSON);
+  return parseProductsFileJSON(fileJSON);
+}
+
+/**
+ * Validates product config and returns a PaymentsConfig
+ *
+ * @throws if payment handlers are not registered if a products.json is detected
+ * note: this method is intentionally called outside of `this.createVersion` because it includes
+ * validation steps that should exit early should errors be thrown
+ */
+export async function getPaymentsConfig(
+  bundle: Readonly<Bundle>,
+  products: Product[],
+  verifyProductImgAssets: boolean = true
+): Promise<PaymentsConfig> {
   checkProductsConfig(products, bundle, verifyProductImgAssets);
-  bundle.paymentsConfig = makePaymentsConfig(products);
+  return makePaymentsConfig(products);
 }
 
 function checkProductsConfig(
@@ -58,66 +65,69 @@ function checkProductsConfig(
     (prv) => prv.definition?.fullName === PaymentProcessorDefinition.fullName
   );
 
-  // check that if products were detected, that we are providing the `PaymentsProcessor` actor
-  if (hasProducts) {
-    if (!providesPaymentProcessor) {
+  if (!hasProducts) {
+    if (providesPaymentProcessor || usesPaymentPlugin) {
       throw new Error(
-        'You have a `products.json` with products, but your app does not handle payment processing of those products. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation to enable the payments feature.'
+        'To fully support the Payment capability in our app, you must specify products in the `src/products.json` config file. Please refer to https://developers.reddit.com/docs/capabilities/payments for more details.'
       );
     }
 
-    for (const product of products) {
-      const invalidKeys = filterToReservedDevvitMetadataKeys(Object.keys(product.metadata));
+    // no products, early return;
+    return;
+  }
 
-      // Enforced here on the CLI and also on the server. Server processing is done too late for error
-      // messages to reach the end user, so doing here prior to upload.
-      if (invalidKeys.length > 0) {
-        throw new Error(
-          `Products metadata cannot start with "devvit-". Invalid keys: ${invalidKeys.join(', ')}`
-        );
-      }
-    }
+  // check that if products were detected, that we are providing the `PaymentsProcessor` actor
+  if (!providesPaymentProcessor) {
+    throw new Error(
+      'You have a `products.json` with products, but your app does not handle payment processing of those products. Please refer to https://developers.reddit.com/docs/capabilities/payments for documentation to enable the payments feature.'
+    );
+  }
 
-    const missingAssets: string[] = [];
-    if (verifyProductImgAssets) {
-      // check that all product images are included in the assets
-      const assets = Object.keys(bundle.assetIds);
+  for (const product of products) {
+    const invalidKeys = filterToReservedDevvitMetadataKeys(Object.keys(product.metadata));
 
-      for (const product of products) {
-        // check to see if there are images associated with this product
-        if (!product.images) {
-          continue;
-        }
-
-        // find any assets used in products that are missing from the assets in the bundle
-        const missing = Object.values(product.images).filter(
-          (assetPath) => !assets.includes(assetPath)
-        );
-
-        // if there are missing assets, add them to the list and check the next product
-        if (missing.length > 0) {
-          missingAssets.push(...missing);
-          continue;
-        }
-
-        // enforce image constraints on icons
-        if (product.images.icon) {
-          validateProductIcon(path.join(ASSET_DIRNAME, product.images.icon));
-        }
-      }
-
-      if (missingAssets.length > 0) {
-        throw new Error(
-          `Product images ${missingAssets.join(', ')} are not included in the assets of the bundle. Please ensure that the image is included in the /assets directory.`
-        );
-      }
+    // Enforced here on the CLI and also on the server. Server processing is done too late for error
+    // messages to reach the end user, so doing here prior to upload.
+    if (invalidKeys.length > 0) {
+      throw new Error(
+        `Products metadata cannot start with "devvit-". Invalid keys: ${invalidKeys.join(', ')}`
+      );
     }
   }
 
-  if ((providesPaymentProcessor || usesPaymentPlugin) && !hasProducts) {
-    throw new Error(
-      'To fully support the Payment capability in our app, you must specify products in the `src/products.json` config file. Please refer to https://developers.reddit.com/docs/capabilities/payments for more details.'
-    );
+  const missingAssets: string[] = [];
+  if (verifyProductImgAssets) {
+    // check that all product images are included in the assets
+    const assets = Object.keys(bundle.assetIds);
+
+    for (const product of products) {
+      // check to see if there are images associated with this product
+      if (!product.images) {
+        continue;
+      }
+
+      // find any assets used in products that are missing from the assets in the bundle
+      const missing = Object.values(product.images).filter(
+        (assetPath) => !assets.includes(assetPath)
+      );
+
+      // if there are missing assets, add them to the list and check the next product
+      if (missing.length > 0) {
+        missingAssets.push(...missing);
+        continue;
+      }
+
+      // enforce image constraints on icons
+      if (product.images.icon) {
+        validateProductIcon(path.join(ASSET_DIRNAME, product.images.icon));
+      }
+    }
+
+    if (missingAssets.length > 0) {
+      throw new Error(
+        `Product images ${missingAssets.join(', ')} are not included in the assets of the bundle. Please ensure that the image is included in the /assets directory.`
+      );
+    }
   }
 }
 

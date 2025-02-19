@@ -7,8 +7,9 @@ import { AccountingType } from '@devvit/shared-types/payments/Product.js';
 import path from 'path';
 
 import {
+  getPaymentsConfig,
   makePaymentsConfig,
-  readAndInjectBundleProducts,
+  readProducts,
   validateProductIcon,
 } from './paymentsConfig.js';
 
@@ -31,19 +32,19 @@ const MOCK_PRODUCTS_JSON: { products: Product[] } = {
 };
 const MOCK_PRODUCTS_JSON_STRING = JSON.stringify(MOCK_PRODUCTS_JSON);
 
-describe(readAndInjectBundleProducts.name, () => {
+describe('Read and inject Bundle Products', () => {
   it('does not inject products into the bundle if products.json is not found', async () => {
-    const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
     vi.mocked(access).mockRejectedValueOnce(new Error('not found'));
-    await readAndInjectBundleProducts(PROJECT_ROOT, bundle);
-    expect(bundle.paymentsConfig).toBeUndefined();
+    const products = await readProducts(PROJECT_ROOT);
+
+    expect(products).toBeUndefined();
   });
 
-  it('does not inject products into the bundle if products.json is not formatted properly', async () => {
+  it('throws an error if products.json is not formatted properly', async () => {
     const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
     const products = [{ ...MOCK_PRODUCTS_JSON.products[0], price: 'not a number' }];
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
-    await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
+    await expect(() => readProducts(PROJECT_ROOT)).rejects.toThrowError(
       'products.json validation error'
     );
     expect(bundle.paymentsConfig).toBeUndefined();
@@ -53,9 +54,14 @@ describe(readAndInjectBundleProducts.name, () => {
     const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(MOCK_PRODUCTS_JSON_STRING);
-    await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
-      'your app does not handle payment processing'
-    );
+
+    await expect(async () => {
+      const products = await readProducts(PROJECT_ROOT);
+      if (products) {
+        bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
+      }
+    }).rejects.toThrowError('your app does not handle payment processing');
+
     expect(bundle.paymentsConfig).toBeUndefined();
   });
 
@@ -88,9 +94,14 @@ describe(readAndInjectBundleProducts.name, () => {
     };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
-    await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
-      `Product images ${productImage} are not included in the assets`
-    );
+
+    await expect(async () => {
+      const products = await readProducts(PROJECT_ROOT);
+      if (products) {
+        bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
+      }
+    }).rejects.toThrowError(`Product images ${productImage} are not included in the assets`);
+
     expect(bundle.paymentsConfig).toBeUndefined();
   });
 
@@ -112,9 +123,14 @@ describe(readAndInjectBundleProducts.name, () => {
     };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify({ products: [] }));
-    await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
-      'you must specify products in the `src/products.json` config file'
-    );
+
+    await expect(async () => {
+      const products = await readProducts(PROJECT_ROOT);
+      if (products) {
+        bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
+      }
+    }).rejects.toThrowError('you must specify products in the `src/products.json` config file');
+
     expect(bundle.paymentsConfig).toBeUndefined();
   });
 
@@ -141,7 +157,12 @@ describe(readAndInjectBundleProducts.name, () => {
     };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(MOCK_PRODUCTS_JSON_STRING);
-    await readAndInjectBundleProducts(PROJECT_ROOT, bundle);
+
+    const products = await readProducts(PROJECT_ROOT);
+    if (products) {
+      bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
+    }
+
     expect(bundle.paymentsConfig).toStrictEqual(makePaymentsConfig(MOCK_PRODUCTS_JSON.products));
   });
 
@@ -184,7 +205,13 @@ describe(readAndInjectBundleProducts.name, () => {
 
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
-    await expect(() => readAndInjectBundleProducts(PROJECT_ROOT, bundle)).rejects.toThrowError(
+
+    await expect(async () => {
+      const products = await readProducts(PROJECT_ROOT);
+      if (products) {
+        bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
+      }
+    }).rejects.toThrowError(
       'Products metadata cannot start with "devvit-". Invalid keys: devvit-invalid'
     );
   });
@@ -218,7 +245,12 @@ describe(readAndInjectBundleProducts.name, () => {
     };
     vi.mocked(access).mockResolvedValueOnce();
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
-    await readAndInjectBundleProducts(PROJECT_ROOT, bundle, false);
+
+    const productsFromConfig = await readProducts(PROJECT_ROOT);
+    if (productsFromConfig) {
+      bundle.paymentsConfig = await getPaymentsConfig(bundle, productsFromConfig, false);
+    }
+
     expect(bundle.paymentsConfig).toStrictEqual(makePaymentsConfig(products.products));
   });
 });

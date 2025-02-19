@@ -6,7 +6,7 @@ import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 
 import { createAppClient, createAppSettingsClient } from '../../util/clientGenerators.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
-import { getAppBySlug } from '../../util/utils.js';
+import { getAppBySlug } from '../../util/getAppBySlug.js';
 
 export default class ListAppSettings extends ProjectCommand {
   static override description =
@@ -18,15 +18,20 @@ export default class ListAppSettings extends ProjectCommand {
     const appName = projectConfig.slug ?? projectConfig.name;
     ux.action.start('Fetching app setting keys');
     try {
-      const appInfo = await getAppBySlug(this.#appService, appName);
-      if (!appInfo?.app?.id) {
+      const appInfo = await getAppBySlug(this.#appService, {
+        slug: appName,
+        hidePrereleaseVersions: true,
+        limit: 0,
+      });
+      const appId = appInfo?.app?.id;
+      if (!appId) {
         ux.action.stop(
           "Error: Your app doesn't exist yet - you'll need to run 'devvit upload' before you can list settings."
         );
         return;
       }
       const response = await this.#appSettingsService.GetForm({
-        appId: appInfo.app.id as string,
+        appId,
       });
       ux.action.stop();
       if (response) {

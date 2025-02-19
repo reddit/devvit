@@ -22,7 +22,7 @@ import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 export const toLowerCaseArgParser = async (input: string): Promise<string> => input.toLowerCase();
 
 export abstract class DevvitCommand extends Command {
-  #configFile: string | undefined;
+  #configFileName: string | undefined;
 
   static override baseFlags: FlagInput = {
     config: Flags.string({
@@ -32,9 +32,11 @@ export abstract class DevvitCommand extends Command {
     }),
   };
 
-  public get configFile(): string {
-    return this.#configFile ?? DEVVIT_CONFIG_FILE;
+  public get configFileName(): string {
+    return this.#configFileName ?? DEVVIT_CONFIG_FILE;
   }
+
+  protected readonly waitlistClient = createWaitlistClient();
 
   protected override async init(): Promise<void> {
     await super.init();
@@ -55,13 +57,12 @@ export abstract class DevvitCommand extends Command {
       flags: DevvitCommand.baseFlags,
     });
 
-    this.#configFile = flags.config;
-    if (this.#configFile !== DEVVIT_CONFIG_FILE) {
-      this.log(`Using custom config file: ${this.#configFile}`);
+    this.#configFileName = flags.config;
+    if (this.#configFileName !== DEVVIT_CONFIG_FILE) {
+      this.log(`Using custom config file: ${this.#configFileName}`);
     }
   }
 
-  readonly waitlistClient = createWaitlistClient();
   protected checkDeveloperAccount = async (): Promise<void> => {
     const { acceptedTermsVersion, currentTermsVersion } =
       await this.waitlistClient.GetCurrentUserStatus({});
@@ -145,11 +146,11 @@ export abstract class DevvitCommand extends Command {
   }
 
   protected async inferAppNameFromProject(): Promise<string> {
-    const projectRoot = await findProjectRoot(this.configFile);
+    const projectRoot = await findProjectRoot(this.configFileName);
     if (projectRoot == null) {
       this.error(`You must specify an app name or run this command from within a project.`);
     }
-    const devvitConfig = await readDevvitConfig(projectRoot, this.configFile);
+    const devvitConfig = await readDevvitConfig(projectRoot, this.configFileName);
 
     return devvitConfig.name;
   }
@@ -168,11 +169,11 @@ export abstract class DevvitCommand extends Command {
       return appWithVersion;
     }
 
-    const projectRoot = await findProjectRoot(this.configFile);
+    const projectRoot = await findProjectRoot(this.configFileName);
     if (projectRoot == null) {
       this.error(`You must specify an app name or run this command from within a project.`);
     }
-    const devvitConfig = await readDevvitConfig(projectRoot, this.configFile);
+    const devvitConfig = await readDevvitConfig(projectRoot, this.configFileName);
 
     if (!appWithVersion) {
       // getInfoForSlugString is called after this which will default to latest version so we don't need to return the
