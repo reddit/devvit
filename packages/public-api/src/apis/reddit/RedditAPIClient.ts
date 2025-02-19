@@ -1,4 +1,4 @@
-import type { JsonStatus, Metadata } from '@devvit/protos';
+import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT3ID, asT5ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
@@ -37,6 +37,7 @@ import type {
   SendPrivateMessageAsSubredditOptions,
   SendPrivateMessageOptions,
   SetPostFlairOptions,
+  SetUserFlairBatchConfig,
   SetUserFlairOptions,
   SubmitPostOptions,
   SubredditInfo,
@@ -1258,6 +1259,24 @@ export class RedditAPIClient {
    */
   async setUserFlair(options: SetUserFlairOptions): Promise<void> {
     return Flair.setUserFlair(options, this.#metadata);
+  }
+
+  /**
+   * Set the flair of multiple users in the same subreddit with a single API call.
+   * Can process up to 100 entries at once.
+   *
+   * @param subredditName - The name of the subreddit to edit flairs in.
+   * @param {SetUserFlairBatchConfig[]} flairs - Array of user flair configuration objects. If both text and cssClass are empty for a given user the flair will be cleared.
+   * @param flairs[].username - The username of the user to edit the flair for.
+   * @param flairs[].text - The text of the flair.
+   * @param flairs[].cssClass - The CSS class of the flair.
+   * @returns {FlairCsvResult[]} - Array of statuses for each entry provided.
+   */
+  async setUserFlairBatch(
+    subredditName: string,
+    flairs: SetUserFlairBatchConfig[]
+  ): Promise<FlairCsvResult[]> {
+    return Flair.setUserFlairBatch(subredditName, flairs, this.#metadata);
   }
 
   /**

@@ -1,4 +1,9 @@
-import type { FlairObject, Metadata, UserFlair as UserFlairProto } from '@devvit/protos';
+import {
+  type FlairCsvResult,
+  type FlairObject,
+  type Metadata,
+  type UserFlair as UserFlairProto,
+} from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { T3ID } from '@devvit/shared-types/tid.js';
 import { asT3ID } from '@devvit/shared-types/tid.js';
@@ -10,6 +15,7 @@ export enum FlairType {
   User = 'USER_FLAIR',
   Post = 'LINK_FLAIR',
 }
+
 export type AllowableFlairContent = 'all' | 'emoji' | 'text';
 export type FlairTextColor = 'light' | 'dark';
 export type FlairBackgroundColor = `#${string}` | 'transparent';
@@ -292,6 +298,15 @@ export type InternalSetPostFlairOptions = SetFlairOptions & {
   postId: T3ID;
 };
 
+export type SetUserFlairBatchConfig = {
+  /** The username of the user to edit the flair on */
+  username: string;
+  /** The flair text. Can't contain the comma character (",") */
+  text?: string | undefined;
+  /** The flair CSS class */
+  cssClass?: string | undefined;
+};
+
 export type UserFlairPageOptions = {
   /** A user id optionally provided which will result in a slice of user flairs, starting after this user, to be returned.  */
   after?: string;
@@ -374,6 +389,15 @@ export class Flair {
   }
 
   /** @internal */
+  static setUserFlairBatch(
+    subredditName: string,
+    flairs: SetUserFlairBatchConfig[],
+    metadata: Metadata | undefined
+  ): Promise<FlairCsvResult[]> {
+    return Flair.#setUserFlairBatch(subredditName, flairs, metadata);
+  }
+
+  /** @internal */
   static setPostFlair(options: SetPostFlairOptions, metadata: Metadata | undefined): Promise<void> {
     return Flair.#setFlair(
       {
@@ -405,6 +429,48 @@ export class Flair {
       },
       metadata
     );
+  }
+
+  /** @internal */
+  static async #setUserFlairBatch(
+    subredditName: string,
+    flairs: SetUserFlairBatchConfig[],
+    metadata: Metadata | undefined
+  ): Promise<FlairCsvResult[]> {
+    if (!flairs.length) {
+      return [];
+    }
+
+    const maxFlairsPerRequest = 100;
+    if (flairs.length > maxFlairsPerRequest) {
+      throw new Error('Unexpected input: flairs array cannot be longer than 100 entries.');
+    }
+
+    const csvDelimiter = ',';
+
+    const flairCsv = flairs
+      .map((userConfig) => {
+        for (const propertyName in userConfig) {
+          if (userConfig[propertyName as keyof SetUserFlairBatchConfig]?.includes(csvDelimiter)) {
+            throw new Error(`Unexpected input: ${propertyName} cannot contain the "," character`);
+          }
+        }
+        return [userConfig.username, userConfig.text || '', userConfig.cssClass || ''].join(
+          csvDelimiter
+        );
+      })
+      .join('\n');
+
+    const client = Devvit.redditAPIPlugins.Flair;
+    const response = await client.FlairCsv(
+      {
+        subreddit: subredditName,
+        flairCsv,
+      },
+      metadata
+    );
+
+    return response.result;
   }
 
   /** @internal */
