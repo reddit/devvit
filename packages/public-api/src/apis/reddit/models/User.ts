@@ -166,6 +166,7 @@ export class User {
   #url: string;
   // R2 bug: user object does not contain a permalink field
   #permalink: string;
+  #hasVerifiedEmail: boolean;
 
   #metadata: Metadata | undefined;
 
@@ -203,6 +204,7 @@ export class User {
 
     this.#url = new URL(data.subreddit?.url ?? '', 'https://www.reddit.com').toString();
     this.#permalink = data.subreddit?.url ?? '';
+    this.#hasVerifiedEmail = data.hasVerifiedEmail ?? false;
 
     this.#metadata = metadata;
   }
@@ -277,6 +279,13 @@ export class User {
    */
   get permalink(): string {
     return this.#permalink;
+  }
+
+  /**
+   * Indicates whether or not the user has verified their email address.
+   */
+  get hasVerifiedEmail(): boolean {
+    return this.#hasVerifiedEmail;
   }
 
   toJSON(): Pick<User, 'id' | 'username' | 'createdAt' | 'linkKarma' | 'commentKarma' | 'nsfw'> & {

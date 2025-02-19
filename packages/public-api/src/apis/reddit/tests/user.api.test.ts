@@ -98,6 +98,7 @@ describe('User API', () => {
           name: currentUsername,
           createdUtc: createdUtc,
           snoovatarSize: [],
+          hasVerifiedEmail: true,
         },
       };
       const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Users, 'UserAbout');
@@ -115,6 +116,7 @@ describe('User API', () => {
       expect(user?.id).toStrictEqual(currentUserId);
       expect(user?.username).toStrictEqual(currentUsername);
       expect(user?.createdAt).toStrictEqual(createdAt);
+      expect(user?.hasVerifiedEmail).toStrictEqual(true);
     });
   });
 

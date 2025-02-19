@@ -10,6 +10,7 @@ A class representing a user.
 
 - [commentKarma](models.User.md#commentkarma)
 - [createdAt](models.User.md#createdat)
+- [hasVerifiedEmail](models.User.md#hasverifiedemail)
 - [id](models.User.md#id)
 - [isAdmin](models.User.md#isadmin)
 - [linkKarma](models.User.md#linkkarma)
@@ -52,6 +53,18 @@ The date the user was created.
 #### Returns
 
 `Date`
+
+---
+
+### <a id="hasverifiedemail" name="hasverifiedemail"></a> hasVerifiedEmail
+
+• `get` **hasVerifiedEmail**(): `boolean`
+
+Indicates whether or not the user has verified their email address.
+
+#### Returns
+
+`boolean`
 
 ---
 
