@@ -44,7 +44,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Showcase',
-      items: ['showcase/apps', 'showcase/payments_examples', 'showcase/playgrounds', 'showcase/tutorials'],
+      items: ['showcase/apps', 'showcase/monetization_examples', 'showcase/playgrounds', 'showcase/tutorials'],
     },
     {
       type: 'category',
@@ -79,7 +79,7 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Payments',
+      label: 'Monetization',
       items: [
         'payments/payments_overview',
         'payments/payments_add',
