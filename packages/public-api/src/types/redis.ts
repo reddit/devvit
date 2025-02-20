@@ -1548,7 +1548,7 @@ export type RedisClient = {
    * ```ts
    * async function bitfieldExample(context: Devvit.Context) {
    *  const fooResults : number[] =
-   *    await context.redis.bitfield('foo', 'incrBy', 'i5', 100, 1, 'get', 'u4' 0);
+   *    await context.redis.bitfield('foo', 'incrBy', 'i5', 100, 1, 'get', 'u4', 0);
    *  console.log("fooResults: " + fooResults); // [1, 0]
    *
    *  const barResults : number[] =
@@ -1558,7 +1558,7 @@ export type RedisClient = {
    *      'incrBy', 'u2', 0, 1,
    *      'overflow', 'sat',
    *      'get', 'u2', 0,
-   *      'set, 'u2', 0, 3,
+   *      'set', 'u2', 0, 3,
    *      'incrBy', 'u2', 0, 1);
    *  console.log("barResults: " + barResults); // [0, 3, 0, 0, 3, 3]
    * }

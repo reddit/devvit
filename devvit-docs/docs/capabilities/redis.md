@@ -7,6 +7,7 @@ You can add a database to your app to store and retrieve data. The Redis plugin 
 - [Number operations](#numbers) for incrementing numbers
 - [Sorted sets](#sorted-set) for creating leaderboards
 - [Hashes](#hash) for managing a collection of key-value pairs
+- [Bitfields](#bitfield) for efficient operation on sequences of bits
 
 Each app version installed on a subreddit is namespaced, which means Redis data is siloed from other subreddits. Keep in mind that there won’t be a single source of truth for all installations of your app, since each app installation can only access the data that it has stored in the Redis database.
 
@@ -705,3 +706,59 @@ async function sortedSetExample7(context: Devvit.Context) {
 ```bash
 zScanResponse: {"cursor":0,"members":[{"score":10,"member":"kiwi"},{"score":20,"member":"mango"}]}
 ```
+
+</details>
+
+### Bitfield
+
+| **Command**                                                 | **Action**                                        |
+| ----------------------------------------------------------- | ------------------------------------------------- |
+| [bitfield](https://redis.io/docs/latest/commands/bitfield/) | Performs a sequence of operations on a bit string |
+
+<details><summary>Code Example</summary>
+
+```tsx
+async function bitfieldExample(context: Devvit.Context) {
+  const setBits: number[] = await context.redis.bitfield('foo', 'set', 'i5', '#0', 11);
+  console.log('Set result: ' + setBits); // [0]
+
+  const getBits: number[] = await context.redis.bitfield('foo', 'get', 'i5', '#0');
+  console.log('Get result: ' + setBits); // [11]
+
+  const manyOperations: number[] = await context.redis.bitfield(
+    'bar',
+    'set',
+    'u2',
+    0,
+    3,
+    'get',
+    'u2',
+    0,
+    'incrBy',
+    'u2',
+    0,
+    1,
+    'overflow',
+    'sat',
+    'get',
+    'u2',
+    0,
+    'set',
+    'u2',
+    0,
+    3,
+    'incrBy',
+    'u2',
+    0,
+    1
+  );
+  console.log('Results of many operations: ' + manyOperations); // [0, 3, 0, 0, 3, 3]
+}
+```
+
+```bash
+fooResults: [1, 0]
+barResults: [0, 3, 0, 0, 3, 3]
+```
+
+</details>
