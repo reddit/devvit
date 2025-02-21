@@ -3,5 +3,5 @@
 Guidelines, limitations, and help.
 
 - [Beta participation](beta_participation.md)
-- [Limitations](limits)
+- [Limitations](limits.md)
 - [Help](help.md)
