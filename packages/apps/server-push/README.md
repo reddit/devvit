@@ -4,7 +4,7 @@ This app demonstrates how to:
 
 * Use Devvit's scheduler to run a recurring job every minute.
 
-* Use the app install trigger to run an initialization job (i.e., starting the scheudler job).
+* Use the app install trigger to run an initialization job (i.e., starting the scheduler job).
 
 * Use realtime service to send information from a server to all active clients.
 
