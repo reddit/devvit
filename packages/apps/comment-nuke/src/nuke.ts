@@ -38,9 +38,6 @@ async function* getAllCommentsInPost(
 ): AsyncGenerator<Comment> {
   const comments = await post.comments.all();
   for (const comment of comments) {
-    if (!skipDistinguished || !comment.isDistinguished()) {
-      yield comment;
-    }
     yield* getAllCommentsInThread(comment, skipDistinguished);
   }
 }
