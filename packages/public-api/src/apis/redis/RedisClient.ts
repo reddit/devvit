@@ -254,6 +254,17 @@ export class TxClient implements TxClientLike {
     } else if (options?.by === 'score') {
       opts.byScore = true;
     }
+    if (options?.limit) {
+      if (opts.byLex || opts.byScore) {
+        opts.offset = options.limit.offset;
+        opts.count = options.limit.count;
+      } else {
+        throw new Error(
+          `zRange parsing error: 'limit' only allowed when 'byLex' or 'byScore' is set`
+        );
+      }
+    }
+
     await this.#storage.ZRange(
       {
         key: { key: key, transactionId: this.#transactionId },
@@ -500,6 +511,11 @@ export class RedisClient implements RedisClientLike {
     return response.value;
   }
 
+  async exists(...keys: string[]): Promise<number> {
+    const response = await this.storage.Exists({ keys, scope: this.scope }, this.#metadata);
+    return response.existingKeys;
+  }
+
   async del(...keys: string[]): Promise<void> {
     await this.storage.Del({ keys, scope: this.scope }, this.#metadata);
   }
@@ -728,6 +744,14 @@ export class RedisClient implements RedisClientLike {
     const fv = Object.entries(fieldValues).map(([field, value]) => ({ field, value }));
     const response = await this.storage.HSet({ key, fv, scope: this.scope }, this.#metadata);
     return response.value;
+  }
+
+  async hSetNX(key: string, field: string, value: string): Promise<number> {
+    const response = await this.storage.HSetNX(
+      { key, field, value, scope: this.scope },
+      this.#metadata
+    );
+    return response.success;
   }
 
   async hgetall(key: string): Promise<Record<string, string>> {

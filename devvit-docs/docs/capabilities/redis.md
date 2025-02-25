@@ -48,12 +48,13 @@ Not all Redis features are supported. If you would like to request a specific Re
 
 ### Simple read/write
 
-| **Command**                            | **Action**                                                            |
-| -------------------------------------- | --------------------------------------------------------------------- |
-| [get](https://redis.io/commands/get)   | Gets the value of key.                                                |
-| [set](https://redis.io/commands/set)   | Sets key to hold a string value.                                      |
-| [del](https://redis.io/commands/del)   | Removes the specified keys.                                           |
-| [type](https://redis.io/commands/type) | Returns the string representation of the type of value stored at key. |
+| **Command**                                | **Action**                                                            |
+| ------------------------------------------ | --------------------------------------------------------------------- |
+| [get](https://redis.io/commands/get)       | Gets the value of key.                                                |
+| [set](https://redis.io/commands/set)       | Sets key to hold a string value.                                      |
+| [exists](https://redis.io/commands/exists) | Returns number of given keys that exist.                              |
+| [del](https://redis.io/commands/del)       | Removes the specified keys.                                           |
+| [type](https://redis.io/commands/type)     | Returns the string representation of the type of value stored at key. |
 
 <details><summary>Code Example</summary>
 
@@ -61,6 +62,9 @@ Not all Redis features are supported. If you would like to request a specific Re
 async function simpleReadWriteExample(context: Devvit.Context) {
   // Set a key
   await context.redis.set('color', 'red');
+
+  // Check if a key exists
+  console.log('Key exists: ' + (await context.redis.exists('color')));
 
   // Get a key
   console.log('Color: ' + (await context.redis.get('color')));
@@ -149,17 +153,18 @@ Word length: 7
 
 Redis hashes can store up to ~ 4.2 billion key-value pairs. We recommend using hash for managing collections of key-value pairs whenever possible and iterating over it using a combination of `hscan`, `hkeys` and `hgetall`.
 
-| **Command**                                   | **Action**                                                                      |
-| --------------------------------------------- | ------------------------------------------------------------------------------- |
-| [hGet](https://redis.io/commands/hget)        | Returns the value associated with field in the hash stored at key.              |
-| [hMGet](https://redis.io/commands/hmget)      | Returns the value of all specified field in the hash stored at multiple keys.   |
-| [hSet](https://redis.io/commands/hset/)       | Sets the specified fields to their respective values in the hash stored at key. |
-| [hDel](https://redis.io/commands/hdel/)       | Removes the specified fields from the hash stored at key.                       |
-| [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash.                    |
-| [hKeys](https://redis.io/commands/hkeys/)     | Returns all field names in the hash stored at key.                              |
-| [hScan](https://redis.io/commands/hscan/)     | Iterates fields of Hash types and their associated values.                      |
-| [hIncrBy](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value.        |
-| [hLen](https://redis.io/commands/hlen/)       | Returns the number of fields contained in the hash stored at key.               |
+| **Command**                                   | **Action**                                                                       |
+| --------------------------------------------- | -------------------------------------------------------------------------------- |
+| [hGet](https://redis.io/commands/hget)        | Returns the value associated with field in the hash stored at key.               |
+| [hMGet](https://redis.io/commands/hmget)      | Returns the value of all specified field in the hash stored at multiple keys.    |
+| [hSet](https://redis.io/commands/hset/)       | Sets the specified fields to their respective values in the hash stored at key.  |
+| [hSetNX](https://redis.io/commands/hsetnx/)   | Sets field in the hash stored at key to value, only if field does not yet exist. |
+| [hDel](https://redis.io/commands/hdel/)       | Removes the specified fields from the hash stored at key.                        |
+| [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash.                     |
+| [hKeys](https://redis.io/commands/hkeys/)     | Returns all field names in the hash stored at key.                               |
+| [hScan](https://redis.io/commands/hscan/)     | Iterates fields of Hash types and their associated values.                       |
+| [hIncrBy](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value.         |
+| [hLen](https://redis.io/commands/hlen/)       | Returns the number of fields contained in the hash stored at key.                |
 
 <details><summary>Code Examples</summary>
 
