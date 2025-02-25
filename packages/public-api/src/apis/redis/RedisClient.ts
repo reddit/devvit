@@ -260,7 +260,7 @@ export class TxClient implements TxClientLike {
         opts.count = options.limit.count;
       } else {
         throw new Error(
-          `zRange parsing error: 'limit' only allowed when 'byLex' or 'byScore' is set`
+          `zRange parsing error: 'limit' only allowed when 'options.by' is 'lex' or 'score'`
         );
       }
     }
@@ -583,6 +583,18 @@ export class RedisClient implements RedisClientLike {
       opts.offset = 0;
       opts.count = 0;
     }
+
+    if (options?.limit) {
+      if (opts.byLex || opts.byScore) {
+        opts.offset = options.limit.offset;
+        opts.count = options.limit.count;
+      } else {
+        throw new Error(
+          `zRange parsing error: 'limit' only allowed when 'options.by' is 'lex' or 'score'`
+        );
+      }
+    }
+
     return (
       await this.storage.ZRange(
         { key: { key: key }, start: start + '', stop: stop + '', ...opts, scope: this.scope },
