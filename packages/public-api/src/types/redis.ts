@@ -827,6 +827,7 @@ export type RedisClient = {
   watch(...keys: string[]): Promise<TxClientLike>;
   /**
    * Get the value of key. If the key does not exist the special value nil is returned.
+   * An exception will be raised if the value of key is not a valid utf-8 encoding.
    * https://redis.io/commands/get/
    * @arg {} key
    * @returns value of key or null when key does not exist.
@@ -840,6 +841,23 @@ export type RedisClient = {
    * ```
    */
   get(key: string): Promise<string | undefined>;
+  /**
+   * Get the value of key and return it as a buffer.
+   * Use getBytes instead of get if you need to tolerate values that are not valid utf-8.
+   * If the key does not exist the special value nil is returned.
+   * https://redis.io/commands/get/
+   * @arg {} key
+   * @returns value of key or null when key does not exist.
+   * @example
+   * ```ts
+   * async function getExample(context: Devvit.Context) {
+   *  await context.redis.bitfield("nonutf8", "set", "u8", "0", "192");
+   *  const buf : string | undefined = await context.redis.getBuffer("nonutf8");
+   *  console.log("Bytes: " + JSON.stringify(buf));
+   * }
+   * ```
+   */
+  getBuffer(key: string): Promise<Buffer | undefined>;
   /**
    * Set key to hold the string value. If key already holds a value, it is overwritten
    * https://redis.io/commands/set/

@@ -441,6 +441,7 @@ export class RedisClient implements RedisClientLike {
 
   async get(key: string): Promise<string | undefined> {
     try {
+      console.log('storage is:', this.storage);
       const response = await this.storage.Get(
         { key, scope: this.scope },
         {
@@ -449,6 +450,25 @@ export class RedisClient implements RedisClientLike {
         }
       );
       return response !== null ? (response.value ?? undefined) : response;
+    } catch (e) {
+      if (isRedisNilError(e)) {
+        return undefined;
+      }
+
+      throw e;
+    }
+  }
+
+  async getBuffer(key: string): Promise<Buffer | undefined> {
+    try {
+      const response = await this.storage.GetBytes(
+        { key, scope: this.scope },
+        {
+          ...this.#metadata,
+          'throw-redis-nil': { values: ['true'] },
+        }
+      );
+      return response !== null ? Buffer.from(response.value) : response;
     } catch (e) {
       if (isRedisNilError(e)) {
         return undefined;
