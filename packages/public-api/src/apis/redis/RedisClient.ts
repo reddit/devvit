@@ -441,7 +441,6 @@ export class RedisClient implements RedisClientLike {
 
   async get(key: string): Promise<string | undefined> {
     try {
-      console.log('storage is:', this.storage);
       const response = await this.storage.Get(
         { key, scope: this.scope },
         {
