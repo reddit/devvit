@@ -923,6 +923,23 @@ export type RedisClient = {
    */
   type(key: string): Promise<string>;
   /**
+   * Renames key to newKey. It returns an error when key does not exist.
+   * https://redis.io/commands/rename/
+   * @arg {} key key to be renamed
+   * @arg {} newKey new key name
+   * @returns string returns "OK" if the key was renamed successfully
+   * @example
+   * ```ts
+   * async function renameExample(context: Devvit.Context) {
+   *  await context.redis.set("quantity", "5");
+   *  await context.redis.rename("quantity", "amount");
+   *  const value : string = await context.redis.get("amount");
+   *  console.log("Value: " + value);
+   * }
+   * ```
+   */
+  rename(key: string, newKey: string): Promise<string>;
+  /**
    * Returns the substring of the string value stored at key, determined by
    * the offsets start and end (both are inclusive).
    * https://redis.io/commands/getrange/
@@ -1651,7 +1668,7 @@ export type ZRangeOptions = {
    */
   reverse?: boolean;
   by: 'score' | 'lex' | 'rank';
-  limit: {
+  limit?: {
     offset: number;
     count: number;
   };
