@@ -3,7 +3,7 @@ import { readdirSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { URL, fileURLToPath } from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
 import util from 'node:util';
 
 import type { PenSave } from '@devvit/play';
