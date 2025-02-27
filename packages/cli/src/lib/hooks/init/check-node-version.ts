@@ -32,8 +32,8 @@ const hook: Hook<'init'> = async function () {
   }
 };
 
-const isWebcontainer = () =>
-  process.env.SHELL === "/bin/jsh" &&
-  process.versions.webcontainer
+function isWebContainer() {
+  return process.env.SHELL === '/bin/jsh' && process.versions.webcontainer;
+}
 
 export default hook;
