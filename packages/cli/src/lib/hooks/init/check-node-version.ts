@@ -5,7 +5,7 @@ import type { Hook } from '@oclif/core';
 const hook: Hook<'init'> = async function () {
   // TODO: remove this check after stackblitz ships node20 support
   if (isWebcontainer()) {
-    return
+    return;
   }
   // Verify that the user is using a supported version of Node.js, based on the engines property in package.json
   const require = createRequire(import.meta.url);
