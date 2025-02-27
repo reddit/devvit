@@ -3,6 +3,10 @@ import { createRequire } from 'node:module';
 import type { Hook } from '@oclif/core';
 
 const hook: Hook<'init'> = async function () {
+  // TODO: remove this check after stackblitz ships node20 support
+  if (isWebcontainer()) {
+    return;
+  }
   // Verify that the user is using a supported version of Node.js, based on the engines property in package.json
   const require = createRequire(import.meta.url);
   const { engines } = require('../../../../package.json');
@@ -21,11 +25,15 @@ const hook: Hook<'init'> = async function () {
     if (curVersion[i] < reqVersion[i]) {
       this.error(
         `Node.js ${requiredVersion} is required, but you are using Node.js ${currentVersion}. Check` +
-          `out our docs for notes on how to install the latest version of Node:\n` +
-          `https://developers.reddit.com/docs/get-started/environment#install-nodejs`
+        `out our docs for notes on how to install the latest version of Node:\n` +
+        `https://developers.reddit.com/docs/get-started/environment#install-nodejs`
       );
     }
   }
 };
+
+function isWebContainer() {
+  return process.env.SHELL === '/bin/jsh' && process.versions.webcontainer;
+}
 
 export default hook;
