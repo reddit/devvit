@@ -720,6 +720,11 @@ export class RedisClient implements RedisClientLike {
     return response !== null ? response.value : response;
   }
 
+  async rename(key: string, newKey: string): Promise<string> {
+    const response = await this.storage.Rename({ key, newKey, scope: this.scope }, this.#metadata);
+    return response.result;
+  }
+
   async hget(key: string, field: string): Promise<string | undefined> {
     return this.hGet(key, field);
   }
