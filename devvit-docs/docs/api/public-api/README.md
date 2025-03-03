@@ -5,9 +5,12 @@
 ### Namespaces
 
 - [Devvit](modules/Devvit.md)
+- [EventTypes](modules/EventTypes.md)
 
 ### Enumerations
 
+- [DeletionReason](enums/DeletionReason.md)
+- [EventSource](enums/EventSource.md)
 - [SettingScope](enums/SettingScope.md)
 
 ### Classes
@@ -195,10 +198,10 @@ The event name for when your app is installed
 
 #### Type declaration
 
-| Name      | Type                                                                              |
-| :-------- | :-------------------------------------------------------------------------------- |
-| `event`   | [`AppInstall`](README.md#appinstall)                                              |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AppInstall`\> |
+| Name      | Type                                                                                                              |
+| :-------- | :---------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`AppInstall`](README.md#appinstall)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`AppInstall`](interfaces/EventTypes.AppInstall.md)\> |
 
 ---
 
@@ -216,10 +219,10 @@ The event name for when your app is upgraded
 
 #### Type declaration
 
-| Name      | Type                                                                              |
-| :-------- | :-------------------------------------------------------------------------------- |
-| `event`   | [`AppUpgrade`](README.md#appupgrade)                                              |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AppUpgrade`\> |
+| Name      | Type                                                                                                              |
+| :-------- | :---------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`AppUpgrade`](README.md#appupgrade)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`AppUpgrade`](interfaces/EventTypes.AppUpgrade.md)\> |
 
 ---
 
@@ -381,10 +384,10 @@ The event name for when a comment is created, after safety delay
 
 #### Type declaration
 
-| Name      | Type                                                                                 |
-| :-------- | :----------------------------------------------------------------------------------- |
-| `event`   | [`CommentCreate`](README.md#commentcreate)                                           |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.CommentCreate`\> |
+| Name      | Type                                                                                                                    |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`CommentCreate`](README.md#commentcreate)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`CommentCreate`](interfaces/EventTypes.CommentCreate.md)\> |
 
 ---
 
@@ -402,10 +405,10 @@ The event name for when a comment is deleted
 
 #### Type declaration
 
-| Name      | Type                                                                                 |
-| :-------- | :----------------------------------------------------------------------------------- |
-| `event`   | [`CommentDelete`](README.md#commentdelete)                                           |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.CommentDelete`\> |
+| Name      | Type                                                                                                                    |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`CommentDelete`](README.md#commentdelete)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`CommentDelete`](interfaces/EventTypes.CommentDelete.md)\> |
 
 ---
 
@@ -423,10 +426,10 @@ The event name for when a comment is reported
 
 #### Type declaration
 
-| Name      | Type                                                                                 |
-| :-------- | :----------------------------------------------------------------------------------- |
-| `event`   | [`CommentReport`](README.md#commentreport)                                           |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.CommentReport`\> |
+| Name      | Type                                                                                                                    |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`CommentReport`](README.md#commentreport)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`CommentReport`](interfaces/EventTypes.CommentReport.md)\> |
 
 ---
 
@@ -444,10 +447,10 @@ The event name for when a comment is submitted
 
 #### Type declaration
 
-| Name      | Type                                                                                 |
-| :-------- | :----------------------------------------------------------------------------------- |
-| `event`   | [`CommentSubmit`](README.md#commentsubmit)                                           |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.CommentSubmit`\> |
+| Name      | Type                                                                                                                    |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`CommentSubmit`](README.md#commentsubmit)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`CommentSubmit`](interfaces/EventTypes.CommentSubmit.md)\> |
 
 ---
 
@@ -465,10 +468,10 @@ The event name for when a comment is updated
 
 #### Type declaration
 
-| Name      | Type                                                                                 |
-| :-------- | :----------------------------------------------------------------------------------- |
-| `event`   | [`CommentUpdate`](README.md#commentupdate)                                           |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.CommentUpdate`\> |
+| Name      | Type                                                                                                                    |
+| :-------- | :---------------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`CommentUpdate`](README.md#commentupdate)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`CommentUpdate`](interfaces/EventTypes.CommentUpdate.md)\> |
 
 ---
 
@@ -1001,10 +1004,10 @@ A number field
 
 #### Type declaration
 
-| Name      | Type                                                                                              |
-| :-------- | :------------------------------------------------------------------------------------------------ |
-| `event`   | [`AutomoderatorFilterComment`](README.md#automoderatorfiltercomment)                              |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AutomoderatorFilterComment`\> |
+| Name      | Type                                                                                                                                              |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `event`   | [`AutomoderatorFilterComment`](README.md#automoderatorfiltercomment)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`AutomoderatorFilterComment`](interfaces/EventTypes.AutomoderatorFilterComment.md)\> |
 
 ---
 
@@ -1014,16 +1017,16 @@ A number field
 
 #### Type declaration
 
-| Name      | Type                                                                                           |
-| :-------- | :--------------------------------------------------------------------------------------------- |
-| `event`   | [`AutomoderatorFilterPost`](README.md#automoderatorfilterpost)                                 |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.AutomoderatorFilterPost`\> |
+| Name      | Type                                                                                                                                        |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| `event`   | [`AutomoderatorFilterPost`](README.md#automoderatorfilterpost)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`AutomoderatorFilterPost`](interfaces/EventTypes.AutomoderatorFilterPost.md)\> |
 
 ---
 
 ### <a id="ontriggerrequest" name="ontriggerrequest"></a> OnTriggerRequest
 
-Ƭ **OnTriggerRequest**: `protos.PostFlairUpdate` \| `protos.PostSubmit` \| `protos.PostCreate` \| `protos.PostUpdate` \| `protos.PostReport` \| `protos.PostDelete` \| `protos.CommentSubmit` \| `protos.CommentCreate` \| `protos.CommentUpdate` \| `protos.CommentReport` \| `protos.CommentDelete` \| `protos.AppInstall` \| `protos.AppUpgrade` \| `protos.ModAction` \| `protos.ModMail` \| `protos.PostNsfwUpdate` \| `protos.PostSpoilerUpdate` \| `protos.AutomoderatorFilterPost` \| `protos.AutomoderatorFilterComment`
+Ƭ **OnTriggerRequest**: [`PostFlairUpdate`](interfaces/EventTypes.PostFlairUpdate.md) \| [`PostSubmit`](interfaces/EventTypes.PostSubmit.md) \| [`PostCreate`](interfaces/EventTypes.PostCreate.md) \| [`PostUpdate`](interfaces/EventTypes.PostUpdate.md) \| [`PostReport`](interfaces/EventTypes.PostReport.md) \| [`PostDelete`](interfaces/EventTypes.PostDelete.md) \| [`CommentSubmit`](interfaces/EventTypes.CommentSubmit.md) \| [`CommentCreate`](interfaces/EventTypes.CommentCreate.md) \| [`CommentUpdate`](interfaces/EventTypes.CommentUpdate.md) \| [`CommentReport`](interfaces/EventTypes.CommentReport.md) \| [`CommentDelete`](interfaces/EventTypes.CommentDelete.md) \| [`AppInstall`](interfaces/EventTypes.AppInstall.md) \| [`AppUpgrade`](interfaces/EventTypes.AppUpgrade.md) \| `protos.ModAction` \| `protos.ModMail` \| [`PostNsfwUpdate`](interfaces/EventTypes.PostNsfwUpdate.md) \| [`PostSpoilerUpdate`](interfaces/EventTypes.PostSpoilerUpdate.md) \| [`AutomoderatorFilterPost`](interfaces/EventTypes.AutomoderatorFilterPost.md) \| [`AutomoderatorFilterComment`](interfaces/EventTypes.AutomoderatorFilterComment.md)
 
 ---
 
@@ -1130,10 +1133,10 @@ The event name for when a post is created, after safety delay
 
 #### Type declaration
 
-| Name      | Type                                                                              |
-| :-------- | :-------------------------------------------------------------------------------- |
-| `event`   | [`PostCreate`](README.md#postcreate)                                              |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostCreate`\> |
+| Name      | Type                                                                                                              |
+| :-------- | :---------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`PostCreate`](README.md#postcreate)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`PostCreate`](interfaces/EventTypes.PostCreate.md)\> |
 
 ---
 
@@ -1151,10 +1154,10 @@ The event name for when a post is deleted
 
 #### Type declaration
 
-| Name      | Type                                                                              |
-| :-------- | :-------------------------------------------------------------------------------- |
-| `event`   | [`PostDelete`](README.md#postdelete)                                              |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostDelete`\> |
+| Name      | Type                                                                                                              |
+| :-------- | :---------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`PostDelete`](README.md#postdelete)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`PostDelete`](interfaces/EventTypes.PostDelete.md)\> |
 
 ---
 
@@ -1172,10 +1175,10 @@ The event name for when the flair of a post is updated
 
 #### Type declaration
 
-| Name      | Type                                                                                   |
-| :-------- | :------------------------------------------------------------------------------------- |
-| `event`   | [`PostFlairUpdate`](README.md#postflairupdate)                                         |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostFlairUpdate`\> |
+| Name      | Type                                                                                                                        |
+| :-------- | :-------------------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`PostFlairUpdate`](README.md#postflairupdate)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`PostFlairUpdate`](interfaces/EventTypes.PostFlairUpdate.md)\> |
 
 ---
 
@@ -1193,10 +1196,10 @@ The event name for when a post is marked/unmarked as nsfw
 
 #### Type declaration
 
-| Name      | Type                                                                                  |
-| :-------- | :------------------------------------------------------------------------------------ |
-| `event`   | [`PostNsfwUpdate`](README.md#postnsfwupdate)                                          |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostNsfwUpdate`\> |
+| Name      | Type                                                                                                                      |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `event`   | [`PostNsfwUpdate`](README.md#postnsfwupdate)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`PostNsfwUpdate`](interfaces/EventTypes.PostNsfwUpdate.md)\> |
 
 ---
 
@@ -1214,10 +1217,10 @@ The event name for when a post is reported
 
 #### Type declaration
 
-| Name      | Type                                                                              |
-| :-------- | :-------------------------------------------------------------------------------- |
-| `event`   | [`PostReport`](README.md#postreport)                                              |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostReport`\> |
+| Name      | Type                                                                                                              |
+| :-------- | :---------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`PostReport`](README.md#postreport)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`PostReport`](interfaces/EventTypes.PostReport.md)\> |
 
 ---
 
@@ -1235,10 +1238,10 @@ The event name for when a post is marked/unmarked as spoiler
 
 #### Type declaration
 
-| Name      | Type                                                                                     |
-| :-------- | :--------------------------------------------------------------------------------------- |
-| `event`   | [`PostSpoilerUpdate`](README.md#postspoilerupdate)                                       |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostSpoilerUpdate`\> |
+| Name      | Type                                                                                                                            |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------ |
+| `event`   | [`PostSpoilerUpdate`](README.md#postspoilerupdate)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`PostSpoilerUpdate`](interfaces/EventTypes.PostSpoilerUpdate.md)\> |
 
 ---
 
@@ -1256,10 +1259,10 @@ The event name for when a post is submitted
 
 #### Type declaration
 
-| Name      | Type                                                                              |
-| :-------- | :-------------------------------------------------------------------------------- |
-| `event`   | [`PostSubmit`](README.md#postsubmit)                                              |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostSubmit`\> |
+| Name      | Type                                                                                                              |
+| :-------- | :---------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`PostSubmit`](README.md#postsubmit)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`PostSubmit`](interfaces/EventTypes.PostSubmit.md)\> |
 
 ---
 
@@ -1277,10 +1280,10 @@ The event name for when a post is updated
 
 #### Type declaration
 
-| Name      | Type                                                                              |
-| :-------- | :-------------------------------------------------------------------------------- |
-| `event`   | [`PostUpdate`](README.md#postupdate)                                              |
-| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<`protos.PostUpdate`\> |
+| Name      | Type                                                                                                              |
+| :-------- | :---------------------------------------------------------------------------------------------------------------- |
+| `event`   | [`PostUpdate`](README.md#postupdate)                                                                              |
+| `onEvent` | [`TriggerOnEventHandler`](README.md#triggeroneventhandler)\<[`PostUpdate`](interfaces/EventTypes.PostUpdate.md)\> |
 
 ---
 
@@ -1681,27 +1684,27 @@ Maps a TriggerEvent to a Protobuf message and type.
 
 #### Type declaration
 
-| Name                         | Type                                                                              |
-| :--------------------------- | :-------------------------------------------------------------------------------- |
-| `AppInstall`                 | \{ `type`: `"AppInstall"` } & `protos.AppInstall`                                 |
-| `AppUpgrade`                 | \{ `type`: `"AppUpgrade"` } & `protos.AppUpgrade`                                 |
-| `AutomoderatorFilterComment` | \{ `type`: `"AutomoderatorFilterComment"` } & `protos.AutomoderatorFilterComment` |
-| `AutomoderatorFilterPost`    | \{ `type`: `"AutomoderatorFilterPost"` } & `protos.AutomoderatorFilterPost`       |
-| `CommentCreate`              | \{ `type`: `"CommentCreate"` } & `protos.CommentCreate`                           |
-| `CommentDelete`              | \{ `type`: `"CommentDelete"` } & `protos.CommentDelete`                           |
-| `CommentReport`              | \{ `type`: `"CommentReport"` } & `protos.CommentReport`                           |
-| `CommentSubmit`              | \{ `type`: `"CommentSubmit"` } & `protos.CommentSubmit`                           |
-| `CommentUpdate`              | \{ `type`: `"CommentUpdate"` } & `protos.CommentUpdate`                           |
-| `ModAction`                  | \{ `type`: `"ModAction"` } & `protos.ModAction`                                   |
-| `ModMail`                    | \{ `type`: `"ModMail"` } & `protos.ModMail`                                       |
-| `PostCreate`                 | \{ `type`: `"PostCreate"` } & `protos.PostCreate`                                 |
-| `PostDelete`                 | \{ `type`: `"PostDelete"` } & `protos.PostDelete`                                 |
-| `PostFlairUpdate`            | \{ `type`: `"PostFlairUpdate"` } & `protos.PostFlairUpdate`                       |
-| `PostNsfwUpdate`             | \{ `type`: `"PostNsfwUpdate"` } & `protos.PostNsfwUpdate`                         |
-| `PostReport`                 | \{ `type`: `"PostReport"` } & `protos.PostReport`                                 |
-| `PostSpoilerUpdate`          | \{ `type`: `"PostSpoilerUpdate"` } & `protos.PostSpoilerUpdate`                   |
-| `PostSubmit`                 | \{ `type`: `"PostSubmit"` } & `protos.PostSubmit`                                 |
-| `PostUpdate`                 | \{ `type`: `"PostUpdate"` } & `protos.PostUpdate`                                 |
+| Name                         | Type                                                                                                                              |
+| :--------------------------- | :-------------------------------------------------------------------------------------------------------------------------------- |
+| `AppInstall`                 | \{ `type`: `"AppInstall"` } & [`AppInstall`](interfaces/EventTypes.AppInstall.md)                                                 |
+| `AppUpgrade`                 | \{ `type`: `"AppUpgrade"` } & [`AppUpgrade`](interfaces/EventTypes.AppUpgrade.md)                                                 |
+| `AutomoderatorFilterComment` | \{ `type`: `"AutomoderatorFilterComment"` } & [`AutomoderatorFilterComment`](interfaces/EventTypes.AutomoderatorFilterComment.md) |
+| `AutomoderatorFilterPost`    | \{ `type`: `"AutomoderatorFilterPost"` } & [`AutomoderatorFilterPost`](interfaces/EventTypes.AutomoderatorFilterPost.md)          |
+| `CommentCreate`              | \{ `type`: `"CommentCreate"` } & [`CommentCreate`](interfaces/EventTypes.CommentCreate.md)                                        |
+| `CommentDelete`              | \{ `type`: `"CommentDelete"` } & [`CommentDelete`](interfaces/EventTypes.CommentDelete.md)                                        |
+| `CommentReport`              | \{ `type`: `"CommentReport"` } & [`CommentReport`](interfaces/EventTypes.CommentReport.md)                                        |
+| `CommentSubmit`              | \{ `type`: `"CommentSubmit"` } & [`CommentSubmit`](interfaces/EventTypes.CommentSubmit.md)                                        |
+| `CommentUpdate`              | \{ `type`: `"CommentUpdate"` } & [`CommentUpdate`](interfaces/EventTypes.CommentUpdate.md)                                        |
+| `ModAction`                  | \{ `type`: `"ModAction"` } & `protos.ModAction`                                                                                   |
+| `ModMail`                    | \{ `type`: `"ModMail"` } & `protos.ModMail`                                                                                       |
+| `PostCreate`                 | \{ `type`: `"PostCreate"` } & [`PostCreate`](interfaces/EventTypes.PostCreate.md)                                                 |
+| `PostDelete`                 | \{ `type`: `"PostDelete"` } & [`PostDelete`](interfaces/EventTypes.PostDelete.md)                                                 |
+| `PostFlairUpdate`            | \{ `type`: `"PostFlairUpdate"` } & [`PostFlairUpdate`](interfaces/EventTypes.PostFlairUpdate.md)                                  |
+| `PostNsfwUpdate`             | \{ `type`: `"PostNsfwUpdate"` } & [`PostNsfwUpdate`](interfaces/EventTypes.PostNsfwUpdate.md)                                     |
+| `PostReport`                 | \{ `type`: `"PostReport"` } & [`PostReport`](interfaces/EventTypes.PostReport.md)                                                 |
+| `PostSpoilerUpdate`          | \{ `type`: `"PostSpoilerUpdate"` } & [`PostSpoilerUpdate`](interfaces/EventTypes.PostSpoilerUpdate.md)                            |
+| `PostSubmit`                 | \{ `type`: `"PostSubmit"` } & [`PostSubmit`](interfaces/EventTypes.PostSubmit.md)                                                 |
+| `PostUpdate`                 | \{ `type`: `"PostUpdate"` } & [`PostUpdate`](interfaces/EventTypes.PostUpdate.md)                                                 |
 
 ---
 
