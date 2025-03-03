@@ -1,9 +1,5 @@
 # Web views
 
-:::note
-Web views is currently experimental. Web view apps will be publishable once they are using focus mode and the `useWebView` hook.
-:::
-
 Web views allow you to include HTML, CSS, and JavaScript and have it run within your Reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
 
 ## Migration guide
