@@ -118,7 +118,7 @@ export default class Upload extends ProjectCommand {
       appInfo = await getAppBySlug(this.#appClient, {
         slug: appName,
         hidePrereleaseVersions: true,
-        limit: 1,
+        limit: 1, // fetched version limit; we only need the latest one
       });
     } catch (e) {
       this.error(StringUtil.caughtToString(e, 'message'));
@@ -133,7 +133,7 @@ export default class Upload extends ProjectCommand {
       if (flags['employee-update'] || flags.justDoIt) {
         const isEmployee = await isCurrentUserEmployee(token);
         if (!isEmployee) {
-          this.error(`You can't update someone else's app.`);
+          this.error(`You're not an employee, so you can't playtest someone else's app.`);
         }
         // Else, we're an employee, so we can update someone else's app
         this.warn(`Overriding ownership check because you're an employee and told me to!`);

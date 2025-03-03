@@ -160,30 +160,51 @@ export abstract class DevvitCommand extends Command {
    *
    * Case 1: devvit <publish|install> <app-name>@<version>  - can be run anywhere
    * Case 1: devvit <publish|install> <app-name>            - can be run anywhere
-   * Case 3: devvit <publish|install> <version>             - must be in project directory
+   * Case 3: devvit <publish|install> @<version>            - must be in project directory
    * Case 2: devvit <publish|install>                       - must be in project directory
    */
-  protected async inferAppNameAndVersion(appWithVersion: string | undefined): Promise<string> {
-    if (appWithVersion && !appWithVersion.startsWith('@')) {
-      // assume it is the form <app-name>@<version> or <app-name>
-      return appWithVersion;
+  protected async inferAppNameAndVersion(
+    appWithVersion: string | undefined
+  ): Promise<{ appName: string; version: string }> {
+    appWithVersion = appWithVersion ?? '';
+
+    // If the agrument has "<app-name>@<version>" format, then both appName and version can be inferred
+    if (appWithVersion.includes('@') && !appWithVersion.startsWith('@')) {
+      const [appName, version] = appWithVersion.split('@');
+
+      return {
+        appName,
+        version,
+      };
     }
 
+    // If the agrument has "<app-name>" format, then we assume the version as "latest"
+    if (appWithVersion.length > 0 && !appWithVersion.includes('@')) {
+      return {
+        appName: appWithVersion,
+        version: 'latest',
+      };
+    }
+
+    // Otherwise, we need to read appName or app version from the config
     const projectRoot = await findProjectRoot(this.configFileName);
     if (projectRoot == null) {
       this.error(`You must specify an app name or run this command from within a project.`);
     }
     const devvitConfig = await readDevvitConfig(projectRoot, this.configFileName);
 
-    if (!appWithVersion) {
-      // getInfoForSlugString is called after this which will default to latest version so we don't need to return the
-      // version here
-      return devvitConfig.name;
-    }
+    // If the agrument has "@<version>" format
     if (appWithVersion.startsWith('@')) {
-      return `${devvitConfig.name}${appWithVersion}`;
+      return {
+        appName: devvitConfig.name,
+        version: appWithVersion,
+      };
     }
 
-    return appWithVersion;
+    // Otherwise, default to the config values
+    return {
+      appName: devvitConfig.name,
+      version: devvitConfig.version,
+    };
   }
 }

@@ -1,42 +1,7 @@
-import type { AppClient, AppVersionInfo } from '@devvit/protos/community.js';
-import { type FullAppInfo } from '@devvit/protos/community.js';
+import type { AppVersionInfo } from '@devvit/protos/community.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 
-export async function getInfoForSlugString(
-  slugVersionString: string,
-  appClient: AppClient
-): Promise<{ appInfo: FullAppInfo; appVersion: AppVersionInfo }> {
-  // Split this out into the slug and the optional version identifier
-  const split = slugVersionString.split('@');
-  const slug = split[0];
-  let version = 'latest';
-  if (split.length === 2) {
-    version = split[1];
-  } else if (split.length > 2) {
-    throw Error(`Invalid app@version string given: ${slugVersionString}`);
-  }
-
-  let appInfo: FullAppInfo;
-  try {
-    appInfo = await appClient.GetBySlug({ slug });
-  } catch (e) {
-    throw new Error(`${e}. Please run 'devvit upload' and try your command again.`);
-  }
-
-  return {
-    appInfo: appInfo,
-    appVersion: getCorrectVersion(version, appInfo.versions),
-  };
-}
-
-export async function slugVersionStringToUUID(
-  slugVersionString: string,
-  appClient: AppClient
-): Promise<string> {
-  return (await getInfoForSlugString(slugVersionString, appClient)).appVersion.id;
-}
-
-function getCorrectVersion(version: string, appVersions: AppVersionInfo[]): AppVersionInfo {
+export function getVersionByNumber(version: string, appVersions: AppVersionInfo[]): AppVersionInfo {
   const latest = getLatestVersion(appVersions);
   if (version === 'latest') {
     return latest;

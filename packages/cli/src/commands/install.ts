@@ -1,6 +1,7 @@
 import os from 'node:os';
 
 import type {
+  FullAppInfo,
   FullInstallationInfo,
   MultipleInstallationsResponse,
 } from '@devvit/protos/community.js';
@@ -18,7 +19,8 @@ import {
 } from '../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
-import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
+import { getVersionByNumber } from '../util/common-actions/getVersionByNumber.js';
+import { getAppBySlug } from '../util/getAppBySlug.js';
 
 export default class Install extends DevvitCommand {
   static override description =
@@ -55,7 +57,7 @@ export default class Install extends DevvitCommand {
     const { args } = await this.parse(Install);
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
-    const appWithVersion = await this.inferAppNameAndVersion(args.appWithVersion);
+    const inferredParams = await this.inferAppNameAndVersion(args.appWithVersion);
 
     await this.checkIfUserLoggedIn();
     await this.checkDeveloperAccount();
@@ -63,7 +65,25 @@ export default class Install extends DevvitCommand {
     const token = await getAccessTokenAndLoginIfNeeded();
     const userT2Id = await this.getUserT2Id(token);
 
-    const { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);
+    let appInfo: FullAppInfo | undefined;
+    try {
+      appInfo = await getAppBySlug(this.#appClient, {
+        slug: inferredParams.appName,
+        hidePrereleaseVersions: true,
+      });
+    } catch (err) {
+      this.error(
+        `App ${inferredParams.appName} is not found. Please run 'devvit upload' and try again.\n${StringUtil.caughtToString(err, 'message')}`
+      );
+    }
+
+    if (!appInfo?.app) {
+      this.error(
+        `App ${inferredParams.appName} is not found. Please run 'devvit upload' and try again.`
+      );
+    }
+
+    const appVersion = await getVersionByNumber(inferredParams.version, appInfo?.versions);
 
     const name = appInfo.app!.slug;
     const version = DevvitVersion.fromProtoAppVersionInfo(appVersion).toString();
