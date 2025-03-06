@@ -47,7 +47,7 @@ import { updateDevvitConfig } from '../util/devvitConfig.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import Logs from './logs.js';
 
-const ON_WATCH_DEBOUNCE_MS_DEFAULT = 300;
+const ON_WATCH_DEBOUNCE_MS_DEFAULT = 100;
 
 export default class Playtest extends ProjectCommand {
   static override description =
