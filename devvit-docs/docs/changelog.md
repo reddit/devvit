@@ -4,6 +4,47 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.8: Minor Redis, Reddit API, and CLI improvements
+
+**Release Date: Mar 10, 2025**
+
+This version of Devvit includes a few small quality-of-life updates for our developers. If you have any feedback, please let us know.
+
+**New Features**
+
+Additional Redis support, which includes:
+
+- `bitfield` support for Redis
+- Redis `rename`, `exist`, and `hSetNX` commands
+- a limit option to `zRange`
+
+Reddit API Client changes:
+
+- added `hasVerifiedEmail` field on the user object
+- added `setUserFlairBatch` to bulk update user flair
+
+CLI changes:
+
+- Added a small (100ms) debounce to devvit playtest to prevent issues from file generation causing multiple uploads. To modify this, you can:
+  - Set your own debounce with a flag (e.g. `devvit playtest --debounce=0`)
+  - Configure a debounce time in your `package.json`
+
+```tsx
+// in package.json
+
+{
+  "devvit": {
+    "playtest": {
+      "debounceConfigMs": 1000
+    }
+  }
+}
+```
+
+**Fixes**
+
+You can now create an image post that would previously error out.
+
 ## Devvit 0.11.7: The next step for web views
 
 We’re impressed by the adoption of web views and the powerful apps the developer community has built with it. It’s exciting to see so many devs embrace this experimental feature!
