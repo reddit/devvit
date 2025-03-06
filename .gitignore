@@ -78,3 +78,6 @@ yarn.lock # Don't commit this - we'll generate it ourselves.
 
 
 .snootobuf
+
+__e2e__/playwright/tmp/
+__e2e__/playwright/test-results/
