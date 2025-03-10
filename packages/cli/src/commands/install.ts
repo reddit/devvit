@@ -69,7 +69,6 @@ export default class Install extends DevvitCommand {
     try {
       appInfo = await getAppBySlug(this.#appClient, {
         slug: inferredParams.appName,
-        hidePrereleaseVersions: true,
       });
     } catch (err) {
       this.error(
