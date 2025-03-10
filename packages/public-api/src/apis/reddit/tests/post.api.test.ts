@@ -5,6 +5,7 @@ import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.j
 import { describe, expect, test, vi } from 'vitest';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import { RunAs } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { Post } from '../models/Post.js';
 import { createPreview } from './utils/createTestPreview.js';
@@ -157,6 +158,7 @@ describe('Post API', () => {
             richtextJson:
               'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
             richtextFallback: 'This is a post with text as a fallback',
+            runAs: RunAs.APP,
           },
           metadata
         );
@@ -195,6 +197,7 @@ describe('Post API', () => {
               'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
             richtextFallback:
               '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
+            runAs: RunAs.APP,
           },
           metadata
         );
@@ -234,6 +237,7 @@ describe('Post API', () => {
               'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
             richtextFallback:
               '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
+            runAs: RunAs.APP,
           },
           metadata
         );

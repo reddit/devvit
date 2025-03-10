@@ -16,6 +16,7 @@ import { fromByteArray } from 'base64-js';
 import { Devvit } from '../../../devvit/Devvit.js';
 import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
 import { BlocksHandler } from '../../../devvit/internals/blocks/handler/BlocksHandler.js';
+import { RunAs } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
@@ -1076,6 +1077,8 @@ export class Post {
   static async submit(options: SubmitPostOptions, metadata: Metadata | undefined): Promise<Post> {
     const client = Devvit.redditAPIPlugins.LinksAndComments;
 
+    // Temporary change: Always default runAs to 'APP'. The behavior can still be overwritten to runAs: 'USER' using the runAs config.
+    const runAs = RunAs.APP;
     let response: SubmitResponse;
 
     if ('preview' in options) {
@@ -1098,6 +1101,7 @@ export class Post {
         sr: options.subredditName,
         richtextJson: fromByteArray(encodedCached),
         richtextFallback,
+        runAs,
         ...sanitizedOptions,
       };
 
@@ -1108,6 +1112,7 @@ export class Post {
           kind: 'kind' in options ? options.kind : 'url' in options ? 'link' : 'self',
           sr: options.subredditName,
           richtextJson: 'richtext' in options ? richtextToString(options.richtext) : undefined,
+          runAs,
           ...options,
         },
         metadata
@@ -1149,6 +1154,7 @@ export class Post {
         kind: 'crosspost',
         sr: subredditName,
         crosspostFullname: asT3ID(postId),
+        runAs: RunAs.APP,
         ...rest,
       },
       metadata
@@ -1180,6 +1186,7 @@ export class Post {
         thingId: id,
         text: 'text' in options ? options.text : '',
         richtextJson: richtextString,
+        runAs: RunAs.APP,
       },
       metadata
     );
