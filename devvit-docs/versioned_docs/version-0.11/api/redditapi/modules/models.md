@@ -128,6 +128,7 @@
 - [SendPrivateMessageOptions](models.md#sendprivatemessageoptions)
 - [SetFlairOptions](models.md#setflairoptions)
 - [SetPostFlairOptions](models.md#setpostflairoptions)
+- [SetUserFlairBatchConfig](models.md#setuserflairbatchconfig)
 - [SetUserFlairOptions](models.md#setuserflairoptions)
 - [SubmitCustomPostOptions](models.md#submitcustompostoptions)
 - [SubmitCustomPostTextFallbackOptions](models.md#submitcustomposttextfallbackoptions)
@@ -1087,6 +1088,20 @@ An individual Removal Reason object.
 
 ---
 
+### <a id="setuserflairbatchconfig" name="setuserflairbatchconfig"></a> SetUserFlairBatchConfig
+
+Ƭ **SetUserFlairBatchConfig**: `Object`
+
+#### Type declaration
+
+| Name        | Type     | Description                                             |
+| :---------- | :------- | :------------------------------------------------------ |
+| `cssClass?` | `string` | The flair CSS class                                     |
+| `text?`     | `string` | The flair text. Can't contain the comma character (",") |
+| `username`  | `string` | The username of the user to edit the flair on           |
+
+---
+
 ### <a id="setuserflairoptions" name="setuserflairoptions"></a> SetUserFlairOptions
 
 Ƭ **SetUserFlairOptions**: [`SetFlairOptions`](models.md#setflairoptions) & \{ `username`: `string` }
@@ -1119,7 +1134,7 @@ An individual Removal Reason object.
 
 ### <a id="submitmediaoptions" name="submitmediaoptions"></a> SubmitMediaOptions
 
-Ƭ **SubmitMediaOptions**: [`CommonSubmitPostOptions`](models.md#commonsubmitpostoptions) & \{ `kind`: `"image"` \| `"video"` \| `"videogif"` ; `videoPosterUrl`: `string` }
+Ƭ **SubmitMediaOptions**: [`CommonSubmitPostOptions`](models.md#commonsubmitpostoptions) & \{ `imageUrls?`: [`string`] ; `kind`: `"image"` \| `"video"` \| `"videogif"` ; `videoPosterUrl?`: `string` }
 
 ---
 

@@ -124,6 +124,7 @@ async (event, context) => {
 - [setModeratorPermissions](RedditAPIClient.RedditAPIClient.md#setmoderatorpermissions)
 - [setPostFlair](RedditAPIClient.RedditAPIClient.md#setpostflair)
 - [setUserFlair](RedditAPIClient.RedditAPIClient.md#setuserflair)
+- [setUserFlairBatch](RedditAPIClient.RedditAPIClient.md#setuserflairbatch)
 - [submitComment](RedditAPIClient.RedditAPIClient.md#submitcomment)
 - [submitPost](RedditAPIClient.RedditAPIClient.md#submitpost)
 - [subscribeToCurrentSubreddit](RedditAPIClient.RedditAPIClient.md#subscribetocurrentsubreddit)
@@ -2216,6 +2217,28 @@ Set the flair for a user in a subreddit.
 #### Returns
 
 `Promise`\<`void`\>
+
+---
+
+### <a id="setuserflairbatch" name="setuserflairbatch"></a> setUserFlairBatch
+
+▸ **setUserFlairBatch**(`subredditName`, `flairs`): `Promise`\<`FlairCsvResult`[]\>
+
+Set the flair of multiple users in the same subreddit with a single API call.
+Can process up to 100 entries at once.
+
+#### Parameters
+
+| Name            | Type                                                                        | Description                                                                                                                |
+| :-------------- | :-------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| `subredditName` | `string`                                                                    | The name of the subreddit to edit flairs in.                                                                               |
+| `flairs`        | [`SetUserFlairBatchConfig`](../modules/models.md#setuserflairbatchconfig)[] | Array of user flair configuration objects. If both text and cssClass are empty for a given user the flair will be cleared. |
+
+#### Returns
+
+`Promise`\<`FlairCsvResult`[]\>
+
+- Array of statuses for each entry provided.
 
 ---
 
