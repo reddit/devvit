@@ -10,7 +10,7 @@ To publish your app navigate to the project directory and run:
 $ devvit publish
 ```
 
-Apps that use [interactive posts](/docs/interactive_post.md), or are NSFW must go through the review process before they can be published. Apps that use the [`http fetch`](/docs/capabilities/http-fetch.md) capability must provide _terms & conditions_ and a _privacy policy_ before they can be published. Links to these documents can be added on the App Details Page in the Developer Portal.
+Apps that use [interactive posts](../interactive_post.md), or are NSFW must go through the review process before they can be published. Apps that use the [`http fetch`](../capabilities/http-fetch.md) capability must provide _terms & conditions_ and a _privacy policy_ before they can be published. Links to these documents can be added on the App Details Page in the Developer Portal.
 
 After you’ve published your app, here’s what happens. You can now install your app to any sub you moderate. Your app is published on the Developer Portal, but it is only visible to you.
 

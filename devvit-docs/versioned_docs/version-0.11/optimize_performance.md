@@ -50,8 +50,8 @@ Every request defined in `useState` is blocking the render function. You can imp
 The faster the first view appears on the user’s screen, the better the user experience. You can minimize and delay the data loading necessary for your app to display the first view. To do this:
 
 - Use [setCustomPostPreview](./custom_post_preview.md) to make a dynamic, compelling preview that loads quickly.
-- Use [useAysnc](./working_with_useasync.md) to load the necessary data without blocking the rendering process.
-- Import [useState](./working_with_usestate.md) or [useAysnc](./working_with_useasync.md) to load the data needed for the specific component only when that component is rendered.
+- Use [useAsync](./working_with_useasync.md) to load the necessary data without blocking the rendering process.
+- Import [useState](./working_with_usestate.md) or [useAsync](./working_with_useasync.md) to load the data needed for the specific component only when that component is rendered.
 
 ## How to: make parallel requests
 
@@ -300,7 +300,7 @@ const [leaderboard, setLeaderboard] = useState(async () => {
 const channel = useChannel({
   name: 'leaderboard_updates',
   onMessage: (newLeaderboardEntry) => {
-    const newLeaderBoard = [...leaderboard, newMember] // append new entry
+    const newLeaderboard = [...leaderboard, newLeaderboardEntry] // append new entry
       .sort((a, b) => b.score - a.score) // sort by score
       .slice(0, 5); // leave top 5
     setLeaderboard(newLeaderboard); // update the state
