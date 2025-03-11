@@ -77,12 +77,23 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
       throw Error(`useWebView fullscreen request failed; web view asset could not be found`);
     }
 
+    this.#emitFullscreenEffect(true, url);
+  };
+
+  /**
+   * Triggers the fullscreen effect to hide the open web view.
+   */
+  unmount = (): void => {
+    this.#emitFullscreenEffect(false, '');
+  };
+
+  #emitFullscreenEffect = (show: boolean, url: string): void => {
     this.#renderContext.emitEffect('fullscreen', {
       type: EffectType.EFFECT_WEB_VIEW,
       webView: {
         fullscreen: {
           id: this.#hookId,
-          show: true,
+          show,
           url,
         },
       },
@@ -103,5 +114,6 @@ export function useWebView<From extends JSONValue = JSONValue, To extends JSONVa
   return {
     postMessage: hook.postMessage,
     mount: hook.mount,
+    unmount: hook.unmount,
   };
 }

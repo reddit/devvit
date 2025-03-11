@@ -175,4 +175,6 @@ export type UseWebViewResult<To extends JSONValue = JSONValue> = {
   postMessage(message: To): void;
   /** Initiate a request for the web view to open */
   mount(): void;
+  /** Initiate a request for the web view to be closed */
+  unmount(): void;
 };

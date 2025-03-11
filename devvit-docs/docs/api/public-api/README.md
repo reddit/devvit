@@ -2058,6 +2058,7 @@ A tuple containing the current state and a function to update it
 | :------------ | :-------------------------- |
 | `mount`       | () => `void`                |
 | `postMessage` | (`message`: `To`) => `void` |
+| `unmount`     | () => `void`                |
 
 ---
 
