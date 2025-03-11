@@ -70,7 +70,7 @@ export default class BundleActor extends ProjectCommand {
         }
 
         if (products) {
-          bundle.paymentsConfig = await getPaymentsConfig(bundle, products, false);
+          bundle.paymentsConfig = getPaymentsConfig(bundle, products, false);
         }
 
         await writeFile(

@@ -7,7 +7,6 @@ import {
   InstallationType,
   type VersionVisibility,
 } from '@devvit/protos/community.js';
-import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { ux } from '@oclif/core';
@@ -16,7 +15,7 @@ import { default as glob } from 'tiny-glob';
 import { AssetUploader } from './AssetUploader.js';
 import { createAppVersionClient } from './clientGenerators.js';
 import type { ProjectCommand } from './commands/ProjectCommand.js';
-import { getPaymentsConfig, readProducts } from './payments/paymentsConfig.js';
+import { getPaymentsConfig, type JSONProduct, readProducts } from './payments/paymentsConfig.js';
 import { handleTwirpError } from './twirp-error-handler.js';
 
 export class AppVersionUploader {
@@ -45,7 +44,7 @@ export class AppVersionUploader {
     const assetUploader = new AssetUploader(this.#cmd, appInfo.appSlug, { verbose: this.#verbose });
     const { assetMap, webViewAssetMap } = await assetUploader.syncAssets();
 
-    let products: Product[] | undefined;
+    let products: JSONProduct[] | undefined;
 
     try {
       products = await readProducts(this.#cmd.projectRoot);
@@ -64,7 +63,7 @@ export class AppVersionUploader {
         bundle.webviewAssetIds = webViewAssetMap ?? {};
 
         if (products) {
-          bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
+          bundle.paymentsConfig = getPaymentsConfig(bundle, products);
         }
       })
     );
