@@ -133,5 +133,5 @@ export default Devvit;
 
 ## Limitations
 
-- At least one app installation is required before you can store secrets via the CLI. You can use Devvit [playtest](/docs/get-started/playtest.md) once with the latest `Devvit.addSettings` config to accomplish this.
+- At least one app installation is required before you can store secrets via the CLI. You can use Devvit [playtest](../playtest.md) once with the latest `Devvit.addSettings` config to accomplish this.
 - App setting values are currently not surfaced in the CLI.
