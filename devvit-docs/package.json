@@ -24,11 +24,11 @@
   "dependencies": {
     "@cmfcmf/docusaurus-search-local": "1.1.0",
     "@devvit/protos": "0.11.9",
-    "@docusaurus/core": "3.1.1",
-    "@docusaurus/plugin-content-docs": "3.1.1",
-    "@docusaurus/preset-classic": "3.1.1",
-    "@docusaurus/tsconfig": "3.1.1",
-    "@docusaurus/types": "3.1.1",
+    "@docusaurus/core": "3.7.0",
+    "@docusaurus/plugin-content-docs": "3.7.0",
+    "@docusaurus/preset-classic": "3.7.0",
+    "@docusaurus/tsconfig": "3.7.0",
+    "@docusaurus/types": "3.7.0",
     "@mdx-js/react": "3.0.0",
     "clsx": "2.1.0",
     "js-yaml": "4.1.0",
@@ -39,10 +39,10 @@
     "redocusaurus": "2.0.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.1.1",
+    "@docusaurus/module-type-aliases": "3.7.0",
     "prettier": "3.3.3",
-    "typedoc": "0.25.9",
-    "typedoc-plugin-markdown": "3.17.1",
+    "typedoc": "0.28.0",
+    "typedoc-plugin-markdown": "4.5.0",
     "typescript": "5.3.2"
   },
   "browserslist": {

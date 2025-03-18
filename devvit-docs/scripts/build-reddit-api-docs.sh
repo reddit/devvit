@@ -13,7 +13,7 @@ typedoc \
     --disableSources \
     --includeVersion \
     --excludePrivate \
-    --namedAnchors \
+    --useHTMLAnchors \
     --excludeExternals \
     --excludeInternal \
     --readme none \

@@ -109,7 +109,7 @@
     "prettier": "3.3.3",
     "prettier-package-json": "2.8.0",
     "turbo": "1.6.3",
-    "typedoc": "0.25.9",
+    "typedoc": "0.28.0",
     "typescript-eslint": "8.8.1",
     "vitest": "1.6.0"
   },

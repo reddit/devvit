@@ -1,135 +1,133 @@
+[**@devvit/public-api v0.11.11-dev**](../README.md)
+
+---
+
 # Class: RichTextBuilder
 
-**`Mixes`**
+## Mixes
 
 ParagraphContainer
 
-**`Mixes`**
+## Mixes
 
 HeadingContainer
 
-**`Mixes`**
+## Mixes
 
 HorizontalRuleContainer
 
-**`Mixes`**
+## Mixes
 
 BlockQuoteContainer
 
-**`Mixes`**
+## Mixes
 
 CodeBlockContainer
 
-**`Mixes`**
+## Mixes
 
 EmbedContainer
 
-**`Mixes`**
+## Mixes
 
 ListContainer
 
-**`Mixes`**
+## Mixes
 
 TableContainer
 
-**`Mixes`**
+## Mixes
 
 ImageContainer
 
-**`Mixes`**
+## Mixes
 
 VideoContainer
 
 ## Implements
 
-- `ParagraphContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `HeadingContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `HorizontalRuleContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `BlockQuoteContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `CodeBlockContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `EmbedContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `ListContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `TableContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `ImageContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-- `VideoContainer`\<[`RichTextBuilder`](RichTextBuilder.md)\>
-
-## Table of contents
-
-### Constructors
-
-- [constructor](RichTextBuilder.md#constructor)
-
-### Methods
-
-- [animatedImage](RichTextBuilder.md#animatedimage)
-- [blockQuote](RichTextBuilder.md#blockquote)
-- [build](RichTextBuilder.md#build)
-- [codeBlock](RichTextBuilder.md#codeblock)
-- [embed](RichTextBuilder.md#embed)
-- [heading](RichTextBuilder.md#heading)
-- [horizontalRule](RichTextBuilder.md#horizontalrule)
-- [image](RichTextBuilder.md#image)
-- [list](RichTextBuilder.md#list)
-- [paragraph](RichTextBuilder.md#paragraph)
-- [table](RichTextBuilder.md#table)
-- [video](RichTextBuilder.md#video)
+- `ParagraphContainer`\<`RichTextBuilder`\>
+- `HeadingContainer`\<`RichTextBuilder`\>
+- `HorizontalRuleContainer`\<`RichTextBuilder`\>
+- `BlockQuoteContainer`\<`RichTextBuilder`\>
+- `CodeBlockContainer`\<`RichTextBuilder`\>
+- `EmbedContainer`\<`RichTextBuilder`\>
+- `ListContainer`\<`RichTextBuilder`\>
+- `TableContainer`\<`RichTextBuilder`\>
+- `ImageContainer`\<`RichTextBuilder`\>
+- `VideoContainer`\<`RichTextBuilder`\>
 
 ## Constructors
 
-### <a id="constructor" name="constructor"></a> constructor
+<a id="constructor"></a>
 
-• **new RichTextBuilder**(): [`RichTextBuilder`](RichTextBuilder.md)
+### new RichTextBuilder()
+
+> **new RichTextBuilder**(): `RichTextBuilder`
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 ## Methods
 
-### <a id="animatedimage" name="animatedimage"></a> animatedImage
+<a id="animatedimage"></a>
 
-▸ **animatedImage**(`_opts`): [`RichTextBuilder`](RichTextBuilder.md)
+### animatedImage()
 
-#### Parameters
+> **animatedImage**(`_opts`): `RichTextBuilder`
 
-| Name    | Type           |
-| :------ | :------------- |
-| `_opts` | `MediaOptions` |
-
-#### Returns
-
-[`RichTextBuilder`](RichTextBuilder.md)
-
-#### Implementation of
-
-ImageContainer.animatedImage
-
----
-
-### <a id="blockquote" name="blockquote"></a> blockQuote
-
-▸ **blockQuote**(`_opts`, `_cb`): [`RichTextBuilder`](RichTextBuilder.md)
+Append an Animated Image
 
 #### Parameters
 
-| Name    | Type                                          |
-| :------ | :-------------------------------------------- |
-| `_opts` | `BlockQuoteOptions`                           |
-| `_cb`   | (`blockQuote`: `BlockQuoteContext`) => `void` |
+##### \_opts
+
+`MediaOptions`
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 #### Implementation of
 
-BlockQuoteContainer.blockQuote
+`ImageContainer.animatedImage`
 
 ---
 
-### <a id="build" name="build"></a> build
+<a id="blockquote"></a>
 
-▸ **build**(): `string`
+### blockQuote()
+
+> **blockQuote**(`_opts`, `_cb`): `RichTextBuilder`
+
+Append a Block Quote element
+
+#### Parameters
+
+##### \_opts
+
+`BlockQuoteOptions`
+
+##### \_cb
+
+(`blockQuote`) => `void`
+
+#### Returns
+
+`RichTextBuilder`
+
+#### Implementation of
+
+`BlockQuoteContainer.blockQuote`
+
+---
+
+<a id="build"></a>
+
+### build()
+
+> **build**(): `string`
 
 Serializes the document to a JSON string
 
@@ -139,177 +137,222 @@ Serializes the document to a JSON string
 
 ---
 
-### <a id="codeblock" name="codeblock"></a> codeBlock
+<a id="codeblock"></a>
 
-▸ **codeBlock**(`_opts`, `_cb`): [`RichTextBuilder`](RichTextBuilder.md)
+### codeBlock()
 
-#### Parameters
+> **codeBlock**(`_opts`, `_cb`): `RichTextBuilder`
 
-| Name    | Type                                        |
-| :------ | :------------------------------------------ |
-| `_opts` | `CodeBlockOptions`                          |
-| `_cb`   | (`codeBlock`: `CodeBlockContext`) => `void` |
-
-#### Returns
-
-[`RichTextBuilder`](RichTextBuilder.md)
-
-#### Implementation of
-
-CodeBlockContainer.codeBlock
-
----
-
-### <a id="embed" name="embed"></a> embed
-
-▸ **embed**(`_opts`): [`RichTextBuilder`](RichTextBuilder.md)
+Append a Code Block element
 
 #### Parameters
 
-| Name    | Type           |
-| :------ | :------------- |
-| `_opts` | `EmbedOptions` |
+##### \_opts
+
+`CodeBlockOptions`
+
+##### \_cb
+
+(`codeBlock`) => `void`
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 #### Implementation of
 
-EmbedContainer.embed
+`CodeBlockContainer.codeBlock`
 
 ---
 
-### <a id="heading" name="heading"></a> heading
+<a id="embed"></a>
 
-▸ **heading**(`_opts`, `_cb`): [`RichTextBuilder`](RichTextBuilder.md)
+### embed()
+
+> **embed**(`_opts`): `RichTextBuilder`
+
+Append an embedded iframe
 
 #### Parameters
 
-| Name    | Type                                    |
-| :------ | :-------------------------------------- |
-| `_opts` | `HeadingOptions`                        |
-| `_cb`   | (`heading`: `HeadingContext`) => `void` |
+##### \_opts
+
+`EmbedOptions`
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 #### Implementation of
 
-HeadingContainer.heading
+`EmbedContainer.embed`
 
 ---
 
-### <a id="horizontalrule" name="horizontalrule"></a> horizontalRule
+<a id="heading"></a>
 
-▸ **horizontalRule**(): [`RichTextBuilder`](RichTextBuilder.md)
+### heading()
 
-#### Returns
+> **heading**(`_opts`, `_cb`): `RichTextBuilder`
 
-[`RichTextBuilder`](RichTextBuilder.md)
-
-#### Implementation of
-
-HorizontalRuleContainer.horizontalRule
-
----
-
-### <a id="image" name="image"></a> image
-
-▸ **image**(`_opts`): [`RichTextBuilder`](RichTextBuilder.md)
+Append a Heading
 
 #### Parameters
 
-| Name    | Type           |
-| :------ | :------------- |
-| `_opts` | `MediaOptions` |
+##### \_opts
+
+`HeadingOptions`
+
+##### \_cb
+
+(`heading`) => `void`
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 #### Implementation of
 
-ImageContainer.image
+`HeadingContainer.heading`
 
 ---
 
-### <a id="list" name="list"></a> list
+<a id="horizontalrule"></a>
 
-▸ **list**(`_opts`, `_cb`): [`RichTextBuilder`](RichTextBuilder.md)
+### horizontalRule()
 
-#### Parameters
+> **horizontalRule**(): `RichTextBuilder`
 
-| Name    | Type                              |
-| :------ | :-------------------------------- |
-| `_opts` | `ListOptions`                     |
-| `_cb`   | (`list`: `ListContext`) => `void` |
+Append a Horizontal Rule
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 #### Implementation of
 
-ListContainer.list
+`HorizontalRuleContainer.horizontalRule`
 
 ---
 
-### <a id="paragraph" name="paragraph"></a> paragraph
+<a id="image"></a>
 
-▸ **paragraph**(`_cb`): [`RichTextBuilder`](RichTextBuilder.md)
+### image()
+
+> **image**(`_opts`): `RichTextBuilder`
+
+Append an Image
 
 #### Parameters
 
-| Name  | Type                                        |
-| :---- | :------------------------------------------ |
-| `_cb` | (`paragraph`: `ParagraphContext`) => `void` |
+##### \_opts
+
+`MediaOptions`
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 #### Implementation of
 
-ParagraphContainer.paragraph
+`ImageContainer.image`
 
 ---
 
-### <a id="table" name="table"></a> table
+<a id="list"></a>
 
-▸ **table**(`_cb`): [`RichTextBuilder`](RichTextBuilder.md)
+### list()
+
+> **list**(`_opts`, `_cb`): `RichTextBuilder`
+
+Append a List
 
 #### Parameters
 
-| Name  | Type                                |
-| :---- | :---------------------------------- |
-| `_cb` | (`table`: `TableContext`) => `void` |
+##### \_opts
+
+`ListOptions`
+
+##### \_cb
+
+(`list`) => `void`
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 #### Implementation of
 
-TableContainer.table
+`ListContainer.list`
 
 ---
 
-### <a id="video" name="video"></a> video
+<a id="paragraph"></a>
 
-▸ **video**(`_opts`): [`RichTextBuilder`](RichTextBuilder.md)
+### paragraph()
+
+> **paragraph**(`_cb`): `RichTextBuilder`
+
+Append a Paragraph
 
 #### Parameters
 
-| Name    | Type           |
-| :------ | :------------- |
-| `_opts` | `VideoOptions` |
+##### \_cb
+
+(`paragraph`) => `void`
 
 #### Returns
 
-[`RichTextBuilder`](RichTextBuilder.md)
+`RichTextBuilder`
 
 #### Implementation of
 
-VideoContainer.video
+`ParagraphContainer.paragraph`
+
+---
+
+<a id="table"></a>
+
+### table()
+
+> **table**(`_cb`): `RichTextBuilder`
+
+Append a Table
+
+#### Parameters
+
+##### \_cb
+
+(`table`) => `void`
+
+#### Returns
+
+`RichTextBuilder`
+
+#### Implementation of
+
+`TableContainer.table`
+
+---
+
+<a id="video"></a>
+
+### video()
+
+> **video**(`_opts`): `RichTextBuilder`
+
+Append a Video
+
+#### Parameters
+
+##### \_opts
+
+`VideoOptions`
+
+#### Returns
+
+`RichTextBuilder`
+
+#### Implementation of
+
+`VideoContainer.video`
