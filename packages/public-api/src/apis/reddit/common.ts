@@ -1,4 +1,4 @@
-import { RunAs as _RunAs } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+import { RunAs as _RunAs } from '@devvit/protos';
 
 export const RunAs = {
   APP: _RunAs.APP,
