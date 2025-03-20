@@ -37,6 +37,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@devvit/metrics": "0.11.9",
     "@devvit/protos": "0.11.9",
     "@devvit/shared-types": "0.11.9",
     "base64-js": "1.5.1",
