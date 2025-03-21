@@ -142,7 +142,7 @@ export type WebViewMessage =
   | { type: 'webViewReady' }
   | { type: 'setCounter'; data: { newCounter: number } };
 
-const { mount, postMessage } = useWebView<WebViewMessage, DevvitMessage>({
+const { mount, unmount, postMessage } = useWebView<WebViewMessage, DevvitMessage>({
   url: 'page.html',
   onMessage: (message, webView) => {},
   onUnmount: () => {},
@@ -158,6 +158,7 @@ const { mount, postMessage } = useWebView<WebViewMessage, DevvitMessage>({
 Return values:
 
 - mount: function to programmatically open the web view
+- unmount: function to programmatically close the web view
 - postMessage: function to send a message to the web view
 
 ### Basic example
@@ -247,9 +248,11 @@ In your Devvit app:
 // main.tsx
 const { mount } = useWebView({
   url: 'page.html',
-  onMessage: (message) => {
+  onMessage: (message, webView) => {
     if (message.type === 'userAction') {
       console.log('User clicked:', message.data.clicked);
+    } else if (message.type === 'unmount') {
+      webView.unmount();
     }
   },
 });
@@ -261,11 +264,18 @@ In your Devvit app:
 
 ```typescript
 // main.tsx
-const { mount, postMessage } = useWebView({
+const { mount } = useWebView({
   url: 'page.html',
-  onMessage: (message) => {  }
+  onMessage: (message, webView) => {
+    if (message.type === 'userAction') {
+      console.log('User clicked:', message.data.clicked);
+      webView.postMessage({
+        type: 'userActionHandled',
+        data: { userActionComplete: true },
+      });
+    }
+  },
 });
-postMessage({ data: “hello, from devvit” })
 ```
 
 In your web view JavaScript:
