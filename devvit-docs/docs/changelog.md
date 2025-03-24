@@ -4,6 +4,21 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.11: Adding web view unmount
+
+**Release Date: Mar 24, 2025**
+
+We've been working on making the web view experience better and more consistent across all platforms, and one new change we’re including is a `webview.unmount` function. This lets you unmount a [web view](./webviews.md#usewebview) that's in focus mode programmatically.
+
+:::note
+Unmount is only available in v2025.12+ on iOS and v2025.11+ on Android.
+:::
+
+**Other Fixes**
+
+- You can now omit metadata in in your product config.
+- We added a hook ID in logs to help debug invalid state errors.
+
 ## Devvit 0.11.8: Minor Redis, Reddit API, and CLI improvements
 
 **Release Date: Mar 10, 2025**
