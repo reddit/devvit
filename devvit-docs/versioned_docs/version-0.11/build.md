@@ -12,13 +12,13 @@ npm install -g @devvit/cli
 
 :::note
 
-If you are running into errors, check out our guide for how to set up your [development environment](./get-started/environment.mdx).
+If you are running into errors, check out our guide for how to set up your [development environment](./dev_guide.mdx#environmentsetup).
 
 :::
 
 ## Create an app
 
-Creating an app is easy. You can create your own app from scratch or use an [app template](./get-started/create-app.md#templates) to start with complete, functioning code examples.
+Creating an app is easy. You can create your own app from scratch or use an [app template](./templates.mdx) to start with complete, functioning code examples.
 
 To create a new app, navigate to your selected app folder and run the create command.
 
