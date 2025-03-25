@@ -420,9 +420,8 @@ export default class Playtest extends ProjectCommand {
         `Success! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
       );
     } catch (err) {
-      ux.action.stop(
-        chalk.red(`Something went wrong... ${StringUtil.caughtToString(err, 'message')}`)
-      );
+      ux.action.stop('Error'); // Stop any spinner if it's running
+      this.log(chalk.red(`Something went wrong... ${StringUtil.caughtToString(err, 'message')}`));
     }
 
     this.#isOnWatchExecuting = false;

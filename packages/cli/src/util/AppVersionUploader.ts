@@ -50,9 +50,11 @@ export class AppVersionUploader {
       products = await readProducts(this.#cmd.projectRoot);
     } catch (err) {
       throw new Error(
-        `An unknown error occurred when reading and validating products.json.
-  Please refer to https://developers.reddit.com/docs/capabilities/payments and ensure that your app is in a compatible state.
-  ${StringUtil.caughtToString(err, 'message')}`
+        `An error occurred when reading and validating products.json: 
+
+  ${StringUtil.caughtToString(err, 'message')}
+  
+Please refer to https://developers.reddit.com/docs/capabilities/payments for more details.`
       );
     }
 
