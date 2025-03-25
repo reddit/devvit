@@ -210,7 +210,7 @@ Provide the product sku to trigger a purchase. This automatically populates the 
 import { usePayments } from '@devvit/payments';
 
 // handles purchase results
-const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.status); });
+const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.success); });
 
 // foreach sku in products:
 <button onPress{payments.purchase(sku)}>Buy a {sku}</button>

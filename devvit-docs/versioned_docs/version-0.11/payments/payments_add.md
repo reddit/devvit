@@ -20,17 +20,7 @@ Make sure you’re on Devvit 0.11.3 or higher. See the [quickstart](https://deve
 
 ## Register products
 
-Register products in the src/products.json file in your local app. To add products to your app, run the following command:
-
-```bash
-devvit products add
-```
-
-Registered products are updated every time an app is uploaded, including when you use [Devvit playtest](../playtest).
-
-<details>
-  <summary>Click here for instructions on how to add products manually to your products.json file.</summary>
-The JSON schema for the file format is available at <a href="https://developers.reddit.com/schema/products.json" target="_blank">https://developers.reddit.com/schema/products.json</a>.
+Register products in the src/products.json file in your local app. The JSON schema for the file format is available at https://developers.reddit.com/schema/products.json.
 
 Each product in the products field has the following attributes:
 | **Attribute** | **Description** |
@@ -43,7 +33,7 @@ Each product in the products field has the following attributes:
 | `metadata` | **(optional)** An optional object that contains additional attributes you want to use to group and filter products. Keys and values must be alphanumeric (a - Z, 0 - 9, and - ) and contain 30 characters or less. You can add up to 10 metadata keys. Metadata keys cannot start with "devvit-". |
 | `accountingType` | Categories for how buyers consume your products. Possible values are: <ul><li>`INSTANT` for purchased items that are used immediately and disappear.</li><li>`DURABLE` for purchased items that are permanently applied to the account and can be used any number of times</li><li>`CONSUMABLE` for items that can be used at a later date but are removed once they are used.</li><li>`VALID_FOR_` values indicate a product can be used throughout a period of time after it is purchased.</li></ul> |
 
-</details>
+Registered products are updated every time an app is uploaded, including when you use [Devvit playtest](../playtest).
 
 ## Price products
 
@@ -216,7 +206,7 @@ Provide the product sku to trigger a purchase. This automatically populates the 
 import { usePayments } from '@devvit/payments';
 
 // handles purchase results
-const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.status); });
+const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.success); });
 
 // for each sku in products:
 <button onPress{payments.purchase(sku)}>Buy a {sku}</button>
