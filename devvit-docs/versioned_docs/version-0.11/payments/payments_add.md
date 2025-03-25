@@ -11,7 +11,7 @@ devvit new --template=payments
 To add payments functionality to an existing app, run:
 
 ```bash
-npm install @devvit/payments@next
+npm install @devvit/payments
 ```
 
 :::note
@@ -85,7 +85,7 @@ If you don’t provide an image, the default Reddit product image is used.
       "description": "God mode gives you superpowers (in theory)",
       "price": 25,
       "images": {
-        "icon": "assets/products/extra_life_icon.png"
+        "icon": "products/extra_life_icon.png"
       },
       "metadata": {
         "category": "powerup"
@@ -206,7 +206,7 @@ Provide the product sku to trigger a purchase. This automatically populates the 
 import { usePayments } from '@devvit/payments';
 
 // handles purchase results
-const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.success); });
+const payments = usePayments((result: OnPurchaseResult) => { console.log('Tried to buy:', result.sku, '; result:', result.status); });
 
 // for each sku in products:
 <button onPress{payments.purchase(sku)}>Buy a {sku}</button>
