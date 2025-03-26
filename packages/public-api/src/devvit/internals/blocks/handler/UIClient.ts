@@ -128,7 +128,10 @@ export class UIClient implements _UIClient {
       webView: {
         postMessage: {
           webViewId,
-          app: { message: msg },
+          app: {
+            message: msg, // This is deprecated, but populated for backwards compatibility
+            jsonString: JSON.stringify(msg), // Encode as JSON for consistency with the mobile clients
+          },
         },
       },
     });
