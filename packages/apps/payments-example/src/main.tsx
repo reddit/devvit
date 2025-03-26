@@ -8,9 +8,10 @@ import {
   usePayments,
   useProducts,
 } from '@devvit/payments';
+import { ProductButton, ProductButtonProps } from '@devvit/payments/helpers/ProductButton';
 import { Devvit, useState } from '@devvit/public-api';
 
-import { OrderListItem, ProductListItem, TitledList } from './Payments.js';
+import { OrderListItem, TitledList } from './Payments.js';
 
 addPaymentHandler({
   fulfillOrder: async (order, _) => {
@@ -31,6 +32,12 @@ enum Tab {
 }
 
 const ORDERS_PAGE_SIZE = 3;
+
+const productButtonAppearances: ProductButtonProps['appearance'][] = [
+  'compact',
+  'detailed',
+  'tile',
+];
 
 Devvit.addCustomPostType({
   name: 'Devvit Snack Bar',
@@ -63,14 +70,22 @@ Devvit.addCustomPostType({
           ))}
         </hstack>
         {selectedTab === Tab.Products && (
-          <TitledList title="Products">
+          <TitledList title="ProductButtons">
             {Array.isArray(products) && products.length > 0 ? (
-              products.map((product) => (
-                <ProductListItem
-                  product={product}
-                  onBuy={() => payments.purchase(product.sku, { timestamp: `${Date.now()}` })}
-                />
-              ))
+              products.map((product, idx) => {
+                const appearance = productButtonAppearances[idx % productButtonAppearances.length];
+                return (
+                  <hstack gap="medium" alignment="middle start">
+                    <text weight="bold" width="90px">{`${appearance}:`}</text>
+                    <ProductButton
+                      product={product}
+                      onPurchase={(p) => payments.purchase(p.sku, { timestamp: `${Date.now()}` })}
+                      showIcon
+                      appearance={appearance}
+                    />
+                  </hstack>
+                );
+              })
             ) : (
               <text>No products found</text>
             )}

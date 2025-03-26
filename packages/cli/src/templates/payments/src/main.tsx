@@ -6,6 +6,7 @@ import {
   usePayments,
   useProducts,
 } from '@devvit/payments';
+import { ProductButton } from '@devvit/payments/helpers/ProductButton';
 import { Devvit, useState } from '@devvit/public-api';
 
 Devvit.configure({
@@ -69,18 +70,9 @@ const App: Devvit.CustomPostComponent = (context) => {
   return (
     <vstack alignment="center middle" height={100} gap="medium" padding="large">
       <text size="large">Has god mode been enabled: {godModeEnabled}</text>
-      {godModeEnabled ? (
+      {godModeEnabled && (
         <button width={75} onPress={() => clearGodModeFn()}>
           I tire of being a god - return me to the mortal coil.
-        </button>
-      ) : (
-        <button
-          width={75}
-          onPress={async () => {
-            payments.purchase(GOD_MODE_SKU);
-          }}
-        >
-          $$$ for god mode.
         </button>
       )}
 
@@ -90,10 +82,13 @@ const App: Devvit.CustomPostComponent = (context) => {
       <vstack>
         Products:
         {products.map((product) => (
-          <hstack gap="small">
-            <text>Name: {product.displayName}</text>
-            <text>Price: {product.price}</text>
-          </hstack>
+          <ProductButton
+            product={product}
+            appearance="detailed"
+            onPurchase={(p) => {
+              payments.purchase(p.sku);
+            }}
+          />
         ))}
       </vstack>
     </vstack>
