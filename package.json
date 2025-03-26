@@ -25,6 +25,7 @@
     "dev:play": "turbo run dev:build --filter=previews --filter=protos --filter=public-api --filter=runtime-lite --filter=shared-types --filter=ui-renderer --parallel --include-dependencies",
     "docs:build": "yarn workspace devvit-docs docs:build",
     "docs:gen": "yarn workspace devvit-docs gen:all",
+    "docs:gen-next": "node ./packages/repo-tools/bin/gen-next-docs.mjs",
     "docs:start": "yarn workspace devvit-docs docs:start",
     "docs:update-versioned": "node ./packages/repo-tools/bin/update-versioned-docs.mjs",
     "docs:verify": "yarn workspace devvit-docs gen:verify",
