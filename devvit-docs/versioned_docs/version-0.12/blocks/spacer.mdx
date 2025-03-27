@@ -1,0 +1,84 @@
+import AttributeMinHeight from './attributes/_minHeight.md';
+import AttributeMaxHeight from './attributes/_maxHeight.md';
+import AttributeMinWidth from './attributes/_minWidth.md';
+import AttributeMaxWidth from './attributes/_maxWidth.md';
+import AttributeGrow from './attributes/_grow.md';
+import AttributeWidth from './attributes/_width.mdx';
+import AttributeHeight from './attributes/_height.mdx';
+
+# Spacer
+
+The `<spacer>` element is used to create adjustable space between UI elements.
+
+## Attributes
+
+### `size`
+
+Sets the spacer size. Possible values:
+
+- `xsmall`
+- `small`: The default if the attribute is not used.
+- `medium`
+- `large`
+
+### `grow`
+
+<AttributeGrow />
+
+### `shape`
+
+Possible values:
+
+- `invisible`
+- `thin`
+- `square`
+
+### `width`
+
+<AttributeWidth />
+
+### `minWidth`
+
+<AttributeMinWidth />
+
+### `maxWidth`
+
+<AttributeMaxWidth />
+
+### `height`
+
+<AttributeHeight />
+
+### `minHeight`
+
+<AttributeMinHeight />
+
+### `maxHeight`
+
+<AttributeMaxHeight />
+
+## Examples
+
+```tsx
+<hstack>
+  <button>Button 1</button>
+  <spacer size="medium" />
+  <button>Button 2</button>
+</hstack>
+```
+
+```tsx
+<hstack>
+  <button>Button 1</button>
+  <spacer grow />
+  <button>Button 2</button>
+</hstack>
+```
+
+```tsx
+<hstack>
+  <button>Button 1</button>
+  <spacer width="50%" />
+  <button>Button 2</button>
+</hstack>
+```
