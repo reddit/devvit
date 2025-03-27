@@ -998,8 +998,6 @@ export namespace Devvit {
     export type WebViewProps = BaseProps &
       WebViewActionable & {
         url: string;
-        /** @deprecated use UIClient.webview.postMessage() */
-        state?: JSONObject;
       };
   }
 }

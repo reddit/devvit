@@ -8,14 +8,6 @@
 
 ## Type declaration
 
-### ~~state?~~
-
-> `optional` **state**: [`JSONObject`](../../../../../../type-aliases/JSONObject.md)
-
-#### Deprecated
-
-use UIClient.webview.postMessage()
-
 ### url
 
 > **url**: `string`
