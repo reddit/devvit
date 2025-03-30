@@ -70,5 +70,5 @@ export default Devvit;
 
 # Troubleshooting
 
-- When apps use `kvStore.list` - safe execution in a multi-tenant environment is not guaranteed - it causes CPU spikes and blocks other Redis commands from running at the same time. We recommend using Redis Hashes instead, each hash can store upto 4.2 billion key value pairs and a combination of `hscan`, `hgetall` and `hkeys` can be used for iteration. Please reach out to us in Discord - we can help adapt your existing data model to use Redis and improve performance and reliability of your app.
+- When apps use `kvStore.list` - safe execution in a multi-tenant environment is not guaranteed - it causes CPU spikes and blocks other Redis commands from running at the same time. We recommend using Redis Hashes instead, each hash can store up to 4.2 billion key value pairs and a combination of `hscan`, `hgetall` and `hkeys` can be used for iteration. Please reach out to us in Discord - we can help adapt your existing data model to use Redis and improve the performance and reliability of your app.
 - `kvStore.put` encodes the values with `JSON.stringify` and `kvStore.get` does `JSON.parse` to obtain the original data. If you are seeing returned values from `redis.get` wrapped in additional quotes during migration - add a try/catch block with `JSON.parse` to resolve the issue.
