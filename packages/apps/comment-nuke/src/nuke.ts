@@ -21,12 +21,13 @@ async function* getAllCommentsInThread(
   comment: Comment,
   skipDistinguished: boolean
 ): AsyncGenerator<Comment> {
+  if (!skipDistinguished || !comment.isDistinguished()) {
+    yield comment;
+  }
+
   const replies = await comment.replies.all();
   for (const reply of replies) {
-    if (!skipDistinguished || !reply.isDistinguished()) {
-      yield* getAllCommentsInThread(reply, skipDistinguished);
-      yield reply;
-    }
+    yield* getAllCommentsInThread(reply, skipDistinguished);
   }
 }
 
@@ -37,10 +38,7 @@ async function* getAllCommentsInPost(
 ): AsyncGenerator<Comment> {
   const comments = await post.comments.all();
   for (const comment of comments) {
-    if (!skipDistinguished || !comment.isDistinguished()) {
-      yield* getAllCommentsInThread(comment, skipDistinguished);
-      yield comment;
-    }
+    yield* getAllCommentsInThread(comment, skipDistinguished);
   }
 }
 
