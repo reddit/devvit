@@ -170,7 +170,7 @@ describe('BlocksHandler', () => {
         await handler.handle(getEmptyRequest(), mockMetadata);
         expect(false).toBe(true);
       } catch (e) {
-        expect(e).toMatchInlineSnapshot(`[Error: Exceeded maximum iterations of 64]`);
+        expect(e).toMatchInlineSnapshot(`[Error: Exceeded maximum iterations of 128]`);
       }
     });
 

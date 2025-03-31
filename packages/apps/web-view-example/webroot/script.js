@@ -11,6 +11,7 @@ class App {
     this.decreaseButton = /** @type {HTMLButtonElement} */ (
       document.querySelector('#btn-decrease')
     );
+    this.unmountButton = /** @type {HTMLButtonElement} */ (document.querySelector('#btn-unmount'));
     this.usernameLabel = /** @type {HTMLSpanElement} */ (document.querySelector('#username'));
     this.counterLabel = /** @type {HTMLSpanElement} */ (document.querySelector('#counter'));
     this.counter = 0;
@@ -28,6 +29,10 @@ class App {
 
     this.decreaseButton.addEventListener('click', () => {
       postWebViewMessage({ type: 'setCounter', data: { newCounter: this.counter - 1 } });
+    });
+
+    this.unmountButton.addEventListener('click', () => {
+      postWebViewMessage({ type: 'unmount' });
     });
   }
 

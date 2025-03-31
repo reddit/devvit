@@ -11,7 +11,7 @@ typedoc \
     --tsconfig '../packages/public-api/tsconfig.json' \
     --hideBreadcrumbs \
     --disableSources \
-    --namedAnchors \
+    --useHTMLAnchors \
     --includeVersion \
     --excludePrivate \
     --excludeExternals \

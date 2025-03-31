@@ -1,9 +1,5 @@
 # Web views
 
-:::note
-Web views is currently experimental. Web view apps will be publishable once they are using focus mode and the `useWebView` hook.
-:::
-
 Web views allow you to include HTML, CSS, and JavaScript and have it run within your Reddit app. This gives you full control over your app's appearance and behavior while running within Reddit's platform.
 
 ## Migration guide
@@ -146,7 +142,7 @@ export type WebViewMessage =
   | { type: 'webViewReady' }
   | { type: 'setCounter'; data: { newCounter: number } };
 
-const { mount, postMessage } = useWebView<WebViewMessage, DevvitMessage>({
+const { mount, unmount, postMessage } = useWebView<WebViewMessage, DevvitMessage>({
   url: 'page.html',
   onMessage: (message, webView) => {},
   onUnmount: () => {},
@@ -162,6 +158,7 @@ const { mount, postMessage } = useWebView<WebViewMessage, DevvitMessage>({
 Return values:
 
 - mount: function to programmatically open the web view
+- unmount: function to programmatically close the web view
 - postMessage: function to send a message to the web view
 
 ### Basic example
@@ -251,9 +248,11 @@ In your Devvit app:
 // main.tsx
 const { mount } = useWebView({
   url: 'page.html',
-  onMessage: (message) => {
+  onMessage: (message, webView) => {
     if (message.type === 'userAction') {
       console.log('User clicked:', message.data.clicked);
+    } else if (message.type === 'unmount') {
+      webView.unmount();
     }
   },
 });
@@ -265,11 +264,18 @@ In your Devvit app:
 
 ```typescript
 // main.tsx
-const { mount, postMessage } = useWebView({
+const { mount } = useWebView({
   url: 'page.html',
-  onMessage: (message) => {  }
+  onMessage: (message, webView) => {
+    if (message.type === 'userAction') {
+      console.log('User clicked:', message.data.clicked);
+      webView.postMessage({
+        type: 'userActionHandled',
+        data: { userActionComplete: true },
+      });
+    }
+  },
 });
-postMessage({ data: “hello, from devvit” })
 ```
 
 In your web view JavaScript:
@@ -354,4 +360,44 @@ const App = () => {
 
   return <button onPress={mount}>Open App</button>;
 };
+```
+
+## Adding payments
+
+Adding [payments](payments/payments_add.md) to your app is pretty straightforward, but there are a couple of things to you need to know when also using web views.
+
+For a full working example, see `devvit new --template=payments-web-view`.
+
+### Using events to handle payments
+
+Your user will interact with a web view, but payments APIs can only be invoked in blocks. To make this work, you need to:
+
+- Use events (from web view to Devvit) to communicate that the user wants to purchase a product.
+- Use events (from Devvit to the web view) to communicate whether purchase succeeds and what the user purchased.
+
+### Communicating between web view and payments
+
+Both your web view and payments integrations need to be declared in the same `addCustomPostType` block. At that point, the lambdas given to each integration will be able to reference each other:
+
+```typescript
+const payments = usePayments((result: OnPurchaseResult) => {
+  // Tell the web view that a purchase was made.
+  // A full example might validate that the purchase was successful & communicate what was purchased.
+  webView.postMessage({
+    type: 'purchaseMade',
+    data: {},
+  });
+});
+const webView = useWebView<WebViewMessage, DevvitMessage>({
+  url: 'page.html',
+  async onMessage(message) {
+    // Trigger a payment, based on user interaction in the web view.
+    // A full example might check that the user is eligible to make the purchased indicated -
+    // for instance validating they aren't trying to purchase something they've already purchased
+    // or are otherwise ineligible to purchase.
+    if (message.type === 'purchase') {
+      payments.purchase(message.data.sku);
+    }
+  },
+});
 ```

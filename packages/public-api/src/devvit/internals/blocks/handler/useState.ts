@@ -59,7 +59,11 @@ class UseStateHook<S extends JSONValue> implements Hook {
        * This would probably be some sort of concurrent access bug.  It's not clear what would put us
        * in this state, but it's worth logging so we can investigate.
        */
-      console.warn('Invalid state: ', this.state.load_state, this._promise);
+      console.warn(
+        `Invalid state for hook (${this.#hookId}):`,
+        this.state.load_state,
+        this._promise
+      );
     }
   }
 

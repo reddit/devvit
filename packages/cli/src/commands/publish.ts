@@ -1,5 +1,6 @@
 import {
   type AppVersionUpdateRequest,
+  type FullAppInfo,
   type FullAppVersionInfo,
   NutritionCategory,
 } from '@devvit/protos/community.js';
@@ -26,8 +27,9 @@ import {
   createDeveloperSettingsClient,
 } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
-import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
+import { getVersionByNumber } from '../util/common-actions/getVersionByNumber.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
+import { getAppBySlug } from '../util/getAppBySlug.js';
 import { readLine } from '../util/input-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
 
@@ -82,13 +84,31 @@ export default class Publish extends ProjectCommand {
 
   async run(): Promise<void> {
     const { args, flags } = await this.parse(Publish);
-    const appWithVersion = await this.inferAppNameAndVersion(args.appWithVersion);
+    const inferredParams = await this.inferAppNameAndVersion(args.appWithVersion);
 
     await this.checkIfUserLoggedIn();
     await this.checkDeveloperAccount();
 
-    ux.action.start(`Finding ${appWithVersion}`);
-    const { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);
+    ux.action.start(`Finding ${inferredParams.appName}@${inferredParams.version}`);
+    let appInfo: FullAppInfo | undefined;
+    try {
+      appInfo = await getAppBySlug(this.#appClient, {
+        slug: inferredParams.appName,
+        hidePrereleaseVersions: true,
+      });
+    } catch (err) {
+      this.error(
+        `App ${inferredParams.appName} is not found. Please run 'devvit upload' and try again.\n${StringUtil.caughtToString(err, 'message')}`
+      );
+    }
+
+    if (!appInfo?.app) {
+      this.error(
+        `App ${inferredParams.appName} is not found. Please run 'devvit upload' and try again.`
+      );
+    }
+
+    const appVersion = await getVersionByNumber(inferredParams.version, appInfo?.versions);
     ux.action.stop();
 
     const devvitVersion = new DevvitVersion(

@@ -254,6 +254,17 @@ export class TxClient implements TxClientLike {
     } else if (options?.by === 'score') {
       opts.byScore = true;
     }
+    if (options?.limit) {
+      if (opts.byLex || opts.byScore) {
+        opts.offset = options.limit.offset;
+        opts.count = options.limit.count;
+      } else {
+        throw new Error(
+          `zRange parsing error: 'limit' only allowed when 'options.by' is 'lex' or 'score'`
+        );
+      }
+    }
+
     await this.#storage.ZRange(
       {
         key: { key: key, transactionId: this.#transactionId },
@@ -458,6 +469,25 @@ export class RedisClient implements RedisClientLike {
     }
   }
 
+  async getBuffer(key: string): Promise<Buffer | undefined> {
+    try {
+      const response = await this.storage.GetBytes(
+        { key, scope: this.scope },
+        {
+          ...this.#metadata,
+          'throw-redis-nil': { values: ['true'] },
+        }
+      );
+      return response !== null ? Buffer.from(response.value) : response;
+    } catch (e) {
+      if (isRedisNilError(e)) {
+        return undefined;
+      }
+
+      throw e;
+    }
+  }
+
   async set(key: string, value: string, options?: SetOptions): Promise<string> {
     let expiration;
     if (options?.expiration) {
@@ -479,6 +509,11 @@ export class RedisClient implements RedisClientLike {
       this.#metadata
     );
     return response.value;
+  }
+
+  async exists(...keys: string[]): Promise<number> {
+    const response = await this.storage.Exists({ keys, scope: this.scope }, this.#metadata);
+    return response.existingKeys;
   }
 
   async del(...keys: string[]): Promise<void> {
@@ -548,6 +583,18 @@ export class RedisClient implements RedisClientLike {
       opts.offset = 0;
       opts.count = 0;
     }
+
+    if (options?.limit) {
+      if (opts.byLex || opts.byScore) {
+        opts.offset = options.limit.offset;
+        opts.count = options.limit.count;
+      } else {
+        throw new Error(
+          `zRange parsing error: 'limit' only allowed when 'options.by' is 'lex' or 'score'`
+        );
+      }
+    }
+
     return (
       await this.storage.ZRange(
         { key: { key: key }, start: start + '', stop: stop + '', ...opts, scope: this.scope },
@@ -673,6 +720,11 @@ export class RedisClient implements RedisClientLike {
     return response !== null ? response.value : response;
   }
 
+  async rename(key: string, newKey: string): Promise<string> {
+    const response = await this.storage.Rename({ key, newKey, scope: this.scope }, this.#metadata);
+    return response.result;
+  }
+
   async hget(key: string, field: string): Promise<string | undefined> {
     return this.hGet(key, field);
   }
@@ -709,6 +761,14 @@ export class RedisClient implements RedisClientLike {
     const fv = Object.entries(fieldValues).map(([field, value]) => ({ field, value }));
     const response = await this.storage.HSet({ key, fv, scope: this.scope }, this.#metadata);
     return response.value;
+  }
+
+  async hSetNX(key: string, field: string, value: string): Promise<number> {
+    const response = await this.storage.HSetNX(
+      { key, field, value, scope: this.scope },
+      this.#metadata
+    );
+    return response.success;
   }
 
   async hgetall(key: string): Promise<Record<string, string>> {

@@ -767,7 +767,6 @@ export class BlocksTransformer {
       this.makeBlock(BlockType.BLOCK_WEBVIEW, props, transformContext, {
         webviewConfig: {
           url: this.resolveAssetUrl(props.url, { webView: true }),
-          state: props.state,
         },
       })
     );

@@ -120,7 +120,7 @@ export let _latestBlocksHandler: BlocksHandler | null = null;
 /**
  * Limit the number of render cycles to prevent infinite loops.
  */
-const MaxIterations = 64;
+const MaxIterations = 128;
 
 /**
  * Replacing BlocksReconciler, the model is now less of a "reconciliation", and more
@@ -157,8 +157,26 @@ export class BlocksHandler {
      *
      * This also means we need to respect execution queues here, and not just in the platform.
      */
-    const eventsToProcess = request.events;
-    const noEvents = !request.events?.length;
+    const drop = request.events.length - MaxIterations;
+    let eventsToProcess = request.events;
+    if (drop > 0) {
+      eventsToProcess = [];
+
+      // Filter out old realtime messages until drop is met.
+      {
+        let dropped = 0;
+        for (const ev of request.events) {
+          if (dropped < drop && ev.realtimeEvent) dropped++;
+          else eventsToProcess.push(ev);
+        }
+      }
+
+      // Filter out _any_ old remaining messages until drop is met.
+      while (eventsToProcess.length > MaxIterations) eventsToProcess.shift();
+
+      console.warn(`dropped ${drop} events`);
+    }
+    const noEvents = !eventsToProcess.length;
     const isMainQueue = noEvents || eventsToProcess.some((e) => !e.async);
 
     const isBlockingSSR = eventsToProcess.some((e) => e.blocking);

@@ -1,6 +1,8 @@
 import { EffectType, type UIEvent } from '@devvit/protos';
 import { WebViewVisibility } from '@devvit/protos';
+import type { WebViewAppMessage } from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/post_message.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 import type {
   UseWebViewOnMessage,
@@ -43,25 +45,41 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
       if (!isVisible && this.#onUnmount) await this.#onUnmount(this);
     } else if (event.webView?.postMessage) {
       // Handle messages sent from web view -> Devvit app
-      const { message } = event.webView.postMessage;
-      await this.#onMessage(message, this);
+      if (event.webView.postMessage.jsonString) {
+        const parsedJson = JSON.parse(event.webView.postMessage.jsonString);
+        await this.#onMessage(parsedJson, this);
+      } else {
+        // Fallback to deprecated message field for mobile client backwards compatibility
+        await this.#onMessage(event.webView.postMessage.message, this);
+      }
     }
   }
 
   /**
-   * Send a message from a Devvit app to a web view.
+   * Send a message from a Devvit app to a web view (fullscreen).
    */
   postMessage = (message: To): void => {
-    // Handle messages sent from Devvit app -> web view
-    this.#renderContext.emitEffect(`postMessage${this.state.messageCount++}`, {
-      type: EffectType.EFFECT_WEB_VIEW,
-      webView: {
-        postMessage: {
-          webViewId: this.#hookId,
-          app: { message },
+    try {
+      // Encode message as JSON for consistency with the mobile clients
+      const jsonString = JSON.stringify(message);
+      // Handle messages sent from Devvit app -> web view
+      this.#renderContext.emitEffect(`postMessage${this.state.messageCount++}`, {
+        type: EffectType.EFFECT_WEB_VIEW,
+        webView: {
+          postMessage: {
+            webViewId: this.#hookId,
+            app: <WebViewAppMessage>{
+              message, // This is deprecated, but populated for mobile client backwards compatibility
+              jsonString,
+            },
+          },
         },
-      },
-    });
+      });
+    } catch (e) {
+      console.error(StringUtil.caughtToString(e));
+      // Safety net if something went wrong with JSON.stringify
+      throw Error('Something went wrong. Please check the contents of your postMessage.');
+    }
   };
 
   /**
@@ -77,12 +95,23 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
       throw Error(`useWebView fullscreen request failed; web view asset could not be found`);
     }
 
+    this.#emitFullscreenEffect(true, url);
+  };
+
+  /**
+   * Triggers the fullscreen effect to hide the open web view.
+   */
+  unmount = (): void => {
+    this.#emitFullscreenEffect(false, '');
+  };
+
+  #emitFullscreenEffect = (show: boolean, url: string): void => {
     this.#renderContext.emitEffect('fullscreen', {
       type: EffectType.EFFECT_WEB_VIEW,
       webView: {
         fullscreen: {
           id: this.#hookId,
-          show: true,
+          show,
           url,
         },
       },
@@ -103,5 +132,6 @@ export function useWebView<From extends JSONValue = JSONValue, To extends JSONVa
   return {
     postMessage: hook.postMessage,
     mount: hook.mount,
+    unmount: hook.unmount,
   };
 }

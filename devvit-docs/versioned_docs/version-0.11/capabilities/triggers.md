@@ -168,7 +168,7 @@ Mod actions are another kind of trigger that are just for mods. These triggers s
 Devvit.addTrigger({
   event: 'ModAction',
   async onEvent(event, context) {
-    if (event.action === 'BAN_USER') {
+    if (event.action === 'banuser') {
       console.log(`A new user ${event.targetUser?.name} was banned!`);
     }
   },

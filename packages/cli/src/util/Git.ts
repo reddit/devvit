@@ -1,14 +1,11 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+import url from 'node:url';
 
 import git, { Errors as GitErrors, TREE } from 'isomorphic-git';
 
-// Note: This is a Release candidate feature. It's been around since v21.2.0
-// and v20.11.0, but technically still in experimental status, and may break.
-// If `devvit new` suddenly stops appearing as a valid command, this may be why.
-// https://nodejs.org/api/esm.html#importmetadirname
-const __dirname = import.meta.dirname;
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export type IGit = {
   rootDir: string;

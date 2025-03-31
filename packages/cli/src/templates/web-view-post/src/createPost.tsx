@@ -1,10 +1,5 @@
 import { Devvit } from '@devvit/public-api';
 
-// Configure Devvit's plugins
-Devvit.configure({
-  redditAPI: true,
-});
-
 // Adds a new menu item to the subreddit allowing to create a new post
 Devvit.addMenuItem({
   label: 'Create New Devvit Post (with Web View)',

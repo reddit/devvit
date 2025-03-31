@@ -827,6 +827,7 @@ export type RedisClient = {
   watch(...keys: string[]): Promise<TxClientLike>;
   /**
    * Get the value of key. If the key does not exist the special value nil is returned.
+   * An exception will be raised if the value of key is not a valid utf-8 encoding.
    * https://redis.io/commands/get/
    * @arg {} key
    * @returns value of key or null when key does not exist.
@@ -841,6 +842,23 @@ export type RedisClient = {
    */
   get(key: string): Promise<string | undefined>;
   /**
+   * Get the value of key and return it as a buffer.
+   * Use getBytes instead of get if you need to tolerate values that are not valid utf-8.
+   * If the key does not exist the special value nil is returned.
+   * https://redis.io/commands/get/
+   * @arg {} key
+   * @returns value of key or null when key does not exist.
+   * @example
+   * ```ts
+   * async function getExample(context: Devvit.Context) {
+   *  await context.redis.bitfield("nonutf8", "set", "u8", "0", "192");
+   *  const buf : string | undefined = await context.redis.getBuffer("nonutf8");
+   *  console.log("Bytes: " + JSON.stringify(buf));
+   * }
+   * ```
+   */
+  getBuffer(key: string): Promise<Buffer | undefined>;
+  /**
    * Set key to hold the string value. If key already holds a value, it is overwritten
    * https://redis.io/commands/set/
    * @arg {} key
@@ -854,6 +872,28 @@ export type RedisClient = {
    * ```
    */
   set(key: string, value: string, options?: SetOptions): Promise<string>;
+  /**
+   * Returns number of given keys that exists
+   * https://redis.io/commands/exists/
+   * @arg {} keys Keys to check for existence
+   * @returns number of keys in the list of keys that exist (note: double counts if an existing key is passed twice)
+   * @example
+   * ```ts
+   * async function existsExample(context: Devvit.Context) {
+   *  const exists : number = await context.redis.exists("someKey");
+   *  console.log("Exists: " + exists); // 0
+   *
+   *  await context.redis.set("someKey", "someValue");
+   *  const exists2 : number = await context.redis.exists("someKey", "someOtherKey");
+   *  console.log("Exists2: " + exists2); // 1
+   *
+   *  await context.redis.set("someOtherKey", "someOtherValue");
+   *  const exists3 : number = await context.redis.exists("someKey", "someKey", "someOtherKey");
+   *  console.log("Exists3: " + exists3); // 3, since "someKey" is counted twice
+   * }
+   * ```
+   */
+  exists(...keys: string[]): Promise<number>;
   /**
    * Removes the specified keys. A key is ignored if it does not exist.
    * https://redis.io/commands/del/
@@ -882,6 +922,23 @@ export type RedisClient = {
    * ```
    */
   type(key: string): Promise<string>;
+  /**
+   * Renames key to newKey. It returns an error when key does not exist.
+   * https://redis.io/commands/rename/
+   * @arg {} key key to be renamed
+   * @arg {} newKey new key name
+   * @returns string returns "OK" if the key was renamed successfully
+   * @example
+   * ```ts
+   * async function renameExample(context: Devvit.Context) {
+   *  await context.redis.set("quantity", "5");
+   *  await context.redis.rename("quantity", "amount");
+   *  const value : string = await context.redis.get("amount");
+   *  console.log("Value: " + value);
+   * }
+   * ```
+   */
+  rename(key: string, newKey: string): Promise<string>;
   /**
    * Returns the substring of the string value stored at key, determined by
    * the offsets start and end (both are inclusive).
@@ -1319,6 +1376,19 @@ export type RedisClient = {
    */
   hSet(key: string, fieldValues: { [field: string]: string }): Promise<number>;
   /**
+   * Sets field in the hash stored at key to value, only if field does not yet exist.
+   * https://redis.io/commands/hsetnx/
+   * @returns 1 if field is a new field in the hash and value was set, 0 if field already exists in the hash and no operation was performed.
+   * @example
+   * ```ts
+   * async function hSetNXExample(context: Devvit.Context) {
+   *  const result : number = await context.redis.hSetNX("myhash", "field1", "value1");
+   *  console.log("HSETNX result: " + result);
+   * }
+   * ```
+   */
+  hSetNX(key: string, field: string, value: string): Promise<number>;
+  /**
    * Returns the value associated with field in the hash stored at key.
    * https://redis.io/commands/hget
    * @deprecated Use {@link RedisClient.hGet} instead.
@@ -1598,6 +1668,10 @@ export type ZRangeOptions = {
    */
   reverse?: boolean;
   by: 'score' | 'lex' | 'rank';
+  limit?: {
+    offset: number;
+    count: number;
+  };
 };
 
 export type ZRangeByScoreOptions = {

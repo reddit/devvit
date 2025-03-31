@@ -349,10 +349,10 @@ Updated points: 153
 
 ### Key expiration
 
-| **Command**                                         | **Action**                                                                                                 |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| [expire](https://redis.io/commands/expire/)         | Sets a timeout on key.                                                                                     |
-| [expireTime](https://redis.io/commands/expiretime/) | Returns the absolute Unix timestamp (since January 1, 1970) in seconds at which the given key will expire. |
+| **Command**                                         | **Action**                                                        |
+| --------------------------------------------------- | ----------------------------------------------------------------- |
+| [expire](https://redis.io/commands/expire/)         | Sets a timeout on key.                                            |
+| [expireTime](https://redis.io/commands/expiretime/) | Returns the remaining seconds at which the given key will expire. |
 
 <details><summary>Code Example</summary>
 

@@ -16,7 +16,7 @@ Interactive posts allow you to build apps like [live scoreboards](./showcase/app
 Devvit provides two interactive post templates:
 
 - `blocks-post` to create an interactive post with blocks.
-- `web-view-post` to create an interactive post that utilizes webviews [experimental]
+- `web-view-post` to create an interactive post that uses web views.
 
 You can also create your own interactive post from scratch.
 
@@ -35,16 +35,11 @@ You can see code examples of apps built with blocks [here](./showcase/apps.mdx) 
 
 ### Webviews
 
-:::note
-Webviews is an experimental feature and currently only works reliably on web.
-:::
-
 [Webviews](./webviews.md) lets you use standard web technologies:
 
 - ✅ HTML, CSS, JavaScript
 - ✅ Rich multimedia support
 - ✅ Advanced animations
-- ⚠️ Currently experimental, best on desktop
 
 Perfect for: Games, complex visualizations, rich interactions
 

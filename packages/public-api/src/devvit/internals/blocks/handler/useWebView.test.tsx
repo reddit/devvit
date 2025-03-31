@@ -169,6 +169,7 @@ describe('useWebView', () => {
         webView: {
           postMessage: {
             app: {
+              jsonString: '{"type":"CLEANUP","data":{"finalCount":10}}',
               message: {
                 data: {
                   finalCount: 10,
@@ -229,6 +230,9 @@ describe('useWebView', () => {
             hook: webviewHookRef.id,
             webView: {
               postMessage: {
+                jsonString: JSON.stringify({
+                  foo: 'bar',
+                }),
                 message: {
                   foo: 'bar',
                 },
@@ -246,6 +250,7 @@ describe('useWebView', () => {
         webView: {
           postMessage: {
             app: {
+              jsonString: '{"type":"UPDATE","data":{"newCount":1}}',
               message: {
                 data: {
                   newCount: 1,
