@@ -264,4 +264,56 @@ describe('useWebView', () => {
       },
     ]);
   });
+
+  test('onMessage filters out devvit-client messages', async () => {
+    const webviewHookRef: HookRef = {};
+    const showFullScreenWebviewButtonRef: HookRef = {};
+    const BaseWebView: Devvit.BlockComponent = (_props: JSX.Props) => {
+      const webViewHook = captureHookRef(
+        useWebView({
+          onMessage: (_message: WebViewMessage, _webView: UseWebViewResult) => {},
+        }),
+        webviewHookRef
+      );
+
+      return (
+        <vstack>
+          <button
+            onPress={captureHookRef(() => {
+              webViewHook.mount();
+            }, showFullScreenWebviewButtonRef)}
+          >
+            Full screen
+          </button>
+        </vstack>
+      );
+    };
+
+    const handler = new BlocksHandler(BaseWebView);
+    await handler.handle(getEmptyRequest(), mockMetadata);
+
+    const internalMessage = {
+      event: 'pointerdown',
+      scope: 0,
+      type: 'devvit-internal',
+    };
+    const webviewToBlocksPostMessage = await handler.handle(
+      {
+        events: [
+          {
+            hook: webviewHookRef.id,
+            webView: {
+              postMessage: {
+                jsonString: JSON.stringify(internalMessage),
+                message: internalMessage,
+              },
+            },
+          },
+        ],
+      },
+      mockMetadata
+    );
+
+    expect(webviewToBlocksPostMessage.effects).toStrictEqual([]);
+  });
 });

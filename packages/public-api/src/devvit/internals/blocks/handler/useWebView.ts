@@ -9,6 +9,7 @@ import type {
   UseWebViewOptions,
   UseWebViewResult,
 } from '../../../../index.js';
+import { webViewMessageIsInternalAndClientScope } from '../../helpers/devvitInternalMessage.js';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';
@@ -45,13 +46,16 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
       if (!isVisible && this.#onUnmount) await this.#onUnmount(this);
     } else if (event.webView?.postMessage) {
       // Handle messages sent from web view -> Devvit app
-      if (event.webView.postMessage.jsonString) {
-        const parsedJson = JSON.parse(event.webView.postMessage.jsonString);
-        await this.#onMessage(parsedJson, this);
-      } else {
-        // Fallback to deprecated message field for mobile client backwards compatibility
-        await this.#onMessage(event.webView.postMessage.message, this);
-      }
+
+      // Fallback to deprecated message field for mobile client backwards compatibility
+      const message = event.webView.postMessage.jsonString
+        ? JSON.parse(event.webView.postMessage.jsonString)
+        : event.webView.postMessage.message;
+
+      // TODO: Temporary. Remove this filter once clients are updated.
+      if (webViewMessageIsInternalAndClientScope(message)) return;
+
+      await this.#onMessage(message, this);
     }
   }
 
