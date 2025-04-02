@@ -43,12 +43,7 @@ type CreateAppFlags = {
   yes: boolean;
   here: boolean;
   template: string | undefined;
-  noDependencies: boolean;
-};
-
-type CreateAppParseResult = {
-  args: CreateAppArgs;
-  flags: CreateAppFlags;
+  'no-dependencies': boolean;
 };
 
 type CreateAppParams = {
@@ -58,6 +53,7 @@ type CreateAppParams = {
   /** Pen unpacked from play URL template. */
   pen: PenSave | undefined;
 };
+
 export default class New extends DevvitCommand {
   static override description = 'Create a new app';
 
@@ -84,12 +80,13 @@ export default class New extends DevvitCommand {
           .join('\n')}`,
       required: false,
     }),
-    noDependencies: Flags.boolean({
+    'no-dependencies': Flags.boolean({
+      aliases: ['noDependencies'],
       required: false,
       default: false,
       description: 'Flag to skip dependency installation step',
     }),
-  };
+  } as const;
 
   static override args = {
     appName: Args.string({
@@ -98,7 +95,7 @@ export default class New extends DevvitCommand {
       required: false,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
 
   #createAppParams: CreateAppParams | null = null;
   #createAppFlags: CreateAppFlags | null = null;
@@ -150,7 +147,7 @@ export default class New extends DevvitCommand {
   }
 
   override async run(): Promise<void> {
-    const { args, flags }: CreateAppParseResult = await this.parse(New);
+    const { args, flags } = await this.parse(New);
     this.#createAppFlags = flags;
 
     if (flags.yes) {
@@ -202,7 +199,9 @@ export default class New extends DevvitCommand {
 
     // skip dependency installation if 'yes' is set to avoid unexpected changes in CI
     const dependenciesInstalled =
-      flags.yes || flags.noDependencies ? false : (await this.#installAppDependencies()).success;
+      flags.yes || flags['no-dependencies']
+        ? false
+        : (await this.#installAppDependencies()).success;
 
     this.#logWelcomeMessage(path.relative(process.cwd(), this.#projectPath), {
       dependenciesInstalled,

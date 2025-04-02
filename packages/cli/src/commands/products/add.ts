@@ -52,11 +52,15 @@ export default class AddProduct extends ProjectCommand {
 
   static override args = {
     sku: Args.string({ description: 'Product SKU' }),
-  };
+  } as const;
 
   static override flags = {
-    name: Flags.string({ description: 'Product display name' }),
-    description: Flags.string({ description: 'Product description' }),
+    name: Flags.string({
+      description: 'Product display name',
+    }),
+    description: Flags.string({
+      description: 'Product description',
+    }),
     price: Flags.integer({
       options: ALLOWED_PRICES.map((price) => price.toString()),
       description: 'Product price in Reddit Gold',
@@ -86,7 +90,7 @@ export default class AddProduct extends ProjectCommand {
         return input.replace(/^\.?\/?/, '');
       },
     }),
-  };
+  } as const;
 
   get productsFilePath(): string {
     return path.join(this.projectRoot, 'src', 'products.json');

@@ -1,6 +1,5 @@
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { Command, Flags } from '@oclif/core';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import { parse } from '@oclif/core/lib/parser/index.js';
 import inquirer from 'inquirer';
 import open from 'open';
@@ -24,13 +23,12 @@ export const toLowerCaseArgParser = async (input: string): Promise<string> => in
 export abstract class DevvitCommand extends Command {
   #configFileName: string | undefined;
 
-  static override baseFlags: FlagInput = {
+  static override baseFlags = {
     config: Flags.string({
-      name: 'config',
       description: 'path to devvit config file',
       default: DEVVIT_CONFIG_FILE,
     }),
-  };
+  } as const;
 
   public get configFileName(): string {
     return this.#configFileName ?? DEVVIT_CONFIG_FILE;

@@ -60,22 +60,20 @@ export default class Publish extends ProjectCommand {
         'App to install (defaults to working directory app) and version (defaults to latest)',
       required: false,
     }),
-  };
+  } as const;
 
   static override flags = {
     public: Flags.boolean({
-      name: 'public',
       description: 'Submit the app for review to be published publicly',
       required: false,
     }),
     unlisted: Flags.boolean({
-      name: 'unlisted',
       description:
         'Submit the app for review to be published unlisted (installable only by you, ' +
         'but removes subreddit size restrictions)',
       required: false,
     }),
-  };
+  } as const;
 
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();

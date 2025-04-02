@@ -47,7 +47,7 @@ export default class Install extends DevvitCommand {
       required: false,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
 
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();

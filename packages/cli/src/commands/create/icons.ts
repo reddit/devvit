@@ -18,7 +18,7 @@ export default class Icons extends ProjectCommand {
       description: 'Path to the output file',
       default: 'src/icons.ts',
     }),
-  };
+  } as const;
 
   async run(): Promise<void> {
     const {

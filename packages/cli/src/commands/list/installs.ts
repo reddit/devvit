@@ -28,7 +28,7 @@ export default class ListInstalls extends DevvitCommand {
         'Provide the name of the subreddit in which to search for app installs. The "r/" prefix is optional',
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
 
   readonly #installationsClient = createInstallationsClient();
 

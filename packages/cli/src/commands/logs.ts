@@ -42,7 +42,7 @@ export default class Logs extends DevvitCommand {
       required: false,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
   static override flags = {
     connect: Flags.boolean({ default: true, description: 'Connect to local runtime.' }),
     dateformat: Flags.string({
@@ -57,10 +57,12 @@ export default class Logs extends DevvitCommand {
       default: false,
     }),
     'log-runtime': Flags.boolean({
+      aliases: ['logRuntime'],
       description:
         'Include executing runtime in logs. Remote logs originate from apps running on Reddit servers, local logs originate from your browser.',
     }),
-    showKeepAlive: Flags.boolean({
+    'show-keep-alive': Flags.boolean({
+      aliases: ['showKeepAlive'],
       default: false,
       hidden: true,
     }),
@@ -69,7 +71,7 @@ export default class Logs extends DevvitCommand {
       description: `when to start the logs from. example "15s", "2w1d" "30m"\n${supportedDurationFormats}`,
     }),
     verbose: Flags.boolean({ default: false }),
-  };
+  } as const;
 
   #appLogSub?: Subscription;
   #playtest?: PlaytestServer;

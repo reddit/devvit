@@ -25,14 +25,14 @@ export default class BundleActor extends ProjectCommand {
       parse: toLowerCaseArgParser,
       default: 'main',
     }),
-  };
+  } as const;
 
   static override flags = {
     metafile: Flags.boolean({
       description: 'Produce a metafile to analyze the size of the bundle',
       required: false,
     }),
-  };
+  } as const;
 
   static override hidden = true;
 

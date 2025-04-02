@@ -84,7 +84,7 @@ export function makeLogSubscription(
           dateFormat: flags.dateformat,
           json: flags.json,
           runtime: flags['log-runtime'],
-          showKeepAlive: flags.showKeepAlive,
+          showKeepAlive: flags['show-keep-alive'],
           verbose: flags.verbose,
         },
         console

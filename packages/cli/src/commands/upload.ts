@@ -12,7 +12,6 @@ import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import { Flags, ux } from '@oclif/core';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
@@ -31,9 +30,8 @@ import { sendEvent } from '../util/metrics.js';
 export default class Upload extends ProjectCommand {
   static override description = `Upload the app to the App Directory. Uploaded apps are only visible to you (the app owner) and can only be installed to a small test subreddit with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} subscribers`;
 
-  static override flags: FlagInput = {
+  static override flags = {
     bump: Flags.custom<VersionBumpType>({
-      name: 'bump',
       description: 'Type of version bump (major|minor|patch|prerelease)',
       required: false,
       options: [
@@ -44,32 +42,34 @@ export default class Upload extends ProjectCommand {
       ],
     })(),
     'employee-update': Flags.boolean({
-      name: 'employee-update',
+      aliases: ['employeeUpdate'],
       description:
         "I'm an employee and I want to update someone else's app. (This will only work if you're an employee.)",
       required: false,
       hidden: true,
     }),
-    justDoIt: Flags.boolean({
-      name: 'justDoIt',
+    'just-do-it': Flags.boolean({
+      aliases: ['justDoIt'],
       description: "Don't ask any questions, just use defaults & continue. (Useful for testing.)",
       required: false,
       hidden: true,
     }),
-    ignoreOutdated: Flags.boolean({
-      name: 'ignoreOutdated',
+    // Used in packages/cli/src/lib/hooks/init/check-update.ts
+    'ignore-outdated': Flags.boolean({
+      aliases: ['ignoreOutdated'],
       description: 'Skip CLI version check. The apps that you upload may not work as expected',
       required: false,
       hidden: false,
     }),
-    disableTypecheck: Flags.boolean({
+    'disable-typecheck': Flags.boolean({
+      aliases: ['disableTypecheck'],
       char: 't',
       description: 'Disable typechecking before uploading',
       default: false,
       hidden: true,
     }),
-    copyPaste: Flags.boolean({
-      name: 'copyPaste',
+    'copy-paste': Flags.boolean({
+      aliases: ['copyPaste'],
       description: 'Copy-paste the auth code instead of opening a browser',
       default: false,
     }),
@@ -79,7 +79,7 @@ export default class Upload extends ProjectCommand {
       default: false,
       hidden: true,
     }),
-  };
+  } as const;
 
   readonly #appClient = createAppClient();
 
@@ -99,7 +99,7 @@ export default class Upload extends ProjectCommand {
     const { flags } = await this.parse(Upload);
 
     const projectConfig = await this.getProjectConfig();
-    await this.#checkDependencies(flags.justDoIt);
+    await this.#checkDependencies(flags['just-do-it']);
 
     const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
@@ -130,7 +130,7 @@ export default class Upload extends ProjectCommand {
     if (!isOwner) {
       shouldCreateNewApp = true;
       // Unless...
-      if (flags['employee-update'] || flags.justDoIt) {
+      if (flags['employee-update'] || flags['just-do-it']) {
         const isEmployee = await isCurrentUserEmployee(token);
         if (!isEmployee) {
           this.error(`You're not an employee, so you can't playtest someone else's app.`);
@@ -143,13 +143,17 @@ export default class Upload extends ProjectCommand {
 
     // Ensure the app builds before we potentially create an new app or a new version
     ux.action.start('Verifying app builds');
-    await this.#bundleActors(username, projectConfig.version, !flags.disableTypecheck);
+    await this.#bundleActors(username, projectConfig.version, !flags['disable-typecheck']);
     ux.action.stop();
 
     if (shouldCreateNewApp || !appInfo) {
       const appUploader = new AppUploader(this);
 
-      appInfo = await appUploader.createNewApp(projectConfig, flags.copyPaste, flags.justDoIt);
+      appInfo = await appUploader.createNewApp(
+        projectConfig,
+        flags['copy-paste'],
+        flags['just-do-it']
+      );
 
       this.#event.devplatform.cli_upload_is_initial = true;
       this.#event.devplatform.cli_upload_is_nsfw = appInfo.app?.isNsfw;
@@ -169,7 +173,7 @@ export default class Upload extends ProjectCommand {
       appInfo,
       DevvitVersion.fromString(projectConfig.version),
       flags.bump,
-      !flags.justDoIt
+      !flags['just-do-it']
     );
 
     await updateDevvitConfig(this.projectRoot, this.configFileName, {
@@ -182,7 +186,7 @@ export default class Upload extends ProjectCommand {
     const bundles = await this.#bundleActors(
       username,
       appVersionNumber.toString(),
-      !flags.disableTypecheck
+      !flags['disable-typecheck']
     );
     ux.action.stop();
 

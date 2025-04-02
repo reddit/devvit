@@ -7,13 +7,6 @@ import { createAppVersionClient, createInstallationsClient } from '../util/clien
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 
-type UninstallParseResult = {
-  args: {
-    app?: string | undefined;
-    subreddit: string;
-  };
-};
-
 export default class Uninstall extends DevvitCommand {
   static override description = 'Uninstall an app from the specified subreddit';
 
@@ -35,13 +28,13 @@ export default class Uninstall extends DevvitCommand {
       required: false,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
 
   readonly #installationsClient = createInstallationsClient();
   readonly #appVersionClient = createAppVersionClient();
 
   async run(): Promise<void> {
-    const { args }: UninstallParseResult = await this.parse(Uninstall);
+    const { args } = await this.parse(Uninstall);
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
     const appName = args.app || (await this.inferAppNameFromProject());

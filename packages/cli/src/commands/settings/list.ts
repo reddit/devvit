@@ -13,6 +13,7 @@ export default class ListAppSettings extends ProjectCommand {
     'List settings for your app. These settings exist at the global app-scope and are available to all instances of your app.';
   readonly #appSettingsService = createAppSettingsClient();
   readonly #appService = createAppClient();
+
   override async run(): Promise<void> {
     const projectConfig = await this.getProjectConfig();
     const appName = projectConfig.slug ?? projectConfig.name;

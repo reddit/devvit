@@ -12,7 +12,7 @@ export default class Metrics extends DevvitCommand {
       required: true,
       options: ['on', 'off'],
     }),
-  };
+  } as const;
 
   async run(): Promise<void> {
     const { args } = await this.parse(Metrics);

@@ -17,7 +17,6 @@ import { debounce } from '@devvit/shared-types/debounce.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import { Args, Flags, ux } from '@oclif/core';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
 import path from 'path';
@@ -59,27 +58,32 @@ export default class Playtest extends ProjectCommand {
     '$ devvit playtest myOtherTestSubreddit',
   ];
 
-  static override get flags(): FlagInput {
-    return {
-      ...Logs.flags,
-      // to-do: delete. This only exists in case users dislike live-reload.
-      'no-live-reload': Flags.boolean({
-        description: 'Attempt to reload the subreddit being browsed automatically.',
-      }),
-      'employee-update': Flags.boolean({
-        name: 'employee-update',
-        description:
-          "I'm an employee and I want to update someone else's app. (This will only work if you're an employee.)",
-        required: false,
-        hidden: true,
-      }),
-      debounce: Flags.integer({
-        name: 'debounce',
-        description: 'Debounce time in milliseconds for file changes',
-        required: false,
-      }),
-    };
-  }
+  static override flags = {
+    ...Logs.flags,
+    // to-do: delete. This only exists in case users dislike live-reload.
+    'no-live-reload': Flags.boolean({
+      aliases: ['noLiveReload'],
+      description: 'Attempt to reload the subreddit being browsed automatically.',
+    }),
+    'employee-update': Flags.boolean({
+      aliases: ['employeeUpdate'],
+      description:
+        "I'm an employee and I want to update someone else's app. (This will only work if you're an employee.)",
+      required: false,
+      hidden: true,
+    }),
+    // Used in packages/cli/src/lib/hooks/init/check-update.ts
+    'ignore-outdated': Flags.boolean({
+      aliases: ['ignoreOutdated'],
+      description: 'Skip CLI version check. The apps that you upload may not work as expected',
+      required: false,
+      hidden: false,
+    }),
+    debounce: Flags.integer({
+      description: 'Debounce time in milliseconds for file changes',
+      required: false,
+    }),
+  } as const;
 
   static override args = {
     subreddit: Args.string({
@@ -87,7 +91,7 @@ export default class Playtest extends ProjectCommand {
       required: true,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
 
   // API Clients
   readonly #installationsClient = createInstallationsClient();

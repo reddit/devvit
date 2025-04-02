@@ -16,9 +16,9 @@ const hook: Hook<'init'> = async function (options) {
     return;
   }
 
-  // Ignore version check if --ignoreOutdated is applied
+  // Ignore version check if --ignore-outdated is applied
   const canBypassVersionCheck = options.argv.includes(
-    `--${UploadCommand.flags.ignoreOutdated.name}`
+    `--${UploadCommand.flags['ignore-outdated'].name}`
   );
   if (canBypassVersionCheck) {
     return;

@@ -19,7 +19,7 @@ export default class SetAppSettings extends ProjectCommand {
       description: 'Settings key to add',
       required: true,
     }),
-  };
+  } as const;
 
   async #promptSettingValue(settingsKey: string): Promise<string> {
     const promptMessage = `Enter the value you would like to assign to the variable ${settingsKey}:`;
