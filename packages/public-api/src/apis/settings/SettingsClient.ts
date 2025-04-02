@@ -1,4 +1,5 @@
-import type { FormFieldValue, Metadata } from '@devvit/protos';
+import { FormFieldType, type FormFieldValue, type Metadata } from '@devvit/protos';
+import type { SettingsResponse } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
 import type {
@@ -35,10 +36,50 @@ export class SettingsClient implements _SettingsClient {
       throw new Error('Could not get app settings');
     }
 
+    cleanAppSettings(response);
+
     return {
       ...getSettingsValues(response.installationSettings.settings, Devvit.installationSettings),
       ...getSettingsValues(response.appSettings.settings, Devvit.appSettings),
     } as T;
+  }
+}
+
+export function cleanAppSettings(response: SettingsResponse): void {
+  if (!response.appSettings) {
+    throw new Error('Could not get app settings');
+  }
+
+  // FIX: appSettings don't come back typed correctly for bools or numbers.
+  // Fix that. This is a workaround. We intend to make appSettings set this
+  // way entirely obsolete in the future; this is just a stopgap.
+  for (const [key, value] of Object.entries(response.appSettings.settings)) {
+    // Find the matching setting definition, because we can't trust the types in the response.
+    const settingDefinition = Devvit.appSettings?.find((s) => s.type !== 'group' && s.name === key);
+    if (!settingDefinition) {
+      continue;
+    }
+
+    // If the setting is a boolean or number, we need to convert it from string to the correct type.
+    if (
+      settingDefinition.type === 'boolean' &&
+      value.fieldType === FormFieldType.STRING &&
+      value.boolValue == null &&
+      value.stringValue != null
+    ) {
+      value.fieldType = FormFieldType.BOOLEAN;
+      value.boolValue = Boolean(value.stringValue);
+      delete value.stringValue;
+    } else if (
+      settingDefinition.type === 'number' &&
+      value.fieldType === FormFieldType.STRING &&
+      value.numberValue == null &&
+      value.stringValue != null
+    ) {
+      value.fieldType = FormFieldType.NUMBER;
+      value.numberValue = Number(value.stringValue);
+      delete value.stringValue;
+    }
   }
 }
 
