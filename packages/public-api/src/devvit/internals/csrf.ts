@@ -108,7 +108,6 @@ export async function addCSRFTokenToContext(
     JSON.stringify(val)
   );
   await context.redis.expire(`${userHeader}${subredditHeader}${targetId}${req.actionId}`, 600);
-  console.debug('CSRF token added: ' + JSON.stringify(val));
 }
 
 async function isModerator(context: BaseContext & ContextAPIClients) {
@@ -135,5 +134,4 @@ export async function validateCSRFToken(
   if (csrf.needsModCheck && !(await isModerator(context))) {
     throw new Error('User is not a moderator: ' + userHeader + '; ' + subredditHeader);
   }
-  console.debug('CSRF token validated: ' + csrfData);
 }
