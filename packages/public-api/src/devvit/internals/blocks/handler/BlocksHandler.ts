@@ -527,7 +527,11 @@ export class BlocksHandler {
               if (event.userAction) {
                 return props[key](event.userAction.data);
               } else if (event.webView?.postMessage) {
-                return props[key](event.webView.postMessage.message);
+                // Fallback to deprecated message field for mobile client backwards compatibility
+                const message = event.webView.postMessage.jsonString
+                  ? JSON.parse(event.webView.postMessage.jsonString)
+                  : event.webView.postMessage.message;
+                return props[key](message);
               }
             },
           }),
