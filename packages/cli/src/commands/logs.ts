@@ -66,6 +66,11 @@ export default class Logs extends DevvitCommand {
       default: false,
       hidden: true,
     }),
+    'show-timestamps': Flags.boolean({
+      default: false,
+      description: 'Show log message timestamps',
+      aliases: ['showTimestamps'],
+    }),
     since: durationFlag({
       char: 's',
       description: `when to start the logs from. example "15s", "2w1d" "30m"\n${supportedDurationFormats}`,
@@ -109,7 +114,12 @@ export default class Logs extends DevvitCommand {
     const { args, flags } = await this.parse(Logs);
 
     this.#playtest = new PlaytestServer(
-      { dateFormat: flags.dateformat, runtime: flags['log-runtime'], verbose: flags.verbose },
+      {
+        dateFormat: flags.dateformat,
+        runtime: flags['log-runtime'],
+        verbose: flags.verbose,
+        showTimestamps: flags['show-timestamps'],
+      },
       this
     );
     if (flags.connect) this.#playtest.open();

@@ -196,7 +196,12 @@ export default class Playtest extends ProjectCommand {
 
     if (flags.connect) {
       this.#server = new PlaytestServer(
-        { dateFormat: undefined, runtime: flags['log-runtime'], verbose: flags.verbose },
+        {
+          dateFormat: undefined,
+          runtime: flags['log-runtime'],
+          verbose: flags.verbose,
+          showTimestamps: flags['show-timestamps'],
+        },
         this
       );
       this.#server.open();

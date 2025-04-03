@@ -9,6 +9,8 @@ export type AppLogConfig = {
   runtime: boolean;
   /** When true, print log level and timestamp with each message. */
   verbose: boolean;
+  /** When true, show timestamp with each message. */
+  showTimestamps: boolean;
 };
 
 export type SeverityConfig = { label: string; color: (text: string) => string };

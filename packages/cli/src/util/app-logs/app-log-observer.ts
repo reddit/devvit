@@ -72,10 +72,7 @@ export class AppLogObserver implements Observer<RemoteLogMessage> {
   #logError(error: LogErrorMessage): void {
     const severity = severities[Severity.ERROR];
     const level = this.#config.verbose ? severity.color(`[${severity.label}]`) : '';
-    const timestamp =
-      this.#config.verbose && error.timestamp
-        ? chalk.dim(formatAppLogDate(error.timestamp, this.#config.dateFormat))
-        : '';
+    const timestamp = this.#getTimestamp(error);
 
     let lines = [level, timestamp, severity.color(error.message)].filter(Boolean).join(' ');
 
@@ -100,13 +97,16 @@ export class AppLogObserver implements Observer<RemoteLogMessage> {
   #logEvent(log: LogEventMessage): void {
     const serverity = severities[Severity.VERBOSE];
     const level = this.#config.verbose ? serverity.color(`[EVENT]`) : '';
-    const timestamp =
-      this.#config.verbose && log.timestamp
-        ? chalk.dim(formatAppLogDate(log.timestamp, this.#config.dateFormat))
-        : '';
+    const timestamp = this.#getTimestamp(log);
     const line = [level, timestamp, log.type, `labels=${JSON.stringify(log.labels)}`]
       .filter(Boolean)
       .join(' ');
     this.#logger.log(line);
+  }
+
+  #getTimestamp(log: { timestamp?: Date | undefined }): string {
+    return (this.#config.showTimestamps || this.#config.verbose) && log.timestamp
+      ? chalk.dim(formatAppLogDate(log.timestamp, this.#config.dateFormat))
+      : '';
   }
 }
