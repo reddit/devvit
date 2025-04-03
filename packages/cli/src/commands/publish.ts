@@ -15,7 +15,6 @@ import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, Flags, ux } from '@oclif/core';
 import chalk from 'chalk';
-import inquirer from 'inquirer';
 import open from 'open';
 
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
@@ -65,12 +64,6 @@ export default class Publish extends ProjectCommand {
   static override flags = {
     public: Flags.boolean({
       description: 'Submit the app for review to be published publicly',
-      required: false,
-    }),
-    unlisted: Flags.boolean({
-      description:
-        'Submit the app for review to be published unlisted (installable only by you, ' +
-        'but removes subreddit size restrictions)',
       required: false,
     }),
   } as const;
@@ -141,18 +134,9 @@ export default class Publish extends ProjectCommand {
       return;
     }
 
-    let visibility: AppPublishRequestVisibility = AppPublishRequestVisibility.UNRECOGNIZED;
-    if (flags['public'] && flags['unlisted']) {
-      this.error('You cannot specify both --public and --unlisted flags - pick one!');
-    }
+    let visibility: AppPublishRequestVisibility = AppPublishRequestVisibility.UNLISTED;
     if (flags['public']) {
       visibility = AppPublishRequestVisibility.PUBLIC;
-    }
-    if (flags['unlisted']) {
-      visibility = AppPublishRequestVisibility.UNLISTED;
-    }
-    if (visibility === AppPublishRequestVisibility.UNRECOGNIZED) {
-      visibility = await this.#promptForVisibility();
     }
 
     const appCapabilities = appCapabilitiesFromLinkedBundle(bundle);
@@ -290,28 +274,5 @@ export default class Publish extends ProjectCommand {
       }
       this.error(StringUtil.caughtToString(err, 'message'));
     }
-  }
-
-  async #promptForVisibility(): Promise<AppPublishRequestVisibility> {
-    const res = await inquirer.prompt<{ visibility: AppPublishRequestVisibility }>([
-      {
-        name: 'visibility',
-        message: "What visibility would you like for your app once it's approved?",
-        type: 'list',
-        choices: [
-          {
-            name: 'Public',
-            value: AppPublishRequestVisibility.PUBLIC,
-            short: 'Publicly visible and installable by anyone',
-          },
-          {
-            name: 'Unlisted',
-            value: AppPublishRequestVisibility.UNLISTED,
-            short: 'Installable only by you, but removes subreddit size restrictions',
-          },
-        ],
-      },
-    ]);
-    return res.visibility;
   }
 }
