@@ -16,7 +16,7 @@ import { fromByteArray } from 'base64-js';
 import { Devvit } from '../../../devvit/Devvit.js';
 import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
 import { BlocksHandler } from '../../../devvit/internals/blocks/handler/BlocksHandler.js';
-import { RunAs } from '../common.js';
+import { RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
@@ -208,6 +208,7 @@ export type SubmitCustomPostTextFallbackOptions = {
 export type SubmitCustomPostOptions = CommonSubmitPostOptions &
   SubmitCustomPostTextFallbackOptions & {
     preview: JSX.Element;
+    userGeneratedContent?: UserGeneratedContent;
   };
 
 export type CommonSubmitPostOptions = {
@@ -217,6 +218,7 @@ export type CommonSubmitPostOptions = {
   spoiler?: boolean;
   flairId?: string;
   flairText?: string;
+  runAs?: RunAs;
 };
 
 export type SubmitPostOptions = (
@@ -1075,14 +1077,20 @@ export class Post {
 
   /** @internal */
   static async submit(options: SubmitPostOptions, metadata: Metadata | undefined): Promise<Post> {
-    const client = Devvit.redditAPIPlugins.LinksAndComments;
+    const { runAs = RunAs.APP } = options;
+    const client =
+      runAs === RunAs.USER ? Devvit.userActionsPlugin : Devvit.redditAPIPlugins.LinksAndComments;
 
-    // Temporary change: Always default runAs to 'APP'. The behavior can still be overwritten to runAs: 'USER' using the runAs config.
-    const runAs = RunAs.APP;
     let response: SubmitResponse;
 
     if ('preview' in options) {
       assertNonNull(metadata, 'Missing metadata in `SubmitPostOptions`');
+      if (runAs === RunAs.USER) {
+        assertNonNull(
+          options.userGeneratedContent,
+          'userGeneratedContent must be set in `SubmitPostOptions` when RunAs=USER for experience posts'
+        );
+      }
       const reconciler = new BlocksReconciler(
         () => options.preview,
         undefined,
@@ -1145,7 +1153,9 @@ export class Post {
 
   /** @internal */
   static async crosspost(options: CrosspostOptions, metadata: Metadata | undefined): Promise<Post> {
-    const client = Devvit.redditAPIPlugins.LinksAndComments;
+    const { runAs = RunAs.APP } = options;
+    const client =
+      runAs === RunAs.USER ? Devvit.userActionsPlugin : Devvit.redditAPIPlugins.LinksAndComments;
 
     const { postId, subredditName, ...rest } = options;
 
@@ -1154,7 +1164,7 @@ export class Post {
         kind: 'crosspost',
         sr: subredditName,
         crosspostFullname: asT3ID(postId),
-        runAs: RunAs.APP,
+        runAs,
         ...rest,
       },
       metadata

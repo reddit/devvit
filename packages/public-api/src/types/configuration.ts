@@ -18,6 +18,8 @@ export type Configuration = {
   modLog?: PluginSettings | boolean;
   /** Allows your app to use the Realtime Plugin */
   realtime?: PluginSettings | boolean;
+  /** Allows your app to call Reddit APIs on behalf of the User */
+  userActions?: PluginSettings | boolean;
   /**
    * Allows your app to use the Payments Plugin
    * @internal

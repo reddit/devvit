@@ -71,6 +71,7 @@ type PluginType =
   | protos.Wiki
   | protos.MediaService
   | protos.Realtime
+  | protos.UserActions
   | PaymentsService;
 
 /**
@@ -172,6 +173,10 @@ export class Devvit extends Actor {
 
     if (pluginIsEnabled(config.realtime)) {
       this.use(protos.RealtimeDefinition);
+    }
+
+    if (pluginIsEnabled(config.userActions)) {
+      this.use(protos.UserActionsDefinition);
     }
   }
 
@@ -599,6 +604,20 @@ export class Devvit extends Actor {
     }
 
     return realtime as protos.Realtime;
+  }
+
+  /** @internal */
+  static get userActionsPlugin(): protos.UserActions {
+    const userActionsAndRedditApiEnabled =
+      pluginIsEnabled(this.#config.userActions) && pluginIsEnabled(this.#config.redditAPI);
+
+    if (!userActionsAndRedditApiEnabled) {
+      throw new Error(
+        'UserActions is not enabled. You can enable it by passing both `userActions: true` and `redditAPI: true` to `Devvit.configure`'
+      );
+    }
+
+    return this.#pluginClients[protos.UserActionsDefinition.fullName] as protos.UserActions;
   }
 
   /** @internal */

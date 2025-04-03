@@ -322,6 +322,31 @@ export class RedditAPIClient {
    *     .build()
    * });
    * ```
+   *
+   * By default, `submitPost()` creates a Post on behalf of the App account, but it may be called on behalf of the User making the request by setting the option `runAs: RunAs.USER`.
+   * When using `runAs: RunAs.USER` to create an experience Post, you must specify the `userGeneratedContent` option. For example:
+   * @example
+   * ```ts
+   * import { RunAs } from '@devvit/public-api';
+   * 
+   * const post = await reddit.submitPost({
+   *  title: 'My Devvit Post',
+   *  runAs: RunAs.USER,
+   *  userGeneratedContent: {
+   *    text: "hello there", 
+   *    imageUrls: ["https://styles.redditmedia.com/t5_5wa5ww/styles/communityIcon_wyopomb2xb0a1.png", "https://styles.redditmedia.com/t5_49fkib/styles/bannerBackgroundImage_5a4axis7cku61.png"]
+      },
+   *  subredditName: await reddit.getCurrentSubredditName(),
+   *  textFallback: {
+   *    text: 'This is a Devvit post!',
+   *  },
+   *  preview: (
+   *    <vstack height="100%" width="100%" alignment="middle center">
+   *      <text size="large">Loading...</text>
+   *    </vstack>
+   *  ),
+   * });
+   * ```
    */
   submitPost(options: SubmitPostOptions): Promise<Post> {
     return Post.submit(options, this.#metadata);
@@ -486,7 +511,18 @@ export class RedditAPIClient {
    * @param options.id - The ID of the post or comment to comment on. e.g. 't3_1qjpg' for post and 't1_1qgif' for comment
    * @param options.text - The text of the comment
    * @param options.richtext - The rich text of the comment
+   * @param options.runAs - The user type to submit the comment as, eg 'APP' or 'USER'
    * @returns A Promise that resolves to a Comment object.
+   * @example
+   * ```ts
+   * import { RunAs } from '@devvit/public-api';
+   *
+   * const comment = await reddit.submitComment({
+   *  id: 't1_1qgif',
+   *  text: 'Hello world!',
+   *  runAs: RunAs.APP,
+   * })
+   * ```
    */
   submitComment(options: CommentSubmissionOptions & { id: string }): Promise<Comment> {
     return Comment.submit(

@@ -4,4 +4,4 @@
 
 # Type Alias: CommentSubmissionOptions
 
-> **CommentSubmissionOptions** = \{ `text`: `string`; \} \| \{ `richtext`: `object` \| `RichTextBuilder`; \}
+> **CommentSubmissionOptions** = \{ `runAs`: `RunAs`; `text`: `string`; \} \| \{ `richtext`: `object` \| `RichTextBuilder`; `runAs`: `RunAs`; \}

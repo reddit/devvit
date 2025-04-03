@@ -134,6 +134,74 @@ describe('Post API', () => {
         title: 'My First Post',
       };
 
+      test('submit(): can set runAs: USER when userActions enabled', async () => {
+        const { reddit, metadata } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: true,
+        });
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await reddit.submitPost({
+          title: mockedPost.title,
+          subredditName: mockedPost.subredditName,
+          preview: createPreview(),
+          runAs: RunAs.USER,
+          userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            ...commonPostFields,
+            richtextJson:
+              'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
+            richtextFallback: '',
+            runAs: RunAs.USER,
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+          },
+          metadata
+        );
+      });
+
+      test('submit(): throws error when runAs: USER with userActions disabled', async () => {
+        const { reddit } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: false,
+        });
+
+        await expect(
+          reddit.submitPost({
+            title: 'Some post title',
+            subredditName: 'askReddit',
+            preview: createPreview(),
+            runAs: RunAs.USER,
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+          })
+        ).rejects.toThrow(/UserActions is not enabled./);
+      });
+
+      test('submit(): throws error when runAs: USER without userGeneratedContent for experience post', async () => {
+        const { reddit } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: true,
+        });
+
+        await expect(
+          reddit.submitPost({
+            title: 'Some post title',
+            subredditName: 'askReddit',
+            preview: createPreview(),
+            runAs: RunAs.USER,
+          })
+        ).rejects.toThrow(/userGeneratedContent must be set/);
+      });
+
       test('sets plain text as the richtext fallback', async () => {
         const { reddit, metadata } = createTestRedditApiClient();
         const mockedPost = new Post({ ...defaultPostData }, metadata);

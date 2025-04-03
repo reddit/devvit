@@ -2,9 +2,13 @@ import type { Metadata } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 
 import { Devvit } from '../../../../devvit/Devvit.js';
+import type { Configuration } from '../../../../types/configuration.js';
 import { RedditAPIClient } from '../../RedditAPIClient.js';
 
-export function createTestRedditApiClient(): { metadata: Metadata; reddit: RedditAPIClient } {
+export function createTestRedditApiClient(config?: Configuration): {
+  metadata: Metadata;
+  reddit: RedditAPIClient;
+} {
   const metadata: Metadata = {
     [Header.AppUser]: {
       values: ['t2_appuser'],
@@ -14,9 +18,11 @@ export function createTestRedditApiClient(): { metadata: Metadata; reddit: Reddi
 
   const reddit = new RedditAPIClient(metadata);
 
-  Devvit.configure({
-    redditAPI: true,
-  });
+  Devvit.configure(
+    config || {
+      redditAPI: true,
+    }
+  );
 
   return { metadata, reddit };
 }

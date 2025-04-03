@@ -32,6 +32,14 @@
 
 ---
 
+<a id="runas"></a>
+
+### runAs?
+
+> `optional` **runAs**: `RunAs`
+
+---
+
 <a id="sendreplies"></a>
 
 ### sendreplies?

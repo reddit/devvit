@@ -211,4 +211,5 @@ const nutritionCategoryToString: Readonly<Record<NutritionCategory, string>> = {
   [NutritionCategory.UNRECOGNIZED]: 'Use unknown permissions.',
   [NutritionCategory.WEBVIEW]: 'Embed webapps to display rich content.',
   [NutritionCategory.CUSTOM_POST]: 'Can create a custom post.',
+  [NutritionCategory.USER_ACTIONS]: 'Can call Reddit APIs on behalf of the user.',
 };

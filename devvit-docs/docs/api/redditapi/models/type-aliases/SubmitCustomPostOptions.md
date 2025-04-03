@@ -11,3 +11,7 @@
 ### preview
 
 > **preview**: `JSX.Element`
+
+### userGeneratedContent?
+
+> `optional` **userGeneratedContent**: `UserGeneratedContent`
