@@ -605,10 +605,9 @@ export class Comment {
     options: CommentSubmissionOptions & { id: T1ID | T3ID },
     metadata: Metadata | undefined
   ): Promise<Comment> {
+    const { runAs = RunAs.APP } = options;
     const client =
-      options.runAs === RunAs.USER
-        ? Devvit.userActionsPlugin
-        : Devvit.redditAPIPlugins.LinksAndComments;
+      runAs === RunAs.USER ? Devvit.userActionsPlugin : Devvit.redditAPIPlugins.LinksAndComments;
     const { id } = options;
 
     let richtextString: string | undefined;
@@ -621,7 +620,7 @@ export class Comment {
         thingId: id,
         text: 'text' in options ? options.text : '',
         richtextJson: richtextString,
-        runAs: RunAs.APP,
+        runAs: runAs,
       },
       metadata
     );
