@@ -164,7 +164,7 @@ $ devvit logout
 
 ## devvit logs
 
-Stream logs for an installation within a specified subreddit.
+Stream logs for an installation within a specified subreddit. You can see 5,000 logs or up to 7 days of log events.
 
 #### Usage
 

@@ -1,6 +1,6 @@
 # Logging
 
-Stream log events from your installed app to your command line to enable troubleshooting your app.
+Stream log events from your installed app to your command line to troubleshoot your app. You can see 5,000 logs or up to 7 days of log events.
 
 ## Create logs
 
