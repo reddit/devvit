@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.11-dev**](../../../../../../README.md)
+[**@devvit/public-api v0.11.12-dev**](../../../../../../README.md)
 
 ---
 
@@ -7,14 +7,6 @@
 > **WebViewProps** = [`BaseProps`](BaseProps.md) & [`WebViewActionable`](WebViewActionable.md) & `object`
 
 ## Type declaration
-
-### ~~state?~~
-
-> `optional` **state**: [`JSONObject`](../../../../../../type-aliases/JSONObject.md)
-
-#### Deprecated
-
-use UIClient.webview.postMessage()
 
 ### url
 

@@ -4,6 +4,26 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.12: Everything but the kitchen sink updates
+
+**Release Date: Apr 7, 2025**
+
+Here’s what you can find in 0.11.12.
+
+**Feature improvements**
+
+- [Logging](./debug.md) improvements:
+  - Retention has been increased from 100 events to the last 5,000 events.
+  - There's a new CLI flag to turn on timestamps when requested.
+- There's a new CLI command to easily generate payment products.
+  - CLI helper to add/edit existing payment products
+- Updated app [publishing](./publishing.md) workflow:
+  - All apps are published unlisted by default.
+  - We’ve added a new flag if you want to publish your app publicly: `devvit publish --public`.
+
+**Other fixes**
+Patched an issue that prevented some payments playtest errors from being logged due to reliance on `ux.action.stop`.
+
 ## Devvit 0.11.11: Adding web view unmount
 
 **Release Date: Mar 24, 2025**
