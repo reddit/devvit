@@ -50,11 +50,11 @@ type GetCommentsListingOptions = {
 export type CommentSubmissionOptions =
   | {
       text: string;
-      runAs?: RunAs;
+      runAs?: 'USER' | 'APP';
     }
   | {
       richtext: object | RichTextBuilder;
-      runAs?: RunAs;
+      runAs?: 'USER' | 'APP';
     };
 
 export type EditCommentOptions = CommentSubmissionOptions;
@@ -605,9 +605,12 @@ export class Comment {
     options: CommentSubmissionOptions & { id: T1ID | T3ID },
     metadata: Metadata | undefined
   ): Promise<Comment> {
-    const { runAs = RunAs.APP } = options;
+    const { runAs = 'APP' } = options;
+    const runAsType = RunAs[runAs];
     const client =
-      runAs === RunAs.USER ? Devvit.userActionsPlugin : Devvit.redditAPIPlugins.LinksAndComments;
+      runAsType === RunAs.USER
+        ? Devvit.userActionsPlugin
+        : Devvit.redditAPIPlugins.LinksAndComments;
     const { id } = options;
 
     let richtextString: string | undefined;
@@ -620,7 +623,7 @@ export class Comment {
         thingId: id,
         text: 'text' in options ? options.text : '',
         richtextJson: richtextString,
-        runAs: runAs,
+        runAs: runAsType,
       },
       metadata
     );

@@ -152,7 +152,7 @@ describe('Post API', () => {
           title: mockedPost.title,
           subredditName: mockedPost.subredditName,
           preview: createPreview(),
-          runAs: RunAs.USER,
+          runAs: 'USER',
           userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
         });
 
@@ -180,7 +180,7 @@ describe('Post API', () => {
             title: 'Some post title',
             subredditName: 'askReddit',
             preview: createPreview(),
-            runAs: RunAs.USER,
+            runAs: 'USER',
             userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
           })
         ).rejects.toThrow(/UserActions is not enabled./);
@@ -197,7 +197,7 @@ describe('Post API', () => {
             title: 'Some post title',
             subredditName: 'askReddit',
             preview: createPreview(),
-            runAs: RunAs.USER,
+            runAs: 'USER',
           })
         ).rejects.toThrow(/userGeneratedContent must be set/);
       });

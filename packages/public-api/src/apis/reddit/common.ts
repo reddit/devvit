@@ -3,8 +3,6 @@ export const RunAs = {
   USER: 1,
 } as const;
 
-export type RunAs = (typeof RunAs)[keyof typeof RunAs];
-
 export type UserGeneratedContent = {
   text: string;
   imageUrls: string[];

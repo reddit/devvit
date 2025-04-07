@@ -218,7 +218,7 @@ export type CommonSubmitPostOptions = {
   spoiler?: boolean;
   flairId?: string;
   flairText?: string;
-  runAs?: RunAs;
+  runAs?: 'USER' | 'APP';
 };
 
 export type SubmitPostOptions = (
@@ -1077,15 +1077,18 @@ export class Post {
 
   /** @internal */
   static async submit(options: SubmitPostOptions, metadata: Metadata | undefined): Promise<Post> {
-    const { runAs = RunAs.APP } = options;
+    const { runAs = 'APP' } = options;
+    const runAsType = RunAs[runAs];
     const client =
-      runAs === RunAs.USER ? Devvit.userActionsPlugin : Devvit.redditAPIPlugins.LinksAndComments;
+      runAsType === RunAs.USER
+        ? Devvit.userActionsPlugin
+        : Devvit.redditAPIPlugins.LinksAndComments;
 
     let response: SubmitResponse;
 
     if ('preview' in options) {
       assertNonNull(metadata, 'Missing metadata in `SubmitPostOptions`');
-      if (runAs === RunAs.USER) {
+      if (runAsType === RunAs.USER) {
         assertNonNull(
           options.userGeneratedContent,
           'userGeneratedContent must be set in `SubmitPostOptions` when RunAs=USER for experience posts'
@@ -1109,8 +1112,8 @@ export class Post {
         sr: options.subredditName,
         richtextJson: fromByteArray(encodedCached),
         richtextFallback,
-        runAs,
         ...sanitizedOptions,
+        runAs: runAsType,
       };
 
       response = await client.SubmitCustomPost(submitRequest, metadata);
@@ -1120,8 +1123,8 @@ export class Post {
           kind: 'kind' in options ? options.kind : 'url' in options ? 'link' : 'self',
           sr: options.subredditName,
           richtextJson: 'richtext' in options ? richtextToString(options.richtext) : undefined,
-          runAs,
           ...options,
+          runAs: runAsType,
         },
         metadata
       );
@@ -1153,10 +1156,12 @@ export class Post {
 
   /** @internal */
   static async crosspost(options: CrosspostOptions, metadata: Metadata | undefined): Promise<Post> {
-    const { runAs = RunAs.APP } = options;
+    const { runAs = 'APP' } = options;
+    const runAsType = RunAs[runAs];
     const client =
-      runAs === RunAs.USER ? Devvit.userActionsPlugin : Devvit.redditAPIPlugins.LinksAndComments;
-
+      runAsType === RunAs.USER
+        ? Devvit.userActionsPlugin
+        : Devvit.redditAPIPlugins.LinksAndComments;
     const { postId, subredditName, ...rest } = options;
 
     const response = await client.Submit(
@@ -1164,8 +1169,8 @@ export class Post {
         kind: 'crosspost',
         sr: subredditName,
         crosspostFullname: asT3ID(postId),
-        runAs,
         ...rest,
+        runAs: runAsType,
       },
       metadata
     );

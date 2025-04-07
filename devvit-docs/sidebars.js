@@ -110,6 +110,7 @@ const sidebars = {
         'capabilities/secrets-storage',
         'capabilities/server-side-functions',
         'capabilities/triggers',
+        'capabilities/userActions',
       ],
     },
     {

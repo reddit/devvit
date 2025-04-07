@@ -3,7 +3,6 @@ import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 
 import { Devvit } from '../../../devvit/Devvit.js';
-import { RunAs } from '../common.js';
 import { Comment } from '../models/Comment.js';
 import type { RedditAPIClient } from '../RedditAPIClient.js';
 import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
@@ -141,7 +140,7 @@ describe('Commment API', () => {
       const resp = await reddit.submitComment({
         id: 't1_commentid',
         text: 'body',
-        runAs: RunAs.USER,
+        runAs: 'USER',
       });
       expect(resp.toJSON()).toMatchSnapshot();
     });
@@ -153,7 +152,7 @@ describe('Commment API', () => {
         reddit.submitComment({
           id: 't1_commentid',
           text: 'body',
-          runAs: RunAs.USER,
+          runAs: 'USER',
         })
       ).rejects.toThrow(/UserActions is not enabled./);
     });
@@ -172,7 +171,7 @@ describe('Commment API', () => {
       await expect(
         comment.reply({
           text: 'some reply',
-          runAs: RunAs.USER,
+          runAs: 'USER',
         })
       ).rejects.toThrow(/UserActions is not enabled./);
     });

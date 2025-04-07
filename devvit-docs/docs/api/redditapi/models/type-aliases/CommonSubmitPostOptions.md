@@ -36,7 +36,7 @@
 
 ### runAs?
 
-> `optional` **runAs**: `RunAs`
+> `optional` **runAs**: `"USER"` \| `"APP"`
 
 ---
 
