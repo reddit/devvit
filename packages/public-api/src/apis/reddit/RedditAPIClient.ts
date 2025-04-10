@@ -448,7 +448,14 @@ export class RedditAPIClient {
    * @param username - The username of the snoovatar to retrieve
    * @returns A Promise that resolves to a URL of the snoovatar image if it exists.
    */
-  getSnoovatarUrl(username: string): Promise<string | undefined> {
+  async getSnoovatarUrl(username: string): Promise<string | undefined> {
+    const currentUsername = await this.getCurrentUsername();
+    if (currentUsername && username === currentUsername) {
+      const snoovatarUrl = this.#metadata?.[Header.UserSnoovatarUrl]?.values[0];
+      if (snoovatarUrl) {
+        return snoovatarUrl;
+      }
+    }
     return User.getSnoovatarUrl(username, this.#metadata);
   }
 
