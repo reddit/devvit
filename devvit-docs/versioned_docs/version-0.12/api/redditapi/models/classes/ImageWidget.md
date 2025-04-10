@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -128,11 +128,11 @@
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<[`Widget`](Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<`ImageWidget`, `"images"`\>
+> **toJSON**(): `Pick`\<[`Widget`](Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<`ImageWidget`, `"images"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<`ImageWidget`, `"images"`\>
+`Pick`\<[`Widget`](Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<`ImageWidget`, `"images"`\>
 
 #### Overrides
 

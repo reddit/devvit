@@ -7,7 +7,7 @@ For example, if your post has information about a future event, you could set th
 ```ts
 // creation of the post
 const daysAwayFromEvent = 3; // would actually be done by checking the date diff, but just hardcoding for this example
-const post = await reddit.submitPost({
+const post = await submitPost({
   title: 'A Countdown post',
   subredditName: subreddit.name,
   preview: (
@@ -32,7 +32,7 @@ Devvit.addSchedulerJob({
       return;
     }
 
-    const post = await reddit.getPostById(postId);
+    const post = await getPostById(postId);
     const daysAwayFromEvent = 2; // would actually be done by checking the date diff, but just hardcoding for this example
     const newPreview = (
       <vstack height="100%" width="100%" alignment="center middle">

@@ -150,7 +150,7 @@ async function remindMeHandler(event: FormOnSubmitEvent, context: Devvit.Context
     context.ui.showToast("I can't remind you in the past!");
     return;
   }
-  const currentUser = await context.reddit.getCurrentUser();
+  const currentUser = await getCurrentUser();
 
   await context.scheduler.runJob({
     name: REMIND_ME_ACTION_NAME,
@@ -188,10 +188,10 @@ Devvit.addSchedulerJob({
   onRun: async (event, context) => {
     const { userId, postId, fromWhen } = event.data!;
 
-    const user = await context.reddit.getUserById(userId);
-    const post = await context.reddit.getPostById(postId);
+    const user = await getUserById(userId);
+    const post = await getPostById(postId);
 
-    await context.reddit.sendPrivateMessage({
+    await sendPrivateMessage({
       to: user.username,
       subject: 'RemindMe',
       text: `Beep boop! You asked me to remind you about [${post.title}](${post.permalink}) at ${fromWhen}!`,

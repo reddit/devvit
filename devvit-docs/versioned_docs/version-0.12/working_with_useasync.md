@@ -4,7 +4,7 @@
 This feature is experimental, which means the design is not final but it's still available for you to use.
 :::
 
-`useAsync` is a hook that allows your app to perform server side calls like `redis.get` or `reddit.getCurrentUser` without blocking the render process.
+`useAsync` is a hook that allows your app to perform server side calls like `redis.get` or `getCurrentUser` without blocking the render process.
 
 ## Blocking versus non-blocking
 
@@ -91,7 +91,7 @@ const {
   loading: usernameLoading,
   error: usernameError,
 } = useAsync(async () => {
-  const user = await ctx.reddit.getCurrentUser();
+  const user = await getCurrentUser();
 
   return user?.username ?? null;
 });

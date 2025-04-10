@@ -75,9 +75,9 @@ Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Make custom post with image asset',
   onPress: async (event, context) => {
-    const subreddit = await context.reddit.getSubredditById(context.subredditId);
+    const subreddit = await getSubredditById(context.subredditId);
 
-    await context.reddit.submitPost({
+    await submitPost({
       subredditName: subreddit.name,
       title: 'Custom post!',
       preview: render(context),

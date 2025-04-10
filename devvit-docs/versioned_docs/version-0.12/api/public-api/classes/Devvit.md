@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../README.md)
+[**@devvit/public-api v0.12.0-dev**](../README.md)
 
 ---
 
@@ -129,7 +129,7 @@ The scheduled job type to add.
 Devvit.addSchedulerJob({
   name: 'checkNewPosts',
   onRun: async (event, context) => {
-    const newPosts = await context.reddit.getNewPosts({ limit: 5 }).all();
+    const newPosts = await getNewPosts({ limit: 5 }).all();
     for (const post of newPosts) {
       if (post.title.includes('bad word')) {
         await post.remove();

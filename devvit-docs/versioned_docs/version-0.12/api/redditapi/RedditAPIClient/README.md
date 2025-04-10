@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../README.md)
+[**@devvit/public-api v0.12.0-dev**](../README.md)
 
 ---
 
@@ -6,7 +6,7 @@
 
 ## Classes
 
-- [RedditAPIClient](classes/RedditAPIClient.md)
+- [\_RedditAPIClient](classes/RedditAPIClient.md)
 
 ## Type Aliases
 

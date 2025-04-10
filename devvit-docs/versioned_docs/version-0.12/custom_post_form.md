@@ -74,13 +74,13 @@ Devvit.addCustomPostType({
 7. Use the Reddit API to say hello to the user.
 
 ```jsx
-import { Devvit, useState } from '@devvit/public-api';
+import { Devvit, useState, getCurrentUser } from '@devvit/public-api';
 
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
   render: (context) => {
     const [currentUsername] = useState(async () => {
-      const currentUser = await context.reddit.getCurrentUser();
+      const currentUser = await getCurrentUser();
       return currentUser.username;
     });
 
@@ -98,13 +98,13 @@ Devvit.addCustomPostType({
 8.  Create a form to collect user input.
 
 ```tsx
-import { Devvit, useState, useForm } from '@devvit/public-api';
+import { Devvit, getCurrentUser, useState, useForm } from '@devvit/public-api';
 
 Devvit.addCustomPostType({
   name: 'My Custom Post Type',
   render: (context) => {
     const [currentUsername] = useState(async () => {
-      const currentUser = await context.reddit.getCurrentUser();
+      const currentUser = await getCurrentUser();
       return currentUser.username;
     });
 
@@ -163,8 +163,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Submit custom post',
   onPress: async (_, context) => {
-    const currentSubreddit = await context.reddit.getCurrentSubreddit();
-    await context.reddit.submitPost({
+    const currentSubreddit = await getCurrentSubreddit();
+    await submitPost({
       title: 'My custom post',
       subredditName: currentSubreddit.name,
       preview: (

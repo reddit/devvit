@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -156,11 +156,11 @@
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<[`Widget`](Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<`PostFlairWidget`, `"styles"` \| `"templates"` \| `"display"`\>
+> **toJSON**(): `Pick`\<[`Widget`](Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<`PostFlairWidget`, `"styles"` \| `"templates"` \| `"display"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<`PostFlairWidget`, `"styles"` \| `"templates"` \| `"display"`\>
+`Pick`\<[`Widget`](Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<`PostFlairWidget`, `"styles"` \| `"templates"` \| `"display"`\>
 
 #### Overrides
 

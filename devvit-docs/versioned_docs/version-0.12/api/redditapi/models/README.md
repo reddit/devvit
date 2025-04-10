@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../README.md)
+[**@devvit/public-api v0.12.0-dev**](../README.md)
 
 ---
 
@@ -158,13 +158,3 @@
 - [Visibility](type-aliases/Visibility.md)
 - [WikiEditMode](type-aliases/WikiEditMode.md)
 - [WithUserData](type-aliases/WithUserData.md)
-
-## Functions
-
-- [getModerationLog](functions/getModerationLog.md)
-- [getSubredditInfoById](functions/getSubredditInfoById.md)
-- [getSubredditInfoByName](functions/getSubredditInfoByName.md)
-- [getSubredditLeaderboard](functions/getSubredditLeaderboard.md)
-- [getSubredditStyles](functions/getSubredditStyles.md)
-- [getVaultByAddress](functions/getVaultByAddress.md)
-- [getVaultByUserId](functions/getVaultByUserId.md)

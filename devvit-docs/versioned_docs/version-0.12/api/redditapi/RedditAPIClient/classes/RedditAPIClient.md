@@ -1,8 +1,8 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
-# Class: RedditAPIClient
+# Class: \_RedditAPIClient
 
 The Reddit API Client
 
@@ -18,8 +18,8 @@ Devvit.configure({
 
 // use within one of our capability handlers e.g. Menu Actions, Triggers, Scheduled Job Type, etc
 async (event, context) => {
-  const subreddit = await context.reddit.getSubredditById(context.subredditId);
-  context.reddit.submitPost({
+  const subreddit = await getSubredditById(context.subredditId);
+  submitPost({
     subredditName: subreddit.name,
     title: 'test post',
     text: 'test body',
@@ -32,9 +32,9 @@ async (event, context) => {
 
 <a id="constructor"></a>
 
-### new RedditAPIClient()
+### new \_RedditAPIClient()
 
-> **new RedditAPIClient**(`metadata`): `RedditAPIClient`
+> **new \_RedditAPIClient**(`metadata`): `_RedditAPIClient`
 
 #### Parameters
 
@@ -44,7 +44,7 @@ async (event, context) => {
 
 #### Returns
 
-`RedditAPIClient`
+`_RedditAPIClient`
 
 ## Accessors
 
@@ -61,7 +61,7 @@ Get ModMail API object
 ##### Example
 
 ```ts
-await reddit.modMail.reply({
+await modMail().reply({
   body: "Here is my message",
   conversationId: "abcd42";
 })
@@ -192,7 +192,7 @@ Removal Reason ID
 #### Example
 
 ```ts
-const newReason = await reddit.addSubredditRemovalReasons('askReddit', {
+const newReason = await addSubredditRemovalReasons('askReddit', {
   title: 'Spam',
   message: 'This is spam!',
 });
@@ -276,8 +276,8 @@ The id of the post (t3*) or comment (t1*) to approve.
 #### Example
 
 ```ts
-await reddit.approve('t3_123456');
-await reddit.approve('t1_123456');
+await approve('t3_123456');
+await approve('t1_123456');
 ```
 
 ---
@@ -596,7 +596,7 @@ A Promise that resolves to a User object.
 #### Example
 
 ```ts
-const user = await reddit.getAppUser(metadata);
+const user = await getAppUser(metadata);
 ```
 
 ---
@@ -674,7 +674,7 @@ A Promise that resolves to a Comment object.
 #### Example
 
 ```ts
-const comment = await reddit.getCommentById('t1_1qjpg');
+const comment = await getCommentById('t1_1qjpg');
 ```
 
 ---
@@ -704,13 +704,11 @@ A Listing of Comment objects.
 #### Example
 
 ```ts
-const comments = await reddit
-  .getComments({
-    postId: 't3_1qjpg',
-    limit: 1000,
-    pageSize: 100,
-  })
-  .all();
+const comments = await getComments({
+  postId: 't3_1qjpg',
+  limit: 1000,
+  pageSize: 100,
+}).all();
 ```
 
 ---
@@ -788,14 +786,12 @@ A Listing of Post objects.
 #### Example
 
 ```ts
-const posts = await reddit
-  .getControversialPosts({
-    subredditName: 'memes',
-    timeframe: 'day',
-    limit: 1000,
-    pageSize: 100,
-  })
-  .all();
+const posts = await getControversialPosts({
+  subredditName: 'memes',
+  timeframe: 'day',
+  limit: 1000,
+  pageSize: 100,
+}).all();
 ```
 
 ---
@@ -817,7 +813,7 @@ A Promise that resolves a Subreddit object.
 #### Example
 
 ```ts
-const currentSubreddit = await reddit.getCurrentSubreddit();
+const currentSubreddit = await getCurrentSubreddit();
 ```
 
 ---
@@ -839,7 +835,7 @@ A Promise that resolves a string representing the current subreddit's name.
 #### Example
 
 ```ts
-const currentSubredditName = await reddit.getCurrentSubredditName();
+const currentSubredditName = await getCurrentSubredditName();
 ```
 
 ---
@@ -862,7 +858,7 @@ A Promise that resolves to a User object or undefined
 #### Example
 
 ```ts
-const user = await reddit.getCurrentUser();
+const user = await getCurrentUser();
 ```
 
 ---
@@ -885,7 +881,7 @@ A Promise that resolves to a string representing the username or undefined
 #### Example
 
 ```ts
-const username = await reddit.getCurrentUsername();
+const username = await getCurrentUsername();
 ```
 
 ---
@@ -913,7 +909,7 @@ Return a listing of things that have been edited recently.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getEdited();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getEdited({ type: 'post' });
@@ -939,7 +935,7 @@ Return a listing of things that have been edited recently.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getEdited();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getEdited({ type: 'post' });
@@ -965,7 +961,7 @@ Return a listing of things that have been edited recently.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getEdited();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getEdited({ type: 'post' });
@@ -999,14 +995,12 @@ A Listing of Post objects.
 #### Example
 
 ```ts
-const posts = await reddit
-  .getHotPosts({
-    subredditName: 'memes',
-    timeframe: 'day',
-    limit: 1000,
-    pageSize: 100,
-  })
-  .all();
+const posts = await getHotPosts({
+  subredditName: 'memes',
+  timeframe: 'day',
+  limit: 1000,
+  pageSize: 100,
+}).all();
 ```
 
 ---
@@ -1058,15 +1052,13 @@ A Listing of ModAction objects.
 #### Example
 
 ```ts
-const modActions = await reddit
-  .getModerationLog({
-    subredditName: 'memes',
-    moderatorUsernames: ['spez'],
-    type: 'banuser',
-    limit: 1000,
-    pageSize: 100,
-  })
-  .all();
+const modActions = await getModerationLog({
+  subredditName: 'memes',
+  moderatorUsernames: ['spez'],
+  type: 'banuser',
+  limit: 1000,
+  pageSize: 100,
+}).all();
 ```
 
 ---
@@ -1142,7 +1134,7 @@ Return a listing of things requiring moderator review, such as reported things a
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getModQueue();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getModQueue({ type: 'post' });
@@ -1168,7 +1160,7 @@ Return a listing of things requiring moderator review, such as reported things a
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getModQueue();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getModQueue({ type: 'post' });
@@ -1194,7 +1186,7 @@ Return a listing of things requiring moderator review, such as reported things a
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getModQueue();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getModQueue({ type: 'post' });
@@ -1252,13 +1244,11 @@ A Listing of Post objects.
 #### Example
 
 ```ts
-const posts = await reddit
-  .getNewPosts({
-    subredditName: 'memes',
-    limit: 1000,
-    pageSize: 100,
-  })
-  .all();
+const posts = await getNewPosts({
+  subredditName: 'memes',
+  limit: 1000,
+  pageSize: 100,
+}).all();
 ```
 
 ---
@@ -1356,7 +1346,7 @@ Return a listing of things that have been reported.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getReports();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getReports({ type: 'post' });
@@ -1382,7 +1372,7 @@ Return a listing of things that have been reported.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getReports();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getReports({ type: 'post' });
@@ -1408,7 +1398,7 @@ Return a listing of things that have been reported.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getReports();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getReports({ type: 'post' });
@@ -1442,14 +1432,12 @@ A Listing of Post objects.
 #### Example
 
 ```ts
-const posts = await reddit
-  .getRisingPosts({
-    subredditName: 'memes',
-    timeframe: 'day',
-    limit: 1000,
-    pageSize: 100,
-  })
-  .all();
+const posts = await getRisingPosts({
+  subredditName: 'memes',
+  timeframe: 'day',
+  limit: 1000,
+  pageSize: 100,
+}).all();
 ```
 
 ---
@@ -1501,7 +1489,7 @@ Return a listing of things that have been marked as spam or otherwise removed.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getSpam();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getSpam({ type: 'post' });
@@ -1527,7 +1515,7 @@ Return a listing of things that have been marked as spam or otherwise removed.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getSpam();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getSpam({ type: 'post' });
@@ -1553,7 +1541,7 @@ Return a listing of things that have been marked as spam or otherwise removed.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getSpam();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getSpam({ type: 'post' });
@@ -1586,12 +1574,12 @@ A Promise that resolves a Subreddit object.
 
 #### Deprecated
 
-Use [getSubredditInfoById](../../models/functions/getSubredditInfoById.md) instead.
+Use [getSubredditInfoById](#getsubredditinfobyid) instead.
 
 #### Example
 
 ```ts
-const memes = await reddit.getSubredditById('t5_2qjpg');
+const memes = await getSubredditById('t5_2qjpg');
 ```
 
 ---
@@ -1620,12 +1608,12 @@ A Promise that resolves a Subreddit object.
 
 #### Deprecated
 
-Use [getSubredditInfoByName](../../models/functions/getSubredditInfoByName.md) instead.
+Use [getSubredditInfoByName](#getsubredditinfobyname) instead.
 
 #### Example
 
 ```ts
-const askReddit = await reddit.getSubredditByName('askReddit');
+const askReddit = await getSubredditByName('askReddit');
 ```
 
 ---
@@ -1655,7 +1643,7 @@ A Promise that resolves a SubredditInfo object.
 #### Example
 
 ```ts
-const memes = await reddit.getSubredditInfoById('t5_2qjpg');
+const memes = await getSubredditInfoById('t5_2qjpg');
 ```
 
 ---
@@ -1685,7 +1673,7 @@ A Promise that resolves a SubredditInfo object.
 #### Example
 
 ```ts
-const askReddit = await reddit.getSubredditInfoByName('askReddit');
+const askReddit = await getSubredditInfoByName('askReddit');
 ```
 
 ---
@@ -1737,7 +1725,7 @@ Ordered array of Removal Reasons
 #### Example
 
 ```ts
-const reasons = await reddit.getSubredditRemovalReasons('askReddit');
+const reasons = await getSubredditRemovalReasons('askReddit');
 
 for (let reason of reasons) {
   console.log(reason.id, reason.message, reason.title);
@@ -1795,14 +1783,12 @@ A Listing of Post objects.
 #### Example
 
 ```ts
-const posts = await reddit
-  .getControversialPosts({
-    subredditName: 'memes',
-    timeframe: 'day',
-    limit: 1000,
-    pageSize: 100,
-  })
-  .all();
+const posts = await getControversialPosts({
+  subredditName: 'memes',
+  timeframe: 'day',
+  limit: 1000,
+  pageSize: 100,
+}).all();
 ```
 
 ---
@@ -1830,7 +1816,7 @@ Return a listing of things that have yet to be approved/removed by a mod.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getUnmoderated();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getUnmoderated({ type: 'post' });
@@ -1856,7 +1842,7 @@ Return a listing of things that have yet to be approved/removed by a mod.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getUnmoderated();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getUnmoderated({ type: 'post' });
@@ -1882,7 +1868,7 @@ Return a listing of things that have yet to be approved/removed by a mod.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getUnmoderated();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getUnmoderated({ type: 'post' });
@@ -1916,7 +1902,7 @@ A Promise that resolves to a User object.
 #### Example
 
 ```ts
-const user = await reddit.getUserById('t2_1qjpg');
+const user = await getUserById('t2_1qjpg');
 ```
 
 ---
@@ -1947,7 +1933,7 @@ not found (user doesn't exist, account suspended, etc).
 #### Example
 
 ```ts
-const user = await reddit.getUserByUsername('devvit');
+const user = await getUserByUsername('devvit');
 if (user) {
   console.log(user);
 }
@@ -2002,7 +1988,7 @@ The address (starting with 0x) of the Vault.
 #### Example
 
 ```ts
-const vault = await reddit.getVaultByAddress('0x205ee28744456bDBf180A0Fa7De51e0F116d54Ed');
+const vault = await getVaultByAddress('0x205ee28744456bDBf180A0Fa7De51e0F116d54Ed');
 ```
 
 ---
@@ -2030,7 +2016,7 @@ The ID (starting with t2\_) of the Vault owner.
 #### Example
 
 ```ts
-const vault = await reddit.getVaultByUserId('t2_1w72');
+const vault = await getVaultByUserId('t2_1w72');
 ```
 
 ---
@@ -2278,8 +2264,8 @@ Is the post or comment being removed because it's spam?
 #### Example
 
 ```ts
-await reddit.remove('t3_123456', false);
-await reddit.remove('t1_123456', true);
+await remove('t3_123456', false);
+await remove('t1_123456', true);
 ```
 
 ---
@@ -2521,7 +2507,7 @@ Why the thing is reported
 #### Example
 
 ```ts
-await reddit.report(post, {
+await report(post, {
   reason: 'This is spam!',
 });
 ```
@@ -2769,6 +2755,18 @@ You must provide either `options.text` or `options.richtext` but not both.
 
 A Promise that resolves to a Comment object.
 
+#### Example
+
+```ts
+import { RunAs } from '@devvit/public-api';
+
+const comment = await submitComment({
+  id: 't1_1qgif',
+  text: 'Hello world!',
+  runAs: RunAs.APP,
+});
+```
+
 ---
 
 <a id="submitpost"></a>
@@ -2793,10 +2791,10 @@ Either a self post or a link post.
 
 A Promise that resolves to a Post object.
 
-#### Example
+#### Examples
 
 ```ts
-const post = await reddit.submitPost({
+const post = await submitPost({
   subredditName: 'devvit',
   title: 'Hello World',
   richtext: new RichTextBuilder()
@@ -2805,6 +2803,31 @@ const post = await reddit.submitPost({
     })
     .codeBlock({}, (cb) => cb.rawText('This post was created via the Devvit API'))
     .build(),
+});
+```
+
+By default, `submitPost()` creates a Post on behalf of the App account, but it may be called on behalf of the User making the request by setting the option `runAs: RunAs.USER`.
+When using `runAs: RunAs.USER` to create an experience Post, you must specify the `userGeneratedContent` option. For example:
+
+```ts
+import { RunAs } from '@devvit/public-api';
+
+const post = await submitPost({
+ title: 'My Devvit Post',
+ runAs: RunAs.USER,
+ userGeneratedContent: {
+   text: "hello there",
+   imageUrls: ["https://styles.redditmedia.com/t5_5wa5ww/styles/communityIcon_wyopomb2xb0a1.png", "https://styles.redditmedia.com/t5_49fkib/styles/bannerBackgroundImage_5a4axis7cku61.png"]
+   },
+ subredditName: await getCurrentSubredditName(),
+ textFallback: {
+   text: 'This is a Devvit post!',
+ },
+ preview: (
+   <vstack height="100%" width="100%" alignment="middle center">
+     <text size="large">Loading...</text>
+   </vstack>
+ ),
 });
 ```
 

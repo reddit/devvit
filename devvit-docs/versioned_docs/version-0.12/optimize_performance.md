@@ -25,13 +25,13 @@ These best practices will optimize your app.
 
 If you only need the name of the current user:
 
-- Avoid requests like `context.reddit.getCurrentUser()` or `context.reddit.getUserById(context.userId)`.
-- Use `context.reddit.getCurrentUsername()` instead.
+- Avoid requests like `getCurrentUser()` or `getUserById(context.userId)`.
+- Use `getCurrentUsername()` instead.
 
 If you only need the subreddit name:
 
-- Don’t request the whole Subreddit model with `context.reddit.getCurrentSubreddit()`.
-- Use `context.reddit.getCurrentSubredditName()` instead.
+- Don’t request the whole Subreddit model with `getCurrentSubreddit()`.
+- Use `getCurrentSubredditName()` instead.
 
 ### Cache requests to RedditAPI or external resources
 
@@ -320,7 +320,7 @@ This example shows the render function of a basic post that fetches the number o
 
 ```tsx
 const [subscriberCount] = useState<number>(async () => {
-  const devvitSubredditInfo = await context.reddit.getSubredditInfoByName('devvit');
+  const devvitSubredditInfo = await getSubredditInfoByName('devvit');
   return devvitSubredditInfo.subscribersCount || 0;
 });
 
@@ -342,7 +342,7 @@ To do this, you can add:
 ```tsx
 const [subscriberCount] = useState<number>(async () => {
   const startSubscribersRequest = Date.now(); // a reference point for the request start
-  const devvitSubredditInfo = await context.reddit.getSubredditInfoByName('devvit');
+  const devvitSubredditInfo = await getSubredditInfoByName('devvit');
 
   console.log(`subscribers request took: ${Date.now() - startSubscribersRequest} milliseconds`);
 
@@ -369,7 +369,7 @@ const [performanceStartRender] = useState(Date.now()); // a reference point for 
 
 const [subscriberCount] = useState<number>(async () => {
   const startSubscribersRequest = Date.now(); // a reference point for the request start
-  const devvitSubredditInfo = await context.reddit.getSubredditInfoByName('devvit');
+  const devvitSubredditInfo = await getSubredditInfoByName('devvit');
 
   console.log(`subscribers request took: ${Date.now() - startSubscribersRequest} milliseconds`);
 

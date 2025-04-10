@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -705,7 +705,7 @@ Throws an error if the thumbnail could not be fetched
 
 ```ts
 // from a menu action, form, scheduler, trigger, custom post click event, etc
-const post = await context.reddit.getPostById(context.postId);
+const post = await getPostById(context.postId);
 const enrichedThumbnail = await post.getEnrichedThumbnail();
 ```
 
@@ -977,7 +977,7 @@ const preview = (
     <text size="large">An updated preview!</text>
   </vstack>
 );
-const post = await reddit.getPostById(context.postId);
+const post = await getPostById(context.postId);
 await post.setCustomPostPreview(() => preview);
 ```
 
@@ -1008,7 +1008,7 @@ Throws an error if the suggested sort could not be set.
 #### Example
 
 ```ts
-const post = await reddit.getPostById(context.postId);
+const post = await getPostById(context.postId);
 await post.setSuggestedCommentSort('NEW');
 ```
 
@@ -1043,7 +1043,7 @@ Throws an error if the fallback could not be set.
 ```ts
 // from a menu action, form, scheduler, trigger, custom post click event, etc
 const newTextFallback = { text: 'This is an updated text fallback' };
-const post = await context.reddit.getPostById(context.postId);
+const post = await getPostById(context.postId);
 await post.setTextFallback(newTextFallback);
 ```
 
@@ -1071,11 +1071,11 @@ await post.setTextFallback(newTextFallback);
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`Post`, `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"url"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
+> **toJSON**(): `Pick`\<`Post`, `"spoiler"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"subredditName"` \| `"id"` \| `"body"` \| `"permalink"` \| `"flair"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"url"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
 
 #### Returns
 
-`Pick`\<`Post`, `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"url"` \| `"body"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
+`Pick`\<`Post`, `"spoiler"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"subredditName"` \| `"id"` \| `"body"` \| `"permalink"` \| `"flair"` \| `"archived"` \| `"nsfw"` \| `"quarantined"` \| `"spam"` \| `"url"` \| `"authorId"` \| `"authorName"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"edited"` \| `"locked"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
 
 ---
 

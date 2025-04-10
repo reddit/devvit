@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../README.md)
+[**@devvit/public-api v0.12.0-dev**](../README.md)
 
 ---
 
@@ -35,7 +35,7 @@ const response = await context.media.upload({
   url: 'https://media2.giphy.com/media/xTiN0CNHgoRf1Ha7CM/giphy.gif',
   type: 'gif',
 });
-await context.reddit.submitPost({
+await submitPost({
   subredditName: subreddit.name,
   title: 'Hello World with Media',
   richtext: new RichTextBuilder()

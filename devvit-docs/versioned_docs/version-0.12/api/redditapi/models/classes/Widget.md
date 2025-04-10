@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -101,8 +101,8 @@
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`Widget`, `"subredditName"` \| `"id"` \| `"name"`\>
+> **toJSON**(): `Pick`\<`Widget`, `"name"` \| `"subredditName"` \| `"id"`\>
 
 #### Returns
 
-`Pick`\<`Widget`, `"subredditName"` \| `"id"` \| `"name"`\>
+`Pick`\<`Widget`, `"name"` \| `"subredditName"` \| `"id"`\>

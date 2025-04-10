@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -132,11 +132,11 @@
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<[`Widget`](Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<`SubredditRulesWidget`, `"rules"`\>
+> **toJSON**(): `Pick`\<[`Widget`](Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<`SubredditRulesWidget`, `"rules"`\>
 
 #### Returns
 
-`Pick`\<[`Widget`](Widget.md), `"subredditName"` \| `"id"` \| `"name"`\> & `Pick`\<`SubredditRulesWidget`, `"rules"`\>
+`Pick`\<[`Widget`](Widget.md), `"name"` \| `"subredditName"` \| `"id"`\> & `Pick`\<`SubredditRulesWidget`, `"rules"`\>
 
 #### Overrides
 

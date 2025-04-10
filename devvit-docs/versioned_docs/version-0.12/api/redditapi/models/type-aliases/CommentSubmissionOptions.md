@@ -1,7 +1,7 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
 # Type Alias: CommentSubmissionOptions
 
-> **CommentSubmissionOptions** = \{ `text`: `string`; \} \| \{ `richtext`: `object` \| `RichTextBuilder`; \}
+> **CommentSubmissionOptions** = \{ `runAs`: `"USER"` \| `"APP"`; `text`: `string`; \} \| \{ `richtext`: `object` \| `RichTextBuilder`; `runAs`: `"USER"` \| `"APP"`; \}

@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -39,7 +39,7 @@ Id of a modmail conversation
 #### Example
 
 ```ts
-await reddit.modMail.approveConversation('abcdef');
+await modMail().approveConversation('abcdef');
 ```
 
 ---
@@ -67,7 +67,7 @@ Id of a modmail conversation
 #### Example
 
 ```ts
-await reddit.modMail.archive('abcdef');
+await modMail().archive('abcdef');
 ```
 
 ---
@@ -103,7 +103,7 @@ conversationIds
 #### Example
 
 ```ts
-const conversationIds = await reddit.modMail.bulkReadConversations(
+const conversationIds = await modMail().bulkReadConversations(
   ['askReddit', 'myAwesomeSubreddit'],
   'filtered'
 );
@@ -178,7 +178,7 @@ Otherwise, messages sent to the app-account or moderator will automatically be r
 #### Example
 
 ```ts
-const { conversation, messages, modActions } = await reddit.modMail.createConversation({
+const { conversation, messages, modActions } = await modMail().createConversation({
   subredditName: 'askReddit',
   subject: 'Test conversation',
   body: 'Lorem ipsum sit amet',
@@ -223,7 +223,7 @@ A Promise that resolves a string representing the conversationId of the message.
 #### Example
 
 ```ts
-const conversationId = await reddit.modMail.createModDiscussionConversation({
+const conversationId = await modMail().createModDiscussionConversation({
   subject: 'Test conversation',
   bodyMarkdown: '**Hello there** \n\n _Have a great day!_',
   subredditId: context.subredditId,
@@ -265,7 +265,7 @@ A Promise that resolves a string representing the conversationId of the message.
 #### Example
 
 ```ts
-const conversationId = await reddit.modMail.createModInboxConversation({
+const conversationId = await modMail().createModInboxConversation({
   subject: 'Test conversation',
   bodyMarkdown: '**Hello there** \n\n _Have a great day!_',
   subredditId: context.subredditId,
@@ -308,7 +308,7 @@ A Promise that resolves a string representing the conversationId of the message.
 #### Example
 
 ```ts
-const conversationId = await reddit.modMail.createModNotification({
+const conversationId = await modMail().createModNotification({
   subject: 'Test notification',
   bodyMarkdown: '**Hello there** \n\n _This is a notification!_',
   subredditId: context.subredditId,
@@ -340,7 +340,7 @@ Id of a modmail conversation
 #### Example
 
 ```ts
-await reddit.modMail.disapproveConversation('abcdef');
+await modMail().disapproveConversation('abcdef');
 ```
 
 ---
@@ -376,7 +376,7 @@ mark read?
 #### Example
 
 ```ts
-const { conversation, messages, modActions, user } = await reddit.modMail.getConversation({
+const { conversation, messages, modActions, user } = await modMail().getConversation({
   conversationId: 'abcdef',
   markRead: true,
 });
@@ -405,7 +405,7 @@ Get conversations for a logged in user or subreddits
 #### Example
 
 ```ts
-const { viewerId, conversations } = await reddit.modMail.getConversations({
+const { viewerId, conversations } = await modMail().getConversations({
   after: 'abcdef',
   limit: 42,
 });
@@ -430,7 +430,7 @@ Returns a list of Subreddits that the user moderates with mail permission
 #### Example
 
 ```ts
-const subredditsData = await reddit.modMail.getSubreddits();
+const subredditsData = await modMail().getSubreddits();
 
 for (const subreddit of Object.values(subreddits)) {
   console.log(subreddit.id);
@@ -455,7 +455,7 @@ Endpoint to retrieve the unread conversation count by conversation state.
 #### Example
 
 ```ts
-const response = await reddit.modMail.getUnreadCount();
+const response = await modMail().getUnreadCount();
 
 console.log(response.highlighted);
 console.log(response.new);
@@ -486,7 +486,7 @@ Id of a modmail conversation
 #### Example
 
 ```ts
-const data = await reddit.modMail.getUserConversations('abcdef');
+const data = await modMail().getUserConversations('abcdef');
 
 console.log(data.recentComments);
 console.log(data.recentPosts);
@@ -517,7 +517,7 @@ Id of a modmail conversation
 #### Example
 
 ```ts
-await reddit.modMail.highlightConversation('abcdef');
+await modMail().highlightConversation('abcdef');
 ```
 
 ---
@@ -553,7 +553,7 @@ For how many hours the conversation needs to be muted. Must be one of 72, 168, o
 #### Example
 
 ```ts
-await reddit.modMail.muteConversation({ conversationId: 'abcdef', numHours: 72 });
+await modMail().muteConversation({ conversationId: 'abcdef', numHours: 72 });
 ```
 
 ---
@@ -581,7 +581,7 @@ An array of ids
 #### Example
 
 ```ts
-await reddit.modMail.readConversations(['abcdef', 'qwerty']);
+await modMail().readConversations(['abcdef', 'qwerty']);
 ```
 
 ---
@@ -629,7 +629,7 @@ is internal message? (default: false)
 #### Example
 
 ```ts
-await reddit.modMail.reply({
+await modMail().reply({
   body: 'Lorem ipsum sit amet',
   conversationId: 'abcdef',
 });
@@ -668,7 +668,7 @@ duration in days, max 999
 #### Example
 
 ```ts
-await reddit.modMail.tempBanConversation({ conversationId: 'abcdef', duration: 42 });
+await modMail().tempBanConversation({ conversationId: 'abcdef', duration: 42 });
 ```
 
 ---
@@ -696,7 +696,7 @@ Id of a modmail conversation
 #### Example
 
 ```ts
-await reddit.modMail.unarchiveConversation('abcdef');
+await modMail().unarchiveConversation('abcdef');
 ```
 
 ---
@@ -724,7 +724,7 @@ a modmail conversation id
 #### Example
 
 ```ts
-await reddit.modMail.unbanConversation('abcdef');
+await modMail().unbanConversation('abcdef');
 ```
 
 ---
@@ -752,7 +752,7 @@ Id of a modmail conversation
 #### Example
 
 ```ts
-await reddit.modMail.unhighlightConversation('abcdef');
+await modMail().unhighlightConversation('abcdef');
 ```
 
 ---
@@ -780,7 +780,7 @@ Id of a modmail conversation
 #### Example
 
 ```ts
-await reddit.modMail.unmuteConversation('abcdef');
+await modMail().unmuteConversation('abcdef');
 ```
 
 ---
@@ -808,5 +808,5 @@ An array of ids
 #### Example
 
 ```ts
-await reddit.modMail.unreadConversations(['abcdef', 'qwerty']);
+await modMail().unreadConversations(['abcdef', 'qwerty']);
 ```

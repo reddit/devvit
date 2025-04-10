@@ -5,7 +5,7 @@ Some surfaces (like old.reddit) don’t render interactive posts. To remedy this
 ## Use a text string
 
 ```tsx
-const post = await reddit.submitPost({
+const post = await submitPost({
   title: 'Devvit post with text fallback',
   subredditName: subreddit.name,
   textFallback: { text: 'This is a text fallback' },
@@ -24,7 +24,7 @@ const post = await reddit.submitPost({
 ## Use a text string with markdown
 
 ```tsx
-const post = await reddit.submitPost({
+const post = await submitPost({
   title: 'Devvit post with markdown text fallback',
   subredditName: subreddit.name,
   textFallback: {
@@ -51,7 +51,7 @@ const textFallbackRichtext = new RichTextBuilder()
   })
   .codeBlock({}, (cb) => cb.rawText('This post was created via the Devvit API.'));
 
-const post = await reddit.submitPost({
+const post = await submitPost({
   title: 'Devvit post with richtext fallback',
   subredditName: subreddit.name,
   textFallback: { richtext: textFallbackRichtext },
@@ -74,6 +74,6 @@ The post author can edit and update text fallback content after it’s been crea
 ```tsx
 // from a menu action, form, scheduler, trigger, custom post click event, etc
 const newTextFallback = { text: 'This is an updated text fallback' };
-const post = await context.reddit.getPostById(context.postId);
+const post = await getPostById(context.postId);
 await post.setTextFallback(newTextFallback);
 ```

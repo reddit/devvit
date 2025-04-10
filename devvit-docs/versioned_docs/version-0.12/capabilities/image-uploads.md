@@ -40,7 +40,7 @@ You can use the code snippet below as a starting point:
 <details><summary>Code example</summary>
 
 ```ts
-import { Devvit, RichTextBuilder } from '@devvit/public-api';
+import { Devvit, RichTextBuilder, submitComment } from '@devvit/public-api';
 
 Devvit.configure({ media: true, redditAPI: true });
 
@@ -54,7 +54,7 @@ Devvit.addMenuItem({
         url: 'https://media2.giphy.com/media/xTiN0CNHgoRf1Ha7CM/giphy.gif',
         type: 'gif',
       });
-      await context.reddit.submitComment({
+      await submitComment({
         id: event.targetId, // where context menu action was invoked
         text: 'Hello World with Media',
         richtext: new RichTextBuilder()

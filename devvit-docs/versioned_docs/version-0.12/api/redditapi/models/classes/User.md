@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -327,7 +327,7 @@ The name of the subreddit associated with the user's flair.
 ```ts
 const username = 'badapple';
 const subredditName = 'mysubreddit';
-const user = await reddit.getUserByUsername(username);
+const user = await getUserByUsername(username);
 const userFlair = await user.getUserFlairBySubreddit(subredditName);
 ```
 
@@ -337,8 +337,8 @@ const userFlair = await user.getUserFlairBySubreddit(subredditName);
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`User`, `"username"` \| `"id"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & `object`
+> **toJSON**(): `Pick`\<`User`, `"id"` \| `"username"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & `object`
 
 #### Returns
 
-`Pick`\<`User`, `"username"` \| `"id"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & `object`
+`Pick`\<`User`, `"id"` \| `"username"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & `object`

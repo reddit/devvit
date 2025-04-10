@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../README.md)
+[**@devvit/public-api v0.12.0-dev**](../README.md)
 
 ---
 
@@ -107,7 +107,7 @@ Navigate to a URL
 
 ###### urlOrThing
 
-`string` | `User` | `Subreddit` | `Post` | `Comment`
+`string` | `Subreddit` | `Post` | `Comment` | `User`
 
 ##### Returns
 

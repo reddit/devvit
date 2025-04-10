@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -469,7 +469,7 @@ Array of thing full ids (e.g. t3_abc123)
 #### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('askReddit');
+const subreddit = await getSubredditByName('askReddit');
 const listing = subreddit.getCommentsAndPostsByIds(['t3_abc123', 't1_xyz123']);
 const items = await listing.all();
 console.log(items); // [Post, Comment]
@@ -518,7 +518,7 @@ Return a listing of things that have been edited recently.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getEdited();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getEdited({ type: 'post' });
@@ -544,7 +544,7 @@ Return a listing of things that have been edited recently.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getEdited();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getEdited({ type: 'post' });
@@ -570,7 +570,7 @@ Return a listing of things that have been edited recently.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getEdited();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getEdited({ type: 'post' });
@@ -638,7 +638,7 @@ Return a listing of things requiring moderator review, such as reported things a
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getModQueue();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getModQueue({ type: 'post' });
@@ -664,7 +664,7 @@ Return a listing of things requiring moderator review, such as reported things a
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getModQueue();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getModQueue({ type: 'post' });
@@ -690,7 +690,7 @@ Return a listing of things requiring moderator review, such as reported things a
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getModQueue();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getModQueue({ type: 'post' });
@@ -752,7 +752,7 @@ Return a listing of things that have been reported.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getReports();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getReports({ type: 'post' });
@@ -778,7 +778,7 @@ Return a listing of things that have been reported.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getReports();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getReports({ type: 'post' });
@@ -804,7 +804,7 @@ Return a listing of things that have been reported.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getReports();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getReports({ type: 'post' });
@@ -836,7 +836,7 @@ Return a listing of things that have been marked as spam or otherwise removed.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getSpam();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getSpam({ type: 'post' });
@@ -862,7 +862,7 @@ Return a listing of things that have been marked as spam or otherwise removed.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getSpam();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getSpam({ type: 'post' });
@@ -888,7 +888,7 @@ Return a listing of things that have been marked as spam or otherwise removed.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getSpam();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getSpam({ type: 'post' });
@@ -938,7 +938,7 @@ Return a listing of things that have yet to be approved/removed by a mod.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getUnmoderated();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getUnmoderated({ type: 'post' });
@@ -964,7 +964,7 @@ Return a listing of things that have yet to be approved/removed by a mod.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getUnmoderated();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getUnmoderated({ type: 'post' });
@@ -990,7 +990,7 @@ Return a listing of things that have yet to be approved/removed by a mod.
 ##### Example
 
 ```ts
-const subreddit = await reddit.getSubredditByName('mysubreddit');
+const subreddit = await getSubredditByName('mysubreddit');
 let listing = await subreddit.getUnmoderated();
 console.log('Posts and Comments: ', await listing.all());
 listing = await subreddit.getUnmoderated({ type: 'post' });
@@ -1027,7 +1027,7 @@ See interface
 
 ```ts
 const subredditName = 'mysubreddit';
-const subreddit = await reddit.getSubredditByName(subredditName);
+const subreddit = await getSubredditByName(subredditName);
 const response = await subreddit.getUserFlair();
 const userFlairList = response.users;
 ```
@@ -1234,11 +1234,11 @@ const userFlairList = response.users;
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`Subreddit`, `"description"` \| `"type"` \| `"id"` \| `"name"` \| `"title"` \| `"settings"` \| `"language"` \| `"nsfw"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
+> **toJSON**(): `Pick`\<`Subreddit`, `"description"` \| `"type"` \| `"name"` \| `"title"` \| `"settings"` \| `"id"` \| `"language"` \| `"nsfw"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
 
 #### Returns
 
-`Pick`\<`Subreddit`, `"description"` \| `"type"` \| `"id"` \| `"name"` \| `"title"` \| `"settings"` \| `"language"` \| `"nsfw"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
+`Pick`\<`Subreddit`, `"description"` \| `"type"` \| `"name"` \| `"title"` \| `"settings"` \| `"id"` \| `"language"` \| `"nsfw"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
 
 ---
 

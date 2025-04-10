@@ -81,7 +81,7 @@ event: 'ModMail',
 This alerts the mod when modmail is sent or received. This example enables the app to listen to modmail events and fetch the relevant message payload via the Reddit API wrapper.
 
 ```tsx
-import { Devvit } from '@devvit/public-api';
+import { Devvit, modMail } from '@devvit/public-api';
 
 Devvit.configure({ redditAPI: true });
 
@@ -96,7 +96,7 @@ Devvit.addTrigger({
     // Example conversation ID: ModmailConversation_1mzkfh
     // We are fetching the latest conversation state from Reddit API
     const conversationId = event.conversationId;
-    const result = await context.reddit.modMail.getConversation({
+    const result = await modMail().getConversation({
       conversationId: conversationId,
       markRead: false,
     });

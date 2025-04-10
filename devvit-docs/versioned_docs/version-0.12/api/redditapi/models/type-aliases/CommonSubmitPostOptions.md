@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.12.0-dev**](../../README.md)
 
 ---
 
@@ -29,6 +29,14 @@
 ### nsfw?
 
 > `optional` **nsfw**: `boolean`
+
+---
+
+<a id="runas"></a>
+
+### runAs?
+
+> `optional` **runAs**: `"USER"` \| `"APP"`
 
 ---
 

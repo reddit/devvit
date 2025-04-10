@@ -96,7 +96,8 @@
         "capabilities/scheduler",
         "capabilities/secrets-storage",
         "capabilities/server-side-functions",
-        "capabilities/triggers"
+        "capabilities/triggers",
+        "capabilities/userActions"
       ]
     },
     {

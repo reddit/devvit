@@ -397,7 +397,7 @@ Below is a collection of common use cases and patterns.
 Instead of passing a static Form, you can create a function that returns a Form. This enables us to dynamically determine which fields to show and what default values to populate them with. We can also pass along any data via the `context.ui.showForm` method's optional 2nd argument.
 
 ```tsx
-import { Devvit } from '@devvit/public-api';
+import { Devvit, getCurrentUser } from '@devvit/public-api';
 
 Devvit.configure({
   redditAPI: true,
@@ -429,7 +429,7 @@ Devvit.addMenuItem({
   label: 'Show a dynamic form',
   location: 'subreddit',
   onPress: async (_event, context) => {
-    const user = await context.reddit.getCurrentUser();
+    const user = await getCurrentUser();
     const username = user?.username;
     context.ui.showForm(myForm, { username });
   },
@@ -516,7 +516,7 @@ export default Devvit;
 Add a multi-step dynamic form to an interactive post
 
 ```tsx
-import { Devvit, useState, useForm } from '@devvit/public-api';
+import { Devvit, getCurrentSubreddit, submitPost, useState, useForm } from '@devvit/public-api';
 
 Devvit.configure({
   redditAPI: true,
@@ -609,8 +609,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Add post with multi-step form',
   onPress: async (_event, context) => {
-    const currentSubreddit = await context.reddit.getCurrentSubreddit();
-    await context.reddit.submitPost({
+    const currentSubreddit = await getCurrentSubreddit();
+    await submitPost({
       title: 'Interactive post with multi-step form',
       subredditName: currentSubreddit.name,
       preview: (

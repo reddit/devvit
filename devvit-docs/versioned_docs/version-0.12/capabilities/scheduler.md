@@ -101,7 +101,7 @@ export default Devvit;
 You can schedule an action to run once at a specific time, like sending a private message in the [Remind Me](/docs/showcase/tutorials/remind_me.md) tutorial.
 
 ```ts
-import { Devvit } from '@devvit/public-api';
+import { Devvit, getUserById, getPostById, sendPrivateMessage } from '@devvit/public-api';
 
 const REMIND_ME_ACTION_NAME = 'remindme';
 
@@ -110,11 +110,11 @@ Devvit.addSchedulerJob({
   onRun: async (event, context) => {
     const { userId, postId, fromWhen } = event.data!;
 
-    const user = await context.reddit.getUserById(userId);
-    const post = await context.reddit.getPostById(postId);
+    const user = await getUserById(userId);
+    const post = await getPostById(postId);
 
     // Send a private message to the user
-    await context.reddit.sendPrivateMessage({
+    await sendPrivateMessage({
       to: user.username,
       subject: 'RemindMe',
       text: `Beep boop! You asked me to remind you about [${post.title}](${post.permalink}) at ${fromWhen}!`,
@@ -150,14 +150,14 @@ export default Devvit;
 You can schedule an action that repeats at a specific time. This sample code creates a recurring action to post a new daily thread every day at 12:00 UTC. In this example, the recurring action is initiated when the app is installed, but you can also schedule a recurring action from a menu action instead.
 
 ```ts
-import { Devvit } from '@devvit/public-api';
+import { Devvit, getCurrentSubreddit, submitPost } from '@devvit/public-api';
 
 Devvit.addSchedulerJob({
   name: 'daily_thread',
   onRun: async (_, context) => {
     console.log('daily_thread handler called');
-    const subreddit = await context.reddit.getCurrentSubreddit();
-    const resp = await context.reddit.submitPost({
+    const subreddit = await getCurrentSubreddit();
+    const resp = await submitPost({
       subredditName: subreddit.name,
       title: 'Daily Thread',
       text: 'This is a daily thread, comment here!',

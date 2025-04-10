@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../README.md)
+[**@devvit/public-api v0.12.0-dev**](../README.md)
 
 ---
 
@@ -59,6 +59,16 @@ The ID of the current comment
 > **debug**: [`ContextDebugInfo`](ContextDebugInfo.md)
 
 More useful things, but probably not for the average developer
+
+---
+
+<a id="metadata"></a>
+
+### metadata
+
+> **metadata**: `Metadata`
+
+Metadata about the current call.
 
 ---
 

@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../README.md)
+[**@devvit/public-api v0.12.0-dev**](../README.md)
 
 ---
 
@@ -104,16 +104,6 @@ A client for the ModLog API
 > **realtime**: `RealtimeClient`
 
 A client for Realtime API
-
----
-
-<a id="reddit"></a>
-
-### reddit
-
-> **reddit**: `RedditAPIClient`
-
-A client for the Reddit API
 
 ---
 

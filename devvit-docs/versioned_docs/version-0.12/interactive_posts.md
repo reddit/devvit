@@ -135,8 +135,8 @@ Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Add a poll',
   onPress: async (_, context) => {
-    const currentSubreddit = await context.reddit.getCurrentSubreddit();
-    await context.reddit.submitPost({
+    const currentSubreddit = await getCurrentSubreddit();
+    await submitPost({
       title: 'My custom post',
       subredditName: currentSubreddit.name,
       preview: (
@@ -161,7 +161,7 @@ The `submitPost(options: SubmitPostOptions)` function has these parameters:
 **Example**
 
 ```ts
-await reddit.submitPost({
+await submitPost({
   title: 'My custom post',
   subredditName: currentSubreddit.name,
   preview: (

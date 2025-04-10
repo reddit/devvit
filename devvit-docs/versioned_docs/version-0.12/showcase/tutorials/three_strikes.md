@@ -76,9 +76,9 @@ function getKeyForAuthor(author: User) {
 ```typescript
 async function getThing(event: MenuItemOnPressEvent, context: Devvit.Context) {
   if (event.location === 'post') {
-    return await context.reddit.getPostById(event.targetId);
+    return await getPostById(event.targetId);
   } else if (event.location === 'comment') {
-    return await context.reddit.getCommentById(event.targetId);
+    return await getCommentById(event.targetId);
   }
   throw 'Cannot find a post or comment with that ID';
 }
@@ -91,7 +91,7 @@ async function getThing(event: MenuItemOnPressEvent, context: Devvit.Context) {
 ```typescript
 async function getAuthor(event: MenuItemOnPressEvent, context: Devvit.Context) {
   const thing = await getThing(event, context);
-  return await context.reddit.getUserById(thing.authorId!);
+  return await getUserById(thing.authorId!);
 }
 ```
 
@@ -221,7 +221,7 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   let days = 0;
 
   // Get the current subreddit from the metadata
-  const subreddit = await context.reddit.getCurrentSubreddit();
+  const subreddit = await getCurrentSubreddit();
   const permalink = thing.permalink;
   const location = event.location;
   switch (strikes) {
@@ -253,7 +253,7 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
    * NOTE: Apps are executed as the moderator that installed this app into a
    *       subreddit and will be used as the user that sends this message!
    */
-  await context.reddit.sendPrivateMessage({
+  await sendPrivateMessage({
     to: author.username,
     subject: `Received a strike on ${subreddit.name}`,
     text: pmMessage,
@@ -262,8 +262,8 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
   const result = `u/$\{author.username} strikes: ${strikes} and has been ${punishment}.`;
 
   if (ban) {
-    const currentUser = await context.reddit.getCurrentUser();
-    await context.reddit.banUser({
+    const currentUser = await getCurrentUser();
+    await banUser({
       subredditName: subreddit.name,
       username: author.username,
       duration: days,
