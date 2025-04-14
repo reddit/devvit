@@ -14,6 +14,10 @@
     },
     "./package.json": "./package.json",
     "./bin/devvit": "./bin/devvit.js",
+    "./api": {
+      "types": "./dist/api.d.ts",
+      "default": "./dist/api.js"
+    },
     "./client": {
       "types": "./dist/client.d.ts",
       "default": "./dist/client.js"
@@ -45,6 +49,7 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@devvit/cli": "0.11.11",
+    "@devvit/public-api": "0.11.11",
     "@devvit/webbit-client": "0.11.11",
     "@devvit/webbit-server": "0.11.11"
   },

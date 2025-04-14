@@ -1,1 +1,1 @@
-export default '@devvit/webbit-client';
+export * from '@devvit/webbit-client';
