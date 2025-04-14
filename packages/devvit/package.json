@@ -13,7 +13,15 @@
       "default": "./dist/index.js"
     },
     "./package.json": "./package.json",
-    "./bin/devvit": "./bin/devvit.js"
+    "./bin/devvit": "./bin/devvit.js",
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    }
   },
   "main": "./dist/index.js",
   "bin": "bin/devvit.js",
@@ -36,7 +44,9 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/cli": "0.11.11"
+    "@devvit/cli": "0.11.11",
+    "@devvit/webbit-client": "0.11.11",
+    "@devvit/webbit-server": "0.11.11"
   },
   "devDependencies": {
     "@devvit/tsconfig": "0.11.11",
