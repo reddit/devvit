@@ -13,7 +13,7 @@ npx prettier --write '**/*.md'
 
 # Check for unstaged changes
 if [ -n "$(git status --porcelain)" ]; then
-  echo -e "${R}The docs generation script (yarn docs:gen) resulted in unstaged changes. Please run 'yarn docs:gen' and commit the generated docs.${RESET}";
+  echo -e "${R}The docs generation script (yarn docs:gen) resulted in unstaged changes. Please run 'devvit-docs/scripts/verify-docs.sh' and commit the generated docs.${RESET}";
   git status
   git diff
   exit 1

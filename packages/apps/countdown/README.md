@@ -4,12 +4,12 @@ The post can include a link that is revealed after the countdown is over, and us
 
 ## Creating a countdown post
 
-* Install the app from this page.
+- Install the app from this page.
 
-* [Click the subreddit menu and select “Create a countdown timer”](https://i.redd.it/y7ew9qiqhxic1.png).
+- [Click the subreddit menu and select “Create a countdown timer”](https://i.redd.it/y7ew9qiqhxic1.png).
 
-* Fill in the fields in the form.
+- Fill in the fields in the form.
 
-* Submit the form, and the countdown is ready!
+- Submit the form, and the countdown is ready!
 
 If you encounter issues or bugs, please message our team.

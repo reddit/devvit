@@ -21,6 +21,27 @@ import {
   OnPostSubmitDefinition,
   OnPostUpdateDefinition,
 } from '@devvit/protos';
+import type {
+  OnAppInstall,
+  OnAppUpgrade,
+  OnAutomoderatorFilterComment,
+  OnAutomoderatorFilterPost,
+  OnCommentCreate,
+  OnCommentDelete,
+  OnCommentReport,
+  OnCommentSubmit,
+  OnCommentUpdate,
+  OnModAction,
+  OnModMail,
+  OnPostCreate,
+  OnPostDelete,
+  OnPostFlairUpdate,
+  OnPostNsfwUpdate,
+  OnPostReport,
+  OnPostSpoilerUpdate,
+  OnPostSubmit,
+  OnPostUpdate,
+} from '@devvit/protos/types/devvit/actor/automation/v1alpha/event_handlers.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
@@ -67,133 +88,133 @@ export function registerTriggers(config: Config): void {
     switch (event) {
       case 'PostSubmit':
         config.provides(OnPostSubmitDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnPostSubmit>(
           'OnPostSubmit',
           createCombinedHandler('PostSubmit', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'PostCreate':
         config.provides(OnPostCreateDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnPostCreate>(
           'OnPostCreate',
           createCombinedHandler('PostCreate', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'PostUpdate':
         config.provides(OnPostUpdateDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnPostUpdate>(
           'OnPostUpdate',
           createCombinedHandler('PostUpdate', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'PostReport':
         config.provides(OnPostReportDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnPostReport>(
           'OnPostReport',
           createCombinedHandler('PostReport', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'PostDelete':
         config.provides(OnPostDeleteDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnPostDelete>(
           'OnPostDelete',
           createCombinedHandler('PostDelete', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'PostFlairUpdate':
         config.provides(OnPostFlairUpdateDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnPostFlairUpdate>(
           'OnPostFlairUpdate',
           createCombinedHandler('PostFlairUpdate', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'CommentSubmit':
         config.provides(OnCommentSubmitDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnCommentSubmit>(
           'OnCommentSubmit',
           createCombinedHandler('CommentSubmit', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'CommentCreate':
         config.provides(OnCommentCreateDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnCommentCreate>(
           'OnCommentCreate',
           createCombinedHandler('CommentCreate', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'CommentUpdate':
         config.provides(OnCommentUpdateDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnCommentUpdate>(
           'OnCommentUpdate',
           createCombinedHandler('CommentUpdate', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'CommentReport':
         config.provides(OnCommentReportDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnCommentReport>(
           'OnCommentReport',
           createCombinedHandler('CommentReport', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'CommentDelete':
         config.provides(OnCommentDeleteDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnCommentDelete>(
           'OnCommentDelete',
           createCombinedHandler('CommentDelete', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'AppInstall':
         config.provides(OnAppInstallDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnAppInstall>(
           'OnAppInstall',
           createCombinedHandler('AppInstall', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'AppUpgrade':
         config.provides(OnAppUpgradeDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnAppUpgrade>(
           'OnAppUpgrade',
           createCombinedHandler('AppUpgrade', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'ModAction':
         config.provides(OnModActionDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnModAction>(
           'OnModAction',
           createCombinedHandler('ModAction', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'ModMail':
         config.provides(OnModMailDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnModMail>(
           'OnModMail',
           createCombinedHandler('ModMail', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'PostNsfwUpdate':
         config.provides(OnPostNsfwUpdateDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnPostNsfwUpdate>(
           'OnPostNsfwUpdate',
           createCombinedHandler('PostNsfwUpdate', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'PostSpoilerUpdate':
         config.provides(OnPostSpoilerUpdateDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnPostSpoilerUpdate>(
           'OnPostSpoilerUpdate',
           createCombinedHandler('PostSpoilerUpdate', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'AutomoderatorFilterPost':
         config.provides(OnAutomoderatorFilterPostDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnAutomoderatorFilterPost>(
           'OnAutomoderatorFilterPost',
           createCombinedHandler('AutomoderatorFilterPost', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'AutomoderatorFilterComment':
         config.provides(OnAutomoderatorFilterCommentDefinition);
-        extendDevvitPrototype(
+        extendDevvitPrototype<OnAutomoderatorFilterComment>(
           'OnAutomoderatorFilterComment',
           createCombinedHandler(
             'AutomoderatorFilterComment',

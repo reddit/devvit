@@ -1,4 +1,4 @@
-import type { Metadata, ScheduledAction } from '@devvit/protos';
+import type { Empty, Metadata, ScheduledAction, SchedulerHandler } from '@devvit/protos';
 import { SchedulerHandlerDefinition } from '@devvit/protos';
 import type { Config } from '@devvit/shared-types/Config.js';
 
@@ -7,7 +7,7 @@ import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 
-async function handleScheduledAction(args: ScheduledAction, metadata: Metadata): Promise<void> {
+async function handleScheduledAction(args: ScheduledAction, metadata: Metadata): Promise<Empty> {
   const jobName = args.type;
   const scheduledJobHandler = Devvit.scheduledJobHandlers.get(jobName);
 
@@ -28,9 +28,11 @@ async function handleScheduledAction(args: ScheduledAction, metadata: Metadata):
   );
 
   await scheduledJobHandler(event, context);
+
+  return {};
 }
 
 export function registerScheduler(config: Config): void {
   config.provides(SchedulerHandlerDefinition);
-  extendDevvitPrototype('HandleScheduledAction', handleScheduledAction);
+  extendDevvitPrototype<SchedulerHandler>('HandleScheduledAction', handleScheduledAction);
 }

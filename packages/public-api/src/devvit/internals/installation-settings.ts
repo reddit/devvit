@@ -1,5 +1,6 @@
 import type { Metadata, ValidateFormRequest, ValidateFormResponse } from '@devvit/protos';
 import { GetFieldsResponse, InstallationSettingsDefinition } from '@devvit/protos';
+import type { InstallationSettings } from '@devvit/protos/types/devvit/actor/settings/v1alpha/installation_settings.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 
 import { transformFormFields } from '../../apis/ui/helpers/transformForm.js';
@@ -28,6 +29,6 @@ async function onValidateForm(
 
 export function registerInstallationSettings(config: Config): void {
   config.provides(InstallationSettingsDefinition);
-  extendDevvitPrototype('GetSettingsFields', onGetSettingsFields);
-  extendDevvitPrototype('ValidateForm', onValidateForm);
+  extendDevvitPrototype<InstallationSettings>('GetSettingsFields', onGetSettingsFields);
+  extendDevvitPrototype<InstallationSettings>('ValidateForm', onValidateForm);
 }
