@@ -1107,12 +1107,20 @@ export class Post {
       const { textFallback, ...sanitizedOptions } = options;
       const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
 
+      const userGeneratedContent = options.userGeneratedContent
+        ? {
+            text: options.userGeneratedContent.text ?? '',
+            imageUrls: options.userGeneratedContent.imageUrls ?? [],
+          }
+        : undefined;
+
       const submitRequest: SubmitRequest = {
         kind: 'custom',
         sr: options.subredditName,
         richtextJson: fromByteArray(encodedCached),
         richtextFallback,
         ...sanitizedOptions,
+        userGeneratedContent,
         runAs: runAsType,
       };
 

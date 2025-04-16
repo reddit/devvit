@@ -5,5 +5,5 @@ export const RunAs = {
 
 export type UserGeneratedContent = {
   text: string;
-  imageUrls: string[];
+  imageUrls?: string[];
 };
