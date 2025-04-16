@@ -1077,7 +1077,7 @@ export class Post {
 
   /** @internal */
   static async submit(options: SubmitPostOptions, metadata: Metadata | undefined): Promise<Post> {
-    const { runAs = 'APP' } = options;
+    const { runAs = 'UNSPECIFIED' } = options;
     const runAsType = RunAs[runAs];
     const client =
       runAsType === RunAs.USER

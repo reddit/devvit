@@ -605,7 +605,7 @@ export class Comment {
     options: CommentSubmissionOptions & { id: T1ID | T3ID },
     metadata: Metadata | undefined
   ): Promise<Comment> {
-    const { runAs = 'APP' } = options;
+    const { runAs = 'UNSPECIFIED' } = options;
     const runAsType = RunAs[runAs];
     const client =
       runAsType === RunAs.USER

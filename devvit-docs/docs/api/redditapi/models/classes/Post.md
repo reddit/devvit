@@ -1059,7 +1059,7 @@ await post.setTextFallback(newTextFallback);
 
 ##### position?
 
-`1` | `3` | `4` | `2`
+`1` | `2` | `3` | `4`
 
 #### Returns
 
