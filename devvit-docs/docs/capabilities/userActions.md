@@ -2,11 +2,35 @@
 
 ## Overview
 
-Typically, your app makes posts or comments with its associated [app account](../about_devvit#app-accounts). With `userActions` enabled, your app can create posts and comments on behalf of the user and submit user-generated content (UGC). This includes:
+By default, apps make posts or comments with their associated [app account](../about_devvit#app-accounts). With `userActions` enabled, your app can create posts and comments on behalf of the user and submit user-generated content (UGC). This includes:
 
 - Creating posts or comments from the [post UI](../interactive_posts.md)
 - Creating posts or comments via a [form](forms.md)
 - Creating posts or comments via a [menu action](./menu-actions.md)
+
+## Guidelines
+
+Users should never be surprised by an app creating content on their behalf. Apps using this feature need to:
+
+- **Be transparent.** Inform users and show them the content that will be posted on their behalf.
+- **Provide user control.** Users must opt in to allow the app to post on their behalf. If opt-in is persistent, you must make it clear on how the user can opt out.
+
+## How it works
+
+If you’re using an unapproved app version (including for a playtest):
+
+- `runAs: 'USER'` will operate from the app account unless the app owner takes the action
+- User actions taken by the app owner will be attributed to the app owner's username.
+
+After you [publish](../publishing.md) your app and it’s approved in app review:
+
+- `runAs: 'USER'` will operate on behalf of the user for all users
+
+:::note
+Make sure your app follows the guidelines above in order to be approved.
+:::
+
+### Usage
 
 To enable the `userActions` plugin in your app, set it to `true` in `Devvit.configure()`:
 
@@ -18,7 +42,8 @@ Devvit.configure({
 ```
 
 After enabling `userActions`, you can call certain Reddit APIs on behalf of the user by passing in the option `runAs: 'USER'`.
-Currently, the only APIs which support this option are:
+
+Currently, the only APIs that support this option are:
 
 - [submitPost()](../api/redditapi/RedditAPIClient/classes/RedditAPIClient.md#submitpost)
 - [submitComment()](../api/redditapi/RedditAPIClient/classes/RedditAPIClient.md#submitcomment)
@@ -29,22 +54,18 @@ If the `runAs` option is not specified, then the API will use `runAs: 'APP'` by 
 Both `redditAPI` and `userActions` must be enabled to call Reddit APIs with `runAs: 'USER'`.
 :::
 
-## Requirements
+### Parameters
 
-When setting the option `runAs: 'USER'`, the app version installed to the subreddit must be approved in order for the post or comment to be attributed to the user.
+| **Parameters**         | **Description**                                                                                                                                                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runAs`                | The type of account to perform the action on behalf of, either `'USER'` or `'APP'`. Defaults to `'APP'`.                                                                                                               |
+| `userGeneratedContent` | Represents text or images submitted by the user that may be displayed in the post. When calling `submitPost()` to create an interactive post with `runAs: 'USER'`, you must specify the option `userGeneratedContent`. |
 
-If the app is being playtested or if the installed app version has not yet been approved, actions will be attributed to the app account by default.
+Note: Apps that `submitPost()` with `runAs: 'USER'` require `userGeneratedContent` in order to be approved. This helps Reddit with safety and compliance of user generated content.
 
-The exception to this behavior is if the app owner takes the action. User actions taken by the app owner will be attributed to the app owner's username.
+## Example
 
-## The `userGeneratedContent` option
-
-When submitting an interactive post on behalf of the user, you must specify the option `userGeneratedContent` in addition to `runAs: 'USER'`.
-The `userGeneratedContent` option represents text or images submitted by the user that may be displayed in the post.
-
-Below is an example app that uses a form to prompt the user for their favorite color, then submits a post displaying the user's text input.
-
-<details><summary>'Favorite Color' App Example</summary>
+This example app uses a form to prompt the user for their favorite color and then submits a post displaying the user's text input.
 
 ```tsx
 import { Devvit, useForm, useState } from '@devvit/public-api';
@@ -104,7 +125,7 @@ Devvit.addCustomPostType({
           subredditName: currentSubreddit,
           preview: loadingPreview,
           runAs: 'USER',
-          userGeneratedContent: { text: submittedFavColor, imageUrls: [] },
+          userGeneratedContent: { text: submittedFavColor },
         });
 
         context.redis.set(post.id, submittedFavColor);
@@ -138,5 +159,3 @@ Devvit.addCustomPostType({
 
 export default Devvit;
 ```
-
-</details>
