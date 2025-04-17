@@ -199,7 +199,7 @@ export default class Publish extends ProjectCommand {
       appCapabilitiesForReview.forEach((capability) => {
         this.log(`  - ${appCapabilityToReviewRequirementMessage[capability]}`);
       });
-      this.log("You'll receive a DM when your app has been reviewed.");
+      this.log("You'll receive an email when your app has been approved.");
       this.log("Once approved, you'll be able to install your app anywhere you're a moderator!");
 
       // Early return
@@ -211,7 +211,7 @@ export default class Publish extends ProjectCommand {
     this.log("Your app is now unlisted. You can install it anywhere you're a moderator!");
 
     if (visibility === AppPublishRequestVisibility.PUBLIC) {
-      this.log("You'll receive a DM when your app has been reviewed & made public.");
+      this.log("You'll receive an email when your app has been approved.");
       this.log(
         'Once approved, you (and everyone else!) will be able to install your app anywhere they moderate!'
       );
