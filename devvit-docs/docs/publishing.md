@@ -43,7 +43,9 @@ Public apps are discoverable on our apps directory for anyone on Reddit. These a
 
 ## App review
 
-Apps are reviewed and published on a per version basis. The Developer Platform team will review your code, read through your app description, and potentially test your app. The review process typically takes one week, and you’ll be notified of your app status, which could be:
+Apps are reviewed and published on a per version basis, and you'll get an email when your app is published.
+
+During the app review, the Developer Platform team will look at your code, read through your app description, and potentially test your app. The review process typically takes one week, and you’ll be notified of your app status, which could be:
 
 - Approved
 - Approved with non-blocking feedback
