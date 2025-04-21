@@ -4,6 +4,22 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.13: User actions API, developer email notifications, and a new way to get support for your app
+
+**Release Date: Apr 21, 2025**
+
+In this release, Devvit introduces a new way for apps to let users easily create content when interacting with your app. With the user’s permission, an app can post content on the user’s behalf. This is great for a lot of reasons! The user actions API;
+
+- **Boosts engagement**. Automatically sharing content increases reach, facilitates user interaction, and gives you insight into what’s working in your app.
+- **Saves the user time and effort**. Users can participate in the conversation without having to manually create posts.
+- **Improves retention**. When people interact with your app, they’re more likely to stick around, and continued user engagement helps your app reach new people. Total positive feedback loop!
+
+Check out our new [user action API](./capabilities/userActions.md) to see how you can add this to your own app.
+
+Also in this release, we’ve streamlined developer communication. New devs will get automatic email notifications when they [upload](./dev_guide.mdx) their first app and every time an app is approved for [publishing](./publishing.md).
+
+Last but certainly not least, we’ve added a way for you to garner user support while you develop your app! Use the [support this app](./payments/support_this_app.md) payments molecule to let your biggest fans show their love.
+
 ## Devvit 0.11.12: Everything but the kitchen sink updates
 
 **Release Date: Apr 7, 2025**

@@ -91,6 +91,7 @@ const sidebars = {
         'payments/payments_test',
         'payments/payments_publish',
         'payments/payments_manage',
+        'payments/support_this_app',
       ],
     },
     {
