@@ -8,10 +8,10 @@ Before upgrading `@devvit/public-api` in your project, always update the CLI fir
 
 **Release Date: Apr 21, 2025**
 
-In this release, Devvit introduces a new way for apps to let users easily create content when interacting with your app. With the user’s permission, an app can post content on the user’s behalf. This is great for a lot of reasons! The user actions API;
+In this release, Devvit introduces a new way for apps to let users create content when interacting with your app. With the user's permission, an app can create posts or comments on behalf of the user. Our most successful apps, like [Pixelary](https://reddit.com/r/pixelary) and [Riddonkulous](https://www.reddit.com/r/riddonkulous/), leverage the creativity of the community by allowing users to create content as they play. This has helped these games grow quickly! The user actions API:
 
 - **Boosts engagement**. Automatically sharing content increases reach, facilitates user interaction, and gives you insight into what’s working in your app.
-- **Saves the user time and effort**. Users can participate in the conversation without having to manually create posts.
+- **Saves the user time and effort**. It’s easy for users to jump into the conversation.
 - **Improves retention**. When people interact with your app, they’re more likely to stick around, and continued user engagement helps your app reach new people. Total positive feedback loop!
 
 Check out our new [user action API](./capabilities/userActions.md) to see how you can add this to your own app.
