@@ -77,7 +77,8 @@
         "payments/payments_add",
         "payments/payments_test",
         "payments/payments_publish",
-        "payments/payments_manage"
+        "payments/payments_manage",
+        "payments/support_this_app"
       ]
     },
     {
@@ -96,7 +97,8 @@
         "capabilities/scheduler",
         "capabilities/secrets-storage",
         "capabilities/server-side-functions",
-        "capabilities/triggers"
+        "capabilities/triggers",
+        "capabilities/userActions"
       ]
     },
     {

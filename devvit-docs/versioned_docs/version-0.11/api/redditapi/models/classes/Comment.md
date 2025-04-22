@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../../README.md)
+[**@devvit/public-api v0.11.13-dev**](../../README.md)
 
 ---
 
@@ -664,11 +664,11 @@ id of a Removal Reason - you can leave this as an empty string if you don't have
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`Comment`, `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"body"` \| `"spam"` \| `"replies"` \| `"permalink"` \| `"authorName"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"parentId"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
+> **toJSON**(): `Pick`\<`Comment`, `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"body"` \| `"spam"` \| `"parentId"` \| `"createdAt"` \| `"permalink"` \| `"authorName"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"replies"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
 
 #### Returns
 
-`Pick`\<`Comment`, `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"body"` \| `"spam"` \| `"replies"` \| `"permalink"` \| `"authorName"` \| `"createdAt"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"parentId"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
+`Pick`\<`Comment`, `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"body"` \| `"spam"` \| `"parentId"` \| `"createdAt"` \| `"permalink"` \| `"authorName"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"replies"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
 
 ---
 

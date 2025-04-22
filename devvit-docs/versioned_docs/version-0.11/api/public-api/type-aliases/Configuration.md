@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.12-dev**](../README.md)
+[**@devvit/public-api v0.11.13-dev**](../README.md)
 
 ---
 
@@ -75,3 +75,13 @@ Allows your app to use the reddit API
 > `optional` **redis**: [`PluginSettings`](PluginSettings.md) \| `boolean`
 
 Allows your app to use the Redis Plugin
+
+---
+
+<a id="useractions"></a>
+
+### userActions?
+
+> `optional` **userActions**: [`PluginSettings`](PluginSettings.md) \| `boolean`
+
+Allows your app to call Reddit APIs on behalf of the User
