@@ -20,7 +20,17 @@ Make sure you’re on Devvit 0.11.3 or higher. See the [quickstart](https://deve
 
 ## Register products
 
-Register products in the src/products.json file in your local app. The JSON schema for the file format is available at https://developers.reddit.com/schema/products.json.
+Register products in the src/products.json file in your local app. To add products to your app, run the following command:
+
+```bash
+devvit products add
+```
+
+Registered products are updated every time an app is uploaded, including when you use [Devvit playtest](../playtest).
+
+<details>
+  <summary>Click here for instructions on how to add products manually to your products.json file.</summary>
+The JSON schema for the file format is available at <a href="https://developers.reddit.com/schema/products.json" target="_blank">https://developers.reddit.com/schema/products.json</a>.
 
 Each product in the products field has the following attributes:
 | **Attribute** | **Description** |
@@ -33,7 +43,7 @@ Each product in the products field has the following attributes:
 | `metadata` | **(optional)** An optional object that contains additional attributes you want to use to group and filter products. Keys and values must be alphanumeric (a - Z, 0 - 9, and - ) and contain 30 characters or less. You can add up to 10 metadata keys. Metadata keys cannot start with "devvit-". |
 | `accountingType` | Categories for how buyers consume your products. Possible values are: <ul><li>`INSTANT` for purchased items that are used immediately and disappear.</li><li>`DURABLE` for purchased items that are permanently applied to the account and can be used any number of times</li><li>`CONSUMABLE` for items that can be used at a later date but are removed once they are used.</li><li>`VALID_FOR_` values indicate a product can be used throughout a period of time after it is purchased.</li></ul> |
 
-Registered products are updated every time an app is uploaded, including when you use [Devvit playtest](../playtest).
+</details>
 
 ## Price products
 
@@ -98,11 +108,37 @@ If you don’t provide an image, the default Reddit product image is used.
 
 ### Purchase buttons (required)
 
+#### Blocks
+
+The `ProductButton` is a Devvit blocks component designed to render a product with a purchase button. It can be customized to match your app's look and feel.
+
+**Usage:**
+
+```tsx
+<ProductButton
+  showIcon
+  product={product}
+  onPress={(p) => payments.purchase(p.sku)}
+  appearance="tile"
+/>
+```
+
+##### `ProductButtonProps`
+
+| **Prop Name**      | **Type**                                        | **Description**                                                                      |
+| ------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `product`          | `Product`                                       | The product object containing details such as `sku`, `price`, and `metadata`.        |
+| `onPress`          | `(product: Product) => void`                    | Callback function triggered when the button is pressed.                              |
+| `showIcon`         | `boolean`                                       | Determines whether the product icon is displayed on the button. Defaults to `false`. |
+| `appearance`       | `'compact'` &#124; `'detailed'` &#124; `'tile'` | Defines the visual style of the button. Defaults to `compact`.                       |
+| `buttonAppearance` | `string`                                        | Optional [button appearance](../blocks/button#appearance).                           |
+| `textColor`        | `string`                                        | Optional [text color](../blocks/text#color).                                         |
+
+#### Webviews
+
 Use Reddit’s primary, secondary, or bordered button component and gold icon in one of the following formats:
 
 ![default image](../assets/payments_button_purchase.png)
-
-### Product components
 
 Use a consistent and clear product component to display paid goods or services to your users. Product components can be customized to fit your app, like the examples below.
 
