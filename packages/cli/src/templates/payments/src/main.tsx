@@ -85,7 +85,7 @@ const App: Devvit.CustomPostComponent = (context) => {
           <ProductButton
             product={product}
             appearance="detailed"
-            onPurchase={(p) => {
+            onPress={(p) => {
               payments.purchase(p.sku);
             }}
           />

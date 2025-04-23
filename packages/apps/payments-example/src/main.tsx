@@ -79,7 +79,7 @@ Devvit.addCustomPostType({
                     <text weight="bold" width="90px">{`${appearance}:`}</text>
                     <ProductButton
                       product={product}
-                      onPurchase={(p) => payments.purchase(p.sku, { timestamp: `${Date.now()}` })}
+                      onPress={(p) => payments.purchase(p.sku, { timestamp: `${Date.now()}` })}
                       showIcon
                       appearance={appearance}
                     />
