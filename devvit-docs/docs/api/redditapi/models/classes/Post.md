@@ -188,6 +188,22 @@
 
 ---
 
+<a id="gallery"></a>
+
+### gallery
+
+#### Get Signature
+
+> **get** **gallery**(): [`GalleryMedia`](../type-aliases/GalleryMedia.md)[]
+
+Get the media in the post. Empty if the post doesn't have any media.
+
+##### Returns
+
+[`GalleryMedia`](../type-aliases/GalleryMedia.md)[]
+
+---
+
 <a id="hidden"></a>
 
 ### hidden

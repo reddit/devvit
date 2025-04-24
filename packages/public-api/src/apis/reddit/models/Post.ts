@@ -383,6 +383,15 @@ export type EnrichedThumbnail = {
   };
 };
 
+/**
+ * Represents media that the post may contain.
+ */
+export type GalleryMedia = {
+  url: string;
+  height: number;
+  width: number;
+};
+
 export class Post {
   #id: T3ID;
   #authorId?: T2ID;
@@ -424,6 +433,7 @@ export class Post {
   #secureMedia?: SecureMedia;
   #modReportReasons: string[];
   #userReportReasons: string[];
+  #gallery: GalleryMedia[];
 
   #metadata: Metadata | undefined;
 
@@ -528,6 +538,16 @@ export class Post {
         })),
         textColor: data.linkFlairTextColor,
       };
+    }
+
+    if (data.gallery) {
+      this.#gallery = data.gallery.map((item) => ({
+        url: item.url,
+        height: item.height,
+        width: item.width,
+      }));
+    } else {
+      this.#gallery = [];
     }
   }
 
@@ -698,6 +718,13 @@ export class Post {
 
   get modReportReasons(): string[] {
     return this.#modReportReasons;
+  }
+
+  /**
+   * Get the media in the post. Empty if the post doesn't have any media.
+   */
+  get gallery(): GalleryMedia[] {
+    return this.#gallery;
   }
 
   toJSON(): Pick<

@@ -66,6 +66,13 @@ describe('Post API', () => {
         transcodingStatus: 'completed',
       },
     },
+    gallery: [
+      {
+        url: 'https://i.redd.it/12345678.jpg',
+        width: 1080,
+        height: 1080,
+      },
+    ],
   };
 
   describe('RedditAPIClient', () => {

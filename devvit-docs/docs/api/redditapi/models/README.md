@@ -80,6 +80,7 @@
 - [FlairBackgroundColor](type-aliases/FlairBackgroundColor.md)
 - [FlairSettings](type-aliases/FlairSettings.md)
 - [FlairTextColor](type-aliases/FlairTextColor.md)
+- [GalleryMedia](type-aliases/GalleryMedia.md)
 - [GetCommentsByUserOptions](type-aliases/GetCommentsByUserOptions.md)
 - [GetCommentsOptions](type-aliases/GetCommentsOptions.md)
 - [GetConversationResponse](type-aliases/GetConversationResponse.md)
