@@ -1,6 +1,7 @@
 import type {
   AppClient,
   AppVersionClient,
+  DeveloperAccountClient,
   DevPortalAppSettingsClient,
   EventsClient,
   FeedbackClient,
@@ -10,6 +11,7 @@ import type {
 import {
   AppClientJSON,
   AppVersionClientJSON,
+  DeveloperAccountClientJSON,
   DevPortalAppSettingsClientJSON,
   DevPortalDeveloperSettingsClientJSON,
   EventsClientJSON,
@@ -77,6 +79,7 @@ const APP_SETTINGS_PATH = 'app-settings';
 const EVENTS_PATH = 'events';
 const PUBLISH_REQUEST_PATH = 'app-publish-request';
 const DEVELOPER_SETTINGS_PATH = 'developer-settings';
+const DEVELOPER_ACCOUNT_PATH = 'developer-account';
 
 export function createAppClient(): AppClient {
   return wrapWithRetry(
@@ -153,6 +156,17 @@ export function createWaitlistClient(): WaitlistClient {
     new WaitlistClientJSON(
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${WAITLIST_PATH}`,
+        getToken: getAccessToken,
+        headers: getHeaders(),
+      })
+    )
+  );
+}
+export function createDeveloperAccountClient(): DeveloperAccountClient {
+  return wrapWithRetry(
+    new DeveloperAccountClientJSON(
+      NodeFetchRPC({
+        baseUrl: `${DEVVIT_PORTAL_API}/${DEVELOPER_ACCOUNT_PATH}`,
         getToken: getAccessToken,
         headers: getHeaders(),
       })

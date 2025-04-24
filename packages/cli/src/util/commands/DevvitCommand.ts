@@ -6,7 +6,7 @@ import open from 'open';
 
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { getAccessToken } from '../auth.js';
-import { createWaitlistClient } from '../clientGenerators.js';
+import { createDeveloperAccountClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
 import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../devvitConfig.js';
 import { findProjectRoot } from '../project-util.js';
@@ -34,7 +34,7 @@ export abstract class DevvitCommand extends Command {
     return this.#configFileName ?? DEVVIT_CONFIG_FILE;
   }
 
-  protected readonly waitlistClient = createWaitlistClient();
+  protected readonly developerAccountClient = createDeveloperAccountClient();
 
   protected override async init(): Promise<void> {
     await super.init();
@@ -63,7 +63,7 @@ export abstract class DevvitCommand extends Command {
 
   protected checkDeveloperAccount = async (): Promise<void> => {
     const { acceptedTermsVersion, currentTermsVersion } =
-      await this.waitlistClient.GetCurrentUserStatus({});
+      await this.developerAccountClient.GetUserAccountInfoIfExists({});
 
     const devAccountUrl = `${DEVVIT_PORTAL_URL}/create-account?cli=true`;
     if (acceptedTermsVersion < currentTermsVersion) {
