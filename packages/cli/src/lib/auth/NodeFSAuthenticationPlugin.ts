@@ -212,7 +212,7 @@ export class NodeFSAuthenticationPlugin {
       scope: this.#authCfg.scopes,
       devvit_cli: 'true',
       state,
-    })}`;
+    })}`.replaceAll('*', '%2A'); // querystring thinks this is safe, but it's not standard
 
     console.log(`
 Press enter to open Reddit to complete authentication:
