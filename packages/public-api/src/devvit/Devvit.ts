@@ -297,19 +297,29 @@ export class Devvit extends Actor {
   }
 
   /**
-   * Add settings that can be configured to customize the behavior of your app. There are two levels of settings: App settings (scope: 'app') and
-   * install settings (scope: 'installation' or unspecified scope). Install settings are meant to be configured by the user that installs your app.
+   * Add settings that can be configured to customize the behavior of your app.
+   *
+   * There are two levels of settings:
+   * - App settings (scope: 'app')
+   * - Installation settings (scope: 'installation' or unspecified scope).
+   *
+   * Installation settings are meant to be configured by the user that installs your app.
    * This is a good place to add anything that a user might want to change to personalize the app (e.g. the default city to show the weather for or a
    * specific sport team that a subreddit follows). Note that these are good for subreddit level customization but not necessarily good for things
    * that might be different for two users in a subreddit (e.g. setting the default city to show the weather for is only useful at a sub level if
-   * the sub is for a specific city or region). Install settings can be viewed and configured here: https://developers.reddit.com/r/subreddit-name/apps/app-name.
+   * the sub is for a specific city or region).
+   * Installation settings can be viewed and configured here: https://developers.reddit.com/r/subreddit-name/apps/app-name.
+   *
    * App settings can be accessed and consumed by all installations of the app. This is mainly useful for developer secrets/API keys that your
    * app needs to function. They can only be changed/viewed by you via the CLI (devvit settings set and devvit settings list). This ensures secrets
-   * are persisted in an encrypted store and don't get committed in the source code. You should never paste your actual key into any fields passed into
-   * Devvit.addSettings - this is merely where you state what your API key's name and description are. You will be able to set the actual value of the key via CLI.
+   * are persisted in an encrypted store and don't get committed in the source code.
+   *
+   * Warning: You should never paste your actual key into any fields passed into Devvit.addSettings - this is merely where you state what your API key's name and description are. You will be able to set the actual value of the key via CLI.
+   *
    * Note: setting names must be unique across all settings.
+   *
    * @param fields - Fields for the app and installation settings.
-   * @example
+   * @example Add multiple fields
    * ```ts
    * Devvit.addSettings([
    *   {
@@ -343,23 +353,42 @@ export class Devvit extends Actor {
    *   },
    * ]);
    * ```
+   *
+   * @example Add a single field
+   * ```ts
+   * Devvit.addSettings({
+   *   type: 'string',
+   *   name: 'weather-api-key',
+   *   label: 'My weather.com API key',
+   *   scope: SettingScope.App,
+   *   isSecret: true
+   * });
+   * ```
    */
-  static addSettings(fields: SettingsFormField[]): void {
-    assertValidFormFields(fields);
-    const installSettings = fields.filter(
+  static addSettings(fields: SettingsFormField[] | SettingsFormField): void {
+    // if the fields is a single field, convert it to an array
+    const fieldsArray = Array.isArray(fields) ? fields : [fields];
+
+    const installSettings = fieldsArray.filter(
       (field) => field.type === 'group' || !field.scope || field.scope === SettingScope.Installation
     );
-    const appSettings = fields.filter(
+    const appSettings = fieldsArray.filter(
       (field) => field.type !== 'group' && field.scope === SettingScope.App
     );
 
     if (installSettings.length > 0) {
-      this.#installationSettings = installSettings;
+      // initialize the installation settings with empty array if it is not initialized
+      this.#installationSettings ??= [];
+      this.#installationSettings.push(...installSettings);
     }
 
     if (appSettings.length > 0) {
-      this.#appSettings = appSettings;
+      // initialize the app settings with empty array if it is not initialized
+      this.#appSettings ??= [];
+      this.#appSettings.push(...appSettings);
     }
+
+    assertValidFormFields([...(this.#installationSettings ?? []), ...(this.#appSettings ?? [])]);
 
     if (!this.#pluginClients[protos.SettingsDefinition.fullName]) {
       this.use(protos.SettingsDefinition);
