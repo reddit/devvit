@@ -7,6 +7,7 @@ import type {
 } from '@devvit/protos';
 import { type SetCustomPostPreviewRequest_BodyType } from '@devvit/protos';
 import { Block, UIResponse } from '@devvit/protos';
+import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
@@ -941,6 +942,13 @@ export class Post {
   }
 
   async delete(): Promise<void> {
+    assertNonNull(this.#metadata);
+    const appUsername = this.#metadata?.[Header.App]?.values[0];
+    if (appUsername !== this.#authorName) {
+      throw new Error(
+        `App '${appUsername}' is not the author of Post ${this.id}, delete not allowed.`
+      );
+    }
     return Post.delete(this.id, this.#metadata);
   }
 
