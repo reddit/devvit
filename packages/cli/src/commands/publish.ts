@@ -9,6 +9,7 @@ import {
   InstallationType,
   VersionVisibility,
 } from '@devvit/protos/community.js';
+import { AppPublishRequestStatus } from '@devvit/protos/types/devvit/dev_portal/app_publish_request/app_publish_request.js';
 import { PaymentsVerificationStatus } from '@devvit/protos/types/devvit/dev_portal/payments/payments_verification.js';
 import { appCapabilitiesFromLinkedBundle } from '@devvit/shared-types/AppCapabilities.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
@@ -66,6 +67,10 @@ export default class Publish extends ProjectCommand {
       description: 'Submit the app for review to be published publicly',
       required: false,
     }),
+    withdraw: Flags.boolean({
+      description: 'Withdraw the publish request (if it exists and is pending)',
+      required: false,
+    }),
   } as const;
 
   readonly #appClient = createAppClient();
@@ -99,8 +104,19 @@ export default class Publish extends ProjectCommand {
       );
     }
 
-    const appVersion = await getVersionByNumber(inferredParams.version, appInfo?.versions);
+    const appVersion = getVersionByNumber(inferredParams.version, appInfo.versions);
     ux.action.stop();
+
+    if (flags.withdraw) {
+      if (flags.public) {
+        this.error(
+          'Do not use --public and --withdraw together - if you want to withdraw a public request, just use --withdraw by itself.'
+        );
+      }
+      // If we're just withdrawing the request, do that & exit early
+      await this.#withdrawRequest(appVersion.id);
+      return;
+    }
 
     const devvitVersion = new DevvitVersion(
       appVersion.majorVersion,
@@ -109,9 +125,6 @@ export default class Publish extends ProjectCommand {
       appVersion.prereleaseVersion
     );
 
-    if (!appInfo.app) {
-      this.error('There was an error retrieving the app info.');
-    }
     const appDetailsUrl = `${DEVVIT_PORTAL_URL}/apps/${appInfo.app.slug}`;
 
     const resp = await this.#appVersionClient.GetAppVersionBundle({
@@ -135,7 +148,7 @@ export default class Publish extends ProjectCommand {
     }
 
     let visibility: AppPublishRequestVisibility = AppPublishRequestVisibility.UNLISTED;
-    if (flags['public']) {
+    if (flags.public) {
       visibility = AppPublishRequestVisibility.PUBLIC;
     }
 
@@ -274,5 +287,22 @@ export default class Publish extends ProjectCommand {
       }
       this.error(StringUtil.caughtToString(err, 'message'));
     }
+  }
+
+  async #withdrawRequest(appVersionId: string) {
+    ux.action.start('Withdrawing publish request');
+    try {
+      await this.#appPRClient.Update({
+        appVersionId,
+        status: AppPublishRequestStatus.WITHDRAWN,
+      });
+    } catch (err) {
+      ux.action.stop('Error');
+      if (err && typeof err === 'object' && 'code' in err && err.code === 'not_found') {
+        this.error('No publish request found to withdraw!');
+      }
+      this.error(StringUtil.caughtToString(err, 'message'));
+    }
+    ux.action.stop();
   }
 }
