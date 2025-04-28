@@ -15,6 +15,7 @@ import { default as glob } from 'tiny-glob';
 import { AssetUploader } from './AssetUploader.js';
 import { createAppVersionClient } from './clientGenerators.js';
 import type { ProjectCommand } from './commands/ProjectCommand.js';
+import { decodeAsUtf8, decodeAsUtf16 } from './encodings.js';
 import { getPaymentsConfig, type JSONProduct, readProducts } from './payments/paymentsConfig.js';
 import { handleTwirpError } from './twirp-error-handler.js';
 
@@ -98,8 +99,6 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
    * Get the 'about' text from a README.md file
    */
   async #getReadmeContent(): Promise<string> {
-    let about = '';
-
     const readmeFileName = 'README.md';
     const readmePath = (await glob('*.md', { cwd: this.#cmd.projectRoot })).filter(
       (file) => file.toLowerCase() === readmeFileName.toLowerCase()
@@ -112,13 +111,27 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
     }
 
     if (readmePath.length >= 1) {
-      about = await fsp.readFile(path.join(this.#cmd.projectRoot, readmePath[0]), 'utf-8');
+      const aboutBuffer = await fsp.readFile(path.join(this.#cmd.projectRoot, readmePath[0]));
+      const utf8String = decodeAsUtf8(aboutBuffer);
+      if (utf8String) {
+        // we're UTF-8, no worries
+        return utf8String;
+      }
+
+      // Check if we're UTF-16
+      const utf16String = decodeAsUtf16(aboutBuffer);
+      if (utf16String) {
+        return utf16String;
+      }
+
+      this.#cmd.error(
+        `${readmePath[0]} is not UTF-8 or UTF-16 encoded. Please convert it to UTF-8 or UTF-16.`
+      );
     } else {
       this.#cmd.log(
         `Couldn't find ${readmeFileName}, so not setting an 'about' for this app version (you can update this later)`
       );
+      return '';
     }
-
-    return about;
   }
 }
