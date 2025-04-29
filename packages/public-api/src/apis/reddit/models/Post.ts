@@ -5,7 +5,10 @@ import type {
   SubmitRequest,
   SubmitResponse,
 } from '@devvit/protos';
-import { type SetCustomPostPreviewRequest_BodyType } from '@devvit/protos';
+import type {
+  GalleryMediaStatus as GalleryMediaStatusProto,
+  SetCustomPostPreviewRequest_BodyType,
+} from '@devvit/protos';
 import { Block, UIResponse } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
@@ -384,10 +387,21 @@ export type EnrichedThumbnail = {
   };
 };
 
+export const GalleryMediaStatus = {
+  UNKNOWN: 0,
+  VALID: 1,
+  FAILED: 2,
+} as const;
+
+export type GalleryMediaStatus =
+  (typeof GalleryMediaStatusProto)[keyof typeof GalleryMediaStatusProto];
+
 /**
  * Represents media that the post may contain.
  */
 export type GalleryMedia = {
+  /** Status of the media. Media that were successfully uplaoded will have GalleryMediaStatus.VALID status */
+  status: GalleryMediaStatus;
   url: string;
   height: number;
   width: number;
@@ -543,6 +557,7 @@ export class Post {
 
     if (data.gallery) {
       this.#gallery = data.gallery.map((item) => ({
+        status: item.status,
         url: item.url,
         height: item.height,
         width: item.width,

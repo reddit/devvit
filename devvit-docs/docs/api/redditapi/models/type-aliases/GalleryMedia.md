@@ -18,6 +18,16 @@ Represents media that the post may contain.
 
 ---
 
+<a id="status"></a>
+
+### status
+
+> **status**: [`GalleryMediaStatus`](GalleryMediaStatus.md)
+
+Status of the media. Media that were successfully uplaoded will have GalleryMediaStatus.VALID status
+
+---
+
 <a id="url"></a>
 
 ### url

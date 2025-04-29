@@ -62,7 +62,7 @@
   },
   "filesize": {
     "dist/public-api.min.js": {
-      "gzip": "61 KB",
+      "gzip": "62 KB",
       "none": "217 KB"
     }
   },

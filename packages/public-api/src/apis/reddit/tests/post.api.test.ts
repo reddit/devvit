@@ -7,7 +7,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { Devvit } from '../../../devvit/Devvit.js';
 import { RunAs } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
-import { Post } from '../models/Post.js';
+import { GalleryMediaStatus, Post } from '../models/Post.js';
 import { createPreview } from './utils/createTestPreview.js';
 import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
 
@@ -71,6 +71,7 @@ describe('Post API', () => {
         url: 'https://i.redd.it/12345678.jpg',
         width: 1080,
         height: 1080,
+        status: GalleryMediaStatus.VALID,
       },
     ],
   };
