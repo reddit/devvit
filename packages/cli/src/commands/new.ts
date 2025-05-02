@@ -20,7 +20,7 @@ import semver from 'semver';
 
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import Cutter from '../util/Cutter.js';
-import { generateDevvitConfig } from '../util/devvitConfig.js';
+import { generateDevvitConfig } from '../util/devvit-config.js';
 import { Git } from '../util/Git.js';
 import { sendEvent } from '../util/metrics.js';
 import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTemplateResolver.js';

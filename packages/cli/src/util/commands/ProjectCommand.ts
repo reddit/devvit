@@ -1,5 +1,5 @@
-import type { DevvitConfig } from '../devvitConfig.js';
-import { readDevvitConfig } from '../devvitConfig.js';
+import type { DevvitConfig } from '../devvit-config.js';
+import { readDevvitConfig } from '../devvit-config.js';
 import { type PackageJSON, readPackageJSON } from '../package-managers/package-util.js';
 import { findProjectRoot } from '../project-util.js';
 import { DevvitCommand } from './DevvitCommand.js';

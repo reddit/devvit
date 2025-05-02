@@ -10,7 +10,7 @@ import { Bundler } from '../../util/Bundler.js';
 import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { distDirFilename } from '../../util/config.js';
-import { readDevvitConfig } from '../../util/devvitConfig.js';
+import { readDevvitConfig } from '../../util/devvit-config.js';
 import { getPaymentsConfig, readProducts } from '../../util/payments/paymentsConfig.js';
 
 export default class BundleActor extends ProjectCommand {

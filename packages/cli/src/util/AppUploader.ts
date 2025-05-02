@@ -11,7 +11,7 @@ import { getCaptcha } from './captcha.js';
 import { checkAppNameAvailability } from './checkAppNameAvailability.js';
 import { createAppClient } from './clientGenerators.js';
 import type { ProjectCommand } from './commands/ProjectCommand.js';
-import { type DevvitConfig, updateDevvitConfig } from './devvitConfig.js';
+import { type DevvitConfig, updateDevvitConfig } from './devvit-config.js';
 import { readPackageJSON } from './package-managers/package-util.js';
 
 export class AppUploader {

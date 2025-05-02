@@ -42,7 +42,7 @@ import {
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
-import { updateDevvitConfig } from '../util/devvitConfig.js';
+import { updateDevvitConfig } from '../util/devvit-config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import Logs from './logs.js';
 

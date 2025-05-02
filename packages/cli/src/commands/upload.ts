@@ -23,7 +23,7 @@ import { Bundler } from '../util/Bundler.js';
 import { createAppClient } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
-import { updateDevvitConfig } from '../util/devvitConfig.js';
+import { updateDevvitConfig } from '../util/devvit-config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
 

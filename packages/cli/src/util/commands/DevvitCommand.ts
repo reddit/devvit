@@ -8,7 +8,7 @@ import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { getAccessToken } from '../auth.js';
 import { createDeveloperAccountClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
-import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../devvitConfig.js';
+import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../devvit-config.js';
 import { findProjectRoot } from '../project-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 
