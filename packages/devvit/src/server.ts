@@ -1,1 +1,1 @@
-export * from '@devvit/webbit-server';
+export * from '@devvit/server';
