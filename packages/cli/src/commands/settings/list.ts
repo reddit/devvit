@@ -16,11 +16,10 @@ export default class ListAppSettings extends ProjectCommand {
 
   override async run(): Promise<void> {
     const projectConfig = await this.getProjectConfig();
-    const appName = projectConfig.slug ?? projectConfig.name;
     ux.action.start('Fetching app setting keys');
     try {
       const appInfo = await getAppBySlug(this.#appService, {
-        slug: appName,
+        slug: projectConfig.name,
         hidePrereleaseVersions: true,
         limit: 0,
       });

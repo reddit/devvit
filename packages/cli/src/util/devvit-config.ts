@@ -1,105 +1,64 @@
 import { writeFile } from 'node:fs/promises';
 
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { JSONValue } from '@devvit/shared-types/json.js';
 import path from 'path';
 
-import { validateConfig } from '../vendor/@reddit/json-config/0.4.2/index.js';
-import * as v from '../vendor/@reddit/json-config/0.4.2/validators.js';
 import { isFile } from './file-util.js';
 import { dumpJsonToYaml, readYamlToJson } from './files.js';
 
-export const DEVVIT_CONFIG_FILE = 'devvit.yaml';
-
-function getConfigFilepath(projectPath: string, configFile: string): string {
-  return path.join(projectPath, configFile);
-}
+export const DEVVIT_CONFIG_FILE: string = 'devvit.yaml';
 
 export type DevvitConfig = {
-  // name of the project
+  /** Lowercase app name and Community app slug. */
   name: string;
-  // unique identifier of the project
-  slug?: string;
-  // DevvitVersion
+  /** DevvitVersion string. Eg, 1.2.3 or 1.2.3.4. */
   version: string;
-};
-
-export const DEVVIT_CONFIG_SCHEMA = {
-  name: v.string,
-  slug: v.optional(v.string, undefined),
-  version: v.string,
 };
 
 export async function readDevvitConfig(
   projectPath: string,
   configFileName: string
 ): Promise<DevvitConfig> {
-  const configFilePath = getConfigFilepath(projectPath, configFileName);
-  if (!(await isFile(configFilePath))) {
-    throw new Error(`Devvit.yaml does not exist`);
-  }
-  const configJSON = await readYamlToJson(configFilePath);
-
-  try {
-    const validatedConfig = validateConfig(configJSON, DEVVIT_CONFIG_SCHEMA);
-
-    return {
-      ...validatedConfig,
-      slug: validatedConfig.slug?.toLowerCase(),
-      name: validatedConfig.name.toLowerCase(),
-    };
-  } catch (err) {
-    throw new Error(`Invalid Devvit.yaml config format. ${err}`);
-  }
+  const filename = path.join(projectPath, configFileName);
+  if (!(await isFile(filename))) throw new Error(`${filename} does not exist`);
+  return _parseConfig(await readYamlToJson(filename));
 }
 
 export async function updateDevvitConfig(
   projectPath: string,
   configFileName: string,
-  updates: Partial<DevvitConfig>
+  updates: Partial<Readonly<DevvitConfig>>
 ): Promise<void> {
   const config = await readDevvitConfig(projectPath, configFileName);
   if (updates.name != null) {
     config.name = updates.name.toLowerCase();
   }
-
   if (updates.version != null) {
     config.version = updates.version;
   }
 
-  if (updates.slug != null) {
-    config.slug = updates.slug.toLowerCase();
-  }
-
-  validateConfig(config as unknown as JSONObject, DEVVIT_CONFIG_SCHEMA);
-
-  const newConfigYaml = dumpJsonToYaml(config);
-  await writeFile(getConfigFilepath(projectPath, configFileName), newConfigYaml);
+  await writeDevvitConfig(projectPath, configFileName, config);
 }
 
-export async function generateDevvitConfig(
+export async function writeDevvitConfig(
   projectPath: string,
   configFile: string,
-  config: DevvitConfig
+  config: Readonly<DevvitConfig>
 ): Promise<void> {
-  const configFilePath = getConfigFilepath(projectPath, configFile);
-
-  const oldConfigExists = await isFile(configFilePath);
-  const oldConfig: DevvitConfig = oldConfigExists ? await readYamlToJson(configFilePath) : {};
-
-  const newConfigJSON = merge(oldConfig, config) as unknown as JSONObject;
-  validateConfig(newConfigJSON, DEVVIT_CONFIG_SCHEMA);
-
-  const newConfigYaml = dumpJsonToYaml(newConfigJSON);
-
-  await writeFile(configFilePath, newConfigYaml);
+  await writeFile(path.join(projectPath, configFile), dumpJsonToYaml(config));
 }
 
-/**
- * @description utility function that shallow merges two objects. rhs will overwrite lhs obj whenever keys clash upon shallow comparison
- */
-function merge<L, R>(lhsObj: Readonly<L>, rhsObj: Readonly<R>): L & R {
-  return {
-    ...lhsObj,
-    ...rhsObj,
-  };
+/** @internal */
+export function _parseConfig(json: JSONValue): DevvitConfig {
+  if (json == null || typeof json !== 'object' || Array.isArray(json))
+    throw Error(`${DEVVIT_CONFIG_FILE} must be an object \`{"name": "foo", ...}\`.`);
+
+  if (typeof json.name !== 'string')
+    throw Error(`${DEVVIT_CONFIG_FILE} must have \`name\` property.`);
+
+  if (typeof json.version !== 'string')
+    throw Error(`${DEVVIT_CONFIG_FILE} must have \`version\` property.`);
+
+  // Include original data in case it's a superset.
+  return { ...json, name: json.name.toLowerCase(), version: json.version };
 }

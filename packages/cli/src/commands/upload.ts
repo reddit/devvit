@@ -106,17 +106,10 @@ export default class Upload extends ProjectCommand {
 
     await this.checkDeveloperAccount();
 
-    // for backwards compatibility, we'll use the app's name as the slug to
-    // check if it already exists
-    const appName = projectConfig.slug ?? projectConfig.name;
-    if (appName == null) {
-      this.error("The app's devvit.yaml is misconfigured. It must have at least a 'name' field.");
-    }
-
     let appInfo: FullAppInfo | undefined;
     try {
       appInfo = await getAppBySlug(this.#appClient, {
-        slug: appName,
+        slug: projectConfig.name,
         hidePrereleaseVersions: true,
         limit: 1, // fetched version limit; we only need the latest one
       });
@@ -165,7 +158,7 @@ export default class Upload extends ProjectCommand {
     }
 
     if (!appInfo?.app) {
-      this.error(`App ${appName} is not found`);
+      this.error(`App ${projectConfig.name} is not found`);
     }
 
     // Now, create a new version, probably prompting for the new version number

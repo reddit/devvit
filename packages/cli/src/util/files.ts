@@ -1,20 +1,18 @@
 import fsp, { readFile } from 'node:fs/promises';
 
+import type { JSONValue } from '@devvit/public-api';
 import yaml from 'js-yaml';
 
-// TODO: remove use of any below
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function dumpJsonToYaml(obj: { [key: string]: any }): string {
-  return yaml.dump(obj);
+export function dumpJsonToYaml(val: JSONValue): string {
+  return yaml.dump(val);
 }
 
-// TODO: remove use of any below
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function readYamlToJson(filePath: string): Promise<any> {
+export async function readYamlToJson(filePath: string): Promise<JSONValue> {
   const rawFileContent = await readFile(filePath, { encoding: 'utf8' });
-  return yaml.load(rawFileContent);
+  return (yaml.load(rawFileContent) ?? null) as JSONValue;
 }
 
+// to-do: move to file-util and rename isDir(). Rename this file to yaml-util.
 export async function dirExists(dirPath: string): Promise<boolean> {
   try {
     const stat = await fsp.stat(dirPath);

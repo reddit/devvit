@@ -88,7 +88,6 @@
     "@reddit/eslint-plugin-i18n-shreddit": "0.1.0",
     "@reddit/eslint-plugin-no-unsafe": "1.0.0",
     "@reddit/faceplate-docs": "0.4.12",
-    "@reddit/json-config": "0.4.2",
     "@sentry/cli": "2.11.0",
     "check-dependency-version-consistency": "3.0.3",
     "eslint": "9.11.1",

@@ -39,11 +39,10 @@ export default class SetAppSettings extends ProjectCommand {
     const settingsValue = await this.#promptSettingValue(settingsKey);
 
     const projectConfig = await this.getProjectConfig();
-    const appName = projectConfig.slug ?? projectConfig.name;
     ux.action.start('Updating app settings');
     try {
       const appInfo = await getAppBySlug(this.#appService, {
-        slug: appName,
+        slug: projectConfig.name,
         hidePrereleaseVersions: true,
         limit: 0,
       });

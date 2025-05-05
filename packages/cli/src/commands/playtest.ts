@@ -192,7 +192,7 @@ export default class Playtest extends ProjectCommand {
     await this.checkDeveloperAccount();
 
     const projectConfig = await this.getProjectConfig();
-    this.#appName = projectConfig.slug ?? projectConfig.name;
+    this.#appName = projectConfig.name;
 
     if (flags.connect) {
       this.#server = new PlaytestServer(

@@ -20,7 +20,7 @@ import semver from 'semver';
 
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import Cutter from '../util/Cutter.js';
-import { generateDevvitConfig } from '../util/devvit-config.js';
+import { writeDevvitConfig } from '../util/devvit-config.js';
 import { Git } from '../util/Git.js';
 import { sendEvent } from '../util/metrics.js';
 import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTemplateResolver.js';
@@ -47,6 +47,7 @@ type CreateAppFlags = {
 };
 
 type CreateAppParams = {
+  /** Lowercase app name and Community app slug. */
   appName: string;
   /** Static project template name like custom-post. */
   templateName: string;
@@ -174,7 +175,7 @@ export default class New extends DevvitCommand {
     await this.#copyProjectTemplate();
 
     // Make devvit.yaml (we put in the app name as is without a unique suffix)
-    await generateDevvitConfig(this.#projectPath, this.configFileName, {
+    await writeDevvitConfig(this.#projectPath, this.configFileName, {
       name: this.#createAppParams.appName,
       version: DevvitVersion.fromString('0.0.0').toString(),
     });
