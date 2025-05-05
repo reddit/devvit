@@ -39,12 +39,6 @@ export async function readDevvitConfig(
   }
   const configJSON = await readYamlToJson(configFilePath);
 
-  // delete packageManager from config if it exists
-  if (configJSON.packageManager != null) {
-    delete configJSON.packageManager;
-    await writeFile(configFilePath, dumpJsonToYaml(configJSON));
-  }
-
   try {
     const validatedConfig = validateConfig(configJSON, DEVVIT_CONFIG_SCHEMA);
 
