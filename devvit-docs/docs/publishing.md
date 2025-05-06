@@ -54,6 +54,12 @@ During the app review, the Developer Platform team will look at your code, read 
 
 If you are submitting a new version of a previously approved app, review will typically go very quickly.
 
+## App versions
+
+Use the app version panel to track all the versions of your app. The panel displays the most recent versions of your app, and you can download a complete list of published versions via CSV.
+
+![app version panel](./assets/app_versions_panel.png)
+
 ## Changing app visibility
 
 After your app has been approved, you may want to change the visibility status.
