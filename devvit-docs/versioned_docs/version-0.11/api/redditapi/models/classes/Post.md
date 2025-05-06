@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.13-dev**](../../README.md)
+[**@devvit/public-api v0.11.14-dev**](../../README.md)
 
 ---
 
@@ -185,6 +185,22 @@
 ##### Returns
 
 `undefined` \| [`LinkFlair`](../type-aliases/LinkFlair.md)
+
+---
+
+<a id="gallery"></a>
+
+### gallery
+
+#### Get Signature
+
+> **get** **gallery**(): [`GalleryMedia`](../type-aliases/GalleryMedia.md)[]
+
+Get the media in the post. Empty if the post doesn't have any media.
+
+##### Returns
+
+[`GalleryMedia`](../type-aliases/GalleryMedia.md)[]
 
 ---
 

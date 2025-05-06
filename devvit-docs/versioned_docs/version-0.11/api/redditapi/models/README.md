@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.13-dev**](../README.md)
+[**@devvit/public-api v0.11.14-dev**](../README.md)
 
 ---
 
@@ -80,6 +80,8 @@
 - [FlairBackgroundColor](type-aliases/FlairBackgroundColor.md)
 - [FlairSettings](type-aliases/FlairSettings.md)
 - [FlairTextColor](type-aliases/FlairTextColor.md)
+- [GalleryMedia](type-aliases/GalleryMedia.md)
+- [GalleryMediaStatus](type-aliases/GalleryMediaStatus.md)
 - [GetCommentsByUserOptions](type-aliases/GetCommentsByUserOptions.md)
 - [GetCommentsOptions](type-aliases/GetCommentsOptions.md)
 - [GetConversationResponse](type-aliases/GetConversationResponse.md)
@@ -158,6 +160,10 @@
 - [Visibility](type-aliases/Visibility.md)
 - [WikiEditMode](type-aliases/WikiEditMode.md)
 - [WithUserData](type-aliases/WithUserData.md)
+
+## Variables
+
+- [GalleryMediaStatus](variables/GalleryMediaStatus.md)
 
 ## Functions
 

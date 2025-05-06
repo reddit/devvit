@@ -108,11 +108,37 @@ If you don’t provide an image, the default Reddit product image is used.
 
 ### Purchase buttons (required)
 
+#### Blocks
+
+The `ProductButton` is a Devvit blocks component designed to render a product with a purchase button. It can be customized to match your app's look and feel.
+
+**Usage:**
+
+```tsx
+<ProductButton
+  showIcon
+  product={product}
+  onPress={(p) => payments.purchase(p.sku)}
+  appearance="tile"
+/>
+```
+
+##### `ProductButtonProps`
+
+| **Prop Name**      | **Type**                                        | **Description**                                                                      |
+| ------------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `product`          | `Product`                                       | The product object containing details such as `sku`, `price`, and `metadata`.        |
+| `onPress`          | `(product: Product) => void`                    | Callback function triggered when the button is pressed.                              |
+| `showIcon`         | `boolean`                                       | Determines whether the product icon is displayed on the button. Defaults to `false`. |
+| `appearance`       | `'compact'` &#124; `'detailed'` &#124; `'tile'` | Defines the visual style of the button. Defaults to `compact`.                       |
+| `buttonAppearance` | `string`                                        | Optional [button appearance](../blocks/button#appearance).                           |
+| `textColor`        | `string`                                        | Optional [text color](../blocks/text#color).                                         |
+
+#### Webviews
+
 Use Reddit’s primary, secondary, or bordered button component and gold icon in one of the following formats:
 
 ![default image](../assets/payments_button_purchase.png)
-
-### Product components
 
 Use a consistent and clear product component to display paid goods or services to your users. Product components can be customized to fit your app, like the examples below.
 

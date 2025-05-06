@@ -4,6 +4,29 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.14: App versions panel, gallery image support, and some smaller fixes
+
+**Release Date: May 6, 2025**
+
+We’ve released a new [app version panel](./publishing.md#app-versions) that lets you track all the versions of your app, so you can see your app’s status, visibility, and number of installations for each app version. The panel displays the most recent versions of your app, and you can download a complete list of published versions via CSV.
+
+**Other fixes**  
+This release also includes some small but mighty fixes:
+
+- Public API
+
+  - Added support for gallery media on Post objects
+  - Fixed the issue where `Post.delete()` was not throwing an error on an unsuccessful delete call
+
+- Settings
+
+  - Added the ability to define and aggregate multiple addSettings calls
+
+- CLI
+  - Fixed issue with redirect links containing \* for Windows users
+  - Added a `--withdraw` flag to `devvit publish` that allows you to withdraw an app you previously published
+  - Added handling for UTF-16 encoded READMEs, and if a README’s encoding isn’t understood at upload time, the CLI will let you know
+
 ## Devvit 0.11.13: User actions API, developer email notifications, and a new way to get support for your app
 
 **Release Date: Apr 21, 2025**

@@ -4,7 +4,7 @@ You can optimize your app to make it run faster, use resources more efficiently,
 
 ## Always use the latest public-api
 
-To update your app to use the latest version of the public API:
+You can check your current Devvit version on the [apps version panel](./publishing.md#app-versions). To update your app to use the latest version of the public API:
 
 1. Run `npm install -g devvit` to update the Devvit CLI globally.
 

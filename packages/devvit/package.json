@@ -1,6 +1,6 @@
 {
   "name": "devvit",
-  "version": "0.11.12",
+  "version": "0.11.13",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -48,13 +48,13 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/cli": "0.11.12",
-    "@devvit/client": "0.11.12",
-    "@devvit/public-api": "0.11.12",
-    "@devvit/server": "0.11.12"
+    "@devvit/cli": "0.11.13",
+    "@devvit/client": "0.11.13",
+    "@devvit/public-api": "0.11.13",
+    "@devvit/server": "0.11.13"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.11.12",
+    "@devvit/tsconfig": "0.11.13",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
