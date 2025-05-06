@@ -172,14 +172,7 @@ export class AssetUploader {
     ux.action.start(`Checking for new WebView assets to upload`);
     const assetMap = await this.#uploadNewAssets(assets, true);
     ux.action.stop(`Found ${assets.length} new WebView asset${assets.length === 1 ? '' : 's'}.`);
-
-    // only return the html files for the WebView assets
-    return Object.keys(assetMap).reduce<AssetMap>((map, assetPath) => {
-      if (assetPath.match(/\.htm(l)?$/)) {
-        map[assetPath] = assetMap[assetPath];
-      }
-      return map;
-    }, {});
+    return assetMap;
   }
 
   async #uploadNewAssets(
