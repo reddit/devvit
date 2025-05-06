@@ -166,7 +166,7 @@
 
 ##### input
 
-`Uint8Array` | `Reader`
+`Uint8Array`\<`ArrayBufferLike`\> | `Reader`
 
 ##### length?
 

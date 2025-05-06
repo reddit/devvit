@@ -80,3 +80,6 @@ yarn.lock # Don't commit this - we'll generate it ourselves.
 
 __e2e__/playwright/tmp/
 __e2e__/playwright/test-results/
+
+# Ignore all build artifacts
+tsconfig.tsbuildinfo
