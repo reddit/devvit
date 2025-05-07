@@ -13,10 +13,10 @@ import type {
 } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
-import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/index.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
-import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
+import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/Product.js';
 import { filterToReservedDevvitMetadataKeys } from '@devvit/shared-types/reservedDevvitMetadataKeys.js';
+import { validateProductsJSON } from '@devvit/shared-types/schemas/productsSchemaJSONValidator.js';
 import { imageSize } from 'image-size';
 import type { ISizeCalculationResult } from 'image-size/dist/types/interface.js';
 

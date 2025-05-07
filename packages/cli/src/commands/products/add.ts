@@ -1,5 +1,6 @@
 import { readdir, writeFile } from 'node:fs/promises';
 
+import { PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import { AccountingType } from '@devvit/shared-types/payments/Product.js';
 import { Args, Flags, ux } from '@oclif/core';
 import chalk from 'chalk';
@@ -9,7 +10,7 @@ import * as path from 'path';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { type JSONProduct, readProducts } from '../../util/payments/paymentsConfig.js';
 
-// TODO: Import these from the products.schema.json file
+// TODO: Import these from the products.json schema file.
 const ALLOWED_PRICES = [5, 25, 50, 100, 150, 250, 500, 1000, 2500];
 type ValidAccountingType =
   | AccountingType.CONSUMABLE
@@ -93,7 +94,7 @@ export default class AddProduct extends ProjectCommand {
   } as const;
 
   get productsFilePath(): string {
-    return path.join(this.projectRoot, 'src', 'products.json');
+    return path.join(this.projectRoot, 'src', PRODUCTS_JSON_FILE);
   }
 
   async run() {
@@ -136,7 +137,7 @@ export default class AddProduct extends ProjectCommand {
         `Go to ${chalk.underline('https://developers.reddit.com/docs/payments/payments_add#complete-the-payment-flow')} to integrate the product into your app.`
       );
     } catch (error) {
-      this.error(`Failed to write products.json:\n${error}`);
+      this.error(`Failed to write ${PRODUCTS_JSON_FILE}:\n${error}`);
     }
   }
 
@@ -224,14 +225,16 @@ export default class AddProduct extends ProjectCommand {
       products: [],
     };
 
-    ux.action.start('Reading products.json');
+    ux.action.start(`Reading ${PRODUCTS_JSON_FILE}`);
     const products = await readProducts(this.projectRoot);
 
     if (products) {
-      ux.action.stop(`products.json read successfully. Found ${products.length} products.`);
+      ux.action.stop(
+        `${PRODUCTS_JSON_FILE} json read successfully. Found ${products.length} products.`
+      );
       productsJSON.products = products;
     } else {
-      ux.action.stop('No products.json found. A new one will be created.');
+      ux.action.stop(`No ${PRODUCTS_JSON_FILE} found. A new one will be created.`);
     }
 
     return productsJSON;

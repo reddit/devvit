@@ -7,6 +7,7 @@ import {
   InstallationType,
   type VersionVisibility,
 } from '@devvit/protos/community.js';
+import { PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { ux } from '@oclif/core';
@@ -51,7 +52,7 @@ export class AppVersionUploader {
       products = await readProducts(this.#cmd.projectRoot);
     } catch (err) {
       throw new Error(
-        `An error occurred when reading and validating products.json: 
+        `An error occurred when reading and validating ${PRODUCTS_JSON_FILE}: 
 
   ${StringUtil.caughtToString(err, 'message')}
   
