@@ -1,4 +1,4 @@
-import { exec as _exec } from 'node:child_process';
+import { exec as _exec, execFile as _execFile } from 'node:child_process';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
@@ -35,7 +35,7 @@ export default class Cutter {
 
     const cmd = path.join(target, 'init.sh');
     if (fs.existsSync(cmd)) {
-      const { stderr } = await exec(`bash ${cmd}`);
+      const { stderr } = await util.promisify(_execFile)('bash', [cmd]);
       if (stderr.length) {
         throw new Error(stderr);
       }
