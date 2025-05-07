@@ -23,6 +23,7 @@ import type {
   MenuItem,
   MultiTriggerDefinition,
   OnTriggerRequest,
+  PluginSettings,
   ScheduledJobHandler,
   ScheduledJobType,
   SettingsFormField,
@@ -112,6 +113,7 @@ export class Devvit extends Actor {
     TriggerOnEventHandler<OnTriggerRequest>[]
   > = new Map();
   static #webViewAssets: AssetMap = {};
+  static #requestedFetchDomains: string[] = [];
 
   static #additionallyProvides: protos.Definition[] = [];
 
@@ -135,7 +137,16 @@ export class Devvit extends Actor {
   static configure(config: Configuration): void {
     this.#config = { ...this.#config, ...config };
 
-    if (pluginIsEnabled(config.http)) {
+    const httpConfig = config.http;
+    const hasRequestedDomains =
+      typeof httpConfig === 'object' && 'requestedFetchDomains' in httpConfig;
+    const pluginSettings: PluginSettings | boolean | undefined = hasRequestedDomains
+      ? { enabled: true }
+      : httpConfig;
+    if (pluginIsEnabled(pluginSettings)) {
+      if (hasRequestedDomains) {
+        this.#requestedFetchDomains = httpConfig.requestedFetchDomains;
+      }
       this.use(protos.HTTPDefinition);
     }
 
@@ -698,6 +709,11 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
+  static get requestedHosts(): string[] {
+    return this.#requestedFetchDomains;
+  }
+
+  /** @internal */
   constructor(config: Config) {
     super(config);
 
@@ -744,6 +760,10 @@ export class Devvit extends Actor {
 
     for (const provides of Devvit.#additionallyProvides) {
       config.provides(provides);
+    }
+
+    if (Devvit.#requestedFetchDomains.length > 0) {
+      config.addPermissions({ requestedFetchDomains: Devvit.#requestedFetchDomains });
     }
   }
 }

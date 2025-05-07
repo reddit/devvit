@@ -534,7 +534,7 @@ export default class Playtest extends ProjectCommand {
 
 export function modifyBundleVersions(bundles: Bundle[], version: string): void {
   for (const bundle of bundles) {
-    bundle.dependencies ??= { hostname: '', provides: [], uses: [] };
+    bundle.dependencies ??= { hostname: '', provides: [], uses: [], permissions: [] };
     bundle.dependencies.actor ??= { name: '', owner: '', version: '' };
     bundle.dependencies.actor.version = version.toString();
   }

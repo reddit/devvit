@@ -45,6 +45,7 @@ const MOCK_BUNDLE: Bundle = {
         partitionsBy: [],
       },
     ],
+    permissions: [],
     uses: [],
   },
   assetIds: {},

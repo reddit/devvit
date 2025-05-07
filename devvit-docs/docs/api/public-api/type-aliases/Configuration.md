@@ -12,7 +12,7 @@
 
 ### http?
 
-> `optional` **http**: [`PluginSettings`](PluginSettings.md) \| `boolean`
+> `optional` **http**: [`PluginSettings`](PluginSettings.md) \| `boolean` \| \{ `requestedFetchDomains`: `string`[]; \}
 
 Allows your app to use the HTTP/Fetch API
 
