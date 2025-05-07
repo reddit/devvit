@@ -1,10 +1,10 @@
 # Getting started with {{name}}
 
-Your project has been created using a Devvit template. Follow the [tutorial to finsih updating your app](https://developers.reddit.com/docs/intro-to-devvit).
+Your project has been created using a Devvit template. Follow the [tutorial to finish updating your app](https://developers.reddit.com/docs/intro-to-devvit).
 
 ## Capabilities used
 
-This app uses a number of Devvit capability:
+This app uses a number of Devvit capabilities:
 
 - Custom experiences
 - HTTP Fetch
