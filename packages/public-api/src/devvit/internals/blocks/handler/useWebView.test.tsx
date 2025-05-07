@@ -2,7 +2,7 @@
 /** @jsxFrag Devvit.Fragment */
 import { WebViewVisibility } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
-import { describe, expect, test } from 'vitest';
+import { beforeAll, describe, expect, test } from 'vitest';
 
 import { useWebView, type UseWebViewResult } from '../../../../index.js';
 import { Devvit } from '../../../Devvit.js';
@@ -15,6 +15,36 @@ import { useState } from './useState.js';
 type WebViewMessage = {
   type: 'initialData';
   data: { username: string; currentCounter: number };
+};
+
+const createBaseWebView = (
+  webviewHookRef: HookRef,
+  buttonRef: HookRef,
+  onMessage = () => {},
+  onUnmount?: (hook: UseWebViewResult) => void
+) => {
+  const BaseWebView: Devvit.BlockComponent = (_props: JSX.Props) => {
+    const webViewHook = captureHookRef(
+      useWebView({
+        onMessage,
+        onUnmount,
+      }),
+      webviewHookRef
+    );
+
+    return (
+      <vstack>
+        <button
+          onPress={captureHookRef(() => {
+            webViewHook.mount();
+          }, buttonRef)}
+        >
+          Full screen
+        </button>
+      </vstack>
+    );
+  };
+  return BaseWebView;
 };
 
 const ASSET_1 = 'index.html';
@@ -33,26 +63,10 @@ describe('useWebView', () => {
   test('getUrl defaults to index.html when omitted', async () => {
     const webviewHookRef: HookRef = {};
     const showFullScreenWebviewButtonRef: HookRef = {};
-    const BaseWebView: Devvit.BlockComponent = (_props: JSX.Props) => {
-      const webViewHook = captureHookRef(
-        useWebView({
-          onMessage: () => {},
-        }),
-        webviewHookRef
-      );
-
-      return (
-        <vstack>
-          <button
-            onPress={captureHookRef(() => {
-              webViewHook.mount();
-            }, showFullScreenWebviewButtonRef)}
-          >
-            Full screen
-          </button>
-        </vstack>
-      );
-    };
+    const BaseWebView: Devvit.BlockComponent = createBaseWebView(
+      webviewHookRef,
+      showFullScreenWebviewButtonRef
+    );
 
     const handler = new BlocksHandler(BaseWebView);
     await handler.handle(getEmptyRequest(), mockMetadata);
@@ -316,4 +330,113 @@ describe('useWebView', () => {
 
     expect(webviewToBlocksPostMessage.effects).toStrictEqual([]);
   });
+
+  test('fullscreen webview is opened when mount() is called', async () => {
+    const webviewHookRef: HookRef = {};
+    const showFullScreenWebviewButtonRef: HookRef = {};
+    const BaseWebView = createBaseWebView(webviewHookRef, showFullScreenWebviewButtonRef);
+
+    const handler = new BlocksHandler(BaseWebView);
+    await handler.handle(getEmptyRequest(), mockMetadata);
+
+    const mountResponse = await handler.handle(
+      generatePressRequest(showFullScreenWebviewButtonRef),
+      mockMetadata
+    );
+
+    // Verify mount effect is sent
+    expect(mountResponse.effects).toHaveLength(1);
+    expect(mountResponse.effects[0]).toMatchObject({
+      type: 9,
+      webView: {
+        fullscreen: {
+          show: true,
+          url: expect.any(String),
+        },
+      },
+    });
+
+    // Simulate webview becoming visible and verify state is updated
+    const visibilityResponse = await handler.handle(
+      {
+        events: [
+          {
+            hook: webviewHookRef.id,
+            webView: {
+              fullScreen: {
+                visibility: WebViewVisibility.WEBVIEW_VISIBLE,
+              },
+            },
+          },
+        ],
+      },
+      mockMetadata
+    );
+
+    // State should be updated to reflect mounted status
+    expect(visibilityResponse.state?.[webviewHookRef.id!]).toEqual({
+      messageCount: 0,
+      isMounted: true,
+    });
+  });
+});
+
+test('mount() is a no-op when webview is already mounted', async () => {
+  const webviewHookRef: HookRef = {};
+  const showFullScreenWebviewButtonRef: HookRef = {};
+  const BaseWebView = createBaseWebView(webviewHookRef, showFullScreenWebviewButtonRef);
+
+  const handler = new BlocksHandler(BaseWebView);
+  await handler.handle(getEmptyRequest(), mockMetadata);
+
+  // Initial mount
+  const mountResponse = await handler.handle(
+    generatePressRequest(showFullScreenWebviewButtonRef),
+    mockMetadata
+  );
+
+  expect(mountResponse.effects).toStrictEqual([
+    {
+      type: 9,
+      webView: {
+        fullscreen: {
+          id: 'BaseWebView.useWebView-0',
+          show: true,
+          url: 'https://i.redd.it/index.html',
+        },
+      },
+    },
+  ]);
+
+  // Simulate webview becoming visible
+  const visibilityResponse = await handler.handle(
+    {
+      events: [
+        {
+          hook: webviewHookRef.id,
+          webView: {
+            fullScreen: {
+              visibility: WebViewVisibility.WEBVIEW_VISIBLE,
+            },
+          },
+        },
+      ],
+    },
+    mockMetadata
+  );
+
+  // Verify state is updated to reflect mounted status
+  expect(visibilityResponse.state?.[webviewHookRef.id!]).toEqual({
+    messageCount: 0,
+    isMounted: true,
+  });
+
+  // Attempt second mount - should be no-op
+  const secondMountResponse = await handler.handle(
+    generatePressRequest(showFullScreenWebviewButtonRef),
+    mockMetadata
+  );
+
+  // No effects should be sent since webview is already mounted
+  expect(secondMountResponse.effects).toHaveLength(0);
 });

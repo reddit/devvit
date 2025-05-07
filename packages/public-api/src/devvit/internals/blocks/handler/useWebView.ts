@@ -19,7 +19,9 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
     // Auto-incrementing count of the number of WebviewMessage effects called this frame.
     // Used as part of the dedup key for emitEvent to prevent messages from being dedup'd.
     messageCount: number;
-  } = { messageCount: 0 };
+    // Tracks whether the webview is currently mounted
+    isMounted: boolean;
+  } = { messageCount: 0, isMounted: false };
   #hookId: string;
   // This url is the path to the asset that will be loaded in the web view.
   // It is ensured to be a valid path prior to the effect being emitted.
@@ -27,6 +29,7 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
   #onMessage: UseWebViewOnMessage<From, To>;
   #onUnmount?: (hook: UseWebViewResult) => void | Promise<void>;
   #renderContext: RenderContext;
+  #invalidate: () => void;
 
   constructor(params: HookParams, options: UseWebViewOptions<From, To>) {
     // Default to index.html if there is no URL provided.
@@ -35,6 +38,11 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
     this.#onMessage = options.onMessage;
     this.#onUnmount = options.onUnmount;
     this.#renderContext = params.context;
+    this.#invalidate = params.invalidate;
+  }
+
+  onStateLoaded(): void {
+    // No need to remount here since the UI events will handle the state
   }
 
   /**
@@ -43,6 +51,8 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
   async onUIEvent(event: UIEvent): Promise<void> {
     if (event.webView?.fullScreen) {
       const isVisible = event.webView.fullScreen.visibility === WebViewVisibility.WEBVIEW_VISIBLE;
+      this.state.isMounted = isVisible;
+      this.#invalidate(); // Ensure the state change is persisted
       if (!isVisible && this.#onUnmount) await this.#onUnmount(this);
     } else if (event.webView?.postMessage) {
       // Handle messages sent from web view -> Devvit app
@@ -90,6 +100,12 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
    * Triggers the fullscreen effect to show the web view in fullscreen mode.
    */
   mount = (): void => {
+    // If already mounted, do nothing
+    if (this.state.isMounted) {
+      console.warn('Webview is already mounted!');
+      return;
+    }
+
     const assets = this.#renderContext?.devvitContext?.assets;
 
     // Get the public URL for the asset. Returns an empty string if the asset is not found.
