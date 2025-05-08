@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "bingo",
-  "version": "0.11.13",
+  "version": "0.11.14",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/public-api": "0.11.13",
+    "@devvit/public-api": "0.11.14",
     "tldts": "^6.0.14"
   },
   "devDependencies": {

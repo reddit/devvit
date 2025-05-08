@@ -1,12 +1,12 @@
 {
   "private": true,
   "name": "payments-web-view-template",
-  "version": "0.11.13",
+  "version": "0.11.14",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/payments": "0.11.13",
-    "@devvit/public-api": "0.11.13"
+    "@devvit/payments": "0.11.14",
+    "@devvit/public-api": "0.11.14"
   },
   "devDependencies": {
     "typescript": "5.8.3"

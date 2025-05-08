@@ -4,6 +4,12 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.15: Typescript update
+
+**Release Date: May 7, 2025**
+
+This little release updates typescript to 5.8.3 and fixes an internal issue that caused problems uploading webview assets.
+
 ## Devvit 0.11.14: App versions panel, gallery image support, and some smaller fixes
 
 **Release Date: May 6, 2025**
