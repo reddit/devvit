@@ -199,10 +199,10 @@ export abstract class DevvitCommand extends Command {
       };
     }
 
-    // Otherwise, default to the config values
+    // Otherwise, default to the config and latest.
     return {
       appName: devvitConfig.name,
-      version: devvitConfig.version,
+      version: 'latest',
     };
   }
 }

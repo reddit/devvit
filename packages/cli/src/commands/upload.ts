@@ -13,7 +13,6 @@ import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js'
 import { Flags, ux } from '@oclif/core';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import chalk from 'chalk';
-import inquirer from 'inquirer';
 
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
 import { AppUploader } from '../util/AppUploader.js';
@@ -23,7 +22,6 @@ import { Bundler } from '../util/Bundler.js';
 import { createAppClient } from '../util/clientGenerators.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
-import { updateDevvitConfig } from '../util/devvit-config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
 
@@ -134,9 +132,9 @@ export default class Upload extends ProjectCommand {
       }
     }
 
-    // Ensure the app builds before we potentially create an new app or a new version
     ux.action.start('Verifying app builds');
-    await this.#bundleActors(username, projectConfig.version, !flags['disable-typecheck']);
+    // Version is unknown until upload. Use a fake one for build verification.
+    await this.#bundleActors(username, '0.0.0', !flags['disable-typecheck']);
     ux.action.stop();
 
     if (shouldCreateNewApp || !appInfo) {
@@ -161,17 +159,8 @@ export default class Upload extends ProjectCommand {
       this.error(`App ${projectConfig.name} is not found`);
     }
 
-    // Now, create a new version, probably prompting for the new version number
-    const appVersionNumber = await this.#getNextVersionNumber(
-      appInfo,
-      DevvitVersion.fromString(projectConfig.version),
-      flags.bump,
-      !flags['just-do-it']
-    );
-
-    await updateDevvitConfig(this.projectRoot, this.configFileName, {
-      version: appVersionNumber.toString(),
-    });
+    // Now, create a new version.
+    const appVersionNumber = await this.#getNextVersionNumber(appInfo, flags.bump);
 
     this.#event.devplatform.app_version_number = appVersionNumber.toString();
 
@@ -251,27 +240,14 @@ export default class Upload extends ProjectCommand {
 
   async #getNextVersionNumber(
     appInfo: FullAppInfo,
-    projectConfigVersion: DevvitVersion,
-    bump: VersionBumpType | undefined,
-    prompt: boolean
+    bump: VersionBumpType | undefined
   ): Promise<DevvitVersion> {
-    const latestUploadedVersion = this.#getLatestPublishedVersion(appInfo.versions);
-    // Sync up our local and remote versions
-    const appVersion = await this.#checkIfPublishedAndLocalVersionsMatch(
-      latestUploadedVersion,
-      projectConfigVersion,
-      !prompt
-    );
-
-    // Get how much we want to bump the version number by
+    const appVersion = findLatestVersion(appInfo.versions) ?? new DevvitVersion(0, 0, 0);
     if (bump) {
       appVersion.bumpVersion(bump);
     } else {
-      // Automatically bump the version
-      if (appVersion.isEqual(latestUploadedVersion)) {
-        appVersion.bumpVersion(VersionBumpType.Patch);
-        this.log('Automatically bumped app version to:', appVersion.toString());
-      }
+      appVersion.bumpVersion(VersionBumpType.Patch);
+      this.log('Automatically bumped app version to:', appVersion.toString());
     }
 
     return appVersion;
@@ -296,49 +272,6 @@ export default class Upload extends ProjectCommand {
     }
   }
 
-  #getLatestPublishedVersion(versions: AppVersionInfo[]): DevvitVersion {
-    const versionsSorted = versions
-      .map(
-        (v) =>
-          new DevvitVersion(v.majorVersion, v.minorVersion, v.patchVersion, v.prereleaseVersion)
-      )
-      .sort((lhs, rhs) => lhs.compare(rhs));
-
-    return versionsSorted.at(-1) ?? new DevvitVersion(0, 0, 0);
-  }
-
-  async #checkIfPublishedAndLocalVersionsMatch(
-    latestStoredVersion: DevvitVersion,
-    projectConfigVersion: DevvitVersion,
-    justDoIt: boolean | undefined
-  ): Promise<DevvitVersion> {
-    if (!latestStoredVersion.isEqual(projectConfigVersion)) {
-      this.warn(
-        `The latest published version on Reddit is "${latestStoredVersion}". The version number in your local devvit.yaml is "${projectConfigVersion}"`
-      );
-      const overwriteVersion =
-        justDoIt ||
-        (
-          await inquirer.prompt([
-            {
-              name: 'overwriteVersion',
-              type: 'confirm',
-              message:
-                'Allow overwriting local devvit.yaml to match versions with the latest published version on Reddit?',
-            },
-          ])
-        ).overwriteVersion;
-
-      if (!overwriteVersion) {
-        this.error(
-          `Aborting. Make sure to manually set the version field of devvit.yaml to "${latestStoredVersion}" to match the latest published version already on Reddit.`
-        );
-      }
-    }
-
-    return latestStoredVersion.clone();
-  }
-
   async #sendEventIfNotSent(): Promise<void> {
     if (!this.#eventSent) {
       this.#eventSent = true;
@@ -352,4 +285,15 @@ export default class Upload extends ProjectCommand {
     await this.#sendEventIfNotSent();
     return super.catch(err);
   }
+}
+
+function findLatestVersion(
+  versions: readonly Readonly<AppVersionInfo>[]
+): DevvitVersion | undefined {
+  return versions
+    .map(
+      (v) => new DevvitVersion(v.majorVersion, v.minorVersion, v.patchVersion, v.prereleaseVersion)
+    )
+    .sort((lhs, rhs) => lhs.compare(rhs))
+    .at(-1);
 }

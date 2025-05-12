@@ -42,7 +42,6 @@ import {
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { ProjectCommand } from '../util/commands/ProjectCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
-import { updateDevvitConfig } from '../util/devvit-config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import Logs from './logs.js';
 
@@ -277,7 +276,7 @@ export default class Playtest extends ProjectCommand {
       flags as CommandFlags<typeof Logs>
     );
 
-    this.#startWatchingSrc(username, projectConfig.version);
+    this.#startWatchingSrc(username);
     this.#startWatchingAssets();
 
     // We don't know when the user is done. If connected to a terminal, end when
@@ -292,11 +291,13 @@ export default class Playtest extends ProjectCommand {
   /**
    * Watching source code changes
    */
-  #startWatchingSrc(username: string, version: string): void {
+  #startWatchingSrc(username: string): void {
     const watchSrc = this.#bundler.watch(this.projectRoot, {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
-      version,
+      // Version is always incorrect since it changes on each upload and the
+      // watch request isn't reissued.
+      version: '0.0.0',
     });
 
     // Async subscribers are
@@ -371,15 +372,10 @@ export default class Playtest extends ProjectCommand {
     this.#version.bumpVersion(VersionBumpType.Prerelease);
 
     try {
-      // 2. update devvit yaml:
-      await updateDevvitConfig(this.projectRoot, this.configFileName, {
-        version: this.#version.toString(),
-      });
-
-      // 3. update bundle version:
+      // 2. update bundle version:
       modifyBundleVersions(this.#lastBundles, this.#version.toString());
 
-      // 4. create new playtest version:
+      // 3. create new playtest version:
       const appVersionCreator = new AppVersionUploader(this, {
         verbose: Boolean(this.#flags?.verbose),
       });

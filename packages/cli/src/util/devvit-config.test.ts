@@ -5,7 +5,7 @@ import { _parseConfig, type DevvitConfig } from './devvit-config.js';
 
 describe('_parseConfig()', () => {
   test('ok', () => {
-    const config: DevvitConfig = { name: 'name', version: '1.2.3' };
+    const config: DevvitConfig = { name: 'name' };
     expect(_parseConfig(config)).toStrictEqual(config);
   });
   test('no root', () => {
@@ -16,16 +16,8 @@ describe('_parseConfig()', () => {
   });
   test('no name', () =>
     expect(() => _parseConfig({})).toThrow('devvit.yaml must have `name` property.'));
-  test('no version', () =>
-    expect(() => _parseConfig({ name: 'name' })).toThrow(
-      'devvit.yaml must have `version` property.'
-    ));
   test('superset', () => {
-    const config: JSONObject & DevvitConfig = {
-      name: 'name',
-      version: '1.2.3',
-      abc: 'def',
-    };
+    const config: JSONObject & DevvitConfig = { name: 'name', abc: 'def' };
     expect(_parseConfig(config)).toStrictEqual(config);
   });
 });

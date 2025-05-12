@@ -10,7 +10,6 @@ import type { PenSave } from '@devvit/play';
 import { penFromHash } from '@devvit/play';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
-import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, Flags } from '@oclif/core';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import chalk from 'chalk';
@@ -177,7 +176,6 @@ export default class New extends DevvitCommand {
     // Make devvit.yaml (we put in the app name as is without a unique suffix)
     await writeDevvitConfig(this.#projectPath, this.configFileName, {
       name: this.#createAppParams.appName,
-      version: DevvitVersion.fromString('0.0.0').toString(),
     });
 
     // git init

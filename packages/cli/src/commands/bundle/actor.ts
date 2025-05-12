@@ -10,7 +10,6 @@ import { Bundler } from '../../util/Bundler.js';
 import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
 import { distDirFilename } from '../../util/config.js';
-import { readDevvitConfig } from '../../util/devvit-config.js';
 import { getPaymentsConfig, readProducts } from '../../util/payments/paymentsConfig.js';
 
 export default class BundleActor extends ProjectCommand {
@@ -40,12 +39,11 @@ export default class BundleActor extends ProjectCommand {
     const { args, flags } = await this.parse(BundleActor);
 
     const username = await this.#getOwnerUsername();
-    const config = await readDevvitConfig(this.projectRoot, this.configFileName);
 
     const actorSpec = {
       name: args.name,
       owner: username,
-      version: config.version,
+      version: '0.0.0', // Version is unknown.
     };
 
     await this.#makeBundles(actorSpec, flags.metafile);

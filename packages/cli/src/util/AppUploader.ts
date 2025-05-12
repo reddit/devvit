@@ -1,7 +1,6 @@
 import type { FullAppInfo } from '@devvit/protos/community.js';
 import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { ux } from '@oclif/core';
 import inquirer from 'inquirer';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
@@ -28,8 +27,6 @@ export class AppUploader {
     copyPaste: boolean,
     justDoIt: boolean
   ): Promise<FullAppInfo> {
-    await this.#checkConfigVersion(projectConfig, justDoIt);
-
     const appName = await this.#promptNameUntilNotTaken(
       sluggable(projectConfig.name) ? makeSlug(projectConfig.name) : undefined
     );
@@ -56,7 +53,6 @@ export class AppUploader {
       });
       await updateDevvitConfig(this.#cmd.projectRoot, this.#cmd.configFileName, {
         name: newApp.slug,
-        version: '0.0.0',
       });
       ux.action.stop('Successfully created your app in Reddit!');
       return {
@@ -77,34 +73,6 @@ export class AppUploader {
         this.#cmd.error(
           'Your app could not be uploaded because we encountered an issue creating your app account. This may happen because of a network issue on our end. Please try again.'
         );
-      }
-    }
-  }
-
-  /**
-   * Check if the config version is larger than 0.0.0 when creating a new App
-   */
-  async #checkConfigVersion(projectConfig: DevvitConfig, justDoIt: boolean) {
-    if (DevvitVersion.fromString(projectConfig.version).newerThan(new DevvitVersion(0, 0, 0))) {
-      this.#cmd.warn(
-        `The version number in your devvit.yaml is larger than "0.0.0". The first published version of your app must be "0.0.0".
-          We use the name of your app to index published versions, so unless you want to publish a "new" app, don't change the "name" field of devvit.yaml`
-      );
-
-      const shouldOverwriteVersion =
-        justDoIt ||
-        (
-          await inquirer.prompt([
-            {
-              name: 'overwriteVersion',
-              type: 'confirm',
-              message: `Would you like us to overwrite the "version" field of devvit.yaml to "0.0.0"?`,
-            },
-          ])
-        ).overwriteVersion;
-
-      if (!shouldOverwriteVersion) {
-        this.#cmd.error(`Please manually change the version back to "0.0.0"`);
       }
     }
   }

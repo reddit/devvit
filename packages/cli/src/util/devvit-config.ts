@@ -11,8 +11,6 @@ export const DEVVIT_CONFIG_FILE: string = 'devvit.yaml';
 export type DevvitConfig = {
   /** Lowercase app name and Community app slug. */
   name: string;
-  /** DevvitVersion string. Eg, 1.2.3 or 1.2.3.4. */
-  version: string;
 };
 
 export async function readDevvitConfig(
@@ -32,9 +30,6 @@ export async function updateDevvitConfig(
   const config = await readDevvitConfig(projectPath, configFileName);
   if (updates.name != null) {
     config.name = updates.name.toLowerCase();
-  }
-  if (updates.version != null) {
-    config.version = updates.version;
   }
 
   await writeDevvitConfig(projectPath, configFileName, config);
@@ -56,9 +51,6 @@ export function _parseConfig(json: JSONValue): DevvitConfig {
   if (typeof json.name !== 'string')
     throw Error(`${DEVVIT_CONFIG_FILE} must have \`name\` property.`);
 
-  if (typeof json.version !== 'string')
-    throw Error(`${DEVVIT_CONFIG_FILE} must have \`version\` property.`);
-
   // Include original data in case it's a superset.
-  return { ...json, name: json.name.toLowerCase(), version: json.version };
+  return { ...json, name: json.name.toLowerCase() };
 }
