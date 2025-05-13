@@ -67,6 +67,10 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         bundle.webviewAssetIds = webViewAssetMap ?? {};
 
         if (products) {
+          this.#verifyThatDevvitPackagesVersionsMatch(bundle, [
+            '@devvit/payments',
+            '@devvit/public-api',
+          ]);
           bundle.paymentsConfig = getPaymentsConfig(bundle, products);
         }
       })
@@ -133,6 +137,29 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         `Couldn't find ${readmeFileName}, so not setting an 'about' for this app version (you can update this later)`
       );
       return '';
+    }
+  }
+
+  /**
+   * Verify that the versions of the specified Devvit packages match in the bundle.
+   * @param bundle The bundle to check.
+   * @param packageNames The names of the Devvit packages to check.
+   * @throws Error if the versions do not match.
+   */
+  #verifyThatDevvitPackagesVersionsMatch(
+    bundle: Bundle,
+    packageNames: `@devvit/${string}`[]
+  ): void {
+    const uniqueVersions = new Set(
+      packageNames.map((pkgName) => bundle.buildInfo?.dependencies?.[pkgName])
+    );
+
+    if (uniqueVersions.size !== 1) {
+      throw new Error(
+        `The versions of the required packages do not match. Please ensure that all packages have the same version: ${packageNames.join(
+          ', '
+        )}`
+      );
     }
   }
 }
