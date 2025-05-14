@@ -19,7 +19,6 @@ import semver from 'semver';
 
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import Cutter from '../util/Cutter.js';
-import { writeDevvitConfig } from '../util/devvit-config.js';
 import { Git } from '../util/Git.js';
 import { sendEvent } from '../util/metrics.js';
 import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTemplateResolver.js';
@@ -97,8 +96,8 @@ export default class New extends DevvitCommand {
     }),
   } as const;
 
-  #createAppParams: CreateAppParams | null = null;
-  #createAppFlags: CreateAppFlags | null = null;
+  #createAppParams: CreateAppParams | undefined;
+  #createAppFlags: CreateAppFlags | undefined;
 
   #event = {
     source: 'devplatform_cli',
@@ -112,28 +111,6 @@ export default class New extends DevvitCommand {
   };
   #eventSent = false;
 
-  #appNameValidator: NonNullable<Validator> = async (rawAppName: string) => {
-    const existingDirNames = new Set(
-      readdirSync(process.cwd(), { withFileTypes: true })
-        .filter((d) => d.isDirectory())
-        .map((d) => d.name)
-    );
-    if (existingDirNames.has(rawAppName)) {
-      return `The directory "${rawAppName}" already exists. Use a new directory name!`;
-    }
-    if (!sluggable(rawAppName)) {
-      return `The app name is invalid. An app name must:\n\t1. be between 3~${APP_SLUG_BASE_MAX_LENGTH} characters long\n\t2. contain only the following characters: [0-9], [a-z], [A-Z], spaces, and dashes\n\t3. begin with a letter\n\t`;
-    }
-    return true;
-  };
-
-  get #slug(): string {
-    if (this.#createAppParams?.appName == null) {
-      this.error('The project was not properly initialized. Aborting');
-    }
-    return makeSlug(this.#createAppParams.appName);
-  }
-
   get #projectPath(): string {
     if (this.#createAppParams?.appName == null) {
       this.error('The project was not properly initialized. Aborting');
@@ -142,8 +119,8 @@ export default class New extends DevvitCommand {
     if (this.#createAppFlags?.here) {
       return process.cwd();
     }
-    // else, we're using the app slug (without the unique suffix) as the dir name
-    return path.join(process.cwd(), this.#slug);
+    // else, we're using the app slug as the dir name
+    return path.join(process.cwd(), this.#createAppParams.appName);
   }
 
   override async run(): Promise<void> {
@@ -173,20 +150,19 @@ export default class New extends DevvitCommand {
     // Copy project template
     await this.#copyProjectTemplate();
 
-    // Make devvit.yaml (we put in the app name as is without a unique suffix)
-    await writeDevvitConfig(this.#projectPath, this.configFileName, {
-      name: this.#createAppParams.appName,
-    });
-
     // git init
     await this.#gitInit();
 
-    // make package.json
+    // make package.json.
+    // to-do: use readPackageJSON() or better yet use the existing Mustache
+    //        templating. This may require tweaks to the Yarn workspace to
+    //        ignore the package.json templates and some TypeScript tweaks to
+    //        keep type-checking.
     const pkgJsonPath = path.join(this.#projectPath, 'package.json');
     const templatePkgJson = JSON.parse(await readFile(pkgJsonPath, 'utf8'));
     const pkgJson = {
       ...templatePkgJson,
-      name: this.#slug,
+      name: this.#createAppParams.appName,
       version: '0.0.0',
       type: 'module',
       private: true,
@@ -230,7 +206,7 @@ export default class New extends DevvitCommand {
     // Favor explicit appName to pen name default.
     const name = args.appName || pen?.name;
     if (name) {
-      const validationResult = await this.#appNameValidator(name);
+      const validationResult = await appNameValidator(name);
       if (typeof validationResult === 'string') {
         this.error(validationResult);
       }
@@ -257,9 +233,9 @@ export default class New extends DevvitCommand {
         name: 'appName',
         message: 'Project name:',
         type: 'input',
-        validate: this.#appNameValidator,
+        validate: appNameValidator,
         filter: (input: unknown) => {
-          return String(input).trim().toLowerCase();
+          return makeSlug(String(input).trim());
         },
       },
     ]);
@@ -288,14 +264,15 @@ export default class New extends DevvitCommand {
   }
 
   async #copyProjectTemplate(): Promise<void> {
+    if (!this.#createAppParams) throw Error('no app params');
     const templatePath = templateResolver.resolve({
-      name: this.#createAppParams!.templateName,
+      name: this.#createAppParams.templateName,
     });
     const cutter = new Cutter(templatePath);
     await cutter.cut(this.#projectPath, {
-      name: this.#createAppParams!.appName,
+      name: this.#createAppParams.appName,
       // Specify pen source Mustache template, if any.
-      mainSrc: this.#createAppParams?.pen?.src ?? '',
+      mainSrc: this.#createAppParams.pen?.src ?? '',
     });
   }
 
@@ -366,3 +343,18 @@ export default class New extends DevvitCommand {
     return super.catch(err);
   }
 }
+
+const appNameValidator: NonNullable<Validator> = async (rawAppName: string) => {
+  const existingDirNames = new Set(
+    readdirSync(process.cwd(), { withFileTypes: true })
+      .filter((d) => d.isDirectory())
+      .map((d) => d.name)
+  );
+  if (existingDirNames.has(rawAppName)) {
+    return `The directory "${rawAppName}" already exists. Use a new directory name!`;
+  }
+  if (!sluggable(rawAppName)) {
+    return `The app name is invalid. An app name must:\n\t1. be between 3~${APP_SLUG_BASE_MAX_LENGTH} characters long\n\t2. contain only the following characters: [0-9], [a-z], [A-Z], spaces, and dashes\n\t3. begin with a letter\n\t`;
+  }
+  return true;
+};

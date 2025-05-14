@@ -24,23 +24,15 @@ export async function readDevvitConfig(
 
 export async function updateDevvitConfig(
   projectPath: string,
-  configFileName: string,
+  configFilename: string,
   updates: Partial<Readonly<DevvitConfig>>
 ): Promise<void> {
-  const config = await readDevvitConfig(projectPath, configFileName);
+  const config = await readDevvitConfig(projectPath, configFilename);
   if (updates.name != null) {
     config.name = updates.name.toLowerCase();
   }
 
-  await writeDevvitConfig(projectPath, configFileName, config);
-}
-
-export async function writeDevvitConfig(
-  projectPath: string,
-  configFile: string,
-  config: Readonly<DevvitConfig>
-): Promise<void> {
-  await writeFile(path.join(projectPath, configFile), dumpJsonToYaml(config));
+  await writeFile(path.join(projectPath, configFilename), dumpJsonToYaml(config));
 }
 
 /** @internal */
