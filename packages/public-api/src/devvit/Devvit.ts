@@ -36,6 +36,10 @@ import type {
 import { SettingScope } from '../types/index.js';
 import { registerAppSettings } from './internals/app-settings.js';
 import { registerCustomPost } from './internals/custom-post.js';
+import {
+  assertRequestedFetchDomainsLimit,
+  normalizeDomains,
+} from './internals/helpers/fetchDomains.js';
 import { registerInstallationSettings } from './internals/installation-settings.js';
 import { registerMenuItems } from './internals/menu-items.js';
 import { pluginIsEnabled } from './internals/plugins.js';
@@ -145,7 +149,8 @@ export class Devvit extends Actor {
       : httpConfig;
     if (pluginIsEnabled(pluginSettings)) {
       if (hasRequestedDomains) {
-        this.#requestedFetchDomains = httpConfig.requestedFetchDomains;
+        assertRequestedFetchDomainsLimit(httpConfig.requestedFetchDomains);
+        this.#requestedFetchDomains = normalizeDomains(httpConfig.requestedFetchDomains);
       }
       this.use(protos.HTTPDefinition);
     }
