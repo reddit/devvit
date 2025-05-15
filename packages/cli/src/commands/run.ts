@@ -1,6 +1,6 @@
-import { ProjectCommand } from '../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 
-export default class Run extends ProjectCommand {
+export default class Run extends DevvitCommand {
   static override hidden = true;
   static deprecated = true;
   static override description =

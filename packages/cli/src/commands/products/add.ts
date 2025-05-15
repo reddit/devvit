@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import * as path from 'path';
 
-import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import { type JSONProduct, readProducts } from '../../util/payments/paymentsConfig.js';
 
 // TODO: Import these from the products.json schema file.
@@ -42,7 +42,7 @@ type ProductsJSON = {
   $schema: 'https://developers.reddit.com/schema/products.json';
   products: JSONProduct[];
 };
-export default class AddProduct extends ProjectCommand {
+export default class AddProduct extends DevvitCommand {
   static override description = 'Add a new product to your app';
 
   static override examples = [

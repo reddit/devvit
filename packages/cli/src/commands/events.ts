@@ -76,7 +76,7 @@ export default class Events extends DevvitCommand {
     const { args, flags } = await this.parse(Events);
     const loggerClient = createRemoteLoggerClient();
 
-    const appName = args.app || (await this.inferAppNameFromProject());
+    const appName = args.app || this.projectConfig.name;
 
     this.log(formatAppLogDivider(`streaming event logs for ${appName}`));
 

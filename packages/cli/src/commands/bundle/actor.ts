@@ -8,11 +8,11 @@ import { Args, Flags } from '@oclif/core';
 import { getAccessToken } from '../../util/auth.js';
 import { Bundler } from '../../util/Bundler.js';
 import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
-import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import { distDirFilename } from '../../util/config.js';
 import { getPaymentsConfig, readProducts } from '../../util/payments/paymentsConfig.js';
 
-export default class BundleActor extends ProjectCommand {
+export default class BundleActor extends DevvitCommand {
   static override description = 'Bundle an actor into bundle.json';
 
   static override examples = ['$ devvit bundle actor my-actor'];

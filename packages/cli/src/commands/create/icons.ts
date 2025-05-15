@@ -5,12 +5,12 @@ import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { Args, ux } from '@oclif/core';
 import tinyglob from 'tiny-glob';
 
-import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import { dirExists } from '../../util/files.js';
 
 type SvgAsset = { name: string; contents: string };
 
-export default class Icons extends ProjectCommand {
+export default class Icons extends DevvitCommand {
   static override description = `Create a new icon set for your project`;
 
   static override args = {

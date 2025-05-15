@@ -124,7 +124,7 @@ export default class Logs extends DevvitCommand {
     );
     if (flags.connect) this.#playtest.open();
 
-    const appName = args.app || (await this.inferAppNameFromProject());
+    const appName = args.app || this.projectConfig.name;
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
     const subredditAppName = await this.#getTailFilter(subreddit, appName);
 

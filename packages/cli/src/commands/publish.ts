@@ -26,7 +26,7 @@ import {
   createAppVersionClient,
   createDeveloperSettingsClient,
 } from '../util/clientGenerators.js';
-import { ProjectCommand } from '../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { getVersionByNumber } from '../util/common-actions/getVersionByNumber.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
@@ -43,7 +43,7 @@ const appCapabilityToReviewRequirementMessage: Record<
 
 const DEVELOPER_SETTINGS_PATH = `${DEVVIT_PORTAL_URL}/my/settings`;
 
-export default class Publish extends ProjectCommand {
+export default class Publish extends DevvitCommand {
   static override description =
     'Publish any previously uploaded version of an app. In this state, only the app owner can find or install the app to a subreddit which they moderate.';
 

@@ -9,16 +9,16 @@ import { MY_PORTAL_ENABLED } from '../lib/config.js';
 import { getCaptcha } from './captcha.js';
 import { checkAppNameAvailability } from './checkAppNameAvailability.js';
 import { createAppClient } from './clientGenerators.js';
-import type { ProjectCommand } from './commands/ProjectCommand.js';
-import { type DevvitConfig, updateDevvitConfig } from './devvit-config.js';
+import type { DevvitCommand } from './commands/DevvitCommand.js';
+import { type DevvitConfig } from './devvit-config.js';
 import { readPackageJSON } from './package-managers/package-util.js';
 
 export class AppUploader {
-  readonly #cmd: ProjectCommand;
+  readonly #cmd: DevvitCommand;
 
   readonly #appClient = createAppClient();
 
-  constructor(cmd: ProjectCommand) {
+  constructor(cmd: DevvitCommand) {
     this.#cmd = cmd;
   }
 
@@ -51,9 +51,7 @@ export class AppUploader {
         categories: [], // TODO: should prompt in the future
         captcha,
       });
-      await updateDevvitConfig(this.#cmd.projectRoot, this.#cmd.configFileName, {
-        name: newApp.slug,
-      });
+      await this.#cmd.updateProjectConfig({ name: newApp.slug });
       ux.action.stop('Successfully created your app in Reddit!');
       return {
         app: newApp,

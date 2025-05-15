@@ -14,7 +14,7 @@ import semver from 'semver';
 import glob from 'tiny-glob';
 
 import { UPDATE_ACTIONS } from '../../updateActions/index.js';
-import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import type { PackageJSON } from '../../util/package-managers/package-util.js';
 
 const require = createRequire(import.meta.url);
@@ -22,14 +22,14 @@ const require = createRequire(import.meta.url);
 // eslint-disable-next-line security/detect-non-literal-require
 const cliPackageJSON = require(require.resolve(`@devvit/cli/package.json`));
 
-export default class UpdateApp extends ProjectCommand {
+export default class UpdateApp extends DevvitCommand {
   static override description =
     "Update @devvit project dependencies to the currently installed CLI's version";
 
   static override examples = ['$ devvit update app'];
 
   protected override async init(): Promise<void> {
-    await this.assertProject();
+    await super.init();
 
     const devvitVersion = semver.parse(cliPackageJSON.version);
     const result = await matchDevvitPackageVersions(this.projectRoot, devvitVersion!, true);

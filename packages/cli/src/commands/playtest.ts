@@ -40,14 +40,14 @@ import {
   createInstallationsClient,
 } from '../util/clientGenerators.js';
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
-import { ProjectCommand } from '../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import Logs from './logs.js';
 
 const ON_WATCH_DEBOUNCE_MS_DEFAULT = 100;
 
-export default class Playtest extends ProjectCommand {
+export default class Playtest extends DevvitCommand {
   static override description =
     'Installs your app to your test subreddit and starts a playtest session where a new version is installed whenever you save changes to your app code, and logs are continuously streamed';
 
@@ -103,9 +103,6 @@ export default class Playtest extends ProjectCommand {
   #subreddit?: string; // unprefixed
   #flags?: CommandFlags<typeof Playtest>;
   #debounceMs: number = ON_WATCH_DEBOUNCE_MS_DEFAULT;
-
-  // Project config
-  #appName?: string;
 
   // State
   #appInfo?: FullAppInfo | undefined;
@@ -190,9 +187,6 @@ export default class Playtest extends ProjectCommand {
     const username = await this.getUserDisplayName(token);
     await this.checkDeveloperAccount();
 
-    const projectConfig = await this.getProjectConfig();
-    this.#appName = projectConfig.name;
-
     if (flags.connect) {
       this.#server = new PlaytestServer(
         {
@@ -207,7 +201,7 @@ export default class Playtest extends ProjectCommand {
     }
 
     this.#appInfo = await getAppBySlug(this.#appClient, {
-      slug: this.#appName,
+      slug: this.projectConfig.name,
       limit: 1, // fetched version limit; we only need the latest one
     });
 
@@ -219,7 +213,7 @@ export default class Playtest extends ProjectCommand {
 
     const isOwner = this.#appInfo?.app?.owner?.displayName === username;
     await this.#checkIfUserAllowedToPlaytestThisApp(
-      this.#appName,
+      this.projectConfig.name,
       isOwner,
       token,
       flags['employee-update']
@@ -243,7 +237,10 @@ export default class Playtest extends ProjectCommand {
     );
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
-    this.#installationInfo = await this.#getExistingInstallInfo(this.#appName, this.#subreddit);
+    this.#installationInfo = await this.#getExistingInstallInfo(
+      this.projectConfig.name,
+      this.#subreddit
+    );
 
     if (!this.#installationInfo) {
       const userT2Id = await this.getUserT2Id(token);
@@ -270,7 +267,7 @@ export default class Playtest extends ProjectCommand {
     this.#appLogSub = makeLogSubscription(
       {
         subreddit: this.#installationInfo.installation!.location!.id,
-        appName: this.#appName,
+        appName: this.projectConfig.name,
       },
       this,
       flags as CommandFlags<typeof Logs>
@@ -361,7 +358,7 @@ export default class Playtest extends ProjectCommand {
     this.#isOnWatchExecuting = true;
 
     if (!this.#appInfo?.app) {
-      this.error(`Something went wrong: App ${this.#appName} is not found`);
+      this.error(`Something went wrong: App ${this.projectConfig.name} is not found`);
     }
 
     if (!this.#version) {
@@ -460,10 +457,9 @@ export default class Playtest extends ProjectCommand {
       return debounceFlagMs;
     }
 
-    const rootPackageJson = await this.getRootPackageJson();
-    if (rootPackageJson.devvit?.playtest?.debounceConfigMs != null) {
+    if (this.packageConfig?.playtest?.debounceConfigMs != null) {
       // Else, if the package.json has it set, use that
-      return rootPackageJson.devvit.playtest.debounceConfigMs;
+      return this.packageConfig.playtest.debounceConfigMs;
     }
 
     // If no override is provided, use the default
@@ -516,7 +512,7 @@ export default class Playtest extends ProjectCommand {
     // If this.#installationInfo exists that means a playtest version has already been installed
     if (this.#installationInfo) {
       const revertCommand = chalk.green(
-        `devvit install ${this.#subreddit} ${this.#appName}@latest`
+        `devvit install ${this.#subreddit} ${this.projectConfig.name}@latest`
       );
 
       this.log(

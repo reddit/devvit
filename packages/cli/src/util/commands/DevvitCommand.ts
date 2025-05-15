@@ -8,7 +8,8 @@ import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { getAccessToken } from '../auth.js';
 import { createDeveloperAccountClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
-import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../devvit-config.js';
+import { DEVVIT_CONFIG_FILE, type DevvitConfig, DevvitConfigCache } from '../devvit-config.js';
+import type { DevvitPackageConfig } from '../package-managers/package-util.js';
 import { findProjectRoot } from '../project-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 
@@ -21,20 +22,33 @@ import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 export const toLowerCaseArgParser = async (input: string): Promise<string> => input.toLowerCase();
 
 export abstract class DevvitCommand extends Command {
-  #configFileName: string | undefined;
-
   static override baseFlags = {
-    config: Flags.string({
-      description: 'path to devvit config file',
-      default: DEVVIT_CONFIG_FILE,
-    }),
+    config: Flags.string({ description: 'path to devvit config file' }),
   } as const;
 
-  public get configFileName(): string {
-    return this.#configFileName ?? DEVVIT_CONFIG_FILE;
+  protected readonly developerAccountClient = createDeveloperAccountClient();
+  #configCache: DevvitConfigCache | undefined;
+
+  /** @deprecated Use the config-file.v1.json schema instead. */
+  get packageConfig(): Readonly<DevvitPackageConfig> | undefined {
+    return this.#configCache?.packageConfig;
   }
 
-  protected readonly developerAccountClient = createDeveloperAccountClient();
+  /**
+   * Project configuration. Warning: do not confuse `projectConfig()` for
+   * oclif's `Command.config` which is part of the class hierarchy.
+   */
+  get projectConfig(): Readonly<DevvitConfig> {
+    return this.#nonnullConfigCache.config;
+  }
+
+  get projectRoot(): string {
+    return this.#nonnullConfigCache.root;
+  }
+
+  async updateProjectConfig(updates: Partial<Readonly<DevvitConfig>>): Promise<void> {
+    await this.#nonnullConfigCache.update(updates);
+  }
 
   protected override async init(): Promise<void> {
     await super.init();
@@ -55,9 +69,12 @@ export abstract class DevvitCommand extends Command {
       flags: DevvitCommand.baseFlags,
     });
 
-    this.#configFileName = flags.config;
-    if (this.#configFileName !== DEVVIT_CONFIG_FILE) {
-      this.log(`Using custom config file: ${this.#configFileName}`);
+    const configFilename = flags.config || DEVVIT_CONFIG_FILE;
+    const projectDir = await findProjectRoot(configFilename);
+    if (flags.config && !projectDir) this.error(`Project config "${configFilename}" not found.`);
+    if (projectDir) this.#configCache = await DevvitConfigCache.new(projectDir, configFilename);
+    if (configFilename !== DEVVIT_CONFIG_FILE) {
+      this.log(`Using custom config file: ${configFilename}`);
     }
   }
 
@@ -143,16 +160,6 @@ export abstract class DevvitCommand extends Command {
     return res.value;
   }
 
-  protected async inferAppNameFromProject(): Promise<string> {
-    const projectRoot = await findProjectRoot(this.configFileName);
-    if (projectRoot == null) {
-      this.error(`You must specify an app name or run this command from within a project.`);
-    }
-    const devvitConfig = await readDevvitConfig(projectRoot, this.configFileName);
-
-    return devvitConfig.name;
-  }
-
   /**
    * @description Handle resolving the appname@version for the following cases
    *
@@ -185,24 +192,17 @@ export abstract class DevvitCommand extends Command {
     }
 
     // Otherwise, we need to read appName or app version from the config
-    const projectRoot = await findProjectRoot(this.configFileName);
-    if (projectRoot == null) {
-      this.error(`You must specify an app name or run this command from within a project.`);
-    }
-    const devvitConfig = await readDevvitConfig(projectRoot, this.configFileName);
-
     // If the agrument has "@<version>" format
     if (appWithVersion.startsWith('@')) {
-      return {
-        appName: devvitConfig.name,
-        version: appWithVersion,
-      };
+      return { appName: this.projectConfig.name, version: appWithVersion };
     }
 
     // Otherwise, default to the config and latest.
-    return {
-      appName: devvitConfig.name,
-      version: 'latest',
-    };
+    return { appName: this.projectConfig.name, version: 'latest' };
+  }
+
+  get #nonnullConfigCache(): DevvitConfigCache {
+    if (!this.#configCache) this.error(`No project ${DEVVIT_CONFIG_FILE} config file found.`);
+    return this.#configCache;
   }
 }

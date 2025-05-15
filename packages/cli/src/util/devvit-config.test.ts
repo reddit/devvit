@@ -1,23 +1,25 @@
 import type { JSONObject } from '@devvit/public-api';
 import { test } from 'vitest';
 
-import { _parseConfig, type DevvitConfig } from './devvit-config.js';
+import { type DevvitConfig, parseClassicConfig } from './devvit-config.js';
 
-describe('_parseConfig()', () => {
+describe('parseClassicConfig()', () => {
   test('ok', () => {
     const config: DevvitConfig = { name: 'name' };
-    expect(_parseConfig(config)).toStrictEqual(config);
+    expect(parseClassicConfig(config)).toStrictEqual(config);
   });
   test('no root', () => {
-    expect(() => _parseConfig(null)).toThrow(
+    expect(() => parseClassicConfig(null)).toThrow(
       'devvit.yaml must be an object `{"name": "foo", ...}`.'
     );
-    expect(() => _parseConfig([])).toThrow('devvit.yaml must be an object `{"name": "foo", ...}`.');
+    expect(() => parseClassicConfig([])).toThrow(
+      'devvit.yaml must be an object `{"name": "foo", ...}`.'
+    );
   });
   test('no name', () =>
-    expect(() => _parseConfig({})).toThrow('devvit.yaml must have `name` property.'));
+    expect(() => parseClassicConfig({})).toThrow('devvit.yaml must have `name` property.'));
   test('superset', () => {
     const config: JSONObject & DevvitConfig = { name: 'name', abc: 'def' };
-    expect(_parseConfig(config)).toStrictEqual(config);
+    expect(parseClassicConfig(config)).toStrictEqual(config);
   });
 });

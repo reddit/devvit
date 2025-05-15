@@ -23,21 +23,21 @@ import { default as tinyglob } from 'tiny-glob';
 
 import { dirExists } from '../util/files.js';
 import { createAppClient } from './clientGenerators.js';
-import type { ProjectCommand } from './commands/ProjectCommand.js';
+import type { DevvitCommand } from './commands/DevvitCommand.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
 };
 
 export class AssetUploader {
-  readonly #cmd: ProjectCommand;
+  readonly #cmd: DevvitCommand;
   readonly #verbose: boolean;
 
   readonly #appClient = createAppClient();
 
   readonly #appSlug: string;
 
-  constructor(cmd: ProjectCommand, appSlug: string, { verbose }: { verbose: boolean }) {
+  constructor(cmd: DevvitCommand, appSlug: string, { verbose }: { verbose: boolean }) {
     this.#cmd = cmd;
     this.#verbose = verbose;
     this.#appSlug = appSlug;

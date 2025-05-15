@@ -20,12 +20,12 @@ import { AppVersionUploader } from '../util/AppVersionUploader.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { Bundler } from '../util/Bundler.js';
 import { createAppClient } from '../util/clientGenerators.js';
-import { ProjectCommand } from '../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
 
-export default class Upload extends ProjectCommand {
+export default class Upload extends DevvitCommand {
   static override description = `Upload the app to the App Directory. Uploaded apps are only visible to you (the app owner) and can only be installed to a small test subreddit with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} subscribers`;
 
   static override flags = {
@@ -96,7 +96,6 @@ export default class Upload extends ProjectCommand {
   async run(): Promise<void> {
     const { flags } = await this.parse(Upload);
 
-    const projectConfig = await this.getProjectConfig();
     await this.#checkDependencies(flags['just-do-it']);
 
     const token = await getAccessTokenAndLoginIfNeeded();
@@ -107,7 +106,7 @@ export default class Upload extends ProjectCommand {
     let appInfo: FullAppInfo | undefined;
     try {
       appInfo = await getAppBySlug(this.#appClient, {
-        slug: projectConfig.name,
+        slug: this.projectConfig.name,
         hidePrereleaseVersions: true,
         limit: 1, // fetched version limit; we only need the latest one
       });
@@ -141,7 +140,7 @@ export default class Upload extends ProjectCommand {
       const appUploader = new AppUploader(this);
 
       appInfo = await appUploader.createNewApp(
-        projectConfig,
+        this.projectConfig,
         flags['copy-paste'],
         flags['just-do-it']
       );
@@ -156,7 +155,7 @@ export default class Upload extends ProjectCommand {
     }
 
     if (!appInfo?.app) {
-      this.error(`App ${projectConfig.name} is not found`);
+      this.error(`App ${this.projectConfig.name} is not found`);
     }
 
     // Now, create a new version.

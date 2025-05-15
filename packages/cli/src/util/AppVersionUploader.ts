@@ -15,18 +15,18 @@ import { default as glob } from 'tiny-glob';
 
 import { AssetUploader } from './AssetUploader.js';
 import { createAppVersionClient } from './clientGenerators.js';
-import type { ProjectCommand } from './commands/ProjectCommand.js';
+import type { DevvitCommand } from './commands/DevvitCommand.js';
 import { decodeAsUtf8, decodeAsUtf16 } from './encodings.js';
 import { getPaymentsConfig, type JSONProduct, readProducts } from './payments/paymentsConfig.js';
 import { handleTwirpError } from './twirp-error-handler.js';
 
 export class AppVersionUploader {
-  readonly #cmd: ProjectCommand;
+  readonly #cmd: DevvitCommand;
   readonly #verbose: boolean;
 
   readonly #appVersionClient = createAppVersionClient();
 
-  constructor(cmd: ProjectCommand, { verbose }: { verbose: boolean }) {
+  constructor(cmd: DevvitCommand, { verbose }: { verbose: boolean }) {
     this.#cmd = cmd;
     this.#verbose = verbose;
   }

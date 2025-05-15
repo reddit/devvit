@@ -5,21 +5,20 @@ import { ux } from '@oclif/core';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 
 import { createAppClient, createAppSettingsClient } from '../../util/clientGenerators.js';
-import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import { getAppBySlug } from '../../util/getAppBySlug.js';
 
-export default class ListAppSettings extends ProjectCommand {
+export default class ListAppSettings extends DevvitCommand {
   static override description =
     'List settings for your app. These settings exist at the global app-scope and are available to all instances of your app.';
   readonly #appSettingsService = createAppSettingsClient();
   readonly #appService = createAppClient();
 
   override async run(): Promise<void> {
-    const projectConfig = await this.getProjectConfig();
     ux.action.start('Fetching app setting keys');
     try {
       const appInfo = await getAppBySlug(this.#appService, {
-        slug: projectConfig.name,
+        slug: this.projectConfig.name,
         hidePrereleaseVersions: true,
         limit: 0,
       });
