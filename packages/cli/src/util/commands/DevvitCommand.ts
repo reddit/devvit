@@ -1,3 +1,4 @@
+import type { AppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { Command, Flags } from '@oclif/core';
 import { parse } from '@oclif/core/lib/parser/index.js';
@@ -8,9 +9,14 @@ import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { getAccessToken } from '../auth.js';
 import { createDeveloperAccountClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
-import { DEVVIT_CONFIG_FILE, type DevvitConfig, DevvitConfigCache } from '../devvit-config.js';
+import {
+  devvitClassicConfigFilename,
+  type DevvitConfig,
+  DevvitConfigCache,
+  devvitV1ConfigFilename,
+  newDevvitConfigCache,
+} from '../devvit-config.js';
 import type { DevvitPackageConfig } from '../package-managers/package-util.js';
-import { findProjectRoot } from '../project-util.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 
 /**
@@ -29,7 +35,7 @@ export abstract class DevvitCommand extends Command {
   protected readonly developerAccountClient = createDeveloperAccountClient();
   #configCache: DevvitConfigCache | undefined;
 
-  /** @deprecated Use the config-file.v1.json schema instead. */
+  /** @deprecated Use `v1ProjectConfig()` instead. */
   get packageConfig(): Readonly<DevvitPackageConfig> | undefined {
     return this.#configCache?.packageConfig;
   }
@@ -48,6 +54,10 @@ export abstract class DevvitCommand extends Command {
 
   async updateProjectConfig(updates: Partial<Readonly<DevvitConfig>>): Promise<void> {
     await this.#nonnullConfigCache.update(updates);
+  }
+
+  get v1ProjectConfig(): Readonly<AppConfig | undefined> {
+    return this.#configCache?.v1Config;
   }
 
   protected override async init(): Promise<void> {
@@ -69,12 +79,15 @@ export abstract class DevvitCommand extends Command {
       flags: DevvitCommand.baseFlags,
     });
 
-    const configFilename = flags.config || DEVVIT_CONFIG_FILE;
-    const projectDir = await findProjectRoot(configFilename);
-    if (flags.config && !projectDir) this.error(`Project config "${configFilename}" not found.`);
-    if (projectDir) this.#configCache = await DevvitConfigCache.new(projectDir, configFilename);
-    if (configFilename !== DEVVIT_CONFIG_FILE) {
-      this.log(`Using custom config file: ${configFilename}`);
+    this.#configCache = await newDevvitConfigCache(flags.config);
+    if (flags.config && !this.#configCache)
+      this.error(`Project config "${flags.config}" not found.`);
+    if (
+      flags.config &&
+      flags.config !== devvitClassicConfigFilename &&
+      flags.config !== devvitV1ConfigFilename
+    ) {
+      this.log(`Using custom config file: ${flags.config}`);
     }
   }
 
@@ -202,7 +215,8 @@ export abstract class DevvitCommand extends Command {
   }
 
   get #nonnullConfigCache(): DevvitConfigCache {
-    if (!this.#configCache) this.error(`No project ${DEVVIT_CONFIG_FILE} config file found.`);
+    if (!this.#configCache)
+      this.error(`No project ${devvitClassicConfigFilename} config file found.`);
     return this.#configCache;
   }
 }
