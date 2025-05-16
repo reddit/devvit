@@ -6,12 +6,12 @@ import { vi } from 'vitest';
 import {
   type ClassicAppConfig,
   type DevvitConfig,
-  DevvitConfigCache,
   isAppConfig,
   parseClassicConfig,
-} from './devvit-config.js';
+  Project,
+} from './project.js';
 
-describe('DevvitConfigCache', () => {
+describe('Project', () => {
   beforeEach(() => {
     vi.mock('node:fs', async () => ({
       ...(await vi.importActual('node:fs')),
@@ -22,15 +22,14 @@ describe('DevvitConfigCache', () => {
     vi.restoreAllMocks();
   });
 
-  test('update ClassicAppConfig', async () => {
+  test('update ClassicAppConfig', () => {
     const config: ClassicAppConfig = { name: 'name' };
-    const cache = new DevvitConfigCache('root', 'filename', config, undefined);
-    await cache.update({ name: 'name2' });
-    expect(cache.config.name).toBe('name2');
-    expect(cache.v1Config).toBe(undefined);
+    const project = new Project('root', 'filename', config, undefined);
+    project.name = 'name2';
+    expect(project.name).toBe('name2');
   });
 
-  test('update AppConfig', async () => {
+  test('update AppConfig', () => {
     const config: AppConfig = {
       schema: 'v1',
       name: 'name',
@@ -51,10 +50,36 @@ describe('DevvitConfigCache', () => {
       },
       json: { name: 'name' },
     };
-    const cache = new DevvitConfigCache('root', 'filename', config, undefined);
-    await cache.update({ name: 'name2' });
-    expect(cache.config.name).toBe('name2');
-    expect(cache.v1Config?.name).toBe('name2');
+    const project = new Project('root', 'filename', config, undefined);
+    project.name = 'name2';
+    expect(project.name).toBe('name2');
+  });
+
+  test('flag watchDebounceMillis', () => {
+    const config: AppConfig = {
+      schema: 'v1',
+      name: 'name',
+      permissions: {
+        http: {
+          enabled: false,
+          allowedDomains: [],
+        },
+        media: false,
+        payments: false,
+        realtime: false,
+        redis: false,
+        reddit: {
+          enabled: false,
+          scope: 'user',
+          asUser: [],
+        },
+      },
+      json: { name: 'name' },
+    };
+    const project = new Project('root', 'filename', config, undefined);
+    expect(project.watchDebounceMillis).toBe(100);
+    project.flag.watchDebounceMillis = 200;
+    expect(project.watchDebounceMillis).toBe(200);
   });
 });
 

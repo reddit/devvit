@@ -54,10 +54,10 @@ export default class BundleActor extends DevvitCommand {
   async #makeBundles(actorSpec: ActorSpec, includeMetafile: boolean): Promise<void> {
     const actorBundler = new Bundler();
 
-    const bundles = await actorBundler.bundle(this.projectRoot, actorSpec, includeMetafile);
-    const products = await readProducts(this.projectRoot);
+    const bundles = await actorBundler.bundle(this.project.root, actorSpec, includeMetafile);
+    const products = await readProducts(this.project.root);
 
-    await mkdir(path.join(this.projectRoot, distDirFilename), { recursive: true });
+    await mkdir(path.join(this.project.root, distDirFilename), { recursive: true });
 
     await Promise.all(
       bundles.map(async (bundle) => {
@@ -72,13 +72,13 @@ export default class BundleActor extends DevvitCommand {
         }
 
         await writeFile(
-          path.join(this.projectRoot, distDirFilename, `${actorSpec.name}.bundle${type}.json`),
+          path.join(this.project.root, distDirFilename, `${actorSpec.name}.bundle${type}.json`),
           JSON.stringify(Bundle.toJSON(bundle))
         );
 
         if (bundle.metafile) {
           await writeFile(
-            path.join(this.projectRoot, distDirFilename, `${actorSpec.name}.metafile${type}.json`),
+            path.join(this.project.root, distDirFilename, `${actorSpec.name}.metafile${type}.json`),
             bundle.metafile
           );
         }

@@ -18,7 +18,7 @@ export default class ListAppSettings extends DevvitCommand {
     ux.action.start('Fetching app setting keys');
     try {
       const appInfo = await getAppBySlug(this.#appService, {
-        slug: this.projectConfig.name,
+        slug: this.project.name,
         hidePrereleaseVersions: true,
         limit: 0,
       });

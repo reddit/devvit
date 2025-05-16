@@ -14,7 +14,6 @@ import {
   MAX_ASSET_GIF_SIZE,
   MAX_ASSET_NON_GIF_SIZE,
   prettyPrintSize,
-  WEB_VIEW_ASSET_DIRNAME,
 } from '@devvit/shared-types/Assets.js';
 import { ASSET_HASHING_ALGO, ASSET_UPLOAD_BATCH_SIZE } from '@devvit/shared-types/constants.js';
 import { ux } from '@oclif/core';
@@ -57,7 +56,7 @@ export class AssetUploader {
   }> {
     const [regularAssets, webViewAssets] = await Promise.all([
       this.#getAssets(ASSET_DIRNAME, ALLOWED_ASSET_EXTENSIONS),
-      this.#getAssets(WEB_VIEW_ASSET_DIRNAME, [], true),
+      this.#cmd.project.clientDir ? this.#getAssets(this.#cmd.project.clientDir, [], true) : [],
     ]);
 
     // Return early if no assets
@@ -94,12 +93,12 @@ export class AssetUploader {
     allowedExtensions: string[] = [],
     webViewAssets: boolean = false
   ): Promise<MediaSignatureWithContents[]> {
-    if (!(await dirExists(path.join(this.#cmd.projectRoot, folder)))) {
+    if (!(await dirExists(path.join(this.#cmd.project.root, folder)))) {
       // Return early if there isn't an assets directory
       return [];
     }
 
-    const assetsPath = path.join(this.#cmd.projectRoot, folder);
+    const assetsPath = path.join(this.#cmd.project.root, folder);
     const assetsGlob = path
       .join(assetsPath, '**', '*')
       // Note: tiny-glob *always* uses `/` as its path separator, even on Windows, so we need to

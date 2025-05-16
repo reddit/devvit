@@ -17,7 +17,7 @@ export const migrateTsconfigToPublicAPI: UpdateAction = {
     }
   },
   run: async (cmd) => {
-    const tsconfigPath = path.join(cmd.projectRoot, 'tsconfig.json');
+    const tsconfigPath = path.join(cmd.project.root, 'tsconfig.json');
     if (fs.existsSync(tsconfigPath)) {
       try {
         const tsconfig = await fsp.readFile(tsconfigPath, 'utf8');

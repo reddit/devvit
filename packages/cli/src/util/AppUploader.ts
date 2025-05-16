@@ -10,7 +10,6 @@ import { getCaptcha } from './captcha.js';
 import { checkAppNameAvailability } from './checkAppNameAvailability.js';
 import { createAppClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
-import { type DevvitConfig } from './devvit-config.js';
 import { readPackageJSON } from './package-managers/package-util.js';
 
 export class AppUploader {
@@ -22,13 +21,9 @@ export class AppUploader {
     this.#cmd = cmd;
   }
 
-  async createNewApp(
-    projectConfig: DevvitConfig,
-    copyPaste: boolean,
-    justDoIt: boolean
-  ): Promise<FullAppInfo> {
+  async createNewApp(copyPaste: boolean, justDoIt: boolean): Promise<FullAppInfo> {
     const appName = await this.#promptNameUntilNotTaken(
-      sluggable(projectConfig.name) ? makeSlug(projectConfig.name) : undefined
+      sluggable(this.#cmd.project.name) ? makeSlug(this.#cmd.project.name) : undefined
     );
     const description = await this.#getAppDescription();
     const isNsfw = justDoIt ? false : await this.#promptForNSFW();
@@ -51,7 +46,7 @@ export class AppUploader {
         categories: [], // TODO: should prompt in the future
         captcha,
       });
-      await this.#cmd.updateProjectConfig({ name: newApp.slug });
+      this.#cmd.project.name = newApp.slug;
       ux.action.stop('Successfully created your app in Reddit!');
       return {
         app: newApp,
@@ -129,6 +124,6 @@ export class AppUploader {
   }
 
   async #getAppDescription(): Promise<string> {
-    return ((await readPackageJSON(this.#cmd.projectRoot)).description || '')?.substring(0, 200);
+    return ((await readPackageJSON(this.#cmd.project.root)).description || '')?.substring(0, 200);
   }
 }

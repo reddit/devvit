@@ -37,7 +37,7 @@ export default class Uninstall extends DevvitCommand {
     const { args } = await this.parse(Uninstall);
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
 
-    const appName = args.app || this.projectConfig.name;
+    const appName = args.app || this.project.name;
 
     await getAccessTokenAndLoginIfNeeded();
 

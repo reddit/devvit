@@ -1,4 +1,3 @@
-import type { AppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { Command, Flags } from '@oclif/core';
 import { parse } from '@oclif/core/lib/parser/index.js';
@@ -11,12 +10,10 @@ import { createDeveloperAccountClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
 import {
   devvitClassicConfigFilename,
-  type DevvitConfig,
-  DevvitConfigCache,
   devvitV1ConfigFilename,
-  newDevvitConfigCache,
-} from '../devvit-config.js';
-import type { DevvitPackageConfig } from '../package-managers/package-util.js';
+  newProject,
+  type Project,
+} from '../project.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 
 /**
@@ -33,31 +30,20 @@ export abstract class DevvitCommand extends Command {
   } as const;
 
   protected readonly developerAccountClient = createDeveloperAccountClient();
-  #configCache: DevvitConfigCache | undefined;
+  #project: Project | undefined;
 
-  /** @deprecated Use `v1ProjectConfig()` instead. */
-  get packageConfig(): Readonly<DevvitPackageConfig> | undefined {
-    return this.#configCache?.packageConfig;
+  /** Project configuration. */
+  get project(): Project {
+    if (!this.#project) this.error(`No project ${devvitClassicConfigFilename} config file found.`);
+    return this.#project;
   }
 
   /**
-   * Project configuration. Warning: do not confuse `projectConfig()` for
-   * oclif's `Command.config` which is part of the class hierarchy.
+   * Warning: mutating project state is not well supported. State copies are not
+   * invalidated.
    */
-  get projectConfig(): Readonly<DevvitConfig> {
-    return this.#nonnullConfigCache.config;
-  }
-
-  get projectRoot(): string {
-    return this.#nonnullConfigCache.root;
-  }
-
-  async updateProjectConfig(updates: Partial<Readonly<DevvitConfig>>): Promise<void> {
-    await this.#nonnullConfigCache.update(updates);
-  }
-
-  get v1ProjectConfig(): Readonly<AppConfig | undefined> {
-    return this.#configCache?.v1Config;
+  set project(project: Project) {
+    this.#project = project;
   }
 
   protected override async init(): Promise<void> {
@@ -79,9 +65,8 @@ export abstract class DevvitCommand extends Command {
       flags: DevvitCommand.baseFlags,
     });
 
-    this.#configCache = await newDevvitConfigCache(flags.config);
-    if (flags.config && !this.#configCache)
-      this.error(`Project config "${flags.config}" not found.`);
+    this.#project = await newProject(flags.config);
+    if (flags.config && !this.#project) this.error(`Project config "${flags.config}" not found.`);
     if (
       flags.config &&
       flags.config !== devvitClassicConfigFilename &&
@@ -207,16 +192,10 @@ export abstract class DevvitCommand extends Command {
     // Otherwise, we need to read appName or app version from the config
     // If the agrument has "@<version>" format
     if (appWithVersion.startsWith('@')) {
-      return { appName: this.projectConfig.name, version: appWithVersion };
+      return { appName: this.project.name, version: appWithVersion };
     }
 
     // Otherwise, default to the config and latest.
-    return { appName: this.projectConfig.name, version: 'latest' };
-  }
-
-  get #nonnullConfigCache(): DevvitConfigCache {
-    if (!this.#configCache)
-      this.error(`No project ${devvitClassicConfigFilename} config file found.`);
-    return this.#configCache;
+    return { appName: this.project.name, version: 'latest' };
   }
 }

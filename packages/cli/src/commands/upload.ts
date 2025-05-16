@@ -106,7 +106,7 @@ export default class Upload extends DevvitCommand {
     let appInfo: FullAppInfo | undefined;
     try {
       appInfo = await getAppBySlug(this.#appClient, {
-        slug: this.projectConfig.name,
+        slug: this.project.name,
         hidePrereleaseVersions: true,
         limit: 1, // fetched version limit; we only need the latest one
       });
@@ -139,11 +139,7 @@ export default class Upload extends DevvitCommand {
     if (shouldCreateNewApp || !appInfo) {
       const appUploader = new AppUploader(this);
 
-      appInfo = await appUploader.createNewApp(
-        this.projectConfig,
-        flags['copy-paste'],
-        flags['just-do-it']
-      );
+      appInfo = await appUploader.createNewApp(flags['copy-paste'], flags['just-do-it']);
 
       this.#event.devplatform.cli_upload_is_initial = true;
       this.#event.devplatform.cli_upload_is_nsfw = appInfo.app?.isNsfw;
@@ -155,7 +151,7 @@ export default class Upload extends DevvitCommand {
     }
 
     if (!appInfo?.app) {
-      this.error(`App ${this.projectConfig.name} is not found`);
+      this.error(`App ${this.project.name} is not found`);
     }
 
     // Now, create a new version.
@@ -211,7 +207,7 @@ export default class Upload extends DevvitCommand {
     }
 
     if (
-      !fs.existsSync(path.join(this.projectRoot, '.pnp.cjs')) &&
+      !fs.existsSync(path.join(this.project.root, '.pnp.cjs')) &&
       !(await this.#canImportPublicAPI())
     ) {
       this.error(
@@ -225,7 +221,7 @@ export default class Upload extends DevvitCommand {
     return new Promise<boolean>((resolve, reject) => {
       const checkImportCommand = `node --input-type=module -e "await import('@devvit/public-api')"`;
       // Run this as a child process
-      const process = exec(checkImportCommand, { cwd: this.projectRoot }, (error) => {
+      const process = exec(checkImportCommand, { cwd: this.project.root }, (error) => {
         // If there was an error creating the child process, reject the promise
         if (error) {
           reject(error);
@@ -265,7 +261,7 @@ export default class Upload extends DevvitCommand {
     };
 
     try {
-      return await bundler.bundle(this.projectRoot, actorSpec);
+      return await bundler.bundle(this.project.root, actorSpec);
     } catch (err) {
       this.error(StringUtil.caughtToString(err, 'message'));
     }

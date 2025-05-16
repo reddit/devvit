@@ -17,7 +17,7 @@ export const createAssetsIfMissing: UpdateAction = {
     }
   },
   run: async (cmd) => {
-    const assetsDir = path.join(cmd.projectRoot, 'assets');
+    const assetsDir = path.join(cmd.project.root, 'assets');
     if (!fs.existsSync(assetsDir)) {
       await fsp.mkdir(assetsDir);
     }

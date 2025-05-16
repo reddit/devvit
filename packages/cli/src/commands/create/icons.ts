@@ -38,12 +38,12 @@ export default class Icons extends DevvitCommand {
   }
 
   async #getSvgAssets(): Promise<SvgAsset[]> {
-    if (!(await dirExists(path.join(this.projectRoot, ASSET_DIRNAME)))) {
+    if (!(await dirExists(path.join(this.project.root, ASSET_DIRNAME)))) {
       // Return early if there isn't an assets directory
       return [];
     }
 
-    const assetsPath = path.join(this.projectRoot, ASSET_DIRNAME);
+    const assetsPath = path.join(this.project.root, ASSET_DIRNAME);
     const assetsGlob = path
       .join(assetsPath, '**', '*.svg')
       // Note: tiny-glob *always* uses `/` as its path separator, even on Windows, so we need to

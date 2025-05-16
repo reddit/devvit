@@ -49,7 +49,7 @@ export class AppVersionUploader {
     let products: JSONProduct[] | undefined;
 
     try {
-      products = await readProducts(this.#cmd.projectRoot);
+      products = await readProducts(this.#cmd.project.root);
     } catch (err) {
       throw new Error(
         `An error occurred when reading and validating ${PRODUCTS_JSON_FILE}: 
@@ -105,7 +105,7 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
    */
   async #getReadmeContent(): Promise<string> {
     const readmeFileName = 'README.md';
-    const readmePath = (await glob('*.md', { cwd: this.#cmd.projectRoot })).filter(
+    const readmePath = (await glob('*.md', { cwd: this.#cmd.project.root })).filter(
       (file) => file.toLowerCase() === readmeFileName.toLowerCase()
     );
 
@@ -116,7 +116,7 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
     }
 
     if (readmePath.length >= 1) {
-      const aboutBuffer = await fsp.readFile(path.join(this.#cmd.projectRoot, readmePath[0]));
+      const aboutBuffer = await fsp.readFile(path.join(this.#cmd.project.root, readmePath[0]));
       const utf8String = decodeAsUtf8(aboutBuffer);
       if (utf8String) {
         // we're UTF-8, no worries

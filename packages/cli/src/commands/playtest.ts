@@ -6,7 +6,7 @@ import {
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { ASSET_DIRNAME, WEB_VIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
+import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import {
   ACTOR_SRC_DIR,
   ACTOR_SRC_PRIMARY_NAME,
@@ -43,9 +43,8 @@ import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
+import { Project } from '../util/project.js';
 import Logs from './logs.js';
-
-const ON_WATCH_DEBOUNCE_MS_DEFAULT = 100;
 
 export default class Playtest extends DevvitCommand {
   static override description =
@@ -59,11 +58,6 @@ export default class Playtest extends DevvitCommand {
 
   static override flags = {
     ...Logs.flags,
-    // to-do: delete. This only exists in case users dislike live-reload.
-    'no-live-reload': Flags.boolean({
-      aliases: ['noLiveReload'],
-      description: 'Attempt to reload the subreddit being browsed automatically.',
-    }),
     'employee-update': Flags.boolean({
       aliases: ['employeeUpdate'],
       description:
@@ -102,7 +96,6 @@ export default class Playtest extends DevvitCommand {
   // Args
   #subreddit?: string; // unprefixed
   #flags?: CommandFlags<typeof Playtest>;
-  #debounceMs: number = ON_WATCH_DEBOUNCE_MS_DEFAULT;
 
   // State
   #appInfo?: FullAppInfo | undefined;
@@ -116,6 +109,7 @@ export default class Playtest extends DevvitCommand {
   #appLogSub?: Subscription;
   #watchSrc?: Subscription;
   #watchAssets?: chokidar.FSWatcher;
+  #watchConfigFile?: chokidar.FSWatcher;
   #server?: PlaytestServer;
 
   async #getExistingInstallInfo(
@@ -181,7 +175,7 @@ export default class Playtest extends DevvitCommand {
     const { args, flags } = await this.parse(Playtest);
     this.#flags = flags;
     this.#subreddit = getSubredditNameWithoutPrefix(args.subreddit);
-    this.#debounceMs = await this.#readDebounceTime();
+    this.project.flag.watchDebounceMillis = this.#flags?.['debounce'] as number | undefined;
 
     const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
@@ -201,7 +195,7 @@ export default class Playtest extends DevvitCommand {
     }
 
     this.#appInfo = await getAppBySlug(this.#appClient, {
-      slug: this.projectConfig.name,
+      slug: this.project.name,
       limit: 1, // fetched version limit; we only need the latest one
     });
 
@@ -213,7 +207,7 @@ export default class Playtest extends DevvitCommand {
 
     const isOwner = this.#appInfo?.app?.owner?.displayName === username;
     await this.#checkIfUserAllowedToPlaytestThisApp(
-      this.projectConfig.name,
+      this.project.name,
       isOwner,
       token,
       flags['employee-update']
@@ -237,10 +231,7 @@ export default class Playtest extends DevvitCommand {
     );
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
-    this.#installationInfo = await this.#getExistingInstallInfo(
-      this.projectConfig.name,
-      this.#subreddit
-    );
+    this.#installationInfo = await this.#getExistingInstallInfo(this.project.name, this.#subreddit);
 
     if (!this.#installationInfo) {
       const userT2Id = await this.getUserT2Id(token);
@@ -267,7 +258,7 @@ export default class Playtest extends DevvitCommand {
     this.#appLogSub = makeLogSubscription(
       {
         subreddit: this.#installationInfo.installation!.location!.id,
-        appName: this.projectConfig.name,
+        appName: this.project.name,
       },
       this,
       flags as CommandFlags<typeof Logs>
@@ -275,6 +266,7 @@ export default class Playtest extends DevvitCommand {
 
     this.#startWatchingSrc(username);
     this.#startWatchingAssets();
+    this.#startWatchingConfigFile();
 
     // We don't know when the user is done. If connected to a terminal, end when
     // stdin is closed. Otherwise, close immediately to avoid the chance that
@@ -289,7 +281,7 @@ export default class Playtest extends DevvitCommand {
    * Watching source code changes
    */
   #startWatchingSrc(username: string): void {
-    const watchSrc = this.#bundler.watch(this.projectRoot, {
+    const watchSrc = this.#bundler.watch(this.project.root, {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
       // Version is always incorrect since it changes on each upload and the
@@ -310,11 +302,12 @@ export default class Playtest extends DevvitCommand {
    * Watching asset changes
    */
   #startWatchingAssets(): void {
-    const assetDir = path.join(this.projectRoot, ASSET_DIRNAME);
-    const webViewAssetDir = path.join(this.projectRoot, WEB_VIEW_ASSET_DIRNAME);
-    const productsJSON = path.join(this.projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
+    const assetDir = path.join(this.project.root, ASSET_DIRNAME);
+    const productsJSON = path.join(this.project.root, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
 
-    const assetPaths = [assetDir, webViewAssetDir, productsJSON];
+    const assetPaths = [assetDir, productsJSON];
+    if (this.project.clientDir)
+      assetPaths.push(path.join(this.project.root, this.project.clientDir));
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
 
     this.#watchAssets.on('all', () => {
@@ -323,11 +316,38 @@ export default class Playtest extends DevvitCommand {
     });
   }
 
+  #startWatchingConfigFile(): void {
+    const configFile = path.join(this.project.root, this.project.filename);
+    this.#watchConfigFile = chokidar.watch(configFile, { ignoreInitial: true });
+
+    this.#watchConfigFile.on('all', async (ev) => {
+      if (ev === 'change' || ev === 'add')
+        try {
+          this.project = await Project.new(this.project.root, this.project.filename);
+        } catch (err) {
+          this.error(`Config load failure: ${StringUtil.caughtToString(err, 'message')}.`, {
+            exit: false,
+          });
+        }
+
+      // A lot can change when the config is modified. Eg:
+      // - The project name can change.
+      // - The watch dir can change. The watch process must be restarted.
+      // - A single property can change. Identifying it requires config diff
+      //   support and reloading requires examining the state fanout.
+      // - The file can be renamed. This would require recomputing the project
+      //   root and restarting the watch process.
+      // - The config can be invalid or the file deleted.
+      this.log(`${this.project.filename} modified; some changes may require a playtest restart.`);
+    });
+  }
+
   #onWatch = debounce(
     (result: BundlerResult) => {
       void this.#onWatchActual(result);
     },
-    () => this.#debounceMs // Use a lambda here, because value won't be set at class construction time
+    // Use a lambda here, because value won't be set at class construction time.
+    () => this.project.watchDebounceMillis
   );
 
   #onWatchActual = async (result: BundlerResult): Promise<void> => {
@@ -358,7 +378,7 @@ export default class Playtest extends DevvitCommand {
     this.#isOnWatchExecuting = true;
 
     if (!this.#appInfo?.app) {
-      this.error(`Something went wrong: App ${this.projectConfig.name} is not found`);
+      this.error(`Something went wrong: App ${this.project.name} is not found`);
     }
 
     if (!this.#version) {
@@ -409,9 +429,7 @@ export default class Playtest extends DevvitCommand {
         appVersionId: appVersionInfo.id,
       });
 
-      if (!this.#flags?.['no-live-reload']) {
-        this.#server?.send({ appInstalled: {} });
-      }
+      this.#server?.send({ appInstalled: {} });
 
       const playtestUrl = chalk.bold.green(
         `${REDDIT_DESKTOP}/r/${this.#subreddit}${
@@ -444,26 +462,6 @@ export default class Playtest extends DevvitCommand {
     this.#isOnWatchExecuting = false;
     this.#lastQueuedBundles = undefined;
     this.#onWatch({ bundles: newerBundles });
-  }
-
-  /**
-   * Read the debounce delay (ms) from either the CLI flags or the package.json
-   */
-  async #readDebounceTime(): Promise<number> {
-    const debounceFlagMs = this.#flags?.['debounce'] as number | undefined;
-
-    // if the CLI flag is set, use that
-    if (debounceFlagMs !== undefined) {
-      return debounceFlagMs;
-    }
-
-    if (this.packageConfig?.playtest?.debounceConfigMs != null) {
-      // Else, if the package.json has it set, use that
-      return this.packageConfig.playtest.debounceConfigMs;
-    }
-
-    // If no override is provided, use the default
-    return ON_WATCH_DEBOUNCE_MS_DEFAULT;
   }
 
   async #checkIfUserAllowedToPlaytestThisApp(
@@ -505,6 +503,7 @@ export default class Playtest extends DevvitCommand {
     await this.#bundler.dispose();
     this.#server?.close();
     await this.#watchAssets?.close();
+    await this.#watchConfigFile?.close();
     this.#onWatch.clear();
 
     this.log('Playtest session has ended.');
@@ -512,7 +511,7 @@ export default class Playtest extends DevvitCommand {
     // If this.#installationInfo exists that means a playtest version has already been installed
     if (this.#installationInfo) {
       const revertCommand = chalk.green(
-        `devvit install ${this.#subreddit} ${this.projectConfig.name}@latest`
+        `devvit install ${this.#subreddit} ${this.project.name}@latest`
       );
 
       this.log(

@@ -32,7 +32,7 @@ export default class UpdateApp extends DevvitCommand {
     await super.init();
 
     const devvitVersion = semver.parse(cliPackageJSON.version);
-    const result = await matchDevvitPackageVersions(this.projectRoot, devvitVersion!, true);
+    const result = await matchDevvitPackageVersions(this.project.root, devvitVersion!, true);
 
     if (!result.success) {
       process.exit(1);

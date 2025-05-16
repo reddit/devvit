@@ -94,7 +94,7 @@ export default class AddProduct extends DevvitCommand {
   } as const;
 
   get productsFilePath(): string {
-    return path.join(this.projectRoot, 'src', PRODUCTS_JSON_FILE);
+    return path.join(this.project.root, 'src', PRODUCTS_JSON_FILE);
   }
 
   async run() {
@@ -226,7 +226,7 @@ export default class AddProduct extends DevvitCommand {
     };
 
     ux.action.start(`Reading ${PRODUCTS_JSON_FILE}`);
-    const products = await readProducts(this.projectRoot);
+    const products = await readProducts(this.project.root);
 
     if (products) {
       ux.action.stop(
@@ -241,7 +241,7 @@ export default class AddProduct extends DevvitCommand {
   }
 
   async #getAvailableAssets(): Promise<string[]> {
-    return (await readdir(path.join(this.projectRoot, 'assets'), { recursive: true })).filter(
+    return (await readdir(path.join(this.project.root, 'assets'), { recursive: true })).filter(
       (file) => file.endsWith('.png')
     );
   }
