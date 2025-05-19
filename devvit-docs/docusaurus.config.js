@@ -59,7 +59,13 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           lastVersion: '0.11',
         },
-        blog: false,
+        blog: {
+          path: 'blog',
+          routeBasePath: 'blog',
+          // Optional blog settings
+          postsPerPage: 10,
+          showReadingTime: true,
+        },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
