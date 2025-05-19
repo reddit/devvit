@@ -11,7 +11,6 @@ import type {
   Bundle,
   PaymentsConfig,
 } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/Product.js';
@@ -50,15 +49,17 @@ export async function readProducts(projectRoot: string): Promise<JSONProduct[] |
  * validation steps that should exit early should errors be thrown
  */
 export function getPaymentsConfig(
+  mediaDir: string | undefined,
   bundle: Readonly<Bundle>,
   products: JSONProduct[],
   verifyProductImgAssets: boolean = true
 ): PaymentsConfig {
-  checkProductsConfig(products, bundle, verifyProductImgAssets);
+  checkProductsConfig(mediaDir, products, bundle, verifyProductImgAssets);
   return makePaymentsConfig(products);
 }
 
 function checkProductsConfig(
+  mediaDir: string | undefined,
   products: JSONProduct[],
   bundle: Readonly<Bundle>,
   verifyProductImgAssets: boolean = true
@@ -126,8 +127,8 @@ function checkProductsConfig(
       }
 
       // enforce image constraints on icons
-      if (product.images.icon) {
-        validateProductIcon(path.join(ASSET_DIRNAME, product.images.icon));
+      if (mediaDir && product.images.icon) {
+        validateProductIcon(path.join(mediaDir, product.images.icon));
       }
     }
 

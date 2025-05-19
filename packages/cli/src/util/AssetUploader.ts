@@ -8,7 +8,6 @@ import type {
 } from '@devvit/protos/community.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
-  ASSET_DIRNAME,
   type AssetMap,
   MAX_ASSET_FOLDER_SIZE_BYTES,
   MAX_ASSET_GIF_SIZE,
@@ -55,7 +54,9 @@ export class AssetUploader {
     webViewAssetMap?: AssetMap;
   }> {
     const [regularAssets, webViewAssets] = await Promise.all([
-      this.#getAssets(ASSET_DIRNAME, ALLOWED_ASSET_EXTENSIONS),
+      this.#cmd.project.mediaDir
+        ? this.#getAssets(this.#cmd.project.mediaDir, ALLOWED_ASSET_EXTENSIONS)
+        : [],
       this.#cmd.project.clientDir ? this.#getAssets(this.#cmd.project.clientDir, [], true) : [],
     ]);
 

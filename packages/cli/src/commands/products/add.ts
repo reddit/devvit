@@ -241,8 +241,9 @@ export default class AddProduct extends DevvitCommand {
   }
 
   async #getAvailableAssets(): Promise<string[]> {
-    return (await readdir(path.join(this.project.root, 'assets'), { recursive: true })).filter(
-      (file) => file.endsWith('.png')
-    );
+    if (!this.project.mediaDir) return [];
+    return (
+      await readdir(path.join(this.project.root, this.project.mediaDir), { recursive: true })
+    ).filter((file) => file.endsWith('.png'));
   }
 }

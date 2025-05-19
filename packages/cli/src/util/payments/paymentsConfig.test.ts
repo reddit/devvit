@@ -72,7 +72,7 @@ describe('Read product.json', () => {
 describe('Get payments config', () => {
   it('throws an error if the bundle does not provide a PaymentProcessor', () => {
     const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
-    expect(() => getPaymentsConfig(bundle, MOCK_PRODUCTS_JSON.products)).toThrowError(
+    expect(() => getPaymentsConfig(undefined, bundle, MOCK_PRODUCTS_JSON.products)).toThrowError(
       /You have a `products\.json` with products, but your app does not handle payment processing of those products./
     );
   });
@@ -82,13 +82,13 @@ describe('Get payments config', () => {
     const products = [{ ...MOCK_PRODUCTS_JSON.products[0], images: { icon: productImage } }];
     const bundle: Bundle = { ...MOCK_BUNDLE, assetIds: { 'exists.jpg': 'abc123' } };
 
-    expect(() => getPaymentsConfig(bundle, products)).toThrowError(
+    expect(() => getPaymentsConfig(undefined, bundle, products)).toThrowError(
       `Product images ${productImage} are not included in the assets`
     );
   });
 
   it('throws an error if no products are found ', () => {
-    expect(() => getPaymentsConfig(MOCK_BUNDLE, [])).toThrowError(
+    expect(() => getPaymentsConfig(undefined, MOCK_BUNDLE, [])).toThrowError(
       'you must specify products in the `src/products.json` config file'
     );
   });
@@ -103,13 +103,13 @@ describe('Get payments config', () => {
         'devvit-invalid': 'this breaks upload',
       },
     };
-    expect(() => getPaymentsConfig(MOCK_BUNDLE, [invalidProduct])).toThrowError(
+    expect(() => getPaymentsConfig(undefined, MOCK_BUNDLE, [invalidProduct])).toThrowError(
       'Products metadata cannot start with "devvit-". Invalid keys: devvit-invalid'
     );
   });
 
   it('creates payments config products.json is found and formatted properly', () => {
-    expect(getPaymentsConfig(MOCK_BUNDLE, MOCK_PRODUCTS_JSON.products)).toStrictEqual(
+    expect(getPaymentsConfig(undefined, MOCK_BUNDLE, MOCK_PRODUCTS_JSON.products)).toStrictEqual(
       makePaymentsConfig(MOCK_PRODUCTS_JSON.products)
     );
   });
@@ -122,7 +122,7 @@ describe('Get payments config', () => {
       accountingType: AccountingType.INSTANT,
     };
 
-    expect(getPaymentsConfig(MOCK_BUNDLE, [productWithoutMetadata])).toStrictEqual(
+    expect(getPaymentsConfig(undefined, MOCK_BUNDLE, [productWithoutMetadata])).toStrictEqual(
       // The metadata gets added by makePaymentsConfig
       makePaymentsConfig([{ ...productWithoutMetadata, metadata: {} }])
     );
@@ -137,7 +137,9 @@ describe('Get payments config', () => {
         'exists.jpg': 'abc123',
       },
     };
-    expect(getPaymentsConfig(bundle, products, false)).toStrictEqual(makePaymentsConfig(products));
+    expect(getPaymentsConfig(undefined, bundle, products, false)).toStrictEqual(
+      makePaymentsConfig(products)
+    );
   });
 });
 

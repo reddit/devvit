@@ -68,7 +68,7 @@ export default class BundleActor extends DevvitCommand {
         }
 
         if (products) {
-          bundle.paymentsConfig = getPaymentsConfig(bundle, products, false);
+          bundle.paymentsConfig = getPaymentsConfig(this.project.mediaDir, bundle, products, false);
         }
 
         await writeFile(

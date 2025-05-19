@@ -6,7 +6,6 @@ import {
   VersionVisibility,
 } from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import {
   ACTOR_SRC_DIR,
   ACTOR_SRC_PRIMARY_NAME,
@@ -302,10 +301,10 @@ export default class Playtest extends DevvitCommand {
    * Watching asset changes
    */
   #startWatchingAssets(): void {
-    const assetDir = path.join(this.project.root, ASSET_DIRNAME);
     const productsJSON = path.join(this.project.root, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
 
-    const assetPaths = [assetDir, productsJSON];
+    const assetPaths = [productsJSON];
+    if (this.project.mediaDir) assetPaths.push(path.join(this.project.root, this.project.mediaDir));
     if (this.project.clientDir)
       assetPaths.push(path.join(this.project.root, this.project.clientDir));
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });

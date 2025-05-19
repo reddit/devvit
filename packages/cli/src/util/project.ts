@@ -9,7 +9,13 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 
 import type { JSONValue } from '@devvit/shared-types/json.js';
-import { type AppConfig, parseAppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
+import {
+  type AppConfig,
+  type AppPermissionConfig,
+  type AppPostConfig,
+  type AppServerConfig,
+  parseAppConfig,
+} from '@devvit/shared-types/schemas/config-file.v1.js';
 import path from 'path';
 
 import { findUpDirContaining, isFile } from './file-util.js';
@@ -64,8 +70,14 @@ export class Project {
     this.#packageConfig = packageConfig;
   }
 
+  // to-do: just return post once classic is removed.
   get clientDir(): string | undefined {
     return isAppConfig(this.#config) ? this.#config.post?.client.dir : 'webroot';
+  }
+
+  // to-do: just return media once classic is removed.
+  get mediaDir(): string | undefined {
+    return isAppConfig(this.#config) ? this.#config.media?.dir : 'assets';
   }
 
   get name(): string {
@@ -78,6 +90,19 @@ export class Project {
     writeConfig(this.root, this.filename, this.#config);
   }
 
+  get permissions(): Readonly<AppPermissionConfig | undefined> {
+    return isAppConfig(this.#config) ? this.#config.permissions : undefined;
+  }
+
+  get post(): Readonly<AppPostConfig | undefined> {
+    return isAppConfig(this.#config) ? this.#config.post : undefined;
+  }
+
+  get server(): Readonly<AppServerConfig | undefined> {
+    return isAppConfig(this.#config) ? this.#config.server : undefined;
+  }
+
+  // to-do: move into devvit.json.
   get watchDebounceMillis(): number {
     return this.flag.watchDebounceMillis ?? this.#packageConfig?.playtest?.debounceConfigMs ?? 100;
   }

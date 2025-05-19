@@ -71,7 +71,7 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
             '@devvit/payments',
             '@devvit/public-api',
           ]);
-          bundle.paymentsConfig = getPaymentsConfig(bundle, products);
+          bundle.paymentsConfig = getPaymentsConfig(this.#cmd.project.mediaDir, bundle, products);
         }
       })
     );
