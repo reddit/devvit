@@ -1,12 +1,8 @@
-import { exec as _exec } from 'node:child_process';
-import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import util from 'node:util';
 
 import { fileTypeFromFile } from 'file-type';
 import Mustache from 'mustache';
-const exec = util.promisify(_exec);
 
 const RAW_FILE_MIME_TYPES: string[] = [
   'image/',
@@ -32,15 +28,6 @@ export default class Cutter {
   async cut(target: string, mustacheContext: unknown): Promise<void> {
     await fsp.mkdir(target, { recursive: true });
     await this.#cut(this.source, target, mustacheContext);
-
-    const cmd = path.join(target, 'init.sh');
-    if (fs.existsSync(cmd)) {
-      const { stderr } = await exec(`bash ${cmd}`);
-      if (stderr.length) {
-        throw new Error(stderr);
-      }
-      fs.rmSync(cmd);
-    }
   }
 
   async #cut(source: string, target: string, mustacheContext: unknown): Promise<void> {
