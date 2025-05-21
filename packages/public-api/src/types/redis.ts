@@ -1,5 +1,9 @@
 import type { HScanResponse, ZScanResponse } from '@devvit/protos';
 
+// TODO: This code is currently cloned to the Devvit Web world in the `@devvit/redis` package. If
+//  you change this code, please make sure to update the other package as well. Eventually, this
+//  copy of the code will be deleted, when we move to a fully Devvit Web world.
+
 export type TxClientLike = {
   /**
    * Executes all previously queued commands in a transaction and
