@@ -1,5 +1,4 @@
 import { ESBuildPack } from '@devvit/build-pack/esbuild/ESBuildPack.js';
-import { TscTypeChecker } from '@devvit/build-pack/index.js';
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
 import { type Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
@@ -17,13 +16,10 @@ export type BundlerResult = {
 export class Bundler {
   #buildPack: ESBuildPack;
 
-  constructor(typecheckEnabled: boolean = true) {
+  constructor() {
     this.#buildPack = new ESBuildPack(
       { hostname: LOCAL_HOSTNAME },
-      {
-        disableExternDevvitProtos: DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS,
-        typeChecker: typecheckEnabled ? new TscTypeChecker() : undefined,
-      }
+      { disableExternDevvitProtos: DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS }
     );
   }
 

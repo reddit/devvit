@@ -90,7 +90,7 @@ export default class Playtest extends DevvitCommand {
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();
 
-  readonly #bundler: Bundler = new Bundler(true);
+  readonly #bundler: Bundler = new Bundler();
 
   // Args
   #subreddit?: string; // unprefixed

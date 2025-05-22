@@ -59,13 +59,6 @@ export default class Upload extends DevvitCommand {
       required: false,
       hidden: false,
     }),
-    'disable-typecheck': Flags.boolean({
-      aliases: ['disableTypecheck'],
-      char: 't',
-      description: 'Disable typechecking before uploading',
-      default: false,
-      hidden: true,
-    }),
     'copy-paste': Flags.boolean({
       aliases: ['copyPaste'],
       description: 'Copy-paste the auth code instead of opening a browser',
@@ -133,7 +126,7 @@ export default class Upload extends DevvitCommand {
 
     ux.action.start('Verifying app builds');
     // Version is unknown until upload. Use a fake one for build verification.
-    await this.#bundleActors(username, '0.0.0', !flags['disable-typecheck']);
+    await this.#bundleActors(username, '0.0.0');
     ux.action.stop();
 
     if (shouldCreateNewApp || !appInfo) {
@@ -160,11 +153,7 @@ export default class Upload extends DevvitCommand {
     this.#event.devplatform.app_version_number = appVersionNumber.toString();
 
     ux.action.start('Building');
-    const bundles = await this.#bundleActors(
-      username,
-      appVersionNumber.toString(),
-      !flags['disable-typecheck']
-    );
+    const bundles = await this.#bundleActors(username, appVersionNumber.toString());
     ux.action.stop();
 
     try {
@@ -248,12 +237,8 @@ export default class Upload extends DevvitCommand {
     return appVersion;
   }
 
-  async #bundleActors(
-    username: string,
-    version: string,
-    typecheck: boolean = true
-  ): Promise<Bundle[]> {
-    const bundler = new Bundler(typecheck);
+  async #bundleActors(username: string, version: string): Promise<Bundle[]> {
+    const bundler = new Bundler();
     const actorSpec = {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
