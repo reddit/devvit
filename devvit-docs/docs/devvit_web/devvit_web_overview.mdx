@@ -1,6 +1,5 @@
 # Overview
 
-Overview
 Introducing Devvit Web: an easy way to build Devvit apps using a standard web stack.
 
 :::note
@@ -8,7 +7,7 @@ This is an early-access, experimental feature. Big caveat: you won’t be able t
 using Devvit Web just yet, but that’s coming in July (you can checkout our [future roadmap](../devvit_web/future_roadmap)).
 
 As always, we love your feedback! Let us know what you think on [r/devvit](https://www.reddit.com/r/Devvit/)
-or [Discord](https://discord.com/channels/1050224141732687912/1372228931066794124).
+or [Discord](https://discord.gg/nZDXw2er).
 :::
 
 ## What it is
@@ -30,18 +29,19 @@ In addition, since you’re working with standard web technologies your apps sho
 
 As with most experimental features, there are some caveats.
 
-| Limitation           | What it means                                                                                                                                                                               |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Serverless endpoints | The node server will run just long enough to execute your endpoint function and return a response, which means you can’t use packages that require long-running connections like streaming. |
-| Package limitations  | Developers cannot use fs or external native packages.  For now, we recommend using external services over the native dependencies, such as [StreamPot](https://streampot.io/) (instead of ffmpeg) and [OpenAI](https://platform.openai.com/docs/guides/embeddings) (instead of @xenova/transformers) . |
-| Single request and single response handling only | Streaming or chunked responses and websockets are not supported.   Long-polling is supported if it’s under the max request time. |
-| No external requests from your client | You can’t have any external requests other than the app's webview domain. All backend responses are locked down to the webview domain via CSP. (Your backend can make external fetch requests though.) |
+| Limitation                                       | What it means                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Serverless endpoints                             | The node server will run just long enough to execute your endpoint function and return a response, which means you can’t use packages that require long-running connections like streaming.                                                                                                           |
+| Package limitations                              | Developers cannot use fs or external native packages. For now, we recommend using external services over the native dependencies, such as [StreamPot](https://streampot.io/) (instead of ffmpeg) and [OpenAI](https://platform.openai.com/docs/guides/embeddings) (instead of @xenova/transformers) . |
+| Single request and single response handling only | Streaming or chunked responses and websockets are not supported. Long-polling is supported if it’s under the max request time.                                                                                                                                                                        |
+| No external requests from your client            | You can’t have any external requests other than the app's webview domain. All backend responses are locked down to the webview domain via CSP. (Your backend can make external fetch requests though.)                                                                                                |
 
 Devvit Web still has the same technical requirements:
+
 - Server endpoint calls
- - Max request time: 30s
- - Max payload size: 4MB
- - Max response size: 10MB
+- Max request time: 30s
+- Max payload size: 4MB
+- Max response size: 10MB
 - HTML/CSS/JS only
 
 ## Future support

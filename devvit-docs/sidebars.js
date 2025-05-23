@@ -25,6 +25,11 @@ const sidebars = {
     },
     {
       type: 'doc',
+      label: 'Reddit Developer Funds',
+      id: 'reddit_developer_funds',
+    },
+    {
+      type: 'doc',
       label: 'Ask AI',
       id: 'ask_ai',
     },
@@ -78,6 +83,7 @@ const sidebars = {
             'devvit_web/devvit_web_overview',
             'devvit_web/devvit_web_quickstart',
             'devvit_web/devvit_web_templates',
+            'devvit_web/how_devvit_web_works',
             'devvit_web/ai_tools',
             'devvit_web/future_roadmap',
           ],
@@ -174,13 +180,13 @@ const sidebars = {
     },
     {
       type: 'doc',
-      label: 'Guidelines',
-      id: 'guidelines',
+      label: 'Devvit Rules',
+      id: 'devvit_rules',
     },
     {
       type: 'category',
       label: 'Resources',
-      items: ['reddit_developer_funds', 'get_discovered', 'mod_resources', 'limits', 'help'],
+      items: ['get_discovered', 'mod_resources', 'limits', 'help'],
     },
     {
       type: 'doc',
