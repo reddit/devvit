@@ -1,0 +1,33 @@
+# AI tools
+
+If you want to use AI tools to build your app, you’ll need an AI-powered code editor.
+
+We’re working on IDE and builder-specific instructions. Right now we have Cursor. Bolt.new, Windsurf, and Firebase Studio are coming soon!
+
+:::note
+If you have other IDE or AI builders you want us to support, please reach out on r/Devvit or #devvit-vibe-coding in [Discord](https://discord.com/invite/R7yu2wh9Qz).
+:::
+
+## Cursor setup
+
+The [React](https://github.com/reddit/devvit-react-starter-experimental), [Three.js](https://github.com/reddit/devvit-threejs-starter-experimental), and [Phaser starter](https://github.com/reddit/devvit-phaser-starter-experimental) templates include a Cursor directory that provides project-specific rules for each folder and the Devvit Model Context Protocol (MCP). The Devvit MCP gives the Cursor agent access to Devvit docs and Devvit logs when running.
+
+After you’ve installed Cursor, you can use an example repository to get started:
+
+1. Clone an AI-enabled template repo.
+
+2. In the .cursor file, you’ll see the mpc.json file, which should look like this:
+
+```tsx{
+  "mcpServers": {
+    "devvit-mcp": {
+      "command": "npx",
+      "args": ["-y", "@devvit/mcp"]
+    }
+  }
+}
+```
+
+3. Check [Cursor's](https://www.cursor.com/) settings/MCP section. The Devvit MCP server should show a green active status indicator (you might need to refresh the screen).
+
+4. Suggest a change to the agent to start coding!

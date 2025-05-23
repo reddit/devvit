@@ -71,6 +71,17 @@ const sidebars = {
           ],
         },
         'webviews',
+        {
+          type: 'category',
+          label: 'Devvit Web (experimental)',
+          items: [
+            'devvit_web/devvit_web_overview',
+            'devvit_web/devvit_web_quickstart',
+            'devvit_web/devvit_web_templates',
+            'devvit_web/ai_tools',
+            'devvit_web/future_roadmap',
+          ],
+        },
         'community_games',
         'app_image_assets',
         'post_size',
