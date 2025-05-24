@@ -16,9 +16,9 @@ Release 0.11.16 has several CLI improvements. We’ve also updated our guideline
 
 - **Require the latest CLI version to playtest**. You need to be on the latest version of the CLI in order to playtest your app properly. The latest CLI is now required to `devvit playtest` (just like it is for `devvit upload`). Things to note:
 
-- Updating your CLI does not require you to update your app code / devvit SDK (i.e. you do NOT have to run devvit update app to playtest).
+  - Updating your CLI does not require you to update your app code / devvit SDK (i.e. you do NOT have to run devvit update app to playtest).
 
-- You can update your CLI by doing `npm install -g devvit@latest`
+  - You can update your CLI by doing `npm install -g devvit@latest`
 
 - **Ensure @devvit/payments and @devvit/public-api have the same version**. Unexpected behavior resulted from mismatched payments and public api versions. Going forward, if you’re using payments the versions need to be the same.
 
