@@ -1,0 +1,72 @@
+# Future roadmap
+
+Devvit Web is still very experimental, but in general we’re following these key principles:
+
+- Make Devvit apps easier to build.
+- Lean into open web technologies.
+- Get to parity with what’s supported in Devvit today.
+
+Here are a few things you have to look forward to:
+
+**Streamlined configuration**: moving all configuration from devvit/main.tsx into a devvit.json file. In the future, your directory might look like this:
+
+```
+-src
+  - client // where your webview code goes
+  - server // where your endpoints that your app talks to go
+  - devvit.json // where you put your config file for devvit
+```
+
+**Fully supported Devvit capabilities**: here’s an example of what supported capabilities in the configuration file might look like:
+
+```tsx
+{
+   "$schema": "https://developers.reddit.com/schema/v1/config.json",
+   "name": "my-dope-app",
+   "version": "1.2.3",
+   "server": {
+      "entrypoint": "dist/server/server.js",
+   },
+    /* ... capabilities like scheduler can be defined here */
+    "scheduler": {
+      "my-job": {
+        "cron": "0 12 * * *",
+        "endpoint": "/internal/jobs/my-job"
+      },
+/* ... other jobs & capabilities */
+    },
+
+  /* ...permisisons can be defined here */
+   "permissions": {
+       "reddit": true,
+	"redis": true,
+       "fetch": {
+           "allowedDomains": [ "google.com" ]
+      }
+   },
+
+}
+```
+
+**@devvit/client library**: a robust library to handle client side interactions–including toasts, forms, payments, and more–and context events for your client app to know when to instantiate and with the right data.
+
+Other areas we’re exploring include:
+
+**1st screen customization**: giving you different options for customizing your first screen per post.
+
+**Marketing assets**: an area for developers to provide marketing assets (with required dimensions) to help promote your app.
+
+```tsx
+"assets": {
+  "icon": "images/icons.png",
+  "splashScreen": "images/splash.png",
+  "screenshots": [
+       "images/screenshot1.jpg",
+       "images/screenshot2.jpg",
+   ]
+}
+```
+
+**Multi-post-support**: making it easier to handle routing through a top-level entry point.
+
+If you have thoughts or feedback, let us know in the [#devvit-web-experimental](https://discord.gg/nZDXw2er) Discord channel!

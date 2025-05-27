@@ -4,6 +4,30 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.16: CLI improvements and updated guidelines
+
+**Release Date: May 27, 2025**
+
+Release 0.11.16 has several CLI improvements. We’ve also updated our guidelines to clarify the app review process and use of LLMs, among other things. Check out [Devvit Rules](./devvit_rules) to see what’s new!
+
+**CLI updates**
+
+- **Removed versions from devvit.yaml**. Now you’ll see less of this annoying error: _your local version number doesn't match the server, do you want to continue anyway?_. Versions are handled on our server, and existing versions in devvit.yaml will not update or have any effect on uploads.
+
+- **Require the latest CLI version to playtest**. You need to be on the latest version of the CLI in order to playtest your app properly. The latest CLI is now required to `devvit playtest` (just like it is for `devvit upload`). Things to note:
+
+  - Updating your CLI does not require you to update your app code / devvit SDK (i.e. you do NOT have to run devvit update app to playtest).
+
+  - You can update your CLI by doing `npm install -g devvit@latest`
+
+- **Ensure @devvit/payments and @devvit/public-api have the same version**. Unexpected behavior resulted from mismatched payments and public api versions. Going forward, if you’re using payments the versions need to be the same.
+
+- **Small security fix** - Thanks to a [community report](https://github.com/reddit/devvit/pull/180), we implemented a small CLI security fix.
+
+**Other updates**
+
+There’s a small change to mount() for webviews where you cannot mount() if a webview is already mounted. Doing so will now show a warning log for the developer.
+
 ## Devvit 0.11.15: Typescript update
 
 **Release Date: May 7, 2025**

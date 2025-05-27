@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "community-hub",
-  "version": "0.11.14",
+  "version": "0.11.15",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -15,12 +15,12 @@
     "test:unit-with-coverage": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@devvit/public-api": "0.11.14",
+    "@devvit/public-api": "0.11.15",
     "dset": "3.1.4",
     "zod": "3.22.4"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.11.14",
+    "@devvit/tsconfig": "0.11.15",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
   }
