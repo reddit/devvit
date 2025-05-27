@@ -3,7 +3,6 @@ import * as protos from '@devvit/protos';
 import type { PaymentsService } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
-import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
@@ -487,7 +486,6 @@ export class Devvit extends Actor {
   static #uses: {
     [fullName: protos.Definition['fullName']]: {
       def: protos.Definition;
-      options: DeepPartial<protos.PackageQuery>;
       handler: Readonly<UseHandler> | undefined;
     };
   } = {};
@@ -498,12 +496,8 @@ export class Devvit extends Actor {
   } = {};
 
   /** @internal */
-  static use<T>(d: protos.Definition, opts?: DeepPartial<protos.PackageQuery>): T {
-    this.#uses[d.fullName] = {
-      def: d,
-      options: opts ?? {},
-      handler: undefined,
-    };
+  static use<T>(d: protos.Definition): T {
+    this.#uses[d.fullName] = { def: d, handler: undefined };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const wrapped: any = {};
     for (const method of Object.values(d.methods)) {
@@ -727,7 +721,7 @@ export class Devvit extends Actor {
 
     for (const fullName in Devvit.#uses) {
       const use = Devvit.#uses[fullName];
-      use.handler = config.use<UseHandler>(use.def, use.options);
+      use.handler = config.use<UseHandler>(use.def);
     }
 
     if (Devvit.#menuItems.length > 0) {
