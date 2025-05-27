@@ -107,7 +107,7 @@ export class UIClient implements _UIClient {
       // Validate URL
       url = new URL(thingOrUrl).toString();
     } else {
-      url = new URL(thingOrUrl.permalink, 'https://www.reddit.com').toString();
+      url = new URL(thingOrUrl.url).toString();
     }
     this.#renderContext.emitEffect(url, {
       type: EffectType.EFFECT_NAVIGATE_TO_URL,
