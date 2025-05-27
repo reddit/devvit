@@ -708,11 +708,6 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static get requestedHosts(): string[] {
-    return this.#requestedFetchDomains;
-  }
-
-  /** @internal */
   constructor(config: Config) {
     super(config);
 
