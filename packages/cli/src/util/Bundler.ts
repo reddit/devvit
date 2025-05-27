@@ -28,9 +28,9 @@ export class Bundler {
     actorSpec: ActorSpec,
     includeMetafile: boolean = false
   ): Promise<Bundle[]> {
-    const compiledRes = await this.#buildPack.Compile(
-      { filename: root, info: actorSpec, includeAssets: true, minify: 0, includeMetafile },
-      undefined
+    const compiledRes = await this.#buildPack.compile(
+      // to-do: why no minify?
+      { filename: root, info: actorSpec, minify: 'None', includeMetafile }
     );
 
     if (compiledRes.warnings.length > 0) {
@@ -54,16 +54,12 @@ export class Bundler {
 
   watch(root: ProjectRootDir, actorSpec: ActorSpec): Observable<BundlerResult> {
     return this.#buildPack
-      .Watch(
-        {
-          filename: root,
-          info: actorSpec,
-          includeAssets: false,
-          minify: 0,
-          includeMetafile: false,
-        },
-        undefined
-      )
+      .watch({
+        filename: root,
+        info: actorSpec,
+        minify: 'None',
+        includeMetafile: false,
+      })
       .pipe(
         map((rsp) => {
           if (rsp.warnings.length > 0) console.warn(formatLogs(rsp.warnings));

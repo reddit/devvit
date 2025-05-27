@@ -3,10 +3,10 @@ import path from 'node:path';
 
 import {
   type AppVersionInfo,
-  type Bundle,
   InstallationType,
   type VersionVisibility,
 } from '@devvit/protos/community.js';
+import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { DevvitVersion } from '@devvit/shared-types/Version.js';

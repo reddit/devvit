@@ -1,5 +1,6 @@
 import { exec as _exec } from 'node:child_process';
 import { readdirSync } from 'node:fs';
+import fs from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -15,11 +16,11 @@ import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import chalk from 'chalk';
 import type { Validator } from 'inquirer';
 import inquirer from 'inquirer';
+import git from 'isomorphic-git';
 import semver from 'semver';
 
 import { DevvitCommand, toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import Cutter from '../util/Cutter.js';
-import { Git } from '../util/Git.js';
 import { sendEvent } from '../util/metrics.js';
 import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTemplateResolver.js';
 import { logInBox } from '../util/ui.js';
@@ -186,9 +187,11 @@ export default class New extends DevvitCommand {
   }
 
   async #gitInit(): Promise<void> {
-    const git = new Git(this.#projectPath);
-    await git.init();
-    await git.initDotGitIgnore();
+    await git.init({
+      fs,
+      dir: this.#projectPath,
+      defaultBranch: 'main',
+    });
   }
 
   async #initCreateAppParams(

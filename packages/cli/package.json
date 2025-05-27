@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "build": "rm -rf dist && tsc && yarn build:copy",
-    "build:copy": "cp -a ./src/util/templates ./dist/util; rm -rf ./dist/templates; cp -a ./src/templates ./dist/templates",
+    "build:copy": "rm -rf ./dist/templates; cp -a ./src/templates ./dist/templates",
     "clean": "rm -rf .turbo coverage dist docs.json oclif.manifest.json",
     "clobber": "yarn clean && rm -rf node_modules",
     "dev": "tsc --watch",
@@ -93,7 +93,6 @@
     "eslint": "9.11.1",
     "oclif": "3.17.2",
     "shx": "0.3.4",
-    "tmp-promise": "3.0.3",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
   },
