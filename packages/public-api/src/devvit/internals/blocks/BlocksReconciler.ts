@@ -133,7 +133,7 @@ function indentXML(xml: string): string {
 }
 
 /**
- * @internal
+ * @experimental Do not use directly, for internal use only.
  * An instance of this class should be instantiated for each OnRender call.
  * This class is responsible for:
  *   - rendering JSX elements into Blocks.
