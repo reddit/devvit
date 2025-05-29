@@ -17,11 +17,14 @@ import {
 import { ASSET_HASHING_ALGO, ASSET_UPLOAD_BATCH_SIZE } from '@devvit/shared-types/constants.js';
 import { ux } from '@oclif/core';
 import { createHash } from 'crypto';
+import { JSDOM } from 'jsdom';
 import { default as tinyglob } from 'tiny-glob';
 
 import { dirExists } from '../util/files.js';
 import { createAppClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
+
+export const DEVVIT_ANALYTICS_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -116,7 +119,13 @@ export class AssetUploader {
     return await Promise.all(
       assets.map(async (asset) => {
         const filename = path.relative(assetsPath, asset).replaceAll(path.sep, '/');
-        const file = await fsp.readFile(asset);
+        let file = await fsp.readFile(asset);
+
+        // If the webview asses is an HTML file, inject the Devvit analytics script
+        if (webViewAssets && filename.match(/\.html?$/)) {
+          file = transformHTMLBuffer(file);
+        }
+
         const size = Buffer.byteLength(file);
         const contents = new Uint8Array(file);
 
@@ -320,4 +329,33 @@ export class AssetUploader {
 
     return { newAssets, duplicateAssets, existingAssets };
   }
+}
+
+export function transformHTMLBuffer(buf: Buffer): Buffer {
+  const inStr = new TextDecoder('utf-8').decode(buf);
+  const out = transformHTML(inStr);
+  return Buffer.from(out);
+}
+
+export function transformHTML(str: string): string {
+  const { document } = new JSDOM(str).window;
+
+  // if no html tag, return early
+  const htmlTag = document.querySelector('html');
+  if (htmlTag == null) {
+    return str;
+  }
+
+  const scriptTag = `<script async type="module" src="${DEVVIT_ANALYTICS_JS_URL}"></script>`;
+
+  // if no head tag, create one after the html tag
+  const headTag = document.querySelector('head');
+  if (headTag == null) {
+    htmlTag.insertAdjacentHTML('afterbegin', `<head>${scriptTag}</head>`); // eslint-disable-line no-unsanitized/method
+  } else {
+    // if head tag exists, append the script tag to it
+    headTag.insertAdjacentHTML('beforeend', scriptTag); // eslint-disable-line no-unsanitized/method
+  }
+
+  return document.documentElement.outerHTML;
 }
