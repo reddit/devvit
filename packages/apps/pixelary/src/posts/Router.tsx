@@ -30,18 +30,28 @@ export const Router: Devvit.CustomPostComponent = (context: Context) => {
 
   const getUsername = async () => {
     if (!context.userId) return null; // Return early if no userId
-    const cacheKey = 'cache:userId-username';
-    const cache = await context.redis.hGet(cacheKey, context.userId);
+
+    const cacheKey = `cache:userId-username:${context.userId}`;
+    let cache = await context.redis.get(cacheKey);
     if (cache) {
       return cache;
-    } else {
-      const user = await context.reddit.getUserById(context.userId);
-      if (user) {
-        await context.redis.hSet(cacheKey, {
-          [context.userId]: user.username,
-        });
-        return user.username;
-      }
+    }
+
+    const cacheTtlMs = 30 * 86_400; // 30 days
+    const expiration = new Date(Date.now() + cacheTtlMs);
+
+    const oldCacheKey = 'cache:userId-username';
+    cache = await context.redis.hGet(oldCacheKey, context.userId);
+    if (cache) {
+      // Forward to the current cache.
+      await context.redis.set(cacheKey, cache, { expiration });
+      return cache;
+    }
+
+    const user = await context.reddit.getUserById(context.userId);
+    if (user) {
+      await context.redis.set(cacheKey, user.username, { expiration });
+      return user.username;
     }
     return null;
   };
