@@ -8,6 +8,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 
+import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import {
   type AppConfig,
@@ -52,14 +53,14 @@ export class Project {
   }
 
   readonly flag: { watchDebounceMillis?: number | undefined } = {};
-  readonly root: string;
+  readonly root: ProjectRootDir;
   readonly filename: string;
   readonly #config: DevvitConfig;
   /** @deprecated Use the config-file.v1.json schema instead. */
   readonly #packageConfig: Readonly<DevvitPackageConfig> | undefined;
 
   constructor(
-    root: string,
+    root: ProjectRootDir,
     filename: string,
     config: DevvitConfig,
     packageConfig: Readonly<DevvitPackageConfig> | undefined
@@ -68,6 +69,10 @@ export class Project {
     this.filename = filename;
     this.#config = config;
     this.#packageConfig = packageConfig;
+  }
+
+  get appConfig(): Readonly<AppConfig> | undefined {
+    return isAppConfig(this.#config) ? this.#config : undefined;
   }
 
   // to-do: just return post once classic is removed.
@@ -90,7 +95,7 @@ export class Project {
     writeConfig(this.root, this.filename, this.#config);
   }
 
-  get permissions(): Readonly<AppPermissionConfig | undefined> {
+  get permissions(): Readonly<AppPermissionConfig> | undefined {
     return isAppConfig(this.#config) ? this.#config.permissions : undefined;
   }
 

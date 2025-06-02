@@ -246,7 +246,7 @@ export default class Upload extends DevvitCommand {
     };
 
     try {
-      return await bundler.bundle(this.project.root, actorSpec);
+      return await bundler.bundle(this.project, actorSpec);
     } catch (err) {
       this.error(StringUtil.caughtToString(err, 'message'));
     }

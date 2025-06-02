@@ -18,7 +18,7 @@ afterEach(async () => {
 
 test('watch touched source', async () => {
   const actorDir = path.join(__dirname, '..', 'templates', 'blocks-post', ACTOR_SRC_DIR);
-  const observable = bundler.watch(actorDir, {
+  const observable = bundler.watch(undefined, actorDir, {
     name: ACTOR_SRC_PRIMARY_NAME,
     owner: 'owner',
     version: '1.2.3.4',

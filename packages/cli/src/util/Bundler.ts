@@ -1,6 +1,5 @@
 import { ESBuildPack } from '@devvit/build-pack/esbuild/ESBuildPack.js';
-import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
-import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
+import { formatLogs, type ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { type Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { ActorSpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { LOCAL_HOSTNAME } from '@devvit/shared-types/HostnameUtil.js';
@@ -8,6 +7,7 @@ import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 
 import { DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS } from './config.js';
+import type { Project } from './project.js';
 
 export type BundlerResult = {
   bundles: Bundle[] | undefined;
@@ -24,13 +24,19 @@ export class Bundler {
   }
 
   async bundle(
-    root: ProjectRootDir,
+    project: Readonly<Project>,
     actorSpec: ActorSpec,
     includeMetafile: boolean = false
   ): Promise<Bundle[]> {
     const compiledRes = await this.#buildPack.compile(
       // to-do: why no minify?
-      { filename: root, info: actorSpec, minify: 'None', includeMetafile }
+      {
+        config: project.appConfig,
+        info: actorSpec,
+        minify: 'None',
+        includeMetafile,
+        root: project.root,
+      }
     );
 
     if (compiledRes.warnings.length > 0) {
@@ -52,13 +58,18 @@ export class Bundler {
     await this.#buildPack.dispose();
   }
 
-  watch(root: ProjectRootDir, actorSpec: ActorSpec): Observable<BundlerResult> {
+  watch(
+    project: Readonly<Project> | undefined,
+    root: ProjectRootDir,
+    actorSpec: ActorSpec
+  ): Observable<BundlerResult> {
     return this.#buildPack
       .watch({
-        filename: root,
+        config: project?.appConfig,
         info: actorSpec,
         minify: 'None',
         includeMetafile: false,
+        root,
       })
       .pipe(
         map((rsp) => {

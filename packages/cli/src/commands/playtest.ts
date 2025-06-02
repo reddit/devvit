@@ -280,7 +280,7 @@ export default class Playtest extends DevvitCommand {
    * Watching source code changes
    */
   #startWatchingSrc(username: string): void {
-    const watchSrc = this.#bundler.watch(this.project.root, {
+    const watchSrc = this.#bundler.watch(this.project, this.project.root, {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
       // Version is always incorrect since it changes on each upload and the

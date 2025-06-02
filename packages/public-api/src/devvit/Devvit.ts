@@ -4,6 +4,10 @@ import type { PaymentsService } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import type { Config } from '@devvit/shared-types/Config.js';
+import {
+  assertRequestedFetchDomainsLimit,
+  normalizeDomains,
+} from '@devvit/shared-types/fetch-domains.js';
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
@@ -35,10 +39,6 @@ import type {
 import { SettingScope } from '../types/index.js';
 import { registerAppSettings } from './internals/app-settings.js';
 import { registerCustomPost } from './internals/custom-post.js';
-import {
-  assertRequestedFetchDomainsLimit,
-  normalizeDomains,
-} from './internals/helpers/fetchDomains.js';
 import { registerInstallationSettings } from './internals/installation-settings.js';
 import { registerMenuItems } from './internals/menu-items.js';
 import { pluginIsEnabled } from './internals/plugins.js';
