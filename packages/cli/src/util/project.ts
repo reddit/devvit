@@ -6,7 +6,7 @@
  * to-do: delete this comment when ClassicAppConfig is deleted.
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
@@ -43,6 +43,10 @@ export class Project {
    */
   static async new(root: string, filename: string): Promise<Project> {
     const config = await readConfig(root, filename);
+    if (isAppConfig(config)) {
+      const errs = validateConfig(config, existsSync);
+      if (errs.length) throw Error(errs.join('; '));
+    }
     let packageJSON;
     try {
       packageJSON = await readPackageJSON(root);
@@ -161,6 +165,42 @@ async function readConfig(root: string, filename: string): Promise<DevvitConfig>
   }
 
   return parseClassicConfig(await readYamlToJson(configFilename));
+}
+
+/** @internal; */
+export function validateConfig(
+  config: Readonly<AppConfig>,
+  fileExists: (filename: string) => boolean
+): string[] {
+  const errs = [];
+
+  if (config.blocks) {
+    console.warn('`config.blocks` is deprecated and will be removed soon.');
+
+    if (!fileExists(config.blocks.entry))
+      errs.push(`\`config.blocks.entry\` (${config.blocks.entry}) does not exist`);
+  }
+
+  if (config.post) {
+    if (!fileExists(config.post.client.dir))
+      errs.push(`\`config.post.client.dir\` (${config.post.client.dir}) does not exist`);
+
+    if (!fileExists(config.post.client.entry))
+      errs.push(`\`config.post.client.entry\` (${config.post.client.entry}) does not exist`);
+    else {
+      const dir = path.resolve(config.post.client.dir);
+      const entry = path.resolve(config.post.client.entry);
+      if (!entry.startsWith(dir))
+        errs.push(
+          `\`config.post.client.entry\` (${config.post.client.entry}) must exist within \`config.post.client.dir\` (${config.post.client.dir})`
+        );
+    }
+  }
+
+  if (config.server && !fileExists(config.server.entry))
+    errs.push(`\`config.server.entry\` (${config.server.entry}) does not exist`);
+
+  return errs;
 }
 
 function writeConfig(
