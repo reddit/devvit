@@ -15,6 +15,6 @@ export class MediaClient implements MediaPlugin {
     if (!response.mediaId) {
       throw new Error('unable to get mediaId via uploads');
     }
-    return Promise.resolve({ mediaId: response.mediaId, mediaUrl: response.mediaUrl });
+    return { mediaId: response.mediaId, mediaUrl: response.mediaUrl };
   }
 }
