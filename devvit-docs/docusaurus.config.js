@@ -113,13 +113,25 @@ const config = {
       footer: {
         links: [
           {
-            title: 'More Resources',
-            items: [
-              {
-                label: 'Go to r/Devvit',
-                href: 'https://www.reddit.com/r/devvit',
-              },
-            ],
+            label: 'Blog',
+            to: 'docs/blog',
+          },
+          {
+            label: 'The Reddit Developer Fund',
+            to: 'docs/reddit_developer_funds',
+          },
+
+          {
+            label: 'r/Devvit',
+            href: 'https://www.reddit.com/r/devvit',
+          },
+          {
+            label: 'r/GamesOnReddit',
+            href: 'https://www.reddit.com/r/GamesOnReddit',
+          },
+          {
+            label: 'Join our Discord',
+            href: 'https://discord.gg/Cd43ExtEFS',
           },
         ],
         style: 'dark',
