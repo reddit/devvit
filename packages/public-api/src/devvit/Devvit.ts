@@ -19,6 +19,7 @@ import type {
   CustomPostType,
   Form,
   FormDefinition,
+  FormField,
   FormFunction,
   FormOnSubmitEventHandler,
   FormToFormValues,
@@ -408,6 +409,15 @@ export class Devvit extends Actor {
     if (!this.#pluginClients[protos.SettingsDefinition.fullName]) {
       this.use(protos.SettingsDefinition);
     }
+
+    // Save the settings to the global devvit object so that they can be accessed by the settings
+    // plugin.
+    // TODO: This should be set in the devvit.json config, saved on the bundle by the CLI,
+    //  and loaded into the globalThis.devvitSettings object by the bootstrap code.
+    globalThis.devvit ??= {};
+    globalThis.devvit.settings ??= {};
+    globalThis.devvit.settings.app = this.#appSettings;
+    globalThis.devvit.settings.installation = this.#installationSettings;
   }
 
   /**
@@ -1086,5 +1096,17 @@ declare global {
     type Props<T extends {} = {}> = T & { children?: Devvit.ElementChildren };
 
     type ComponentFunction = (props: JSX.Props, context: Devvit.Context) => JSX.Element;
+  }
+}
+
+declare global {
+  namespace globalThis {
+    // eslint-disable-next-line no-var
+    var devvit: {
+      settings?: {
+        app?: FormField[] | undefined;
+        installation?: FormField[] | undefined;
+      };
+    };
   }
 }
