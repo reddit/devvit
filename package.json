@@ -60,8 +60,7 @@
     "packages/*",
     "packages/apps/**",
     "packages/build-pack/src/__tests__/test-actors/**/*",
-    "packages/internal-examples/internal-projects/**/*",
-    "packages/internal-examples/webbit-projects/**/*"
+    "packages/internal-examples/internal-projects/**/*"
   ],
   "resolutions": {
     "@babel/traverse": "^7.23.2",
