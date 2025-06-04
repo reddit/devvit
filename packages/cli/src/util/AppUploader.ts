@@ -51,6 +51,7 @@ export class AppUploader {
       return {
         app: newApp,
         versions: [], // There's no versions, we just made it :)
+        fetchDomainRequests: [],
       };
     } catch (err) {
       ux.action.stop('Error');
