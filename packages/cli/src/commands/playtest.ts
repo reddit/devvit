@@ -1,3 +1,4 @@
+import { updateBundleServer, updateBundleVersion } from '@devvit/build-pack/esbuild/ESBuildPack.js';
 import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
 import {
   BuildStatus,
@@ -297,9 +298,6 @@ export default class Playtest extends DevvitCommand {
       .subscribe({ error: this.#onWatchError });
   }
 
-  /**
-   * Watching asset changes
-   */
   #startWatchingAssets(): void {
     const productsJSON = path.join(this.project.root, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
 
@@ -307,6 +305,8 @@ export default class Playtest extends DevvitCommand {
     if (this.project.mediaDir) assetPaths.push(path.join(this.project.root, this.project.mediaDir));
     if (this.project.clientDir)
       assetPaths.push(path.join(this.project.root, this.project.clientDir));
+    if (this.project.server?.entry)
+      assetPaths.push(path.join(this.project.root, this.project.server.entry));
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
 
     this.#watchAssets.on('all', () => {
@@ -388,8 +388,14 @@ export default class Playtest extends DevvitCommand {
     this.#version.bumpVersion(VersionBumpType.Prerelease);
 
     try {
-      // 2. update bundle version:
-      modifyBundleVersions(this.#lastBundles, this.#version.toString());
+      // 2. update bundle:
+      updateBundleVersion(this.#lastBundles, this.#version.toString());
+      try {
+        updateBundleServer(this.#lastBundles, this.project.root, this.project.server);
+      } catch (err) {
+        this.error(err instanceof Error ? err.message : String(err), { exit: false });
+        return;
+      }
 
       // 3. create new playtest version:
       const appVersionCreator = new AppVersionUploader(this, {
@@ -519,14 +525,6 @@ export default class Playtest extends DevvitCommand {
     }
 
     process.exit(0);
-  }
-}
-
-export function modifyBundleVersions(bundles: Bundle[], version: string): void {
-  for (const bundle of bundles) {
-    bundle.dependencies ??= { hostname: '', provides: [], uses: [], permissions: [] };
-    bundle.dependencies.actor ??= { name: '', owner: '', version: '' };
-    bundle.dependencies.actor.version = version.toString();
   }
 }
 
