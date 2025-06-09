@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { EventState } from '../sports/GameEvent.js';
 import type { TeamBlockBaseball } from './baseball.js';
 import { sportSpecificContentBaseball } from './baseball.js';

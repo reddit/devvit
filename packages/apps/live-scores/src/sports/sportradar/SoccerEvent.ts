@@ -1,4 +1,5 @@
 import type { Devvit } from '@devvit/public-api';
+
 import type { GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { EventState } from '../GameEvent.js';
 import { APIService } from '../Sports.js';

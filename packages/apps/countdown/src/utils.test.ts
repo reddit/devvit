@@ -1,11 +1,11 @@
+import { TIMEZONES } from './timezones.js';
 import {
   createDatetime,
-  getHourOptions,
-  getFormattedTimeLeft,
   getFormattedDueDate,
+  getFormattedTimeLeft,
+  getHourOptions,
   truncateString,
 } from './utils.js';
-import { TIMEZONES } from './timezones.js';
 
 let initialTimezone = process.env.TZ;
 describe('utils', () => {

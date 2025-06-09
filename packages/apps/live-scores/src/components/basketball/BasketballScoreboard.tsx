@@ -108,7 +108,7 @@ function Clock(info: BasketballGameScoreInfo): JSX.Element {
   );
 }
 
-function Team(props: BasketballScoreboardProps, isHome: Boolean): JSX.Element {
+function Team(props: BasketballScoreboardProps, isHome: boolean): JSX.Element {
   const info = props.scoreInfo;
   const team = isHome ? info.event.homeTeam : info.event.awayTeam;
   const score = isHome ? info.homeScore : info.awayScore;

@@ -1,9 +1,10 @@
 import { Devvit } from '@devvit/public-api';
+
 import { CreatePreview } from '../../components/Preview.js';
 import { BINGO_TILES_COUNT, theme } from '../../constants.js';
 import type { ThemeConfig } from '../../types.js';
-import type { BingoSettings } from '../settings/index.js';
 import { ApprovedDomainsFormatted, isRedditImage } from '../../utils/utils.js';
+import type { BingoSettings } from '../settings/index.js';
 
 export const BingoForm = Devvit.createForm(
   {

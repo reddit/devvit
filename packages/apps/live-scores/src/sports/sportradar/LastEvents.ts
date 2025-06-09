@@ -28,7 +28,7 @@ export async function storeLastEvent(
   gameId: string
 ): Promise<void> {
   const events = await getAllEventIds(redis, gameId);
-  if (events.find((eventId: String) => eventId === lastEvent.id)) {
+  if (events.find((eventId: string) => eventId === lastEvent.id)) {
     // Do not store, already exists
     return;
   }

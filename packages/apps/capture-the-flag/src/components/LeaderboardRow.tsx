@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { formatDurationFull } from '../utils.js';
 
 export type LeaderboardRowProps = {

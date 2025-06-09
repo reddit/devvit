@@ -7,10 +7,10 @@ import type {
 import { EventState } from '../GameEvent.js';
 import {
   APIService,
-  League,
   getLeagueFromString,
   getSportFromLeague,
   getSportFromLeagueString,
+  League,
 } from '../Sports.js';
 
 export type BaseballGameScoreInfo = GeneralGameScoreInfo & {

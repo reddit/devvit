@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
+
+import { Calc } from '../calculator.js';
 import { Keypad } from './Keypad.js';
 import { Output } from './Output.js';
-import { Calc } from '../calculator.js';
 
 type CalculatorProps = {
   disabled?: boolean;

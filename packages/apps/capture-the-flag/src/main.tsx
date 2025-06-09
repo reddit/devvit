@@ -1,9 +1,10 @@
 import { Devvit } from '@devvit/public-api';
+
+import { saveTournamentStateRisky } from './api.js';
 import { CaptureTheFlag } from './components/CaptureTheFlag.js';
 import { Preview } from './components/Preview.js';
-import { getDefaultTournamentState } from './types/state.js';
 import { setGameOverScheduler } from './scheduler.js';
-import { saveTournamentStateRisky } from './api.js';
+import { getDefaultTournamentState } from './types/state.js';
 import { hoursToMs } from './utils.js';
 
 Devvit.configure({
@@ -65,7 +66,7 @@ const TournamentConfigForm = Devvit.createForm(
         }!`,
       });
       ui.navigateTo(post);
-    } catch (e) {
+    } catch {
       console.log(event.values);
       ui.showToast('Something went wrong, please try again later.');
     }

@@ -510,7 +510,7 @@ Devvit.addCustomPostType({
     const updateInterval = context.useInterval(async () => {
       const previousScoreInfo = scoreInfo;
       const data = await fetchCachedGameInfoForPostId(context, postId);
-      data && setScoreInfo(data);
+      if (data) setScoreInfo(data);
       const newEvents = await getAllEventIds(redis, data?.event.id);
       setGameEventIds(newEvents);
       if (previousScoreInfo && data) {

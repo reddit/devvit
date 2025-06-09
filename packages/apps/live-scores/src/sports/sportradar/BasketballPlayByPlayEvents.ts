@@ -180,7 +180,7 @@ export function titleForEventType(eventType: string): string {
 export function filteredBasketballEvents(
   events: BasketballGameScoreInfoEvent[]
 ): BasketballGameScoreInfoEvent[] {
-  const includedEventTypes: String[] = [
+  const includedEventTypes: string[] = [
     BasketballEventType.challengereview,
     // BasketballEventType.challengetimeout,
     BasketballEventType.clearpathfoul,

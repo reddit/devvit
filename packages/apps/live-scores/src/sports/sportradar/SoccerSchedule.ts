@@ -1,8 +1,9 @@
 import { Devvit } from '@devvit/public-api';
-import { SoccerLeague } from './SoccerLeagues.js';
-import { SoccerEvent, soccerScoreInfo } from './SoccerEvent.js';
+
 import { GeneralGameScoreInfo } from '../GameEvent.js';
 import { APIKey } from './APIKeys.js';
+import { SoccerEvent, soccerScoreInfo } from './SoccerEvent.js';
+import { SoccerLeague } from './SoccerLeagues.js';
 
 export type SoccerSchedule = {
   generated_at: string;
@@ -47,6 +48,6 @@ function filterGames(games: SoccerEvent[]): SoccerEvent[] {
     return gameDate >= eightDaysAgo && gameDate <= tenDaysFromNow;
   });
 }
-function parseSchedule(jsonData: any): SoccerSchedule {
+function parseSchedule(jsonData: unknown): SoccerSchedule {
   return jsonData as SoccerSchedule;
 }

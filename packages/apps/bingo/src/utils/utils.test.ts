@@ -1,5 +1,5 @@
-import { extractRows, fillColumns, getAllMatches } from './utils.js';
 import type { TileItem } from '../types.js';
+import { extractRows, fillColumns, getAllMatches } from './utils.js';
 
 describe('utils test', () => {
   describe('column layout', () => {

@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
+
 import { EventState } from '../sports/GameEvent.js';
-import { SoccerGameScoreInfo, formatAsFirstLastName } from '../sports/sportradar/SoccerEvent.js';
+import { formatAsFirstLastName, SoccerGameScoreInfo } from '../sports/sportradar/SoccerEvent.js';
 
 export type EventBubbleStrings = {
   primaryString?: string;

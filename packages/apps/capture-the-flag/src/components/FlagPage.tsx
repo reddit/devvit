@@ -1,8 +1,9 @@
 import { Devvit } from '@devvit/public-api';
+
 import { Page } from '../types/page.js';
+import { formatDurationRough } from '../utils.js';
 import { ClaimButton } from './ClaimButton.js';
 import { IconButton } from './IconButton.js';
-import { formatDurationRough } from '../utils.js';
 
 export interface FlagPageProps {
   claimant: string | null | undefined;

@@ -1,4 +1,6 @@
 import { Devvit, RedisClient, Scheduler } from '@devvit/public-api';
+import { TxClientLike } from '@devvit/public-api/apis/redis/RedisClient.js';
+
 import {
   clearAutoDropJobId,
   getAutoDropJobId,
@@ -9,9 +11,8 @@ import {
   setGameEndJobId,
   updateScore,
 } from './api.js';
-import { TournamentState } from './types/state.js';
 import { key_post, Keys } from './keys.js';
-import { TxClientLike } from '@devvit/public-api/apis/redis/RedisClient.js';
+import { TournamentState } from './types/state.js';
 
 const STOP_GAME_ACTION_ID = 'STOP_GAME';
 const AUTO_DROP_ACTION_ID = 'DROP_THE_FLAG';
@@ -81,7 +82,7 @@ Devvit.addSchedulerJob({
       await transaction.exec();
 
       console.log(`\n SCHEDULED JOB successfully executed for ${postId} \n`);
-    } catch (e) {
+    } catch {
       console.log('SCHEDULED JOB failed, discarding transaction \n\n\n');
       await transaction.discard();
     }

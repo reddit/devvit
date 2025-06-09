@@ -1,3 +1,8 @@
+import { RedditAPIClient, RedisClient } from '@devvit/public-api';
+import { TxClientLike } from '@devvit/public-api/apis/redis/RedisClient.js';
+
+import { MAX_LEADERBOARD_ROWS } from './config.js';
+import { key_post, key_post_user, Keys } from './keys.js';
 import {
   getDefaultTournamentState,
   initialUserData,
@@ -5,10 +10,6 @@ import {
   TournamentState,
   UserData,
 } from './types/state.js';
-import { RedditAPIClient, RedisClient } from '@devvit/public-api';
-import { key_post, key_post_user, Keys } from './keys.js';
-import { MAX_LEADERBOARD_ROWS } from './config.js';
-import { TxClientLike } from '@devvit/public-api/apis/redis/RedisClient.js';
 
 export const fetchUserData = async (
   redis: RedisClient,

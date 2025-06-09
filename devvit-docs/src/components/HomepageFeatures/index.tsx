@@ -1,6 +1,6 @@
-/* eslint-disable @benasher44/implicit-dependencies/no-implicit */
-import React from 'react';
 import clsx from 'clsx';
+import React from 'react';
+
 import styles from './styles.module.css';
 
 type FeatureItem = {
@@ -12,6 +12,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'Customize community',
+    // eslint-disable-next-line implicitDependencies/no-implicit
     Svg: require('@site/static/img/Well-Loved-Brand.svg').default,
     description: (
       <>
@@ -22,6 +23,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Automate moderation',
+    // eslint-disable-next-line implicitDependencies/no-implicit
     Svg: require('@site/static/img/Huge-Scale.svg').default,
     description: (
       <>
@@ -32,6 +34,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Start building today',
+    // eslint-disable-next-line implicitDependencies/no-implicit
     Svg: require('@site/static/img/Exciting-Products.svg').default,
     description: (
       <>

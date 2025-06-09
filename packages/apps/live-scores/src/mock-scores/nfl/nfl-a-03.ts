@@ -1,4 +1,4 @@
-export const demoNflGame03: any = {
+export const demoNflGame03: unknown = {
   id: 'demo-nfl-game-03',
   status: 'inprogress',
   scheduled: '2024-01-07T01:15:00+00:00',

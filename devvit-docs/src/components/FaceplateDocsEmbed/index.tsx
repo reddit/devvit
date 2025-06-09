@@ -1,6 +1,6 @@
-import React from 'react';
-// eslint-disable-next-line @benasher44/implicit-dependencies/no-implicit
+// eslint-disable-next-line implicitDependencies/no-implicit
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import React from 'react';
 
 function resize(event): void {
   const target = event.target as HTMLIFrameElement;

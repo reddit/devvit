@@ -1,15 +1,16 @@
 import type { Devvit, Post } from '@devvit/public-api';
-import type { BasketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
-import { basketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
-import type { GameSubscription } from './Sports.js';
-import { APIService, League, getLeagueFromString } from './Sports.js';
-import { EventState } from './GameEvent.js';
-import { addSubscription } from '../subscriptions.js';
-import { makeKeyForSubscription, makeKeyForPostId, makeKeyForEventId } from './GameFetch.js';
-import { APIKey } from './sportradar/APIKeys.js';
-import { filteredBasketballEvents } from './sportradar/BasketballPlayByPlayEvents.js';
+
 import { LoadingState } from '../components/Loading.js';
 import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
+import { addSubscription } from '../subscriptions.js';
+import { EventState } from './GameEvent.js';
+import { makeKeyForEventId, makeKeyForPostId, makeKeyForSubscription } from './GameFetch.js';
+import { APIKey } from './sportradar/APIKeys.js';
+import type { BasketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
+import { basketballGameScoreInfo } from './sportradar/BasketballPlayByPlay.js';
+import { filteredBasketballEvents } from './sportradar/BasketballPlayByPlayEvents.js';
+import type { GameSubscription } from './Sports.js';
+import { APIService, getLeagueFromString, League } from './Sports.js';
 
 export type SimulatorProps = {
   gameId: string;

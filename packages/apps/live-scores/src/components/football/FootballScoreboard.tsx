@@ -129,7 +129,7 @@ function ScoreComponent(timeouts: number, score: string, info: NFLGameScoreInfo)
   );
 }
 
-function Team(isHome: Boolean, info: NFLGameScoreInfo): JSX.Element {
+function Team(isHome: boolean, info: NFLGameScoreInfo): JSX.Element {
   if (!info.summary) {
     const logo = isHome ? info.event.homeTeam.logo : info.event.awayTeam.logo;
     const team = isHome ? info.event.homeTeam : info.event.awayTeam;

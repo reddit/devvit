@@ -1,4 +1,5 @@
 import type { RedisClient } from '@devvit/public-api';
+
 import type { TileItem } from '../types.js';
 
 const Keys = {

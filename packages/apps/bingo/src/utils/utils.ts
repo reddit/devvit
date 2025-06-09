@@ -1,5 +1,6 @@
-import { parse } from 'tldts';
 import type { OnValidateHandler } from '@devvit/public-api';
+import { parse } from 'tldts';
+
 import type { TileItem } from '../types.js';
 import {
   Col1,
@@ -187,7 +188,7 @@ export const validateImageUrlSetting: OnValidateHandler<string> = (event) => {
   }
 };
 
-export function fillColumns<T extends unknown>(
+export function fillColumns<T>(
   columnCount: number,
   rowCount: number,
   items: T[],

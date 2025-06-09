@@ -1,4 +1,4 @@
-export const demoEpl1: any = JSON.parse(
+export const demoEpl1: unknown = JSON.parse(
   `{
     "generated_at": "2023-10-24T16:19:49+00:00",
     "sport_event": {

@@ -446,7 +446,7 @@ export function validChatURL(str: string): boolean {
       return false;
     }
     return url.hostname === 'www.reddit.com' && paths[1] === 'r' && paths[3] === 's';
-  } catch (error) {
+  } catch {
     return false;
   }
 }

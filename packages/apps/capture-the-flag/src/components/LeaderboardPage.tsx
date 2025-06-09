@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { Page } from '../types/page.js';
 import { Leaderboard } from '../types/state.js';
 import { IconButton } from './IconButton.js';

@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { Calculator } from './components/Calculator.js';
 
 Devvit.configure({
