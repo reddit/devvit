@@ -114,11 +114,11 @@ const config = {
         links: [
           {
             label: 'Blog',
-            to: 'docs/blog',
+            to: '/blog',
           },
           {
             label: 'The Reddit Developer Fund',
-            to: 'docs/reddit_developer_funds',
+            to: '/reddit_developer_funds',
           },
 
           {
