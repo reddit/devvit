@@ -107,7 +107,7 @@ describe('validateConfig()', () => {
     }
   });
 
-  test('post.client.entry', () => {
+  test('post.client.entry file', () => {
     for (const exists of [false, true]) {
       const config: AppConfig = {
         schema: 'v1',
@@ -128,6 +128,25 @@ describe('validateConfig()', () => {
         validateConfig(config, (filename: string) => (filename === 'dir/entry' ? exists : true))
       ).toStrictEqual(exists ? [] : ['`config.post.client.entry` (dir/entry) does not exist']);
     }
+  });
+
+  test('post.client.entry API', () => {
+    const config: AppConfig = {
+      schema: 'v1',
+      name: 'name',
+      permissions: noPermissions,
+      post: {
+        client: { dir: 'dir', entry: '/api/entry' },
+        create: {
+          title: 'title',
+          height: 'regular',
+          menu: { enable: false, label: 'label', scope: 'user' },
+          onInstall: false,
+        },
+      },
+      json: { name: 'name' },
+    };
+    expect(validateConfig(config, (filename) => filename === 'dir')).toStrictEqual([]);
   });
 
   test('server.entry', () => {

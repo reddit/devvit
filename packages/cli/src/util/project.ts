@@ -11,6 +11,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import {
+  apiPathPrefix,
   type AppConfig,
   type AppPermissionConfig,
   type AppPostConfig,
@@ -185,7 +186,9 @@ export function validateConfig(
     if (!fileExists(config.post.client.dir))
       errs.push(`\`config.post.client.dir\` (${config.post.client.dir}) does not exist`);
 
-    if (!fileExists(config.post.client.entry))
+    if (config.post.client.entry.startsWith(apiPathPrefix)) {
+      // URL path.
+    } else if (!fileExists(config.post.client.entry))
       errs.push(`\`config.post.client.entry\` (${config.post.client.entry}) does not exist`);
     else {
       const dir = path.resolve(config.post.client.dir);
