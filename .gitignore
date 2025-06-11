@@ -23,6 +23,7 @@ client.key
 # editors
 .idea
 .vscode
+/.zed/
 
 # dependencies
 node_modules/
