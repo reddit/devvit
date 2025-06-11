@@ -38,7 +38,8 @@ export class AppVersionUploader {
       appSemver: DevvitVersion;
       visibility: VersionVisibility;
     },
-    bundles: Bundle[]
+    bundles: Bundle[],
+    preventSubredditCreation: boolean = false
   ): Promise<AppVersionInfo> {
     const about = await this.#getReadmeContent();
 
@@ -89,6 +90,7 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         patchVersion: appInfo.appSemver.patch,
         prereleaseVersion: appInfo.appSemver.prerelease,
         actorBundles: bundles,
+        preventPlaytestSubredditCreation: preventSubredditCreation,
       });
       ux.action.stop();
 
