@@ -117,7 +117,7 @@ export class Devvit extends Actor {
     TriggerOnEventHandler<OnTriggerRequest>[]
   > = new Map();
   static #webViewAssets: AssetMap = {};
-  static #requestedFetchDomains: string[] = [];
+  static #domains: string[] = [];
 
   static #additionallyProvides: protos.Definition[] = [];
 
@@ -142,15 +142,14 @@ export class Devvit extends Actor {
     this.#config = { ...this.#config, ...config };
 
     const httpConfig = config.http;
-    const hasRequestedDomains =
-      typeof httpConfig === 'object' && 'requestedFetchDomains' in httpConfig;
+    const hasRequestedDomains = typeof httpConfig === 'object' && 'domains' in httpConfig;
     const pluginSettings: PluginSettings | boolean | undefined = hasRequestedDomains
       ? { enabled: true }
       : httpConfig;
     if (pluginIsEnabled(pluginSettings)) {
       if (hasRequestedDomains) {
-        assertRequestedFetchDomainsLimit(httpConfig.requestedFetchDomains);
-        this.#requestedFetchDomains = normalizeDomains(httpConfig.requestedFetchDomains);
+        assertRequestedFetchDomainsLimit(httpConfig.domains);
+        this.#domains = normalizeDomains(httpConfig.domains);
       }
       this.use(protos.HTTPDefinition);
     }
@@ -766,8 +765,8 @@ export class Devvit extends Actor {
       config.provides(provides);
     }
 
-    if (Devvit.#requestedFetchDomains.length > 0) {
-      config.addPermissions({ requestedFetchDomains: Devvit.#requestedFetchDomains });
+    if (Devvit.#domains.length > 0) {
+      config.addPermissions({ requestedFetchDomains: Devvit.#domains });
     }
   }
 }

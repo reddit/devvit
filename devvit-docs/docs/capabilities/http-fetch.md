@@ -17,7 +17,7 @@ Devvit.configure({
 
 ## Requesting a domain to be allow-listed
 
-Apps may request a domain to be added to the allow-list by specifying `requestedFetchDomains` in the `http` configuration.
+Apps may request a domain to be added to the allow-list by specifying `domains` in the `http` configuration.
 This configuration is optional, and apps can still configure `http: true` as before.
 
 ```ts
@@ -25,7 +25,7 @@ import { Devvit } from '@devvit/public-api';
 
 Devvit.configure({
   http: {
-    requestedFetchDomains: ['my-site.com', 'another-domain.net'],
+    domains: ['my-site.com', 'another-domain.net'],
   },
 });
 ```

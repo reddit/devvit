@@ -5,7 +5,7 @@ export type PluginSettings = {
 
 export type Configuration = {
   /** Allows your app to use the HTTP/Fetch API */
-  http?: PluginSettings | boolean | { requestedFetchDomains: string[] };
+  http?: PluginSettings | boolean | { domains: string[] };
   /** Allows your app to use the reddit API */
   redditAPI?: PluginSettings | boolean;
   /** Allows your app to use the Key-Value Store */
