@@ -70,64 +70,77 @@ describe('Project', () => {
 
 describe('validateConfig()', () => {
   test('blocks.entry', () => {
-    for (const exists of [false, true]) {
-      const config: AppConfig = {
-        blocks: { entry: 'entry' },
-        schema: 'v1',
-        name: 'name',
-        permissions: noPermissions,
-        json: { name: 'name' },
-      };
-      expect(validateConfig(config, () => exists)).toStrictEqual(
-        exists ? [] : ['`config.blocks.entry` (entry) does not exist']
-      );
-    }
+    for (const exists of [false, true])
+      for (const mode of ['Static', 'Dynamic'] as const) {
+        const config: AppConfig = {
+          blocks: { entry: 'entry' },
+          schema: 'v1',
+          name: 'name',
+          permissions: noPermissions,
+          json: { name: 'name' },
+        };
+        expect(validateConfig(config, () => exists, mode)).toStrictEqual(
+          exists ? [] : ['`config.blocks.entry` (entry) does not exist']
+        );
+      }
   });
 
   test('post.client.dir', () => {
-    for (const exists of [false, true]) {
-      const config: AppConfig = {
-        schema: 'v1',
-        name: 'name',
-        permissions: noPermissions,
-        post: {
-          client: { dir: 'dir', entry: 'dir/entry' },
-          create: {
-            title: 'title',
-            height: 'regular',
-            menu: { enable: false, label: 'label', scope: 'user' },
-            onInstall: false,
+    for (const exists of [false, true])
+      for (const mode of ['Static', 'Dynamic'] as const) {
+        const config: AppConfig = {
+          schema: 'v1',
+          name: 'name',
+          permissions: noPermissions,
+          post: {
+            client: { dir: 'dir', entry: 'dir/entry' },
+            create: {
+              title: 'title',
+              height: 'regular',
+              menu: { enable: false, label: 'label', scope: 'user' },
+              onInstall: false,
+            },
           },
-        },
-        json: { name: 'name' },
-      };
-      expect(
-        validateConfig(config, (filename: string) => (filename === 'dir' ? exists : true))
-      ).toStrictEqual(exists ? [] : ['`config.post.client.dir` (dir) does not exist']);
-    }
+          json: { name: 'name' },
+        };
+        expect(
+          validateConfig(config, (filename: string) => (filename === 'dir' ? exists : true), mode)
+        ).toStrictEqual(
+          exists || mode === 'Dynamic' ? [] : ['`config.post.client.dir` (dir) does not exist']
+        );
+      }
   });
 
   test('post.client.entry file', () => {
-    for (const exists of [false, true]) {
-      const config: AppConfig = {
-        schema: 'v1',
-        name: 'name',
-        permissions: noPermissions,
-        post: {
-          client: { dir: 'dir', entry: 'dir/entry' },
-          create: {
-            title: 'title',
-            height: 'regular',
-            menu: { enable: false, label: 'label', scope: 'user' },
-            onInstall: false,
+    for (const exists of [false, true])
+      for (const mode of ['Static', 'Dynamic'] as const) {
+        const config: AppConfig = {
+          schema: 'v1',
+          name: 'name',
+          permissions: noPermissions,
+          post: {
+            client: { dir: 'dir', entry: 'dir/entry' },
+            create: {
+              title: 'title',
+              height: 'regular',
+              menu: { enable: false, label: 'label', scope: 'user' },
+              onInstall: false,
+            },
           },
-        },
-        json: { name: 'name' },
-      };
-      expect(
-        validateConfig(config, (filename: string) => (filename === 'dir/entry' ? exists : true))
-      ).toStrictEqual(exists ? [] : ['`config.post.client.entry` (dir/entry) does not exist']);
-    }
+          json: { name: 'name' },
+        };
+        expect(
+          validateConfig(
+            config,
+            (filename: string) => (filename === 'dir/entry' ? exists : true),
+            mode
+          )
+        ).toStrictEqual(
+          exists || mode === 'Dynamic'
+            ? []
+            : ['`config.post.client.entry` (dir/entry) does not exist']
+        );
+      }
   });
 
   test('post.client.entry API', () => {
@@ -146,22 +159,23 @@ describe('validateConfig()', () => {
       },
       json: { name: 'name' },
     };
-    expect(validateConfig(config, (filename) => filename === 'dir')).toStrictEqual([]);
+    expect(validateConfig(config, (filename) => filename === 'dir', 'Static')).toStrictEqual([]);
   });
 
   test('server.entry', () => {
-    for (const exists of [false, true]) {
-      const config: AppConfig = {
-        schema: 'v1',
-        name: 'name',
-        permissions: noPermissions,
-        server: { entry: 'entry' },
-        json: { name: 'name' },
-      };
-      expect(validateConfig(config, () => exists)).toStrictEqual(
-        exists ? [] : ['`config.server.entry` (entry) does not exist']
-      );
-    }
+    for (const exists of [false, true])
+      for (const mode of ['Static', 'Dynamic'] as const) {
+        const config: AppConfig = {
+          schema: 'v1',
+          name: 'name',
+          permissions: noPermissions,
+          server: { entry: 'entry' },
+          json: { name: 'name' },
+        };
+        expect(validateConfig(config, () => exists, mode)).toStrictEqual(
+          exists || mode === 'Dynamic' ? [] : ['`config.server.entry` (entry) does not exist']
+        );
+      }
   });
 });
 

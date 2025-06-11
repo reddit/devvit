@@ -9,6 +9,7 @@ import { getAccessToken } from '../auth.js';
 import { createDeveloperAccountClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
 import {
+  type BuildMode,
   devvitClassicConfigFilename,
   devvitV1ConfigFilename,
   newProject,
@@ -46,7 +47,7 @@ export abstract class DevvitCommand extends Command {
     this.#project = project;
   }
 
-  protected override async init(): Promise<void> {
+  protected override async init(mode?: BuildMode): Promise<void> {
     await super.init();
 
     // to-do: avoid subclassing and compose instead. subclasses cause bugs
@@ -65,7 +66,7 @@ export abstract class DevvitCommand extends Command {
       flags: DevvitCommand.baseFlags,
     });
 
-    this.#project = await newProject(flags.config);
+    this.#project = await newProject(flags.config, mode ?? 'Static');
     if (flags.config && !this.#project) this.error(`Project config "${flags.config}" not found.`);
     if (
       flags.config &&

@@ -277,6 +277,10 @@ export default class Playtest extends DevvitCommand {
     }
   }
 
+  protected override async init(): Promise<void> {
+    await super.init('Dynamic');
+  }
+
   /**
    * Watching source code changes
    */
@@ -322,7 +326,7 @@ export default class Playtest extends DevvitCommand {
     this.#watchConfigFile.on('all', async (ev) => {
       if (ev === 'change' || ev === 'add')
         try {
-          this.project = await Project.new(this.project.root, this.project.filename);
+          this.project = await Project.new(this.project.root, this.project.filename, 'Dynamic');
         } catch (err) {
           this.error(`Config load failure: ${StringUtil.caughtToString(err, 'message')}.`, {
             exit: false,
