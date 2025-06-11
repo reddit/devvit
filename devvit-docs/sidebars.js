@@ -124,7 +124,11 @@ const sidebars = {
         'capabilities/adding-links',
         'capabilities/cache',
         'capabilities/forms',
-        'capabilities/http-fetch',
+        {
+          type: 'category',
+          label: 'HTTP fetch',
+          items: ['capabilities/http-fetch', 'capabilities/http-fetch-allowlist'],
+        },
         'capabilities/image-uploads',
         'capabilities/menu-actions',
         'capabilities/redis',
