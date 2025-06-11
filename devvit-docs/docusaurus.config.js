@@ -85,6 +85,8 @@ const config = {
         indexBlog: false,
       },
     ],
+    [require.resolve('./plugins/llmsTxt.js'), { ignore: ['**/api/**', '**/changelog.md'] }],
+    require.resolve('./plugins/copyDocsRaw'),
   ],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
