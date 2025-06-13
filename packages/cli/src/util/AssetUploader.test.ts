@@ -1,7 +1,8 @@
+import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { JSDOM } from 'jsdom';
 import { describe, expect, it } from 'vitest';
 
-import { DEVVIT_ANALYTICS_JS_URL, transformHTML } from './AssetUploader.js';
+import { DEVVIT_JS_URL, transformHTML } from './AssetUploader.js';
 
 describe('HTML Transformation', () => {
   describe('transformHTML', () => {
@@ -17,7 +18,7 @@ describe('HTML Transformation', () => {
           </body>
         </html>
       `;
-      const result = transformHTML(input);
+      const result = transformHTML(input, '1.2.3');
       const dom = new JSDOM(result);
       const document = dom.window.document;
 
@@ -39,7 +40,7 @@ describe('HTML Transformation', () => {
           </body>
         </html>
       `;
-      const result = transformHTML(input);
+      const result = transformHTML(input, '1.2.3');
       const dom = new JSDOM(result);
       const document = dom.window.document;
 
@@ -66,12 +67,29 @@ describe('HTML Transformation', () => {
           </body>
         </html>
       `;
-      const result = transformHTML(input);
+      const result = transformHTML(input, '1.2.3');
       const dom = new JSDOM(result);
       const document = dom.window.document;
 
       // Verify script tag exists
-      const script = document.querySelector(`script[src="${DEVVIT_ANALYTICS_JS_URL}"]`);
+      const script = document.querySelector(
+        `script[src="${DEVVIT_JS_URL}?${clientVersionQueryParam}=1.2.3"]`
+      );
+      assertScriptExpectations(script);
+    });
+
+    it('should handle non-HTML gracefully', () => {
+      const input = `
+        <
+      `;
+      const result = transformHTML(input, '1.2.3');
+      const dom = new JSDOM(result);
+      const document = dom.window.document;
+
+      // Verify script tag exists
+      const script = document.querySelector(
+        `script[src="${DEVVIT_JS_URL}?${clientVersionQueryParam}=1.2.3"]`
+      );
       assertScriptExpectations(script);
     });
 
@@ -87,7 +105,7 @@ describe('HTML Transformation', () => {
           </body>
         </html>
       `;
-      const result = transformHTML(input);
+      const result = transformHTML(input, '1.2.3');
       const dom = new JSDOM(result);
       const document = dom.window.document;
 
@@ -105,11 +123,11 @@ describe('HTML Transformation', () => {
 });
 
 function selectScript(document: Document): Element | null {
-  return document.querySelector(`head script[src="${DEVVIT_ANALYTICS_JS_URL}"]`);
+  return document.querySelector(
+    `head script[src="${DEVVIT_JS_URL}?${clientVersionQueryParam}=1.2.3"]`
+  );
 }
 
 function assertScriptExpectations(script: Element | null) {
   expect(script).not.toBeNull();
-  expect(script?.getAttribute('async')).toBe('');
-  expect(script?.getAttribute('type')).toBe('module');
 }

@@ -1,6 +1,7 @@
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 
+import { requireFromDir } from '@devvit/build-pack/esbuild/BuildInfoUtil.js';
 import type {
   MediaSignature,
   MediaSignatureStatus,
@@ -15,6 +16,7 @@ import {
   prettyPrintSize,
 } from '@devvit/shared-types/Assets.js';
 import { ASSET_HASHING_ALGO, ASSET_UPLOAD_BATCH_SIZE } from '@devvit/shared-types/constants.js';
+import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { ux } from '@oclif/core';
 import { createHash } from 'crypto';
 import { JSDOM } from 'jsdom';
@@ -24,7 +26,7 @@ import { dirExists } from '../util/files.js';
 import { createAppClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
 
-export const DEVVIT_ANALYTICS_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
+export const DEVVIT_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
@@ -56,11 +58,25 @@ export class AssetUploader {
     assetMap?: AssetMap;
     webViewAssetMap?: AssetMap;
   }> {
+    const clientVersion = readClientVersion(this.#cmd.project.root);
+
     const [regularAssets, webViewAssets] = await Promise.all([
       this.#cmd.project.mediaDir
-        ? this.#getAssets(this.#cmd.project.mediaDir, ALLOWED_ASSET_EXTENSIONS)
+        ? queryAssets(
+            path.join(this.#cmd.project.root, this.#cmd.project.mediaDir),
+            ALLOWED_ASSET_EXTENSIONS,
+            'Media',
+            clientVersion
+          )
         : [],
-      this.#cmd.project.clientDir ? this.#getAssets(this.#cmd.project.clientDir, [], true) : [],
+      this.#cmd.project.clientDir
+        ? queryAssets(
+            path.join(this.#cmd.project.root, this.#cmd.project.clientDir),
+            [],
+            'Client',
+            clientVersion
+          )
+        : [],
     ]);
 
     // Return early if no assets
@@ -90,55 +106,6 @@ export class AssetUploader {
     const webViewAssetMap = await this.#processWebViewAssets(webViewAssets);
 
     return { assetMap, webViewAssetMap };
-  }
-
-  async #getAssets(
-    folder: string,
-    allowedExtensions: string[] = [],
-    webViewAssets: boolean = false
-  ): Promise<MediaSignatureWithContents[]> {
-    if (!(await dirExists(path.join(this.#cmd.project.root, folder)))) {
-      // Return early if there isn't an assets directory
-      return [];
-    }
-
-    const assetsPath = path.join(this.#cmd.project.root, folder);
-    const assetsGlob = path
-      .join(assetsPath, '**', '*')
-      // Note: tiny-glob *always* uses `/` as its path separator, even on Windows, so we need to
-      // replace whatever the system path separator is with `/`
-      .replaceAll(path.sep, '/');
-    const assets = (
-      await tinyglob(assetsGlob, {
-        filesOnly: true,
-        absolute: true,
-      })
-    ).filter(
-      (asset) => allowedExtensions.length === 0 || allowedExtensions.includes(path.extname(asset))
-    );
-    return await Promise.all(
-      assets.map(async (asset) => {
-        const filename = path.relative(assetsPath, asset).replaceAll(path.sep, '/');
-        let file = await fsp.readFile(asset);
-
-        // If the webview asses is an HTML file, inject the Devvit analytics script
-        if (webViewAssets && filename.match(/\.html?$/)) {
-          file = transformHTMLBuffer(file);
-        }
-
-        const size = Buffer.byteLength(file);
-        const contents = new Uint8Array(file);
-
-        const hash = createHash(ASSET_HASHING_ALGO).update(file).digest('hex');
-        return {
-          filePath: filename,
-          size,
-          hash,
-          isWebviewAsset: webViewAssets,
-          contents,
-        };
-      })
-    );
   }
 
   async #processRegularAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
@@ -331,13 +298,73 @@ export class AssetUploader {
   }
 }
 
-export function transformHTMLBuffer(buf: Buffer): Buffer {
+/**
+ * Read assets from disk and transform them.
+ *
+ * Asset kind controls transform. Client (historically webroot/) is for web view
+ * assets. Media (historically assets/) is for everything else.
+ */
+async function queryAssets(
+  dir: string,
+  allowedExtensions: readonly string[],
+  assetKind: 'Client' | 'Media',
+  clientVersionNum: string | undefined
+): Promise<MediaSignatureWithContents[]> {
+  if (!(await dirExists(dir))) {
+    // Return early if there isn't an assets directory
+    return [];
+  }
+
+  const assetsGlob = path
+    .join(dir, '**', '*')
+    // Note: tiny-glob *always* uses `/` as its path separator, even on Windows, so we need to
+    // replace whatever the system path separator is with `/`
+    .replaceAll(path.sep, '/');
+  const assets = (await tinyglob(assetsGlob, { filesOnly: true, absolute: true })).filter(
+    (asset) => allowedExtensions.length === 0 || allowedExtensions.includes(path.extname(asset))
+  );
+  return await Promise.all(
+    assets.map(async (asset) => {
+      const filename = path.relative(dir, asset).replaceAll(path.sep, '/');
+      let file = await fsp.readFile(asset);
+
+      // If the webview assets is an HTML file, inject the Devvit analytics
+      // script.
+      if (assetKind === 'Client' && filename.match(/\.html?$/)) {
+        file = transformHTMLBuffer(file, clientVersionNum);
+      }
+
+      const size = Buffer.byteLength(file);
+      const contents = new Uint8Array(file);
+
+      const hash = createHash(ASSET_HASHING_ALGO).update(file).digest('hex');
+      return {
+        filePath: filename,
+        size,
+        hash,
+        isWebviewAsset: assetKind === 'Client',
+        contents,
+      };
+    })
+  );
+}
+
+function readClientVersion(root: string): string | undefined {
+  try {
+    const pkg = requireFromDir(root, '@devvit/client/package.json');
+    return (pkg as { version: string }).version;
+  } catch {
+    return;
+  }
+}
+
+export function transformHTMLBuffer(buf: Buffer, clientVersionNum: string | undefined): Buffer {
   const inStr = new TextDecoder('utf-8').decode(buf);
-  const out = transformHTML(inStr);
+  const out = transformHTML(inStr, clientVersionNum);
   return Buffer.from(out);
 }
 
-export function transformHTML(str: string): string {
+export function transformHTML(str: string, clientVersionNum: string | undefined): string {
   const { document } = new JSDOM(str).window;
 
   // if no html tag, return early
@@ -346,15 +373,17 @@ export function transformHTML(str: string): string {
     return str;
   }
 
-  const scriptTag = `<script async type="module" src="${DEVVIT_ANALYTICS_JS_URL}"></script>`;
+  const clientVersionQueryArg = clientVersionNum
+    ? `${clientVersionQueryParam}=${clientVersionNum}`
+    : '';
+  const scriptTag = `<script src="${DEVVIT_JS_URL}?${clientVersionQueryArg}"></script>`;
 
   // if no head tag, create one after the html tag
   const headTag = document.querySelector('head');
   if (headTag == null) {
     htmlTag.insertAdjacentHTML('afterbegin', `<head>${scriptTag}</head>`); // eslint-disable-line no-unsanitized/method
   } else {
-    // if head tag exists, append the script tag to it
-    headTag.insertAdjacentHTML('beforeend', scriptTag); // eslint-disable-line no-unsanitized/method
+    headTag.insertAdjacentHTML('afterbegin', scriptTag); // eslint-disable-line no-unsanitized/method
   }
 
   return document.documentElement.outerHTML;
