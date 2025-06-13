@@ -85,7 +85,21 @@ const config = {
         indexBlog: false,
       },
     ],
-    [require.resolve('./plugins/llmsTxt.js'), { ignore: ['**/api/**', '**/changelog.md'] }],
+    [
+      require.resolve('./plugins/llmsTxt.js'),
+      {
+        ignore: [
+          '**/api/**',
+          '**/changelog.md',
+          '**/icon.mdx',
+          '**/devvit_rules.md',
+          '**/migration_guide.md',
+          '**/three_strikes.md',
+          '**/playgrounds.mdx',
+          '**/playground.md',
+        ],
+      },
+    ],
     require.resolve('./plugins/copyDocsRaw'),
   ],
   themeConfig:

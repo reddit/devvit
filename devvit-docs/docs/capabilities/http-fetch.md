@@ -30,7 +30,14 @@ Devvit.configure({
 });
 ```
 
-Requested domains will be submitted for review on app playtest and upload. Admins may approve or deny domain requests.
+Requested domains will be submitted for review when you playtest or upload your app. Admins may approve or deny domain requests.
+
+Domain entries must be exact hostnames only, such as nytimes.com or wikipedia.org. These fetch requests are not allowed:
+
+- No using \* example.com when you need api.example.com
+- No wildcards: \*.example.com
+- No protocols: https://api.example.com
+- No paths: api.example.com/webhooks
 
 Domains that are approved for your app will be displayed in the Developer Settings section for your app at https://developers.reddit.com/apps/{your-app-slug}/developer-settings.
 These domains are allow-listed for **your app only** and not globally.

@@ -27,7 +27,13 @@ module.exports = async function pluginLlmsTxt(context, options = {}) {
       const allMd = await Promise.all(
         files.map(async (relPath) => {
           const absPath = path.join(contentDir, relPath);
-          return fs.promises.readFile(absPath, 'utf8');
+          const original = await fs.promises.readFile(absPath, 'utf8');
+          // Replace long `play#pen` URLs which dramatically inflate token counts.
+          // Example to match: https://developers.reddit.com/play#pen/<anything>
+          return original.replace(
+            /https:\/\/developers\.reddit\.com\/play#pen\/[^\s)]+/g,
+            'https://developers.reddit.com/play/redactedfromllmstxt'
+          );
         })
       );
 
