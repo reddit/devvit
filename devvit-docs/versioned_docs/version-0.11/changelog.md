@@ -4,6 +4,34 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.17: Easier fetch domain requests
+
+**Release Date: June 16, 2025**
+
+We’ve simplified how to request new domains for HTTP fetch (no more forms!). Now you can just add domains in your app’s configuration, and when you playtest or upload the app, the domain is automatically submitted for approval.
+
+```tsx
+import { Devvit } from '@devvit/public-api';
+
+Devvit.configure({
+  http: {
+    domains: ['my-site.com', 'another-domain.net'],
+  },
+});
+```
+
+:::note
+Domains on the [global allow list](./capabilities/http-fetch-allowlist.md) don’t need approval—they just work.
+:::
+
+There’s also a new section in your app’s Developer Settings (https://developers.reddit.com/apps/[app-slug]/developer-setings) tab that lets you check the status of a domain.
+
+![domain exceptions](./assets/domain_exceptions.png)
+
+To use this feature, you’ll need to be on the latest version of the public api. You can do this by running: `npm i @devvit/public-api` in your app.
+
+Learn more about [HTTP fetch](./capabilities/http-fetch.md) and the[allow-listed domains](./capabilities/http-fetch-allowlist.md) in our docs.
+
 ## Devvit 0.11.16: CLI improvements and updated guidelines
 
 **Release Date: May 27, 2025**
