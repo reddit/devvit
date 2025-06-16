@@ -323,9 +323,10 @@ export default class Upload extends DevvitCommand {
         `Something went wrong: couldn't find the app ${this.project.name} after creating a playtest subreddit.`
       );
     } else if (!appInfo.app.defaultPlaytestSubredditId) {
-      this.error(
-        `Something went wrong: the app ${this.project.name} doesn't have a default playtest subreddit ID.`
+      this.warn(
+        `We couldn't find the default playtest subreddit for ${this.project.name}, but one will be created during your next ${'`devvit upload`'} or ${'`devvit playtest`'}.`
       );
+      return undefined;
     }
 
     try {

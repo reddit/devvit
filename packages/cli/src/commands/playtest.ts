@@ -248,7 +248,7 @@ export default class Playtest extends DevvitCommand {
         );
       } else if (!this.#appInfo.app.defaultPlaytestSubredditId) {
         this.error(
-          'Something went wrong: we could not find the newly created playtest subreddit ID. Please try again.'
+          'Something went wrong: we could not find the newly created playtest subreddit. Please playtest on a different subreddit using `devvit playtest <your_subreddit>` instead.'
         );
       }
       this.#subreddit = this.#appInfo.app.defaultPlaytestSubredditId;
