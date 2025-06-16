@@ -58,6 +58,7 @@
     "chalk": "4.1.2",
     "chokidar": "3.5.3",
     "date-fns": "2.29.3",
+    "dotenv": "16.5.0",
     "file-type": "18.2.1",
     "image-size": "1.2.1",
     "inquirer": "9.1.4",

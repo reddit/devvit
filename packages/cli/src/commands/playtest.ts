@@ -1,11 +1,6 @@
 import { updateBundleServer, updateBundleVersion } from '@devvit/build-pack/esbuild/ESBuildPack.js';
-import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
-import {
-  BuildStatus,
-  type FullAppInfo,
-  InstallationType,
-  VersionVisibility,
-} from '@devvit/protos/community.js';
+import type { FullInstallationInfo } from '@devvit/protos/community.js';
+import { type FullAppInfo, InstallationType, VersionVisibility } from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import {
   ACTOR_SRC_DIR,
@@ -42,6 +37,8 @@ import {
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
+import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
+import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { Project } from '../util/project.js';
 import Logs from './logs.js';
@@ -51,6 +48,7 @@ export default class Playtest extends DevvitCommand {
     'Installs your app to your test subreddit and starts a playtest session where a new version is installed whenever you save changes to your app code, and logs are continuously streamed';
 
   static override examples = [
+    '$ devvit playtest',
     '$ devvit playtest <subreddit>',
     '$ devvit playtest r/myTestSubreddit',
     '$ devvit playtest myOtherTestSubreddit',
@@ -80,8 +78,8 @@ export default class Playtest extends DevvitCommand {
 
   static override args = {
     subreddit: Args.string({
-      description: `Provide the name of a small test subreddit with <${MAX_ALLOWED_SUBSCRIBER_COUNT} members. The "r/" prefix is optional`,
-      required: true,
+      description: `Provide the name of a small test subreddit with <${MAX_ALLOWED_SUBSCRIBER_COUNT} members. The "r/" prefix is optional. Leaving this empty will use the subreddit set in the in the "dev.subreddit" field of devvit.json. If neither is set, we will create a "r/[app-name]_dev" subreddit for you.`,
+      required: false,
       parse: toLowerCaseArgParser,
     }),
   } as const;
@@ -139,33 +137,6 @@ export default class Playtest extends DevvitCommand {
     }
   }
 
-  /**
-   * Re-fetching AppVersionInfo to check the current BuildStatus
-   */
-  async #waitUntilVersionBuildComplete(appVersionInfo: AppVersionInfo): Promise<void> {
-    ux.action.start('App is building remotely');
-    for (let i = 0; i < 10 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
-      // version is still building: wait and try again
-      await sleep(3000);
-      const info = await this.#appVersionClient.Get({ id: appVersionInfo.id });
-
-      if (!info.appVersion) {
-        throw new Error('Something went wrong, no app version available.');
-      }
-
-      appVersionInfo = info.appVersion;
-
-      if (i === 5) {
-        this.log(`Your app's taking a while to build - sorry for the delay!`);
-      }
-    }
-    ux.action.stop();
-
-    if (appVersionInfo.buildStatus !== BuildStatus.READY) {
-      throw new Error('Something went wrong: the previous version did not build successfully.');
-    }
-  }
-
   override async run(): Promise<void> {
     // Despite the name, finally() is only invoked on successful termination.
     process.on('SIGINT', () => {
@@ -174,8 +145,9 @@ export default class Playtest extends DevvitCommand {
 
     const { args, flags } = await this.parse(Playtest);
     this.#flags = flags;
-    this.#subreddit = getSubredditNameWithoutPrefix(args.subreddit);
+
     this.project.flag.watchDebounceMillis = this.#flags?.['debounce'] as number | undefined;
+    this.project.flag.subreddit = args.subreddit;
 
     const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
@@ -204,6 +176,7 @@ export default class Playtest extends DevvitCommand {
         "Your app doesn't exist yet - you'll need to run 'devvit upload' before you can playtest your app."
       );
     }
+    this.project.app.defaultPlaytestSubredditId = this.#appInfo.app.defaultPlaytestSubredditId;
 
     const isOwner = this.#appInfo?.app?.owner?.displayName === username;
     await this.#checkIfUserAllowedToPlaytestThisApp(
@@ -213,16 +186,15 @@ export default class Playtest extends DevvitCommand {
       flags['employee-update']
     );
 
-    // alert user if they're about to run playtest in a large subreddit
-    const subscriberCount = await fetchSubredditSubscriberCount(this.#subreddit, token);
-
-    if (subscriberCount > MAX_ALLOWED_SUBSCRIBER_COUNT) {
-      this.error(
-        `Playtest can only be used in a small test subreddit. Please try again in a community with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} members.`
-      );
+    // Set the target subreddit to the passed argument, or to the config subreddit, or to the app's default, in this order.
+    // If none of these are set, it will be undefined, and we will create a new playtest subreddit.
+    const targetSubreddit = this.project.getSubreddit('Dev');
+    if (targetSubreddit) {
+      this.#subreddit = getSubredditNameWithoutPrefix(targetSubreddit);
     }
+    const shouldWriteToConfig = !this.#subreddit;
 
-    const latestVersion = this.#appInfo.versions[0];
+    let latestVersion = this.#appInfo.versions[0];
     this.#version = new DevvitVersion(
       latestVersion.majorVersion,
       latestVersion.minorVersion,
@@ -230,21 +202,74 @@ export default class Playtest extends DevvitCommand {
       latestVersion.prereleaseVersion
     );
 
+    if (this.#subreddit) {
+      // alert user if they're about to run playtest in a large subreddit
+      const subscriberCount = await fetchSubredditSubscriberCount(this.#subreddit, token);
+
+      if (subscriberCount > MAX_ALLOWED_SUBSCRIBER_COUNT) {
+        this.error(
+          `Playtest can only be used in a small test subreddit. Please try again in a community with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} members.`
+        );
+      }
+    } else {
+      this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
+      // TODO: consider having a dedicated endpoint to create the playtest subreddit so we don't have to upload a new version
+      // We need to upload a new version to create a new playtest subreddit
+      this.#version.bumpVersion(VersionBumpType.Prerelease);
+
+      const appVersionCreator = new AppVersionUploader(this, {
+        verbose: Boolean(this.#flags?.verbose),
+      });
+
+      const bundles = await this.#bundler.bundle(this.project, {
+        name: ACTOR_SRC_PRIMARY_NAME,
+        owner: username,
+        version: this.#version.toString(),
+      });
+      latestVersion = await appVersionCreator.createVersion(
+        {
+          appId: this.#appInfo.app.id,
+          appSlug: this.#appInfo.app.slug,
+          appSemver: this.#version,
+          visibility: VersionVisibility.PRIVATE,
+        },
+        bundles,
+        false
+      );
+
+      // Since we created a subreddit, we reload the app info to get the newly created subreddit ID
+      this.#appInfo = await getAppBySlug(this.#appClient, {
+        slug: this.project.name,
+        limit: 1, // fetched version limit; we only need the latest one
+      });
+      if (!this.#appInfo?.app) {
+        this.error(
+          'Something went wrong: we could not find your app after creating a new playtest subreddit. Please try again.'
+        );
+      } else if (!this.#appInfo.app.defaultPlaytestSubredditId) {
+        this.error(
+          'Something went wrong: we could not find the newly created playtest subreddit ID. Please try again.'
+        );
+      }
+      this.#subreddit = this.#appInfo.app.defaultPlaytestSubredditId;
+      // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
+    }
+
     // before starting playtest session, make sure app has been installed to the test subreddit:
     this.#installationInfo = await this.#getExistingInstallInfo(this.project.name, this.#subreddit);
 
     if (!this.#installationInfo) {
-      const userT2Id = await this.getUserT2Id(token);
-
       ux.action.start(`Installing`);
       try {
-        this.#installationInfo = await this.#installationsClient.Create({
-          appVersionId: latestVersion.id,
-          runAs: userT2Id,
-          type: InstallationType.SUBREDDIT,
-          location: this.#subreddit,
-          upgradeStrategy: 0,
-        });
+        const userT2Id = await this.getUserT2Id(token);
+        this.#installationInfo = await installOnSubreddit(
+          this,
+          this.#appVersionClient,
+          this.#installationsClient,
+          userT2Id,
+          latestVersion,
+          this.#subreddit
+        );
 
         ux.action.stop();
       } catch (err: unknown) {
@@ -253,6 +278,10 @@ export default class Playtest extends DevvitCommand {
           `An error occurred while installing your app: ${StringUtil.caughtToString(err, 'message')}`
         );
       }
+    }
+    this.#subreddit = this.#installationInfo.installation!.location!.name;
+    if (shouldWriteToConfig) {
+      this.project.setSubreddit(this.#subreddit, 'Dev'); // Write the new default playtest subreddit to the project config
     }
 
     this.#appLogSub = makeLogSubscription(
@@ -413,7 +442,8 @@ export default class Playtest extends DevvitCommand {
           appSemver: this.#version,
           visibility: VersionVisibility.PRIVATE,
         },
-        this.#lastBundles
+        this.#lastBundles,
+        true // The playtest subreddit should've already been created so we prevent creating a new one
       );
 
       if (this.#lastQueuedBundles) {
@@ -423,7 +453,7 @@ export default class Playtest extends DevvitCommand {
       }
 
       // 5. confirm new version has finished building
-      await this.#waitUntilVersionBuildComplete(appVersionInfo);
+      await waitUntilVersionBuildComplete(this, this.#appVersionClient, appVersionInfo);
 
       if (this.#lastQueuedBundles) {
         // No need to go further if there's a newer playtest version is waiting
@@ -530,8 +560,4 @@ export default class Playtest extends DevvitCommand {
 
     process.exit(0);
   }
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }

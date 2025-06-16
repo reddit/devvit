@@ -3,9 +3,12 @@
 
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Errors, flush, run } from '@oclif/core';
+import { config as dotenvConfig } from 'dotenv';
 
 import { getCurrentCommandEventData } from '../dist/lib/hooks/init/fire-event.js';
 import { sendEvent } from '../dist/util/metrics.js';
+
+dotenvConfig();
 
 run(undefined, import.meta.url)
   .then(() => flush())

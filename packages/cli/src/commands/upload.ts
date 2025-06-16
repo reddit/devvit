@@ -2,7 +2,12 @@ import { exec } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { AppVersionInfo, FullAppInfo, VersionVisibility } from '@devvit/protos/community.js';
+import {
+  AppVersionInfo,
+  FullAppInfo,
+  FullInstallationInfo,
+  VersionVisibility,
+} from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import {
   ACTOR_SRC_PRIMARY_NAME,
@@ -14,13 +19,20 @@ import { Flags, ux } from '@oclif/core';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import chalk from 'chalk';
 
+import type { StoredToken } from '../lib/auth/StoredToken.js';
+import { REDDIT_DESKTOP } from '../lib/config.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
 import { AppUploader } from '../util/AppUploader.js';
 import { AppVersionUploader } from '../util/AppVersionUploader.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { Bundler } from '../util/Bundler.js';
-import { createAppClient } from '../util/clientGenerators.js';
+import {
+  createAppClient,
+  createAppVersionClient,
+  createInstallationsClient,
+} from '../util/clientGenerators.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
+import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
@@ -73,6 +85,7 @@ export default class Upload extends DevvitCommand {
   } as const;
 
   readonly #appClient = createAppClient();
+  readonly #installationsClient = createInstallationsClient();
 
   #event = {
     source: 'devplatform_cli',
@@ -146,6 +159,7 @@ export default class Upload extends DevvitCommand {
     if (!appInfo?.app) {
       this.error(`App ${this.project.name} is not found`);
     }
+    this.project.app.defaultPlaytestSubredditId = appInfo.app.defaultPlaytestSubredditId;
 
     // Now, create a new version.
     const appVersionNumber = await this.#getNextVersionNumber(appInfo, flags.bump);
@@ -158,15 +172,42 @@ export default class Upload extends DevvitCommand {
 
     try {
       const appVersionUploader = new AppVersionUploader(this, { verbose: flags.verbose });
-      await appVersionUploader.createVersion(
+      const shouldCreatePlaytestSubreddit = !this.project.getSubreddit('Dev');
+
+      if (shouldCreatePlaytestSubreddit) {
+        this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
+      }
+      const latestVersion = await appVersionUploader.createVersion(
         {
           appId: appInfo.app.id,
           appSlug: appInfo.app.slug,
           appSemver: appVersionNumber,
           visibility: VersionVisibility.PRIVATE,
         },
-        bundles
+        bundles,
+        !shouldCreatePlaytestSubreddit
       );
+
+      // Install the app to the default playtest subreddit, if it was created.
+      if (shouldCreatePlaytestSubreddit) {
+        const installationInfo = await this.#installOnDefaultPlaytestSubreddit(
+          token,
+          latestVersion
+        );
+        if (installationInfo) {
+          const devSubredditName = installationInfo.installation?.location?.name;
+          if (devSubredditName) {
+            const playtestUrl = chalk.bold.green(`${REDDIT_DESKTOP}/r/${devSubredditName}`);
+            this.log(`We have created a playtest subreddit for you at ${playtestUrl}`);
+            this.project.setSubreddit(devSubredditName, 'Dev');
+            ux.action.stop();
+          }
+        } else {
+          this.warn(
+            `We couldn't install your app to the new playtest subreddit, but you can still do so manually.`
+          );
+        }
+      }
     } catch (err) {
       const errMessage = StringUtil.caughtToString(err, 'message');
       if (err instanceof Error) {
@@ -264,6 +305,51 @@ export default class Upload extends DevvitCommand {
     this.#event.devplatform.cli_upload_failure_reason = err.message;
     await this.#sendEventIfNotSent();
     return super.catch(err);
+  }
+
+  // Install the app to the default playtest subreddit, if it was created.
+  // For convenience, returns the name of the subreddit if the app is successfully installed.
+  async #installOnDefaultPlaytestSubreddit(
+    token: StoredToken,
+    appVersion: AppVersionInfo
+  ): Promise<FullInstallationInfo | undefined> {
+    const appInfo = await getAppBySlug(this.#appClient, {
+      slug: this.project.name,
+      hidePrereleaseVersions: true,
+      limit: 1, // fetched version limit; we only need the latest one
+    });
+    if (!appInfo?.app) {
+      this.error(
+        `Something went wrong: couldn't find the app ${this.project.name} after creating a playtest subreddit.`
+      );
+    } else if (!appInfo.app.defaultPlaytestSubredditId) {
+      this.error(
+        `Something went wrong: the app ${this.project.name} doesn't have a default playtest subreddit ID.`
+      );
+    }
+
+    try {
+      ux.action.start('Installing app to default playtest subreddit');
+
+      const userT2Id = await this.getUserT2Id(token);
+      const installationInfo = await installOnSubreddit(
+        this,
+        createAppVersionClient(),
+        this.#installationsClient,
+        userT2Id,
+        appVersion,
+        appInfo.app.defaultPlaytestSubredditId
+      );
+
+      ux.action.stop();
+      return installationInfo;
+    } catch (err: unknown) {
+      ux.action.stop('Warning');
+      this.warn(
+        `We couldn't install your app to the new playtest subreddit at ${appInfo.app.defaultPlaytestSubredditId}, but you can still do so manually. ${StringUtil.caughtToString(err, 'message')}`
+      );
+    }
+    return undefined;
   }
 }
 

@@ -63,7 +63,8 @@ export class Project {
     return new Project(root, filename, config, packageJSON?.devvit);
   }
 
-  readonly flag: { watchDebounceMillis?: number | undefined } = {};
+  readonly flag: { watchDebounceMillis?: number | undefined; subreddit?: string | undefined } = {};
+  readonly app: { defaultPlaytestSubredditId?: string | undefined } = {};
   readonly root: ProjectRootDir;
   readonly filename: string;
   readonly #config: DevvitConfig;
@@ -121,6 +122,40 @@ export class Project {
   // to-do: move into devvit.json.
   get watchDebounceMillis(): number {
     return this.flag.watchDebounceMillis ?? this.#packageConfig?.playtest?.debounceConfigMs ?? 100;
+  }
+
+  getSubreddit(mode: 'Dev' | 'Prod'): string | undefined {
+    if (mode === 'Prod') {
+      throw Error(`Getting Prod subreddits isn't supported yet.`);
+    }
+
+    const trimmedEnvVar = process.env?.DEVVIT_DEV_SUBREDDIT?.trim();
+    if (trimmedEnvVar) {
+      return process.env.DEVVIT_DEV_SUBREDDIT;
+    }
+    const trimmedFlag = this.flag.subreddit?.trim();
+    if (trimmedFlag) {
+      return this.flag.subreddit;
+    }
+    if (isAppConfig(this.#config) && this.#config.dev?.subreddit) {
+      return this.#config.dev.subreddit;
+    }
+    return this.app.defaultPlaytestSubredditId;
+  }
+
+  setSubreddit(subreddit: string, mode: 'Dev' | 'Prod') {
+    if (mode === 'Prod') {
+      throw Error(`Setting Prod subreddits isn't supported yet.`);
+    }
+
+    if (!isAppConfig(this.#config)) return;
+
+    this.#config.dev ??= {};
+    this.#config.dev.subreddit = subreddit;
+
+    this.#config.json.dev ??= {};
+    this.#config.json.dev.subreddit = subreddit;
+    writeConfig(this.root, this.filename, this.#config);
   }
 }
 

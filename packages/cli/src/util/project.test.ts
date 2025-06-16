@@ -66,6 +66,20 @@ describe('Project', () => {
     project.flag.watchDebounceMillis = 200;
     expect(project.watchDebounceMillis).toBe(200);
   });
+
+  test('dev.subreddit', () => {
+    const config: AppConfig = {
+      schema: 'v1',
+      name: 'name',
+      permissions: noPermissions,
+      json: { name: 'name' },
+      dev: { subreddit: 'devsubreddit' },
+    };
+    const project = new Project('root', 'filename', config, undefined);
+    expect(project.getSubreddit('Dev')).toBe('devsubreddit');
+    project.setSubreddit('newsubreddit', 'Dev');
+    expect(project.getSubreddit('Dev')).toBe('newsubreddit');
+  });
 });
 
 describe('validateConfig()', () => {
