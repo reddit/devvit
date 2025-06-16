@@ -107,7 +107,6 @@
     "hooks": {
       "init": [
         "./dist/lib/hooks/init/check-node-version.js",
-        "./dist/lib/hooks/init/check-update.js",
         "./dist/lib/hooks/init/fire-event.js"
       ]
     }

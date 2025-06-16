@@ -63,13 +63,6 @@ export default class Playtest extends DevvitCommand {
       required: false,
       hidden: true,
     }),
-    // Used in packages/cli/src/lib/hooks/init/check-update.ts
-    'ignore-outdated': Flags.boolean({
-      aliases: ['ignoreOutdated'],
-      description: 'Skip CLI version check. The apps that you upload may not work as expected',
-      required: false,
-      hidden: false,
-    }),
     debounce: Flags.integer({
       description: 'Debounce time in milliseconds for file changes',
       required: false,

@@ -64,13 +64,6 @@ export default class Upload extends DevvitCommand {
       required: false,
       hidden: true,
     }),
-    // Used in packages/cli/src/lib/hooks/init/check-update.ts
-    'ignore-outdated': Flags.boolean({
-      aliases: ['ignoreOutdated'],
-      description: 'Skip CLI version check. The apps that you upload may not work as expected',
-      required: false,
-      hidden: false,
-    }),
     'copy-paste': Flags.boolean({
       aliases: ['copyPaste'],
       description: 'Copy-paste the auth code instead of opening a browser',
