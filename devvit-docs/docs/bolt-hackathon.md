@@ -23,7 +23,7 @@ Visit our [AI Tools section](devvit_web/ai_tools.mdx) for more information on ho
   allowfullscreen
 ></iframe>
 
-Even after the hackathon, you can still earn money with your Devvit project. Visit our [Reddit Developer Funds](reddit_developer_funds.md) page for more information on how you can earn money from your Devvit app or game. This program currently allow developers to get paid as apps achieve certain usage metrics, **with payments up to $$116,500+ per app**
+Even after the hackathon, you can still earn money with your Devvit project. Visit our [Reddit Developer Funds](reddit_developer_funds.md) page for more information on how you can earn money from your Devvit app or game. This program currently allow developers to get paid as apps achieve certain usage metrics, **with payments up to $116,500+ per app**
 
 We hope you have fun with the challenge!
 
