@@ -39,6 +39,7 @@
   "dependencies": {
     "@devvit/metrics": "0.11.16",
     "@devvit/protos": "0.11.16",
+    "@devvit/shared": "0.11.16",
     "@devvit/shared-types": "0.11.16",
     "base64-js": "1.5.1",
     "clone-deep": "4.0.1",
