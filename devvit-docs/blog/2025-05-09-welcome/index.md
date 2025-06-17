@@ -12,7 +12,7 @@ image: logo.png
 
 We’ve been hard at work building and expanding Reddit’s Developer Platform, and it’s growing fast. <!--truncate --> [Since our beta opened](https://www.reddit.com/r/Devvit/comments/1ddmgah/welcome_to_rdevvit/), over 2,000 developers have created apps in 31,000+ communities.
 
-We’re also compensating successful developers through temporary programs, such as hackathons and [Reddit Developer Funds](https://developers.reddit.com/docs/reddit_developer_funds) In particular, our Developer Funds currently allow developers to get paid as apps achieve certain metrics, with payments up to $\$116,500+ per app - up to <strong>\$349,500 per developer</strong>.
+We’re also compensating successful developers through temporary programs, such as hackathons and [Reddit Developer Funds](https://developers.reddit.com/docs/reddit_developer_funds) In particular, our Developer Funds currently allow developers to get paid as apps achieve certain metrics, with payments up to \$116,500+ per app - up to <strong>\$349,500 per developer</strong>.
 
 From powerful mod tools like [Trending Tattler](https://developers.reddit.com/apps/trendingtattler) and [Moderator Mentions](https://developers.reddit.com/apps/mod-mentions) to interactive apps like [Live Scores](https://www.reddit.com/r/realmadrid/comments/1k8kflj/match_thread_fc_barcelona_vs_real_madrid_live/) and to games like [Riddonkulous](https://www.reddit.com/r/riddonkulous/), developers and their apps make Reddit more useful, fun, and community-driven.
 
