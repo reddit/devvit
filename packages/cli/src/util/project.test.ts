@@ -16,12 +16,12 @@ import {
 } from './project.js';
 
 const noPermissions: AppPermissionConfig = {
-  http: { enabled: false, allowedDomains: [] },
+  http: { enable: false, allowedDomains: [] },
   media: false,
   payments: false,
   realtime: false,
   redis: false,
-  reddit: { enabled: false, scope: 'user', asUser: [] },
+  reddit: { enable: false, scope: 'user', asUser: [] },
 };
 
 describe('Project', () => {
@@ -87,7 +87,7 @@ describe('validateConfig()', () => {
     for (const exists of [false, true])
       for (const mode of ['Static', 'Dynamic'] as const) {
         const config: AppConfig = {
-          blocks: { entry: 'entry' },
+          blocks: { entry: 'entry', menu: { enable: true } },
           schema: 'v1',
           name: 'name',
           permissions: noPermissions,
@@ -221,7 +221,7 @@ describe('isAppConfig()', () => {
       name: 'name',
       permissions: {
         http: {
-          enabled: false,
+          enable: false,
           allowedDomains: [],
         },
         media: false,
@@ -229,7 +229,7 @@ describe('isAppConfig()', () => {
         realtime: false,
         redis: false,
         reddit: {
-          enabled: false,
+          enable: false,
           scope: 'user',
           asUser: [],
         },

@@ -1,21 +1,18 @@
-/* eslint-env node */
-/* eslint-disable no-undef */
-const fs = require('fs/promises');
-const path = require('path');
-const { glob } = require('glob');
+import { LoadContext, Plugin } from '@docusaurus/types';
+import { Dirent } from 'fs';
+import fs from 'fs/promises';
+import { glob } from 'glob';
+import path from 'path';
 
 /**
  * Docusaurus plugin that copies every .md/.mdx file under the docs folder
  * into the final build so they are accessible as raw markdown (e.g.
  * /docs/quickstart.md).
- *
- * @typedef {Object} CopyDocsRawOptions
- * @property {string[]} [ignore] Glob patterns to exclude when copying markdown files.
- *
- * @param {import('@docusaurus/types').LoadContext} context Docusaurus plugin context.
- * @param {CopyDocsRawOptions} [options={}] Plugin options.
  */
-module.exports = function copyDocsRawPlugin(context, options = {}) {
+export default function copyDocsRawPlugin(
+  context: LoadContext,
+  { ignore = [] }: { ignore?: string[]; docsBaseUrl?: string } = {}
+): Plugin {
   return {
     name: 'copy-docs-raw',
 
@@ -28,7 +25,7 @@ module.exports = function copyDocsRawPlugin(context, options = {}) {
       const docsDir = path.resolve(__dirname, '..', 'docs');
       const files = await glob(['**/*.md', '**/*.mdx'], {
         cwd: docsDir,
-        ignore: options.ignore ?? [],
+        ignore,
       });
 
       await Promise.all(
@@ -60,7 +57,7 @@ module.exports = function copyDocsRawPlugin(context, options = {}) {
 
       // It is possible a project does not use versioned docs – skip gracefully
       // if the directory is missing.
-      let versionDirEntries = [];
+      let versionDirEntries: Dirent[] = [];
       try {
         versionDirEntries = await fs.readdir(versionedDocsRoot, { withFileTypes: true });
       } catch (err) {
@@ -76,7 +73,7 @@ module.exports = function copyDocsRawPlugin(context, options = {}) {
 
         const versionFiles = await glob(['**/*.md', '**/*.mdx'], {
           cwd: sourceDir,
-          ignore: options.ignore ?? [],
+          ignore,
         });
 
         await Promise.all(
@@ -95,4 +92,4 @@ module.exports = function copyDocsRawPlugin(context, options = {}) {
       }
     },
   };
-};
+}

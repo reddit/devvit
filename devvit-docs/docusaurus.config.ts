@@ -1,14 +1,10 @@
-// @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
-
-const { themes } = require('prism-react-renderer');
-const lightCodeTheme = themes.github;
-const darkCodeTheme = themes.dracula;
+import type * as Preset from '@docusaurus/preset-classic';
+import type { Config } from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
 
 const baseUrl = process.env.DOCUSAURUS_BASE_URL ?? '/';
 
-/** @type {import('@docusaurus/types').Config} */
-const config = {
+const config: Config = {
   title: 'Reddit for Developers',
   tagline: 'An app for anything',
   url: 'https://developers.reddit.com',
@@ -56,7 +52,7 @@ const config = {
       {
         docs: {
           routeBasePath: '/', // Serve the docs at the site's root
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: './sidebars.ts',
           lastVersion: '0.11',
         },
         blog: {
@@ -67,7 +63,7 @@ const config = {
           showReadingTime: true,
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: './src/css/custom.css',
         },
         gtag: {
           trackingID: 'G-GWE79J8M6R',
@@ -80,13 +76,23 @@ const config = {
   plugins: [
     
     [
-      require.resolve('@cmfcmf/docusaurus-search-local'),
+      '@easyops-cn/docusaurus-search-local',
       {
         indexBlog: false,
+        docsRouteBasePath: baseUrl,
+        ignoreFiles: [
+          /(?:^|\/)api(?:\/|$)/,
+          /(?:^|\/)icon$/,
+          /(?:^|\/)devvit_rules$/,
+          /(?:^|\/)migration_guide$/,
+          /(?:^|\/)three_strikes$/,
+          /(?:^|\/)playgrounds$/,
+          /(?:^|\/)playground$/,
+        ],
       },
     ],
     [
-      require.resolve('./plugins/llmsTxt.js'),
+      './plugins/llmsTxt.ts',
       {
         ignore: [
           '**/api/**',
@@ -100,69 +106,67 @@ const config = {
         ],
       },
     ],
-    require.resolve('./plugins/copyDocsRaw'),
+    './plugins/copyDocsRaw.ts',
   ],
-  themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
-      docs: {
-        sidebar: {
-          autoCollapseCategories: false,
-        },
+  themeConfig: {
+    docs: {
+      sidebar: {
+        autoCollapseCategories: false,
       },
-      navbar: {
-        logo: {
-          alt: 'Reddit for Developers',
-          src: 'img/logo.svg',
-          href: 'https://developers.reddit.com/',
-          target: '_self',
-        },
-        items: [
-          {
-            docsPluginId: 'default',
-            type: 'docsVersionDropdown',
-            position: 'left',
-            dropdownActiveClassDisabled: true,
-          },
-        ],
+    },
+    navbar: {
+      logo: {
+        alt: 'Reddit for Developers',
+        src: 'img/logo.svg',
+        href: 'https://developers.reddit.com/',
+        target: '_self',
       },
-      footer: {
-        links: [
-          {
-            label: 'Blog',
-            to: '/blog',
-          },
-          {
-            label: 'The Reddit Developer Fund',
-            to: '/reddit_developer_funds',
-          },
+      items: [
+        {
+          docsPluginId: 'default',
+          type: 'docsVersionDropdown',
+          position: 'left',
+          dropdownActiveClassDisabled: true,
+        },
+      ],
+    },
+    footer: {
+      links: [
+        {
+          label: 'Blog',
+          to: '/blog',
+        },
+        {
+          label: 'The Reddit Developer Fund',
+          to: '/reddit_developer_funds',
+        },
 
-          {
-            label: 'r/Devvit',
-            href: 'https://www.reddit.com/r/devvit',
-          },
-          {
-            label: 'r/GamesOnReddit',
-            href: 'https://www.reddit.com/r/GamesOnReddit',
-          },
-          {
-            label: 'Join our Discord',
-            href: 'https://discord.gg/Cd43ExtEFS',
-          },
-        ],
-        style: 'dark',
-        copyright: `Reddit, Inc. © ${new Date().getFullYear()}. Built with Docusaurus.`,
-      },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
-        additionalLanguages: ['json', 'bash'],
-      },
-      colorMode: {
-        disableSwitch: false,
-        respectPrefersColorScheme: true,
-      },
-    }),
+        {
+          label: 'r/Devvit',
+          href: 'https://www.reddit.com/r/devvit',
+        },
+        {
+          label: 'r/GamesOnReddit',
+          href: 'https://www.reddit.com/r/GamesOnReddit',
+        },
+        {
+          label: 'Join our Discord',
+          href: 'https://discord.gg/Cd43ExtEFS',
+        },
+      ],
+      style: 'dark',
+      copyright: `Reddit, Inc. © ${new Date().getFullYear()}. Built with Docusaurus.`,
+    },
+    prism: {
+      theme: prismThemes.github,
+      darkTheme: prismThemes.dracula,
+      additionalLanguages: ['json', 'bash'],
+    } satisfies Preset.ThemeConfig,
+    colorMode: {
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
+    },
+  },
 };
 
-module.exports = config;
+export default config;

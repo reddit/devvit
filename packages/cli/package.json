@@ -100,6 +100,7 @@
     "flexibleTaxonomy": true,
     "plugins": [
       "@oclif/plugin-not-found",
+      "@oclif/plugin-help",
       "@oclif/plugin-warn-if-update-available"
     ],
     "helpClass": "./dist/lib/help",

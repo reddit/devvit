@@ -63,7 +63,10 @@ export class Project {
     return new Project(root, filename, config, packageJSON?.devvit);
   }
 
-  readonly flag: { watchDebounceMillis?: number | undefined; subreddit?: string | undefined } = {};
+  readonly flag: {
+    watchDebounceMillis?: number | undefined;
+    subreddit?: string | undefined;
+  } = {};
   readonly app: { defaultPlaytestSubredditId?: string | undefined } = {};
   readonly root: ProjectRootDir;
   readonly filename: string;
@@ -220,12 +223,11 @@ export function validateConfig(
 ): string[] {
   const errs = [];
 
-  if (config.blocks) {
-    console.warn('`config.blocks` is deprecated and will be removed soon.');
+  if (config.blocks && !fileExists(config.blocks.entry))
+    errs.push(`\`config.blocks.entry\` (${config.blocks.entry}) does not exist`);
 
-    if (!fileExists(config.blocks.entry))
-      errs.push(`\`config.blocks.entry\` (${config.blocks.entry}) does not exist`);
-  }
+  if (config.media && !fileExists(config.media.dir))
+    errs.push(`\`config.media.dir\` (${config.media.dir}) does not exist`);
 
   if (config.post) {
     if (!fileExists(config.post.client.dir) && mode === 'Static')

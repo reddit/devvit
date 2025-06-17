@@ -30,10 +30,6 @@ export function getMenuItemById(id: string): MenuItem | undefined {
 async function getActions(_: Empty, _metadata: Metadata | undefined): Promise<ContextActionList> {
   const menuItems = Devvit.menuItems;
 
-  if (!menuItems.length) {
-    throw new Error('No menu items registered.');
-  }
-
   const actions: DeepPartial<ContextActionDescription>[] = menuItems.map((item, index) => {
     return {
       actionId: getActionId(index),

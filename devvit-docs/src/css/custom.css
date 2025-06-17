@@ -40,6 +40,8 @@
   --ifm-footer-link-color: #ffede5;
   --ifm-background-color: #0f1a1c;
   --ifm-navbar-background-color: #0f1a1c;
+  --ifm-navbar-search-input-color: #0f1a1c;
+  --ifm-navbar-search-input-background-color: #ffffff;
 }
 
 .hero--primary {
