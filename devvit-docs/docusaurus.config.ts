@@ -79,7 +79,7 @@ const config: Config = {
       '@easyops-cn/docusaurus-search-local',
       {
         indexBlog: false,
-        docsRouteBasePath: baseUrl,
+        docsRouteBasePath: '/',
         ignoreFiles: [
           /(?:^|\/)api(?:\/|$)/,
           /(?:^|\/)icon$/,
