@@ -111,6 +111,8 @@ export class TxClient implements TxClientLike {
         output.push(result.str);
       } else if (result.dbl !== undefined) {
         output.push(result.dbl);
+      } else if (result.bool !== undefined) {
+        output.push(result.bool);
       }
     }
     return output;
