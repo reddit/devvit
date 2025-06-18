@@ -14,6 +14,7 @@ import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js'
 import { Args, Flags, ux } from '@oclif/core';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
+import { existsSync } from 'fs';
 import path from 'path';
 import type { Subscription } from 'rxjs';
 import { map } from 'rxjs';
@@ -332,7 +333,10 @@ export default class Playtest extends DevvitCommand {
     if (this.project.clientDir)
       assetPaths.push(path.join(this.project.root, this.project.clientDir));
     if (this.project.server?.entry)
-      assetPaths.push(path.join(this.project.root, this.project.server.entry));
+      // Watch the server directory to allow the watched file to be renamed or deleted.
+      assetPaths.push(
+        path.join(path.dirname(path.join(this.project.root, this.project.server.entry)), '..')
+      );
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
 
     this.#watchAssets.on('all', () => {
@@ -409,9 +413,16 @@ export default class Playtest extends DevvitCommand {
       this.#lastQueuedBundles = result.bundles;
       return;
     }
-
     // No bundles produced, ignore
     if (!result.bundles?.length) {
+      return;
+    }
+
+    if (
+      this.project.server &&
+      !existsSync(path.resolve(this.project.root, this.project.server.entry))
+    ) {
+      // User may be in the process of building a server entry. Wait.
       return;
     }
 
