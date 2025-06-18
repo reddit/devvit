@@ -40,7 +40,7 @@ import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredd
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
-import { Project } from '../util/project.js';
+import { devvitClassicConfigFilename, devvitV1ConfigFilename } from '../util/project.js';
 import Logs from './logs.js';
 
 export default class Playtest extends DevvitCommand {
@@ -82,11 +82,11 @@ export default class Playtest extends DevvitCommand {
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();
 
-  readonly #bundler: Bundler = new Bundler();
+  #bundler: Bundler | undefined;
 
   // Args
   #subreddit?: string; // unprefixed
-  #flags?: CommandFlags<typeof Playtest>;
+  #flags?: CommandFlags<typeof Playtest & typeof DevvitCommand>;
 
   // State
   #appInfo?: FullAppInfo | undefined;
@@ -98,9 +98,9 @@ export default class Playtest extends DevvitCommand {
 
   // Processes
   #appLogSub?: Subscription;
-  #watchSrc?: Subscription;
   #watchAssets?: chokidar.FSWatcher;
   #watchConfigFile?: chokidar.FSWatcher;
+  #watchSrc?: Subscription;
   #server?: PlaytestServer;
 
   async #getExistingInstallInfo(
@@ -132,13 +132,12 @@ export default class Playtest extends DevvitCommand {
 
   override async run(): Promise<void> {
     // Despite the name, finally() is only invoked on successful termination.
-    process.on('SIGINT', () => {
-      void this.#onExit();
-    });
+    process.on('SIGINT', this.#onExit);
 
     const { args, flags } = await this.parse(Playtest);
     this.#flags = flags;
 
+    this.#bundler = new Bundler();
     this.project.flag.watchDebounceMillis = this.#flags?.['debounce'] as number | undefined;
     this.project.flag.subreddit = args.subreddit;
 
@@ -307,6 +306,7 @@ export default class Playtest extends DevvitCommand {
    * Watching source code changes
    */
   #startWatchingSrc(username: string): void {
+    if (!this.#bundler) throw Error('no bundler');
     const watchSrc = this.#bundler.watch(this.project, this.project.root, {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
@@ -342,30 +342,47 @@ export default class Playtest extends DevvitCommand {
   }
 
   #startWatchingConfigFile(): void {
-    const configFile = path.join(this.project.root, this.project.filename);
-    this.#watchConfigFile = chokidar.watch(configFile, { ignoreInitial: true });
-
-    this.#watchConfigFile.on('all', async (ev) => {
-      if (ev === 'change' || ev === 'add')
-        try {
-          this.project = await Project.new(this.project.root, this.project.filename, 'Dynamic');
-        } catch (err) {
-          this.error(`Config load failure: ${StringUtil.caughtToString(err, 'message')}.`, {
-            exit: false,
-          });
-        }
-
-      // A lot can change when the config is modified. Eg:
-      // - The project name can change.
-      // - The watch dir can change. The watch process must be restarted.
-      // - A single property can change. Identifying it requires config diff
-      //   support and reloading requires examining the state fanout.
-      // - The file can be renamed. This would require recomputing the project
-      //   root and restarting the watch process.
-      // - The config can be invalid or the file deleted.
-      this.log(`${this.project.filename} modified; some changes may require a playtest restart.`);
+    // Watch the owning directory to support deletes and renames.
+    const files = this.#flags?.config
+      ? [path.dirname(path.resolve(this.project.root, this.project.filename))]
+      : [path.resolve(this.project.root)];
+    this.#watchAssets = chokidar.watch(files, {
+      ignoreInitial: true,
+      depth: 0,
     });
+    this.#watchAssets.on('all', this.#onConfigFileModified);
   }
+
+  #onConfigFileModified = async (
+    ev: 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir',
+    file: string
+  ): Promise<void> => {
+    // Does the file exist?
+    if (ev !== 'add' && ev !== 'change') return;
+
+    // Is the file the config?
+    const baseFile = path.basename(file);
+    if (
+      (this.#flags?.config &&
+        path.resolve(this.project.root, this.#flags.config as string) !== path.resolve(file)) ||
+      (!this.#flags?.config &&
+        baseFile !== devvitV1ConfigFilename &&
+        baseFile !== devvitClassicConfigFilename)
+    )
+      return;
+
+    ux.action.start(`Reloading config`);
+    try {
+      await this.init();
+    } catch (err) {
+      ux.action.stop(`Error: ${StringUtil.caughtToString(err, 'message')}.`);
+      return;
+    }
+    ux.action.stop(`OK`);
+
+    await this.#destroyWatchers();
+    await this.run();
+  };
 
   #onWatch = debounce(
     (result: BundlerResult) => {
@@ -419,7 +436,9 @@ export default class Playtest extends DevvitCommand {
       try {
         updateBundleServer(this.#lastBundles, this.project.root, this.project.server);
       } catch (err) {
-        this.error(err instanceof Error ? err.message : String(err), { exit: false });
+        this.error(err instanceof Error ? err.message : String(err), {
+          exit: false,
+        });
         return;
       }
 
@@ -474,9 +493,10 @@ export default class Playtest extends DevvitCommand {
     } catch (err) {
       ux.action.stop('Error'); // Stop any spinner if it's running
       this.log(chalk.red(`Something went wrong... ${StringUtil.caughtToString(err, 'message')}`));
+    } finally {
+      this.#isOnWatchExecuting = false;
     }
 
-    this.#isOnWatchExecuting = false;
     if (this.#lastQueuedBundles) {
       this.#runQueuedBundlePlaytest(this.#lastQueuedBundles);
     }
@@ -527,18 +547,21 @@ export default class Playtest extends DevvitCommand {
     }
   }
 
-  async #onExit(): Promise<void> {
-    ux.action.stop('Stopped');
+  async #destroyWatchers(): Promise<void> {
+    process.removeListener('SIGINT', this.#onExit);
 
     this.#watchSrc?.unsubscribe();
     this.#appLogSub?.unsubscribe();
-    await this.#bundler.dispose();
+    await this.#bundler?.dispose();
     this.#server?.close();
     await this.#watchAssets?.close();
     await this.#watchConfigFile?.close();
     this.#onWatch.clear();
+  }
 
-    this.log('Playtest session has ended.');
+  #onExit = async (): Promise<void> => {
+    await this.#destroyWatchers();
+    ux.action.stop('Stopped');
 
     // If this.#installationInfo exists that means a playtest version has already been installed
     if (this.#installationInfo) {
@@ -552,5 +575,5 @@ export default class Playtest extends DevvitCommand {
     }
 
     process.exit(0);
-  }
+  };
 }
