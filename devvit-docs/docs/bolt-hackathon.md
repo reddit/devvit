@@ -73,4 +73,4 @@ We are currently fixing an issue where Safari and iOS are getting network errors
 
 **Q: My new username or development subreddit was banned.**
 
-Please reach out to our team at [devvit-support@reddit.com](mailto:devvit-support@reddit.com) or via our Discord server [here](https://discord.com/invite/R7yu2wh9Qz).
+Please reach out to our team at [devvit-support@reddit.com](mailto:devvit-support@reddit.com) or via our Discord server [here](https://discord.gg/Cd43ExtEFS).

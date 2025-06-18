@@ -56,7 +56,7 @@ We want developers who are interested in this program to have the right tools fo
 
 ## We’re here to help
 
-We want you to succeed! We can help facilitate conversations with moderators that you think would love your app. You can reach us at [r/devvit](https://www.reddit.com/r/devvit/) or become a member of our [Discord](https://discord.com/invite/R7yu2wh9Qz) server for support.
+We want you to succeed! We can help facilitate conversations with moderators that you think would love your app. You can reach us at [r/devvit](https://www.reddit.com/r/devvit/) or become a member of our [Discord](https://discord.gg/Cd43ExtEFS) server for support.
 
 ## Terms and conditions
 
