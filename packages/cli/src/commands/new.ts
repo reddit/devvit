@@ -72,12 +72,7 @@ export default class New extends DevvitCommand {
       description: 'Flag to generate the project here, and not in a subdirectory',
     }),
     template: Flags.string({
-      description:
-        'Template name or pen URL. Available templates are: \n' +
-        `${templateResolver.options
-          .filter(({ hidden }) => !hidden)
-          .map((tmpl) => `- ${tmpl.name}`)
-          .join('\n')}`,
+      description: 'Template name or pen URL.',
       required: false,
     }),
     'no-dependencies': Flags.boolean({
@@ -246,7 +241,7 @@ export default class New extends DevvitCommand {
   }
 
   async #promptChooseTemplate(): Promise<string> {
-    const choices = templateResolver.options
+    const choices = (await templateResolver.options)
       .filter(({ hidden }) => !hidden)
       .map((option) => ({
         name: option.description
@@ -268,9 +263,7 @@ export default class New extends DevvitCommand {
 
   async #copyProjectTemplate(): Promise<void> {
     if (!this.#createAppParams) throw Error('no app params');
-    const templatePath = templateResolver.resolve({
-      name: this.#createAppParams.templateName,
-    });
+    const templatePath = await templateResolver.getProjectUrl(this.#createAppParams.templateName);
     const cutter = new Cutter(templatePath);
     await cutter.cut(this.#projectPath, {
       name: this.#createAppParams.appName,

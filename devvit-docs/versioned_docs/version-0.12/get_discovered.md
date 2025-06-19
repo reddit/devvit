@@ -10,7 +10,7 @@ Or if you don’t feel like reading a novel, we’ve got a bite-sized [video ser
 
 ## Get support
 
-If you’re not already a member, come join our developer subreddit [r/devvit](https://www.reddit.com/r/Devvit/) and our [Discord server](https://discord.com/invite/R7yu2wh9Qz). You can chat with other devs and ask questions about growing your community.
+If you’re not already a member, come join our developer subreddit [r/devvit](https://www.reddit.com/r/Devvit/) and our [Discord server](https://discord.gg/Cd43ExtEFS). You can chat with other devs and ask questions about growing your community.
 
 ## SEO optimization
 

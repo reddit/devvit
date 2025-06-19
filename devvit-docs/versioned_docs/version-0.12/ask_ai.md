@@ -5,7 +5,7 @@ You can use Ask AI to find answers to your questions, explore documentation, and
 To use Ask AI, just click the icon in the bottom right corner of the page and ask a question.
 
 :::note
-You can also use Ask AI from the support section of our [Discord](https://discord.com/invite/R7yu2wh9Qz) server. Simply create a new post in the #ask-ai channel and our bot will answer your question.
+You can also use Ask AI from the support section of our [Discord](https://discord.gg/Cd43ExtEFS) server. Simply create a new post in the #ask-ai channel and our bot will answer your question.
 :::
 
 ## Ways to use Ask AI

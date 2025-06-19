@@ -1,73 +1,30 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import type { ProjectTemplateInfo } from '@devvit/shared-types/ProjectTemplateInfo.js';
 
-export type ProjectName = string;
-export type ProjectPath = string;
-export type ProjectConfig = {
-  description: string;
-  hidden?: boolean;
-};
-export type ProjectTemplate = {
-  path: ProjectPath;
-  name: ProjectName;
-} & ProjectConfig;
-
-export type ProjectTemplateQuery = {
-  name: string;
-};
-
-const DEFAULT_PROJECT_TEMPLATES_PATH = path.join(
-  fileURLToPath(import.meta.url),
-  '..', // This chops off the file name
-  '..', // This chops off the 'util' directory
-  '..', // This chops off the 'src' directory
-  'templates'
-);
+import { DEVVIT_PORTAL_URL } from '../config.js';
 
 export class ProjectTemplateResolver {
-  readonly #templateOptions: Map<ProjectName, ProjectTemplate> = new Map<
-    ProjectName,
-    ProjectTemplate
-  >();
-  readonly options: ProjectTemplate[];
+  readonly options: Promise<ProjectTemplateInfo[]>;
 
-  constructor(projectTemplatesPath: string = DEFAULT_PROJECT_TEMPLATES_PATH) {
-    this.#initOptions(projectTemplatesPath);
-    this.options = Array.from(this.#templateOptions.values());
+  constructor() {
+    this.options = fetch(DEVVIT_PORTAL_URL + '/templates.json').then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to fetch templates: ${response.statusText}`);
+      }
+      return response.json() as Promise<ProjectTemplateInfo[]>;
+    });
   }
 
-  resolve(query: ProjectTemplateQuery): ProjectPath {
-    const projectTemplateName = query.name;
-    const templateProject = this.#templateOptions.get(projectTemplateName);
+  async getProjectUrl(projectName: string): Promise<string> {
+    const projectNameLower = projectName.toLowerCase();
+    const options = await this.options;
+    const templateProject = options.find(
+      (opt) =>
+        opt.name.toLowerCase() === projectNameLower ||
+        opt.shortName?.toLowerCase() === projectNameLower
+    );
     if (!templateProject) {
-      throw new Error(`Specified template: ${projectTemplateName} does not exist`);
+      throw new Error(`Specified template: ${projectName} does not exist`);
     }
-    return templateProject.path;
-  }
-
-  #initOptions(templatesPath: string): void {
-    fs.readdirSync(templatesPath, { withFileTypes: true })
-      .filter((d) => d.isDirectory()) // only get directories
-      .forEach((dirent) => {
-        const projectName = dirent.name.split(path.sep).at(-1)!;
-        const projectPath = path.join(templatesPath, dirent.name);
-        let projectConfig: ProjectConfig;
-        try {
-          projectConfig = JSON.parse(
-            fs.readFileSync(path.join(templatesPath, dirent.name, 'template-config.json'), 'utf-8')
-          );
-        } catch {
-          projectConfig = {
-            description: '',
-            hidden: false,
-          };
-        }
-        this.#templateOptions.set(projectName, {
-          path: projectPath,
-          name: projectName,
-          ...projectConfig,
-        });
-      });
+    return templateProject.url;
   }
 }

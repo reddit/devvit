@@ -5,6 +5,10 @@ import { themes as prismThemes } from 'prism-react-renderer';
 const baseUrl = process.env.DOCUSAURUS_BASE_URL ?? '/';
 
 const config: Config = {
+  future: {
+    v4: true,
+    experimental_faster: true,
+  },
   title: 'Reddit for Developers',
   tagline: 'An app for anything',
   url: 'https://developers.reddit.com',
@@ -107,6 +111,7 @@ const config: Config = {
       },
     ],
     './plugins/copyDocsRaw.ts',
+    './plugins/fixPrism.ts',
   ],
   themeConfig: {
     docs: {
