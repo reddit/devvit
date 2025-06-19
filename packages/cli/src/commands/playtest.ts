@@ -1,12 +1,7 @@
-import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
-import {
-  BuildStatus,
-  type FullAppInfo,
-  InstallationType,
-  VersionVisibility,
-} from '@devvit/protos/community.js';
+import { updateBundleServer, updateBundleVersion } from '@devvit/build-pack/esbuild/ESBuildPack.js';
+import type { FullInstallationInfo } from '@devvit/protos/community.js';
+import { type FullAppInfo, InstallationType, VersionVisibility } from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { ASSET_DIRNAME, WEB_VIEW_ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import {
   ACTOR_SRC_DIR,
   ACTOR_SRC_PRIMARY_NAME,
@@ -17,13 +12,15 @@ import { debounce } from '@devvit/shared-types/debounce.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import { Args, Flags, ux } from '@oclif/core';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
+import { existsSync } from 'fs';
 import path from 'path';
 import type { Subscription } from 'rxjs';
 import { map } from 'rxjs';
+import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 
+import type { StoredToken } from '../lib/auth/StoredToken.js';
 import { REDDIT_DESKTOP } from '../lib/config.js';
 import { fetchSubredditSubscriberCount, isCurrentUserEmployee } from '../lib/http/gql.js';
 import { PlaytestServer } from '../lib/playtest-server.js';
@@ -39,272 +36,259 @@ import {
   createInstallationsClient,
 } from '../util/clientGenerators.js';
 import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
-import { ProjectCommand } from '../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
-import { slugVersionStringToUUID } from '../util/common-actions/slugVersionStringToUUID.js';
-import { updateDevvitConfig } from '../util/devvitConfig.js';
+import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
+import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
+import { devvitClassicConfigFilename, devvitV1ConfigFilename } from '../util/project.js';
 import Logs from './logs.js';
 
-export default class Playtest extends ProjectCommand {
+export default class Playtest extends DevvitCommand {
   static override description =
     'Installs your app to your test subreddit and starts a playtest session where a new version is installed whenever you save changes to your app code, and logs are continuously streamed';
 
   static override examples = [
+    '$ devvit playtest',
     '$ devvit playtest <subreddit>',
     '$ devvit playtest r/myTestSubreddit',
     '$ devvit playtest myOtherTestSubreddit',
   ];
 
-  static override get flags(): FlagInput {
-    return {
-      ...Logs.flags,
-      // to-do: delete. This only exists in case users dislike live-reload.
-      'no-live-reload': Flags.boolean({
-        description: 'Attempt to reload the subreddit being browsed automatically.',
-      }),
-      'employee-update': Flags.boolean({
-        name: 'employee-update',
-        description:
-          "I'm an employee and I want to update someone else's app. (This will only work if you're an employee.)",
-        required: false,
-        hidden: true,
-      }),
-      debounce: Flags.integer({
-        name: 'debounce',
-        description: 'Debounce time in milliseconds for file changes',
-        required: false,
-      }),
-    };
-  }
+  static override flags = {
+    ...Logs.flags,
+    'employee-update': Flags.boolean({
+      aliases: ['employeeUpdate'],
+      description:
+        "I'm an employee and I want to update someone else's app. (This will only work if you're an employee.)",
+      required: false,
+      hidden: true,
+    }),
+    debounce: Flags.integer({
+      description: 'Debounce time in milliseconds for file changes',
+      required: false,
+    }),
+  } as const;
 
   static override args = {
     subreddit: Args.string({
-      description: `Provide the name of a small test subreddit with <${MAX_ALLOWED_SUBSCRIBER_COUNT} members. The "r/" prefix is optional`,
-      required: true,
+      description: `Provide the name of a small test subreddit with <${MAX_ALLOWED_SUBSCRIBER_COUNT} members. The "r/" prefix is optional. Leaving this empty will use the subreddit set in the in the "dev.subreddit" field of devvit.json. If neither is set, we will create a "r/[app-name]_dev" subreddit for you.`,
+      required: false,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
 
   // API Clients
   readonly #installationsClient = createInstallationsClient();
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();
 
-  #appLogSub?: Subscription;
-  readonly #bundler: Bundler = new Bundler(true);
-  #installationInfo?: FullInstallationInfo | undefined;
+  #bundler: Bundler | undefined;
+
+  // Args
+  #subreddit?: string; // unprefixed
+  #flags?: CommandFlags<typeof Playtest & typeof DevvitCommand>;
+
+  // State
   #appInfo?: FullAppInfo | undefined;
   #version?: DevvitVersion;
+  #installationInfo?: FullInstallationInfo | undefined;
   #lastBundles: Bundle[] | undefined;
   #lastQueuedBundles: Bundle[] | undefined;
   #isOnWatchExecuting: boolean = false;
-  #server?: PlaytestServer;
-  #flags?: CommandFlags<typeof Playtest>;
+
+  // Processes
+  #appLogSub?: Subscription;
   #watchAssets?: chokidar.FSWatcher;
-  #debounceMs: number = 300;
+  #watchConfigFile?: chokidar.FSWatcher;
+  #watchSrc?: Subscription;
+  #server?: PlaytestServer;
 
-  #subreddit?: string;
-  #appName?: string;
-
-  async #getExistingInstallInfo(subreddit: string): Promise<FullInstallationInfo | undefined> {
-    const existingInstalls = await this.#installationsClient.GetAllWithInstallLocation({
-      location: subreddit,
-      type: InstallationType.SUBREDDIT,
-    });
-    const fullInstallInfoList = await Promise.all(
-      existingInstalls.installations.map((install) => {
-        // TODO I'm not a fan of having to re-fetch these installs to get the app IDs
-        // TODO we should update the protobuf to include the app and app version IDs
-        return this.#installationsClient.GetByUUID({ id: install.id });
-      })
-    );
-
-    return fullInstallInfoList.find((install) => {
-      return install.app?.id === this.#appInfo?.app?.id;
-    });
-  }
-
-  async #checkVersionBuildStatus(appVersionInfo: AppVersionInfo): Promise<boolean> {
-    ux.action.start('App is building remotely');
-    for (let i = 0; i < 20 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
-      // version is still building: wait and try again
-      await sleep(2000);
-      const info = await this.#appVersionClient.Get({ id: appVersionInfo.id });
-
-      if (!info.appVersion) {
-        this.error('Something went wrong, no app version available.');
-      }
-
-      appVersionInfo = info.appVersion;
-
-      if (i === 10) {
-        this.log(`Your app's taking a while to build - sorry for the delay!`);
-      }
-    }
-    if (appVersionInfo.buildStatus === BuildStatus.READY) {
+  async #getExistingInstallInfo(
+    appName: string,
+    subreddit: string
+  ): Promise<FullInstallationInfo | undefined> {
+    ux.action.start(`Checking for existing installation`);
+    try {
+      const result = await this.#installationsClient.GetByAppNameAndInstallLocation({
+        location: subreddit,
+        type: InstallationType.SUBREDDIT,
+        slug: appName,
+      });
       ux.action.stop();
-    } else {
-      this.warn('Something went wrong: the previous version did not build successfully.');
+
+      return result;
+    } catch (err) {
+      if (err instanceof TwirpError && err.code === TwirpErrorCode.NotFound) {
+        ux.action.stop(`No existing installation found.`);
+        // ignore
+        return;
+      } else {
+        ux.action.stop();
+
+        this.error('Something went wrong when checking for existing installations');
+      }
     }
-    return appVersionInfo.buildStatus === BuildStatus.READY;
   }
 
   override async run(): Promise<void> {
     // Despite the name, finally() is only invoked on successful termination.
-    process.on('SIGINT', () => {
-      void this.#onExit();
-    });
+    process.on('SIGINT', this.#onExit);
 
     const { args, flags } = await this.parse(Playtest);
     this.#flags = flags;
-    this.#subreddit = args.subreddit;
 
-    // Set the debounce delay from either the CLI or the package.json
-    const rootPackageJson = await this.getRootPackageJson();
-    if (flags['debounce']) {
-      // If the CLI flag is set, use that
-      this.#debounceMs = flags['debounce'];
-    } else if (rootPackageJson.devvit?.playtest?.debounceConfigMs != null) {
-      // Else, if the package.json has it set, use that
-      this.#debounceMs = rootPackageJson.devvit.playtest.debounceConfigMs;
-    }
-    // Else use the default which we already set
-
-    const projectConfig = await this.getProjectConfig();
-    this.#appName = projectConfig.slug ?? projectConfig.name;
-
-    if (flags.connect) {
-      this.#server = new PlaytestServer(
-        { dateFormat: undefined, runtime: flags['log-runtime'], verbose: flags.verbose },
-        this
-      );
-      this.#server.open();
-    }
+    this.#bundler = new Bundler();
+    this.project.flag.watchDebounceMillis = this.#flags?.['debounce'] as number | undefined;
+    this.project.flag.subreddit = args.subreddit;
 
     const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
     await this.checkDeveloperAccount();
 
-    const appInfo: FullAppInfo | undefined = await getAppBySlug(this.#appClient, {
-      slug: this.#appName,
-    });
-
-    if (appInfo?.app?.owner?.displayName !== username) {
-      if (flags['employee-update']) {
-        const isEmployee = await isCurrentUserEmployee(token);
-        if (!isEmployee) {
-          this.error(`You're not an employee, so you can't playtest someone else's app.`);
-        }
-        // Else, we're an employee, so we can update someone else's app
-        this.warn(`Overriding ownership check because you're an employee and told me to!`);
-      } else {
-        // Check if the app name is available, implying this is a first run
-        const appExists = await checkAppNameAvailability(this.#appClient, this.#appName);
-        if (appExists.exists) {
-          this.error(`That app already exists, and you can't playtest someone else's app!`);
-        }
-
-        // App doesn't exist - tell the user to run `devvit upload` first
-        this.error(
-          "Your app doesn't exist yet - you'll need to run 'devvit upload' once before you can playtest your app."
-        );
-      }
+    if (flags.connect) {
+      this.#server = new PlaytestServer(
+        {
+          dateFormat: undefined,
+          runtime: flags['log-runtime'],
+          verbose: flags.verbose,
+          showTimestamps: flags['show-timestamps'],
+        },
+        this
+      );
+      this.#server.open();
     }
 
-    const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
+    this.#appInfo = await getAppBySlug(this.#appClient, {
+      slug: this.project.name,
+      limit: 1, // fetched version limit; we only need the latest one
+    });
 
-    this.#appInfo = await getAppBySlug(this.#appClient, { slug: this.#appName });
-
-    if (!this.#appInfo) {
+    if (!this.#appInfo?.app) {
       this.error(
         "Your app doesn't exist yet - you'll need to run 'devvit upload' before you can playtest your app."
       );
     }
+    this.project.app.defaultPlaytestSubredditId = this.#appInfo.app.defaultPlaytestSubredditId;
 
-    // alert user if they're about to run playtest in a large subreddit
-    const subscriberCount = await fetchSubredditSubscriberCount(subreddit, token);
-
-    if (subscriberCount > MAX_ALLOWED_SUBSCRIBER_COUNT) {
-      this.error(
-        `Playtest can only be used in a small test subreddit. Please try again in a community with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} members.`
-      );
-    }
-
-    const v = this.#appInfo.versions[0];
-    this.#version = new DevvitVersion(
-      v.majorVersion,
-      v.minorVersion,
-      v.patchVersion,
-      v.prereleaseVersion
+    const isOwner = this.#appInfo?.app?.owner?.displayName === username;
+    await this.#checkIfUserAllowedToPlaytestThisApp(
+      this.project.name,
+      isOwner,
+      token,
+      flags['employee-update']
     );
 
-    const assetDir = path.join(this.projectRoot, ASSET_DIRNAME);
-    const webViewAssetDir = path.join(this.projectRoot, WEB_VIEW_ASSET_DIRNAME);
-    const productsJSON = path.join(this.projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
+    // Set the target subreddit to the passed argument, or to the config subreddit, or to the app's default, in this order.
+    // If none of these are set, it will be undefined, and we will create a new playtest subreddit.
+    const targetSubreddit = this.project.getSubreddit('Dev');
+    if (targetSubreddit) {
+      this.#subreddit = getSubredditNameWithoutPrefix(targetSubreddit);
+    }
+    const shouldWriteToConfig = !this.#subreddit;
 
-    const watchSrc = this.#bundler.watch(this.projectRoot, {
-      name: ACTOR_SRC_PRIMARY_NAME,
-      owner: username,
-      version: projectConfig.version,
-    });
+    let latestVersion = this.#appInfo.versions[0];
+    this.#version = new DevvitVersion(
+      latestVersion.majorVersion,
+      latestVersion.minorVersion,
+      latestVersion.patchVersion,
+      latestVersion.prereleaseVersion
+    );
 
-    const assetPaths = [assetDir, webViewAssetDir, productsJSON];
-    this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
+    if (this.#subreddit) {
+      // alert user if they're about to run playtest in a large subreddit
+      const subscriberCount = await fetchSubredditSubscriberCount(this.#subreddit, token);
 
-    this.#watchAssets.on('all', () => {
-      // asset changes don't result in a code change, so just re-send the last bundles
-      this.#onWatch({ bundles: this.#lastBundles }, subreddit);
-    });
+      if (subscriberCount > MAX_ALLOWED_SUBSCRIBER_COUNT) {
+        this.error(
+          `Playtest can only be used in a small test subreddit. Please try again in a community with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} members.`
+        );
+      }
+    } else {
+      this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
+      // TODO: consider having a dedicated endpoint to create the playtest subreddit so we don't have to upload a new version
+      // We need to upload a new version to create a new playtest subreddit
+      this.#version.bumpVersion(VersionBumpType.Prerelease);
+
+      const appVersionCreator = new AppVersionUploader(this, {
+        verbose: Boolean(this.#flags?.verbose),
+      });
+
+      const bundles = await this.#bundler.bundle(this.project, {
+        name: ACTOR_SRC_PRIMARY_NAME,
+        owner: username,
+        version: this.#version.toString(),
+      });
+      latestVersion = await appVersionCreator.createVersion(
+        {
+          appId: this.#appInfo.app.id,
+          appSlug: this.#appInfo.app.slug,
+          appSemver: this.#version,
+          visibility: VersionVisibility.PRIVATE,
+        },
+        bundles,
+        false
+      );
+
+      // Since we created a subreddit, we reload the app info to get the newly created subreddit ID
+      this.#appInfo = await getAppBySlug(this.#appClient, {
+        slug: this.project.name,
+        limit: 1, // fetched version limit; we only need the latest one
+      });
+      if (!this.#appInfo?.app) {
+        this.error(
+          'Something went wrong: we could not find your app after creating a new playtest subreddit. Please try again.'
+        );
+      } else if (!this.#appInfo.app.defaultPlaytestSubredditId) {
+        this.error(
+          'Something went wrong: we could not find the newly created playtest subreddit. Please playtest on a different subreddit using `devvit playtest <your_subreddit>` instead.'
+        );
+      }
+      this.#subreddit = this.#appInfo.app.defaultPlaytestSubredditId;
+      // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
+    }
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
-    const appWithVersion = `${this.#appName}@${this.#version}`;
-    const appVersionId = await slugVersionStringToUUID(appWithVersion, this.#appClient);
-
-    ux.action.start(`Checking for existing installation`);
-    this.#installationInfo = await this.#getExistingInstallInfo(subreddit);
+    this.#installationInfo = await this.#getExistingInstallInfo(this.project.name, this.#subreddit);
 
     if (!this.#installationInfo) {
-      ux.action.stop(`No existing installation.`);
-
-      const userT2Id = await this.getUserT2Id(token);
-
       ux.action.start(`Installing`);
       try {
-        this.#installationInfo = await this.#installationsClient.Create({
-          appVersionId,
-          runAs: userT2Id,
-          type: InstallationType.SUBREDDIT,
-          location: subreddit,
-          upgradeStrategy: 0,
-        });
+        const userT2Id = await this.getUserT2Id(token);
+        this.#installationInfo = await installOnSubreddit(
+          this,
+          this.#appVersionClient,
+          this.#installationsClient,
+          userT2Id,
+          latestVersion,
+          this.#subreddit
+        );
+
+        ux.action.stop();
       } catch (err: unknown) {
         ux.action.stop('Error');
         this.error(
           `An error occurred while installing your app: ${StringUtil.caughtToString(err, 'message')}`
         );
       }
-      ux.action.stop();
-    } else {
-      ux.action.stop(`Found!`);
+    }
+    this.#subreddit = this.#installationInfo.installation!.location!.name;
+    if (shouldWriteToConfig) {
+      this.project.setSubreddit(this.#subreddit, 'Dev'); // Write the new default playtest subreddit to the project config
     }
 
     this.#appLogSub = makeLogSubscription(
       {
         subreddit: this.#installationInfo.installation!.location!.id,
-        appName: this.#appName,
+        appName: this.project.name,
       },
       this,
       flags as CommandFlags<typeof Logs>
     );
 
-    // Async subscribers are
-    // unsupported (https://github.com/ReactiveX/rxjs/issues/2827). Pipe all
-    // bundles through an asynchronous observable and only open a subscription
-    // for errors. We just dispose the source (bundler) to unsubscribe.
-    watchSrc
-      .pipe(map((result: BundlerResult) => this.#onWatch(result, subreddit)))
-      .subscribe({ error: this.#onWatchError });
+    this.#startWatchingSrc(username);
+    this.#startWatchingAssets();
+    this.#startWatchingConfigFile();
 
     // We don't know when the user is done. If connected to a terminal, end when
     // stdin is closed. Otherwise, close immediately to avoid the chance that
@@ -315,14 +299,104 @@ export default class Playtest extends ProjectCommand {
     }
   }
 
+  protected override async init(): Promise<void> {
+    await super.init('Dynamic');
+  }
+
+  /**
+   * Watching source code changes
+   */
+  #startWatchingSrc(username: string): void {
+    if (!this.#bundler) throw Error('no bundler');
+    const watchSrc = this.#bundler.watch(this.project, this.project.root, {
+      name: ACTOR_SRC_PRIMARY_NAME,
+      owner: username,
+      // Version is always incorrect since it changes on each upload and the
+      // watch request isn't reissued.
+      version: '0.0.0',
+    });
+
+    // Async subscribers are
+    // unsupported (https://github.com/ReactiveX/rxjs/issues/2827). Pipe all
+    // bundles through an asynchronous observable and only open a subscription
+    // for errors. We just dispose the source (bundler) to unsubscribe.
+    this.#watchSrc = watchSrc
+      .pipe(map((result: BundlerResult) => this.#onWatch(result)))
+      .subscribe({ error: this.#onWatchError });
+  }
+
+  #startWatchingAssets(): void {
+    const productsJSON = path.join(this.project.root, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
+
+    const assetPaths = [productsJSON];
+    if (this.project.mediaDir) assetPaths.push(path.join(this.project.root, this.project.mediaDir));
+    if (this.project.clientDir)
+      assetPaths.push(path.join(this.project.root, this.project.clientDir));
+    if (this.project.server?.entry)
+      // Watch the server directory to allow the watched file to be renamed or deleted.
+      assetPaths.push(
+        path.join(path.dirname(path.join(this.project.root, this.project.server.entry)), '..')
+      );
+    this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
+
+    this.#watchAssets.on('all', () => {
+      // asset changes don't result in a code change, so just re-send the last bundles
+      this.#onWatch({ bundles: this.#lastBundles });
+    });
+  }
+
+  #startWatchingConfigFile(): void {
+    // Watch the owning directory to support deletes and renames.
+    const files = this.#flags?.config
+      ? [path.dirname(path.resolve(this.project.root, this.project.filename))]
+      : [path.resolve(this.project.root)];
+    this.#watchAssets = chokidar.watch(files, {
+      ignoreInitial: true,
+      depth: 0,
+    });
+    this.#watchAssets.on('all', this.#onConfigFileModified);
+  }
+
+  #onConfigFileModified = async (
+    ev: 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir',
+    file: string
+  ): Promise<void> => {
+    // Does the file exist?
+    if (ev !== 'add' && ev !== 'change') return;
+
+    // Is the file the config?
+    const baseFile = path.basename(file);
+    if (
+      (this.#flags?.config &&
+        path.resolve(this.project.root, this.#flags.config as string) !== path.resolve(file)) ||
+      (!this.#flags?.config &&
+        baseFile !== devvitV1ConfigFilename &&
+        baseFile !== devvitClassicConfigFilename)
+    )
+      return;
+
+    ux.action.start(`Reloading config`);
+    try {
+      await this.init();
+    } catch (err) {
+      ux.action.stop(`Error: ${StringUtil.caughtToString(err, 'message')}.`);
+      return;
+    }
+    ux.action.stop(`OK`);
+
+    await this.#destroyWatchers();
+    await this.run();
+  };
+
   #onWatch = debounce(
-    (result: BundlerResult, subreddit: string) => {
-      void this.#onWatchActual(result, subreddit);
+    (result: BundlerResult) => {
+      void this.#onWatchActual(result);
     },
-    () => this.#debounceMs // Use a lambda here, because value won't be set at class construction time
+    // Use a lambda here, because value won't be set at class construction time.
+    () => this.project.watchDebounceMillis
   );
 
-  #onWatchActual = async (result: BundlerResult, subreddit: string): Promise<void> => {
+  #onWatchActual = async (result: BundlerResult): Promise<void> => {
     /* We have to do this here because none of the rxjs functions fit this use case perfectly. What
      * we need is something that serializes this whole pipeline, but also discards all but the most
      * recent value once we resume processing. We would love to use one of these, but...
@@ -339,101 +413,103 @@ export default class Playtest extends ProjectCommand {
       this.#lastQueuedBundles = result.bundles;
       return;
     }
+    // No bundles produced, ignore
+    if (!result.bundles?.length) {
+      return;
+    }
 
-    if (!result.bundles) {
+    if (
+      this.project.server &&
+      !existsSync(path.resolve(this.project.root, this.project.server.entry))
+    ) {
+      // User may be in the process of building a server entry. Wait.
       return;
     }
 
     this.#lastBundles = result.bundles;
 
-    if (!this.#lastBundles) {
-      return;
-    }
+    this.#isOnWatchExecuting = true;
 
     if (!this.#appInfo?.app) {
-      this.error(`Something went wrong: App is not found`);
+      this.error(`Something went wrong: App ${this.project.name} is not found`);
     }
 
     if (!this.#version) {
       this.error('Something went wrong: no version of this app exists.');
     }
 
-    this.#isOnWatchExecuting = true;
-
     // 1. bump playtest version:
     this.#version.bumpVersion(VersionBumpType.Prerelease);
 
-    // 2. update devvit yaml:
-    await updateDevvitConfig(this.projectRoot, this.configFileName, {
-      version: this.#version.toString(),
-    });
-
-    // 3. update bundle version:
-    modifyBundleVersions(this.#lastBundles, this.#version.toString());
-
-    // 4. create new playtest version:
-    let appVersionInfo: AppVersionInfo;
     try {
+      // 2. update bundle:
+      updateBundleVersion(this.#lastBundles, this.#version.toString());
+      try {
+        updateBundleServer(this.#lastBundles, this.project.root, this.project.server);
+      } catch (err) {
+        this.error(err instanceof Error ? err.message : String(err), {
+          exit: false,
+        });
+        return;
+      }
+
+      // 3. create new playtest version:
       const appVersionCreator = new AppVersionUploader(this, {
         verbose: Boolean(this.#flags?.verbose),
       });
 
-      appVersionInfo = await appVersionCreator.createVersion(
+      const appVersionInfo = await appVersionCreator.createVersion(
         {
           appId: this.#appInfo.app.id,
           appSlug: this.#appInfo.app.slug,
           appSemver: this.#version,
           visibility: VersionVisibility.PRIVATE,
         },
-        this.#lastBundles
+        this.#lastBundles,
+        true // The playtest subreddit should've already been created so we prevent creating a new one
+      );
+
+      if (this.#lastQueuedBundles) {
+        // No need to go further if there's a newer playtest version is waiting
+        this.#runQueuedBundlePlaytest(this.#lastQueuedBundles);
+        return;
+      }
+
+      // 5. confirm new version has finished building
+      await waitUntilVersionBuildComplete(this, this.#appVersionClient, appVersionInfo);
+
+      if (this.#lastQueuedBundles) {
+        // No need to go further if there's a newer playtest version is waiting
+        this.#runQueuedBundlePlaytest(this.#lastQueuedBundles);
+        return;
+      }
+
+      // 6. install playtest version to specified subreddit:
+      ux.action.start(`Installing playtest version ${this.#version}`);
+      await this.#installationsClient.Upgrade({
+        id: this.#installationInfo!.installation!.id,
+        appVersionId: appVersionInfo.id,
+      });
+
+      this.#server?.send({ appInstalled: {} });
+
+      const playtestUrl = chalk.bold.green(
+        `${REDDIT_DESKTOP}/r/${this.#subreddit}${
+          this.#flags?.connect ? `?playtest=${this.#appInfo!.app!.slug}` : ''
+        }`
+      );
+      ux.action.stop(
+        `Success! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
       );
     } catch (err) {
-      ux.action.stop(chalk.red('Error'));
-      if (err instanceof Error) {
-        this.log(chalk.red(`\n${StringUtil.caughtToString(err, 'message')}\n`)); // Don't log as error so we don't exit the process.
-      } else {
-        this.error(
-          `An unknown error occurred when creating the app version.\n${StringUtil.caughtToString(err, 'message')}`
-        );
-      }
+      ux.action.stop('Error'); // Stop any spinner if it's running
+      this.log(chalk.red(`Something went wrong... ${StringUtil.caughtToString(err, 'message')}`));
+    } finally {
       this.#isOnWatchExecuting = false;
-      return;
     }
 
-    // 5. confirm new version has finished building:
-    if (!(await this.#checkVersionBuildStatus(appVersionInfo))) {
-      this.error('App version did not build successfully.');
-    }
-
-    // 6. install playtest version to specified subreddit:
-    const appWithVersion = `${this.#appInfo!.app!.slug}@${this.#version}`;
-    const appVersionId = await slugVersionStringToUUID(appWithVersion, this.#appClient);
-    const playtestUrl = chalk.bold.green(
-      `${REDDIT_DESKTOP}/r/${subreddit}${
-        this.#flags?.connect ? `?playtest=${this.#appInfo!.app!.slug}` : ''
-      }`
-    );
-
-    ux.action.start(`Installing playtest version ${this.#version}`);
-    await this.#installationsClient.Upgrade({
-      id: this.#installationInfo!.installation!.id,
-      appVersionId,
-    });
-
-    if (!this.#flags?.['no-live-reload']) {
-      this.#server?.send({ appInstalled: {} });
-    }
-
-    ux.action.stop(
-      `Success! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
-    );
-
-    this.#isOnWatchExecuting = false;
-    // If there's a queued watch, execute it now.
     if (this.#lastQueuedBundles) {
-      const newerBundles = this.#lastQueuedBundles;
-      this.#lastQueuedBundles = undefined;
-      this.#onWatch({ bundles: newerBundles }, subreddit); // subreddit won't change between calls!
+      this.#runQueuedBundlePlaytest(this.#lastQueuedBundles);
     }
   };
 
@@ -441,21 +517,67 @@ export default class Playtest extends ProjectCommand {
     this.error(`watch error: ${StringUtil.caughtToString(err, 'message')}`);
   };
 
-  async #onExit(): Promise<void> {
-    ux.action.stop('Stopped');
+  /**
+   * If there's a queued watch, execute it now.
+   */
+  #runQueuedBundlePlaytest(newerBundles: Bundle[]): void {
+    this.log('Starting a new build...');
+    this.#isOnWatchExecuting = false;
+    this.#lastQueuedBundles = undefined;
+    this.#onWatch({ bundles: newerBundles });
+  }
 
+  async #checkIfUserAllowedToPlaytestThisApp(
+    appName: string,
+    isOwner: boolean,
+    token: StoredToken,
+    employeeUpdateFlag: boolean
+  ): Promise<void> {
+    if (isOwner) {
+      return;
+    }
+
+    if (employeeUpdateFlag) {
+      const isEmployee = await isCurrentUserEmployee(token);
+      if (!isEmployee) {
+        this.error(`You're not an employee, so you can't playtest someone else's app.`);
+      }
+      // Else, we're an employee, so we can update someone else's app
+      this.warn(`Overriding ownership check because you're an employee and told me to!`);
+    } else {
+      // Check if the app name is available, implying this is a first run
+      const appExists = await checkAppNameAvailability(this.#appClient, appName);
+      if (appExists.exists) {
+        this.error(`That app already exists, and you can't playtest someone else's app!`);
+      }
+
+      // App doesn't exist - tell the user to run `devvit upload` first
+      this.error(
+        "Your app doesn't exist yet - you'll need to run 'devvit upload' once before you can playtest your app."
+      );
+    }
+  }
+
+  async #destroyWatchers(): Promise<void> {
+    process.removeListener('SIGINT', this.#onExit);
+
+    this.#watchSrc?.unsubscribe();
     this.#appLogSub?.unsubscribe();
-    await this.#bundler.dispose();
+    await this.#bundler?.dispose();
     this.#server?.close();
     await this.#watchAssets?.close();
+    await this.#watchConfigFile?.close();
     this.#onWatch.clear();
+  }
 
-    this.log('Playtest session has ended.');
+  #onExit = async (): Promise<void> => {
+    await this.#destroyWatchers();
+    ux.action.stop('Stopped');
 
     // If this.#installationInfo exists that means a playtest version has already been installed
     if (this.#installationInfo) {
       const revertCommand = chalk.green(
-        `devvit install ${this.#subreddit} ${this.#appName}@latest`
+        `devvit install ${this.#subreddit} ${this.project.name}@latest`
       );
 
       this.log(
@@ -464,17 +586,5 @@ export default class Playtest extends ProjectCommand {
     }
 
     process.exit(0);
-  }
-}
-
-export function modifyBundleVersions(bundles: Bundle[], version: string): void {
-  for (const bundle of bundles) {
-    bundle.dependencies ??= { hostname: '', provides: [], uses: [] };
-    bundle.dependencies.actor ??= { name: '', owner: '', version: '' };
-    bundle.dependencies.actor.version = version.toString();
-  }
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  };
 }

@@ -1,5 +1,6 @@
 import {
   type AppVersionUpdateRequest,
+  type FullAppInfo,
   type FullAppVersionInfo,
   NutritionCategory,
 } from '@devvit/protos/community.js';
@@ -8,13 +9,13 @@ import {
   InstallationType,
   VersionVisibility,
 } from '@devvit/protos/community.js';
+import { AppPublishRequestStatus } from '@devvit/protos/types/devvit/dev_portal/app_publish_request/app_publish_request.js';
 import { PaymentsVerificationStatus } from '@devvit/protos/types/devvit/dev_portal/payments/payments_verification.js';
 import { appCapabilitiesFromLinkedBundle } from '@devvit/shared-types/AppCapabilities.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, Flags, ux } from '@oclif/core';
 import chalk from 'chalk';
-import inquirer from 'inquirer';
 import open from 'open';
 
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
@@ -25,9 +26,10 @@ import {
   createAppVersionClient,
   createDeveloperSettingsClient,
 } from '../util/clientGenerators.js';
-import { ProjectCommand } from '../util/commands/ProjectCommand.js';
-import { getInfoForSlugString } from '../util/common-actions/slugVersionStringToUUID.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
+import { getVersionByNumber } from '../util/common-actions/getVersionByNumber.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
+import { getAppBySlug } from '../util/getAppBySlug.js';
 import { readLine } from '../util/input-util.js';
 import { handleTwirpError } from '../util/twirp-error-handler.js';
 
@@ -41,7 +43,7 @@ const appCapabilityToReviewRequirementMessage: Record<
 
 const DEVELOPER_SETTINGS_PATH = `${DEVVIT_PORTAL_URL}/my/settings`;
 
-export default class Publish extends ProjectCommand {
+export default class Publish extends DevvitCommand {
   static override description =
     'Publish any previously uploaded version of an app. In this state, only the app owner can find or install the app to a subreddit which they moderate.';
 
@@ -58,22 +60,18 @@ export default class Publish extends ProjectCommand {
         'App to install (defaults to working directory app) and version (defaults to latest)',
       required: false,
     }),
-  };
+  } as const;
 
   static override flags = {
     public: Flags.boolean({
-      name: 'public',
       description: 'Submit the app for review to be published publicly',
       required: false,
     }),
-    unlisted: Flags.boolean({
-      name: 'unlisted',
-      description:
-        'Submit the app for review to be published unlisted (installable only by you, ' +
-        'but removes subreddit size restrictions)',
+    withdraw: Flags.boolean({
+      description: 'Withdraw the publish request (if it exists and is pending)',
       required: false,
     }),
-  };
+  } as const;
 
   readonly #appClient = createAppClient();
   readonly #appVersionClient = createAppVersionClient();
@@ -82,14 +80,43 @@ export default class Publish extends ProjectCommand {
 
   async run(): Promise<void> {
     const { args, flags } = await this.parse(Publish);
-    const appWithVersion = await this.inferAppNameAndVersion(args.appWithVersion);
+    const inferredParams = await this.inferAppNameAndVersion(args.appWithVersion);
 
     await this.checkIfUserLoggedIn();
     await this.checkDeveloperAccount();
 
-    ux.action.start(`Finding ${appWithVersion}`);
-    const { appInfo, appVersion } = await getInfoForSlugString(appWithVersion, this.#appClient);
+    ux.action.start(`Finding ${inferredParams.appName}@${inferredParams.version}`);
+    let appInfo: FullAppInfo | undefined;
+    try {
+      appInfo = await getAppBySlug(this.#appClient, {
+        slug: inferredParams.appName,
+        hidePrereleaseVersions: true,
+      });
+    } catch (err) {
+      this.error(
+        `App ${inferredParams.appName} is not found. Please run 'devvit upload' and try again.\n${StringUtil.caughtToString(err, 'message')}`
+      );
+    }
+
+    if (!appInfo?.app) {
+      this.error(
+        `App ${inferredParams.appName} is not found. Please run 'devvit upload' and try again.`
+      );
+    }
+
+    const appVersion = getVersionByNumber(inferredParams.version, appInfo.versions);
     ux.action.stop();
+
+    if (flags.withdraw) {
+      if (flags.public) {
+        this.error(
+          'Do not use --public and --withdraw together - if you want to withdraw a public request, just use --withdraw by itself.'
+        );
+      }
+      // If we're just withdrawing the request, do that & exit early
+      await this.#withdrawRequest(appVersion.id);
+      return;
+    }
 
     const devvitVersion = new DevvitVersion(
       appVersion.majorVersion,
@@ -98,9 +125,6 @@ export default class Publish extends ProjectCommand {
       appVersion.prereleaseVersion
     );
 
-    if (!appInfo.app) {
-      this.error('There was an error retrieving the app info.');
-    }
     const appDetailsUrl = `${DEVVIT_PORTAL_URL}/apps/${appInfo.app.slug}`;
 
     const resp = await this.#appVersionClient.GetAppVersionBundle({
@@ -123,18 +147,9 @@ export default class Publish extends ProjectCommand {
       return;
     }
 
-    let visibility: AppPublishRequestVisibility = AppPublishRequestVisibility.UNRECOGNIZED;
-    if (flags['public'] && flags['unlisted']) {
-      this.error('You cannot specify both --public and --unlisted flags - pick one!');
-    }
-    if (flags['public']) {
+    let visibility: AppPublishRequestVisibility = AppPublishRequestVisibility.UNLISTED;
+    if (flags.public) {
       visibility = AppPublishRequestVisibility.PUBLIC;
-    }
-    if (flags['unlisted']) {
-      visibility = AppPublishRequestVisibility.UNLISTED;
-    }
-    if (visibility === AppPublishRequestVisibility.UNRECOGNIZED) {
-      visibility = await this.#promptForVisibility();
     }
 
     const appCapabilities = appCapabilitiesFromLinkedBundle(bundle);
@@ -197,7 +212,7 @@ export default class Publish extends ProjectCommand {
       appCapabilitiesForReview.forEach((capability) => {
         this.log(`  - ${appCapabilityToReviewRequirementMessage[capability]}`);
       });
-      this.log("You'll receive a DM when your app has been reviewed.");
+      this.log("You'll receive an email when your app has been approved.");
       this.log("Once approved, you'll be able to install your app anywhere you're a moderator!");
 
       // Early return
@@ -209,7 +224,7 @@ export default class Publish extends ProjectCommand {
     this.log("Your app is now unlisted. You can install it anywhere you're a moderator!");
 
     if (visibility === AppPublishRequestVisibility.PUBLIC) {
-      this.log("You'll receive a DM when your app has been reviewed & made public.");
+      this.log("You'll receive an email when your app has been approved.");
       this.log(
         'Once approved, you (and everyone else!) will be able to install your app anywhere they moderate!'
       );
@@ -274,26 +289,20 @@ export default class Publish extends ProjectCommand {
     }
   }
 
-  async #promptForVisibility(): Promise<AppPublishRequestVisibility> {
-    const res = await inquirer.prompt<{ visibility: AppPublishRequestVisibility }>([
-      {
-        name: 'visibility',
-        message: "What visibility would you like for your app once it's approved?",
-        type: 'list',
-        choices: [
-          {
-            name: 'Public',
-            value: AppPublishRequestVisibility.PUBLIC,
-            short: 'Publicly visible and installable by anyone',
-          },
-          {
-            name: 'Unlisted',
-            value: AppPublishRequestVisibility.UNLISTED,
-            short: 'Installable only by you, but removes subreddit size restrictions',
-          },
-        ],
-      },
-    ]);
-    return res.visibility;
+  async #withdrawRequest(appVersionId: string) {
+    ux.action.start('Withdrawing publish request');
+    try {
+      await this.#appPRClient.Update({
+        appVersionId,
+        status: AppPublishRequestStatus.WITHDRAWN,
+      });
+    } catch (err) {
+      ux.action.stop('Error');
+      if (err && typeof err === 'object' && 'code' in err && err.code === 'not_found') {
+        this.error('No publish request found to withdraw!');
+      }
+      this.error(StringUtil.caughtToString(err, 'message'));
+    }
+    ux.action.stop();
   }
 }

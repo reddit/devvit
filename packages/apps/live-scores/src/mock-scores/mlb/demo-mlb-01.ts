@@ -1,4 +1,4 @@
-export const demoMlb1: any = JSON.parse(
+export const demoMlb1: unknown = JSON.parse(
   `{
     "id": "demo-mlb-01",
     "uid": "s:1~l:10~e:401581129",

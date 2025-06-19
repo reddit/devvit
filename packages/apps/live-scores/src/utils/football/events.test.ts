@@ -1,8 +1,9 @@
 import { RedisClient } from '@devvit/public-api';
-import { getNavigationCallbacks, getPositionAndTotalEvents } from './events.js';
+import { Mock } from 'vitest';
+
 import { fetchDebugGameInfo } from '../../sports/GameFetch.js';
 import { NFLGameScoreInfo } from '../../sports/sportradar/NFLBoxscore.js';
-import { Mock } from 'vitest';
+import { getNavigationCallbacks, getPositionAndTotalEvents } from './events.js';
 
 describe('football event utils', () => {
   const mockRedis = { get: vi.fn() } as unknown as RedisClient;

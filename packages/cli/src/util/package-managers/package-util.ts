@@ -13,6 +13,7 @@ export type PackageJSON = {
   devvit?: DevvitPackageConfig;
 };
 
+// to-do: consolidate into config-file.v1.json dev section.
 /** Configuration provided in the `devvit` property of a project's package.json */
 export type DevvitPackageConfig = {
   playtest?: {

@@ -1,4 +1,4 @@
-import type { Definition, Metadata, MethodDefinition, UIRequest } from '@devvit/protos';
+import type { CustomPost, Definition, Metadata, MethodDefinition, UIRequest } from '@devvit/protos';
 import { CustomPostDefinition, UIResponse } from '@devvit/protos';
 import type { Config } from '@devvit/shared-types/Config.js';
 
@@ -51,6 +51,6 @@ export function makeHandler(
 export function registerUIRequestHandlers(config: Config): void {
   for (const [definition, method, component] of UIComponentBindings) {
     config.provides(definition);
-    extendDevvitPrototype(method.name, makeHandler(component));
+    extendDevvitPrototype<CustomPost>(method.name as keyof CustomPost, makeHandler(component));
   }
 }

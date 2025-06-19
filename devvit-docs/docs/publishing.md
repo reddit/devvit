@@ -8,13 +8,15 @@ To use your app in larger subreddits, you’ll need to publish your app. To do t
 devvit publish
 ```
 
-Your app is automatically submitted to the Devvit team for review and approval. From the CLI, you’ll be prompted to select how you want this version of your app to appear in the Apps directory:
+Your app is automatically submitted to the Devvit team for review and approval. Published apps are either public or unlisted:
 
 - **Unlisted** means that the app is only visible to you in the directory, and you can install your app on larger subreddits that you moderate.
 - **Public** means that your app is visible to all users in the Apps directory and can be installed by mods and admins across Reddit.
 
 :::note
-If you select `Unlisted`, your app will be available immediately and will be reviewed retroactively. However, if your app uses blocks, it will require preemtive review for both unlisted and public apps.
+By default, your app is published as unlisted.
+
+To publish your app as public, use `devvit publish --public`.
 :::
 
 ## Publishing requirements
@@ -23,9 +25,9 @@ Before submitting your app for review, please go through the following checklist
 
 ### Requirements for public apps
 
-Public apps are discoverable on our apps directory for anyone on Reddit. These apps should be fully functional, tested, and have detailed READMEs that non-technical users can understand. Prior to publishing make sure to:
+Public apps are discoverable on our apps directory for anyone on Reddit. These apps should be fully functional, tested, and have detailed app descriptions that non-technical users can understand. Prior to publishing make sure to:
 
-- Add a README.md file to the root of your project directory with:
+- Add an app description file to the root of your project directory with:
   - An app overview
   - Instructions on how to use the app
   - Changelogs for new versions
@@ -35,13 +37,15 @@ Public apps are discoverable on our apps directory for anyone on Reddit. These a
 
 ### Requirements for unlisted apps
 
-- Add a README.md file to the root of your project directory with an app overview
+- Add an app description file to the root of your project directory with an app overview
 - Ensure app contents can be moderated
 - Ensure app complies with our [Developer Terms](https://redditinc.com/policies/developer-terms) and [guidelines](guidelines.md)
 
 ## App review
 
-Apps are reviewed and published on a per version basis. The Developer Platform team will review your code, read through your app README.md file, and potentially test your app. The review process typically takes one week, and you’ll be notified of your app status, which could be:
+Apps are reviewed and published on a per version basis, and you'll get an email when your app is published.
+
+During the app review, the Developer Platform team will look at your code, read through your app description, and potentially test your app. The review process typically takes one week, and you’ll be notified of your app status, which could be:
 
 - Approved
 - Approved with non-blocking feedback
@@ -49,6 +53,12 @@ Apps are reviewed and published on a per version basis. The Developer Platform t
 - Rejected on the basis of a policy, guideline, or conflict with the intended behavior of our products
 
 If you are submitting a new version of a previously approved app, review will typically go very quickly.
+
+## App versions
+
+Use the app version panel to track all the versions of your app. The panel displays the most recent versions of your app, and you can download a complete list of published versions via CSV.
+
+![app version panel](./assets/app_versions_panel.png)
 
 ## Changing app visibility
 

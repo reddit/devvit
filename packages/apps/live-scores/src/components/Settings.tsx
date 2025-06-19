@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { NavigateToPage } from './Scoreboard.js';
 import { ScoreboardColor, ScoreboardPage } from './Scoreboard.js';
 

@@ -1,6 +1,10 @@
 import type * as protos from '@devvit/protos';
+import type * as EventTypes from '@devvit/protos/types/devvit/events/v1alpha/events.d.ts';
 
 import type { Devvit } from '../devvit/Devvit.js';
+
+export { DeletionReason, EventSource } from '@devvit/protos';
+export type { EventTypes };
 
 /** The event name for when a post is submitted */
 export type PostSubmit = 'PostSubmit';

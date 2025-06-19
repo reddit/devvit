@@ -3,11 +3,11 @@ import path from 'node:path';
 
 import {
   type AppVersionInfo,
-  type Bundle,
   InstallationType,
   type VersionVisibility,
 } from '@devvit/protos/community.js';
-import type { Product } from '@devvit/shared-types/payments/Product.js';
+import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+import { PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { ux } from '@oclif/core';
@@ -15,17 +15,18 @@ import { default as glob } from 'tiny-glob';
 
 import { AssetUploader } from './AssetUploader.js';
 import { createAppVersionClient } from './clientGenerators.js';
-import type { ProjectCommand } from './commands/ProjectCommand.js';
-import { getPaymentsConfig, readProducts } from './payments/paymentsConfig.js';
+import type { DevvitCommand } from './commands/DevvitCommand.js';
+import { decodeAsUtf8, decodeAsUtf16 } from './encodings.js';
+import { getPaymentsConfig, type JSONProduct, readProducts } from './payments/paymentsConfig.js';
 import { handleTwirpError } from './twirp-error-handler.js';
 
 export class AppVersionUploader {
-  readonly #cmd: ProjectCommand;
+  readonly #cmd: DevvitCommand;
   readonly #verbose: boolean;
 
   readonly #appVersionClient = createAppVersionClient();
 
-  constructor(cmd: ProjectCommand, { verbose }: { verbose: boolean }) {
+  constructor(cmd: DevvitCommand, { verbose }: { verbose: boolean }) {
     this.#cmd = cmd;
     this.#verbose = verbose;
   }
@@ -37,7 +38,8 @@ export class AppVersionUploader {
       appSemver: DevvitVersion;
       visibility: VersionVisibility;
     },
-    bundles: Bundle[]
+    bundles: Bundle[],
+    preventSubredditCreation: boolean = false
   ): Promise<AppVersionInfo> {
     const about = await this.#getReadmeContent();
 
@@ -45,15 +47,17 @@ export class AppVersionUploader {
     const assetUploader = new AssetUploader(this.#cmd, appInfo.appSlug, { verbose: this.#verbose });
     const { assetMap, webViewAssetMap } = await assetUploader.syncAssets();
 
-    let products: Product[] | undefined;
+    let products: JSONProduct[] | undefined;
 
     try {
-      products = await readProducts(this.#cmd.projectRoot);
+      products = await readProducts(this.#cmd.project.root);
     } catch (err) {
       throw new Error(
-        `An unknown error occurred when reading and validating products.json.
-  Please refer to https://developers.reddit.com/docs/capabilities/payments and ensure that your app is in a compatible state.
-  ${StringUtil.caughtToString(err, 'message')}`
+        `An error occurred when reading and validating ${PRODUCTS_JSON_FILE}: 
+
+  ${StringUtil.caughtToString(err, 'message')}
+  
+Please refer to https://developers.reddit.com/docs/capabilities/payments for more details.`
       );
     }
 
@@ -64,7 +68,11 @@ export class AppVersionUploader {
         bundle.webviewAssetIds = webViewAssetMap ?? {};
 
         if (products) {
-          bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
+          this.#verifyThatDevvitPackagesVersionsMatch(bundle, [
+            '@devvit/payments',
+            '@devvit/public-api',
+          ]);
+          bundle.paymentsConfig = getPaymentsConfig(this.#cmd.project.mediaDir, bundle, products);
         }
       })
     );
@@ -82,6 +90,7 @@ export class AppVersionUploader {
         patchVersion: appInfo.appSemver.patch,
         prereleaseVersion: appInfo.appSemver.prerelease,
         actorBundles: bundles,
+        preventPlaytestSubredditCreation: preventSubredditCreation,
       });
       ux.action.stop();
 
@@ -97,10 +106,8 @@ export class AppVersionUploader {
    * Get the 'about' text from a README.md file
    */
   async #getReadmeContent(): Promise<string> {
-    let about = '';
-
     const readmeFileName = 'README.md';
-    const readmePath = (await glob('*.md', { cwd: this.#cmd.projectRoot })).filter(
+    const readmePath = (await glob('*.md', { cwd: this.#cmd.project.root })).filter(
       (file) => file.toLowerCase() === readmeFileName.toLowerCase()
     );
 
@@ -111,13 +118,50 @@ export class AppVersionUploader {
     }
 
     if (readmePath.length >= 1) {
-      about = await fsp.readFile(path.join(this.#cmd.projectRoot, readmePath[0]), 'utf-8');
+      const aboutBuffer = await fsp.readFile(path.join(this.#cmd.project.root, readmePath[0]));
+      const utf8String = decodeAsUtf8(aboutBuffer);
+      if (utf8String) {
+        // we're UTF-8, no worries
+        return utf8String;
+      }
+
+      // Check if we're UTF-16
+      const utf16String = decodeAsUtf16(aboutBuffer);
+      if (utf16String) {
+        return utf16String;
+      }
+
+      this.#cmd.error(
+        `${readmePath[0]} is not UTF-8 or UTF-16 encoded. Please convert it to UTF-8 or UTF-16.`
+      );
     } else {
       this.#cmd.log(
         `Couldn't find ${readmeFileName}, so not setting an 'about' for this app version (you can update this later)`
       );
+      return '';
     }
+  }
 
-    return about;
+  /**
+   * Verify that the versions of the specified Devvit packages match in the bundle.
+   * @param bundle The bundle to check.
+   * @param packageNames The names of the Devvit packages to check.
+   * @throws Error if the versions do not match.
+   */
+  #verifyThatDevvitPackagesVersionsMatch(
+    bundle: Bundle,
+    packageNames: `@devvit/${string}`[]
+  ): void {
+    const uniqueVersions = new Set(
+      packageNames.map((pkgName) => bundle.buildInfo?.dependencies?.[pkgName])
+    );
+
+    if (uniqueVersions.size !== 1) {
+      throw new Error(
+        `The versions of the required packages do not match. Please ensure that all packages have the same version: ${packageNames.join(
+          ', '
+        )}`
+      );
+    }
   }
 }

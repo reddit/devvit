@@ -1,6 +1,9 @@
+import { DevvitWatermarkWrapper } from '@devvit/kit';
 import type { MediaPlugin } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
+import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { parse } from 'tldts';
+
 import {
   APPROVED_DOMAINS,
   ApprovedDomainsFormatted,
@@ -25,8 +28,6 @@ import {
   getTimezones,
   truncateString,
 } from './utils.js';
-import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import { DevvitWatermarkWrapper } from '@devvit/kit';
 
 Devvit.configure({
   redditAPI: true,
@@ -183,7 +184,7 @@ const CountdownForm = Devvit.createForm(
 
       ui.showToast(`Countdown created!`);
       ui.navigateTo(post);
-    } catch (e) {
+    } catch {
       console.log(event.values);
       ui.showToast('Something went wrong, please try again later.');
     }

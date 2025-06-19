@@ -1,4 +1,9 @@
-import type { ContextActionDescription, ContextActionRequest, Metadata } from '@devvit/protos';
+import type {
+  ContextAction,
+  ContextActionDescription,
+  ContextActionRequest,
+  Metadata,
+} from '@devvit/protos';
 import { ContextActionDefinition, ContextActionList, ContextActionResponse } from '@devvit/protos';
 import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
@@ -22,15 +27,8 @@ export function getMenuItemById(id: string): MenuItem | undefined {
   return Devvit.menuItems.find((_, index) => getActionId(index) === id);
 }
 
-async function getActions(
-  _: Empty,
-  _metadata: Metadata | undefined
-): Promise<DeepPartial<ContextActionList>> {
+async function getActions(_: Empty, _metadata: Metadata | undefined): Promise<ContextActionList> {
   const menuItems = Devvit.menuItems;
-
-  if (!menuItems.length) {
-    throw new Error('No menu items registered.');
-  }
 
   const actions: DeepPartial<ContextActionDescription>[] = menuItems.map((item, index) => {
     return {
@@ -99,6 +97,6 @@ async function onAction(
 
 export function registerMenuItems(config: Config): void {
   config.provides(ContextActionDefinition);
-  extendDevvitPrototype('GetActions', getActions);
-  extendDevvitPrototype('OnAction', onAction);
+  extendDevvitPrototype<ContextAction>('GetActions', getActions);
+  extendDevvitPrototype<ContextAction>('OnAction', onAction);
 }

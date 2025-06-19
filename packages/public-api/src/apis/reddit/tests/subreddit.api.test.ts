@@ -64,6 +64,7 @@ describe('Subreddit API', () => {
             spoiler: false,
             modReports: [],
             userReports: [],
+            gallery: [],
           },
         },
         {
@@ -89,6 +90,7 @@ describe('Subreddit API', () => {
             spoiler: false,
             modReports: [],
             userReports: [],
+            gallery: [],
           },
         },
       ],

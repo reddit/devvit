@@ -1,5 +1,9 @@
 import { RedisClient } from './RedisClient.js';
 
+// TODO: This code is currently cloned to the Devvit Web world in the `@devvit/redis` package. If
+//  you change this code, please make sure to update the other package as well. Eventually, this
+//  copy of the code will be deleted, when we move to a fully Devvit Web world.
+
 test('bitfield typing is intuitive', () => {
   const client = new RedisClient({});
 

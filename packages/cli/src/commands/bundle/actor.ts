@@ -8,12 +8,11 @@ import { Args, Flags } from '@oclif/core';
 import { getAccessToken } from '../../util/auth.js';
 import { Bundler } from '../../util/Bundler.js';
 import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
-import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import { distDirFilename } from '../../util/config.js';
-import { readDevvitConfig } from '../../util/devvitConfig.js';
 import { getPaymentsConfig, readProducts } from '../../util/payments/paymentsConfig.js';
 
-export default class BundleActor extends ProjectCommand {
+export default class BundleActor extends DevvitCommand {
   static override description = 'Bundle an actor into bundle.json';
 
   static override examples = ['$ devvit bundle actor my-actor'];
@@ -25,14 +24,14 @@ export default class BundleActor extends ProjectCommand {
       parse: toLowerCaseArgParser,
       default: 'main',
     }),
-  };
+  } as const;
 
   static override flags = {
     metafile: Flags.boolean({
       description: 'Produce a metafile to analyze the size of the bundle',
       required: false,
     }),
-  };
+  } as const;
 
   static override hidden = true;
 
@@ -40,12 +39,11 @@ export default class BundleActor extends ProjectCommand {
     const { args, flags } = await this.parse(BundleActor);
 
     const username = await this.#getOwnerUsername();
-    const config = await readDevvitConfig(this.projectRoot, this.configFileName);
 
     const actorSpec = {
       name: args.name,
       owner: username,
-      version: config.version,
+      version: '0.0.0', // Version is unknown.
     };
 
     await this.#makeBundles(actorSpec, flags.metafile);
@@ -56,10 +54,10 @@ export default class BundleActor extends ProjectCommand {
   async #makeBundles(actorSpec: ActorSpec, includeMetafile: boolean): Promise<void> {
     const actorBundler = new Bundler();
 
-    const bundles = await actorBundler.bundle(this.projectRoot, actorSpec, includeMetafile);
-    const products = await readProducts(this.projectRoot);
+    const bundles = await actorBundler.bundle(this.project, actorSpec, includeMetafile);
+    const products = await readProducts(this.project.root);
 
-    await mkdir(path.join(this.projectRoot, distDirFilename), { recursive: true });
+    await mkdir(path.join(this.project.root, distDirFilename), { recursive: true });
 
     await Promise.all(
       bundles.map(async (bundle) => {
@@ -70,17 +68,17 @@ export default class BundleActor extends ProjectCommand {
         }
 
         if (products) {
-          bundle.paymentsConfig = await getPaymentsConfig(bundle, products, false);
+          bundle.paymentsConfig = getPaymentsConfig(this.project.mediaDir, bundle, products, false);
         }
 
         await writeFile(
-          path.join(this.projectRoot, distDirFilename, `${actorSpec.name}.bundle${type}.json`),
+          path.join(this.project.root, distDirFilename, `${actorSpec.name}.bundle${type}.json`),
           JSON.stringify(Bundle.toJSON(bundle))
         );
 
         if (bundle.metafile) {
           await writeFile(
-            path.join(this.projectRoot, distDirFilename, `${actorSpec.name}.metafile${type}.json`),
+            path.join(this.project.root, distDirFilename, `${actorSpec.name}.metafile${type}.json`),
             bundle.metafile
           );
         }

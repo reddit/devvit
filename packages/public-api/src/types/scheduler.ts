@@ -64,7 +64,7 @@ export type Scheduler = {
   /**
    * Schedule a new job to run at a specific time or on a cron schedule
    * @param job The job to schedule
-   * @returns {} The id of the scheduled job
+   * @returns {string} The id of the scheduled job
    */
   runJob: <Data extends JSONObject | undefined>(
     job: ScheduledJobOptions<Data> | ScheduledCronJobOptions<Data>

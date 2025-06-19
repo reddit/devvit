@@ -4,6 +4,179 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.17: Easier fetch domain requests
+
+**Release Date: June 16, 2025**
+
+We’ve simplified how to request new domains for HTTP fetch (no more forms!). Now you can just add domains in your app’s configuration, and when you playtest or upload the app, the domain is automatically submitted for approval.
+
+```tsx
+import { Devvit } from '@devvit/public-api';
+
+Devvit.configure({
+  http: {
+    domains: ['my-site.com', 'another-domain.net'],
+  },
+});
+```
+
+:::note
+Domains on the [global allow list](./capabilities/http-fetch-allowlist.md) don’t need approval—they just work.
+:::
+
+There’s also a new section in your app’s Developer Settings (https://developers.reddit.com/apps/[app-slug]/developer-setings) tab that lets you check the status of a domain.
+
+![domain exceptions](./assets/domain_exceptions.png)
+
+To use this feature, you’ll need to be on the latest version of the public api. You can do this by running: `npm i @devvit/public-api` in your app.
+
+Learn more about [HTTP fetch](./capabilities/http-fetch.md) and the[allow-listed domains](./capabilities/http-fetch-allowlist.md) in our docs.
+
+## Devvit 0.11.16: CLI improvements and updated guidelines
+
+**Release Date: May 27, 2025**
+
+Release 0.11.16 has several CLI improvements. We’ve also updated our guidelines to clarify the app review process and use of LLMs, among other things. Check out [Devvit Rules](./devvit_rules) to see what’s new!
+
+**CLI updates**
+
+- **Removed versions from devvit.yaml**. Now you’ll see less of this annoying error: _your local version number doesn't match the server, do you want to continue anyway?_. Versions are handled on our server, and existing versions in devvit.yaml will not update or have any effect on uploads.
+
+- **Require the latest CLI version to playtest**. You need to be on the latest version of the CLI in order to playtest your app properly. The latest CLI is now required to `devvit playtest` (just like it is for `devvit upload`). Things to note:
+
+  - Updating your CLI does not require you to update your app code / devvit SDK (i.e. you do NOT have to run devvit update app to playtest).
+
+  - You can update your CLI by doing `npm install -g devvit@latest`
+
+- **Ensure @devvit/payments and @devvit/public-api have the same version**. Unexpected behavior resulted from mismatched payments and public api versions. Going forward, if you’re using payments the versions need to be the same.
+
+- **Small security fix** - Thanks to a [community report](https://github.com/reddit/devvit/pull/180), we implemented a small CLI security fix.
+
+**Other updates**
+
+There’s a small change to mount() for webviews where you cannot mount() if a webview is already mounted. Doing so will now show a warning log for the developer.
+
+## Devvit 0.11.15: Typescript update
+
+**Release Date: May 7, 2025**
+
+This little release updates typescript to 5.8.3 and fixes an internal issue that caused problems uploading webview assets.
+
+## Devvit 0.11.14: App versions panel, gallery image support, and some smaller fixes
+
+**Release Date: May 6, 2025**
+
+We’ve released a new [app version panel](./publishing.md#app-versions) that lets you track all the versions of your app, so you can see your app’s status, visibility, and number of installations for each app version. The panel displays the most recent versions of your app, and you can download a complete list of published versions via CSV.
+
+**Other fixes**  
+This release also includes some small but mighty fixes:
+
+- Public API
+
+  - Added support for gallery media on Post objects
+  - Fixed the issue where `Post.delete()` was not throwing an error on an unsuccessful delete call
+
+- Settings
+
+  - Added the ability to define and aggregate multiple addSettings calls
+
+- CLI
+  - Fixed issue with redirect links containing \* for Windows users
+  - Added a `--withdraw` flag to `devvit publish` that allows you to withdraw an app you previously published
+  - Added handling for UTF-16 encoded READMEs, and if a README’s encoding isn’t understood at upload time, the CLI will let you know
+
+## Devvit 0.11.13: User actions API, developer email notifications, and a new way to get support for your app
+
+**Release Date: Apr 21, 2025**
+
+In this release, Devvit introduces a new way for apps to let users create content when interacting with your app. With the user's permission, an app can create posts or comments on behalf of the user. Our most successful apps, like [Pixelary](https://reddit.com/r/pixelary) and [Riddonkulous](https://www.reddit.com/r/riddonkulous/), leverage the creativity of the community by allowing users to create content as they play. This has helped these games grow quickly! The user actions API:
+
+- **Boosts engagement**. Automatically sharing content increases reach, facilitates user interaction, and gives you insight into what’s working in your app.
+- **Saves the user time and effort**. It’s easy for users to jump into the conversation.
+- **Improves retention**. When people interact with your app, they’re more likely to stick around, and continued user engagement helps your app reach new people. Total positive feedback loop!
+
+Check out our new [user action API](./capabilities/userActions.md) to see how you can add this to your own app.
+
+Also in this release, we’ve streamlined developer communication. New devs will get automatic email notifications when they [upload](./dev_guide.mdx) their first app and every time an app is approved for [publishing](./publishing.md).
+
+Last but certainly not least, we’ve added a way for you to garner user support while you develop your app! Use the [support this app](./payments/support_this_app.md) payments molecule to let your biggest fans show their love.
+
+## Devvit 0.11.12: Everything but the kitchen sink updates
+
+**Release Date: Apr 7, 2025**
+
+Here’s what you can find in 0.11.12.
+
+**Feature improvements**
+
+- [Logging](./debug.md) improvements:
+  - Retention has been increased from 100 events to the last 5,000 events.
+  - There's a new CLI flag to turn on timestamps when requested.
+- There's a new CLI command to easily generate payment products.
+  - CLI helper to add/edit existing payment products
+- Updated app [publishing](./publishing.md) workflow:
+  - All apps are published unlisted by default.
+  - We’ve added a new flag if you want to publish your app publicly: `devvit publish --public`.
+
+**Other fixes**
+Patched an issue that prevented some payments playtest errors from being logged due to reliance on `ux.action.stop`.
+
+## Devvit 0.11.11: Adding web view unmount
+
+**Release Date: Mar 24, 2025**
+
+We've been working on making the web view experience better and more consistent across all platforms, and one new change we’re including is a `webview.unmount` function. This lets you unmount a [web view](./webviews.md#usewebview) that's in focus mode programmatically.
+
+:::note
+Unmount is only available in v2025.12+ on iOS and v2025.11+ on Android.
+:::
+
+**Other Fixes**
+
+- You can now omit metadata in in your product config.
+- We added a hook ID in logs to help debug invalid state errors.
+
+## Devvit 0.11.8: Minor Redis, Reddit API, and CLI improvements
+
+**Release Date: Mar 10, 2025**
+
+This version of Devvit includes a few small quality-of-life updates for our developers. If you have any feedback, please let us know.
+
+**New Features**
+
+Additional Redis support, which includes:
+
+- `bitfield` support for Redis
+- Redis `rename`, `exist`, and `hSetNX` commands
+- a limit option to `zRange`
+
+Reddit API Client changes:
+
+- added `hasVerifiedEmail` field on the user object
+- added `setUserFlairBatch` to bulk update user flair
+
+CLI changes:
+
+- Added a small (100ms) debounce to devvit playtest to prevent issues from file generation causing multiple uploads. To modify this, you can:
+  - Set your own debounce with a flag (e.g. `devvit playtest --debounce=0`)
+  - Configure a debounce time in your `package.json`
+
+```tsx
+// in package.json
+
+{
+  "devvit": {
+    "playtest": {
+      "debounceConfigMs": 1000
+    }
+  }
+}
+```
+
+**Fixes**
+
+You can now create an image post that would previously error out.
+
 ## Devvit 0.11.7: The next step for web views
 
 We’re impressed by the adoption of web views and the powerful apps the developer community has built with it. It’s exciting to see so many devs embrace this experimental feature!

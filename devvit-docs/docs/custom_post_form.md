@@ -187,7 +187,7 @@ export default Devvit;
 
 ## Testing
 
-You can use [playtest](./get-started/playtest.md) to test your custom post or install it on a test subreddit.
+You can use [playtest](./playtest.md) to test your custom post or install it on a test subreddit.
 
 To install to a test subreddit:
 
@@ -197,4 +197,4 @@ To install to a test subreddit:
 
 ### Next steps
 
-Congratulations on building your interactive form! Next up: add [logging](./get-started/debug.md) to your app to help you debug.
+Congratulations on building your interactive form! Next up: add [logging](./debug.md) to your app to help you debug.

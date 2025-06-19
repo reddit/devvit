@@ -1,6 +1,6 @@
 import type { HandleUIEventRequest, Metadata } from '@devvit/protos';
 import { EffectType, HandleUIEventResponse, UIEventHandlerDefinition } from '@devvit/protos';
-import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
+import type { UIEventHandler } from '@devvit/protos/types/devvit/ui/events/v1alpha/handle_ui.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
@@ -20,7 +20,7 @@ import { getMenuItemById } from './menu-items.js';
 async function handleUIEvent(
   req: HandleUIEventRequest,
   metadata: Metadata
-): Promise<DeepPartial<HandleUIEventResponse>> {
+): Promise<HandleUIEventResponse> {
   // Keep track of the original state so we can check if it was updated.
   const originalState = req.state ?? {};
   const state = cloneDeep(originalState);
@@ -136,5 +136,5 @@ async function handleUIEvent(
 
 export function registerUIEventHandler(config: Config): void {
   config.provides(UIEventHandlerDefinition);
-  extendDevvitPrototype('HandleUIEvent', handleUIEvent);
+  extendDevvitPrototype<UIEventHandler>('HandleUIEvent', handleUIEvent);
 }

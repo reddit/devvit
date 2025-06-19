@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import { EventState, leagueAssetPath } from '../sports/GameEvent.js';
 import type {
   SoccerGameScoreInfo,

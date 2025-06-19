@@ -107,7 +107,7 @@ export class UIClient implements _UIClient {
       // Validate URL
       url = new URL(thingOrUrl).toString();
     } else {
-      url = new URL(thingOrUrl.permalink, 'https://www.reddit.com').toString();
+      url = new URL(thingOrUrl.url).toString();
     }
     this.#renderContext.emitEffect(url, {
       type: EffectType.EFFECT_NAVIGATE_TO_URL,
@@ -128,7 +128,10 @@ export class UIClient implements _UIClient {
       webView: {
         postMessage: {
           webViewId,
-          app: { message: msg },
+          app: {
+            message: msg, // This is deprecated, but populated for backwards compatibility
+            jsonString: JSON.stringify(msg), // Encode as JSON for consistency with the mobile clients
+          },
         },
       },
     });

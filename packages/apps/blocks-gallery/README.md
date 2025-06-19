@@ -1,17 +1,17 @@
 Blocks Gallery showcases all layout features available to developers within Reddit Blocks. This includes comprehensive examples of how to use:
 
-* Buttons
+- Buttons
 
-* Colors
+- Colors
 
-* Icons
+- Icons
 
-* Image elements, specifically how to create and style images
+- Image elements, specifically how to create and style images
 
-* Spacers
+- Spacers
 
-* Vertical <vstack>, horizontal (<hstack>), and layering (<zstack>) elements
+- Vertical <vstack>, horizontal (<hstack>), and layering (<zstack>) elements
 
-* Text elements
+- Text elements
 
-* Form input, including a rudimentary search capability
+- Form input, including a rudimentary search capability

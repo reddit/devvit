@@ -1,0 +1,56 @@
+# Overview
+
+Introducing Devvit Web: an easy way to build Devvit apps using a standard web stack.
+
+:::note
+This is an early-access, experimental feature. Big caveat: you won’t be able to publish apps
+using Devvit Web just yet, but that’s coming in July (you can checkout our [future roadmap](../devvit_web/future_roadmap)).
+
+As always, we love your feedback! Let us know what you think on [r/devvit](https://www.reddit.com/r/Devvit/)
+or [Discord](https://discord.gg/nZDXw2er).
+:::
+
+## What it is
+
+Devvit Web allows developers to build Devvit apps just like you would for the web. At the core, Devvit Web provides:
+
+- **A standard web app** that allows you to build with industry-standard frameworks and technologies (like React, Three.js, or Phaser).
+- **Server endpoints** that you define to communicate between the webview client and the Devvit server, using industry-standard frameworks and technologies (like Express.js, Koa, etc.).
+- **Devvit configuration** with a traditional client/server split. Devvit capabilities are now in one of three places:
+  - Client capabilities in the @devvit/client SDK
+  - Server capabilities, like Redis and Reddit API with the @devvit/server SDK
+  - A configuration file in devvit/main.tsx for defining app metadata
+
+With Devvit Web, you have continued access to our hosting services, key capabilities like Redis and Reddit API, standard web technologies, and a typical client/server pattern to build your apps.
+
+In addition, since you’re working with standard web technologies your apps should work with [AI tools](../devvit_web/ai_tools) more effectively.
+
+## Limitations
+
+As with most experimental features, there are some caveats.
+
+| Limitation                                       | What it means                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Serverless endpoints                             | The node server will run just long enough to execute your endpoint function and return a response, which means you can’t use packages that require long-running connections like streaming.                                                                                                           |
+| Package limitations                              | Developers cannot use fs or external native packages. For now, we recommend using external services over the native dependencies, such as [StreamPot](https://streampot.io/) (instead of ffmpeg) and [OpenAI](https://platform.openai.com/docs/guides/embeddings) (instead of @xenova/transformers) . |
+| Single request and single response handling only | Streaming or chunked responses and websockets are not supported. Long-polling is supported if it’s under the max request time.                                                                                                                                                                        |
+| No external requests from your client            | You can’t have any external requests other than the app's webview domain. All backend responses are locked down to the webview domain via CSP. (Your backend can make external fetch requests though.)                                                                                                |
+
+Devvit Web still has the same technical requirements:
+
+- Server endpoint calls
+- Max request time: 30s
+- Max payload size: 4MB
+- Max response size: 10MB
+- HTML/CSS/JS only
+
+## Future support
+
+We are still working on full support for these features, and you can check out our [Future Roadmap](../devvit_web/future_roadmap) to see the general plans for things like:
+
+- Client-side effects (toasts, forms, payments, realtime)
+- Supported by using devvit code in devvit/main.tsx
+- Scheduler
+- Triggers
+- Settings and secrets
+- Menu actions (except when creating the initial post)

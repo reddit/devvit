@@ -54,19 +54,21 @@ const durationFlag = Flags.custom<Date>({
 export default class Events extends DevvitCommand {
   static override description: string = 'Streams event logs for an installation';
   static override hidden: boolean = true;
+
   static override args = {
     app: Args.string({
       description: 'app name',
       required: false,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
+
   static override flags = {
     since: durationFlag({
       char: 's',
       description: `when to start the logs from. example "15s", "2w1d" "30m"\n${supportedDurationFormats}`,
     }),
-  };
+  } as const;
 
   async run(): Promise<void> {
     await this.checkIfUserLoggedIn();
@@ -74,7 +76,7 @@ export default class Events extends DevvitCommand {
     const { args, flags } = await this.parse(Events);
     const loggerClient = createRemoteLoggerClient();
 
-    const appName = args.app || (await this.inferAppNameFromProject());
+    const appName = args.app || this.project.name;
 
     this.log(formatAppLogDivider(`streaming event logs for ${appName}`));
 

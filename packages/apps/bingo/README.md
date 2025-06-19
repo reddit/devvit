@@ -2,13 +2,13 @@ A community Bingo game built using Reddit Blocks. This example shows how to use 
 
 To create a bingo post:
 
-* Install the app.
+- Install the app.
 
-* Click the subreddit menu and select “Create a Bingo Post".
+- Click the subreddit menu and select “Create a Bingo Post".
 
-* Fill in the fields in the form.
+- Fill in the fields in the form.
 
-* Submit the form.
+- Submit the form.
 
 Users will see a random Bingo card that they can fill out.
 

@@ -9,12 +9,13 @@ export default class Login extends DevvitCommand {
 
   static override flags = {
     'copy-paste': Flags.boolean({
+      aliases: ['copyPaste'],
       required: false,
       default: false,
       description:
         'If present, the user will copy-paste their code from the browser, rather than use localhost.',
     }),
-  };
+  } as const;
 
   #event = {
     source: 'devplatform_cli',

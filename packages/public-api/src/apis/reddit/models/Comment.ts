@@ -11,6 +11,7 @@ import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT1ID, asT2ID, asT3ID, asT5ID, isCommentId, isT1ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import { RunAs } from '../common.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import type { ListingFetchOptions, ListingFetchResponse, MoreObject } from './Listing.js';
@@ -49,9 +50,11 @@ type GetCommentsListingOptions = {
 export type CommentSubmissionOptions =
   | {
       text: string;
+      runAs?: 'USER' | 'APP';
     }
   | {
       richtext: object | RichTextBuilder;
+      runAs?: 'USER' | 'APP';
     };
 
 export type EditCommentOptions = CommentSubmissionOptions;
@@ -517,6 +520,7 @@ export class Comment {
         thingId: id,
         text: 'text' in options ? options.text : '',
         richtextJson: richtextString,
+        runAs: RunAs.APP,
       },
       metadata
     );
@@ -601,7 +605,12 @@ export class Comment {
     options: CommentSubmissionOptions & { id: T1ID | T3ID },
     metadata: Metadata | undefined
   ): Promise<Comment> {
-    const client = Devvit.redditAPIPlugins.LinksAndComments;
+    const { runAs = 'APP' } = options;
+    const runAsType = RunAs[runAs];
+    const client =
+      runAsType === RunAs.USER
+        ? Devvit.userActionsPlugin
+        : Devvit.redditAPIPlugins.LinksAndComments;
     const { id } = options;
 
     let richtextString: string | undefined;
@@ -614,6 +623,7 @@ export class Comment {
         thingId: id,
         text: 'text' in options ? options.text : '',
         richtextJson: richtextString,
+        runAs: runAsType,
       },
       metadata
     );

@@ -1,4 +1,5 @@
 import type { JSONObject } from '@devvit/shared-types/json.js';
+import { isT5ID } from '@devvit/shared-types/tid.js';
 
 import { GQL_QUERY_URL } from '../../util/config.js';
 import type { StoredToken } from '../auth/StoredToken.js';
@@ -10,6 +11,8 @@ const GET_SUBREDDIT_INFO_BY_NAME_QUERY_HASH =
   'f1d2d2ac1ef6e39f9c4a103960d5b07d83665073a376c7852655fae2f1ad5159';
 const GET_REDDITOR_INFO_BY_NAME_QUERY_HASH =
   '19b0be6bef17faf58939802d3858fec2622ba5ec28d6b8a2982998749ceca30b';
+const GET_SUBREDDIT_INFO_BY_ID_QUERY_HASH =
+  '109b67500ceb4e883d6a0e15e1699948e957bf85dc630651f1e10463b6ed5db6';
 
 export type GQLQueryConfig<T extends JSONObject> = {
   accessToken?: string;
@@ -58,6 +61,13 @@ export async function isCurrentUserEmployee(token: StoredToken): Promise<boolean
   return identity.data.identity.isEmployee;
 }
 
+/**
+ * Get the number of subscribers of a subreddit.
+ *
+ * @param subreddit - The name or t5 ID of the subreddit.
+ * @param token - The stored token for authentication.
+ * @returns A Promise that resolves to the number of subscribers if the subreddit exists.
+ */
 export async function fetchSubredditSubscriberCount(
   subreddit: string,
   token: StoredToken
@@ -65,19 +75,37 @@ export async function fetchSubredditSubscriberCount(
   // Hack: GQL is failing below on snoodev.
   if (MY_PORTAL_ENABLED) return 0;
 
-  const subredditInfo = await gqlQuery<
-    { subredditInfoByName: { subscribersCount: number } | null },
-    { name: string }
-  >({
-    accessToken: token.accessToken,
-    hash: GET_SUBREDDIT_INFO_BY_NAME_QUERY_HASH,
-    name: 'GetSubredditInfoByName',
-    variables: { name: subreddit },
-  });
-  if (!subredditInfo.data.subredditInfoByName) {
-    throw new Error(`Community '${subreddit}' not found.`);
+  if (isT5ID(subreddit)) {
+    const subredditInfo = await gqlQuery<
+      { subredditInfoById: { subscribersCount: number } | null },
+      { id: string }
+    >({
+      accessToken: token.accessToken,
+      hash: GET_SUBREDDIT_INFO_BY_ID_QUERY_HASH,
+      name: 'GetSubredditInfoById',
+      variables: { id: subreddit },
+    });
+
+    if (!subredditInfo.data.subredditInfoById) {
+      throw new Error(`Community with ID '${subreddit}' not found.`);
+    }
+    return subredditInfo.data.subredditInfoById.subscribersCount;
+  } else {
+    const subredditInfo = await gqlQuery<
+      { subredditInfoByName: { subscribersCount: number } | null },
+      { name: string }
+    >({
+      accessToken: token.accessToken,
+      hash: GET_SUBREDDIT_INFO_BY_NAME_QUERY_HASH,
+      name: 'GetSubredditInfoByName',
+      variables: { name: subreddit },
+    });
+
+    if (!subredditInfo.data.subredditInfoByName) {
+      throw new Error(`Community '${subreddit}' not found.`);
+    }
+    return subredditInfo.data.subredditInfoByName.subscribersCount;
   }
-  return subredditInfo.data.subredditInfoByName.subscribersCount;
 }
 
 export async function getUserId(username: string, token: StoredToken): Promise<string> {

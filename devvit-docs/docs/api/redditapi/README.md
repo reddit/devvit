@@ -1,8 +1,10 @@
-# @devvit/public-api - v0.11.8-dev
+**@devvit/public-api v0.11.18-dev**
 
-## Table of contents
+---
 
-### Modules
+# @devvit/public-api v0.11.18-dev
 
-- [RedditAPIClient](modules/RedditAPIClient.md)
-- [models](modules/models.md)
+## Modules
+
+- [models](models/README.md)
+- [RedditAPIClient](RedditAPIClient/README.md)

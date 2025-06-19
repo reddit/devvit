@@ -11,20 +11,25 @@ import type {
   Bundle,
   PaymentsConfig,
 } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { ASSET_DIRNAME } from '@devvit/shared-types/Assets.js';
 import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
-import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/index.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
-import { validateProductsJSON } from '@devvit/shared-types/payments/productSchemaJSONValidator.js';
+import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/Product.js';
 import { filterToReservedDevvitMetadataKeys } from '@devvit/shared-types/reservedDevvitMetadataKeys.js';
+import { validateProductsJSON } from '@devvit/shared-types/schemas/productsSchemaJSONValidator.js';
 import { imageSize } from 'image-size';
 import type { ISizeCalculationResult } from 'image-size/dist/types/interface.js';
+
+// The JSONProduct type is a Product with the metadata field as optional
+// We don't require developers to provide metadata in the products.json file
+// but we require it to be present in the Product type. This is an itermidiate
+// type to handle this discrepancy when generating the PaymentsConfig.
+export type JSONProduct = Omit<Product, 'metadata'> & Partial<Pick<Product, 'metadata'>>;
 
 /**
  * Reads Products from src/products.json
  * @throws if products.json is malformed
  */
-export async function readProducts(projectRoot: string): Promise<Product[] | undefined> {
+export async function readProducts(projectRoot: string): Promise<JSONProduct[] | undefined> {
   const productsJSONFile = path.join(projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
   try {
     await access(productsJSONFile);
@@ -43,17 +48,19 @@ export async function readProducts(projectRoot: string): Promise<Product[] | und
  * note: this method is intentionally called outside of `this.createVersion` because it includes
  * validation steps that should exit early should errors be thrown
  */
-export async function getPaymentsConfig(
+export function getPaymentsConfig(
+  mediaDir: string | undefined,
   bundle: Readonly<Bundle>,
-  products: Product[],
+  products: JSONProduct[],
   verifyProductImgAssets: boolean = true
-): Promise<PaymentsConfig> {
-  checkProductsConfig(products, bundle, verifyProductImgAssets);
+): PaymentsConfig {
+  checkProductsConfig(mediaDir, products, bundle, verifyProductImgAssets);
   return makePaymentsConfig(products);
 }
 
 function checkProductsConfig(
-  products: Product[],
+  mediaDir: string | undefined,
+  products: JSONProduct[],
   bundle: Readonly<Bundle>,
   verifyProductImgAssets: boolean = true
 ): void {
@@ -84,14 +91,16 @@ function checkProductsConfig(
   }
 
   for (const product of products) {
-    const invalidKeys = filterToReservedDevvitMetadataKeys(Object.keys(product.metadata));
+    if (product.metadata) {
+      const invalidKeys = filterToReservedDevvitMetadataKeys(Object.keys(product.metadata));
 
-    // Enforced here on the CLI and also on the server. Server processing is done too late for error
-    // messages to reach the end user, so doing here prior to upload.
-    if (invalidKeys.length > 0) {
-      throw new Error(
-        `Products metadata cannot start with "devvit-". Invalid keys: ${invalidKeys.join(', ')}`
-      );
+      // Enforced here on the CLI and also on the server. Server processing is done too late for error
+      // messages to reach the end user, so doing here prior to upload.
+      if (invalidKeys.length > 0) {
+        throw new Error(
+          `Products metadata cannot start with "devvit-". Invalid keys: ${invalidKeys.join(', ')}`
+        );
+      }
     }
   }
 
@@ -118,8 +127,8 @@ function checkProductsConfig(
       }
 
       // enforce image constraints on icons
-      if (product.images.icon) {
-        validateProductIcon(path.join(ASSET_DIRNAME, product.images.icon));
+      if (mediaDir && product.images.icon) {
+        validateProductIcon(path.join(mediaDir, product.images.icon));
       }
     }
 
@@ -131,7 +140,7 @@ function checkProductsConfig(
   }
 }
 
-function parseProductsFileJSON(fileContents: string): Product[] {
+function parseProductsFileJSON(fileContents: string): JSONProduct[] {
   try {
     return validateProductsJSON(JSON.parse(fileContents));
   } catch (err) {
@@ -146,7 +155,7 @@ function parseProductsFileJSON(fileContents: string): Product[] {
   }
 }
 
-export function makePaymentsConfig(products: Readonly<Product[]>): PaymentsConfig {
+export function makePaymentsConfig(products: Readonly<JSONProduct[]>): PaymentsConfig {
   const formattedProducts: PaymentsConfig['products'] = {};
   products.forEach((product) => {
     formattedProducts[product.sku] = {

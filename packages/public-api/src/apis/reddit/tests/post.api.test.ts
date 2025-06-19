@@ -5,8 +5,9 @@ import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.j
 import { describe, expect, test, vi } from 'vitest';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import { RunAs } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
-import { Post } from '../models/Post.js';
+import { GalleryMediaStatus, Post } from '../models/Post.js';
 import { createPreview } from './utils/createTestPreview.js';
 import { createTestRedditApiClient } from './utils/createTestRedditApiClient.js';
 
@@ -65,6 +66,14 @@ describe('Post API', () => {
         transcodingStatus: 'completed',
       },
     },
+    gallery: [
+      {
+        url: 'https://i.redd.it/12345678.jpg',
+        width: 1080,
+        height: 1080,
+        status: GalleryMediaStatus.VALID,
+      },
+    ],
   };
 
   describe('RedditAPIClient', () => {
@@ -133,6 +142,74 @@ describe('Post API', () => {
         title: 'My First Post',
       };
 
+      test('submit(): can set runAs: USER when userActions enabled', async () => {
+        const { reddit, metadata } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: true,
+        });
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await reddit.submitPost({
+          title: mockedPost.title,
+          subredditName: mockedPost.subredditName,
+          preview: createPreview(),
+          runAs: 'USER',
+          userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            ...commonPostFields,
+            richtextJson:
+              'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
+            richtextFallback: '',
+            runAs: RunAs.USER,
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+          },
+          metadata
+        );
+      });
+
+      test('submit(): throws error when runAs: USER with userActions disabled', async () => {
+        const { reddit } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: false,
+        });
+
+        await expect(
+          reddit.submitPost({
+            title: 'Some post title',
+            subredditName: 'askReddit',
+            preview: createPreview(),
+            runAs: 'USER',
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+          })
+        ).rejects.toThrow(/UserActions is not enabled./);
+      });
+
+      test('submit(): throws error when runAs: USER without userGeneratedContent for experience post', async () => {
+        const { reddit } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: true,
+        });
+
+        await expect(
+          reddit.submitPost({
+            title: 'Some post title',
+            subredditName: 'askReddit',
+            preview: createPreview(),
+            runAs: 'USER',
+          })
+        ).rejects.toThrow(/userGeneratedContent must be set/);
+      });
+
       test('sets plain text as the richtext fallback', async () => {
         const { reddit, metadata } = createTestRedditApiClient();
         const mockedPost = new Post({ ...defaultPostData }, metadata);
@@ -157,6 +234,7 @@ describe('Post API', () => {
             richtextJson:
               'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
             richtextFallback: 'This is a post with text as a fallback',
+            runAs: RunAs.APP,
           },
           metadata
         );
@@ -195,6 +273,7 @@ describe('Post API', () => {
               'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
             richtextFallback:
               '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
+            runAs: RunAs.APP,
           },
           metadata
         );
@@ -234,6 +313,7 @@ describe('Post API', () => {
               'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
             richtextFallback:
               '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
+            runAs: RunAs.APP,
           },
           metadata
         );

@@ -42,7 +42,7 @@ export default class Logs extends DevvitCommand {
       required: false,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
   static override flags = {
     connect: Flags.boolean({ default: true, description: 'Connect to local runtime.' }),
     dateformat: Flags.string({
@@ -57,19 +57,26 @@ export default class Logs extends DevvitCommand {
       default: false,
     }),
     'log-runtime': Flags.boolean({
+      aliases: ['logRuntime'],
       description:
         'Include executing runtime in logs. Remote logs originate from apps running on Reddit servers, local logs originate from your browser.',
     }),
-    showKeepAlive: Flags.boolean({
+    'show-keep-alive': Flags.boolean({
+      aliases: ['showKeepAlive'],
       default: false,
       hidden: true,
+    }),
+    'show-timestamps': Flags.boolean({
+      default: false,
+      description: 'Show log message timestamps',
+      aliases: ['showTimestamps'],
     }),
     since: durationFlag({
       char: 's',
       description: `when to start the logs from. example "15s", "2w1d" "30m"\n${supportedDurationFormats}`,
     }),
     verbose: Flags.boolean({ default: false }),
-  };
+  } as const;
 
   #appLogSub?: Subscription;
   #playtest?: PlaytestServer;
@@ -107,12 +114,17 @@ export default class Logs extends DevvitCommand {
     const { args, flags } = await this.parse(Logs);
 
     this.#playtest = new PlaytestServer(
-      { dateFormat: flags.dateformat, runtime: flags['log-runtime'], verbose: flags.verbose },
+      {
+        dateFormat: flags.dateformat,
+        runtime: flags['log-runtime'],
+        verbose: flags.verbose,
+        showTimestamps: flags['show-timestamps'],
+      },
       this
     );
     if (flags.connect) this.#playtest.open();
 
-    const appName = args.app || (await this.inferAppNameFromProject());
+    const appName = args.app || this.project.name;
     const subreddit = getSubredditNameWithoutPrefix(args.subreddit);
     const subredditAppName = await this.#getTailFilter(subreddit, appName);
 

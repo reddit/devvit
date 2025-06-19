@@ -4,107 +4,107 @@ Devvit supports the following (really long) list of mod actions.
 
 ## A - C
 
-- ACCEPT_MODERATOR_INVITE
-- ADD_COMMUNITY_TOPICS
-- ADD_CONTRIBUTOR
-- ADD_MODERATOR
-- ADD_NOTE
-- ADD_REMOVAL_REASON
-- ADJUST_POST_CROWD_CONTROL_LEVEL
-- APPROVE_COMMENT
-- APPROVE_LINK
-- BAN_USER
-- COLLECTIONS
-- COMMUNITY_STYLING
-- COMMUNITY_WIDGETS
-- CREATE_AWARD
-- CREATE_REMOVAL_REASON
-- CREATE_RULE
-- CREATE_SCHEDULED_POST
+- acceptmoderatorinvite
+- add_community_topics
+- addcontributor
+- addmoderator
+- addnote
+- addremovalreason
+- adjust_post_crowd_control_level
+- approvecomment
+- approvelink
+- banuser
+- collections
+- community_styling
+- community_widgets
+- create_award
+- createremovalreason
+- createrule
+- create_scheduled_post
 
 ## D - G
 
-- DELETE_AWARD
-- DELETE_RULE
-- DELETE_SCHEDULED_POST
-- DELETE_OVERRIDDEN_CLASSIFICATION
-- DELETE_NOTE
-- DELETE_REMOVAL_REASON
-- DEV_PLATFORM_APP_CHANGED
-- DEV_PLATFORM_APP_DISABLED
-- DEV_PLATFORM_APP_ENABLED
-- DEV_PLATFORM_APP_INSTALLED
-- DEV_PLATFORM_APP_UNINSTALLED
-- DISABLE_AWARD
-- DISABLE_POST_CROWD_CONTROL_FILTER
-- DISTINGUISH
-- EDIT_FLAIR
-- EDIT_POST_REQUIREMENTS
-- EDIT_RULE
-- EDIT_SCHEDULED_POST
-- EDIT_SETTINGS
-- ENABLE_AWARD
-- ENABLE_POST_CROWD_CONTROL_FILTER
-- EVENTS
+- delete_award
+- deleterule
+- delete_scheduled_post
+- deleteoverriddenclassification
+- deletenote
+- deleteremovalreason
+- dev_platform_app_changed
+- dev_platform_app_disabled
+- dev_platform_app_enabled
+- dev_platform_app_installed
+- dev_platform_app_uninstalled
+- disable_award
+- disable_post_crowd_control_filter
+- distinguish
+- editflair
+- edit_post_requirements
+- editrule
+- edit_scheduled_post
+- editsettings
+- enable_award
+- enable_post_crowd_control_filter
+- events
 
 ## H - O
 
-- HIDDEN_AWARD
-- IGNORE_REPORTS
-- INVITE_MODERATOR
-- INVITE_SUBSCRIBER
-- LOCK
-- MARK_NSFW
-- MARK_ORIGINAL_CONTENT
-- MOD_AWARD_GIVEN
-- MODMAIL_ENROLLMENT
-- MUTE_USER
-- OVERRIDE_CLASSIFICATION
+- hidden_award
+- ignorereports
+- invitemoderator
+- invitesubscriber
+- lock
+- marknsfw
+- markoriginalcontent
+- mod_award_given
+- modmail_enrollment
+- muteuser
+- overrideclassification
 
 ## R
 
-- REMOVE_COMMENT
-- REMOVE_COMMUNITY_TOPICS
-- REMOVE_CONTRIBUTOR
-- REMOVE_LINK
-- REMOVE_MODERATOR
-- REMOVE_WIKI_CONTRIBUTOR
-- REORDER_MODERATORS
-- REORDER_REMOVAL_REASON
-- REORDER_RULES
+- removecomment
+- remove_community_topics
+- removecontributor
+- removelink
+- removemoderator
+- removewikicontributor
+- reordermoderators
+- reorderremovalreason
+- reorderrules
 
 ## S - T
 
-- SET_CONTEST_MODE
-- SET_PERMISSIONS
-- SET_SUGGESTEDSORT
-- SHOW_COMMENT
-- SNOOZE_REPORTS
-- SPAM_COMMENT
-- SPAM_LINK
-- SPOILER
-- STICKY
-- SUBMIT_CONTENT_RATING_SURVEY
-- SUBMIT_SCHEDULED_POST
+- setcontestmode
+- setpermissions
+- setsuggestedsort
+- showcomment
+- snoozereports
+- spamcomment
+- spamlink
+- spoiler
+- sticky
+- submit_content_rating_survey
+- submit_scheduled_post
 
 ## U
 
-- UNBAN_USER
-- UNIGNORE_REPORTS
-- UNINVITE_MODERATOR
-- UNLOCK
-- UNMUTE_USER
-- UPDATE_REMOVAL_REASON
-- UNSET_CONTEST_MODE
-- UNSNOOZE_REPORTS
-- UNSPOILER
-- UNSTICKY
+- unbanuser
+- unignorereports
+- uninvitemoderator
+- unlock
+- unmuteuser
+- updateremovalreason
+- unsetcontestmode
+- unsnoozereports
+- unspoiler
+- unsticky
 
 ## W - Z
 
-- WIKI_BANNED
-- WIKI_CONTRIBUTOR
-- WIKI_PAGE_LISTED
-- WIKI_PERM_LEVEL
-- WIKI_REVISE
-- WIKI_UNBANNED
+- wikibanned
+- wikicontributor
+- wikipagelisted
+- wikipermlevel
+- wikirevise
+- wikiunbanned

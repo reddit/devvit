@@ -23,14 +23,14 @@ describe('formatAppLogMessage', () => {
     expect(
       formatAppLogMessage(
         { message: 'abc', severity: Severity.INFO, tags: [] },
-        { dateFormat: undefined, runtime: false, verbose: false }
+        { dateFormat: undefined, runtime: false, verbose: false, showTimestamps: false }
       )
     ).toBe('abc'));
   test('an informational message with local runtime', () =>
     expect(
       formatAppLogMessage(
         { message: 'abc', severity: Severity.INFO, tags: [] },
-        { dateFormat: undefined, runtime: true, verbose: false },
+        { dateFormat: undefined, runtime: true, verbose: false, showTimestamps: false },
         true
       )
     ).toBe('[local] abc'));
@@ -38,14 +38,14 @@ describe('formatAppLogMessage', () => {
     expect(
       formatAppLogMessage(
         { message: 'abc', severity: Severity.INFO, tags: [] },
-        { dateFormat: undefined, runtime: true, verbose: false }
+        { dateFormat: undefined, runtime: true, verbose: false, showTimestamps: false }
       )
     ).toBe('[remote] abc'));
   test('an informational message with verbose level', () =>
     expect(
       formatAppLogMessage(
         { message: 'abc', severity: Severity.INFO, tags: [] },
-        { dateFormat: undefined, runtime: false, verbose: true }
+        { dateFormat: undefined, runtime: false, verbose: true, showTimestamps: false }
       )
     ).toBe('[INFO] abc'));
 });

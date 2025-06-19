@@ -1,5 +1,6 @@
-import { Devvit } from '@devvit/public-api';
 import type { KVStore, Scheduler } from '@devvit/public-api';
+import { Devvit } from '@devvit/public-api';
+
 import {
   ONE_MINUTE_IN_MS,
   POST_DATA_KEY,

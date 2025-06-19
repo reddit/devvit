@@ -2,7 +2,12 @@ import { exec } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { AppVersionInfo, FullAppInfo, VersionVisibility } from '@devvit/protos/community.js';
+import {
+  AppVersionInfo,
+  FullAppInfo,
+  FullInstallationInfo,
+  VersionVisibility,
+} from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import {
   ACTOR_SRC_PRIMARY_NAME,
@@ -12,28 +17,31 @@ import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js';
 import { Flags, ux } from '@oclif/core';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import chalk from 'chalk';
-import inquirer from 'inquirer';
 
+import type { StoredToken } from '../lib/auth/StoredToken.js';
+import { REDDIT_DESKTOP } from '../lib/config.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
 import { AppUploader } from '../util/AppUploader.js';
 import { AppVersionUploader } from '../util/AppVersionUploader.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { Bundler } from '../util/Bundler.js';
-import { createAppClient } from '../util/clientGenerators.js';
-import { ProjectCommand } from '../util/commands/ProjectCommand.js';
+import {
+  createAppClient,
+  createAppVersionClient,
+  createInstallationsClient,
+} from '../util/clientGenerators.js';
+import { DevvitCommand } from '../util/commands/DevvitCommand.js';
+import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
-import { updateDevvitConfig } from '../util/devvitConfig.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
 
-export default class Upload extends ProjectCommand {
+export default class Upload extends DevvitCommand {
   static override description = `Upload the app to the App Directory. Uploaded apps are only visible to you (the app owner) and can only be installed to a small test subreddit with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} subscribers`;
 
-  static override flags: FlagInput = {
+  static override flags = {
     bump: Flags.custom<VersionBumpType>({
-      name: 'bump',
       description: 'Type of version bump (major|minor|patch|prerelease)',
       required: false,
       options: [
@@ -44,32 +52,20 @@ export default class Upload extends ProjectCommand {
       ],
     })(),
     'employee-update': Flags.boolean({
-      name: 'employee-update',
+      aliases: ['employeeUpdate'],
       description:
         "I'm an employee and I want to update someone else's app. (This will only work if you're an employee.)",
       required: false,
       hidden: true,
     }),
-    justDoIt: Flags.boolean({
-      name: 'justDoIt',
+    'just-do-it': Flags.boolean({
+      aliases: ['justDoIt'],
       description: "Don't ask any questions, just use defaults & continue. (Useful for testing.)",
       required: false,
       hidden: true,
     }),
-    ignoreOutdated: Flags.boolean({
-      name: 'ignoreOutdated',
-      description: 'Skip CLI version check. The apps that you upload may not work as expected',
-      required: false,
-      hidden: false,
-    }),
-    disableTypecheck: Flags.boolean({
-      char: 't',
-      description: 'Disable typechecking before uploading',
-      default: false,
-      hidden: true,
-    }),
-    copyPaste: Flags.boolean({
-      name: 'copyPaste',
+    'copy-paste': Flags.boolean({
+      aliases: ['copyPaste'],
       description: 'Copy-paste the auth code instead of opening a browser',
       default: false,
     }),
@@ -79,9 +75,10 @@ export default class Upload extends ProjectCommand {
       default: false,
       hidden: true,
     }),
-  };
+  } as const;
 
   readonly #appClient = createAppClient();
+  readonly #installationsClient = createInstallationsClient();
 
   #event = {
     source: 'devplatform_cli',
@@ -98,27 +95,19 @@ export default class Upload extends ProjectCommand {
   async run(): Promise<void> {
     const { flags } = await this.parse(Upload);
 
-    const projectConfig = await this.getProjectConfig();
-    await this.#checkDependencies(flags.justDoIt);
+    await this.#checkDependencies(flags['just-do-it']);
 
     const token = await getAccessTokenAndLoginIfNeeded();
     const username = await this.getUserDisplayName(token);
 
     await this.checkDeveloperAccount();
 
-    // for backwards compatibility, we'll use the app's name as the slug to
-    // check if it already exists
-    const appName = projectConfig.slug ?? projectConfig.name;
-    if (appName == null) {
-      this.error("The app's devvit.yaml is misconfigured. It must have at least a 'name' field.");
-    }
-
     let appInfo: FullAppInfo | undefined;
     try {
       appInfo = await getAppBySlug(this.#appClient, {
-        slug: appName,
+        slug: this.project.name,
         hidePrereleaseVersions: true,
-        limit: 1,
+        limit: 1, // fetched version limit; we only need the latest one
       });
     } catch (e) {
       this.error(StringUtil.caughtToString(e, 'message'));
@@ -130,10 +119,10 @@ export default class Upload extends ProjectCommand {
     if (!isOwner) {
       shouldCreateNewApp = true;
       // Unless...
-      if (flags['employee-update'] || flags.justDoIt) {
+      if (flags['employee-update'] || flags['just-do-it']) {
         const isEmployee = await isCurrentUserEmployee(token);
         if (!isEmployee) {
-          this.error(`You can't update someone else's app.`);
+          this.error(`You're not an employee, so you can't playtest someone else's app.`);
         }
         // Else, we're an employee, so we can update someone else's app
         this.warn(`Overriding ownership check because you're an employee and told me to!`);
@@ -141,15 +130,15 @@ export default class Upload extends ProjectCommand {
       }
     }
 
-    // Ensure the app builds before we potentially create an new app or a new version
     ux.action.start('Verifying app builds');
-    await this.#bundleActors(username, projectConfig.version, !flags.disableTypecheck);
+    // Version is unknown until upload. Use a fake one for build verification.
+    await this.#bundleActors(username, '0.0.0');
     ux.action.stop();
 
     if (shouldCreateNewApp || !appInfo) {
       const appUploader = new AppUploader(this);
 
-      appInfo = await appUploader.createNewApp(projectConfig, flags.copyPaste, flags.justDoIt);
+      appInfo = await appUploader.createNewApp(flags['copy-paste'], flags['just-do-it']);
 
       this.#event.devplatform.cli_upload_is_initial = true;
       this.#event.devplatform.cli_upload_is_nsfw = appInfo.app?.isNsfw;
@@ -161,42 +150,57 @@ export default class Upload extends ProjectCommand {
     }
 
     if (!appInfo?.app) {
-      this.error(`App ${appName} is not found`);
+      this.error(`App ${this.project.name} is not found`);
     }
+    this.project.app.defaultPlaytestSubredditId = appInfo.app.defaultPlaytestSubredditId;
 
-    // Now, create a new version, probably prompting for the new version number
-    const appVersionNumber = await this.#getNextVersionNumber(
-      appInfo,
-      DevvitVersion.fromString(projectConfig.version),
-      flags.bump,
-      !flags.justDoIt
-    );
-
-    await updateDevvitConfig(this.projectRoot, this.configFileName, {
-      version: appVersionNumber.toString(),
-    });
+    // Now, create a new version.
+    const appVersionNumber = await this.#getNextVersionNumber(appInfo, flags.bump);
 
     this.#event.devplatform.app_version_number = appVersionNumber.toString();
 
     ux.action.start('Building');
-    const bundles = await this.#bundleActors(
-      username,
-      appVersionNumber.toString(),
-      !flags.disableTypecheck
-    );
+    const bundles = await this.#bundleActors(username, appVersionNumber.toString());
     ux.action.stop();
 
     try {
       const appVersionUploader = new AppVersionUploader(this, { verbose: flags.verbose });
-      await appVersionUploader.createVersion(
+      const shouldCreatePlaytestSubreddit = !this.project.getSubreddit('Dev');
+
+      if (shouldCreatePlaytestSubreddit) {
+        this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
+      }
+      const latestVersion = await appVersionUploader.createVersion(
         {
           appId: appInfo.app.id,
           appSlug: appInfo.app.slug,
           appSemver: appVersionNumber,
           visibility: VersionVisibility.PRIVATE,
         },
-        bundles
+        bundles,
+        !shouldCreatePlaytestSubreddit
       );
+
+      // Install the app to the default playtest subreddit, if it was created.
+      if (shouldCreatePlaytestSubreddit) {
+        const installationInfo = await this.#installOnDefaultPlaytestSubreddit(
+          token,
+          latestVersion
+        );
+        if (installationInfo) {
+          const devSubredditName = installationInfo.installation?.location?.name;
+          if (devSubredditName) {
+            const playtestUrl = chalk.bold.green(`${REDDIT_DESKTOP}/r/${devSubredditName}`);
+            this.log(`We have created a playtest subreddit for you at ${playtestUrl}`);
+            this.project.setSubreddit(devSubredditName, 'Dev');
+            ux.action.stop();
+          }
+        } else {
+          this.warn(
+            `We couldn't install your app to the new playtest subreddit, but you can still do so manually.`
+          );
+        }
+      }
     } catch (err) {
       const errMessage = StringUtil.caughtToString(err, 'message');
       if (err instanceof Error) {
@@ -226,7 +230,7 @@ export default class Upload extends ProjectCommand {
     }
 
     if (
-      !fs.existsSync(path.join(this.projectRoot, '.pnp.cjs')) &&
+      !fs.existsSync(path.join(this.project.root, '.pnp.cjs')) &&
       !(await this.#canImportPublicAPI())
     ) {
       this.error(
@@ -240,7 +244,7 @@ export default class Upload extends ProjectCommand {
     return new Promise<boolean>((resolve, reject) => {
       const checkImportCommand = `node --input-type=module -e "await import('@devvit/public-api')"`;
       // Run this as a child process
-      const process = exec(checkImportCommand, { cwd: this.projectRoot }, (error) => {
+      const process = exec(checkImportCommand, { cwd: this.project.root }, (error) => {
         // If there was an error creating the child process, reject the promise
         if (error) {
           reject(error);
@@ -254,38 +258,21 @@ export default class Upload extends ProjectCommand {
 
   async #getNextVersionNumber(
     appInfo: FullAppInfo,
-    projectConfigVersion: DevvitVersion,
-    bump: VersionBumpType | undefined,
-    prompt: boolean
+    bump: VersionBumpType | undefined
   ): Promise<DevvitVersion> {
-    const latestUploadedVersion = this.#getLatestPublishedVersion(appInfo.versions);
-    // Sync up our local and remote versions
-    const appVersion = await this.#checkIfPublishedAndLocalVersionsMatch(
-      latestUploadedVersion,
-      projectConfigVersion,
-      !prompt
-    );
-
-    // Get how much we want to bump the version number by
+    const appVersion = findLatestVersion(appInfo.versions) ?? new DevvitVersion(0, 0, 0);
     if (bump) {
       appVersion.bumpVersion(bump);
     } else {
-      // Automatically bump the version
-      if (appVersion.isEqual(latestUploadedVersion)) {
-        appVersion.bumpVersion(VersionBumpType.Patch);
-        this.log('Automatically bumped app version to:', appVersion.toString());
-      }
+      appVersion.bumpVersion(VersionBumpType.Patch);
+      this.log('Automatically bumped app version to:', appVersion.toString());
     }
 
     return appVersion;
   }
 
-  async #bundleActors(
-    username: string,
-    version: string,
-    typecheck: boolean = true
-  ): Promise<Bundle[]> {
-    const bundler = new Bundler(typecheck);
+  async #bundleActors(username: string, version: string): Promise<Bundle[]> {
+    const bundler = new Bundler();
     const actorSpec = {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
@@ -293,53 +280,10 @@ export default class Upload extends ProjectCommand {
     };
 
     try {
-      return await bundler.bundle(this.projectRoot, actorSpec);
+      return await bundler.bundle(this.project, actorSpec);
     } catch (err) {
       this.error(StringUtil.caughtToString(err, 'message'));
     }
-  }
-
-  #getLatestPublishedVersion(versions: AppVersionInfo[]): DevvitVersion {
-    const versionsSorted = versions
-      .map(
-        (v) =>
-          new DevvitVersion(v.majorVersion, v.minorVersion, v.patchVersion, v.prereleaseVersion)
-      )
-      .sort((lhs, rhs) => lhs.compare(rhs));
-
-    return versionsSorted.at(-1) ?? new DevvitVersion(0, 0, 0);
-  }
-
-  async #checkIfPublishedAndLocalVersionsMatch(
-    latestStoredVersion: DevvitVersion,
-    projectConfigVersion: DevvitVersion,
-    justDoIt: boolean | undefined
-  ): Promise<DevvitVersion> {
-    if (!latestStoredVersion.isEqual(projectConfigVersion)) {
-      this.warn(
-        `The latest published version on Reddit is "${latestStoredVersion}". The version number in your local devvit.yaml is "${projectConfigVersion}"`
-      );
-      const overwriteVersion =
-        justDoIt ||
-        (
-          await inquirer.prompt([
-            {
-              name: 'overwriteVersion',
-              type: 'confirm',
-              message:
-                'Allow overwriting local devvit.yaml to match versions with the latest published version on Reddit?',
-            },
-          ])
-        ).overwriteVersion;
-
-      if (!overwriteVersion) {
-        this.error(
-          `Aborting. Make sure to manually set the version field of devvit.yaml to "${latestStoredVersion}" to match the latest published version already on Reddit.`
-        );
-      }
-    }
-
-    return latestStoredVersion.clone();
   }
 
   async #sendEventIfNotSent(): Promise<void> {
@@ -355,4 +299,61 @@ export default class Upload extends ProjectCommand {
     await this.#sendEventIfNotSent();
     return super.catch(err);
   }
+
+  // Install the app to the default playtest subreddit, if it was created.
+  // For convenience, returns the name of the subreddit if the app is successfully installed.
+  async #installOnDefaultPlaytestSubreddit(
+    token: StoredToken,
+    appVersion: AppVersionInfo
+  ): Promise<FullInstallationInfo | undefined> {
+    const appInfo = await getAppBySlug(this.#appClient, {
+      slug: this.project.name,
+      hidePrereleaseVersions: true,
+      limit: 1, // fetched version limit; we only need the latest one
+    });
+    if (!appInfo?.app) {
+      this.error(
+        `Something went wrong: couldn't find the app ${this.project.name} after creating a playtest subreddit.`
+      );
+    } else if (!appInfo.app.defaultPlaytestSubredditId) {
+      this.warn(
+        `We couldn't find the default playtest subreddit for ${this.project.name}, but one will be created during your next ${'`devvit upload`'} or ${'`devvit playtest`'}.`
+      );
+      return undefined;
+    }
+
+    try {
+      ux.action.start('Installing app to default playtest subreddit');
+
+      const userT2Id = await this.getUserT2Id(token);
+      const installationInfo = await installOnSubreddit(
+        this,
+        createAppVersionClient(),
+        this.#installationsClient,
+        userT2Id,
+        appVersion,
+        appInfo.app.defaultPlaytestSubredditId
+      );
+
+      ux.action.stop();
+      return installationInfo;
+    } catch (err: unknown) {
+      ux.action.stop('Warning');
+      this.warn(
+        `We couldn't install your app to the new playtest subreddit at ${appInfo.app.defaultPlaytestSubredditId}, but you can still do so manually. ${StringUtil.caughtToString(err, 'message')}`
+      );
+    }
+    return undefined;
+  }
+}
+
+function findLatestVersion(
+  versions: readonly Readonly<AppVersionInfo>[]
+): DevvitVersion | undefined {
+  return versions
+    .map(
+      (v) => new DevvitVersion(v.majorVersion, v.minorVersion, v.patchVersion, v.prereleaseVersion)
+    )
+    .sort((lhs, rhs) => lhs.compare(rhs))
+    .at(-1);
 }

@@ -1,4 +1,4 @@
-# HTTP fetch
+# Overview
 
 Make requests to allow-listed external domains.
 
@@ -15,13 +15,40 @@ Devvit.configure({
 });
 ```
 
+## Requesting a domain to be allow-listed
+
+Apps may request a domain to be added to the allow-list by specifying `domains` in the `http` configuration.
+This configuration is optional, and apps can still configure `http: true` as before.
+
+```ts
+import { Devvit } from '@devvit/public-api';
+
+Devvit.configure({
+  http: {
+    domains: ['my-site.com', 'another-domain.net'],
+  },
+});
+```
+
+Requested domains will be submitted for review when you playtest or upload your app. Admins may approve or deny domain requests.
+
+Domain entries must be exact hostnames only, such as nytimes.com or wikipedia.org. These fetch requests are not allowed:
+
+- No using \* example.com when you need api.example.com
+- No wildcards: \*.example.com
+- No protocols: https://api.example.com
+- No paths: api.example.com/webhooks
+
+Domains that are approved for your app will be displayed in the Developer Settings section for your app at https://developers.reddit.com/apps/{your-app-slug}/developer-settings.
+These domains are allow-listed for **your app only** and not globally.
+
+Apps must request each individual domain that it intends to fetch, even if the domain is already globally allowed. See the [global fetch allowlist](./http-fetch-allowlist.md) to view the list of globally allowed domains.
+
 ## Limitations
 
 - Access is only allowed to https URIs.
 - Supported HTTP methods: `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS` and `PATCH`.
 - HTTP timeout limit is 30 seconds.
-
-To request a domain to the allow-list, [please contact us via r/devvit modmail](https://www.reddit.com/message/compose/?to=r%2Fdevvit) or fill out [this form](https://forms.gle/Pn8Eq3RoPcmH1ZJJ7).
 
 ## Example
 

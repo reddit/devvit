@@ -1,9 +1,10 @@
 import { Devvit } from '@devvit/public-api';
-import { TeamBlock } from './TeamBlock.js';
-import { TopBar } from './TopBar.js';
+
 import type { GeneralGameScoreInfo } from '../sports/GameEvent.js';
 import { leagueAssetPath } from '../sports/GameEvent.js';
 import type { BasketballGameScoreInfo } from '../sports/sportradar/BasketballPlayByPlay.js';
+import { TeamBlock } from './TeamBlock.js';
+import { TopBar } from './TopBar.js';
 
 export enum ScoreboardPage {
   SCORE,

@@ -1,6 +1,6 @@
 import { access, readFile } from 'node:fs/promises';
 
-import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
+import { PaymentProcessorDefinition } from '@devvit/protos/payments.js';
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { AccountingType } from '@devvit/shared-types/payments/Product.js';
@@ -18,7 +18,6 @@ vi.mock('node:fs/promises', () => ({
   readFile: vi.fn().mockResolvedValue(''),
 }));
 
-const PROJECT_ROOT = '/path/to/project';
 const MOCK_PRODUCTS_JSON: { products: Product[] } = {
   products: [
     {
@@ -30,143 +29,71 @@ const MOCK_PRODUCTS_JSON: { products: Product[] } = {
     },
   ],
 };
-const MOCK_PRODUCTS_JSON_STRING = JSON.stringify(MOCK_PRODUCTS_JSON);
 
-describe('Read and inject Bundle Products', () => {
-  it('does not inject products into the bundle if products.json is not found', async () => {
+const MOCK_BUNDLE: Bundle = {
+  code: '',
+  dependencies: {
+    hostname: '',
+    provides: [
+      {
+        definition: {
+          fullName: PaymentProcessorDefinition.fullName,
+          methods: [],
+          name: '',
+          version: '',
+        },
+        partitionsBy: [],
+      },
+    ],
+    permissions: [],
+    uses: [],
+  },
+  assetIds: {},
+  webviewAssetIds: {},
+};
+
+describe('Read product.json', () => {
+  const PROJECT_ROOT = '/path/to/project';
+  it('does not return any products if the files does not exist', async () => {
     vi.mocked(access).mockRejectedValueOnce(new Error('not found'));
     const products = await readProducts(PROJECT_ROOT);
-
     expect(products).toBeUndefined();
   });
 
   it('throws an error if products.json is not formatted properly', async () => {
-    const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
     const products = [{ ...MOCK_PRODUCTS_JSON.products[0], price: 'not a number' }];
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
     await expect(() => readProducts(PROJECT_ROOT)).rejects.toThrowError(
       'products.json validation error'
     );
-    expect(bundle.paymentsConfig).toBeUndefined();
   });
+});
 
-  it('does not inject products into the bundle if the bundle does not provide a PaymentProcessor', async () => {
+describe('Get payments config', () => {
+  it('throws an error if the bundle does not provide a PaymentProcessor', () => {
     const bundle: Bundle = { assetIds: {}, code: '', webviewAssetIds: {} };
-    vi.mocked(access).mockResolvedValueOnce();
-    vi.mocked(readFile).mockResolvedValueOnce(MOCK_PRODUCTS_JSON_STRING);
-
-    await expect(async () => {
-      const products = await readProducts(PROJECT_ROOT);
-      if (products) {
-        bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
-      }
-    }).rejects.toThrowError('your app does not handle payment processing');
-
-    expect(bundle.paymentsConfig).toBeUndefined();
+    expect(() => getPaymentsConfig(undefined, bundle, MOCK_PRODUCTS_JSON.products)).toThrowError(
+      /You have a `products\.json` with products, but your app does not handle payment processing of those products./
+    );
   });
 
-  it('does not inject products into the bundle if the product images are not included in the assets', async () => {
+  it('throws an error if the product images are not included in the assets', () => {
     const productImage = 'doesnotexist.jpg';
-    const products = {
-      products: [{ ...MOCK_PRODUCTS_JSON.products[0], images: { icon: productImage } }],
-    };
-    const bundle: Bundle = {
-      code: '',
-      dependencies: {
-        hostname: '',
-        provides: [
-          {
-            definition: {
-              fullName: PaymentProcessorDefinition.fullName,
-              methods: [],
-              name: '',
-              version: '',
-            },
-            partitionsBy: [],
-          },
-        ],
-        uses: [],
-      },
-      assetIds: {
-        'exists.jpg': 'abc123',
-      },
-      webviewAssetIds: {},
-    };
-    vi.mocked(access).mockResolvedValueOnce();
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
+    const products = [{ ...MOCK_PRODUCTS_JSON.products[0], images: { icon: productImage } }];
+    const bundle: Bundle = { ...MOCK_BUNDLE, assetIds: { 'exists.jpg': 'abc123' } };
 
-    await expect(async () => {
-      const products = await readProducts(PROJECT_ROOT);
-      if (products) {
-        bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
-      }
-    }).rejects.toThrowError(`Product images ${productImage} are not included in the assets`);
-
-    expect(bundle.paymentsConfig).toBeUndefined();
+    expect(() => getPaymentsConfig(undefined, bundle, products)).toThrowError(
+      `Product images ${productImage} are not included in the assets`
+    );
   });
 
-  it('does not inject products if no products are found in products.json', async () => {
-    const bundle: Bundle = {
-      assetIds: {},
-      code: '',
-      dependencies: {
-        hostname: '',
-        provides: [],
-        uses: [
-          {
-            typeName: PaymentsServiceDefinition.fullName,
-            name: '',
-          },
-        ],
-      },
-      webviewAssetIds: {},
-    };
-    vi.mocked(access).mockResolvedValueOnce();
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify({ products: [] }));
-
-    await expect(async () => {
-      const products = await readProducts(PROJECT_ROOT);
-      if (products) {
-        bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
-      }
-    }).rejects.toThrowError('you must specify products in the `src/products.json` config file');
-
-    expect(bundle.paymentsConfig).toBeUndefined();
+  it('throws an error if no products are found ', () => {
+    expect(() => getPaymentsConfig(undefined, MOCK_BUNDLE, [])).toThrowError(
+      'you must specify products in the `src/products.json` config file'
+    );
   });
 
-  it('injects products into the bundle if products.json is found and formatted properly', async () => {
-    const bundle: Bundle = {
-      assetIds: {},
-      code: '',
-      dependencies: {
-        hostname: '',
-        provides: [
-          {
-            definition: {
-              fullName: PaymentProcessorDefinition.fullName,
-              methods: [],
-              name: '',
-              version: '',
-            },
-            partitionsBy: [],
-          },
-        ],
-        uses: [],
-      },
-      webviewAssetIds: {},
-    };
-    vi.mocked(access).mockResolvedValueOnce();
-    vi.mocked(readFile).mockResolvedValueOnce(MOCK_PRODUCTS_JSON_STRING);
-
-    const products = await readProducts(PROJECT_ROOT);
-    if (products) {
-      bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
-    }
-
-    expect(bundle.paymentsConfig).toStrictEqual(makePaymentsConfig(MOCK_PRODUCTS_JSON.products));
-  });
-
-  it('throws error if a product has metadata starting with "devvit-"', async () => {
+  it('throws error if a product has metadata starting with "devvit-"', () => {
     const invalidProduct = {
       sku: 'product-1',
       displayName: 'Product 1',
@@ -176,86 +103,47 @@ describe('Read and inject Bundle Products', () => {
         'devvit-invalid': 'this breaks upload',
       },
     };
-
-    const products = {
-      products: [{ ...invalidProduct }],
-    };
-    const bundle: Bundle = {
-      code: '',
-      dependencies: {
-        hostname: '',
-        provides: [
-          {
-            definition: {
-              fullName: PaymentProcessorDefinition.fullName,
-              methods: [],
-              name: '',
-              version: '',
-            },
-            partitionsBy: [],
-          },
-        ],
-        uses: [],
-      },
-      assetIds: {
-        'exists.jpg': 'abc123',
-      },
-      webviewAssetIds: {},
-    };
-
-    vi.mocked(access).mockResolvedValueOnce();
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
-
-    await expect(async () => {
-      const products = await readProducts(PROJECT_ROOT);
-      if (products) {
-        bundle.paymentsConfig = await getPaymentsConfig(bundle, products);
-      }
-    }).rejects.toThrowError(
+    expect(() => getPaymentsConfig(undefined, MOCK_BUNDLE, [invalidProduct])).toThrowError(
       'Products metadata cannot start with "devvit-". Invalid keys: devvit-invalid'
     );
   });
 
-  it('ignores product image asset verification if option is set to false', async () => {
-    const productImage = 'doesnotexist.jpg';
-    const products = {
-      products: [{ ...MOCK_PRODUCTS_JSON.products[0], images: { icon: productImage } }],
+  it('creates payments config products.json is found and formatted properly', () => {
+    expect(getPaymentsConfig(undefined, MOCK_BUNDLE, MOCK_PRODUCTS_JSON.products)).toStrictEqual(
+      makePaymentsConfig(MOCK_PRODUCTS_JSON.products)
+    );
+  });
+
+  it('handles products without metadata', () => {
+    const productWithoutMetadata = {
+      sku: 'product-1',
+      displayName: 'Product 1',
+      price: 25,
+      accountingType: AccountingType.INSTANT,
     };
+
+    expect(getPaymentsConfig(undefined, MOCK_BUNDLE, [productWithoutMetadata])).toStrictEqual(
+      // The metadata gets added by makePaymentsConfig
+      makePaymentsConfig([{ ...productWithoutMetadata, metadata: {} }])
+    );
+  });
+
+  it('ignores product image asset verification if option is set to false', () => {
+    const productImage = 'doesnotexist.jpg';
+    const products = [{ ...MOCK_PRODUCTS_JSON.products[0], images: { icon: productImage } }];
     const bundle: Bundle = {
-      code: '',
-      dependencies: {
-        hostname: '',
-        provides: [
-          {
-            definition: {
-              fullName: PaymentProcessorDefinition.fullName,
-              methods: [],
-              name: '',
-              version: '',
-            },
-            partitionsBy: [],
-          },
-        ],
-        uses: [],
-      },
+      ...MOCK_BUNDLE,
       assetIds: {
         'exists.jpg': 'abc123',
       },
-      webviewAssetIds: {},
     };
-    vi.mocked(access).mockResolvedValueOnce();
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
-
-    const productsFromConfig = await readProducts(PROJECT_ROOT);
-    if (productsFromConfig) {
-      bundle.paymentsConfig = await getPaymentsConfig(bundle, productsFromConfig, false);
-    }
-
-    expect(bundle.paymentsConfig).toStrictEqual(makePaymentsConfig(products.products));
+    expect(getPaymentsConfig(undefined, bundle, products, false)).toStrictEqual(
+      makePaymentsConfig(products)
+    );
   });
 });
 
-describe(validateProductIcon.name, () => {
+describe('Validate product icon', () => {
   const imgPath = (filename: string): string => path.join(__dirname, 'test-images', filename);
 
   it('rejects non-images', () => {

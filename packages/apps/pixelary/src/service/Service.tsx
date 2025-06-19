@@ -26,6 +26,12 @@ import type {
 } from '../types.js';
 import { getLevelByScore } from '../utils.js';
 
+// Keep the size of the word selection events within a maximum event count.
+const maxWordSelectionEvents = 1_000_000;
+
+// Trimming (to enforce maxWordSelectionEvents) will only be done on this fraction of event emissions.
+const trimWordSelectionEventsProbability = 0.01;
+
 // Service that handles the backbone logic for the application
 // This service is responsible for:
 // * Storing and fetching post data for drawings
@@ -63,7 +69,7 @@ export class Service {
     userData: (username: string) => `users:${username}`,
     userDrawings: (username: string) => `user-drawings:${username}`,
     wordDrawings: (word: string) => `word-drawings:${word}`,
-    wordSelectionEvents: 'word-selection-events',
+    wordSelectionEvents: 'word-selection-events-v2',
   };
 
   /*
@@ -705,6 +711,11 @@ ${parsedData.map((word) => `- ${word}`).join('\n')}
    */
 
   async emitWordSelectionEvent(data: WordSelectionEvent): Promise<number> {
+    // Occasionally trim the events collection if needed.
+    if (Math.random() < trimWordSelectionEventsProbability) {
+      await this.trimWordSelectionEvents(maxWordSelectionEvents);
+    }
+
     const key = this.keys.wordSelectionEvents;
     return await this.redis.zAdd(key, {
       member: JSON.stringify(data),
@@ -716,5 +727,14 @@ ${parsedData.map((word) => `- ${word}`).join('\n')}
     const key = this.keys.wordSelectionEvents;
     const data = await this.redis.zRange(key, 0, count - 1, { reverse: true, by: 'rank' });
     return data.map((value) => JSON.parse(value.member));
+  }
+
+  async trimWordSelectionEvents(maxCount: number): Promise<void> {
+    const key = this.keys.wordSelectionEvents;
+    const currentCount = await this.redis.zCard(key);
+    if (currentCount > maxCount) {
+      const n = await this.redis.zRemRangeByRank(key, 0, currentCount - maxCount - 1);
+      console.log(`trimmed ${n} word selection events from ${key}`);
+    }
   }
 }

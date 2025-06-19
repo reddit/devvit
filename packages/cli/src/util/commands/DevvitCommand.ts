@@ -1,16 +1,20 @@
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { Command, Flags } from '@oclif/core';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 import { parse } from '@oclif/core/lib/parser/index.js';
 import inquirer from 'inquirer';
 import open from 'open';
 
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { getAccessToken } from '../auth.js';
-import { createWaitlistClient } from '../clientGenerators.js';
+import { createDeveloperAccountClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
-import { DEVVIT_CONFIG_FILE, readDevvitConfig } from '../devvitConfig.js';
-import { findProjectRoot } from '../project-util.js';
+import {
+  type BuildMode,
+  devvitClassicConfigFilename,
+  devvitV1ConfigFilename,
+  newProject,
+  type Project,
+} from '../project.js';
 import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 
 /**
@@ -22,23 +26,28 @@ import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
 export const toLowerCaseArgParser = async (input: string): Promise<string> => input.toLowerCase();
 
 export abstract class DevvitCommand extends Command {
-  #configFileName: string | undefined;
+  static override baseFlags = {
+    config: Flags.string({ description: 'path to devvit config file' }),
+  } as const;
 
-  static override baseFlags: FlagInput = {
-    config: Flags.string({
-      name: 'config',
-      description: 'path to devvit config file',
-      default: DEVVIT_CONFIG_FILE,
-    }),
-  };
+  protected readonly developerAccountClient = createDeveloperAccountClient();
+  #project: Project | undefined;
 
-  public get configFileName(): string {
-    return this.#configFileName ?? DEVVIT_CONFIG_FILE;
+  /** Project configuration. */
+  get project(): Project {
+    if (!this.#project) this.error(`No project ${devvitClassicConfigFilename} config file found.`);
+    return this.#project;
   }
 
-  protected readonly waitlistClient = createWaitlistClient();
+  /**
+   * Warning: mutating project state is not well supported. State copies are not
+   * invalidated.
+   */
+  set project(project: Project) {
+    this.#project = project;
+  }
 
-  protected override async init(): Promise<void> {
+  protected override async init(mode?: BuildMode): Promise<void> {
     await super.init();
 
     // to-do: avoid subclassing and compose instead. subclasses cause bugs
@@ -57,15 +66,20 @@ export abstract class DevvitCommand extends Command {
       flags: DevvitCommand.baseFlags,
     });
 
-    this.#configFileName = flags.config;
-    if (this.#configFileName !== DEVVIT_CONFIG_FILE) {
-      this.log(`Using custom config file: ${this.#configFileName}`);
+    this.#project = await newProject(flags.config, mode ?? 'Static');
+    if (flags.config && !this.#project) this.error(`Project config "${flags.config}" not found.`);
+    if (
+      flags.config &&
+      flags.config !== devvitClassicConfigFilename &&
+      flags.config !== devvitV1ConfigFilename
+    ) {
+      this.log(`Using custom config file: ${flags.config}`);
     }
   }
 
   protected checkDeveloperAccount = async (): Promise<void> => {
     const { acceptedTermsVersion, currentTermsVersion } =
-      await this.waitlistClient.GetCurrentUserStatus({});
+      await this.developerAccountClient.GetUserAccountInfoIfExists({});
 
     const devAccountUrl = `${DEVVIT_PORTAL_URL}/create-account?cli=true`;
     if (acceptedTermsVersion < currentTermsVersion) {
@@ -145,45 +159,44 @@ export abstract class DevvitCommand extends Command {
     return res.value;
   }
 
-  protected async inferAppNameFromProject(): Promise<string> {
-    const projectRoot = await findProjectRoot(this.configFileName);
-    if (projectRoot == null) {
-      this.error(`You must specify an app name or run this command from within a project.`);
-    }
-    const devvitConfig = await readDevvitConfig(projectRoot, this.configFileName);
-
-    return devvitConfig.name;
-  }
-
   /**
    * @description Handle resolving the appname@version for the following cases
    *
    * Case 1: devvit <publish|install> <app-name>@<version>  - can be run anywhere
    * Case 1: devvit <publish|install> <app-name>            - can be run anywhere
-   * Case 3: devvit <publish|install> <version>             - must be in project directory
+   * Case 3: devvit <publish|install> @<version>            - must be in project directory
    * Case 2: devvit <publish|install>                       - must be in project directory
    */
-  protected async inferAppNameAndVersion(appWithVersion: string | undefined): Promise<string> {
-    if (appWithVersion && !appWithVersion.startsWith('@')) {
-      // assume it is the form <app-name>@<version> or <app-name>
-      return appWithVersion;
+  protected async inferAppNameAndVersion(
+    appWithVersion: string | undefined
+  ): Promise<{ appName: string; version: string }> {
+    appWithVersion = appWithVersion ?? '';
+
+    // If the agrument has "<app-name>@<version>" format, then both appName and version can be inferred
+    if (appWithVersion.includes('@') && !appWithVersion.startsWith('@')) {
+      const [appName, version] = appWithVersion.split('@');
+
+      return {
+        appName,
+        version,
+      };
     }
 
-    const projectRoot = await findProjectRoot(this.configFileName);
-    if (projectRoot == null) {
-      this.error(`You must specify an app name or run this command from within a project.`);
+    // If the agrument has "<app-name>" format, then we assume the version as "latest"
+    if (appWithVersion.length > 0 && !appWithVersion.includes('@')) {
+      return {
+        appName: appWithVersion,
+        version: 'latest',
+      };
     }
-    const devvitConfig = await readDevvitConfig(projectRoot, this.configFileName);
 
-    if (!appWithVersion) {
-      // getInfoForSlugString is called after this which will default to latest version so we don't need to return the
-      // version here
-      return devvitConfig.name;
-    }
+    // Otherwise, we need to read appName or app version from the config
+    // If the agrument has "@<version>" format
     if (appWithVersion.startsWith('@')) {
-      return `${devvitConfig.name}${appWithVersion}`;
+      return { appName: this.project.name, version: appWithVersion };
     }
 
-    return appWithVersion;
+    // Otherwise, default to the config and latest.
+    return { appName: this.project.name, version: 'latest' };
   }
 }

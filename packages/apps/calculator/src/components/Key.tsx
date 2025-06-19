@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { KeyValue, OnKeyPress } from '../types.js';
 import { keyValueLabel } from '../types.js';
 

@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
-import { PixelText } from './PixelText.js';
+
 import Settings from '../settings.json';
+import { PixelText } from './PixelText.js';
 
 interface TabsProps {
   children: JSX.Element[];

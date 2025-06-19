@@ -1,11 +1,12 @@
 import { Devvit } from '@devvit/public-api';
-import { getAllMatches, getCommentRichtext, shuffleArray } from '../utils/utils.js';
+
 import { getUserTiles, setUserTiles } from '../api/api.js';
+import { BINGO_TILES_COUNT, staticColors, theme } from '../constants.js';
+import type { TileItem } from '../types.js';
+import type { ThemeConfig } from '../types.js';
+import { getAllMatches, getCommentRichtext, shuffleArray } from '../utils/utils.js';
 import { Tile } from './Tile.js';
 import { TileDetails } from './TileDetails.js';
-import type { TileItem } from '../types.js';
-import { BINGO_TILES_COUNT, staticColors, theme } from '../constants.js';
-import type { ThemeConfig } from '../types.js';
 
 const createTile = (answer: string): TileItem => ({ text: answer, active: false });
 

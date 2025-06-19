@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import {
   fetchUserData,
   getAutoDropJobId,
@@ -15,7 +16,7 @@ import {
   MAX_COOLDOWN_SECONDS,
   MIN_COOLDOWN_SECONDS,
 } from '../config.js';
-import { Keys, key_post } from '../keys.js';
+import { key_post, Keys } from '../keys.js';
 import { scheduleAutoDropJob } from '../scheduler.js';
 import { Page } from '../types/page.js';
 import { Leaderboard, TournamentState, UserData } from '../types/state.js';
@@ -174,7 +175,7 @@ export const CaptureTheFlag: Devvit.CustomPostComponent = (context): JSX.Element
       await transaction.exec();
       context.ui.showToast('Flag is yours!');
       console.log('Flag capture execution end \n\n\n');
-    } catch (e) {
+    } catch {
       console.log('Flag capture failed, discarding transaction \n\n\n');
       await transaction.discard();
     }

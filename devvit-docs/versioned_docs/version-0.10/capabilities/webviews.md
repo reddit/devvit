@@ -62,37 +62,37 @@ $ devvit upload
        <h1>Hello, world!</h1>
        <button id="ping">Ping!</button>
        <div id="log"></div>
-
-
        <script src="page.js"></script>
    </body>
 </html>
-
 ```
 
 5. Create JS (project/webroot/page.js).
 
 ```tsx
 window.onmessage = (ev) => {
-   const log = document.querySelector('#log');
-   const msg = JSON.stringify(ev.data);
-   const pre = document.createElement('pre');
-   pre.innerText = msg;
-   log.appendChild(pre);
-}
+  const log = document.querySelector('#log');
+  const msg = JSON.stringify(ev.data);
+  const pre = document.createElement('pre');
+  pre.innerText = msg;
+  log.appendChild(pre);
+};
 
+window.addEventListener('load', () => {
+  window.parent.postMessage({ type: 'webview_ready' }, '*');
+});
 
 function sendPing() {
-    window.parent.postMessage(
-  {
-       type: 'ping',
-       data: {
-           hello: 'world',
-       }
-   },
-  "*"
-);
-
+  window.parent.postMessage(
+    {
+      type: 'ping',
+      data: {
+        time: Date.now(),
+      },
+    },
+    '*'
+  );
+}
 
 document.body.querySelector('#ping').onclick = sendPing;
 ```
@@ -100,11 +100,9 @@ document.body.querySelector('#ping').onclick = sendPing;
 6. Create CSS (project/webroot/style.css).
 
 ```tsx
-
 body {
     background-color: red;
 }
-
 ```
 
 7. Update `main.tsx`.
@@ -116,15 +114,22 @@ Devvit.addCustomPostType({
   render: (context) => {
     const { useState } = context;
 
-    const [myState, setMyState] = useState({});
+    const [myState, setMyState] = useState({
+      time: Date.now(),
+    });
 
     const handleMessage = (ev: JSONObject) => {
-      console.log(ev);
+      if (ev.type === 'webview_ready') {
+        context.ui.webView.postMessage(myState);
+      } else if (ev.type == 'ping') {
+        setMyState(ev.data);
+        context.ui.webView.postMessage(ev.data);
+      }
     };
 
     return (
       <vstack height="100%" width="100%" gap="medium" alignment="center middle">
-        <webview grow url="page.html" state={myState} onMessage={handleMessage} />
+        <webview grow url="page.html" onMessage={handleMessage} />
       </vstack>
     );
   },
@@ -134,13 +139,11 @@ Devvit.addCustomPostType({
 8. If webview does not take the full width, use this workaround.
 
 ```tsx
-
-  <webview
-         url="page.html"
-         state={myState}
-         onMessage={handleMessage}
-	   width=”100%”
-         minWidth=”100%”
+<webview
+  url="page.html"
+  onMessage={handleMessage}
+  width=”100%”
+  minWidth=”100%”
 />
 ```
 

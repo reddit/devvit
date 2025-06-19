@@ -1,53 +1,51 @@
-# Reddit Developer Funds
+# Reddit Developer Funds 2025
 
-[Sign up when you create an account!](https://developers.reddit.com/create-account) Reddit Developer Funds is a rewards program for adventurous devs who build successful [interactive posts](https://developers.reddit.com/docs/interactive_posts) and mod tools on Reddit.
+Reddit developer funds is a way for developers to earn money for the apps they build.
 
 ## What we’re looking for
 
 We want creative new apps that enrich the Reddit community through:
 
 - A new experience, like a [live score board](https://developers.reddit.com/docs/showcase/apps#live-scores) or [community bingo](https://developers.reddit.com/docs/showcase/apps#bingo)
-- An entirely new community created around the app, like [r/pixelary](https://www.reddit.com/r/Pixelary/)
+- An entirely new community created around the app, like [r/pixelary](https://www.reddit.com/r/Pixelary/) or [r/riddonkulous](https://www.reddit.com/r/riddonkulous/)
 - A quality of life improvement that benefits hundreds of subreddits
 
 ## How it works
 
-The Developer Funds program will run from July 1, 2024 - Dec 31, 2024. This program is focused on reach, and success will be measured by Qualified Views, Qualified Members, and Qualified Installs, defined as:
+The Reddit Developer Funds 2025 program (the “Program”) will run from April 1, 2025 - Dec 31, 2025. The Program is focused on reach, and success will be measured by Daily Qualified Engagers and Qualified Installs defined as:
 
-- A "Qualified Member" is a subscriber of a new app-centric community that: 1) is a real user in good standing; 2) is not a bot, alt, or programmatic account; 3) has joined the community of their own volition and interest in the community.
+- A “Qualified Install” means that a subreddit has your app installed and that subreddit: 1) has a minimum of 1,000 members, and 2) is eligible for monetization under Reddit’s Earn Policy (e.g., that is Safe for Work).
 
-- A “Qualified View” is a view of your App that: 1) occurs after July 1, 2024; 2) lasts at least two seconds; 3) is in a subreddit that has a minimum of 1,000 members; and 4) is in a subreddit or on content that is eligible for monetization under Reddit’s Contributor Monetization Policy (e.g., that is Safe for Work).
-
-- A “Qualified Install” means that a subreddit has your App installed and that subreddit: 1) has a minimum of 1,000 members; and 2) is eligible for monetization under Reddit’s Contributor Monetization Policy (e.g., that is Safe for Work).
+- A “Daily Qualified Engager” is a unique user that clicks and takes an action in your App for a specific day that: 1) occurs after April 1, 2025; 2) is logged in; 3) is in a subreddit that has a minimum of 200 members, and 4) is in a subreddit or on content that is eligible for monetization under Reddit’s Earn Policy (e.g., that is Safe for Work).
 
 Measurement and eligibility are further defined in our terms. Please reference our [terms](https://support.reddithelp.com/hc/en-us/articles/27958169342996) when evaluating your app performance.
 
-## What you can get
+## Awards
 
-The "Qualified Members" rewards are cumulative, which means you’ll get paid for each threshold tier your app achieves.
+| Tier              | Threshold                          | Payout  | Cumulative Payout |
+| :---------------- | :--------------------------------- | :------ | :---------------- |
+| Tier 1 - Engagers | 500 daily qualified engagers       | $500    | $500              |
+| Tier 2 - Engagers | 1,000 daily qualified engagers     | $1,000  | $1,500            |
+| Tier 3 - Engagers | 10,000 daily qualified engagers    | $5,000  | $6,500            |
+| Tier 4 - Engagers | 50,000 daily qualified engagers    | $10,000 | $16,500           |
+| Tier 5 - Engagers | 250,000 daily qualified engagers   | $25,000 | $41,500           |
+| Tier 6 - Engagers | 1,000,000 daily qualified engagers | $75,000 | $116,500          |
 
-| Tier             | Threshold                                                           | Payout | Cumulative Payout |
-| :--------------- | :------------------------------------------------------------------ | :----- | :---------------- |
-| Tier 1 - Members | 1,000 qualified members prior to 12/31/24                           | $5,000 | $5,000            |
-| Tier 2 - Members | 2,000 qualified members prior to 12/31/24 & 250,000 qualified views | $5,000 | $10,000           |
-
-The “Qualified View” rewards are cumulative, which means you’ll get paid for each threshold tier your app achieves.
-
-| Tier           | Threshold                                 | Payout  | Cumulative Payout |
-| :------------- | :---------------------------------------- | :------ | :---------------- |
-| Tier 1 - Views | 10,000 qualified views within 30 days     | $500    | $500              |
-| Tier 2 - Views | 750,000 qualified views within 30 days    | $5,000  | $5,500            |
-| Tier 3 - Views | 10,000,000 qualified views within 30 days | $20,000 | $25,500           |
-
-The “Qualified Install” threshold is met when your app exceeds the threshold below and maintains that number of qualified installs for a consecutive 7-day period:
+The Daily Qualified Engagers threshold(s) are determined on a rolling seven day average, which means that the average Daily Qualified Engagers for your app over the prior seven days exceeds a given threshold.
 
 | Tier     | Threshold              | Payout |
 | :------- | :--------------------- | :----- |
 | Installs | 250 qualified installs | $1000  |
 
+The “Qualified Install” threshold is met when your app exceeds the threshold below and maintains that number of qualified installs for a consecutive 7-day period.
+
+### Eligibility restrictions:
+
+Apps are not eligible if they previously received a payout under Developer Funds. However, if you have an app that you are excited about that previously received a payout under Developer Funds that would otherwise qualify, please reach out to us. We may consider exceptions to this restriction.
+
 ## Program rules
 
-- After you upload your first app (a test app counts!), you'll be sent an onboarding message to let you know you qualify for the program.
+- After you create your developer account, you'll be able to onboard [here](https://www.reddit.com/contributor-program)
 - Apps can only qualify once for each reward tier.
 - Don’t use spam, bots, or other forms of view manipulation, which may result in your disqualification from the program
 - The community comes first. Apps should only be installed where relevant, useful, or enriching
@@ -62,11 +60,11 @@ To be eligible for the program please sign up by [creating a developer account](
 
 ## Tracking
 
-We want developers who are interested in this program to have the right tools for success - this includes tracking how your app is performing. Once you have signed up and onboarded onto the program you will receive periodic updates over email detailing app performance once you have at least one approved app.
+We want developers who are interested in this program to have the right tools for success - this includes tracking how your app is performing. Once you have signed up and onboarded onto the program [fill out this form](https://forms.gle/nywmjkvR6P6Ax2fM7) to receive regular updates on your app’s performance.
 
 ## We’re here to help
 
-We want you to succeed! We can help facilitate conversations with moderators that you think would love your app. You can reach us at [r/devvit](https://www.reddit.com/r/devvit/) or become a member of our [Discord](https://discord.com/invite/R7yu2wh9Qz) server for support.
+We want you to succeed! We can help facilitate conversations with moderators that you think would love your app. You can reach us at [r/devvit](https://www.reddit.com/r/devvit/) or become a member of our [Discord](https://discord.gg/Cd43ExtEFS) server for support.
 
 ## Terms and conditions
 

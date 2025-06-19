@@ -1,9 +1,10 @@
 import { Devvit, RedisClient } from '@devvit/public-api';
+
+import { stringsForLatestEvent } from './components/EventBubble.js';
 import { GeneralGameScoreInfo } from './sports/GameEvent.js';
 import { makeKeyForEventId } from './sports/GameFetch.js';
-import { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
 import { NFLGameScoreInfo } from './sports/sportradar/NFLBoxscore.js';
-import { stringsForLatestEvent } from './components/EventBubble.js';
+import { SoccerGameScoreInfo } from './sports/sportradar/SoccerEvent.js';
 
 const eventCommentsEnabledKey = (postId: string) => `${postId}:eventCommentsEnabled`;
 const eventCommentsPostedKey = (postId: string) => `${postId}:eventCommentsPosted`;
@@ -46,7 +47,7 @@ export async function postLatestEvents(
 
       if (scoreInfo.event.gameType === 'soccer') {
         const soccerGameScoreInfo = scoreInfo as SoccerGameScoreInfo;
-        let latestEvent = soccerGameScoreInfo.summary?.latestEvent;
+        const latestEvent = soccerGameScoreInfo.summary?.latestEvent;
         if (latestEvent) {
           if (commentsPosted.includes(latestEvent.id)) {
             console.log(`Already posted comment for ${latestEvent.id} on ${postId}`);
@@ -63,7 +64,7 @@ export async function postLatestEvents(
         }
       } else if (scoreInfo.event.gameType === 'football') {
         const footballGameScoreInfo = scoreInfo as NFLGameScoreInfo;
-        let latestEvent = footballGameScoreInfo.lastEvent;
+        const latestEvent = footballGameScoreInfo.lastEvent;
         if (latestEvent) {
           if (commentsPosted.includes(latestEvent.id)) {
             console.log(`Already posted comment for ${latestEvent.id} on ${postId}`);

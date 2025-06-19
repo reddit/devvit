@@ -51,6 +51,9 @@ Devvit.addCustomPostType({
               },
             });
             break;
+          case 'unmount':
+            webView.unmount();
+            break;
           default:
             throw new Error(`Unknown message type: ${message satisfies never}`);
         }

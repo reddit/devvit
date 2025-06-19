@@ -1,6 +1,5 @@
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, Flags } from '@oclif/core';
-import type { FlagInput } from '@oclif/core/lib/interfaces/parser.js';
 
 import { MY_PORTAL_ENABLED } from '../../lib/config.js';
 import { getCaptcha } from '../../util/captcha.js';
@@ -12,13 +11,13 @@ export default class CreateApp extends DevvitCommand {
 
   static override description = 'Create a new app account for an existing app without one';
 
-  static override flags: FlagInput = {
-    copyPaste: Flags.boolean({
-      name: 'copyPaste',
+  static override flags = {
+    'copy-paste': Flags.boolean({
+      aliases: ['copyPaste'],
       description: 'Copy-paste the auth code instead of opening a browser',
       default: false,
     }),
-  };
+  } as const;
 
   static override args = {
     appName: Args.string({
@@ -31,21 +30,18 @@ export default class CreateApp extends DevvitCommand {
       required: true,
       parse: toLowerCaseArgParser,
     }),
-  };
+  } as const;
 
   readonly #appClient = createAppClient();
 
   override async run(): Promise<void> {
-    const {
-      args: { appName, appAccountName },
-      flags: { copyPaste },
-    } = await this.parse(CreateApp);
+    const { args, flags } = await this.parse(CreateApp);
     try {
       const response = await this.#appClient.CreateAppAccount({
-        slug: appName,
-        accountName: appAccountName,
+        slug: args.appName,
+        accountName: args.appAccountName,
         // Only prompt for captcha if we're talking to prod
-        captcha: MY_PORTAL_ENABLED ? '' : await getCaptcha({ copyPaste }),
+        captcha: MY_PORTAL_ENABLED ? '' : await getCaptcha({ copyPaste: flags['copy-paste'] }),
       });
       if (!response.created) {
         this.error(response.errors ?? 'For some reason, the account was not created.');

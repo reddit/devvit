@@ -1,6 +1,7 @@
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 
+import { requireFromDir } from '@devvit/build-pack/esbuild/BuildInfoUtil.js';
 import type {
   MediaSignature,
   MediaSignatureStatus,
@@ -8,36 +9,38 @@ import type {
 } from '@devvit/protos/community.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
-  ASSET_DIRNAME,
   type AssetMap,
   MAX_ASSET_FOLDER_SIZE_BYTES,
   MAX_ASSET_GIF_SIZE,
   MAX_ASSET_NON_GIF_SIZE,
   prettyPrintSize,
-  WEB_VIEW_ASSET_DIRNAME,
 } from '@devvit/shared-types/Assets.js';
 import { ASSET_HASHING_ALGO, ASSET_UPLOAD_BATCH_SIZE } from '@devvit/shared-types/constants.js';
+import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { ux } from '@oclif/core';
 import { createHash } from 'crypto';
+import { JSDOM } from 'jsdom';
 import { default as tinyglob } from 'tiny-glob';
 
 import { dirExists } from '../util/files.js';
 import { createAppClient } from './clientGenerators.js';
-import type { ProjectCommand } from './commands/ProjectCommand.js';
+import type { DevvitCommand } from './commands/DevvitCommand.js';
+
+export const DEVVIT_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
 };
 
 export class AssetUploader {
-  readonly #cmd: ProjectCommand;
+  readonly #cmd: DevvitCommand;
   readonly #verbose: boolean;
 
   readonly #appClient = createAppClient();
 
   readonly #appSlug: string;
 
-  constructor(cmd: ProjectCommand, appSlug: string, { verbose }: { verbose: boolean }) {
+  constructor(cmd: DevvitCommand, appSlug: string, { verbose }: { verbose: boolean }) {
     this.#cmd = cmd;
     this.#verbose = verbose;
     this.#appSlug = appSlug;
@@ -55,9 +58,25 @@ export class AssetUploader {
     assetMap?: AssetMap;
     webViewAssetMap?: AssetMap;
   }> {
+    const clientVersion = readClientVersion(this.#cmd.project.root);
+
     const [regularAssets, webViewAssets] = await Promise.all([
-      this.#getAssets(ASSET_DIRNAME, ALLOWED_ASSET_EXTENSIONS),
-      this.#getAssets(WEB_VIEW_ASSET_DIRNAME, [], true),
+      this.#cmd.project.mediaDir
+        ? queryAssets(
+            path.join(this.#cmd.project.root, this.#cmd.project.mediaDir),
+            ALLOWED_ASSET_EXTENSIONS,
+            'Media',
+            clientVersion
+          )
+        : [],
+      this.#cmd.project.clientDir
+        ? queryAssets(
+            path.join(this.#cmd.project.root, this.#cmd.project.clientDir),
+            [],
+            'Client',
+            clientVersion
+          )
+        : [],
     ]);
 
     // Return early if no assets
@@ -87,49 +106,6 @@ export class AssetUploader {
     const webViewAssetMap = await this.#processWebViewAssets(webViewAssets);
 
     return { assetMap, webViewAssetMap };
-  }
-
-  async #getAssets(
-    folder: string,
-    allowedExtensions: string[] = [],
-    webViewAssets: boolean = false
-  ): Promise<MediaSignatureWithContents[]> {
-    if (!(await dirExists(path.join(this.#cmd.projectRoot, folder)))) {
-      // Return early if there isn't an assets directory
-      return [];
-    }
-
-    const assetsPath = path.join(this.#cmd.projectRoot, folder);
-    const assetsGlob = path
-      .join(assetsPath, '**', '*')
-      // Note: tiny-glob *always* uses `/` as its path separator, even on Windows, so we need to
-      // replace whatever the system path separator is with `/`
-      .replaceAll(path.sep, '/');
-    const assets = (
-      await tinyglob(assetsGlob, {
-        filesOnly: true,
-        absolute: true,
-      })
-    ).filter(
-      (asset) => allowedExtensions.length === 0 || allowedExtensions.includes(path.extname(asset))
-    );
-    return await Promise.all(
-      assets.map(async (asset) => {
-        const filename = path.relative(assetsPath, asset).replaceAll(path.sep, '/');
-        const file = await fsp.readFile(asset);
-        const size = Buffer.byteLength(file);
-        const contents = new Uint8Array(file);
-
-        const hash = createHash(ASSET_HASHING_ALGO).update(file).digest('hex');
-        return {
-          filePath: filename,
-          size,
-          hash,
-          isWebviewAsset: webViewAssets,
-          contents,
-        };
-      })
-    );
   }
 
   async #processRegularAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
@@ -172,14 +148,7 @@ export class AssetUploader {
     ux.action.start(`Checking for new WebView assets to upload`);
     const assetMap = await this.#uploadNewAssets(assets, true);
     ux.action.stop(`Found ${assets.length} new WebView asset${assets.length === 1 ? '' : 's'}.`);
-
-    // only return the html files for the WebView assets
-    return Object.keys(assetMap).reduce<AssetMap>((map, assetPath) => {
-      if (assetPath.match(/\.htm(l)?$/)) {
-        map[assetPath] = assetMap[assetPath];
-      }
-      return map;
-    }, {});
+    return assetMap;
   }
 
   async #uploadNewAssets(
@@ -327,4 +296,95 @@ export class AssetUploader {
 
     return { newAssets, duplicateAssets, existingAssets };
   }
+}
+
+/**
+ * Read assets from disk and transform them.
+ *
+ * Asset kind controls transform. Client (historically webroot/) is for web view
+ * assets. Media (historically assets/) is for everything else.
+ */
+async function queryAssets(
+  dir: string,
+  allowedExtensions: readonly string[],
+  assetKind: 'Client' | 'Media',
+  clientVersionNum: string | undefined
+): Promise<MediaSignatureWithContents[]> {
+  if (!(await dirExists(dir))) {
+    // Return early if there isn't an assets directory
+    return [];
+  }
+
+  const assetsGlob = path
+    .join(dir, '**', '*')
+    // Note: tiny-glob *always* uses `/` as its path separator, even on Windows, so we need to
+    // replace whatever the system path separator is with `/`
+    .replaceAll(path.sep, '/');
+  const assets = (await tinyglob(assetsGlob, { filesOnly: true, absolute: true })).filter(
+    (asset) => allowedExtensions.length === 0 || allowedExtensions.includes(path.extname(asset))
+  );
+  return await Promise.all(
+    assets.map(async (asset) => {
+      const filename = path.relative(dir, asset).replaceAll(path.sep, '/');
+      let file = await fsp.readFile(asset);
+
+      // If the webview assets is an HTML file, inject the Devvit analytics
+      // script.
+      if (assetKind === 'Client' && filename.match(/\.html?$/)) {
+        file = transformHTMLBuffer(file, clientVersionNum);
+      }
+
+      const size = Buffer.byteLength(file);
+      const contents = new Uint8Array(file);
+
+      const hash = createHash(ASSET_HASHING_ALGO).update(file).digest('hex');
+      return {
+        filePath: filename,
+        size,
+        hash,
+        isWebviewAsset: assetKind === 'Client',
+        contents,
+      };
+    })
+  );
+}
+
+function readClientVersion(root: string): string | undefined {
+  try {
+    const pkg = requireFromDir(root, '@devvit/client/package.json');
+    return (pkg as { version: string }).version;
+  } catch {
+    return;
+  }
+}
+
+export function transformHTMLBuffer(buf: Buffer, clientVersionNum: string | undefined): Buffer {
+  const inStr = new TextDecoder('utf-8').decode(buf);
+  const out = transformHTML(inStr, clientVersionNum);
+  return Buffer.from(out);
+}
+
+export function transformHTML(str: string, clientVersionNum: string | undefined): string {
+  const { document } = new JSDOM(str).window;
+
+  // if no html tag, return early
+  const htmlTag = document.querySelector('html');
+  if (htmlTag == null) {
+    return str;
+  }
+
+  const clientVersionQueryArg = clientVersionNum
+    ? `${clientVersionQueryParam}=${clientVersionNum}`
+    : '';
+  const scriptTag = `<script src="${DEVVIT_JS_URL}?${clientVersionQueryArg}"></script>`;
+
+  // if no head tag, create one after the html tag
+  const headTag = document.querySelector('head');
+  if (headTag == null) {
+    htmlTag.insertAdjacentHTML('afterbegin', `<head>${scriptTag}</head>`); // eslint-disable-line no-unsanitized/method
+  } else {
+    headTag.insertAdjacentHTML('afterbegin', scriptTag); // eslint-disable-line no-unsanitized/method
+  }
+
+  return document.documentElement.outerHTML;
 }

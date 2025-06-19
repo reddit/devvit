@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { Reaction, ReactionScore } from '../Reactions.js';
 import { friendlyNumber } from '../Reactions.js';
 import type { Nullable } from '../utils/types.js';

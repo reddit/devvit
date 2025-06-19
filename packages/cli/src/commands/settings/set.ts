@@ -5,10 +5,10 @@ import inquirer from 'inquirer';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 
 import { createAppClient, createAppSettingsClient } from '../../util/clientGenerators.js';
-import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import { getAppBySlug } from '../../util/getAppBySlug.js';
 
-export default class SetAppSettings extends ProjectCommand {
+export default class SetAppSettings extends DevvitCommand {
   static override description =
     'Create and update settings for your app. These settings will be added at the global app-scope.';
   readonly #appSettingsService = createAppSettingsClient();
@@ -19,7 +19,7 @@ export default class SetAppSettings extends ProjectCommand {
       description: 'Settings key to add',
       required: true,
     }),
-  };
+  } as const;
 
   async #promptSettingValue(settingsKey: string): Promise<string> {
     const promptMessage = `Enter the value you would like to assign to the variable ${settingsKey}:`;
@@ -38,12 +38,10 @@ export default class SetAppSettings extends ProjectCommand {
     const settingsKey = args.settingsKey;
     const settingsValue = await this.#promptSettingValue(settingsKey);
 
-    const projectConfig = await this.getProjectConfig();
-    const appName = projectConfig.slug ?? projectConfig.name;
     ux.action.start('Updating app settings');
     try {
       const appInfo = await getAppBySlug(this.#appService, {
-        slug: appName,
+        slug: this.project.name,
         hidePrereleaseVersions: true,
         limit: 0,
       });

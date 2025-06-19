@@ -7,6 +7,7 @@ You can add a database to your app to store and retrieve data. The Redis plugin 
 - [Number operations](#numbers) for incrementing numbers
 - [Sorted sets](#sorted-set) for creating leaderboards
 - [Hashes](#hash) for managing a collection of key-value pairs
+- [Bitfields](#bitfield) for efficient operation on sequences of bits
 
 Each app version installed on a subreddit is namespaced, which means Redis data is siloed from other subreddits. Keep in mind that there won’t be a single source of truth for all installations of your app, since each app installation can only access the data that it has stored in the Redis database.
 
@@ -47,12 +48,14 @@ Not all Redis features are supported. If you would like to request a specific Re
 
 ### Simple read/write
 
-| **Command**                            | **Action**                                                            |
-| -------------------------------------- | --------------------------------------------------------------------- |
-| [get](https://redis.io/commands/get)   | Gets the value of key.                                                |
-| [set](https://redis.io/commands/set)   | Sets key to hold a string value.                                      |
-| [del](https://redis.io/commands/del)   | Removes the specified keys.                                           |
-| [type](https://redis.io/commands/type) | Returns the string representation of the type of value stored at key. |
+| **Command**                                | **Action**                                                            |
+| ------------------------------------------ | --------------------------------------------------------------------- |
+| [get](https://redis.io/commands/get)       | Gets the value of key.                                                |
+| [set](https://redis.io/commands/set)       | Sets key to hold a string value.                                      |
+| [exists](https://redis.io/commands/exists) | Returns number of given keys that exist.                              |
+| [del](https://redis.io/commands/del)       | Removes the specified keys.                                           |
+| [type](https://redis.io/commands/type)     | Returns the string representation of the type of value stored at key. |
+| [rename](https://redis.io/commands/rename) | Renames a key.                                                        |
 
 <details><summary>Code Example</summary>
 
@@ -60,6 +63,9 @@ Not all Redis features are supported. If you would like to request a specific Re
 async function simpleReadWriteExample(context: Devvit.Context) {
   // Set a key
   await context.redis.set('color', 'red');
+
+  // Check if a key exists
+  console.log('Key exists: ' + (await context.redis.exists('color')));
 
   // Get a key
   console.log('Color: ' + (await context.redis.get('color')));
@@ -148,17 +154,18 @@ Word length: 7
 
 Redis hashes can store up to ~ 4.2 billion key-value pairs. We recommend using hash for managing collections of key-value pairs whenever possible and iterating over it using a combination of `hscan`, `hkeys` and `hgetall`.
 
-| **Command**                                   | **Action**                                                                      |
-| --------------------------------------------- | ------------------------------------------------------------------------------- |
-| [hGet](https://redis.io/commands/hget)        | Returns the value associated with field in the hash stored at key.              |
-| [hMGet](https://redis.io/commands/hmget)      | Returns the value of all specified field in the hash stored at multiple keys.   |
-| [hSet](https://redis.io/commands/hset/)       | Sets the specified fields to their respective values in the hash stored at key. |
-| [hDel](https://redis.io/commands/hdel/)       | Removes the specified fields from the hash stored at key.                       |
-| [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash.                    |
-| [hKeys](https://redis.io/commands/hkeys/)     | Returns all field names in the hash stored at key.                              |
-| [hScan](https://redis.io/commands/hscan/)     | Iterates fields of Hash types and their associated values.                      |
-| [hIncrBy](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value.        |
-| [hLen](https://redis.io/commands/hlen/)       | Returns the number of fields contained in the hash stored at key.               |
+| **Command**                                   | **Action**                                                                        |
+| --------------------------------------------- | --------------------------------------------------------------------------------- |
+| [hGet](https://redis.io/commands/hget)        | Returns the value associated with field in the hash stored at key.                |
+| [hMGet](https://redis.io/commands/hmget)      | Returns the value of all specified field in the hash stored at multiple keys.     |
+| [hSet](https://redis.io/commands/hset/)       | Sets the specified fields to their respective values in the hash stored at key.   |
+| [hSetNX](https://redis.io/commands/hsetnx/)   | Sets field in the hash stored at key to value, only if field does not yet exist.ƒ |
+| [hDel](https://redis.io/commands/hdel/)       | Removes the specified fields from the hash stored at key.                         |
+| [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash.                      |
+| [hKeys](https://redis.io/commands/hkeys/)     | Returns all field names in the hash stored at key.                                |
+| [hScan](https://redis.io/commands/hscan/)     | Iterates fields of Hash types and their associated values.                        |
+| [hIncrBy](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value.          |
+| [hLen](https://redis.io/commands/hlen/)       | Returns the number of fields contained in the hash stored at key.                 |
 
 <details><summary>Code Examples</summary>
 
@@ -338,10 +345,10 @@ Updated points: 153
 
 ### Key expiration
 
-| **Command**                                         | **Action**                                                                                                 |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| [expire](https://redis.io/commands/expire/)         | Sets a timeout on key.                                                                                     |
-| [expireTime](https://redis.io/commands/expiretime/) | Returns the absolute Unix timestamp (since January 1, 1970) in seconds at which the given key will expire. |
+| **Command**                                         | **Action**                                                        |
+| --------------------------------------------------- | ----------------------------------------------------------------- |
+| [expire](https://redis.io/commands/expire/)         | Sets a timeout on key.                                            |
+| [expireTime](https://redis.io/commands/expiretime/) | Returns the remaining seconds at which the given key will expire. |
 
 <details><summary>Code Example</summary>
 
@@ -705,3 +712,59 @@ async function sortedSetExample7(context: Devvit.Context) {
 ```bash
 zScanResponse: {"cursor":0,"members":[{"score":10,"member":"kiwi"},{"score":20,"member":"mango"}]}
 ```
+
+</details>
+
+### Bitfield
+
+| **Command**                                                 | **Action**                                        |
+| ----------------------------------------------------------- | ------------------------------------------------- |
+| [bitfield](https://redis.io/docs/latest/commands/bitfield/) | Performs a sequence of operations on a bit string |
+
+<details><summary>Code Example</summary>
+
+```tsx
+async function bitfieldExample(context: Devvit.Context) {
+  const setBits: number[] = await context.redis.bitfield('foo', 'set', 'i5', '#0', 11);
+  console.log('Set result: ' + setBits); // [0]
+
+  const getBits: number[] = await context.redis.bitfield('foo', 'get', 'i5', '#0');
+  console.log('Get result: ' + setBits); // [11]
+
+  const manyOperations: number[] = await context.redis.bitfield(
+    'bar',
+    'set',
+    'u2',
+    0,
+    3,
+    'get',
+    'u2',
+    0,
+    'incrBy',
+    'u2',
+    0,
+    1,
+    'overflow',
+    'sat',
+    'get',
+    'u2',
+    0,
+    'set',
+    'u2',
+    0,
+    3,
+    'incrBy',
+    'u2',
+    0,
+    1
+  );
+  console.log('Results of many operations: ' + manyOperations); // [0, 3, 0, 0, 3, 3]
+}
+```
+
+```bash
+fooResults: [1, 0]
+barResults: [0, 3, 0, 0, 3, 3]
+```
+
+</details>

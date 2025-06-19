@@ -24,7 +24,7 @@ export class AssetsClient {
 
   /**
    * Gets the public URLs for an asset.
-   * @param assetPath A path, relative to the 'assets/' folder.
+   * @param assetPath A path, relative to the media (or 'assets/') folder.
    * @param options
    * @returns The public URL for that asset (https://i.redd.it/<id>.<ext>)
    */
@@ -34,14 +34,14 @@ export class AssetsClient {
 
   /**
    * Gets the public URLs for multiple assets.
-   * @param assetPaths An array of paths, relative to the 'assets/' folder.
+   * @param assetPaths An array of paths, relative to the media (or 'assets/)' folder.
    * @returns A map of each asset path to its public URL (https://i.redd.it/<id>.<ext>)
    */
   getURL(assetPaths: string[]): AssetMap;
 
   getURL(assetPaths: string[], options: GetURLOptions | undefined): AssetMap;
   /**
-   * Takes one or more asset names, relative to the 'assets/' folder, and returns either the
+   * Takes one or more asset names, relative to the media (or 'assets/') folder, and returns either the
    * public URL for that one asset, or a map of each asset name to its URL.
    * @param assetPathOrPaths - Either the path you need the public URL for, or an array of paths.
    * @param options

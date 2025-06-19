@@ -1,4 +1,4 @@
-export const demoNfl2: any = {
+export const demoNfl2: unknown = {
   id: 'a8255a2f-1dd2-4555-bc9b-61b35c6115da',
   status: 'inprogress',
   scheduled: '2023-10-17T00:15:00+00:00',

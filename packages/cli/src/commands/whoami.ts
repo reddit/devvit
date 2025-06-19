@@ -12,7 +12,7 @@ export default class Whoami extends DevvitCommand {
       required: false,
       hidden: true,
     }),
-  };
+  } as const;
 
   async run(): Promise<void> {
     const { flags } = await this.parse(Whoami);

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import ExpandIcon from '../../../docs/assets/icons/icon-expand-right-outline.svg';
 import styles from './styles.module.css';
 

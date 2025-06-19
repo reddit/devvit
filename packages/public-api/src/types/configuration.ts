@@ -5,7 +5,7 @@ export type PluginSettings = {
 
 export type Configuration = {
   /** Allows your app to use the HTTP/Fetch API */
-  http?: PluginSettings | boolean;
+  http?: PluginSettings | boolean | { domains: string[] };
   /** Allows your app to use the reddit API */
   redditAPI?: PluginSettings | boolean;
   /** Allows your app to use the Key-Value Store */
@@ -18,6 +18,8 @@ export type Configuration = {
   modLog?: PluginSettings | boolean;
   /** Allows your app to use the Realtime Plugin */
   realtime?: PluginSettings | boolean;
+  /** Allows your app to call Reddit APIs on behalf of the User */
+  userActions?: PluginSettings | boolean;
   /**
    * Allows your app to use the Payments Plugin
    * @internal

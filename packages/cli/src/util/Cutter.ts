@@ -1,12 +1,10 @@
-import { exec as _exec } from 'node:child_process';
-import fs from 'node:fs';
 import fsp from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
-import util from 'node:util';
 
 import { fileTypeFromFile } from 'file-type';
+import JSZip from 'jszip';
 import Mustache from 'mustache';
-const exec = util.promisify(_exec);
 
 const RAW_FILE_MIME_TYPES: string[] = [
   'image/',
@@ -24,23 +22,56 @@ function m(template: string, mustacheContext: unknown): string {
 
 /** Render a template directly to the filesystem. */
 export default class Cutter {
-  source: string;
-  constructor(source: string) {
-    this.source = source;
+  readonly sourceUrl: string;
+
+  constructor(sourceUrl: string) {
+    this.sourceUrl = sourceUrl;
   }
 
   async cut(target: string, mustacheContext: unknown): Promise<void> {
     await fsp.mkdir(target, { recursive: true });
-    await this.#cut(this.source, target, mustacheContext);
+    console.log('Fetching and extracting the template...');
+    const tmpdir = await this.#fetchAndExtract(this.sourceUrl);
+    console.log('Cutting the template to the target directory...');
+    await this.#cut(tmpdir, target, mustacheContext);
+  }
 
-    const cmd = path.join(target, 'init.sh');
-    if (fs.existsSync(cmd)) {
-      const { stderr } = await exec(`bash ${cmd}`);
-      if (stderr.length) {
-        throw new Error(stderr);
-      }
-      fs.rmSync(cmd);
+  async #fetchAndExtract(sourceUrl: string): Promise<string> {
+    const tmpdir = await fsp.mkdtemp(path.join(os.tmpdir(), 'devvit-cutter-'));
+
+    // Fetch the source URL into a buffer
+    const response = await fetch(sourceUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch template from ${sourceUrl}: ${response.statusText}`);
     }
+    const buffer = await response.arrayBuffer();
+
+    // Extract the buffer to the temporary directory using jszip
+    const zip = await JSZip.loadAsync(buffer);
+    await Promise.all(
+      Object.entries(zip.files).map(async ([fileName, file]) => {
+        // Write this file to the temporary directory
+        const filePath = path.join(tmpdir, fileName);
+        if (file.dir) {
+          // If it's a directory, create it
+          await fsp.mkdir(filePath, { recursive: true });
+        } else {
+          // If it's a file, write its content
+          const content = await file.async('nodebuffer');
+          await fsp.writeFile(filePath, content);
+        }
+      })
+    );
+
+    // There will be a subdirectory in the temporary directory; we want to return the path to that subdirectory.
+    const entries = await fsp.readdir(tmpdir, { withFileTypes: true });
+    if (entries.length !== 1 || !entries[0].isDirectory()) {
+      throw new Error(
+        `Expected a single directory in ${tmpdir}, found: ${entries.map((e) => e.name).join(', ')}`
+      );
+    }
+    // Return the path to the extracted directory
+    return path.join(tmpdir, entries[0].name);
   }
 
   async #cut(source: string, target: string, mustacheContext: unknown): Promise<void> {

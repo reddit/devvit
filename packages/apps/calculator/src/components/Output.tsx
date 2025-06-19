@@ -1,6 +1,7 @@
 import { Devvit } from '@devvit/public-api';
-import { Op, keyValueLabel } from '../types.js';
+
 import type { Calc } from '../calculator.js';
+import { keyValueLabel, Op } from '../types.js';
 
 type CurrentOpProps = {
   op: Op;

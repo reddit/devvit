@@ -1,7 +1,8 @@
-import moment from 'moment-timezone';
-import { TIMEZONES } from './timezones.js';
 import type { KVStore } from '@devvit/public-api';
+import moment from 'moment-timezone';
+
 import { POST_DATA_KEY } from './constants.js';
+import { TIMEZONES } from './timezones.js';
 
 const MINUTES_IN_HOUR = 60;
 const HOURS_IN_DAY = 24;

@@ -1,5 +1,5 @@
 {
-  "$schema": "../../../../shared-types/src/payments/products.schema.json",
+  "$schema": "https://developers.reddit.com/schema/products.json",
   "products": [
     {
       "sku": "hotdog",
@@ -32,6 +32,9 @@
       "displayName": "Ice Cream",
       "description": "Red(dit) raspberry ice cream",
       "price": 25,
+      "images": {
+        "icon": "IceCream.png"
+      },
       "metadata": {
         "category": "dessert"
       },

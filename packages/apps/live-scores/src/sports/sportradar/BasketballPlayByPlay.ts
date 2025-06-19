@@ -1,8 +1,9 @@
 import type { Devvit } from '@devvit/public-api';
+
 import type { GeneralGameScoreInfo, TeamInfo } from '../GameEvent.js';
 import { EventState } from '../GameEvent.js';
-import { APIKey } from './APIKeys.js';
 import { APIService, League } from '../Sports.js';
+import { APIKey } from './APIKeys.js';
 import type {
   BasketballGame,
   BasketballPeriod,

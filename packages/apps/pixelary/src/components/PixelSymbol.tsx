@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import Glyphs from '../data/glyphs.json';
 import Settings from '../settings.json';
 

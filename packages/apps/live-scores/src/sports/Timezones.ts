@@ -597,8 +597,9 @@ Zulu`
 
 function getAllKnownTimezones(): string[] {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (Intl as unknown as any).supportedValuesOf('timeZone').sort(compareTimezones);
-  } catch (e) {
+  } catch {
     return tzList.sort(compareTimezones);
   }
 }

@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
+
+import { AUTO_DROP_INTERVAL_MINUTES } from '../config.js';
 import { Page } from '../types/page.js';
 import { IconButton } from './IconButton.js';
-import { AUTO_DROP_INTERVAL_MINUTES } from '../config.js';
 
 export interface InfoPageProps {
   setPage: (page: Page) => void;

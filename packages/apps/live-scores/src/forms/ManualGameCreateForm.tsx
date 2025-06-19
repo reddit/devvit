@@ -1,15 +1,16 @@
 import type { Post } from '@devvit/public-api';
 import { Devvit } from '@devvit/public-api';
-import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
+
 import { LoadingStateFootball } from '../components/Loading.js';
+import { configurePostWithAvailableReactions, defaultReactions } from '../Reactions.js';
 import {
-  makeKeyForSubscription,
   makeKeyForEventId,
   makeKeyForPostId,
+  makeKeyForSubscription,
 } from '../sports/GameFetch.js';
-import type { GameSubscription } from '../sports/Sports.js';
-import { getLeagueFromString, APIService, League } from '../sports/Sports.js';
 import { fetchNFLSimulationBoxscore } from '../sports/sportradar/NFLBoxscore.js';
+import type { GameSubscription } from '../sports/Sports.js';
+import { APIService, getLeagueFromString, League } from '../sports/Sports.js';
 import { addSubscription } from '../subscriptions.js';
 
 export const srManualNFLScoreboardCreateForm = Devvit.createForm(

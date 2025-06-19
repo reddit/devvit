@@ -1,7 +1,8 @@
 import { Devvit } from '@devvit/public-api';
+
+import { eventPeriodString } from '../sports/espn/espn.js';
 import type { GameEvent } from '../sports/GameEvent.js';
 import { EventState } from '../sports/GameEvent.js';
-import { eventPeriodString } from '../sports/espn/espn.js';
 import type { TopBarBaseball } from './baseball.js';
 import { topBarBaseballComponent } from './baseball.js';
 import type { TopBarBasketball } from './basketball.js';

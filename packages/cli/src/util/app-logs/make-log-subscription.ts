@@ -63,13 +63,13 @@ export function makeLogSubscription(
     );
   };
 
-  const logsQuery = {
+  const logsQuery: RemoteLogQuery = {
     since: flags.since,
     subredditAppName,
     type: RemoteLogType.LOG,
   };
   const logs = createResumableStream(logsQuery);
-  const errorsQuery = {
+  const errorsQuery: RemoteLogQuery = {
     since: flags.since,
     subredditAppName,
     type: RemoteLogType.ERROR,
@@ -84,8 +84,9 @@ export function makeLogSubscription(
           dateFormat: flags.dateformat,
           json: flags.json,
           runtime: flags['log-runtime'],
-          showKeepAlive: flags.showKeepAlive,
+          showKeepAlive: flags['show-keep-alive'],
           verbose: flags.verbose,
+          showTimestamps: flags['show-timestamps'],
         },
         console
       )

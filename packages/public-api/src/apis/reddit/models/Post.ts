@@ -5,8 +5,12 @@ import type {
   SubmitRequest,
   SubmitResponse,
 } from '@devvit/protos';
-import { type SetCustomPostPreviewRequest_BodyType } from '@devvit/protos';
+import type {
+  GalleryMediaStatus as GalleryMediaStatusProto,
+  SetCustomPostPreviewRequest_BodyType,
+} from '@devvit/protos';
 import { Block, UIResponse } from '@devvit/protos';
+import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
@@ -16,6 +20,7 @@ import { fromByteArray } from 'base64-js';
 import { Devvit } from '../../../devvit/Devvit.js';
 import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
 import { BlocksHandler } from '../../../devvit/internals/blocks/handler/BlocksHandler.js';
+import { RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
@@ -192,7 +197,7 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
   kind: 'image' | 'video' | 'videogif';
   // If `kind` is "video" or "videogif" this must be set to the thumbnail URL
   // https://www.reddit.com/dev/api/#POST_api_submit
-  videoPosterUrl: string;
+  videoPosterUrl?: string;
   // If `kind` is "image" this must be set to the image URL
   // Currently Devvit only supports posts with a single image
   imageUrls?: [string];
@@ -207,6 +212,7 @@ export type SubmitCustomPostTextFallbackOptions = {
 export type SubmitCustomPostOptions = CommonSubmitPostOptions &
   SubmitCustomPostTextFallbackOptions & {
     preview: JSX.Element;
+    userGeneratedContent?: UserGeneratedContent;
   };
 
 export type CommonSubmitPostOptions = {
@@ -216,6 +222,7 @@ export type CommonSubmitPostOptions = {
   spoiler?: boolean;
   flairId?: string;
   flairText?: string;
+  runAs?: 'USER' | 'APP';
 };
 
 export type SubmitPostOptions = (
@@ -380,6 +387,26 @@ export type EnrichedThumbnail = {
   };
 };
 
+export const GalleryMediaStatus = {
+  UNKNOWN: 0,
+  VALID: 1,
+  FAILED: 2,
+} as const;
+
+export type GalleryMediaStatus =
+  (typeof GalleryMediaStatusProto)[keyof typeof GalleryMediaStatusProto];
+
+/**
+ * Represents media that the post may contain.
+ */
+export type GalleryMedia = {
+  /** Status of the media. Media that were successfully uplaoded will have GalleryMediaStatus.VALID status */
+  status: GalleryMediaStatus;
+  url: string;
+  height: number;
+  width: number;
+};
+
 export class Post {
   #id: T3ID;
   #authorId?: T2ID;
@@ -421,6 +448,7 @@ export class Post {
   #secureMedia?: SecureMedia;
   #modReportReasons: string[];
   #userReportReasons: string[];
+  #gallery: GalleryMedia[];
 
   #metadata: Metadata | undefined;
 
@@ -525,6 +553,17 @@ export class Post {
         })),
         textColor: data.linkFlairTextColor,
       };
+    }
+
+    if (data.gallery) {
+      this.#gallery = data.gallery.map((item) => ({
+        status: item.status,
+        url: item.url,
+        height: item.height,
+        width: item.width,
+      }));
+    } else {
+      this.#gallery = [];
     }
   }
 
@@ -695,6 +734,13 @@ export class Post {
 
   get modReportReasons(): string[] {
     return this.#modReportReasons;
+  }
+
+  /**
+   * Get the media in the post. Empty if the post doesn't have any media.
+   */
+  get gallery(): GalleryMedia[] {
+    return this.#gallery;
   }
 
   toJSON(): Pick<
@@ -911,6 +957,13 @@ export class Post {
   }
 
   async delete(): Promise<void> {
+    assertNonNull(this.#metadata);
+    const appUsername = this.#metadata?.[Header.App]?.values[0];
+    if (appUsername !== this.#authorName) {
+      throw new Error(
+        `App '${appUsername}' is not the author of Post ${this.id}, delete not allowed.`
+      );
+    }
     return Post.delete(this.id, this.#metadata);
   }
 
@@ -1074,12 +1127,23 @@ export class Post {
 
   /** @internal */
   static async submit(options: SubmitPostOptions, metadata: Metadata | undefined): Promise<Post> {
-    const client = Devvit.redditAPIPlugins.LinksAndComments;
+    const { runAs = 'APP' } = options;
+    const runAsType = RunAs[runAs];
+    const client =
+      runAsType === RunAs.USER
+        ? Devvit.userActionsPlugin
+        : Devvit.redditAPIPlugins.LinksAndComments;
 
     let response: SubmitResponse;
 
     if ('preview' in options) {
       assertNonNull(metadata, 'Missing metadata in `SubmitPostOptions`');
+      if (runAsType === RunAs.USER) {
+        assertNonNull(
+          options.userGeneratedContent,
+          'userGeneratedContent must be set in `SubmitPostOptions` when RunAs=USER for experience posts'
+        );
+      }
       const reconciler = new BlocksReconciler(
         () => options.preview,
         undefined,
@@ -1093,12 +1157,21 @@ export class Post {
       const { textFallback, ...sanitizedOptions } = options;
       const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
 
+      const userGeneratedContent = options.userGeneratedContent
+        ? {
+            text: options.userGeneratedContent.text ?? '',
+            imageUrls: options.userGeneratedContent.imageUrls ?? [],
+          }
+        : undefined;
+
       const submitRequest: SubmitRequest = {
         kind: 'custom',
         sr: options.subredditName,
         richtextJson: fromByteArray(encodedCached),
         richtextFallback,
         ...sanitizedOptions,
+        userGeneratedContent,
+        runAs: runAsType,
       };
 
       response = await client.SubmitCustomPost(submitRequest, metadata);
@@ -1109,6 +1182,7 @@ export class Post {
           sr: options.subredditName,
           richtextJson: 'richtext' in options ? richtextToString(options.richtext) : undefined,
           ...options,
+          runAs: runAsType,
         },
         metadata
       );
@@ -1117,10 +1191,16 @@ export class Post {
     // Post Id might not be present as image/video post creation can happen asynchronously
     const isAllowedMediaType =
       'kind' in options && ['image', 'video', 'videogif'].includes(options.kind);
-    if (isAllowedMediaType && !response.json?.data?.id && 'url' in options) {
-      throw new Error(
-        `Post of ${options.kind} type with ${options.url} is being created asynchronously and should be updated in the subreddit soon.`
-      );
+    if (isAllowedMediaType && !response.json?.data?.id) {
+      if (options.kind === 'image' && 'imageUrls' in options) {
+        throw new Error(
+          `Image post type with ${options.imageUrls} is being created asynchronously and should be updated in the subreddit soon.`
+        );
+      } else if ('videoPosterUrl' in options) {
+        throw new Error(
+          `Post of ${options.kind} type with ${options.videoPosterUrl} is being created asynchronously and should be updated in the subreddit soon.`
+        );
+      }
     }
 
     if (!response.json?.data?.id || response.json?.errors?.length) {
@@ -1134,8 +1214,12 @@ export class Post {
 
   /** @internal */
   static async crosspost(options: CrosspostOptions, metadata: Metadata | undefined): Promise<Post> {
-    const client = Devvit.redditAPIPlugins.LinksAndComments;
-
+    const { runAs = 'APP' } = options;
+    const runAsType = RunAs[runAs];
+    const client =
+      runAsType === RunAs.USER
+        ? Devvit.userActionsPlugin
+        : Devvit.redditAPIPlugins.LinksAndComments;
     const { postId, subredditName, ...rest } = options;
 
     const response = await client.Submit(
@@ -1144,6 +1228,7 @@ export class Post {
         sr: subredditName,
         crosspostFullname: asT3ID(postId),
         ...rest,
+        runAs: runAsType,
       },
       metadata
     );
@@ -1174,6 +1259,7 @@ export class Post {
         thingId: id,
         text: 'text' in options ? options.text : '',
         richtextJson: richtextString,
+        runAs: RunAs.APP,
       },
       metadata
     );

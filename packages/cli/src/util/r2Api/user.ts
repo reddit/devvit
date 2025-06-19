@@ -1,8 +1,8 @@
+import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { asT2ID } from '@devvit/shared-types/tid.js';
 
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
-import type { JSONObject } from '../../vendor/@reddit/json-config/0.4.2/index.js';
 import { authHeaders } from '../auth.js';
 import { REDDIT_OAUTH_API } from '../config.js';
 import { Result } from './result.js';
@@ -64,5 +64,5 @@ async function fetchUserInfo(token: StoredToken): Promise<Result<JSONObject>> {
     return Result.Err(`Failed to fetch user info: ${response.status} ${response.statusText}`);
   }
 
-  return Result.Ok((await response.json()) as JSONObject);
+  return Result.Ok(await response.json());
 }

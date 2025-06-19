@@ -1,0 +1,13 @@
+{
+    "$schema": "https://developers.reddit.com/schema/products.json",
+    "products": [
+      {
+        "sku": "webviewpurchase",
+        "displayName": "A Generous Purchase",
+        "description": "It's very kind you'd purchase this! Let's see what you get!",
+        "metadata": {},
+        "price": 25,
+        "accountingType": "CONSUMABLE"
+      }
+    ]
+}

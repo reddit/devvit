@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "blocks-gallery",
-  "version": "0.11.6",
+  "version": "0.11.16",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -15,13 +15,13 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/public-api": "0.11.6",
-    "@devvit/shared-types": "0.11.6"
+    "@devvit/public-api": "0.11.16",
+    "@devvit/shared-types": "0.11.16"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.11.6",
+    "@devvit/tsconfig": "0.11.16",
     "eslint": "9.11.1",
-    "typescript": "5.3.2",
-    "vitest": "1.6.0"
+    "typescript": "5.8.3",
+    "vitest": "1.6.1"
   }
 }

@@ -1,4 +1,5 @@
 import { Devvit } from '@devvit/public-api';
+
 import type { ThemeConfig } from '../types.js';
 
 type TileProps = {

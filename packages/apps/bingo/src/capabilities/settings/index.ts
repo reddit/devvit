@@ -1,4 +1,5 @@
 import { Devvit, SettingScope } from '@devvit/public-api';
+
 import { theme } from '../../constants.js';
 import { ApprovedDomainsFormatted, validateImageUrlSetting } from '../../utils/utils.js';
 

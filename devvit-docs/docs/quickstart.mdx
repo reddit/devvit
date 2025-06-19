@@ -86,17 +86,25 @@ Follow these steps to install Devvit and create your first app.
 
 1. **Install the Devvit CLI** - Choose your preferred package manager:
 
+<!-- prettier-ignore-start -->
 <Tabs>
   <TabItem value="npm" label="npm" default>
-    ```bash npm install -g devvit ```
+    ```bash 
+    npm install -g devvit
+    ```
   </TabItem>
   <TabItem value="yarn" label="Yarn">
-    ```bash yarn global add devvit ```
+    ```bash 
+    yarn global add devvit 
+    ```
   </TabItem>
   <TabItem value="pnpm" label="pnpm" default>
-    ```bash pnpm install -g devvit ```
+    ```bash 
+    pnpm install -g devvit 
+    ```
   </TabItem>
 </Tabs>
+<!-- prettier-ignore-end -->
 
 2. **Log in to Reddit**
 
@@ -120,6 +128,10 @@ If you're already a savvy web developer, use `--template web-view-post` (instead
 ```bash
 devvit upload
 ```
+
+:::note
+You'll get an email when you upload your first app.
+:::
 
 5. **Playtest your app**
 
@@ -154,7 +166,7 @@ Here are the recommended next steps:
 
 - Learn about [building interactive posts](./interactive_posts.md)
 - Check out the [showcase](/docs/showcase/apps.mdx) to see example apps
-- Learn how to [publish](dev_guide/#9-publish) your app
+- Learn how to [publish](./publishing.md) your app
 
 :::note
 Reddit collects usage metrics when you use the Devvit CLI. See

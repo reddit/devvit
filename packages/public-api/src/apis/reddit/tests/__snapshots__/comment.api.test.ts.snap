@@ -69,3 +69,38 @@ exports[`Commment API > RedditAPIClient:Comment > submitComment() should return 
   "userReportReasons": [],
 }
 `;
+
+exports[`Commment API > RedditAPIClient:Comment > submitComment(): can set runAs: USER when userActions is enabled 1`] = `
+{
+  "approved": false,
+  "authorName": "my-user",
+  "body": "body",
+  "collapsedBecauseCrowdControl": false,
+  "createdAt": +053979-04-14T00:00:00.000Z,
+  "distinguishedBy": undefined,
+  "edited": false,
+  "id": "t1_commentid",
+  "ignoringReports": false,
+  "locked": false,
+  "modReportReasons": [],
+  "numReports": 0,
+  "parentId": "t1_t3_parentid",
+  "permalink": "fake-permalink//",
+  "postId": "t3_linkid",
+  "removed": false,
+  "replies": Listing {
+    "_fetch": [Function],
+    "children": [],
+    "hasMore": true,
+    "limit": Infinity,
+    "pageSize": 100,
+  },
+  "score": 0,
+  "spam": false,
+  "stickied": false,
+  "subredditId": "t5_subredditid",
+  "subredditName": "askReddit",
+  "url": "https://www.reddit.com/fake-permalink//",
+  "userReportReasons": [],
+}
+`;

@@ -1,7 +1,5 @@
-import fs from 'node:fs';
-import fsp, { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import path from 'node:path';
 
 import {
   isDependencyManagedByDevvit,
@@ -15,7 +13,8 @@ import type { SemVer } from 'semver';
 import semver from 'semver';
 import glob from 'tiny-glob';
 
-import { ProjectCommand } from '../../util/commands/ProjectCommand.js';
+import { UPDATE_ACTIONS } from '../../updateActions/index.js';
+import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import type { PackageJSON } from '../../util/package-managers/package-util.js';
 
 const require = createRequire(import.meta.url);
@@ -23,17 +22,17 @@ const require = createRequire(import.meta.url);
 // eslint-disable-next-line security/detect-non-literal-require
 const cliPackageJSON = require(require.resolve(`@devvit/cli/package.json`));
 
-export default class UpdateApp extends ProjectCommand {
+export default class UpdateApp extends DevvitCommand {
   static override description =
     "Update @devvit project dependencies to the currently installed CLI's version";
 
   static override examples = ['$ devvit update app'];
 
   protected override async init(): Promise<void> {
-    await this.assertProject();
+    await super.init();
 
     const devvitVersion = semver.parse(cliPackageJSON.version);
-    const result = await matchDevvitPackageVersions(this.projectRoot, devvitVersion!, true);
+    const result = await matchDevvitPackageVersions(this.project.root, devvitVersion!, true);
 
     if (!result.success) {
       process.exit(1);
@@ -76,62 +75,6 @@ export default class UpdateApp extends ProjectCommand {
 
   async run(): Promise<void> {}
 }
-
-type UpdateAction = {
-  description: string;
-  shouldRun: (oldestVersion: semver.SemVer) => boolean | Promise<boolean>;
-  run: (cmd: UpdateApp) => void | Promise<void>;
-};
-
-const UPDATE_ACTIONS: UpdateAction[] = [
-  {
-    description: 'create "assets" folder if missing',
-    shouldRun: (oldestVersion) => {
-      const runIfBeforeVersion = semver.parse('0.10.3')!;
-      try {
-        return semver.gt(runIfBeforeVersion, oldestVersion);
-      } catch {
-        return false;
-      }
-    },
-    run: async (cmd) => {
-      const assetsDir = path.join(cmd.projectRoot, 'assets');
-      if (!fs.existsSync(assetsDir)) {
-        await fsp.mkdir(assetsDir);
-      }
-    },
-  },
-  {
-    description: 'migrate @devvit/tsconfig references to @devvit/public-api',
-    shouldRun: (oldestVersion) => {
-      const runIfBeforeVersion = semver.parse('0.10.9')!;
-      try {
-        return semver.gt(runIfBeforeVersion, oldestVersion);
-      } catch {
-        return false;
-      }
-    },
-    run: async (cmd) => {
-      const tsconfigPath = path.join(cmd.projectRoot, 'tsconfig.json');
-      if (fs.existsSync(tsconfigPath)) {
-        try {
-          const tsconfig = await fsp.readFile(tsconfigPath, 'utf8');
-          await fsp.writeFile(
-            tsconfigPath,
-            tsconfig.replaceAll(
-              '@devvit/tsconfig/devvit.tsconfig.json',
-              '@devvit/public-api/devvit.tsconfig.json'
-            )
-          );
-        } catch (err) {
-          console.error(
-            `skipping failed migration: ${err instanceof Error ? err.message : String(err)}`
-          );
-        }
-      }
-    },
-  },
-];
 
 export type VersionUpgradeResult =
   | {

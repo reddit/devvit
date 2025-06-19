@@ -1,5 +1,6 @@
 import type { Metadata, ValidateFormRequest, ValidateFormResponse } from '@devvit/protos';
 import { AppSettingsDefinition, GetFieldsResponse } from '@devvit/protos';
+import type { AppSettings } from '@devvit/protos/types/devvit/actor/settings/v1alpha/app_settings.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 
 import { transformFormFields } from '../../apis/ui/helpers/transformForm.js';
@@ -28,6 +29,6 @@ async function onValidateForm(
 
 export function registerAppSettings(config: Config): void {
   config.provides(AppSettingsDefinition);
-  extendDevvitPrototype('GetAppSettingsFields', onGetSettingsFields);
-  extendDevvitPrototype('ValidateAppForm', onValidateForm);
+  extendDevvitPrototype<AppSettings>('GetAppSettingsFields', onGetSettingsFields);
+  extendDevvitPrototype<AppSettings>('ValidateAppForm', onValidateForm);
 }

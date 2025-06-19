@@ -1,3 +1,4 @@
+export { RunAs } from './apis/reddit/common.js';
 export * from './apis/reddit/models/index.js';
 export type { RedditAPIClient } from './apis/reddit/RedditAPIClient.js';
 export * from './apis/ui/helpers/svg.js';

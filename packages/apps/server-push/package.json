@@ -1,13 +1,13 @@
 {
   "private": true,
   "name": "server-push-rt",
-  "version": "0.11.6",
+  "version": "0.11.16",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.11.6"
+    "@devvit/public-api": "0.11.16"
   },
   "devDependencies": {
-    "typescript": "5.3.2"
+    "typescript": "5.8.3"
   }
 }

@@ -23,6 +23,7 @@ client.key
 # editors
 .idea
 .vscode
+/.zed/
 
 # dependencies
 node_modules/
@@ -66,7 +67,6 @@ server/static/
 # drone artifacts
 .npmrc
 .terraform/
-.drone.yml
 
 # Go workspace
 go.work.sum
@@ -78,3 +78,9 @@ yarn.lock # Don't commit this - we'll generate it ourselves.
 
 
 .snootobuf
+
+__e2e__/playwright/tmp/
+__e2e__/playwright/test-results/
+
+# Ignore all build artifacts
+tsconfig.tsbuildinfo

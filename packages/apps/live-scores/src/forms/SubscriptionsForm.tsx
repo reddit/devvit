@@ -1,9 +1,10 @@
 import { Devvit } from '@devvit/public-api';
-import type { GameSubscription } from '../sports/Sports.js';
+
 import type { GeneralGameScoreInfo } from '../sports/GameEvent.js';
-import { getSubscriptions, removeSubscription } from '../subscriptions.js';
-import { formatDateForForms } from '../sports/Timezones.js';
 import { fetchCachedGameInfoForGameSubscription } from '../sports/GameFetch.js';
+import type { GameSubscription } from '../sports/Sports.js';
+import { formatDateForForms } from '../sports/Timezones.js';
+import { getSubscriptions, removeSubscription } from '../subscriptions.js';
 
 type GameInfoPair = readonly [GameSubscription, GeneralGameScoreInfo];
 
