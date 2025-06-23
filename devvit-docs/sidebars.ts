@@ -92,6 +92,8 @@ const sidebars: SidebarsConfig = {
             'devvit_web/how_devvit_web_works',
             'devvit_web/ai_tools',
             'devvit_web/realtime',
+            'devvit_web/server',
+            'devvit_web/client',
             'devvit_web/future_roadmap',
           ],
         },
