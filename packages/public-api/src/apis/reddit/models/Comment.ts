@@ -224,6 +224,9 @@ export class Comment {
     return this.#approved;
   }
 
+  /**
+   * a Number representing the UTC timestamp in seconds. or 0 if its not approved.
+   */
   get approvedAtUtc(): number {
     return this.#approvedAtUtc;
   }
