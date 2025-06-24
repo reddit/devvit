@@ -3,15 +3,18 @@ import type { ProjectTemplateInfo } from '@devvit/shared-types/ProjectTemplateIn
 import { DEVVIT_PORTAL_URL } from '../config.js';
 
 export class ProjectTemplateResolver {
-  readonly options: Promise<ProjectTemplateInfo[]>;
+  #options: Promise<ProjectTemplateInfo[]> | undefined = undefined;
+  get options(): Promise<ProjectTemplateInfo[]> {
+    if (!this.#options) {
+      this.#options = fetch(DEVVIT_PORTAL_URL + '/templates.json').then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to fetch templates: ${response.statusText}`);
+        }
+        return response.json() as Promise<ProjectTemplateInfo[]>;
+      });
+    }
 
-  constructor() {
-    this.options = fetch(DEVVIT_PORTAL_URL + '/templates.json').then((response) => {
-      if (!response.ok) {
-        throw new Error(`Failed to fetch templates: ${response.statusText}`);
-      }
-      return response.json() as Promise<ProjectTemplateInfo[]>;
-    });
+    return this.#options;
   }
 
   async getProjectUrl(projectName: string): Promise<string> {
