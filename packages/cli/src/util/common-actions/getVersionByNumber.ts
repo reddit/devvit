@@ -5,6 +5,12 @@ export function getVersionByNumber(version: string, appVersions: AppVersionInfo[
   const latest = getLatestVersion(appVersions);
   if (version === 'latest') {
     return latest;
+  } else if (version === 'playtest' || version === 'prerelease') {
+    const prerelease = getLatestPrereleaseVersion(appVersions);
+    if (!prerelease) {
+      throw new Error(`Could not find a prerelease version`);
+    }
+    return prerelease;
   } else {
     const neVer = DevvitVersion.fromString(version);
 
@@ -38,6 +44,32 @@ function getLatestVersion(appVersions: AppVersionInfo[]): AppVersionInfo {
       // Remove all appVersions that have a prerelease chunk - latest is _never_ a prerelease
       return !appVersion.prereleaseVersion;
     })
+    .map((appVersion) => {
+      // Make a DevvitVersion object for each app version, and tie them together
+      return {
+        appVersion,
+        devvitVersion: new DevvitVersion(
+          appVersion.majorVersion,
+          appVersion.minorVersion,
+          appVersion.patchVersion,
+          appVersion.prereleaseVersion
+        ),
+      };
+    })
+    .sort((a, b) => {
+      // Sort based on devvitVersion - descending order
+      return b.devvitVersion.compare(a.devvitVersion);
+    })[0].appVersion; // return the appVersion of the one that sorted to the top (is latest)
+}
+
+function getLatestPrereleaseVersion(appVersions: AppVersionInfo[]): AppVersionInfo | undefined {
+  const prereleaseVersions = appVersions.filter((appVersion) => {
+    return !!appVersion.prereleaseVersion;
+  });
+  if (prereleaseVersions.length === 0) {
+    return undefined;
+  }
+  return prereleaseVersions
     .map((appVersion) => {
       // Make a DevvitVersion object for each app version, and tie them together
       return {

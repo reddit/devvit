@@ -180,7 +180,10 @@ export default class Install extends DevvitCommand {
   }
 }
 
-function nutritionCategoriesToString(name: string, cats: readonly NutritionCategory[]): string {
+export function nutritionCategoriesToString(
+  name: string,
+  cats: readonly NutritionCategory[]
+): string {
   if (!cats.length) return `${name} requires no permissions!`;
   return `${name} may:\n${cats
     .map(
