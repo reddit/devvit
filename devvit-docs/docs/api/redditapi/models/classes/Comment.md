@@ -28,6 +28,8 @@
 
 > **get** **approvedAtUtc**(): `number`
 
+A number representing the UTC timestamp in seconds, or 0 if its not approved.
+
 ##### Returns
 
 `number`
