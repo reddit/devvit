@@ -1,6 +1,6 @@
 # Migration guide
 
-With version 0.10.0 of Devvit, we are dramatically changing the syntax of our capabilities to make development even easier. Three keys changes you’ll see:
+With version 0.10.0 of Devvit, we are dramatically changing the syntax of our capabilities to make development even easier. Three key changes you’ll see:
 
 - Moving capabilities into a context object that’s passed into handlers
 - Removing the need to pass in metadata
@@ -13,7 +13,7 @@ We’ve outlined the changes below.
 Menu items have been simplified:
 
 - `addAction` and `addActions` are now `addMenuItem`
-- description has been dropped as a key
+- The description has been dropped as a key
 - the new context.ui shows a form or a toast instead of returns
 - forms are created using Devvit.createForm
 - `handler` has been renamed `onPress`
@@ -124,7 +124,7 @@ Devvit.addSchedulerJob({
     const resp = await context.reddit.submitPost({
       subredditName: subreddit.name,
       title: 'Daily Thread',
-      text: 'This is a daily thread, commment here!',
+      text: 'This is a daily thread, comment here!',
     });
   },
 });
@@ -173,7 +173,7 @@ Devvit.addMenuItem({
   },
 });
 
-// alernative w/ deconstruction
+// alternative w/ deconstruction
 
 Devvit.addMenuItem({
   label: 'Reply to post',
@@ -247,7 +247,7 @@ Devvit.addSettings([
   },
 ]);
 
-// retreiving app configurations
+// retrieving app configurations
 
 Devvit.addMenuItem({
   label: 'Get settings values',
