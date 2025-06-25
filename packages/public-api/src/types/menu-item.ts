@@ -1,6 +1,8 @@
+import type { MenuItemLocation, MenuItemOnPressEvent } from '@devvit/shared/types/menu-item.js';
+
 import type { Devvit } from '../devvit/Devvit.js';
 
-export type MenuItemLocation = 'subreddit' | 'post' | 'comment';
+export type { MenuItemLocation, MenuItemOnPressEvent };
 
 export type MenuItemUserType = 'loggedOut' | 'moderator';
 
@@ -8,19 +10,6 @@ export type MenuItemUserType = 'loggedOut' | 'moderator';
  * You can use the "currentApp" filter to only display the menu item on custom posts that were created by your app.
  */
 export type MenuItemPostFilter = 'currentApp';
-
-export type MenuItemOnPressEvent = {
-  /** The location where the menu item was pressed */
-  location: MenuItemLocation;
-  /**
-   * The ID of subreddit, post, or comment that the menu item was pressed;
-   * includes Thing ID prefix:
-   * - t1_ - comment
-   * - t5_ - subreddit
-   * - t3_ - post
-   */
-  targetId: string;
-};
 
 export type MenuItem = {
   /** The label of the menu item */
