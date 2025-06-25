@@ -88,6 +88,7 @@ export function createAppClient(): AppClient {
         baseUrl: `${DEVVIT_PORTAL_API}/${APP_PATH}`,
         getToken: getAccessToken,
         headers: getHeaders(),
+        isTokenOptional: true, // Some app info endpoints are public
       })
     )
   );
@@ -100,6 +101,7 @@ export function createAppVersionClient(): AppVersionClient {
         baseUrl: `${DEVVIT_PORTAL_API}/${APP_VERSION_PATH}`,
         getToken: getAccessToken,
         headers: getHeaders(),
+        isTokenOptional: true, // Some app version info endpoints are public
       })
     )
   );
