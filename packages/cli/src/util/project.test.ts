@@ -18,10 +18,12 @@ import {
 const noPermissions: AppPermissionConfig = {
   http: { enable: false, allowedDomains: [] },
   media: false,
+  menu: false,
   payments: false,
   realtime: false,
   redis: false,
   reddit: { enable: false, scope: 'user', asUser: [] },
+  settings: false,
   triggers: false,
 };
 
@@ -88,7 +90,7 @@ describe('validateConfig()', () => {
     for (const exists of [false, true])
       for (const mode of ['Static', 'Dynamic'] as const) {
         const config: AppConfig = {
-          blocks: { entry: 'entry', menu: { enable: true } },
+          blocks: { entry: 'entry' },
           schema: 'v1',
           name: 'name',
           permissions: noPermissions,

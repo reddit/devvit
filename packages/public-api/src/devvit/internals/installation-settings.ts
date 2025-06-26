@@ -9,13 +9,9 @@ import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 import { onValidateFormHelper } from './helpers/settingsUtils.js';
 
 async function onGetSettingsFields(): Promise<GetFieldsResponse> {
-  if (!Devvit.installationSettings) {
-    throw new Error('Installation settings were not defined.');
-  }
-
   return GetFieldsResponse.fromJSON({
     fields: {
-      fields: transformFormFields(Devvit.installationSettings),
+      fields: transformFormFields(Devvit.installationSettings ?? []),
     },
   });
 }
