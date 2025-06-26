@@ -32,19 +32,19 @@ import { context } from '@devvit/client';
 const postId = context.postId;
 const subredditName = context.subredditName;
 const userId = context.userId;
-const userName = context.userName;
-const isModerator = context.isModerator;
-const isLoggedIn = context.isLoggedIn;
+const subredditId = context.subredditId;
+const appName = context.appName;
+const appVersion = context.appVersion;
 ```
 
 **Available Context Properties:**
 
-- `postId`: The ID of the current post (if applicable)
+- `postId`: The ID of the current post (if applicable) - T3ID format
 - `subredditName`: The name of the current subreddit
-- `userId`: The ID of the current user
-- `userName`: The username of the current user
-- `isModerator`: Whether the current user is a moderator
-- `isLoggedIn`: Whether the current user is logged in
+- `userId`: The ID of the current user - T2ID format
+- `subredditId`: The ID of the current subreddit - T5ID format
+- `appName`: The name of the current app
+- `appVersion`: The version of the current app
 
 ### `showToast`
 
@@ -185,7 +185,7 @@ if (result.action === 'SUBMITTED') {
   name: 'category',
   label: 'Category',
   required?: boolean,
-  defaultValue?: string[],
+  defaultValue?: string[], // Array of selected option values
   helpText?: string,
   disabled?: boolean,
   options: [
@@ -194,6 +194,8 @@ if (result.action === 'SUBMITTED') {
   ]
 }
 ```
+
+**Note:** Select fields support multi-selection. The `defaultValue` and returned values are arrays of strings representing the selected option values.
 
 **Image Field**
 
@@ -251,239 +253,6 @@ navigateTo(user);
 **Parameters:**
 
 - `thingOrUrl`: A URL string or Reddit object (Subreddit, Post, Comment, User)
-
-### `connectRealtime`
-
-Connects to a realtime channel for receiving live messages and updates.
-
-```typescript
-import { connectRealtime } from '@devvit/realtime';
-
-const connection = await connectRealtime({
-  channel: 'my-app-channel',
-  onConnect: (channel) => {
-    console.log(`Connected to channel: ${channel}`);
-  },
-  onDisconnect: (channel) => {
-    console.log(`Disconnected from channel: ${channel}`);
-  },
-  onMessage: (data) => {
-    console.log('Received message:', data);
-    // Handle incoming realtime data
-  },
-});
-
-// Later, disconnect from the channel
-await connection.disconnect();
-```
-
-**Connection Options:**
-
-- `channel`: The channel name to connect to
-- `onConnect`: Callback when connection is established
-- `onDisconnect`: Callback when connection is lost
-- `onMessage`: Callback for incoming messages
-
-**Returns:** A `Connection` object with a `disconnect()` method
-
-## Usage Examples
-
-### Basic Client-Side App
-
-```typescript
-// client/index.ts
-import { context, showToast, showForm, navigateTo } from '@devvit/client';
-
-// Access context
-console.log('Current user:', context.userName);
-console.log('Current subreddit:', context.subredditName);
-
-// Show a welcome toast
-if (context.isLoggedIn) {
-  showToast({
-    text: `Welcome back, ${context.userName}!`,
-    appearance: 'success',
-  });
-}
-
-// Handle form submission
-async function handleSettingsForm() {
-  const result = await showForm({
-    title: 'App Settings',
-    fields: [
-      {
-        type: 'string',
-        name: 'displayName',
-        label: 'Display Name',
-        defaultValue: context.userName || '',
-        required: true,
-      },
-      {
-        type: 'boolean',
-        name: 'enableNotifications',
-        label: 'Enable Notifications',
-        defaultValue: true,
-      },
-    ],
-  });
-
-  if (result.action === 'SUBMITTED') {
-    showToast('Settings saved successfully!');
-    // Send data to server
-    await fetch('/api/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(result.values),
-    });
-  }
-}
-```
-
-### Realtime Chat Application
-
-```typescript
-// client/chat.ts
-import { connectRealtime } from '@devvit/realtime';
-import { showToast } from '@devvit/client';
-
-class ChatApp {
-  private connection: any;
-
-  async initialize() {
-    try {
-      this.connection = await connectRealtime({
-        channel: `chat-${context.subredditName}`,
-        onConnect: (channel) => {
-          showToast(`Connected to ${channel}`);
-        },
-        onDisconnect: (channel) => {
-          showToast(`Disconnected from ${channel}`);
-        },
-        onMessage: (data) => {
-          this.handleMessage(data);
-        },
-      });
-    } catch (error) {
-      showToast('Failed to connect to chat');
-    }
-  }
-
-  private handleMessage(data: any) {
-    // Handle incoming chat messages
-    if (data.type === 'message') {
-      this.displayMessage(data.message, data.user);
-    }
-  }
-
-  async sendMessage(message: string) {
-    // Send message to server
-    await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message }),
-    });
-  }
-
-  async disconnect() {
-    if (this.connection) {
-      await this.connection.disconnect();
-    }
-  }
-}
-```
-
-### Form with Validation
-
-```typescript
-// client/forms.ts
-import { showForm, showToast } from '@devvit/client';
-
-async function showUserProfileForm() {
-  const result = await showForm({
-    title: 'Update Profile',
-    description: 'Update your profile information',
-    fields: [
-      {
-        type: 'string',
-        name: 'displayName',
-        label: 'Display Name',
-        required: true,
-        helpText: 'This will be shown to other users',
-      },
-      {
-        type: 'paragraph',
-        name: 'bio',
-        label: 'Bio',
-        helpText: 'Tell us about yourself',
-      },
-      {
-        type: 'select',
-        name: 'interests',
-        label: 'Interests',
-        options: [
-          { label: 'Technology', value: 'tech' },
-          { label: 'Gaming', value: 'gaming' },
-          { label: 'Sports', value: 'sports' },
-          { label: 'Music', value: 'music' },
-        ],
-        defaultValue: [],
-      },
-      {
-        type: 'boolean',
-        name: 'publicProfile',
-        label: 'Make profile public',
-        defaultValue: false,
-      },
-    ],
-    acceptLabel: 'Update Profile',
-    cancelLabel: 'Cancel',
-  });
-
-  if (result.action === 'SUBMITTED') {
-    try {
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(result.values),
-      });
-
-      if (response.ok) {
-        showToast({
-          text: 'Profile updated successfully!',
-          appearance: 'success',
-        });
-      } else {
-        showToast('Failed to update profile');
-      }
-    } catch (error) {
-      showToast('Network error occurred');
-    }
-  }
-}
-```
-
-## Type Definitions
-
-### `Toast`
-
-```typescript
-type Toast = {
-  text: string;
-  appearance?: 'neutral' | 'success';
-};
-```
-
-### `FormAction`
-
-```typescript
-type FormAction = 'CANCELED' | 'SUBMITTED';
-```
-
-### `FormEffectResponse`
-
-```typescript
-type FormEffectResponse<T> = { action: 'CANCELED' } | { action: 'SUBMITTED'; values: T };
-```
 
 ## Related Documentation
 

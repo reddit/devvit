@@ -95,18 +95,16 @@ server.listen(getServerPort());
 
 **Returns:** Port number (defaults to 3000 if `WEBBIT_PORT` is not set)
 
-### `RequestContext`
+## Plugins
 
-Type definition for the request context object.
+Devvit provides various plugins and capabilities on the server. These are available through the following additional packages:
 
-```typescript
-import type { RequestContext } from '@devvit/server';
-
-function handleRequest(req: Request, res: Response) {
-  // RequestContext type is automatically inferred when using context
-  const ctx: RequestContext = context;
-}
-```
+- @devvit/reddit: Access the Reddit API (e.g. create a post)
+- @devvit/redis: Access a Redis datastore.
+- @devvit/scheduler: Schedule jobs dynamically
+- @devvit/settings: Access installation & developer settings (e.g. secrets)
+- @devvit/realtime: Send and receive events in real-time to power instant experiences.
+- @devvit/media-upload: Upload images to Reddit CDNs at runtime (e.g. a user submission of an image)
 
 ## Usage Examples
 
@@ -154,7 +152,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/api/user-info', (req, res) => {
-  if (!context.isLoggedIn) {
+  if (!context.userId) {
     return res.status(401).json({ error: 'User not logged in' });
   }
 
@@ -175,6 +173,7 @@ server.listen(getServerPort());
 - **No persistent connections**: WebSocket connections and long-running processes are not supported
 - **Package restrictions**: Node.js packages that rely on specific native dependencies may not be available in the serverless environment
 - **Request/response only**: Streaming responses and chunked transfers are not supported
+- **No local development**: You cannot run the devvit server locally, all testing must happen on your playtest subreddit on Reddit.com
 
 ## Related Documentation
 

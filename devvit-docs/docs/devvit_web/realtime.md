@@ -12,12 +12,20 @@ The realtime client allows you to:
 - **Manage** multiple channel subscriptions
 - **Disconnect** from channels when no longer needed
 
+## Installation
+
+Add `@devvit/realtime` to your project:
+
+```bash
+npm install @devvit/realtime
+```
+
 ## Architecture
 
 Realtime functionality in Devvit follows a client/server architecture:
 
-- **Client-side** (`@devvit/client`): Subscribe to channels and receive messages
-- **Server-side** (`@devvit/realtime`): Send messages to channels
+- **Client-side** (connectRealtime): Subscribe to channels and receive messages
+- **Server-side** (realtime.send): Send messages to channels
 
 This separation ensures that message sending is controlled by server-side logic while clients can freely subscribe to channels they're interested in.
 
