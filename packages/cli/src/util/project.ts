@@ -52,7 +52,7 @@ export class Project {
     const config = await readConfig(root, filename);
     if (isAppConfig(config)) {
       const errs = validateConfig(config, existsSync, mode);
-      if (errs.length) throw Error(errs.join('; '));
+      if (errs.length) throw Error(`${errs.join('; ')}.`);
     }
     let packageJSON;
     try {

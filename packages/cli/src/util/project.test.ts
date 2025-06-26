@@ -22,6 +22,7 @@ const noPermissions: AppPermissionConfig = {
   realtime: false,
   redis: false,
   reddit: { enable: false, scope: 'user', asUser: [] },
+  triggers: false,
 };
 
 describe('Project', () => {
