@@ -75,27 +75,27 @@ export type BanUserOptions = {
    */
   username: string;
   /**
-   * The subredditName you want to ban from.
+   * The name of the subreddit you want to ban the user from.
    */
   subredditName: string;
   /**
-   * The Id of the post or comment you want to cite as rule breaking.
+   * The id of the post or comment you want to cite as rule breaking.
    */
   context?: string;
   /**
-   * The Message to display to the user. the "Note from the moderators:" in the ban message modmail
+   * The message to display to the user. (The "Note from the moderators:" in the ban message modmail.)
    */
   message?: string;
   /**
-   * The Reason. shows up in the on the Banned Users Menu.
+   * The reason for the ban. This shows up in the Banned Users Menu.
    */
   reason?: string;
   /**
-   * The Duration. use 0 for permanent, otherwise it must be in the range of 1 and 999
+   * The duration of the ban, in days. Use 0 for permanent; otherwise, it must be in the range of 1 to 999.
    */
   duration?: number;
   /**
-   * The Reason to show up in the modlog, and the ui's usernotes.
+   * The reason to show in the modlog, and the UI's user notes. This isn't show to the user, just other moderators.
    */
   note?: string;
 };
