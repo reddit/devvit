@@ -70,12 +70,33 @@ export type RemoveRelationshipOptions = {
 };
 
 export type BanUserOptions = {
+  /**
+   * The username of the user you want to ban.
+   */
   username: string;
+  /**
+   * The name of the subreddit you want to ban the user from.
+   */
   subredditName: string;
+  /**
+   * The id of the post or comment you want to cite as rule breaking.
+   */
   context?: string;
+  /**
+   * The message to display to the user. (The "Note from the moderators:" in the ban message modmail.)
+   */
   message?: string;
+  /**
+   * The reason for the ban. This shows up in the Banned Users Menu.
+   */
   reason?: string;
+  /**
+   * The duration of the ban, in days. Use 0 for permanent; otherwise, it must be in the range of 1 to 999.
+   */
   duration?: number;
+  /**
+   * The reason to show in the modlog, and the UI's user notes. This isn't show to the user, just other moderators.
+   */
   note?: string;
 };
 
