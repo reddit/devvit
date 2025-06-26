@@ -28,7 +28,7 @@ This separation ensures that message sending is controlled by server-side logic 
 Connects to a realtime channel for receiving messages.
 
 ```tsx
-import { connectRealtime } from '@devvit/client';
+import { connectRealtime } from '@devvit/realtime';
 
 const connection = await connectRealtime({
   channel: 'my-channel',
@@ -106,7 +106,7 @@ Sends a message to a specific channel.
 ### Client-Side: Basic Channel Connection
 
 ```tsx
-import { connectRealtime } from '@devvit/client';
+import { connectRealtime } from '@devvit/realtime';
 
 // Connect to a channel
 const connection = await connectRealtime({
@@ -124,7 +124,7 @@ await connection.disconnect();
 ### Client-Side: Connection Lifecycle Management
 
 ```tsx
-import { connectRealtime } from '@devvit/client';
+import { connectRealtime } from '@devvit/realtime';
 
 const connection = await connectRealtime({
   channel: 'live-chat',

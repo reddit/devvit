@@ -257,7 +257,7 @@ navigateTo(user);
 Connects to a realtime channel for receiving live messages and updates.
 
 ```typescript
-import { connectRealtime } from '@devvit/client';
+import { connectRealtime } from '@devvit/realtime';
 
 const connection = await connectRealtime({
   channel: 'my-app-channel',
@@ -343,7 +343,8 @@ async function handleSettingsForm() {
 
 ```typescript
 // client/chat.ts
-import { connectRealtime, showToast } from '@devvit/client';
+import { connectRealtime } from '@devvit/realtime';
+import { showToast } from '@devvit/client';
 
 class ChatApp {
   private connection: any;
