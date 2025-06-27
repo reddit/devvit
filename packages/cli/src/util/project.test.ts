@@ -97,7 +97,7 @@ describe('validateConfig()', () => {
           json: { name: 'name' },
         };
         expect(validateConfig(config, () => exists, mode)).toStrictEqual(
-          exists ? [] : ['`config.blocks.entry` (entry) does not exist']
+          exists ? [] : ['`config.blocks.entry` (entry)']
         );
       }
   });
@@ -122,9 +122,7 @@ describe('validateConfig()', () => {
         };
         expect(
           validateConfig(config, (filename: string) => (filename === 'dir' ? exists : true), mode)
-        ).toStrictEqual(
-          exists || mode === 'Dynamic' ? [] : ['`config.post.client.dir` (dir) does not exist']
-        );
+        ).toStrictEqual(exists || mode === 'Dynamic' ? [] : ['`config.post.client.dir` (dir)']);
       }
   });
 
@@ -153,9 +151,7 @@ describe('validateConfig()', () => {
             mode
           )
         ).toStrictEqual(
-          exists || mode === 'Dynamic'
-            ? []
-            : ['`config.post.client.entry` (dir/entry) does not exist']
+          exists || mode === 'Dynamic' ? [] : ['`config.post.client.entry` (dir/entry)']
         );
       }
   });
@@ -190,7 +186,7 @@ describe('validateConfig()', () => {
           json: { name: 'name' },
         };
         expect(validateConfig(config, () => exists, mode)).toStrictEqual(
-          exists || mode === 'Dynamic' ? [] : ['`config.server.entry` (entry) does not exist']
+          exists || mode === 'Dynamic' ? [] : ['`config.server.entry` (entry)']
         );
       }
   });

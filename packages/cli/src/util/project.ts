@@ -50,15 +50,26 @@ export class Project {
    */
   static async new(root: string, filename: string, mode: BuildMode): Promise<Project> {
     const config = await readConfig(root, filename);
-    if (isAppConfig(config)) {
-      const errs = validateConfig(config, existsSync, mode);
-      if (errs.length) throw Error(`${errs.join('; ')}.`);
-    }
     let packageJSON;
     try {
       packageJSON = await readPackageJSON(root);
     } catch {
       // Failure is fine, it just means we don't have a config file (yet)
+    }
+    if (isAppConfig(config)) {
+      const missingFiles = validateConfig(config, existsSync, mode);
+      // check if package.json has a build command
+      if (missingFiles.length) {
+        const containsBuildScript = Object.keys(packageJSON?.scripts ?? {}).some((script) =>
+          script.includes('build')
+        );
+        let error = "Your devvit.json references files that don't exist: ";
+        error += missingFiles.join(', ');
+        if (containsBuildScript) {
+          error += `. You may need to run your build script to fix this.`;
+        }
+        throw Error(error);
+      }
     }
     return new Project(root, filename, config, packageJSON?.devvit);
   }
@@ -221,36 +232,36 @@ export function validateConfig(
   fileExists: (filename: string) => boolean,
   mode: BuildMode
 ): string[] {
-  const errs = [];
+  const missingFiles = [];
 
   if (config.blocks && !fileExists(config.blocks.entry))
-    errs.push(`\`config.blocks.entry\` (${config.blocks.entry}) does not exist`);
+    missingFiles.push(`\`config.blocks.entry\` (${config.blocks.entry})`);
 
   if (config.media && !fileExists(config.media.dir))
-    errs.push(`\`config.media.dir\` (${config.media.dir}) does not exist`);
+    missingFiles.push(`\`config.media.dir\` (${config.media.dir})`);
 
   if (config.post) {
     if (!fileExists(config.post.client.dir) && mode === 'Static')
-      errs.push(`\`config.post.client.dir\` (${config.post.client.dir}) does not exist`);
+      missingFiles.push(`\`config.post.client.dir\` (${config.post.client.dir})`);
 
     if (config.post.client.entry.startsWith(apiPathPrefix) || mode === 'Dynamic') {
       // URL path or user is rebuilding regularly during playtest.
     } else if (!fileExists(config.post.client.entry))
-      errs.push(`\`config.post.client.entry\` (${config.post.client.entry}) does not exist`);
+      missingFiles.push(`\`config.post.client.entry\` (${config.post.client.entry})`);
     else {
       const dir = path.resolve(config.post.client.dir);
       const entry = path.resolve(config.post.client.entry);
       if (!entry.startsWith(dir))
-        errs.push(
+        missingFiles.push(
           `\`config.post.client.entry\` (${config.post.client.entry}) must exist within \`config.post.client.dir\` (${config.post.client.dir})`
         );
     }
   }
 
   if (config.server && !fileExists(config.server.entry) && mode === 'Static')
-    errs.push(`\`config.server.entry\` (${config.server.entry}) does not exist`);
+    missingFiles.push(`\`config.server.entry\` (${config.server.entry})`);
 
-  return errs;
+  return missingFiles;
 }
 
 function writeConfig(

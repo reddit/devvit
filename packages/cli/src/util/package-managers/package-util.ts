@@ -10,6 +10,7 @@ export type PackageJSON = {
   version?: string;
   dependencies?: DependencyMap;
   devDependencies?: DependencyMap;
+  scripts?: { [name: string]: string };
   devvit?: DevvitPackageConfig;
 };
 
