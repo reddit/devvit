@@ -16,7 +16,7 @@ Bundles all `SVG` files in the `/assets` folder into a new file (`src/icons.ts` 
 $ devvit create icons [output-file]
 ```
 
-#### Optional Argument
+#### Optional argument
 
 - `output-file`
 
@@ -70,13 +70,13 @@ Install an app from the Apps directory to a subreddit that you moderate. You can
 $ devvit install <subreddit> [app-name]@[version]
 ```
 
-#### Required Arguments
+#### Required arguments
 
 - `subreddit`
 
   Name of the installation subreddit. The "r/" prefix is optional.
 
-#### Optional Arguments
+#### Optional arguments
 
 - `app-name`
 
@@ -260,23 +260,26 @@ $ devvit new --here
 
 ## devvit playtest
 
-Installs your app to your test subreddit and starts a playtest session where a new version is installed whenever you save changes to your app code, and logs are continuously streamed. Press `ctrl+c` to end the playtest session. Once ended, the latest installed version will remain unless you revert to a previous version using [`devvit install`](#devvit-install). For more information, see the [playtest page](playtest.md).
+Installs your app to your test subreddit and starts a playtest session. A new version of your app is installed whenever you save changes to your app code, and logs are continuously streamed. Press `ctrl+c` to end the playtest session. Once ended, the latest installed version will remain unless you revert to a previous version using [`devvit install`](#devvit-install). For more information, see the [playtest page](playtest.md).
 
 #### Usage
 
 ```bash
-$ devvit playtest <subreddit> [--verbose]
+$ devvit playtest
 ```
-
-#### Required argument
-
-- `subreddit`
-
-  Name of a test subreddit with less than 200 subscribers that you moderate. The "r/" prefix is optional.
 
 #### Optional argument
 
-- `--verbose`
+- subreddit
+  Name of a test subreddit with less than 200 subscribers that you moderate. The "r/" prefix is optional.
+
+If no subreddit is specified, the command will use the first available option from:
+
+- DEVVIT_SUBREDDIT environment variable
+- dev.subreddit field in devvit.json
+- The playtest subreddit stored for your app
+
+If none exist, a new playtest subreddit will be automatically created.
 
 ## devvit settings list
 
@@ -372,6 +375,16 @@ Get the version of the locally installed Devvit CLI.
 
 ```bash
 $ devvit version
+```
+
+## devvit view
+
+Shows you the latest version of your app and some data about uploads. Includes an optional --json flag to get information in JSON format.
+
+#### Usage​
+
+```bash
+$ devvit view [APPSLUG[@VERSION]] [--json] [version]
 ```
 
 ## devvit whoami

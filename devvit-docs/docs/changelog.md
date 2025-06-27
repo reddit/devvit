@@ -4,6 +4,38 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.18: Playtest subreddits and CLI improvements
+
+**Release Date: Jul 1, 2025**
+
+We made app development even smoother with auto-generated [playtest subreddits](./playtest.md). When you run `devvit upload` for the first time, u/devvit-dev-bot automatically creates a playtest subreddit for your app that:
+
+- Is private by default
+- Makes you a moderator automatically
+- Has your app pre-installed and ready to test
+- Allows admins to join
+
+Just run `devvit playtest` to use the auto-generated subreddit.
+
+You can also still use your own subreddits for playtesting (with fewer than 200 subscribers) by specifying the subreddit in the CLI or adding a default subreddit in your app. Learn more about playtesting [here](./playtest.md#playtest-on-an-alternate-subreddit).
+
+**CLI improvements**
+
+Here’s what’s new:
+
+- A [`devvit view`](./devvit_cli.md#devvit-view) command that lets you see the latest version of your app (since it’s not updated in devvit.yaml anymore).
+- CLI updates are now less disruptive and don’t require a forced update for non-breaking changes. (Note that this update does require a forced update to take effect.)
+
+Use `npm install -g devvit@latest` to update your CLI .
+
+:::note
+If you’re using Devvit Web (Experimental) templates or Bolt, you should only update Devvit CLI locally by running `npm i devvit@latest`.
+:::
+
+**And a shout-out**
+
+Special thanks to Qin2007 for updating `Comment.ApprovedAt` in our typedoc. We love community contributions!
+
 ## Devvit 0.11.17: Easier fetch domain requests
 
 **Release Date: June 16, 2025**
