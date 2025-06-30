@@ -1,10 +1,11 @@
 import {
   type Effect,
   EffectType,
-  Form,
+  Form as FormProto,
   type Toast as ToastProto,
   ToastAppearance,
 } from '@devvit/protos';
+import type { Form } from '@devvit/shared/types/form.js';
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
@@ -34,6 +35,14 @@ export class UIClient implements _UIClient {
   }
 
   showForm(formKey: FormKey, data?: JSONObject | undefined): void {
+    return this.showFormInternal(formKey, data);
+  }
+
+  showFormInternal(
+    formKey: FormKey,
+    data?: JSONObject | undefined,
+    formInternalOverride?: Form | undefined
+  ): void {
     let formDefinition = Devvit.formDefinitions.get(formKey);
 
     if (!formDefinition && this.#reconciler) {
@@ -54,11 +63,12 @@ export class UIClient implements _UIClient {
     }
 
     const formData =
-      formDefinition.form instanceof Function
+      formInternalOverride ??
+      (formDefinition.form instanceof Function
         ? formDefinition.form(data ?? {})
-        : formDefinition.form;
+        : formDefinition.form);
 
-    const form: Form = {
+    const form: FormProto = {
       fields: [],
       id: formKey,
       title: formData.title,

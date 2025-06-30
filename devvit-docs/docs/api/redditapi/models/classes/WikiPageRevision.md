@@ -116,8 +116,8 @@
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`WikiPageRevision`, `"id"` \| `"reason"` \| `"hidden"` \| `"page"` \| `"date"`\> & `object`
+> **toJSON**(): `Pick`\<`WikiPageRevision`, `"id"` \| `"hidden"` \| `"reason"` \| `"page"` \| `"date"`\> & `object`
 
 #### Returns
 
-`Pick`\<`WikiPageRevision`, `"id"` \| `"reason"` \| `"hidden"` \| `"page"` \| `"date"`\> & `object`
+`Pick`\<`WikiPageRevision`, `"id"` \| `"hidden"` \| `"reason"` \| `"page"` \| `"date"`\> & `object`

@@ -666,11 +666,11 @@ id of a Removal Reason - you can leave this as an empty string if you don't have
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`Comment`, `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"body"` \| `"spam"` \| `"parentId"` \| `"createdAt"` \| `"permalink"` \| `"authorName"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"replies"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
+> **toJSON**(): `Pick`\<`Comment`, `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"createdAt"` \| `"permalink"` \| `"authorName"` \| `"body"` \| `"approved"` \| `"spam"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"parentId"` \| `"replies"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
 
 #### Returns
 
-`Pick`\<`Comment`, `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"body"` \| `"spam"` \| `"parentId"` \| `"createdAt"` \| `"permalink"` \| `"authorName"` \| `"approved"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"replies"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
+`Pick`\<`Comment`, `"subredditName"` \| `"id"` \| `"score"` \| `"subredditId"` \| `"postId"` \| `"url"` \| `"createdAt"` \| `"permalink"` \| `"authorName"` \| `"body"` \| `"approved"` \| `"spam"` \| `"stickied"` \| `"removed"` \| `"edited"` \| `"locked"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"userReportReasons"` \| `"modReportReasons"` \| `"parentId"` \| `"replies"` \| `"numReports"` \| `"collapsedBecauseCrowdControl"`\>
 
 ---
 

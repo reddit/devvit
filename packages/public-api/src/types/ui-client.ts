@@ -1,3 +1,4 @@
+import type { Form } from '@devvit/shared/types/form.js';
 import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
@@ -17,14 +18,21 @@ export type UIClient = {
 
   /** Open a form in a modal */
   showForm(formKey: FormKey, data?: JSONObject | undefined): void;
+  /** Internal use only. */
+  showFormInternal(
+    formKey: FormKey,
+    data?: JSONObject | undefined,
+    formDataOverride?: Form | undefined
+  ): void;
   /** Show a message in a toast. */
   showToast(text: string): void;
   showToast(toast: Toast): void;
+  showToast(textOrToast: string | Toast): void;
   /** Navigate to a URL */
   navigateTo(url: string): void;
-  navigateTo(subreddit: Subreddit): void;
-  navigateTo(post: Post): void;
-  navigateTo(comment: Comment): void;
-  navigateTo(user: User): void;
-  navigateTo(urlOrThing: string | Subreddit | Post | Comment | User): void;
+  navigateTo(subreddit: Pick<Subreddit, 'url'>): void;
+  navigateTo(post: Pick<Post, 'url'>): void;
+  navigateTo(comment: Pick<Comment, 'url'>): void;
+  navigateTo(user: Pick<User, 'url'>): void;
+  navigateTo(urlOrThing: string | { url: string }): void;
 };

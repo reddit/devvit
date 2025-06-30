@@ -1234,11 +1234,11 @@ const userFlairList = response.users;
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`Subreddit`, `"description"` \| `"type"` \| `"id"` \| `"name"` \| `"title"` \| `"settings"` \| `"language"` \| `"nsfw"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
+> **toJSON**(): `Pick`\<`Subreddit`, `"description"` \| `"type"` \| `"id"` \| `"name"` \| `"title"` \| `"settings"` \| `"createdAt"` \| `"language"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"` \| `"nsfw"`\>
 
 #### Returns
 
-`Pick`\<`Subreddit`, `"description"` \| `"type"` \| `"id"` \| `"name"` \| `"title"` \| `"settings"` \| `"language"` \| `"nsfw"` \| `"createdAt"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"`\>
+`Pick`\<`Subreddit`, `"description"` \| `"type"` \| `"id"` \| `"name"` \| `"title"` \| `"settings"` \| `"createdAt"` \| `"language"` \| `"numberOfSubscribers"` \| `"numberOfActiveUsers"` \| `"nsfw"`\>
 
 ---
 

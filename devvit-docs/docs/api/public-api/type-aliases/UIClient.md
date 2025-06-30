@@ -51,7 +51,7 @@ Navigate to a URL
 
 ###### subreddit
 
-`Subreddit`
+`Pick`\<`Subreddit`, `"url"`\>
 
 ##### Returns
 
@@ -65,7 +65,7 @@ Navigate to a URL
 
 ###### post
 
-`Post`
+`Pick`\<`Post`, `"url"`\>
 
 ##### Returns
 
@@ -79,7 +79,7 @@ Navigate to a URL
 
 ###### comment
 
-`Comment`
+`Pick`\<`Comment`, `"url"`\>
 
 ##### Returns
 
@@ -93,7 +93,7 @@ Navigate to a URL
 
 ###### user
 
-`User`
+`Pick`\<`User`, `"url"`\>
 
 ##### Returns
 
@@ -107,7 +107,7 @@ Navigate to a URL
 
 ###### urlOrThing
 
-`string` | `User` | `Subreddit` | `Post` | `Comment`
+`string` | \{ `url`: `string`; \}
 
 ##### Returns
 
@@ -132,6 +132,34 @@ Open a form in a modal
 ##### data?
 
 [`JSONObject`](JSONObject.md)
+
+#### Returns
+
+`void`
+
+---
+
+<a id="showforminternal"></a>
+
+### showFormInternal()
+
+> **showFormInternal**(`formKey`, `data`?, `formDataOverride`?): `void`
+
+Internal use only.
+
+#### Parameters
+
+##### formKey
+
+[`FormKey`](FormKey.md)
+
+##### data?
+
+[`JSONObject`](JSONObject.md)
+
+##### formDataOverride?
+
+[`Form`](Form.md)
 
 #### Returns
 
@@ -168,6 +196,20 @@ Show a message in a toast.
 ###### toast
 
 [`Toast`](Toast.md)
+
+##### Returns
+
+`void`
+
+#### Call Signature
+
+> **showToast**(`textOrToast`): `void`
+
+##### Parameters
+
+###### textOrToast
+
+`string` | [`Toast`](Toast.md)
 
 ##### Returns
 

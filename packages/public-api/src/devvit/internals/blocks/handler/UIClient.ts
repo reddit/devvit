@@ -1,4 +1,10 @@
-import { EffectType, Form, type Toast as ToastProto, ToastAppearance } from '@devvit/protos';
+import {
+  EffectType,
+  Form as FormProto,
+  type Toast as ToastProto,
+  ToastAppearance,
+} from '@devvit/protos';
+import type { Form } from '@devvit/shared/types/form.js';
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
@@ -39,6 +45,14 @@ export class UIClient implements _UIClient {
   }
 
   showForm(formKey: FormKey, data?: JSONObject | undefined): void {
+    return this.showFormInternal(formKey, data);
+  }
+
+  showFormInternal(
+    formKey: FormKey,
+    data?: JSONObject | undefined,
+    formInternalOverride?: Form | undefined
+  ): void {
     const formDefinition = getFormDefinition(this.#renderContext, formKey);
 
     if (!formDefinition) {
@@ -46,11 +60,12 @@ export class UIClient implements _UIClient {
     }
 
     const formData =
-      formDefinition.form instanceof Function
+      formInternalOverride ??
+      (formDefinition.form instanceof Function
         ? formDefinition.form(data ?? {})
-        : formDefinition.form;
+        : formDefinition.form);
 
-    const form: Form = {
+    const form: FormProto = {
       fields: [],
       id: formKey,
       title: formData.title,
@@ -96,11 +111,11 @@ export class UIClient implements _UIClient {
   }
 
   navigateTo(url: string): void;
-  navigateTo(subreddit: Subreddit): void;
-  navigateTo(post: Post): void;
-  navigateTo(comment: Comment): void;
-  navigateTo(user: User): void;
-  navigateTo(thingOrUrl: string | Subreddit | Post | Comment | User): void {
+  navigateTo(subreddit: Pick<Subreddit, 'url'>): void;
+  navigateTo(post: Pick<Post, 'url'>): void;
+  navigateTo(comment: Pick<Comment, 'url'>): void;
+  navigateTo(user: Pick<User, 'url'>): void;
+  navigateTo(thingOrUrl: string | { url: string }): void {
     let url: string;
 
     if (typeof thingOrUrl === 'string') {
