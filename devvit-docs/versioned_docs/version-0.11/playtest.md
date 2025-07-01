@@ -1,21 +1,40 @@
 # Playtest
 
-Playtest lets you test your app while it's still in development. Playtest installs your app to a test subreddit and uploads a new version whenever you save changes to your app code. You can see your app changes and logs in real time using real data.
+You can use playtest to see how your app works on Reddit.
 
-One caveat: your test subreddit cannot have more than 50 subscribers. Once installed, your playtest app will be visible to other users on the subreddit.
+Code changes you save during the playtest will automatically update your app on the playtest subreddit. This lets you see your app updates in real time and creates logs using real data.
 
 ## Start a playtest
 
-1. Run `devvit upload` to upload your app to the Apps directory.
-2. Open a terminal and enter this command from the root of your project.
+1. Run `devvit upload` to add your app to the Apps directory. This automatically creates a playtest subreddit for you.
+2. Run `devvit playtest` to start your app on your default subreddit.
+3. The CLI will return the playtest subreddit link for your app.
 
-```bash
-$ devvit playtest <test subreddit name>
-```
+## Playtest on an alternate subreddit
 
-Once you start a playtest session, a new pre-release version of your app is automatically created and installed on your test subreddit. The pre-release version has a fourth decimal place, so if your current app is 0.0.1, the first pre-release version will be 0.0.1.1.
+If you want to use an alternate subreddit (must have fewer than 200 subscribers) for your playtest, you can do this a couple of different ways:
 
-The pre-release version is updated and uploaded to your test subreddit every time you save your app code. You'll be prompted to visit your subreddit URL like `https://www.reddit.com/r/<test subreddit name>/?playtest=<app name>`. If you have an interactive post and your URL includes a `playtest=<app name>` or `playtest` query parameter, it will automatically refresh when the new version has been installed. If not, you’ll need to refresh your subreddit to see the updated app. This may take a couple of seconds, so be patient.
+- Run `devvit playtest [subreddit_name]`, or
+- Set a default subreddit in one of these fields:
+  - DEVVIT_SUBREDDIT environment variable
+  - dev.subreddit field in devvit.json
+
+If you set a default subreddit in your app, the `devvit playtest` command will use the default instead of the auto-generated subreddit.
+
+## How do I find my playtest subreddit name?
+
+Run `devvit playtest`. The CLI will output a link to your playtest subreddit
+
+## About playtest subreddits
+
+All playtest subreddits must have fewer than 200 subscribers.
+
+The auto-generated playtest subreddit is created for you by u/devvit-dev-bot. This subreddit:
+
+- Is private
+- Makes you a moderator
+- Has your app pre-installed
+- Allows reddit admins to join your subreddit
 
 :::note
 If you need help, run `devvit playtest —-help` for additional information.

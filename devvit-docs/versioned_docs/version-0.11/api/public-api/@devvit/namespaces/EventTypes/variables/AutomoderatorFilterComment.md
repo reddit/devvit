@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.17-dev**](../../../../README.md)
+[**@devvit/public-api v0.11.18-dev**](../../../../README.md)
 
 ---
 
@@ -28,7 +28,7 @@
 
 ###### comment?
 
-\{ `author`: `string`; `body`: `string`; `collapsedBecauseCrowdControl`: `boolean`; `createdAt`: `number`; `deleted`: `boolean`; `downvotes`: `number`; `elementTypes`: `string`[]; `gilded`: `boolean`; `hasMedia`: `boolean`; `id`: `string`; `languageCode`: `string`; `lastModifiedAt`: `number`; `numReports`: `number`; `parentId`: `string`; `permalink`: `string`; `postId`: `string`; `score`: `number`; `spam`: `boolean`; `subredditId`: `string`; `upvotes`: `number`; \}
+\{ `author`: `string`; `body`: `string`; `collapsedBecauseCrowdControl`: `boolean`; `createdAt`: `number`; `deleted`: `boolean`; `downvotes`: `number`; `elementTypes`: `string`[]; `gilded`: `boolean`; `hasMedia`: `boolean`; `id`: `string`; `languageCode`: `string`; `lastModifiedAt`: `number`; `mediaUrls`: `string`[]; `numReports`: `number`; `parentId`: `string`; `permalink`: `string`; `postId`: `string`; `score`: `number`; `spam`: `boolean`; `subredditId`: `string`; `upvotes`: `number`; \}
 
 ###### comment.author?
 
@@ -77,6 +77,10 @@
 ###### comment.lastModifiedAt?
 
 `number`
+
+###### comment.mediaUrls?
+
+`string`[]
 
 ###### comment.numReports?
 
@@ -230,7 +234,7 @@
 
 ###### comment?
 
-\{ `author`: `string`; `body`: `string`; `collapsedBecauseCrowdControl`: `boolean`; `createdAt`: `number`; `deleted`: `boolean`; `downvotes`: `number`; `elementTypes`: `string`[]; `gilded`: `boolean`; `hasMedia`: `boolean`; `id`: `string`; `languageCode`: `string`; `lastModifiedAt`: `number`; `numReports`: `number`; `parentId`: `string`; `permalink`: `string`; `postId`: `string`; `score`: `number`; `spam`: `boolean`; `subredditId`: `string`; `upvotes`: `number`; \}
+\{ `author`: `string`; `body`: `string`; `collapsedBecauseCrowdControl`: `boolean`; `createdAt`: `number`; `deleted`: `boolean`; `downvotes`: `number`; `elementTypes`: `string`[]; `gilded`: `boolean`; `hasMedia`: `boolean`; `id`: `string`; `languageCode`: `string`; `lastModifiedAt`: `number`; `mediaUrls`: `string`[]; `numReports`: `number`; `parentId`: `string`; `permalink`: `string`; `postId`: `string`; `score`: `number`; `spam`: `boolean`; `subredditId`: `string`; `upvotes`: `number`; \}
 
 ###### comment.author?
 
@@ -279,6 +283,10 @@
 ###### comment.lastModifiedAt?
 
 `number`
+
+###### comment.mediaUrls?
+
+`string`[]
 
 ###### comment.numReports?
 

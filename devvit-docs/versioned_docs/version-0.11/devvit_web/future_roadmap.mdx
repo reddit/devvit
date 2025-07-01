@@ -93,9 +93,7 @@ The `brand` section defines your app's visual assets for display on Reddit. The 
 
 You can customize the first screen users see for each post. Clicking the splash screen opens your app in "focus mode" (full view).
 
-:::note
-Apps using inline web views are currently not supported due to potential native gesture conflicts and performance issues in feeds. We will provide guidelines for how an app can enable this in the future.
-:::
+Note: Apps using inline web views are currently not supported due to potential native gesture conflicts and performance issues in feeds. We will provide guidelines for how an app can enable this in the future.
 
 ```ts
 // server.ts
@@ -116,7 +114,7 @@ router.get("/api/submit_post", async (_req, res) => {
 
 **Jobs** (formerly known as "Scheduler") let you run background tasks on a schedule.
 
-```ts
+```json
 // devvit.json
 "jobs": {
   "cleanup-job": {
@@ -139,7 +137,7 @@ router.post("/internal/jobs/cleanup-job", async (req, res) => {
 
 Add custom actions to Reddit's post or comment menus.
 
-```ts
+```javascript
 // devvit.json
 "menuItems": [
   {
@@ -238,7 +236,7 @@ showToast('Hello!');
 
 Define settings for your app (global) and for each installation (per subreddit).
 
-```javascript
+```json
 // devvit.json
 "settings": {
   "app": {
@@ -258,7 +256,7 @@ Define settings for your app (global) and for each installation (per subreddit).
 
 Triggers let your app respond automatically to events like installation or post submission.
 
-```ts
+```json
 // devvit.json
 "triggers": {
   "onInstall": "/internal/post_create",
@@ -278,14 +276,14 @@ router.get("/internal/do_something", async (req, res) => {
 
 Use "blocks" to define your app's main UI entry point.
 
-```ts
+```json
 // devvit.json
 "blocks": {
   "entry": "src/main.tsx"
 },
 
 
-// src/devvit/main.tsx
+// src/main.ts
 
 Devvit.addMenuItem...
 ```
@@ -316,7 +314,7 @@ reddit.submitPost({
 })
 ```
 
-```javascript
+```json
 // devvit.json
 {
   "posts": [

@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.17-dev**](../../README.md)
+[**@devvit/public-api v0.11.18-dev**](../../README.md)
 
 ---
 
@@ -27,6 +27,8 @@
 #### Get Signature
 
 > **get** **approvedAtUtc**(): `number`
+
+A number representing the UTC timestamp in seconds, or 0 if its not approved.
 
 ##### Returns
 

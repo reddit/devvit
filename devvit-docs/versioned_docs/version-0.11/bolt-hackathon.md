@@ -52,8 +52,7 @@ We’d encourage you to test on mobile, but it is not a requirement. The Reddit 
 **Q: What if I get a rpc error within the playtest subreddit post?**
 
 Try with the latest [template](https://github.com/reddit/devvit-bolt-starter-experimental). The `devvit` package should be on `0.11.17`, but the @devvit packages (`@devvit/public-api`, `@devvit/client`, `@devvit/server`, etc) should be on `0.11.16`.
-
-**Example:**
+Example
 
 ```js
 /// package.json
@@ -74,4 +73,4 @@ We are currently fixing an issue where Safari and iOS are getting network errors
 
 **Q: My new username or development subreddit was banned.**
 
-Please reach out to our team at [devvit-support@reddit.com](mailto:devvit-support@reddit.com) or via our Discord server [here](https://discord.com/invite/R7yu2wh9Qz).
+Please reach out to our team at [devvit-support@reddit.com](mailto:devvit-support@reddit.com) or via our Discord server [here](https://discord.gg/Cd43ExtEFS).

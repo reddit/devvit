@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.17-dev**](../../../../README.md)
+[**@devvit/public-api v0.11.18-dev**](../../../../README.md)
 
 ---
 
@@ -24,7 +24,7 @@
 
 ###### post?
 
-\{ `authorFlair`: \{ `backgroundColor`: `string`; `cssClass`: `string`; `enabled`: `boolean`; `subredditId`: `string`; `templateId`: `string`; `text`: `string`; `textColor`: `string`; `userId`: `string`; \}; `authorId`: `string`; `createdAt`: `number`; `crosspostParentId`: `string`; `crowdControlLevel`: `CrowdControlLevel`; `deleted`: `boolean`; `distinguished`: `DistinguishType`; `downvotes`: `number`; `galleryImages`: `string`[]; `gildings`: `number`; `id`: `string`; `ignoreReports`: `boolean`; `isApproved`: `boolean`; `isArchived`: `boolean`; `isGallery`: `boolean`; `isImage`: `boolean`; `isLocked`: `boolean`; `isMeta`: `boolean`; `isMultiMedia`: `boolean`; `isPoll`: `boolean`; `isPromoted`: `boolean`; `isSelf`: `boolean`; `isSpoiler`: `boolean`; `isSticky`: `boolean`; `isVideo`: `boolean`; `languageCode`: `string`; `linkFlair`: \{ `backgroundColor`: `string`; `cssClass`: `string`; `templateId`: `string`; `text`: `string`; `textColor`: `string`; \}; `media`: \{ `oembed`: \{ `authorName`: `string`; `authorUrl`: `string`; `description`: `string`; `height`: `number`; `html`: `string`; `providerName`: `string`; `providerUrl`: `string`; `thumbnailHeight`: `number`; `thumbnailUrl`: `string`; `thumbnailWidth`: `number`; `title`: `string`; `type`: `string`; `version`: `string`; `width`: `number`; \}; `redditVideo`: \{ `bitrateKbps`: `number`; `dashUrl`: `string`; `duration`: `number`; `fallbackUrl`: `string`; `height`: `number`; `hlsUrl`: `string`; `isGif`: `boolean`; `scrubberMediaUrl`: `string`; `transcodingStatus`: `string`; `width`: `number`; \}; `type`: `string`; \}; `nsfw`: `boolean`; `numComments`: `number`; `numReports`: `number`; `permalink`: `string`; `score`: `number`; `selftext`: `string`; `spam`: `boolean`; `subredditId`: `string`; `thumbnail`: `string`; `title`: `string`; `type`: `string`; `unlisted`: `boolean`; `updatedAt`: `number`; `upvotes`: `number`; `url`: `string`; \}
+\{ `authorFlair`: \{ `backgroundColor`: `string`; `cssClass`: `string`; `enabled`: `boolean`; `subredditId`: `string`; `templateId`: `string`; `text`: `string`; `textColor`: `string`; `userId`: `string`; \}; `authorId`: `string`; `createdAt`: `number`; `crosspostParentId`: `string`; `crowdControlLevel`: `CrowdControlLevel`; `deleted`: `boolean`; `distinguished`: `DistinguishType`; `downvotes`: `number`; `galleryImages`: `string`[]; `gildings`: `number`; `id`: `string`; `ignoreReports`: `boolean`; `isApproved`: `boolean`; `isArchived`: `boolean`; `isClubContent`: `boolean`; `isGallery`: `boolean`; `isImage`: `boolean`; `isLocked`: `boolean`; `isMeta`: `boolean`; `isMultiMedia`: `boolean`; `isPoll`: `boolean`; `isPromoted`: `boolean`; `isSelf`: `boolean`; `isSpoiler`: `boolean`; `isSticky`: `boolean`; `isVideo`: `boolean`; `languageCode`: `string`; `linkFlair`: \{ `backgroundColor`: `string`; `cssClass`: `string`; `templateId`: `string`; `text`: `string`; `textColor`: `string`; \}; `media`: \{ `oembed`: \{ `authorName`: `string`; `authorUrl`: `string`; `description`: `string`; `height`: `number`; `html`: `string`; `providerName`: `string`; `providerUrl`: `string`; `thumbnailHeight`: `number`; `thumbnailUrl`: `string`; `thumbnailWidth`: `number`; `title`: `string`; `type`: `string`; `version`: `string`; `width`: `number`; \}; `redditVideo`: \{ `bitrateKbps`: `number`; `dashUrl`: `string`; `duration`: `number`; `fallbackUrl`: `string`; `height`: `number`; `hlsUrl`: `string`; `isGif`: `boolean`; `scrubberMediaUrl`: `string`; `transcodingStatus`: `string`; `width`: `number`; \}; `type`: `string`; \}; `mediaUrls`: `string`[]; `nsfw`: `boolean`; `numComments`: `number`; `numReports`: `number`; `permalink`: `string`; `score`: `number`; `selftext`: `string`; `spam`: `boolean`; `subredditId`: `string`; `thumbnail`: `string`; `title`: `string`; `type`: `string`; `unlisted`: `boolean`; `updatedAt`: `number`; `upvotes`: `number`; `url`: `string`; \}
 
 ###### post.authorFlair?
 
@@ -111,6 +111,10 @@
 `boolean`
 
 ###### post.isArchived?
+
+`boolean`
+
+###### post.isClubContent?
 
 `boolean`
 
@@ -299,6 +303,10 @@ Indicates if the post contains a single image rather than a gallery of multiple 
 ###### post.media.type?
 
 `string`
+
+###### post.mediaUrls?
+
+`string`[]
 
 ###### post.nsfw?
 
@@ -474,7 +482,7 @@ rename to text?
 
 ###### post?
 
-\{ `authorFlair`: \{ `backgroundColor`: `string`; `cssClass`: `string`; `enabled`: `boolean`; `subredditId`: `string`; `templateId`: `string`; `text`: `string`; `textColor`: `string`; `userId`: `string`; \}; `authorId`: `string`; `createdAt`: `number`; `crosspostParentId`: `string`; `crowdControlLevel`: `CrowdControlLevel`; `deleted`: `boolean`; `distinguished`: `DistinguishType`; `downvotes`: `number`; `galleryImages`: `string`[]; `gildings`: `number`; `id`: `string`; `ignoreReports`: `boolean`; `isApproved`: `boolean`; `isArchived`: `boolean`; `isGallery`: `boolean`; `isImage`: `boolean`; `isLocked`: `boolean`; `isMeta`: `boolean`; `isMultiMedia`: `boolean`; `isPoll`: `boolean`; `isPromoted`: `boolean`; `isSelf`: `boolean`; `isSpoiler`: `boolean`; `isSticky`: `boolean`; `isVideo`: `boolean`; `languageCode`: `string`; `linkFlair`: \{ `backgroundColor`: `string`; `cssClass`: `string`; `templateId`: `string`; `text`: `string`; `textColor`: `string`; \}; `media`: \{ `oembed`: \{ `authorName`: `string`; `authorUrl`: `string`; `description`: `string`; `height`: `number`; `html`: `string`; `providerName`: `string`; `providerUrl`: `string`; `thumbnailHeight`: `number`; `thumbnailUrl`: `string`; `thumbnailWidth`: `number`; `title`: `string`; `type`: `string`; `version`: `string`; `width`: `number`; \}; `redditVideo`: \{ `bitrateKbps`: `number`; `dashUrl`: `string`; `duration`: `number`; `fallbackUrl`: `string`; `height`: `number`; `hlsUrl`: `string`; `isGif`: `boolean`; `scrubberMediaUrl`: `string`; `transcodingStatus`: `string`; `width`: `number`; \}; `type`: `string`; \}; `nsfw`: `boolean`; `numComments`: `number`; `numReports`: `number`; `permalink`: `string`; `score`: `number`; `selftext`: `string`; `spam`: `boolean`; `subredditId`: `string`; `thumbnail`: `string`; `title`: `string`; `type`: `string`; `unlisted`: `boolean`; `updatedAt`: `number`; `upvotes`: `number`; `url`: `string`; \}
+\{ `authorFlair`: \{ `backgroundColor`: `string`; `cssClass`: `string`; `enabled`: `boolean`; `subredditId`: `string`; `templateId`: `string`; `text`: `string`; `textColor`: `string`; `userId`: `string`; \}; `authorId`: `string`; `createdAt`: `number`; `crosspostParentId`: `string`; `crowdControlLevel`: `CrowdControlLevel`; `deleted`: `boolean`; `distinguished`: `DistinguishType`; `downvotes`: `number`; `galleryImages`: `string`[]; `gildings`: `number`; `id`: `string`; `ignoreReports`: `boolean`; `isApproved`: `boolean`; `isArchived`: `boolean`; `isClubContent`: `boolean`; `isGallery`: `boolean`; `isImage`: `boolean`; `isLocked`: `boolean`; `isMeta`: `boolean`; `isMultiMedia`: `boolean`; `isPoll`: `boolean`; `isPromoted`: `boolean`; `isSelf`: `boolean`; `isSpoiler`: `boolean`; `isSticky`: `boolean`; `isVideo`: `boolean`; `languageCode`: `string`; `linkFlair`: \{ `backgroundColor`: `string`; `cssClass`: `string`; `templateId`: `string`; `text`: `string`; `textColor`: `string`; \}; `media`: \{ `oembed`: \{ `authorName`: `string`; `authorUrl`: `string`; `description`: `string`; `height`: `number`; `html`: `string`; `providerName`: `string`; `providerUrl`: `string`; `thumbnailHeight`: `number`; `thumbnailUrl`: `string`; `thumbnailWidth`: `number`; `title`: `string`; `type`: `string`; `version`: `string`; `width`: `number`; \}; `redditVideo`: \{ `bitrateKbps`: `number`; `dashUrl`: `string`; `duration`: `number`; `fallbackUrl`: `string`; `height`: `number`; `hlsUrl`: `string`; `isGif`: `boolean`; `scrubberMediaUrl`: `string`; `transcodingStatus`: `string`; `width`: `number`; \}; `type`: `string`; \}; `mediaUrls`: `string`[]; `nsfw`: `boolean`; `numComments`: `number`; `numReports`: `number`; `permalink`: `string`; `score`: `number`; `selftext`: `string`; `spam`: `boolean`; `subredditId`: `string`; `thumbnail`: `string`; `title`: `string`; `type`: `string`; `unlisted`: `boolean`; `updatedAt`: `number`; `upvotes`: `number`; `url`: `string`; \}
 
 ###### post.authorFlair?
 
@@ -561,6 +569,10 @@ rename to text?
 `boolean`
 
 ###### post.isArchived?
+
+`boolean`
+
+###### post.isClubContent?
 
 `boolean`
 
@@ -749,6 +761,10 @@ Indicates if the post contains a single image rather than a gallery of multiple 
 ###### post.media.type?
 
 `string`
+
+###### post.mediaUrls?
+
+`string`[]
 
 ###### post.nsfw?
 
