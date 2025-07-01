@@ -34,7 +34,7 @@ If you’re using Devvit Web (Experimental) templates or Bolt, you should only u
 
 **And a shout-out**
 
-Special thanks to Qin2007 for updating `Comment.ApprovedAt` in our typedoc. We love community contributions!
+Special thanks to u/antboiy for updating `Comment.ApprovedAt` in our typedoc. We love community contributions!
 
 ## Devvit 0.11.17: Easier fetch domain requests
 
