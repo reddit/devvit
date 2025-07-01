@@ -23,8 +23,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc && yarn build:copy",
-    "build:copy": "rm -rf ./dist/templates; cp -a ./src/templates ./dist/templates",
+    "build": "rm -rf dist && tsc",
     "clean": "rm -rf .turbo coverage dist docs.json oclif.manifest.json",
     "clobber": "yarn clean && rm -rf node_modules",
     "dev": "tsc --watch",
