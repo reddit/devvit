@@ -17,12 +17,10 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "yarn && yarn build:semantic-colors && tsc && cp -af devvit.tsconfig.json dist/ && yarn build:types && yarn build:min && yarn build:unmin",
+    "build": "yarn && yarn build:semantic-colors && tsc && cp -af devvit.tsconfig.json dist/ && yarn build:min",
     "build:min": "esbuild --bundle --sourcemap=linked --target=es2020 --format=esm  --metafile=dist/meta.min.json --outfile=dist/public-api.min.js --external:@devvit/protos --minify src/index.ts",
     "build:semantic-colors": "node scripts/make-semantic-colors.js",
-    "build:types": "api-extractor run && sed -ne '/declare global {/,$ p' src/devvit/Devvit.ts >> dist/public-api.d.ts",
-    "build:unmin": "esbuild --bundle --sourcemap=inline --target=es2020 --format=iife --metafile=dist/meta.json     --outfile=dist/public-api.iife.js --global-name=devvitPublicAPI                    src/index.ts",
-    "clean": "rm -rf .turbo api-extractor coverage dist src/devvit/internals/semanticColors.ts src/types/icons.ts || :",
+    "clean": "rm -rf .turbo coverage dist src/devvit/internals/semanticColors.ts src/types/icons.ts || :",
     "clobber": "yarn clean && rm -rf node_modules",
     "dev": "tsc -w",
     "dev:build": "chokidar ./src ../shared-types/dist --command 'yarn build' --ignore './src/types/icons.ts' --ignore './src/devvit/internals/semanticColors.ts'",
@@ -48,7 +46,6 @@
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
     "@devvit/tsconfig": "0.11.17",
-    "@microsoft/api-extractor": "7.41.0",
     "@reddit/faceplate-ui": "18.0.1",
     "@types/clone-deep": "4.0.1",
     "@vitest/coverage-c8": "0.32.0",

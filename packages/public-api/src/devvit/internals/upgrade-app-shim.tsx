@@ -19,11 +19,6 @@ export type ParsedDevvitUserAgent =
       company: 'Reddit';
       platform: 'Shreddit';
       rawVersion: string;
-    }
-  | {
-      company: 'Reddit';
-      platform: 'Play';
-      rawVersion: string;
     };
 
 const getVersionNumberFromRawVersion = (rawVersion: string): number | undefined => {
@@ -84,14 +79,6 @@ export const parseDevvitUserAgent = (input: string): ParsedDevvitUserAgent | und
     };
   }
 
-  if (platform === 'Play') {
-    return {
-      company: 'Reddit',
-      platform: 'Play',
-      rawVersion,
-    };
-  }
-
   console.warn(`Received unknown platform:`, platform);
 };
 
@@ -126,7 +113,6 @@ const getUpgradeLinkForPlatform = (
       return 'https://play.google.com/store/apps/details?id=com.reddit.frontpage';
     case 'iOS':
       return 'https://apps.apple.com/us/app/reddit/id1064216828';
-    case 'Play':
     case 'Shreddit':
       break;
     default:

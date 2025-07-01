@@ -1080,9 +1080,6 @@ export type BlockElement = {
   children: JSX.Element[];
 };
 
-// Workaround api-extractor https://github.com/microsoft/rushstack/issues/1709
-// type augmentations bug. Everything starting at declare is concatenated onto
-// public-api.d.ts.
 declare global {
   namespace JSX {
     interface IntrinsicElements extends Devvit.Blocks.IntrinsicElements {}

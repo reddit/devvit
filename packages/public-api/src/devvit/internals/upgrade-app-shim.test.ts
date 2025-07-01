@@ -32,15 +32,6 @@ describe('parseDevvitUserAgent', () => {
         rawVersion: 'not-provided',
       },
     ],
-    // Play
-    [
-      'Reddit;Play;not-provided',
-      {
-        company: 'Reddit',
-        platform: 'Play',
-        rawVersion: 'not-provided',
-      },
-    ],
   ])('%s parses successfully', (userAgent, parsed) => {
     expect(parseDevvitUserAgent(userAgent)).toEqual(parsed);
   });
@@ -49,7 +40,6 @@ describe('parseDevvitUserAgent', () => {
     [''],
     ['Reddit;'],
     ['Reddit;foo;'],
-    ['play'],
     ['Reddit;Android;foo'],
     ['Reddit;iOS;foo'],
     ['Reddit;iOS;foo'],
@@ -72,8 +62,6 @@ describe('shouldShowUpgradeAppScreen', () => {
     ['Reddit;iOS;2024.31.0.614972', true],
     // Shreddit
     ['Reddit;Shreddit;not-provided', false],
-    // Play
-    ['Reddit;Play;not-provided', false],
   ])('%s should return %s', (userAgent, shouldShow) => {
     expect(shouldShowUpgradeAppScreen(parseDevvitUserAgent(userAgent))).toEqual(shouldShow);
   });
