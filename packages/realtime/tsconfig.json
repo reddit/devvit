@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "./src",
+    "lib": ["ES2023", "WebWorker", "DOM"]
+  },
+  "exclude": ["node_modules"],
+  "extends": "@devvit/tsconfig/base.json",
+  "include": ["src"]
+}

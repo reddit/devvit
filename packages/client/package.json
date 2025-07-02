@@ -1,0 +1,60 @@
+{
+  "name": "@devvit/client",
+  "version": "0.11.17",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./*": "./dist/*"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:min": "esbuild --bundle --format=esm --minify --sourcemap=linked --target=es2020",
+    "clean": "rm -rf .turbo coverage dist",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "dev": "tsc -w",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepublishOnly": "publish-package-json",
+    "test": "yarn test:unit && yarn test:types && yarn lint && yarn test:size",
+    "test:size": "yarn build:min src/index.ts --metafile=dist/client-meta.min.json --outfile=dist/client.min.js && filesize",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@devvit/protos": "0.11.17",
+    "@devvit/reddit": "0.11.17",
+    "@devvit/shared": "0.11.17",
+    "@devvit/shared-types": "0.11.17",
+    "@devvit/web-view-scripts": "0.11.17"
+  },
+  "devDependencies": {
+    "@ampproject/filesize": "4.3.0",
+    "@devvit/tsconfig": "0.11.17",
+    "esbuild": "0.23.0",
+    "eslint": "9.11.1",
+    "typescript": "5.8.3",
+    "vitest": "1.6.1"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  },
+  "filesize": {
+    "dist/client.min.js": {
+      "gzip": "18 KB",
+      "none": "75.5 KB"
+    }
+  },
+  "source": "./src/index.ts"
+}

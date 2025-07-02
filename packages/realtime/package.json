@@ -1,0 +1,54 @@
+{
+  "name": "@devvit/realtime",
+  "version": "0.11.17",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "browser": "./dist/index-browser.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json",
+    "./*": "./dist/*"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf .turbo coverage dist",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "dev": "tsc -w",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepublishOnly": "publish-package-json",
+    "test": "yarn test:types && yarn lint",
+    "test:types": "tsc --noEmit"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@devvit/protos": "0.11.17",
+    "@devvit/shared": "0.11.17"
+  },
+  "peerDependencies": {
+    "@devvit/client": "*",
+    "@devvit/server": "*"
+  },
+  "devDependencies": {
+    "@devvit/client": "0.11.17",
+    "@devvit/server": "0.11.17",
+    "@devvit/tsconfig": "0.11.17",
+    "eslint": "9.11.1",
+    "typescript": "5.8.3",
+    "vitest": "1.6.1"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  },
+  "source": "./src/index.ts"
+}

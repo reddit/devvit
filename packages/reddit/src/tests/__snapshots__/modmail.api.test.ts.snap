@@ -1,0 +1,1892 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ModMail API > approveConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > archiveConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+}
+`;
+
+exports[`ModMail API > createConversation() > with "to" defined 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > createConversation() > with "to" null 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > createConversation() > with "to" undefined 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > disapproveConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > getConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+      "msg_2": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_2",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+      "modaction_2": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_2",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "participantSubreddit": undefined,
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > getConversations() > with subreddits defined 1`] = `
+{
+  "conversationIds": [
+    "fake_conversation_id",
+  ],
+  "conversations": {
+    "fake_conversation_id": {
+      "authors": [
+        {
+          "id": 654322,
+          "isAdmin": true,
+          "isApproved": true,
+          "isDeleted": true,
+          "isHidden": false,
+          "isMod": false,
+          "isOp": false,
+          "isParticipant": false,
+          "name": "John",
+        },
+      ],
+      "conversationType": "sr_user",
+      "id": "fake_conversation_id",
+      "isAuto": true,
+      "isHighlighted": true,
+      "isInternal": false,
+      "isRepliable": true,
+      "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+      "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+      "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+      "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+      "legacyFirstMessageId": "legacyID",
+      "messages": {
+        "msg_1": {
+          "author": {
+            "id": 654322,
+            "name": "Bob",
+          },
+          "body": "Lorem ipsum sit amet",
+          "bodyMarkdown": "<div>",
+          "date": "2006-04-12T10:23:35.187153+00:00",
+          "id": "msg_1",
+          "isInternal": false,
+          "participatingAs": "UNKNOWN",
+        },
+      },
+      "modActions": {},
+      "numMessages": 42,
+      "objIds": [
+        {
+          "id": "msg_1",
+          "key": "messages",
+        },
+        {
+          "id": "msg_2",
+          "key": "messages",
+        },
+        {
+          "id": "modaction_1",
+          "key": "modActions",
+        },
+        {
+          "id": "modaction_2",
+          "key": "modActions",
+        },
+      ],
+      "owner": {
+        "displayName": "AskReddit",
+        "id": "sub_42",
+        "type": "subreddit",
+      },
+      "participant": {
+        "id": 23456765,
+        "isAdmin": false,
+        "isApproved": false,
+        "isDeleted": false,
+        "isHidden": true,
+        "isMod": true,
+        "isOp": true,
+        "isParticipant": true,
+        "name": "Jane",
+      },
+      "state": "Archived",
+      "subject": "Lorem ipsum",
+    },
+  },
+  "viewerId": "viewer_fakeId",
+}
+`;
+
+exports[`ModMail API > getConversations() > with subreddits undefined 1`] = `
+{
+  "conversationIds": [
+    "fake_conversation_id",
+  ],
+  "conversations": {
+    "fake_conversation_id": {
+      "authors": [
+        {
+          "id": 654322,
+          "isAdmin": true,
+          "isApproved": true,
+          "isDeleted": true,
+          "isHidden": false,
+          "isMod": false,
+          "isOp": false,
+          "isParticipant": false,
+          "name": "John",
+        },
+      ],
+      "conversationType": "sr_user",
+      "id": "fake_conversation_id",
+      "isAuto": true,
+      "isHighlighted": true,
+      "isInternal": false,
+      "isRepliable": true,
+      "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+      "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+      "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+      "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+      "legacyFirstMessageId": "legacyID",
+      "messages": {
+        "msg_1": {
+          "author": {
+            "id": 654322,
+            "name": "Bob",
+          },
+          "body": "Lorem ipsum sit amet",
+          "bodyMarkdown": "<div>",
+          "date": "2006-04-12T10:23:35.187153+00:00",
+          "id": "msg_1",
+          "isInternal": false,
+          "participatingAs": "UNKNOWN",
+        },
+      },
+      "modActions": {},
+      "numMessages": 42,
+      "objIds": [
+        {
+          "id": "msg_1",
+          "key": "messages",
+        },
+        {
+          "id": "msg_2",
+          "key": "messages",
+        },
+        {
+          "id": "modaction_1",
+          "key": "modActions",
+        },
+        {
+          "id": "modaction_2",
+          "key": "modActions",
+        },
+      ],
+      "owner": {
+        "displayName": "AskReddit",
+        "id": "sub_42",
+        "type": "subreddit",
+      },
+      "participant": {
+        "id": 23456765,
+        "isAdmin": false,
+        "isApproved": false,
+        "isDeleted": false,
+        "isHidden": true,
+        "isMod": true,
+        "isOp": true,
+        "isParticipant": true,
+        "name": "Jane",
+      },
+      "state": "Archived",
+      "subject": "Lorem ipsum",
+    },
+  },
+  "viewerId": "viewer_fakeId",
+}
+`;
+
+exports[`ModMail API > highlightConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+}
+`;
+
+exports[`ModMail API > muteConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > reply() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {},
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > tempBanConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > unarchiveConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+}
+`;
+
+exports[`ModMail API > unbanConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
+
+exports[`ModMail API > unhighlightConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+}
+`;
+
+exports[`ModMail API > unmuteConversation() 1`] = `
+{
+  "conversation": {
+    "authors": [
+      {
+        "id": 654322,
+        "isAdmin": true,
+        "isApproved": true,
+        "isDeleted": true,
+        "isHidden": false,
+        "isMod": false,
+        "isOp": false,
+        "isParticipant": false,
+        "name": "John",
+      },
+    ],
+    "conversationType": "sr_user",
+    "id": "fake_conversation_id",
+    "isAuto": true,
+    "isHighlighted": true,
+    "isInternal": false,
+    "isRepliable": true,
+    "lastModUpdate": "2006-04-26T10:23:35.187153+00:00",
+    "lastUnread": "2006-04-28T10:23:35.187153+00:00",
+    "lastUpdated": "2006-04-27T10:23:35.187153+00:00",
+    "lastUserUpdate": "2006-04-25T10:23:35.187153+00:00",
+    "legacyFirstMessageId": "legacyID",
+    "messages": {
+      "msg_1": {
+        "author": {
+          "id": 654322,
+          "name": "Bob",
+        },
+        "body": "Lorem ipsum sit amet",
+        "bodyMarkdown": "<div>",
+        "date": "2006-04-12T10:23:35.187153+00:00",
+        "id": "msg_1",
+        "isInternal": false,
+        "participatingAs": "UNKNOWN",
+      },
+    },
+    "modActions": {
+      "modaction_1": {
+        "actionType": "Unarchived",
+        "actionTypeId": 3,
+        "author": {
+          "id": 2323423987,
+          "isAdmin": true,
+          "isDeleted": false,
+          "isHidden": false,
+          "isMod": true,
+          "name": "fake_mod",
+        },
+        "date": "2006-04-01T10:23:35.187153+00:00",
+        "id": "modaction_1",
+      },
+    },
+    "numMessages": 42,
+    "objIds": [
+      {
+        "id": "msg_1",
+        "key": "messages",
+      },
+      {
+        "id": "msg_2",
+        "key": "messages",
+      },
+      {
+        "id": "modaction_1",
+        "key": "modActions",
+      },
+      {
+        "id": "modaction_2",
+        "key": "modActions",
+      },
+    ],
+    "owner": {
+      "displayName": "AskReddit",
+      "id": "sub_42",
+      "type": "subreddit",
+    },
+    "participant": {
+      "id": 23456765,
+      "isAdmin": false,
+      "isApproved": false,
+      "isDeleted": false,
+      "isHidden": true,
+      "isMod": true,
+      "isOp": true,
+      "isParticipant": true,
+      "name": "Jane",
+    },
+    "state": "Archived",
+    "subject": "Lorem ipsum",
+  },
+  "user": {
+    "approveStatus": {
+      "isApproved": true,
+    },
+    "banStatus": {
+      "isBanned": false,
+      "isPermanent": false,
+    },
+    "created": "",
+    "id": "fakeuser_id",
+    "isShadowBanned": false,
+    "isSuspended": false,
+    "muteStatus": {
+      "isMuted": false,
+      "muteCount": 0,
+    },
+    "name": "fakeUser",
+    "recentComments": {},
+    "recentConvos": {},
+    "recentPosts": {},
+  },
+}
+`;
