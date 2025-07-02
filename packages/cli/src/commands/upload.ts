@@ -231,7 +231,10 @@ export default class Upload extends DevvitCommand {
 
     if (
       !fs.existsSync(path.join(this.project.root, '.pnp.cjs')) &&
-      !(await this.#canImportPublicAPI())
+      !(await this.#canImport('devvit')) &&
+      !(await this.#canImport('@devvit/client')) &&
+      !(await this.#canImport('@devvit/server')) &&
+      !(await this.#canImport('@devvit/public-api'))
     ) {
       this.error(
         `It looks like you don't have dependencies installed. Please run 'npm install' (or yarn, if you're using yarn) and try again.`
@@ -239,11 +242,12 @@ export default class Upload extends DevvitCommand {
     }
   }
 
-  #canImportPublicAPI(): Promise<boolean> {
+  #canImport(module: string): Promise<boolean> {
     // Run a node command in the project directory to check if we can import public-api
     return new Promise<boolean>((resolve, reject) => {
-      const checkImportCommand = `node --input-type=module -e "await import('@devvit/public-api')"`;
+      const checkImportCommand = `node --input-type=module -e "await import('${module}')"`;
       // Run this as a child process
+      // eslint-disable-next-line security/detect-child-process
       const process = exec(checkImportCommand, { cwd: this.project.root }, (error) => {
         // If there was an error creating the child process, reject the promise
         if (error) {
