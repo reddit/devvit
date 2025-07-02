@@ -1,34 +1,44 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Overview
 
 Make requests to allow-listed external domains.
 
 Your Devvit app can make network requests to access allow-listed external domains using HTTP Fetch. This enables your app to leverage webhooks, personal servers, and other third-party integrations asynchronously across the network.
 
-## Devvit configure
+## Enabling HTTP fetch calls
 
-```ts
-import { Devvit } from '@devvit/public-api';
+<Tabs>
+  <TabItem value="devvit.json" label="devvit.json">
+  ```json
+  {
+    "permissions": {
+      "http": {
+        "enable": true,
+        "domains": ["my-site.com", "another-domain.net"]
+      }
+    }
+  }
+  ```
+  </TabItem>
+  <TabItem value="devvit.tsx" label="devvit.tsx">
+  ```ts
+  import { Devvit } from '@devvit/public-api';
 
-Devvit.configure({
-  http: true,
-  // other capabilities
-});
-```
+  Devvit.configure({
+    http: {
+      domains: ['my-site.com', 'another-domain.net'],
+    },
+  });
+  ```
+  </TabItem>
+</Tabs>
 
-## Requesting a domain to be allow-listed
+### Requesting a domain to be allow-listed
 
 Apps may request a domain to be added to the allow-list by specifying `domains` in the `http` configuration.
 This configuration is optional, and apps can still configure `http: true` as before.
-
-```ts
-import { Devvit } from '@devvit/public-api';
-
-Devvit.configure({
-  http: {
-    domains: ['my-site.com', 'another-domain.net'],
-  },
-});
-```
 
 Requested domains will be submitted for review when you playtest or upload your app. Admins may approve or deny domain requests.
 
@@ -55,7 +65,11 @@ Apps must request each individual domain that it intends to fetch, even if the d
 ```ts
 import { Devvit } from '@devvit/public-api';
 
-Devvit.configure({ http: true });
+Devvit.configure({
+  http: {
+    domains: ['example.com'],
+  },
+});
 
 Devvit.addMenuItem({
   location: 'comment',

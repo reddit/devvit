@@ -10,3 +10,4 @@ node_modules/
 /packages/public-api/src/types/icons.ts
 
 /devvit-dev-portal/graphql/operations.json
+/devvit-docs/docs/capabilities/http-fetch.mdx

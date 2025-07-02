@@ -16,7 +16,7 @@ import {
 } from './project.js';
 
 const noPermissions: AppPermissionConfig = {
-  http: { enable: false, allowedDomains: [] },
+  http: { enable: false, domains: [] },
   media: false,
   menu: false,
   payments: false,
@@ -221,7 +221,7 @@ describe('isAppConfig()', () => {
       permissions: {
         http: {
           enable: false,
-          allowedDomains: [],
+          domains: [],
         },
         media: false,
         payments: false,
