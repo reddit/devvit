@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { fileURLToPath, URL } from 'node:url';
+import { URL } from 'node:url';
 import util from 'node:util';
 
 import type { PenSave } from '@devvit/play';
@@ -26,7 +26,6 @@ import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTempl
 import { logInBox } from '../util/ui.js';
 
 const exec = util.promisify(_exec);
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const templateResolver = new ProjectTemplateResolver();
 const require = createRequire(import.meta.url);
@@ -286,7 +285,7 @@ export default class New extends DevvitCommand {
       if (dep.startsWith('@devvit')) {
         if (CLI_VERSION.prerelease.includes('dev')) {
           // if we are in a dev version, we want to use a path to the neighboring copy of this dependency
-          deps[dep] = path.resolve(__dirname, '../../../', dep.replace('@devvit/', ''));
+          deps[dep] = path.resolve(import.meta.dirname, '../../../', dep.replace('@devvit/', ''));
         } else {
           deps[dep] = `${CLI_VERSION}`;
         }
