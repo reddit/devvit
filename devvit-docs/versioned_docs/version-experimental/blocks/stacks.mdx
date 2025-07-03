@@ -1,0 +1,297 @@
+import AttributeMinHeight from './attributes/_minHeight.md';
+import AttributeMaxHeight from './attributes/_maxHeight.md';
+import AttributeMinWidth from './attributes/_minWidth.md';
+import AttributeMaxWidth from './attributes/_maxWidth.md';
+import AttributeGrow from './attributes/_grow.md';
+import AttributeAlignment from './attributes/_alignment.md';
+import AttributeOnPress from './attributes/_onPress.md';
+import AttributeWidth from './attributes/_width.mdx';
+import AttributeHeight from './attributes/_height.mdx';
+import AttributeColor from './attributes/_color.md';
+
+# Stacks
+
+The stack elements (`<vstack>`, `<hstack>`, and `<zstack>`) are flexible containers used to arrange child elements in different orientations and layers. Stacks can be nested, styled, and clicked if given an `onPress` handler. Stacks clip any overflowing content.
+
+## Directions
+
+### `<vstack>`
+
+Vertically stacks elements on top of each other. Perfect for forms, lists, or any vertical grouping of elements.
+
+### `<hstack>`
+
+Horizontally arranges elements side by side. Ideal for creating horizontal layouts, like navigation menus or toolbars.
+
+### `<zstack>`
+
+Layers elements on top of each other along the z-axis. Useful for overlaying elements like modals, badges, or custom stacking layouts.
+
+## Attributes
+
+### `padding`
+
+An `enum` that defines the padding inside the stack. Possible values:
+
+- `none`: The default if the attribute is not used.
+- `xsmall`: 4px
+- `small`: 8px
+- `medium`: 16px
+- `large`: 32px
+
+![app_image_fixed_size](../assets/blocks/docs-blocks-stacks-padding.png)
+
+#### Examples
+
+A padded row of buttons with a gap between:
+
+```tsx
+<hstack gap="medium" padding="medium">
+  <hstack padding="10px" height="10px" backgroundColor="#ff4500" />
+  <hstack padding="10px" height="10px" backgroundColor="#000000" />
+</hstack>
+```
+
+### `gap`
+
+An `enum` that determines the space between child elements. Possible values:
+
+- `none`: The default if the attribute is not used.
+- `small`: 8px
+- `medium`: 16px
+- `large`: 32px
+
+Has no effect on `<zstack>`.
+
+![app_image_fixed_size](../assets/blocks/docs-blocks-stacks-gap.png)
+
+#### Examples
+
+Two left aligned buttons with a gap between:
+
+```tsx
+<hstack gap="medium">
+  <button>This</button>
+  <button>That</button>
+</hstack>
+```
+
+The gap is automatically subtracted from the available space children can occupy.
+
+```tsx
+<hstack gap="medium">
+  <button width="50%">This</button>
+  <button width="50%">That</button>
+</hstack>
+```
+
+### `alignment`
+
+<AttributeAlignment />
+
+#### Examples
+
+Align content to the top left corner
+
+```tsx
+<zstack width="100px" height="100px" backgroundColor="#000000" alignment="top start">
+  <hstack width="33%" height="33%" backgroundColor="#ff4500" />
+</zstack>
+```
+
+Align content to the bottom right corner
+
+```tsx
+<zstack width="100px" height="100px" backgroundColor="#000000" alignment="bottom end">
+  <hstack width="33%" height="33%" backgroundColor="#ff4500" />
+</zstack>
+```
+
+### `reverse`
+
+A `boolean` that reverses the order of child elements if set to true. Possible values:
+
+- `true`
+- `false`: The default if the attribute is not used.
+
+![Showing the reverse attribute](../assets/blocks/docs-blocks-stacks-reverse.png)
+
+### `grow`
+
+<AttributeGrow />
+
+#### Examples
+
+In a `hstack` children grow horizontally.
+
+```tsx
+<hstack>
+  <hstack grow backgroundColor="#ff4500" />
+  <hstack grow backgroundColor="#000000" />
+</hstack>
+```
+
+In a `vstack` children grow vertically.
+
+```tsx
+<vstack>
+  <hstack grow backgroundColor="#ff4500" />
+  <hstack grow backgroundColor="#000000" />
+</vstack>
+```
+
+Has no effect on children within a `<zstack>`.
+
+### `width`
+
+<AttributeWidth />
+
+#### Examples
+
+Two colorful squares, taking up 50% of the width 100px each, with a height of 20px.
+
+```tsx
+<hstack width="100px">
+  <hstack width="50%" height="20px" backgroundColor="#ff4500" />
+  <hstack width="50%" height="20px" backgroundColor="#000000" />
+</hstack>
+```
+
+### `minWidth`
+
+<AttributeMinWidth />
+
+### `maxWidth`
+
+<AttributeMaxWidth />
+
+### `height`
+
+<AttributeHeight />
+
+#### Examples
+
+Sets the height as an absolute value
+
+```tsx
+<hstack height="40px"> ... </hstack>
+```
+
+Sets the height as a percentage of the parent.
+
+```tsx
+<hstack height="50%"> ... </hstack>
+```
+
+### `minHeight`
+
+<AttributeMinHeight />
+
+### `maxHeight`
+
+<AttributeMaxHeight />
+
+### `backgroundColor`
+
+<AttributeColor />
+
+Defaults to `transparent`.
+
+### `borderWidth`
+
+An `enum` for setting the border width of the stack. The border sits between edge of the element and the content area. Possible values:
+
+- `none`: The default if the attribute is not used.
+- `thin`: 1px
+- `thick`: 2px
+
+![Showing all the borderWidth options](../assets/blocks/docs-blocks-stacks-border-width.png)
+
+### `borderColor`
+
+<AttributeColor />
+
+Defaults to `neutral-border-weak`.
+
+### `cornerRadius`
+
+En `enum` that rounds all 4 corners of the stack. Clips content. Possible values:
+
+- `none`: The default if the attribute is not used.
+- `small`: 8px.
+- `medium`: 16px.
+- `large`: 24px.
+- `full`: 50%.
+
+![Showing all the cornerRadius options](../assets/blocks/docs-blocks-stacks-corner-radius.png)
+
+## Functions
+
+### `onPress`
+
+<AttributeOnPress />
+
+#### Examples
+
+```tsx
+<hstack
+  height="50px"
+  width="50px"
+  backgroundColor="#ff4500"
+  onPress={() => console.log('clicked')}
+></hstack>
+```
+
+## Examples
+
+An `<hstack>`. Open in [Play](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAbaDJgDoIAgQGEJaMlwAKxMwBUAnoRgAKYBooVIseLwBy0GDzIbhQYMGBCGN4A+ljEYGQwAB6UALwAfFTB7qFkEhhgFE5Z7hQAPLLEWADWaGnFJWUAFmYQ1RQQcgDmYLDxKWogWGEJGBRQeIYyMAMUncr9ILACeBJQM4QGy2CdC0srayAUUq1VnZwS4UbEMqQLAMRsAAxPTwN1BQ2fpQnJFGh4AC8YAsZBAMJ1pocAO4wPCdRpkBZSa4CN4AUUS0EIUwoNiYU1Koh+ZHeny+aA2Q1GZ2IUIoolJZJK5QkZHMBXkcQWphgGBm-yBuxgy1WM2UjjBEDAQwWhAwBDBdjeAFU0LzCVJWezGWTCc0yCcdczRBVqrVigBKYLMDTMK2aMBJEjkChCNgQCQySjaEQoEB0Xn-OIIACMzCAA).
+
+```tsx
+<blocks>
+  <hstack alignment="center middle" gap="medium" padding="medium" backgroundColor="gray">
+    <text size="large" weight="bold">
+      Example Title
+    </text>
+    <spacer grow />
+    <button icon="user" size="medium" appearance="primary">
+      User
+    </button>
+  </hstack>
+</blocks>
+```
+
+A `<vstack>` example. Open in [Play](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAbaDJgDoIAgQGEJaMlwAKxMwBUAnoRgAKYBooVIseLwBy0GDzIbhQYMGBCGN4A+ljEYGQwAB6UALwAfFTB7qFkEhhgFE5Z7hQAPLLEWADWaGnFJWV0ZhDVFBByAOZgsPEpauhkEOQUWGEJGP0UHcp96FDtMpOEBgJ4YB2zsKsSUP11BQ2HpQnJFGh4AF4wmzDbuyAUAO4weB0AFmSzUsQyAnsA4v4KAB5QhkPBxNClUQnMj7Q5HKQSMjmArnK43O6TZSOIYQMCjWZoGCxcJDOx7UHguIUACM0KRKLi8IRJXKyNRZ0u136WzwO2xhFxGHxhP6xNJAnJlLBEIKACYGRzmfVEcq0dzMfz7m0hTA8QSeegSXEpRgKSA0lS5RQAMxKplgFkI6FNQbVZ1s0QVaq1YoASmCzA0zEDmjASRIwyEbAgEhklG0IhQIDoMAw5ziCFpzCAA).
+
+```tsx
+<blocks>
+  <vstack alignment="start center" gap="small" padding="medium">
+    <text size="medium" weight="bold">
+      Game Options
+    </text>
+    <button size="medium" appearance="secondary">
+      Option 1
+    </button>
+    <button size="medium" appearance="secondary">
+      Option 2
+    </button>
+    <button size="medium" appearance="secondary">
+      Option 3
+    </button>
+  </vstack>
+</blocks>
+```
+
+A `<zstack>` example. Open in [Play](https://developers.reddit.com/play#pen/N4IgdghgtgpiBcIQBoQGcBOBjBICWUADgPYYAuABMACIwBudeZAvhQGYbFQUDkAAgBN6jMgHpCAVwBGAGzxYAtBEJ4eAHTAbaDJgDoIAgQGEJaMlwAKxMwBUAnoRgAKYBooVIseLwBy0GDzIbhQYMGBCGN4A+ljEYGQwAB6UALwAfFTB7qFkEhhgFE5Z7hQAPLLEWADWaGnFJWUAXmYQ1RQQcgDmYLDxKWogWGEJGBRQeIYyMAMUAO4TZAAWKTwAzAAM64SJPBSLMHidi2QrAEyb27tSrVWdnBLhRsQypP0gAMQA7AAcAJzrvyMAzqBQaYNKCWSFDQeEaMDeiUSMggGE60xAcwORxOAykzwEM1iLwwb3eADEKZSZmY7FM3vsDHgwJ1gQAhACSAHEKDYAKIADRspVEkLIILB4NF0Nh8IGiTQUA6MhmsyxxzeoU6EmRGEJz1eA3JlIp1LItNlIDxAjsMw6hx6wzeeLI5m4Q3iMF1IHFErBAHkCuZCBRiGxoYqZDIKKL6uCRUkxbH3MLmmQbj6GsKKtVasUAJTBZgaZgFzRgJIkcgUIRsCDayjaEQoEB0T0wuIIACMzCAA).
+
+```tsx
+<blocks>
+  <zstack alignment="center middle" width="300px" height="200px" backgroundColor="#78909C">
+    <text size="xxlarge" weight="bold" color="white" style="heading">
+      BIG TEXT
+    </text>
+    <text size="xsmall" weight="regular" color="white" style="body" alignment="bottom center">
+      On top of small text
+    </text>
+  </zstack>
+</blocks>
+```

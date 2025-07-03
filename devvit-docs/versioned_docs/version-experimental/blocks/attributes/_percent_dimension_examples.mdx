@@ -1,0 +1,95 @@
+**Valid dimensions**
+
+```tsx
+<hstack backgroundColor="red" width="200px" height="200px">
+  <zstack height="100%" width="100%" backgroundColor="green" />
+</hstack>
+```
+
+Z stack dimensions are valid because it satisfies the following rules:
+
+- Height: Parent block must have the height defined.
+
+- Width: Parent block must have the width defined.
+
+---
+
+```tsx
+<vstack backgroundColor="yellow" width="300px" height="300px">
+  <hstack backgroundColor="red" height="200px">
+    <zstack height="100%" width="100%" backgroundColor="green" />
+  </hstack>
+</vstack>
+```
+
+Z stack dimensions are valid because it satisfies the following rules:
+
+- Height: Parent block must have the height defined.
+
+- Width: Parent block must be stretching horizontally in a `vstack`.
+  The parent `hstack` is stretching horizontally in the `vstack`, because the `vstack` does not have any alignment indicated on
+  the cross axis. (See [alignment](../blocks/stacks#alignment))
+
+---
+
+```tsx
+<vstack backgroundColor="yellow" width="300px" height="300px">
+  <hstack backgroundColor="red" width="200px" grow>
+    <zstack height="100%" width="100%" backgroundColor="green" />
+  </hstack>
+</vstack>
+```
+
+Z stack dimensions are valid because it satisfies the following rules:
+
+- Height: Parent block must be growing vertically in a `vstack`.
+  The parent `hstack` is growing vertically along the main axis of the `vstack` because it has grow indicated.
+  (See [grow](../blocks/stacks#grow))
+
+- Width: Parent block must have the width defined.
+
+---
+
+**Invalid dimensions**
+
+```tsx
+<vstack backgroundColor="yellow" width="300px" height="300px" alignment="start top">
+  <hstack backgroundColor="red">
+    <zstack height="100%" width="100%" backgroundColor="green" />
+  </hstack>
+</vstack>
+```
+
+Z stack dimensions are invalid because it does not satisfy any of the rules:
+
+- Height: `hstack` is not growing vertically because it does not indicate `grow`.
+  Therefore, there is no parent height for the `zstack` to base its `height=100%` on.
+- Width: `hstack` is not stretching horizontally because because the `vstack` indicates an alignment.
+  Therefore, there is no parent width for the `zstack` to based its `width=100%` on. Width will be omitted, because the relative width is invalid and the parent is an `hstack`.
+
+---
+
+**Inferred dimensions**
+
+```tsx
+<vstack backgroundColor="yellow" width="300px" height="300px">
+  <hstack backgroundColor="red" width="200px" grow>
+    <zstack height="100%" width="100%" backgroundColor="green" />
+  </hstack>
+</vstack>
+```
+
+In this example, the `hstack` infers its height definition from the `vstack` (height = 300px), so
+the `zstack` dimensions are **valid**.
+
+---
+
+```tsx
+<vstack backgroundColor="yellow" height="300px">
+  <hstack backgroundColor="red" height="200px">
+    <zstack height="100%" width="100%" backgroundColor="green" />
+  </hstack>
+</vstack>
+```
+
+In this example, the `vstack` does not specify width, so there’s nothing for the `hstack` to infer. The width of the `zstack` is **invalid**. Therefore, the width will be omitted.
