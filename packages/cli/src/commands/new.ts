@@ -9,6 +9,7 @@ import util from 'node:util';
 
 import type { PenSave } from '@devvit/play';
 import { penFromHash } from '@devvit/play';
+import { isDevvitDependency } from '@devvit/shared-types/isDevvitDependency.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
 import { Args, Flags } from '@oclif/core';
@@ -282,10 +283,11 @@ export default class New extends DevvitCommand {
   // mutates the deps object
   #syncDependenciesToCurrentCliVersion(deps: Record<string, string>): void {
     for (const dep of Object.keys(deps)) {
-      if (dep.startsWith('@devvit')) {
+      if (isDevvitDependency(dep)) {
         if (CLI_VERSION.prerelease.includes('dev')) {
           // if we are in a dev version, we want to use a path to the neighboring copy of this dependency
-          deps[dep] = path.resolve(import.meta.dirname, '../../../', dep.replace('@devvit/', ''));
+          const packageName = dep.startsWith('@devvit') ? dep.replace('@devvit/', '') : dep;
+          deps[dep] = path.resolve(import.meta.dirname, '../../../', packageName);
         } else {
           deps[dep] = `${CLI_VERSION}`;
         }
