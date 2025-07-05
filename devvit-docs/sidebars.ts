@@ -16,11 +16,6 @@ const sidebars: SidebarsConfig = {
   tutorialSidebar: [
     {
       type: 'doc',
-      label: "⚡️ The World's Largest Hackathon",
-      id: 'bolt-hackathon',
-    },
-    {
-      type: 'doc',
       label: 'Introduction',
       id: 'introduction',
     },
