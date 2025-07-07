@@ -73,7 +73,7 @@ export class SchedulerClient implements Scheduler {
         id: action.id,
         name: action.request.action.type,
         cron: action.request.cron ?? '',
-        data: action.request.action as unknown as JSONObject | undefined,
+        data: action.request.action.data as unknown as JSONObject | undefined,
       };
     });
   }
