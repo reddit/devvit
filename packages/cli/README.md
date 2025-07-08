@@ -8,7 +8,7 @@ Sign up for Reddit's Developer Platform [here!](https://developers.reddit.com)
 
 `devvit` is the command line interface to the [Reddit Developer Platform](https://developers.reddit.com/)
 
-More on available commands: [CLI docs](https://developers.reddit.com/docs/cli/help)
+More on available commands: [CLI docs](https://developers.reddit.com/docs/devvit_cli)
 
 ## Local development
 
