@@ -20,6 +20,7 @@ import {
 } from '@devvit/shared-types/schemas/config-file.v1.js';
 import path from 'path';
 
+import { DEVVIT_SUBREDDIT } from '../constants/Environment.js';
 import { findUpDirContaining, isFile } from './file-util.js';
 import { dumpJsonToYaml, readYamlToJson } from './files.js';
 import { type DevvitPackageConfig, readPackageJSON } from './package-managers/package-util.js';
@@ -143,13 +144,13 @@ export class Project {
       throw Error(`Getting Prod subreddits isn't supported yet.`);
     }
 
-    const trimmedEnvVar = process.env?.DEVVIT_DEV_SUBREDDIT?.trim();
+    const trimmedEnvVar = process.env[DEVVIT_SUBREDDIT]?.trim();
     if (trimmedEnvVar) {
-      return process.env.DEVVIT_DEV_SUBREDDIT;
+      return trimmedEnvVar;
     }
     const trimmedFlag = this.flag.subreddit?.trim();
     if (trimmedFlag) {
-      return this.flag.subreddit;
+      return trimmedFlag;
     }
     if (isAppConfig(this.#config) && this.#config.dev?.subreddit) {
       return this.#config.dev.subreddit;

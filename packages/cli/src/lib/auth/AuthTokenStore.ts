@@ -2,13 +2,20 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
+import chalk from 'chalk';
 import type { FSWatcher } from 'chokidar';
 import chokidar from 'chokidar';
 import fsp, { mkdir, readFile } from 'fs/promises';
 import type { Observable } from 'rxjs';
 import { ReplaySubject } from 'rxjs';
 
+import { DEFAULT_DOTENV_PATH, DEVVIT_AUTH_TOKEN } from '../../constants/Environment.js';
+import {
+  deleteVariableFromDotEnv,
+  writeVariableToDotEnv,
+} from '../../util/common-actions/dotEnvOperations.js';
 import { isFile } from '../../util/file-util.js';
+import { isWebContainer } from '../../util/platform-util.js';
 import { StoredToken } from './StoredToken.js';
 
 export const WATCHER_INTERVAL = 1000;
@@ -49,17 +56,22 @@ export class AuthTokenStore {
   }
 
   async readFSToken(): Promise<TokenInfo | undefined> {
-    if (!(await isFile(this.#tokenLocation))) {
-      return undefined;
-    }
+    let rawToken: string;
+    if (process.env[DEVVIT_AUTH_TOKEN]) {
+      rawToken = process.env[DEVVIT_AUTH_TOKEN];
+    } else {
+      if (!(await isFile(this.#tokenLocation))) {
+        return undefined;
+      }
 
-    const raw = await readFile(this.#tokenLocation, { encoding: 'utf8' });
-    if (raw == null) {
-      return undefined;
+      rawToken = await readFile(this.#tokenLocation, { encoding: 'utf8' });
+      if (rawToken == null) {
+        return undefined;
+      }
     }
 
     try {
-      const jsonParse = JSON.parse(raw);
+      const jsonParse = JSON.parse(rawToken);
       const token = StoredToken.fromBase64(jsonParse.token);
       if (!token) {
         return undefined;
@@ -70,7 +82,7 @@ export class AuthTokenStore {
       };
     } catch {
       // This is fine, the JSON parse failed, which means it's an old style token
-      const token = StoredToken.fromBase64(raw);
+      const token = StoredToken.fromBase64(rawToken);
       if (!token) {
         return undefined;
       }
@@ -82,21 +94,30 @@ export class AuthTokenStore {
   }
 
   async writeFSToken(token: StoredToken, copyPaste?: boolean): Promise<void> {
-    await mkdir(this.#dotDevvitDir, { recursive: true });
-    await fsp.writeFile(
-      this.#tokenLocation,
-      JSON.stringify({
-        token: Buffer.from(JSON.stringify(token)).toString('base64'),
-        copyPaste: !!copyPaste,
-      }),
-      'utf8'
-    );
+    const rawToken = JSON.stringify({
+      token: Buffer.from(JSON.stringify(token)).toString('base64'),
+      copyPaste: !!copyPaste,
+    });
+    if (isWebContainer()) {
+      // If we're running in a web IDE, write the token to the .env file
+      await writeVariableToDotEnv(DEVVIT_AUTH_TOKEN, rawToken, DEFAULT_DOTENV_PATH);
+      console.log(
+        `Your Devvit authentication token has been saved to ${chalk.green(DEFAULT_DOTENV_PATH)}`
+      );
+    } else {
+      await mkdir(this.#dotDevvitDir, { recursive: true });
+      await fsp.writeFile(this.#tokenLocation, rawToken, 'utf8');
+      console.log(
+        `Your Devvit authentication token has been saved to ${chalk.green(this.#tokenLocation)}`
+      );
+    }
   }
 
   async clearToken(): Promise<void> {
     await mkdir(this.#dotDevvitDir, { recursive: true });
     await fsp.writeFile(this.#tokenLocation, '', 'utf8');
     await fsp.rm(this.#tokenLocation, { force: true });
+    await deleteVariableFromDotEnv(DEVVIT_AUTH_TOKEN, DEFAULT_DOTENV_PATH);
   }
 
   #initTokenFileWatcher(): void {
