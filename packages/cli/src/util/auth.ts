@@ -8,10 +8,10 @@ import { DOT_DEVVIT_DIR_FILENAME, REDDIT_DOT_COM } from '../lib/config.js';
 import { DEVVIT_PORTAL_URL } from './config.js';
 
 const PORT = 65010; // Has to match exactly to our oauth app settings
-const CLIENT_ID = 'Bep8X2RRjuoyuxkKsKxFuQ';
+const CLIENT_ID = 'private_secret_id';
 const TOKEN_DURATION = 'permanent';
 const API_V1_URL = `${REDDIT_DOT_COM}/api/v1`;
-const COPY_PASTE_CLIENT_ID = 'TWTsqXa53CexlrYGBWaesQ';
+const COPY_PASTE_CLIENT_ID = 'private_secret_id';
 const COPY_PASTE_REDIRECT_URI = `${DEVVIT_PORTAL_URL}/cli-login`;
 
 const DEVVIT_OAUTH_CLIENT_HEADERS = {
