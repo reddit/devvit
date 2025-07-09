@@ -2,6 +2,8 @@ import { createRequire } from 'node:module';
 
 import type { Hook } from '@oclif/core';
 
+import { isWebContainer } from '../../../util/platform-util.js';
+
 const hook: Hook<'init'> = async function () {
   // TODO: remove this check after stackblitz ships node20 support
   if (isWebContainer()) {
@@ -31,9 +33,5 @@ const hook: Hook<'init'> = async function () {
     }
   }
 };
-
-function isWebContainer() {
-  return process.env.SHELL === '/bin/jsh' && process.versions.webcontainer;
-}
 
 export default hook;
