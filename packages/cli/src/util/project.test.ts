@@ -111,12 +111,6 @@ describe('validateConfig()', () => {
           permissions: noPermissions,
           post: {
             client: { dir: 'dir', entry: 'dir/entry' },
-            create: {
-              title: 'title',
-              height: 'regular',
-              menu: { enable: false, label: 'label', scope: 'user' },
-              onInstall: false,
-            },
           },
           json: { name: 'name' },
         };
@@ -135,12 +129,6 @@ describe('validateConfig()', () => {
           permissions: noPermissions,
           post: {
             client: { dir: 'dir', entry: 'dir/entry' },
-            create: {
-              title: 'title',
-              height: 'regular',
-              menu: { enable: false, label: 'label', scope: 'user' },
-              onInstall: false,
-            },
           },
           json: { name: 'name' },
         };
@@ -163,12 +151,6 @@ describe('validateConfig()', () => {
       permissions: noPermissions,
       post: {
         client: { dir: 'dir', entry: '/api/entry' },
-        create: {
-          title: 'title',
-          height: 'regular',
-          menu: { enable: false, label: 'label', scope: 'user' },
-          onInstall: false,
-        },
       },
       json: { name: 'name' },
     };
