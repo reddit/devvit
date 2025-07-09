@@ -6,7 +6,6 @@ server/bin/
 node_modules/
 
 /packages/build-pack/src/__tests__/test-actors/bad-syntax/main.ts
-/packages/cli/src/templates/pen/
 /packages/public-api/src/types/icons.ts
 
 /devvit-dev-portal/graphql/operations.json
