@@ -78,8 +78,10 @@ export async function getAccessToken(): Promise<StoredToken | undefined> {
   }
 }
 
-export async function getAccessTokenAndLoginIfNeeded(copyPaste?: boolean): Promise<StoredToken> {
-  if (copyPaste) {
+export async function getAccessTokenAndLoginIfNeeded(
+  method: 'CopyPaste' | 'LocalSocket'
+): Promise<StoredToken> {
+  if (method === 'CopyPaste') {
     return await getOAuthSvc().loginViaCopyPaste();
   }
   return await getOAuthSvc().Authenticate();

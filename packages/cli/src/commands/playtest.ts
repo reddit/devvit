@@ -142,7 +142,7 @@ export default class Playtest extends DevvitCommand {
     this.project.flag.watchDebounceMillis = this.#flags?.['debounce'] as number | undefined;
     this.project.flag.subreddit = args.subreddit;
 
-    const token = await getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded('LocalSocket');
     const username = await this.getUserDisplayName(token);
     await this.checkDeveloperAccount();
 

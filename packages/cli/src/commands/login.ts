@@ -36,7 +36,7 @@ export default class Login extends DevvitCommand {
     // Clearing a local token before attempting to login (in case the token has expired, for example)
     await getOAuthSvc().Logout({});
 
-    const token = await getAccessTokenAndLoginIfNeeded(copyPaste);
+    const token = await getAccessTokenAndLoginIfNeeded(copyPaste ? 'CopyPaste' : 'LocalSocket');
     const username = await this.getUserDisplayName(token);
 
     await sendEvent(this.#event);

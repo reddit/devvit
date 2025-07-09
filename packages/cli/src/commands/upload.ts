@@ -97,7 +97,9 @@ export default class Upload extends DevvitCommand {
 
     await this.#checkDependencies(flags['just-do-it']);
 
-    const token = await getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded(
+      flags['copy-paste'] ? 'CopyPaste' : 'LocalSocket'
+    );
     const username = await this.getUserDisplayName(token);
 
     await this.checkDeveloperAccount();

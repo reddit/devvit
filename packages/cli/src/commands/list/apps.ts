@@ -11,7 +11,7 @@ export default class ListApps extends DevvitCommand {
   readonly #appService = createAppClient();
 
   async run(): Promise<void> {
-    const token = await getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded('LocalSocket');
     const t2_id = await this.getUserT2Id(token);
 
     ux.action.start('Fetching');

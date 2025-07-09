@@ -49,7 +49,7 @@ export default class ListInstalls extends DevvitCommand {
   }
 
   async #fetchInstalls(subreddit?: string): Promise<MultipleInstallationsResponse> {
-    const token = await getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded('LocalSocket');
 
     if (subreddit != null) {
       // ask about installations in given subreddit
