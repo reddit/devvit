@@ -1,4 +1,7 @@
-import { WebViewContext } from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/context.js';
+import {
+  DevvitPostData,
+  WebViewContext,
+} from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/context.js';
 import { _initContext } from '@devvit/web-view-scripts/init-context.js';
 import { expect, test } from 'vitest';
 
@@ -14,15 +17,25 @@ describe('get context', () => {
       appVersion: 'testAppVersion',
       postId: 't3_testPost',
     };
+    const testPostData: DevvitPostData = {
+      developerData: {
+        riddle: 'hello world',
+        topScore: 55,
+      },
+    };
 
     const proto = WebViewContext.fromJSON(testContext);
     const mockContext = JSON.stringify(proto);
     const mockSearch = `?context=${encodeURIComponent(mockContext)}`;
 
+    const postDataProto = DevvitPostData.fromJSON(testPostData);
+    const mockHash = `#${encodeURIComponent(JSON.stringify(postDataProto))}`;
+
     Object.defineProperty(globalThis, 'location', {
       value: {
         href: `https://example.com${mockSearch}`,
         search: mockSearch,
+        hash: mockHash,
         toString: () => `https://example.com${mockSearch}`,
       },
       writable: true,
@@ -30,6 +43,9 @@ describe('get context', () => {
 
     _initContext(globalThis.location);
 
-    expect(context).toStrictEqual(testContext);
+    expect(context).toStrictEqual({
+      ...testContext,
+      postData: testPostData.developerData,
+    });
   });
 });

@@ -1,7 +1,8 @@
-import type { Metadata } from '@devvit/protos';
+import { DevvitPostData, type Metadata } from '@devvit/protos';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import type { PostData } from '@devvit/shared-types/PostData.js';
 
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
 import pkg from '../../version.json' with { type: 'json' };
@@ -15,6 +16,13 @@ export function getContextFromMetadata(
   assertNonNull<string | undefined>(subredditId, 'subreddit is missing from Context');
 
   const subredditName = metadata[Header.SubredditName]?.values[0];
+
+  // 'devvit-post-data' is a JSON string. If set in the header, parse it as DevvitPostData.
+  let postData: PostData | undefined;
+  const postDataJSON = metadata[Header.PostData]?.values[0];
+  if (postDataJSON) {
+    postData = DevvitPostData.fromJSON(JSON.parse(postDataJSON)).developerData;
+  }
 
   // devvit-app-user is only available in the remote runtime.
   const appAccountId = metadata[Header.AppUser]?.values[0];
@@ -33,6 +41,7 @@ export function getContextFromMetadata(
     subredditName,
     userId,
     postId,
+    postData,
     commentId,
     appName,
     appVersion,
@@ -46,6 +55,7 @@ export function getContextFromMetadata(
         subredditName,
         userId,
         postId,
+        postData,
         commentId,
         debug,
       };

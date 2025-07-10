@@ -62,6 +62,14 @@ More useful things, but probably not for the average developer
 
 ---
 
+<a id="postdata"></a>
+
+### postData?
+
+> `optional` **postData**: `PostData`
+
+---
+
 <a id="postid"></a>
 
 ### postId?

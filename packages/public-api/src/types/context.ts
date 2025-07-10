@@ -1,6 +1,7 @@
 import type { Metadata, UIDimensions, UIEnvironment } from '@devvit/protos';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
+import type { PostData } from '@devvit/shared-types/PostData.js';
 
 import type { AssetsClient } from '../apis/AssetsClient/AssetsClient.js';
 import type { ModLogClient } from '../apis/modLog/ModLogClient.js';
@@ -51,6 +52,7 @@ export type BaseContext = {
   subredditName?: string;
   /** The ID of the current post */
   postId?: string | undefined;
+  postData?: PostData | undefined;
   /** The current user's ID if this event was triggered by a logged in user */
   userId?: string | undefined;
   /**
