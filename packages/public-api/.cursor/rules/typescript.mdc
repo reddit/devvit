@@ -1,0 +1,6 @@
+---
+description: @devvit/public-api TypeScript and JavaScript rules.
+globs: ["**/*.cjs", "**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cts", "**/*.ts", "**/*.tsx", "**/*.mts"]
+---
+
+- Prefer `@devvit/protos` barrel imports.
