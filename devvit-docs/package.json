@@ -15,11 +15,10 @@
     "docs:write-heading-ids": "docusaurus write-heading-ids",
     "docs:write-translations": "docusaurus write-translations",
     "docusaurus": "docusaurus",
-    "gen:all": "yarn gen:api-docs && yarn gen:reddit-api-docs && yarn gen:snapshot-docs && prettier --write '**/*.md'",
+    "gen:all": "yarn gen:api-docs && yarn gen:reddit-api-docs && prettier --write '**/*.md'",
     "gen:api-docs": "./scripts/build-api-docs.sh",
     "gen:payments-api-docs": "./scripts/build-payments-api-docs.sh",
     "gen:reddit-api-docs": "./scripts/build-reddit-api-docs.sh",
-    "gen:snapshot-docs": "./scripts/build-snapshot-docs.sh",
     "gen:verify": "./scripts/verify-docs.sh",
     "test:types": "tsc --noEmit"
   },

@@ -84,7 +84,6 @@ const config: Config = {
   ],
   plugins: [
     
-    
     [
       '@easyops-cn/docusaurus-search-local',
       {
@@ -98,7 +97,6 @@ const config: Config = {
           /(?:^|\/)three_strikes$/,
           /(?:^|\/)playgrounds$/,
           /(?:^|\/)playground$/,
-          /(?:^|\/)snapshot(?:\/|$)/,
         ],
       },
     ],
