@@ -85,3 +85,32 @@ Firehose docs are auto-generated from source code, and the source has been moved
     b) After that script is finished running you should have unstaged changes. Commit these changes, submit a PR.
 
     c) Once PR is approved and comments are addressed, go to [#devplatform-salon](https://reddit.enterprise.slack.com/archives/C02E3NJMG2E) on Slack and release your PR by using @Harold to acquire a turn in merging your changes
+
+### Updating Snapshot docs
+
+Snapshot docs are auto-generated from source code, which exists in [another repository](https://github.snooguts.net/reddit/dw-airflow). So to update the Snapshot docs, the best way is to make changes there, and then re-generate the docs here.
+
+1.  Make sure you have both repositories ([monorepo](https://github.snooguts.net/reddit/reddit-devplatform-monorepo) and [dw-airflow](https://github.snooguts.net/reddit/dw-airflow)) checked out as siblings, i.e. sharing the parent folder
+
+2.  In [reddit/dw-airflow](https://github.snooguts.net/reddit/dw-airflow):
+
+    a) Go to and make changes to the files in `dags/bulk_export/core_snapshot/schema_configs`
+
+    b) Submit your changes and create a PR
+
+    c) Once PR is approved and comments are addressed, go to [#dw-salon](https://reddit.enterprise.slack.com/archives/C02MVBEMN03) on Slack and release your PR by using @Harold to acquire a turn in merging your changes
+
+    d) Once your changes are merged, go back to the monorepo
+
+3.  In [reddit/reddit-devplatform-monorepo](https://github.snooguts.net/reddit/reddit-devplatform-monorepo)
+
+    a) Run the following command:
+
+    ```bash
+    cd devvit-docs/scripts
+    node writeSnapshotSchemas.js
+    ```
+
+    b) After that script is finished running you should have unstaged changes. Commit these changes, submit a PR.
+
+    c) Once PR is approved and comments are addressed, go to [#devplatform-salon](https://reddit.enterprise.slack.com/archives/C02E3NJMG2E) on Slack and release your PR by using @Harold to acquire a turn in merging your changes
