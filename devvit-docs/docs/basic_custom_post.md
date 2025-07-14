@@ -2,13 +2,13 @@
 
 ## Start a project
 
-To create a custom post app, use the `custom-post` template to start a new project.
+To create a custom post app, use the `Blocks Post` template to start a new project.
 
 1. From the terminal, navigate to a directory where you'll store your project.
 2. Enter the following command to create a project folder on your local machine.
 
 ```bash
-devvit new <replace-with-your-app-name> --template=custom-post
+devvit new <replace-with-your-app-name>
 ```
 
 ### Install dependencies

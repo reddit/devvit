@@ -229,7 +229,7 @@ Create a new app.
 #### Usage
 
 ```bash
-$ devvit new [directory-name] [-t <value>] [--here]
+$ devvit new [directory-name] [--here]
 ```
 
 #### Optional arguments
@@ -237,10 +237,6 @@ $ devvit new [directory-name] [-t <value>] [--here]
 - `directory-name`
 
   Directory name for your new app project. This creates a new directory for your app code. If no name is entered, you will be prompted to choose one.
-
-- `--template <value>`
-
-  Template name or pen URL. If no template is entered, you will be prompted to choose one.
 
 - `--here`
 
@@ -252,8 +248,6 @@ $ devvit new [directory-name] [-t <value>] [--here]
 $ devvit new
 
 $ devvit new tic-tac-toe
-
-$ devvit new tic-tac-toe --template blocks-post
 
 $ devvit new --here
 ```

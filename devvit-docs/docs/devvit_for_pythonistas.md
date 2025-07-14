@@ -203,7 +203,7 @@ Now let's bring your "Hello World" app from the Playground tool to your computer
 2. **Open your terminal and paste the command.** The command will look something like this:
 
    ```bash
-   npx devvit new my-hello-world-app --template=<your-playground-url>
+   npx devvit new my-hello-world-app
    ```
 
 3. **Run the command.** This will create a new folder on your computer containing your "Hello World" app.

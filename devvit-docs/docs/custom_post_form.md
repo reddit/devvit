@@ -10,13 +10,13 @@ Read through our [custom post tutorial](./basic_custom_post.md) to learn what a 
 
 ### Start a project
 
-To create a form, use the `custom-post` template to start a new custom post project.
+To create a form, use the `Blocks Post` template to start a new custom post project.
 
 1. From the terminal, navigate to a directory where you'll store your project.
 2. Enter the following command to create a project folder on your local machine.
 
 ```bash
-devvit new <replace-with-your-app-name> --template=custom-post
+devvit new <replace-with-your-app-name>
 ```
 
 ### Install dependencies

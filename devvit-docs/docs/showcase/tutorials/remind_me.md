@@ -16,12 +16,6 @@ The **Remind Me Later** option is located in the overflow menu of a post (look f
 
 ## Start a project
 
-<!-- :::info -->
-
-<!-- The fully-functioning code in this tutorial is also available in the `remind-me` template. Simply type `devvit new --template remind-me <replace-with-your-app-name>` to start a project with the code below already written. -->
-
-<!-- ::: -->
-
 To create a Remind Me app starting from an empty template:
 
 1. From the terminal, navigate to a directory where you'll store your project (e.g. `cd ~/my/project/directory`).
