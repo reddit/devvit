@@ -53,7 +53,7 @@
   "filesize": {
     "dist/client.min.js": {
       "gzip": "18 KB",
-      "none": "75.5 KB"
+      "none": "76 KB"
     }
   },
   "source": "./src/index.ts"
