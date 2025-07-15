@@ -1,4 +1,5 @@
 import { type JsonWrappedComment, type Metadata } from '@devvit/protos';
+import { Scope } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 
@@ -131,22 +132,11 @@ describe('Commment API', () => {
       ).rejects.toThrow('failed to reply to comment');
     });
 
-    test('submitComment(): can set runAs: USER when userActions is enabled', async () => {
-      const { reddit } = createTestRedditApiClient({ redditAPI: true, userActions: true });
-
-      const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'Comment');
-      spyPlugin.mockImplementationOnce(async () => mockJsonWrappedComment);
-
-      const resp = await reddit.submitComment({
-        id: 't1_commentid',
-        text: 'body',
-        runAs: 'USER',
-      });
-      expect(resp.toJSON()).toMatchSnapshot();
-    });
-
     test('submitComment(): throws error when setting runAs: USER with userActions is disabled', async () => {
-      const { reddit } = createTestRedditApiClient({ redditAPI: true, userActions: false });
+      const { reddit } = createTestRedditApiClient({
+        redditAPI: true,
+        userActions: { scopes: [] },
+      });
 
       await expect(
         reddit.submitComment({
@@ -158,7 +148,10 @@ describe('Commment API', () => {
     });
 
     test('reply(): throws error when setting runAs: USER with userActions is disabled', async () => {
-      const { reddit } = createTestRedditApiClient({ redditAPI: true, userActions: false });
+      const { reddit } = createTestRedditApiClient({
+        redditAPI: true,
+        userActions: { scopes: [] },
+      });
 
       const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.LinksAndComments, 'Comment');
       spyPlugin.mockImplementationOnce(async () => mockJsonWrappedComment);
@@ -175,5 +168,22 @@ describe('Commment API', () => {
         })
       ).rejects.toThrow(/UserActions is not enabled./);
     });
+  });
+
+  test('submitComment(): can set runAs: USER when userActions is enabled', async () => {
+    const { reddit } = createTestRedditApiClient({
+      redditAPI: true,
+      userActions: { scopes: [Scope.SUBMIT_COMMENT] },
+    });
+
+    const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'Comment');
+    spyPlugin.mockImplementationOnce(async () => mockJsonWrappedComment);
+
+    const resp = await reddit.submitComment({
+      id: 't1_commentid',
+      text: 'body',
+      runAs: 'USER',
+    });
+    expect(resp.toJSON()).toMatchSnapshot();
   });
 });

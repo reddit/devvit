@@ -1,5 +1,6 @@
 import type { UnknownMessage } from '@devvit/protos';
 import * as protos from '@devvit/protos';
+import { Scope } from '@devvit/protos';
 import type { PaymentsService } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
@@ -103,7 +104,6 @@ export type DevvitDebug = {
 
 export class Devvit extends Actor {
   static debug: DevvitDebug = {};
-
   static #appSettings: SettingsFormField[] | undefined;
   static #assets: AssetMap = {};
   static #config: Configuration = {};
@@ -118,6 +118,7 @@ export class Devvit extends Actor {
   > = new Map();
   static #webViewAssets: AssetMap = {};
   static #domains: string[] = [];
+  static #scopes: Scope[] = [];
 
   static #additionallyProvides: protos.Definition[] = [];
 
@@ -190,8 +191,10 @@ export class Devvit extends Actor {
       this.use(protos.RealtimeDefinition);
     }
 
-    if (pluginIsEnabled(config.userActions)) {
+    const scopes = Devvit.#getUserScopesFromConfig(config);
+    if (scopes.length > 0) {
       this.use(protos.UserActionsDefinition);
+      this.#scopes = scopes;
     }
   }
 
@@ -657,11 +660,11 @@ export class Devvit extends Actor {
   /** @internal */
   static get userActionsPlugin(): protos.UserActions {
     const userActionsAndRedditApiEnabled =
-      pluginIsEnabled(this.#config.userActions) && pluginIsEnabled(this.#config.redditAPI);
+      this.#scopes.length > 0 && pluginIsEnabled(this.#config.redditAPI);
 
     if (!userActionsAndRedditApiEnabled) {
       throw new Error(
-        'UserActions is not enabled. You can enable it by passing both `userActions: true` and `redditAPI: true` to `Devvit.configure`'
+        'UserActions is not enabled. You can enable it by passing scopes in `userActions: { scopes: [...scopes] }` and `redditAPI: true` to `Devvit.configure`'
       );
     }
 
@@ -765,9 +768,21 @@ export class Devvit extends Actor {
       config.provides(provides);
     }
 
-    if (Devvit.#domains.length > 0) {
-      config.addPermissions({ requestedFetchDomains: Devvit.#domains });
+    if (Devvit.#domains.length > 0 || Devvit.#scopes.length > 0) {
+      config.addPermissions({
+        requestedFetchDomains: Devvit.#domains,
+        asUserScopes: Devvit.#scopes,
+      });
     }
+  }
+
+  static #getUserScopesFromConfig(config: Configuration): Scope[] {
+    const configUserActions = config.userActions;
+    if (!configUserActions) return [];
+    const enabled = [Scope.SUBMIT_COMMENT, Scope.SUBMIT_POST];
+    if (typeof configUserActions === 'boolean') return configUserActions ? enabled : [];
+    if ('enabled' in configUserActions) return configUserActions.enabled ? enabled : [];
+    return configUserActions.scopes;
   }
 }
 

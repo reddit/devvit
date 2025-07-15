@@ -1,3 +1,5 @@
+import type { Scope } from '@devvit/protos';
+
 export type PluginSettings = {
   /** Whether the plugin is enabled */
   enabled: boolean;
@@ -18,8 +20,13 @@ export type Configuration = {
   modLog?: PluginSettings | boolean;
   /** Allows your app to use the Realtime Plugin */
   realtime?: PluginSettings | boolean;
-  /** Allows your app to call Reddit APIs on behalf of the User */
-  userActions?: PluginSettings | boolean;
+  /** Allows your app to call Reddit APIs on behalf of the User. Passing a boolean is deprecated and defaults to SUBMIT_POST and SUBMIT_COMMENT. */
+  userActions?:
+    | boolean
+    | {
+        /** Defaults to SUBMIT_POST and SUBMIT_COMMENT. @deprecated Use scopes. */ enabled: boolean;
+      }
+    | { scopes: Scope[] };
   /**
    * Allows your app to use the Payments Plugin
    * @internal

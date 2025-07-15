@@ -70,7 +70,7 @@ exports[`Commment API > RedditAPIClient:Comment > submitComment() should return 
 }
 `;
 
-exports[`Commment API > RedditAPIClient:Comment > submitComment(): can set runAs: USER when userActions is enabled 1`] = `
+exports[`Commment API > submitComment(): can set runAs: USER when userActions is enabled 1`] = `
 {
   "approved": false,
   "authorName": "my-user",
