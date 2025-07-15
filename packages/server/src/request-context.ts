@@ -4,7 +4,9 @@ import { getContextFromMetadata } from '@devvit/public-api/devvit/internals/cont
 import { Header, headerPrefix } from '@devvit/shared-types/Header.js';
 
 /** Devvit server context for the lifetime of a request. */
-export type RequestContext = Omit<BaseContext, 'toJSON'>;
+export type RequestContext = Omit<BaseContext, 'toJSON'> & {
+  cache?: { [key: string]: unknown };
+};
 
 /** Designed to be compatible with IncomingHttpHeaders and any KV. */
 type Headers = { [header: string]: string | string[] | undefined };

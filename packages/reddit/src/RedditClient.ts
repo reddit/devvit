@@ -1,5 +1,6 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
 import { context } from '@devvit/server';
+import { getContextCache, setContextCache } from '@devvit/server/context.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { asT2ID, type T1ID, type T2ID, type T3ID, type T5ID } from '@devvit/shared-types/tid.js';
 import { asT3ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
@@ -72,6 +73,8 @@ import {
   WikiPage,
 } from './models/index.js';
 
+const CACHE_KEY_CURRENT_USER = 'RedditClient.currentUser';
+
 type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;
 
 export type InviteModeratorOptions = {
@@ -119,8 +122,6 @@ export type MuteUserOptions = {
  */
 export class RedditClient {
   readonly #modMailService: ModMailService;
-  #currentUser: Promise<User | undefined> | undefined;
-  #currentUsername: string | undefined;
 
   constructor() {
     this.#modMailService = new ModMailService();
@@ -377,12 +378,7 @@ export class RedditClient {
    * ```
    */
   async getCurrentUsername(): Promise<string | undefined> {
-    const curUser = await this.getCurrentUser();
-    if (!curUser) {
-      return undefined;
-    }
-    this.#currentUsername ??= curUser.username;
-    return this.#currentUsername;
+    return (await this.getCurrentUser())?.username;
   }
 
   /**
@@ -396,12 +392,23 @@ export class RedditClient {
    * ```
    */
   async getCurrentUser(): Promise<User | undefined> {
+    // If there's no user logged in, return undefined.
     const userId = context.userId;
     if (!userId) {
       return undefined;
     }
-    this.#currentUser ??= User.getById(asT2ID(userId));
-    return this.#currentUser;
+
+    // Get the user from cache; if we miss, fetch the user and cache it.
+    let curUser = getContextCache<User>(CACHE_KEY_CURRENT_USER);
+    if (!curUser) {
+      curUser = await User.getById(asT2ID(userId));
+      if (!curUser) {
+        return undefined;
+      }
+      setContextCache(CACHE_KEY_CURRENT_USER, curUser);
+    }
+
+    return curUser;
   }
 
   /**

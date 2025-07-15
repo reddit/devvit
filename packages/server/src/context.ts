@@ -48,3 +48,19 @@ export const context = new Proxy<RequestContext>({} as RequestContext, {
     return { enumerable: true, configurable: true, value: getContext()[key] };
   },
 });
+
+export function setContextCache(key: string, value: unknown): void {
+  const context = getContext();
+  if (!context.cache) {
+    context.cache = {};
+  }
+  context.cache[key] = value;
+}
+
+export function getContextCache<T>(key: string): T | undefined {
+  const context = getContext();
+  if (!context.cache) {
+    return undefined;
+  }
+  return context.cache[key] as T | undefined;
+}
