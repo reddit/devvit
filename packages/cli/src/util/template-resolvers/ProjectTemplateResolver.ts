@@ -31,4 +31,12 @@ export class ProjectTemplateResolver {
     }
     return (await response.json()) as ProjectTemplateInfo[];
   }
+
+  async isValidProjectTemplate(templateName: string): Promise<boolean> {
+    return (await this.options).some(
+      (opt) =>
+        opt.name.toLowerCase() === templateName.toLowerCase() ||
+        opt.shortName?.toLowerCase() === templateName.toLowerCase()
+    );
+  }
 }

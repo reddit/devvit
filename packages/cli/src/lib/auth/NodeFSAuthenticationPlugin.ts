@@ -142,7 +142,7 @@ export class NodeFSAuthenticationPlugin {
         type: 'input',
       },
     ]);
-    const token = await this.#fetchAccessToken(code, true);
+    const token = await this.fetchAccessToken(code, true);
     await this.authTokenStore.writeFSToken(token);
     return token;
   }
@@ -235,7 +235,7 @@ ${authenticationUrl}
     }
   }
 
-  async #fetchAccessToken(authCode: string, copyPaste: boolean): Promise<StoredToken> {
+  async fetchAccessToken(authCode: string, copyPaste: boolean): Promise<StoredToken> {
     const grant = await fetchR2OAuthGrant(authCode, this.#authCfg, copyPaste);
     return StoredToken.fromGrant(grant);
   }
@@ -249,7 +249,7 @@ ${authenticationUrl}
           // If there's an auth code, attempt using it to get an access token
           const { code: queryCode } = queryParams;
           const code = typeof queryCode === 'string' ? queryCode : queryCode[0];
-          return await this.#fetchAccessToken(code, false);
+          return await this.fetchAccessToken(code, false);
         }
         if (queryParams.error === 'access_denied') {
           // If access was denied, print a message asking them to try again and approve access
