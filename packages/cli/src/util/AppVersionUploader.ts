@@ -45,7 +45,7 @@ export class AppVersionUploader {
 
     // Sync and upload assets
     const assetUploader = new AssetUploader(this.#cmd, appInfo.appSlug, { verbose: this.#verbose });
-    const { assetMap, webViewAssetMap } = await assetUploader.syncAssets();
+    const { assetMap, webViewAssetMap, iconAsset } = await assetUploader.syncAssets();
 
     let products: JSONProduct[] | undefined;
 
@@ -91,6 +91,9 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         prereleaseVersion: appInfo.appSemver.prerelease,
         actorBundles: bundles,
         preventPlaytestSubredditCreation: preventSubredditCreation,
+        marketingInfo: {
+          icon: iconAsset,
+        },
       });
       ux.action.stop();
 

@@ -22,14 +22,21 @@ import { createHash } from 'crypto';
 import { JSDOM } from 'jsdom';
 import { default as tinyglob } from 'tiny-glob';
 
-import { dirExists } from '../util/files.js';
 import { createAppClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
+import { dirExists } from './files.js';
 
 export const DEVVIT_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
+export const ICON_FILE_PATH = '$_icon.png'; // Uses special characters intentionally to avoid conflicts with real asset paths
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
+};
+
+type SyncAssetsResult = {
+  assetMap?: AssetMap;
+  webViewAssetMap?: AssetMap;
+  iconAsset?: string;
 };
 
 export class AssetUploader {
@@ -54,10 +61,7 @@ export class AssetUploader {
    * If present, WebView assets will also be synced but will not be included in
    * the asset map.
    */
-  async syncAssets(): Promise<{
-    assetMap?: AssetMap;
-    webViewAssetMap?: AssetMap;
-  }> {
+  async syncAssets(): Promise<SyncAssetsResult> {
     const clientVersion = readClientVersion(this.#cmd.project.root);
 
     const [regularAssets, webViewAssets] = await Promise.all([
@@ -68,7 +72,7 @@ export class AssetUploader {
             'Media',
             clientVersion
           )
-        : [],
+        : ([] as MediaSignatureWithContents[]),
       this.#cmd.project.clientDir
         ? queryAssets(
             path.join(this.#cmd.project.root, this.#cmd.project.clientDir),
@@ -78,6 +82,29 @@ export class AssetUploader {
           )
         : [],
     ]);
+
+    const iconAssetPath = this.#cmd.project.appConfig?.marketingAssets?.icon;
+    let iconAssetDetails: MediaSignatureWithContents | undefined;
+    if (iconAssetPath) {
+      const iconAssetFullPath = path.join(this.#cmd.project.root, iconAssetPath);
+      if (await dirExists(iconAssetFullPath)) {
+        this.#cmd.error(`Icon asset path ${iconAssetPath} is a directory, not a file.`);
+      }
+      if (!(await fsp.stat(iconAssetFullPath)).isFile()) {
+        this.#cmd.error(`Icon asset path ${iconAssetPath} does not point to a file.`);
+      }
+      const iconAssetContents = await fsp.readFile(iconAssetFullPath);
+      const iconAssetSize = Buffer.byteLength(iconAssetContents);
+      const iconAssetHash = createHash(ASSET_HASHING_ALGO).update(iconAssetContents).digest('hex');
+      iconAssetDetails = {
+        filePath: ICON_FILE_PATH, // Use a placeholder path for the icon asset
+        size: iconAssetSize,
+        hash: iconAssetHash,
+        contents: new Uint8Array(iconAssetContents),
+        isWebviewAsset: false,
+      };
+      regularAssets.push(iconAssetDetails);
+    }
 
     // Return early if no assets
     if (regularAssets.length + webViewAssets.length === 0) {
@@ -105,7 +132,12 @@ export class AssetUploader {
     // webroot assets go to WebView storage
     const webViewAssetMap = await this.#processWebViewAssets(webViewAssets);
 
-    return { assetMap, webViewAssetMap };
+    const retval: SyncAssetsResult = { assetMap, webViewAssetMap };
+    if (iconAssetDetails) {
+      retval.iconAsset = assetMap[ICON_FILE_PATH];
+    }
+
+    return retval;
   }
 
   async #processRegularAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
