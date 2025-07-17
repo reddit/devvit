@@ -164,6 +164,8 @@ export default class Init extends DevvitCommand {
     });
 
     // TODO: DX_9807 - Fire successful init telemetry event
+
+    process.exit(0);
   }
 
   #unpackCode(base64code: string): UnpackedInitAppCode | undefined {
@@ -177,7 +179,7 @@ export default class Init extends DevvitCommand {
       return undefined;
     }
 
-    if (typeof token.authCode !== 'string' && token.authCode !== undefined) {
+    if (!token.authCode || typeof token.authCode !== 'string') {
       return undefined;
     }
 
@@ -256,7 +258,6 @@ export default class Init extends DevvitCommand {
       }
     }
 
-    const line = readLine();
     return localCodeServer({
       serverListeningCallback: ({ port, state }) => {
         const redirectUrl = new URL(`https://localhost:${port}`);
@@ -270,14 +271,15 @@ export default class Init extends DevvitCommand {
             'Press enter to open this link immediately...'
         );
         // Don't await. Start the server immediately, so we don't miss a callback.
-        line.then(() => open(creationWizardUrl)).catch(() => {});
+        readLine()
+          .then(() => open(creationWizardUrl))
+          .catch(() => {});
       },
       requestHandler: async (queryParams) => {
         if (!queryParams.code) {
           return false;
         }
         const queryCode = queryParams.code;
-        line.reject(); // Reject the line promise to stop waiting for input, no-op if it's already resolved
         return typeof queryCode === 'string' ? queryCode : queryCode[0];
       },
     });
