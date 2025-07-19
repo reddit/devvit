@@ -350,11 +350,11 @@ export default class Playtest extends DevvitCommand {
     const files = this.#flags?.config
       ? [path.dirname(path.resolve(this.project.root, this.project.filename))]
       : [path.resolve(this.project.root)];
-    this.#watchAssets = chokidar.watch(files, {
+    this.#watchConfigFile = chokidar.watch(files, {
       ignoreInitial: true,
       depth: 0,
     });
-    this.#watchAssets.on('all', this.#onConfigFileModified);
+    this.#watchConfigFile.on('all', this.#onConfigFileModified);
   }
 
   #onConfigFileModified = async (
