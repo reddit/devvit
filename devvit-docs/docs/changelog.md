@@ -225,7 +225,7 @@ Focus mode enables web view apps that:
 
 ![Web views example](./assets/webviews_snakepit_example.png)
 
-The <webview> component is being deprecated in favor of the new useWebView hook. Please follow the [migration guide](./webviews.md#migration-guide) to migrate over your existing web view apps and check out the updated[web view docs](./webviews.md). Apps using the <webview> component are no longer publishable.
+The <webview> component is being deprecated in favor of the new useWebView hook. Please follow the [migration guide](./webviews.md#migration-guide) to migrate over your existing web view apps and check out the updated [web view docs](./webviews.md). Apps using the <webview> component are no longer publishable.
 
 Once your web view app is migrated to useWebView and works on all platforms, publish your app!
 
@@ -243,7 +243,7 @@ We’ve got a big update for our [payments pilot](./payments/payments_overview.m
 
 - **Instant Access to Sandbox Testing** – Now, all developers can immediately test sandbox payment products in their apps without needing to request allowlist access first. This means you can start experimenting with in-app purchasing right away! (You'll still need to complete the [verification process](./payments/payments_overview.md#prerequisites) before submitting your app for approval.)
 
-- **New Developer Showcase** – We’re highlighting how fellow developers are using payments in their apps! First up: [Dark Dungeon](./showcase/payments_examples.md), a game with in-app purchasing thoughtfully integrated in. Check it out for inspiration on what’s possible!
+- **New Developer Showcase** – We’re highlighting how fellow developers are using payments in their apps! First up: [Dark Dungeon](./showcase/monetization_examples.md#dark-dungeon), a game with in-app purchasing thoughtfully integrated in. Check it out for inspiration on what’s possible!
 
 We can’t wait to see what you build! If you have questions or feedback, drop questions here or in the [Payments Discord channel](https://discord.com/channels/1050224141732687912/1295856497917431879).
 
