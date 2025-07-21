@@ -11,6 +11,7 @@ import { BlocksReconciler } from '@devvit/public-api/devvit/internals/blocks/Blo
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
@@ -210,6 +211,7 @@ export type SubmitCustomPostOptions = CommonSubmitPostOptions &
   SubmitCustomPostTextFallbackOptions & {
     preview: JSX.Element;
     userGeneratedContent?: UserGeneratedContent;
+    postData?: PostData;
   };
 
 export type CommonSubmitPostOptions = {
@@ -888,6 +890,24 @@ export class Post {
   }
 
   /**
+   * Set the postData on a custom post.
+   *
+   * @param {PostData} postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
+   * @throws {Error} Throws an error if the postData could not be set.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   * await post.setPostData({
+   *   currentScore: 55,
+   *   secretWord: 'barbeque',
+   * });
+   * ```
+   */
+  async setPostData(postData: PostData): Promise<void> {
+    await Post.setPostData({ postId: this.id, postData });
+  }
+
+  /**
    * Set a lightweight UI that shows while the custom post renders
    *
    * @param {JSX.ComponentFunction} ui - A JSX component function that returns a simple ui to be rendered.
@@ -1138,6 +1158,12 @@ export class Post {
           }
         : undefined;
 
+      const devvitPostData = options.postData
+        ? {
+            developerData: options.postData,
+          }
+        : undefined;
+
       const submitRequest: SubmitRequest = {
         kind: 'custom',
         sr: options.subredditName,
@@ -1146,6 +1172,7 @@ export class Post {
         ...sanitizedOptions,
         userGeneratedContent,
         runAs: runAsType,
+        postData: devvitPostData,
       };
 
       response = await client.SubmitCustomPost(submitRequest, this.#metadata);
@@ -1260,6 +1287,26 @@ export class Post {
 
     if (!response.data?.setSuggestedSort?.ok) {
       throw new Error('Failed to set suggested sort');
+    }
+  }
+
+  /** @internal */
+  static async setPostData(options: { postId: T3ID; postData: PostData }): Promise<void> {
+    const devvitPostData = options.postData
+      ? {
+          developerData: options.postData,
+        }
+      : undefined;
+
+    const res = await getRedditApiPlugins().LinksAndComments.EditCustomPost(
+      {
+        thingId: options.postId,
+        postData: devvitPostData,
+      },
+      this.#metadata
+    );
+    if (res.json?.errors?.length) {
+      throw new Error(`Failed to set post data, errors: ${res.json?.errors}`);
     }
   }
 

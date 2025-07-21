@@ -8,6 +8,10 @@
 
 ## Type declaration
 
+### postData?
+
+> `optional` **postData**: `PostData`
+
 ### preview
 
 > **preview**: `JSX.Element`

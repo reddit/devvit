@@ -999,6 +999,42 @@ await post.setCustomPostPreview(() => preview);
 
 ---
 
+<a id="setpostdata"></a>
+
+### setPostData()
+
+> **setPostData**(`postData`): `Promise`\<`void`\>
+
+Set the postData on a custom post.
+
+#### Parameters
+
+##### postData
+
+`JSONObject`
+
+Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
+
+#### Returns
+
+`Promise`\<`void`\>
+
+#### Throws
+
+Throws an error if the postData could not be set.
+
+#### Example
+
+```ts
+const post = await reddit.getPostById(context.postId);
+await post.setPostData({
+  currentScore: 55,
+  secretWord: 'barbeque',
+});
+```
+
+---
+
 <a id="setsuggestedcommentsort"></a>
 
 ### setSuggestedCommentSort()
