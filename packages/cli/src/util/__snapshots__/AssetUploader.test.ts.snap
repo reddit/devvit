@@ -1,0 +1,78 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 256x256.png > 256x256.png-err 1`] = `[]`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 256x256.png > 256x256.png-warn 1`] = `
+[
+  [
+    "Icon asset is smaller than 1024x1024 pixels. Consider using a larger icon for better quality.",
+  ],
+]
+`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 256x512.png > 256x512.png-err 1`] = `
+[
+  [
+    "Icon asset must be square, but it is 256x512.",
+  ],
+]
+`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 256x512.png > 256x512.png-warn 1`] = `[]`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 420x420.png > 420x420.png-err 1`] = `[]`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 420x420.png > 420x420.png-warn 1`] = `
+[
+  [
+    "Icon asset is smaller than 1024x1024 pixels. Consider using a larger icon for better quality.",
+  ],
+  [
+    "Icon asset is 420x420. Consider using a standard size (preferably 1024x1024) for better compatibility.",
+  ],
+]
+`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 512x512.png > 512x512.png-err 1`] = `[]`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 512x512.png > 512x512.png-warn 1`] = `
+[
+  [
+    "Icon asset is smaller than 1024x1024 pixels. Consider using a larger icon for better quality.",
+  ],
+]
+`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 1024x1024.gif > 1024x1024.gif-err 1`] = `
+[
+  [
+    "Icon asset cannot be a GIF.",
+  ],
+]
+`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 1024x1024.gif > 1024x1024.gif-warn 1`] = `[]`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 1024x1024.jpg > 1024x1024.jpg-err 1`] = `[]`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 1024x1024.jpg > 1024x1024.jpg-warn 1`] = `
+[
+  [
+    "Icon asset is not a PNG, but it will still be uploaded.",
+  ],
+]
+`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 1024x1024.png > 1024x1024.png-err 1`] = `[]`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 1024x1024.png > 1024x1024.png-warn 1`] = `[]`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: notAnImage.txt > notAnImage.txt-err 1`] = `
+[
+  [
+    "Icon asset is not a valid image.",
+  ],
+]
+`;
+
+exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: notAnImage.txt > notAnImage.txt-warn 1`] = `[]`;

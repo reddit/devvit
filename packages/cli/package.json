@@ -59,7 +59,7 @@
     "date-fns": "2.29.3",
     "dotenv": "16.5.0",
     "file-type": "18.2.1",
-    "image-size": "1.2.1",
+    "image-size": "2.0.2",
     "inquirer": "9.1.4",
     "isomorphic-git": "1.21.0",
     "js-yaml": "4.1.0",

@@ -19,6 +19,8 @@ import { ASSET_HASHING_ALGO, ASSET_UPLOAD_BATCH_SIZE } from '@devvit/shared-type
 import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { ux } from '@oclif/core';
 import { createHash } from 'crypto';
+import { fileTypeFromBuffer } from 'file-type';
+import { imageSize } from 'image-size';
 import { JSDOM } from 'jsdom';
 import { default as tinyglob } from 'tiny-glob';
 
@@ -96,6 +98,9 @@ export class AssetUploader {
       const iconAssetContents = await fsp.readFile(iconAssetFullPath);
       const iconAssetSize = Buffer.byteLength(iconAssetContents);
       const iconAssetHash = createHash(ASSET_HASHING_ALGO).update(iconAssetContents).digest('hex');
+
+      this.assertAssetCanBeAnIcon(iconAssetContents);
+
       iconAssetDetails = {
         filePath: ICON_FILE_PATH, // Use a placeholder path for the icon asset
         size: iconAssetSize,
@@ -138,6 +143,61 @@ export class AssetUploader {
     }
 
     return retval;
+  }
+
+  async assertAssetCanBeAnIcon(data: Buffer): Promise<void> {
+    // Verify the icon. It *must*:
+    // - NOT be a GIF
+    // - be square in shape
+    // - be at least 256x256 pixels
+    // - be at most 1024x1024 pixels
+    // If it doesn't meet these requirements, we throw an error.
+    // Also, we should warn the user in any of these cases:
+    // - if the icon isn't a PNG
+    // - if the icon is smaller than 1024x1024 pixels
+
+    const fileTypeResult = await fileTypeFromBuffer(data);
+    if (!fileTypeResult) {
+      this.#cmd.error(`Icon asset is not a valid image.`);
+    }
+    if (fileTypeResult.mime === 'image/gif') {
+      this.#cmd.error(`Icon asset cannot be a GIF.`);
+    }
+
+    const sizeResult = imageSize(data);
+    if (!sizeResult) {
+      this.#cmd.error(`Icon asset is not a valid image.`);
+    }
+    if (sizeResult.width !== sizeResult.height) {
+      this.#cmd.error(
+        `Icon asset must be square, but it is ${sizeResult.width}x${sizeResult.height}.`
+      );
+    }
+    if (sizeResult.width < 256) {
+      this.#cmd.error(
+        `Icon asset must be at least 256x256 pixels, but it is ${sizeResult.width}x${sizeResult.height}.`
+      );
+    }
+    if (sizeResult.width > 1024) {
+      this.#cmd.error(
+        `Icon asset can be at most 1024x1024 pixels, but it is ${sizeResult.width}x${sizeResult.height}.`
+      );
+    }
+
+    // It's acceptable, but check if there's any warnings we should give the user
+    if (fileTypeResult.mime !== 'image/png') {
+      this.#cmd.warn(`Icon asset is not a PNG, but it will still be uploaded.`);
+    }
+    if (sizeResult.width < 1024) {
+      this.#cmd.warn(
+        `Icon asset is smaller than 1024x1024 pixels. Consider using a larger icon for better quality.`
+      );
+    }
+    if (![1024, 512, 256].includes(sizeResult.width)) {
+      this.#cmd.warn(
+        `Icon asset is ${sizeResult.width}x${sizeResult.height}. Consider using a standard size (preferably 1024x1024) for better compatibility.`
+      );
+    }
   }
 
   async #processRegularAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
