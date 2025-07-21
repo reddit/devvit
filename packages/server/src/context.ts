@@ -2,7 +2,12 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 
 import type { RequestContext } from './request-context.js';
 
-const requestContextStorage = new AsyncLocalStorage<RequestContext>();
+let requestContextStorage: AsyncLocalStorage<RequestContext>;
+try {
+  requestContextStorage = new AsyncLocalStorage<RequestContext>();
+} catch {
+  // Hack: workaround inclusion in Blocks client builds.
+}
 
 /**
  * Gets the current RequestContext. This is set by the server when handling a request. If there is no

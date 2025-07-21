@@ -9,9 +9,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
+import { apiPathPrefix } from '@devvit/shared-types/constants.js';
 import type { JSONValue } from '@devvit/shared-types/json.js';
 import {
-  apiPathPrefix,
   type AppConfig,
   type AppPermissionConfig,
   type AppPostConfig,

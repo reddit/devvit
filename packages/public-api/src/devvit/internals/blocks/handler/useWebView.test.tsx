@@ -49,10 +49,12 @@ const createBaseWebView = (
 
 const ASSET_1 = 'index.html';
 const ASSET_2 = 'page.html';
+const ASSET_3 = 'game.html';
 
 const ASSETS: AssetMap = {
   [ASSET_1]: 'https://i.redd.it/index.html',
   [ASSET_2]: 'https://i.redd.it/page.html',
+  [ASSET_3]: 'https://i.redd.it/game.html',
 };
 
 describe('useWebView', () => {
@@ -131,6 +133,199 @@ describe('useWebView', () => {
             id: 'BaseWebView.useWebView-0',
             show: true,
             url: 'https://i.redd.it/page.html',
+          },
+        },
+      },
+    ]);
+  });
+
+  test('getUrl preserves API path URLs as-is', async () => {
+    const webviewHookRef: HookRef = {};
+    const showFullScreenWebviewButtonRef: HookRef = {};
+    const apiUrl = '/api/pages/scoreboard'; // URL starts with '/api/' prefix
+
+    const BaseWebView: Devvit.BlockComponent = (_props: JSX.Props) => {
+      const webViewHook = captureHookRef(
+        useWebView({
+          url: apiUrl,
+          onMessage: () => {},
+        }),
+        webviewHookRef
+      );
+
+      return (
+        <vstack>
+          <button
+            onPress={captureHookRef(() => {
+              webViewHook.mount();
+            }, showFullScreenWebviewButtonRef)}
+          >
+            Full screen
+          </button>
+        </vstack>
+      );
+    };
+
+    const handler = new BlocksHandler(BaseWebView);
+    await handler.handle(getEmptyRequest(), mockMetadata);
+
+    const fullScreenResponse = await handler.handle(
+      generatePressRequest(showFullScreenWebviewButtonRef),
+      mockMetadata
+    );
+
+    expect(fullScreenResponse.effects).toStrictEqual([
+      {
+        type: 9,
+        webView: {
+          fullscreen: {
+            id: 'BaseWebView.useWebView-0',
+            show: true,
+            url: apiUrl,
+          },
+        },
+      },
+    ]);
+  });
+
+  test('getUrl supports hash fragments from asset URLs', async () => {
+    const webviewHookRef: HookRef = {};
+    const showFullScreenWebviewButtonRef: HookRef = {};
+
+    const BaseWebView: Devvit.BlockComponent = (_props: JSX.Props) => {
+      const webViewHook = captureHookRef(
+        useWebView({
+          url: 'game.html#level-8',
+          onMessage: () => {},
+        }),
+        webviewHookRef
+      );
+
+      return (
+        <vstack>
+          <button
+            onPress={captureHookRef(() => {
+              webViewHook.mount();
+            }, showFullScreenWebviewButtonRef)}
+          >
+            Full screen
+          </button>
+        </vstack>
+      );
+    };
+
+    const handler = new BlocksHandler(BaseWebView);
+    await handler.handle(getEmptyRequest(), mockMetadata);
+
+    const fullScreenResponse = await handler.handle(
+      generatePressRequest(showFullScreenWebviewButtonRef),
+      mockMetadata
+    );
+
+    expect(fullScreenResponse.effects).toStrictEqual([
+      {
+        type: 9,
+        webView: {
+          fullscreen: {
+            id: 'BaseWebView.useWebView-0',
+            show: true,
+            url: 'https://i.redd.it/game.html#level-8',
+          },
+        },
+      },
+    ]);
+  });
+
+  test('getUrl supports query parameters from asset URLs', async () => {
+    const webviewHookRef: HookRef = {};
+    const showFullScreenWebviewButtonRef: HookRef = {};
+
+    const BaseWebView: Devvit.BlockComponent = (_props: JSX.Props) => {
+      const webViewHook = captureHookRef(
+        useWebView({
+          url: 'index.html?debug=true&god=true',
+          onMessage: () => {},
+        }),
+        webviewHookRef
+      );
+
+      return (
+        <vstack>
+          <button
+            onPress={captureHookRef(() => {
+              webViewHook.mount();
+            }, showFullScreenWebviewButtonRef)}
+          >
+            Full screen
+          </button>
+        </vstack>
+      );
+    };
+
+    const handler = new BlocksHandler(BaseWebView);
+    await handler.handle(getEmptyRequest(), mockMetadata);
+
+    const fullScreenResponse = await handler.handle(
+      generatePressRequest(showFullScreenWebviewButtonRef),
+      mockMetadata
+    );
+
+    expect(fullScreenResponse.effects).toStrictEqual([
+      {
+        type: 9,
+        webView: {
+          fullscreen: {
+            id: 'BaseWebView.useWebView-0',
+            show: true,
+            url: 'https://i.redd.it/index.html?debug=true&god=true', // No query parameters
+          },
+        },
+      },
+    ]);
+  });
+
+  test('getUrl supports hash and query parameters from asset URLs', async () => {
+    const webviewHookRef: HookRef = {};
+    const showFullScreenWebviewButtonRef: HookRef = {};
+
+    const BaseWebView: Devvit.BlockComponent = (_props: JSX.Props) => {
+      const webViewHook = captureHookRef(
+        useWebView({
+          url: 'page.html?debug=true#footer',
+          onMessage: () => {},
+        }),
+        webviewHookRef
+      );
+
+      return (
+        <vstack>
+          <button
+            onPress={captureHookRef(() => {
+              webViewHook.mount();
+            }, showFullScreenWebviewButtonRef)}
+          >
+            Full screen
+          </button>
+        </vstack>
+      );
+    };
+
+    const handler = new BlocksHandler(BaseWebView);
+    await handler.handle(getEmptyRequest(), mockMetadata);
+
+    const fullScreenResponse = await handler.handle(
+      generatePressRequest(showFullScreenWebviewButtonRef),
+      mockMetadata
+    );
+
+    expect(fullScreenResponse.effects).toStrictEqual([
+      {
+        type: 9,
+        webView: {
+          fullscreen: {
+            id: 'BaseWebView.useWebView-0',
+            show: true,
+            url: 'https://i.redd.it/page.html?debug=true#footer',
           },
         },
       },
