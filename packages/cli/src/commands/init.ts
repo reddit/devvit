@@ -6,8 +6,8 @@ import path from 'node:path';
 import querystring from 'node:querystring';
 import util from 'node:util';
 
+import { InitAppResponse } from '@devvit/protos/types/devvit/cli/init.js';
 import { isDevvitDependency } from '@devvit/shared-types/isDevvitDependency.js';
-import { isObject } from '@devvit/shared-types/isObject.js';
 import { Args } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
@@ -34,12 +34,6 @@ const require = createRequire(import.meta.url);
 const cliPackageJSON = require(require.resolve(`@devvit/cli/package.json`));
 const CLI_VERSION = semver.parse(cliPackageJSON.version)!;
 
-type UnpackedInitAppCode = {
-  authCode: string | undefined;
-  appName: string;
-  templateName: string | undefined;
-};
-
 export default class Init extends DevvitCommand {
   static override description = 'Initialize a new app';
 
@@ -53,7 +47,7 @@ export default class Init extends DevvitCommand {
     }),
   } as const;
 
-  #initAppParams: UnpackedInitAppCode | undefined;
+  #initAppParams: InitAppResponse | undefined;
 
   get #projectPath(): string {
     if (!this.#initAppParams?.appName) {
@@ -168,34 +162,20 @@ export default class Init extends DevvitCommand {
     process.exit(0);
   }
 
-  #unpackCode(base64code: string): UnpackedInitAppCode | undefined {
-    let token;
+  #unpackCode(base64code: string): InitAppResponse | undefined {
     try {
-      token = JSON.parse(Buffer.from(base64code, 'base64').toString('utf8'));
+      const bytes = Buffer.from(base64code, 'base64');
+      const message = InitAppResponse.decode(bytes);
+
+      // Basic validation
+      if (!message.appName) {
+        return undefined;
+      }
+
+      return message;
     } catch {
       return undefined;
     }
-    if (!isObject(token)) {
-      return undefined;
-    }
-
-    if (!token.authCode || typeof token.authCode !== 'string') {
-      return undefined;
-    }
-
-    if (typeof token.appName !== 'string') {
-      return undefined;
-    }
-
-    if (typeof token.templateName !== 'string' && token.templateName !== undefined) {
-      return undefined;
-    }
-
-    return {
-      authCode: token.authCode,
-      appName: token.appName,
-      templateName: token.templateName,
-    };
   }
 
   async #getCodeThroughCopyPaste(): Promise<string> {
@@ -260,7 +240,7 @@ export default class Init extends DevvitCommand {
 
     return localCodeServer({
       serverListeningCallback: ({ port, state }) => {
-        const redirectUrl = new URL(`https://localhost:${port}`);
+        const redirectUrl = new URL(`http://localhost:${port}`);
         redirectUrl.searchParams.set(`state`, state);
         queryParams.redirect_url = redirectUrl.toString();
 
