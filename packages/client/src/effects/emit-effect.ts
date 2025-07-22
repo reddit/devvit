@@ -1,4 +1,5 @@
-import type { Effect } from '@devvit/protos';
+import type { Effect as SharedEffects } from '@devvit/protos';
+import { WebViewImmersiveModeEffect } from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
 import type {
   WebViewInternalMessage,
   WebViewInternalMessageScope,
@@ -6,6 +7,10 @@ import type {
 import { WebViewInternalEventMessage } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
 
 import { EFFECTS_WITH_RESPONSE } from './constants.js';
+
+type Effect = Omit<SharedEffects, 'interval'> & {
+  immersiveMode?: WebViewImmersiveModeEffect | undefined;
+};
 
 /**
  * Emits an effect to the parent window and handles the response if required.

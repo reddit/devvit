@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { emitEffect } from '@devvit/client';
+import { emitEffect } from '@devvit/client/effects/emit-effect.js';
 import { RealtimeEvent } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import type {

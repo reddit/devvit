@@ -1,4 +1,4 @@
-import { emitEffect } from '@devvit/client';
+import { emitEffect } from '@devvit/client/effects/emit-effect.js';
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import type {
   RealtimeSubscriptionEvent,
