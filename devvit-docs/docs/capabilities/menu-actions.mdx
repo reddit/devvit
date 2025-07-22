@@ -1,12 +1,9 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Menu actions
 
-Add an item to the three dot menu.
-
-You can add custom menu actions to posts and comments using the `Devvit.addMenuItem()` function.
-
-:::note
-On new Reddit, comment menu actions in modqueue are only available in card view.
-:::
+Add an item to the three dot menu for posts, comments, or subreddits.
 
 ![Subreddit menu actions](../assets/capabilities/menu-actions/menu-actions-subreddit.png)
 
@@ -30,19 +27,39 @@ For moderator permission security, when opening a form from a menu action with `
 - The context, name, and description fields do not support dynamic logic.
 
 ## Example
-
-This example uses `Devvit.addMenuItem()` to create menu actions for comments, posts and subreddits.
-
-```ts
-import { Devvit } from '@devvit/public-api';
-
-// Declare multiple actions to be added to the menu
-Devvit.addMenuItem({
-  label: 'Say Hello',
-  location: 'post', // accepts 'post', 'comment', 'subreddit', or a combination as an array
-  forUserType: 'moderator', // restricts this action to moderators, leave blank for any user
-  onPress: (event, context) => {
-    context.ui.showToast(`Hello from a ${event.location}!`);
-  },
-});
-```
+<Tabs>
+  <TabItem value="web" label="Web">
+  ```json title="devvit.json"
+  {
+    "menuActions": [
+      {
+      "label": "My endpoint",
+      "endpoint": "/internal/menu/my-endpoint",
+      "forUserType": "moderator",
+      "location": "subreddit"
+      }
+    ]
+  }
+  ```
+  ```ts title="server/index.ts"
+  // Assumes Express.js
+  router.post("/internal/menu/my-endpoint", async (_req, res: Response<UiResponse>) => {
+    res.json({
+      showToast: 'Clicked a menu!'
+    })
+  });
+  ``` 
+  </TabItem>
+  <TabItem value="blocks" label="devvit.tsx">
+  ```ts
+  Devvit.addMenuItem({
+    label: 'My endpoint',
+    location: 'post', // accepts 'post', 'comment', 'subreddit', or a combination as an array
+    forUserType: 'moderator', // restricts this action to moderators, leave blank for any user
+    onPress: async (event, context) => {
+      context.ui.showToast(data.showToast);
+    },
+  });
+  ```
+  </TabItem>
+</Tabs>

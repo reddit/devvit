@@ -6,7 +6,7 @@ By default, apps make posts or comments with their associated [app account](../a
 
 - Creating posts or comments from the [post UI](../interactive_posts.md)
 - Creating posts or comments via a [form](forms.md)
-- Creating posts or comments via a [menu action](./menu-actions.md)
+- Creating posts or comments via a [menu action](./menu-actions.mdx)
 
 ## Guidelines
 

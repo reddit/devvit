@@ -128,7 +128,7 @@ const sidebars: SidebarsConfig = {
           label: 'HTTP fetch',
           items: ['capabilities/http-fetch', 'capabilities/http-fetch-allowlist'],
         },
-        'capabilities/image-uploads',
+        'capabilities/media-uploads',
         'capabilities/menu-actions',
         'capabilities/redis',
         'capabilities/realtime',

@@ -10,7 +10,7 @@ To optimize app performance, Devvit executes on the client side as much as possi
 
 Some things can only be executed on the server side, including:
 
-- `onPress` handlers of [menu actions](./capabilities/menu-actions.md)
+- `onPress` handlers of [menu actions](./capabilities/menu-actions.mdx)
 - [Scheduled actions](./capabilities/scheduler.md)
 - API requests (such as [Reddit API](./api/redditapi/classes/RedditAPIClient.RedditAPIClient.md), [Redis](./capabilities/redis.md), and [HTTP fetch](./capabilities/http-fetch.md))
 

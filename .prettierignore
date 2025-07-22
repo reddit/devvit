@@ -10,3 +10,4 @@ node_modules/
 
 /devvit-dev-portal/graphql/operations.json
 /devvit-docs/docs/capabilities/http-fetch.mdx
+*.mdx

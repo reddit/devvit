@@ -62,7 +62,7 @@ export default Devvit;
 
 ### Menu actions
 
-This example defines a new form and a onSubmit handler called `myForm` using the `devvit.createForm` method. This form is shown via a [menu action](./menu-actions.md) using `context.ui.showForm()`.
+This example defines a new form and a onSubmit handler called `myForm` using the `devvit.createForm` method. This form is shown via a [menu action](./menu-actions.mdx) using `context.ui.showForm()`.
 
 ```ts
 import { Devvit } from '@devvit/public-api';
