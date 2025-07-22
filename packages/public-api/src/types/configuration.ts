@@ -20,12 +20,13 @@ export type Configuration = {
   modLog?: PluginSettings | boolean;
   /** Allows your app to use the Realtime Plugin */
   realtime?: PluginSettings | boolean;
-  /** Allows your app to call Reddit APIs on behalf of the User. Passing a boolean is deprecated and defaults to SUBMIT_POST and SUBMIT_COMMENT. */
+  /** Allows your app to call Reddit APIs on behalf of the User. Passing a boolean allows you to submit post/comments on behalf of the user. */
   userActions?:
     | boolean
     | {
-        /** Defaults to SUBMIT_POST and SUBMIT_COMMENT. @deprecated Use scopes. */ enabled: boolean;
+        /** Defaults to SUBMIT_POST and SUBMIT_COMMENT. */ enabled: boolean;
       }
+    /** @deprecated Scopes */
     | { scopes: Scope[] };
   /**
    * Allows your app to use the Payments Plugin

@@ -779,9 +779,8 @@ export class Devvit extends Actor {
   static #getUserScopesFromConfig(config: Configuration): Scope[] {
     const configUserActions = config.userActions;
     if (!configUserActions) return [];
-    const enabled = [Scope.SUBMIT_COMMENT, Scope.SUBMIT_POST];
-    if (typeof configUserActions === 'boolean') return configUserActions ? enabled : [];
-    if ('enabled' in configUserActions) return configUserActions.enabled ? enabled : [];
+    if (typeof configUserActions === 'boolean') return [];
+    if ('enabled' in configUserActions) return [];
     return configUserActions.scopes;
   }
 }
