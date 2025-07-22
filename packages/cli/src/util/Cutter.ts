@@ -16,8 +16,11 @@ const RAW_FILE_MIME_TYPES: string[] = [
   'model/',
 ];
 
+// Use custom Mustache delimiters that won't conflict with JSX/TSX curly braces.
+const MUSTACHE_TAGS: [string, string] = ['<%', '%>'];
+
 function m(template: string, mustacheContext: unknown): string {
-  return Mustache.render(template, mustacheContext);
+  return Mustache.render(template, mustacheContext, undefined, { tags: MUSTACHE_TAGS });
 }
 
 /** Render a template directly to the filesystem. */
