@@ -142,7 +142,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Developer tools',
-      items: ['playground', 'playtest', 'debug', 'devvit_cli', 'devvit_kit'],
+      items: ['ui_simulator', 'playground', 'playtest', 'debug', 'devvit_cli', 'devvit_kit'],
     },
     {
       type: 'category',

@@ -112,10 +112,7 @@
         {
           "type": "category",
           "label": "HTTP fetch",
-          "items": [
-            "capabilities/http-fetch",
-            "capabilities/http-fetch-allowlist"
-          ]
+          "items": ["capabilities/http-fetch", "capabilities/http-fetch-allowlist"]
         },
         "capabilities/image-uploads",
         "capabilities/menu-actions",
@@ -131,13 +128,7 @@
     {
       "type": "category",
       "label": "Developer tools",
-      "items": [
-        "playground",
-        "playtest",
-        "debug",
-        "devvit_cli",
-        "devvit_kit"
-      ]
+      "items": ["playground", "playtest", "debug", "devvit_cli", "devvit_kit"]
     },
     {
       "type": "category",
@@ -189,12 +180,7 @@
     {
       "type": "category",
       "label": "Resources",
-      "items": [
-        "get_discovered",
-        "mod_resources",
-        "limits",
-        "help"
-      ]
+      "items": ["get_discovered", "mod_resources", "limits", "help"]
     },
     {
       "type": "doc",
