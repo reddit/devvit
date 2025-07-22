@@ -801,7 +801,6 @@ export class Subreddit {
         banMessage: options.message,
         note: options.note,
         duration: options.duration,
-        banContext: options.context,
       },
       this.#metadata
     );
