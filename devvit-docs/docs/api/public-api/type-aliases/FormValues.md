@@ -4,4 +4,4 @@
 
 # Type Alias: FormValues
 
-> **FormValues** = [`JSONObject`](JSONObject.md)
+> **FormValues** = `FormValuesTyped`\<[`JSONObject`](JSONObject.md)\>

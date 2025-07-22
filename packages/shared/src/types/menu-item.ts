@@ -1,6 +1,6 @@
 export type MenuItemLocation = 'subreddit' | 'post' | 'comment';
 
-export type MenuItemOnPressEvent = {
+export type MenuItemRequest = {
   /** The location where the menu item was pressed */
   location: MenuItemLocation;
   /**

@@ -4,7 +4,7 @@ import type {
   Form,
   FormField,
   FormFieldGroup,
-  FormValues,
+  FormValues as FormValuesTyped,
   ImageField,
   NumberField,
   ParagraphField,
@@ -19,6 +19,8 @@ import type { FormKey } from '@devvit/shared-types/useForm.js';
 import type { Devvit } from '../devvit/Devvit.js';
 import type { FormToFormValues } from './index.js';
 
+type UntypedFormValues = FormValuesTyped<JSONObject>;
+
 export type {
   BaseField,
   BooleanField,
@@ -26,7 +28,7 @@ export type {
   FormField,
   FormFieldGroup,
   FormKey,
-  FormValues,
+  UntypedFormValues as FormValues,
   ImageField,
   NumberField,
   ParagraphField,
