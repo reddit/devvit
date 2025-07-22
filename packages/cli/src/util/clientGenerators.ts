@@ -213,7 +213,7 @@ export function createDeveloperSettingsClient(): DevPortalDeveloperSettingsClien
   );
 }
 
-function getHeaders(): Headers {
+export function getHeaders(): Headers {
   const headers = new Headers();
   headers.set(...HEADER_USER_AGENT());
   headers.set(...HEADER_DEVVIT_CLI());
