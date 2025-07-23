@@ -27,7 +27,7 @@ Community games are asynchronous multiplayer experiences built specifically for 
 - Create an eye-catching first screen that stands out
 - Include a clear, immediate call to action
 - Remember: You're competing with cat videos and memes
-- Example: [r/Pixelary](https://reddit.com/r/pixelary]) shows the drawing canvas right in the feed
+- Example: [r/Pixelary](https://reddit.com/r/pixelary) shows the drawing canvas right in the feed
 
 ### 3. Build content flywheels
 
