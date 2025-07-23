@@ -140,7 +140,7 @@ describe('ModMail API', () => {
           entity: 'askReddit,myAwesomeSubreddit',
           state: 'filtered',
         },
-        context.debug.metadata
+        context.metadata
       );
     });
   });
@@ -182,7 +182,7 @@ describe('ModMail API', () => {
             sort: 'recent',
             state: 'archived',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -205,7 +205,7 @@ describe('ModMail API', () => {
             sort: 'recent',
             state: 'archived',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -240,7 +240,7 @@ describe('ModMail API', () => {
           conversationId,
           markRead: false,
         },
-        context.debug.metadata
+        context.metadata
       );
     });
   });
@@ -263,7 +263,7 @@ describe('ModMail API', () => {
         },
       });
 
-      expect(spyPlugin).toHaveBeenCalledWith({}, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({}, context.metadata);
     });
   });
 
@@ -304,7 +304,7 @@ describe('ModMail API', () => {
             subject: 'Subject: new conversation',
             to: 'my_username',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -328,7 +328,7 @@ describe('ModMail API', () => {
             subject: 'Subject: new conversation',
             to: undefined,
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -351,7 +351,7 @@ describe('ModMail API', () => {
             subject: 'Subject: new conversation',
             to: undefined,
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -385,7 +385,7 @@ describe('ModMail API', () => {
           isAuthorHidden: true,
           isInternal: true,
         },
-        context.debug.metadata
+        context.metadata
       );
     });
   });
@@ -408,7 +408,7 @@ describe('ModMail API', () => {
 
       expect(result).toMatchSnapshot();
 
-      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.metadata);
     });
   });
 
@@ -429,7 +429,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.unhighlightConversation(conversationId);
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.metadata);
     });
   });
 
@@ -450,7 +450,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.archiveConversation(conversationId);
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.metadata);
     });
   });
 
@@ -471,7 +471,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.unarchiveConversation(conversationId);
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.metadata);
     });
   });
 
@@ -493,10 +493,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.muteConversation({ conversationId, numHours: 72 });
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith(
-        { conversationId, numHours: 72 },
-        context.debug.metadata
-      );
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId, numHours: 72 }, context.metadata);
     });
   });
 
@@ -518,7 +515,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.unmuteConversation(conversationId);
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.metadata);
     });
   });
 
@@ -530,7 +527,7 @@ describe('ModMail API', () => {
 
       expect(spyPlugin).toHaveBeenCalledWith(
         { conversationIds: `${conversationId},qwerty` },
-        context.debug.metadata
+        context.metadata
       );
     });
   });
@@ -543,7 +540,7 @@ describe('ModMail API', () => {
 
       expect(spyPlugin).toHaveBeenCalledWith(
         { conversationIds: `${conversationId},qwerty` },
-        context.debug.metadata
+        context.metadata
       );
     });
   });
@@ -567,7 +564,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.approveConversation(conversationId);
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.metadata);
     });
   });
 
@@ -590,7 +587,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.disapproveConversation(conversationId);
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.metadata);
     });
   });
 
@@ -613,10 +610,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.tempBanConversation({ conversationId, duration: 42 });
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith(
-        { conversationId, duration: 42 },
-        context.debug.metadata
-      );
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId, duration: 42 }, context.metadata);
     });
   });
 
@@ -639,7 +633,7 @@ describe('ModMail API', () => {
       const result = await redditAPI.modMail.unbanConversation(conversationId);
 
       expect(result).toMatchSnapshot();
-      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({ conversationId }, context.metadata);
     });
   });
 
@@ -653,7 +647,7 @@ describe('ModMail API', () => {
     await runWithTestContext(async () => {
       const result = await redditAPI.modMail.getUnreadCount();
 
-      expect(spyPlugin).toHaveBeenCalledWith({}, context.debug.metadata);
+      expect(spyPlugin).toHaveBeenCalledWith({}, context.metadata);
 
       expect(result).toEqual({ archived: 42, filtered: 3 });
     });
@@ -684,7 +678,7 @@ describe('ModMail API', () => {
         {
           conversationId,
         },
-        context.debug.metadata
+        context.metadata
       );
 
       expect(result).toEqual(fakeResponse);

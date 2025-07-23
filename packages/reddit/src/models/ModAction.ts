@@ -141,7 +141,7 @@ export function getModerationLog(options: GetModerationLogOptions): Listing<ModA
           type: options.type,
           ...fetchOptions,
         },
-        context.debug.metadata
+        context.metadata
       );
 
       return aboutLogResponseToModActions(response);

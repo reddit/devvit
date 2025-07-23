@@ -12,7 +12,7 @@ export class RealtimeClient {
 
   async send(channel: string, msg: JSONValue): Promise<void> {
     // guarantee an object by wrapping msg. the key must align to useChannel().
-    await this.#realtimePlugin.Send({ channel, data: { msg } }, context.debug.metadata);
+    await this.#realtimePlugin.Send({ channel, data: { msg } }, context.metadata);
   }
 }
 

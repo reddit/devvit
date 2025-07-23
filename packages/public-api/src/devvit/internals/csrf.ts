@@ -9,7 +9,7 @@ type CSRF = {
 };
 
 function getUserHeader(context: BaseContext & ContextAPIClients): string {
-  const userHeader = context.debug.metadata[Header.User].values[0];
+  const userHeader = context.metadata[Header.User].values[0];
   if (!userHeader) {
     throw new Error('User missing from context');
   }
@@ -17,7 +17,7 @@ function getUserHeader(context: BaseContext & ContextAPIClients): string {
 }
 
 function getSubredditHeader(context: BaseContext & ContextAPIClients): string {
-  const subredditHeader = context.debug.metadata[Header.Subreddit].values[0];
+  const subredditHeader = context.metadata[Header.Subreddit].values[0];
   if (!subredditHeader) {
     throw new Error('Subreddit missing from context');
   }

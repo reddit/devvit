@@ -24,8 +24,11 @@ import type { Scheduler } from './scheduler.js';
 import type { SettingsClient } from './settings.js';
 import type { UIClient } from './ui-client.js';
 
+export type { Metadata };
+
 export type ContextDebugInfo = {
   effects?: EffectEmitter;
+  /** @deprecated Use Context.metadata. */
   metadata: Metadata;
 } & {
   /**
@@ -70,6 +73,8 @@ export type BaseContext = {
   toJSON(): Omit<BaseContext, 'toJSON'>;
   /** More useful things, but probably not for the average developer */
   debug: ContextDebugInfo;
+  /** Request headers. */
+  metadata: Metadata;
 };
 
 export type ContextAPIClients = {

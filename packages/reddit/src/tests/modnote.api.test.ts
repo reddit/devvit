@@ -32,7 +32,7 @@ describe('ModNote API', () => {
             reasonId: 'qwerty',
             modNote: 'This is spam!',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });

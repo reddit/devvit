@@ -68,7 +68,7 @@ describe('User API', () => {
           {
             username: currentUsername,
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(user?.id).toStrictEqual(currentUserId);
@@ -115,7 +115,7 @@ describe('User API', () => {
               username: currentUsername,
             },
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(snoovatarUrl).toStrictEqual(currentUserSnoovatarUrl);
@@ -153,7 +153,7 @@ describe('User API', () => {
               username: otherUsername,
             },
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(snoovatarUrl).toStrictEqual(otherSnoovatarUrl);
@@ -181,7 +181,7 @@ describe('User API', () => {
             subreddit: subredditName,
             name: username,
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(userFlair).toEqual({

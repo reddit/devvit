@@ -80,6 +80,7 @@
 - [MenuItemOnPressEvent](type-aliases/MenuItemOnPressEvent.md)
 - [MenuItemPostFilter](type-aliases/MenuItemPostFilter.md)
 - [MenuItemUserType](type-aliases/MenuItemUserType.md)
+- [Metadata](type-aliases/Metadata.md)
 - [ModActionDefinition](type-aliases/ModActionDefinition.md)
 - [ModActionTrigger](type-aliases/ModActionTrigger.md)
 - [ModMailDefinition](type-aliases/ModMailDefinition.md)

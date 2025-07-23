@@ -20,7 +20,7 @@ export class MediaClient {
   }
 
   get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 

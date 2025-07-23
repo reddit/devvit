@@ -52,7 +52,7 @@ describe('Flair API', () => {
             subreddit: 'test_subreddit',
             flairCsv: 'userA,nice bike,miami',
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(response).toStrictEqual([successResponse]);
@@ -76,7 +76,7 @@ describe('Flair API', () => {
             subreddit: 'test_subreddit',
             flairCsv: 'userB,,',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -137,7 +137,7 @@ describe('Flair API', () => {
             subreddit: 'test_subreddit',
             flairCsv: 'userA,nice bike,miami\nuserB,,',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });

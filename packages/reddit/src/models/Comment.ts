@@ -888,6 +888,6 @@ export class Comment {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }

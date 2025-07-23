@@ -55,7 +55,7 @@ export type AddWidgetData =
     });
 
 function getMetadata(): Metadata {
-  return context.debug.metadata;
+  return context.metadata;
 }
 
 export class Widget {

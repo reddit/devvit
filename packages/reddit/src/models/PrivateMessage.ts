@@ -168,10 +168,10 @@ export class PrivateMessage {
 
   async markAsRead(): Promise<void> {
     const client = getRedditApiPlugins().PrivateMessages;
-    await client.ReadMessage({ id: this.#id }, context.debug.metadata);
+    await client.ReadMessage({ id: this.#id }, context.metadata);
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }

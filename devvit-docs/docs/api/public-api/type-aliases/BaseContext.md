@@ -62,6 +62,16 @@ More useful things, but probably not for the average developer
 
 ---
 
+<a id="metadata"></a>
+
+### metadata
+
+> **metadata**: [`Metadata`](Metadata.md)
+
+Request headers.
+
+---
+
 <a id="postdata"></a>
 
 ### postData?

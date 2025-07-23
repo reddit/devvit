@@ -12,6 +12,10 @@
 
 > `optional` **effects**: `EffectEmitter`
 
-### metadata
+### ~~metadata~~
 
-> **metadata**: `Metadata`
+> **metadata**: [`Metadata`](Metadata.md)
+
+#### Deprecated
+
+Use Context.metadata.

@@ -1145,7 +1145,7 @@ export class Subreddit {
       fetch: async () => {
         const listing = await client.Info(
           { thingIds: ids, subreddits: [this.#id] },
-          context.debug.metadata
+          context.metadata
         );
 
         return parseListing(listing);
@@ -1228,7 +1228,7 @@ export class Subreddit {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 
@@ -1373,6 +1373,6 @@ function parseListing(listing: ProtoListing): ListingFetchResponse<Post | Commen
 export async function getSubredditNameById(id: T5ID): Promise<string | undefined> {
   const client = getRedditApiPlugins().LinksAndComments;
 
-  const response = await client.Info({ thingIds: [id], subreddits: [] }, context.debug.metadata);
+  const response = await client.Info({ thingIds: [id], subreddits: [] }, context.metadata);
   return response.data?.children[0]?.data?.displayName;
 }

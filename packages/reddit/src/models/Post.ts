@@ -1740,7 +1740,7 @@ export class Post {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 

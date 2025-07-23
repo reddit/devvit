@@ -116,7 +116,7 @@ describe('Post API', () => {
             thingId: 't3_qwerty',
             usernames: 'my-user',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -181,7 +181,7 @@ describe('Post API', () => {
               runAs: RunAs.USER,
               userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
             },
-            context.debug.metadata
+            context.metadata
           );
         });
       });
@@ -239,7 +239,7 @@ describe('Post API', () => {
               richtextFallback: 'This is a post with text as a fallback',
               runAs: RunAs.APP,
             },
-            context.debug.metadata
+            context.metadata
           );
         });
       });
@@ -279,7 +279,7 @@ describe('Post API', () => {
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               runAs: RunAs.APP,
             },
-            context.debug.metadata
+            context.metadata
           );
         });
       });
@@ -320,7 +320,7 @@ describe('Post API', () => {
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               runAs: RunAs.APP,
             },
-            context.debug.metadata
+            context.metadata
           );
         });
       });
@@ -370,7 +370,7 @@ describe('Post API', () => {
               richtextFallback: 'This is a post with text as a fallback',
               thingId: 't3_qwerty',
             },
-            context.debug.metadata
+            context.metadata
           );
         });
       });
@@ -398,7 +398,7 @@ describe('Post API', () => {
                 '**[Megathread](https://www.reddit.com)** ^([View this post on Reddit redesign for more options](https://www.reddit.com/))',
               thingId: 't3_qwerty',
             },
-            context.debug.metadata
+            context.metadata
           );
         });
       });
@@ -433,7 +433,7 @@ describe('Post API', () => {
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               thingId: 't3_qwerty',
             },
-            context.debug.metadata
+            context.metadata
           );
         });
       });
@@ -459,7 +459,7 @@ describe('Post API', () => {
               bodyType: 1,
               thingId: 't3_qwerty',
             },
-            context.debug.metadata
+            context.metadata
           );
         });
       });

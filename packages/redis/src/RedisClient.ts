@@ -815,7 +815,7 @@ export class RedisClient implements RedisClientLike {
   }
 
   get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 
@@ -845,7 +845,7 @@ function isRedisNilError(e: unknown): boolean {
 }
 
 function assertTxMetadataIsCurrent(metadata: Metadata): void {
-  if (context.debug.metadata !== metadata) {
+  if (context.metadata !== metadata) {
     throw new Error(
       `TxClient: Current metadata does not match what was used to start the transaction. Don't pass clients around between calls!`
     );

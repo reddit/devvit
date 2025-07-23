@@ -103,7 +103,7 @@ describe('Commment API', () => {
             thingId: 't1_commentid',
             usernames: 'my-user',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });

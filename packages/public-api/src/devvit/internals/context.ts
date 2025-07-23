@@ -46,6 +46,7 @@ export function getContextFromMetadata(
     appName,
     appVersion,
     debug,
+    metadata,
     toJSON() {
       return {
         appAccountId,
@@ -58,6 +59,7 @@ export function getContextFromMetadata(
         postData,
         commentId,
         debug,
+        metadata,
       };
     },
   };

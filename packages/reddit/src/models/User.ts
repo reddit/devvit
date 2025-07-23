@@ -548,7 +548,7 @@ export class User {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 
@@ -605,7 +605,7 @@ async function listingProtosToUsers(
         {
           ids: userIds.join(','),
         },
-        context.debug.metadata
+        context.metadata
       )
     )
   );
@@ -649,7 +649,7 @@ async function listingProtosToUsers(
 async function getUsernameById(id: string): Promise<string | undefined> {
   const client = getRedditApiPlugins().Users;
 
-  const response = await client.UserDataByAccountIds({ ids: id }, context.debug.metadata);
+  const response = await client.UserDataByAccountIds({ ids: id }, context.metadata);
 
   return response?.users?.[id]?.name;
 }

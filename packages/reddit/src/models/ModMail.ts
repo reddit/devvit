@@ -1144,7 +1144,7 @@ export class ModMailService {
   }
 
   get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 

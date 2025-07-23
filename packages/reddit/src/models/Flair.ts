@@ -241,7 +241,7 @@ export class FlairTemplate {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 
@@ -475,7 +475,7 @@ export class Flair {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 
