@@ -1,6 +1,6 @@
 {
   "name": "@devvit/client",
-  "version": "0.11.17",
+  "version": "0.11.18",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -33,15 +33,15 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.11.17",
-    "@devvit/reddit": "0.11.17",
-    "@devvit/shared": "0.11.17",
-    "@devvit/shared-types": "0.11.17",
-    "@devvit/web-view-scripts": "0.11.17"
+    "@devvit/protos": "0.11.18",
+    "@devvit/reddit": "0.11.18",
+    "@devvit/shared": "0.11.18",
+    "@devvit/shared-types": "0.11.18",
+    "@devvit/web-view-scripts": "0.11.18"
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
-    "@devvit/tsconfig": "0.11.17",
+    "@devvit/tsconfig": "0.11.18",
     "esbuild": "0.23.0",
     "eslint": "9.11.1",
     "typescript": "5.8.3",

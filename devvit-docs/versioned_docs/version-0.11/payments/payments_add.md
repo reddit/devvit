@@ -5,7 +5,7 @@ You can use the payments template to build your app or add payment functionality
 To start with a template, select the payments template when you create a new project or run:
 
 ```bash
-devvit new --template=payments
+devvit new
 ```
 
 To add payments functionality to an existing app, run:

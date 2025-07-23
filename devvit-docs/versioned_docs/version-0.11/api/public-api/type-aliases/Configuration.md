@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.18-dev**](../README.md)
+[**@devvit/public-api v0.11.19-dev**](../README.md)
 
 ---
 
@@ -82,6 +82,28 @@ Allows your app to use the Redis Plugin
 
 ### userActions?
 
-> `optional` **userActions**: [`PluginSettings`](PluginSettings.md) \| `boolean`
+> `optional` **userActions**: `boolean` \| \{ `enabled`: `boolean`; \} \| \{ `scopes`: `Scope`[]; \}
 
-Allows your app to call Reddit APIs on behalf of the User
+Allows your app to call Reddit APIs on behalf of the User. Passing a boolean is deprecated and defaults to SUBMIT_POST and SUBMIT_COMMENT.
+
+#### Type declaration
+
+`boolean`
+
+\{ `enabled`: `boolean`; \}
+
+#### ~~enabled~~
+
+> **enabled**: `boolean`
+
+Defaults to SUBMIT_POST and SUBMIT_COMMENT.
+
+##### Deprecated
+
+Use scopes.
+
+\{ `scopes`: `Scope`[]; \}
+
+#### scopes
+
+> **scopes**: `Scope`[]

@@ -109,7 +109,8 @@ Supported platforms:
 Create a new web view project:
 
 ```bash
-devvit new --template web-view-post
+devvit new
+# choose the Web View Post template
 cd my-project
 ```
 
@@ -366,7 +367,7 @@ const App = () => {
 
 Adding [payments](payments/payments_add.md) to your app is pretty straightforward, but there are a couple of things to you need to know when also using web views.
 
-For a full working example, see `devvit new --template=payments-web-view`.
+For a full working example, see `devvit new` and choose the Payments Web View template.
 
 ### Using events to handle payments
 

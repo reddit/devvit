@@ -1,6 +1,6 @@
 {
   "name": "@devvit/realtime",
-  "version": "0.11.17",
+  "version": "0.11.18",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -32,17 +32,17 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.11.17",
-    "@devvit/shared": "0.11.17"
+    "@devvit/protos": "0.11.18",
+    "@devvit/shared": "0.11.18"
   },
   "peerDependencies": {
     "@devvit/client": "*",
     "@devvit/server": "*"
   },
   "devDependencies": {
-    "@devvit/client": "0.11.17",
-    "@devvit/server": "0.11.17",
-    "@devvit/tsconfig": "0.11.17",
+    "@devvit/client": "0.11.18",
+    "@devvit/server": "0.11.18",
+    "@devvit/tsconfig": "0.11.18",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"

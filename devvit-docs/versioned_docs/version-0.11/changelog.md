@@ -4,6 +4,19 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.19: UI Simulator
+
+**Release Date: Jul 21, 2025**
+
+Fun fact: most redditors (over 80%!) play Reddit games on their phones. Conversely, most devvitors create apps on desktop. Release 0.11.19 bridges this gap with [UI simulator](./ui_simulator). This tool renders your app in a mobile viewport, lets you test light/dark modes, and helps you build and test apps for a mobile audience.
+
+![UI Simulator Header](./assets/ui_simulator_header.png)
+
+**Other Fixes**
+
+- We fixed `devvit upload --copy-paste` for users who were not logged in
+- We fixed the data object on scheduled cron jobs so that the data is passed as `event.data` rather than `event.data.data`
+
 ## Devvit 0.11.18: Playtest subreddits and CLI improvements
 
 **Release Date: Jul 1, 2025**

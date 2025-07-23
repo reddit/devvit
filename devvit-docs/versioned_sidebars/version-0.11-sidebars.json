@@ -132,6 +132,7 @@
       "type": "category",
       "label": "Developer tools",
       "items": [
+        "ui_simulator",
         "playground",
         "playtest",
         "debug",
