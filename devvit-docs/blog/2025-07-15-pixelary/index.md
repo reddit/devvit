@@ -33,7 +33,7 @@ For Pixelary, I focused on showcasing the drawings. The first screen changes wit
 
 # Make calls to action clear and focused
 
-A game is only as good as its ability to get users to take an action. In Pixelary, I narrowed the focus to just a few key actions: submitting drawings and commenting. This simplicity helps reduce decision fatigue and encourages players to engage with the game on a deeper level.  
+A game is only as good as its ability to get users to take an action. In Pixelary, I narrowed the focus to just a few key actions: submitting drawings and commenting. This simplicity helps reduce decision fatigue and encourages players to engage with the game on a deeper level.
 The game was designed to direct attention toward the most valuable interactions—those that contributed to the game’s ongoing content creation and distribution.
 
 # Build for N players
@@ -73,6 +73,6 @@ Pixelary is far from finished. There’s still much to explore, including:
 
 These ideas are just the beginning, and I’m excited to keep improving the game. You can dive into the open-source code for Pixelary [here](https://github.com/reddit/devvit/tree/main/packages/apps/pixelary).
 
-# Join us\!
+# Join us!
 
 If you’re interested in building community games, I encourage you to explore Reddit’s [developer platform documentation](https://developers.reddit.com/docs/quickstart).
