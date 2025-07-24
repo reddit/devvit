@@ -1,5 +1,5 @@
 import { updateBundleServer, updateBundleVersion } from '@devvit/build-pack/esbuild/ESBuildPack.js';
-import type { FullInstallationInfo } from '@devvit/protos/community.js';
+import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
 import { type FullAppInfo, InstallationType, VersionVisibility } from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import {
@@ -187,7 +187,38 @@ export default class Playtest extends DevvitCommand {
     }
     const shouldWriteToConfig = !this.#subreddit;
 
-    let latestVersion = this.#appInfo.versions[0];
+    let latestVersion: AppVersionInfo;
+    if (this.#appInfo.versions.length > 0 && this.#appInfo.versions[0]) {
+      latestVersion = this.#appInfo.versions[0];
+    } else {
+      // Need to upload version 0.0.1
+      const firstVersion = new DevvitVersion(0, 0, 1);
+      const appVersionCreator = new AppVersionUploader(this, {
+        verbose: Boolean(this.#flags?.verbose),
+      });
+      const bundles = await this.#bundler.bundle(this.project, {
+        name: ACTOR_SRC_PRIMARY_NAME,
+        owner: username,
+        version: firstVersion.toString(),
+      });
+      this.log(
+        "We'll create a non-playtest version of your app first, so you can revert back to it later."
+      );
+      this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
+      latestVersion = await appVersionCreator.createVersion(
+        {
+          appId: this.#appInfo.app.id,
+          appSlug: this.#appInfo.app.slug,
+          appSemver: firstVersion,
+          visibility: VersionVisibility.PRIVATE,
+        },
+        bundles,
+        false
+      );
+      await this.#refreshAppInfoAndSetSubreddit();
+      // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
+    }
+
     this.#version = new DevvitVersion(
       latestVersion.majorVersion,
       latestVersion.minorVersion,
@@ -230,22 +261,14 @@ export default class Playtest extends DevvitCommand {
         false
       );
 
-      // Since we created a subreddit, we reload the app info to get the newly created subreddit ID
-      this.#appInfo = await getAppBySlug(this.#appClient, {
-        slug: this.project.name,
-        limit: 1, // fetched version limit; we only need the latest one
-      });
-      if (!this.#appInfo?.app) {
-        this.error(
-          'Something went wrong: we could not find your app after creating a new playtest subreddit. Please try again.'
-        );
-      } else if (!this.#appInfo.app.defaultPlaytestSubredditId) {
-        this.error(
-          'Something went wrong: we could not find the newly created playtest subreddit. Please playtest on a different subreddit using `devvit playtest <your_subreddit>` instead.'
-        );
-      }
-      this.#subreddit = this.#appInfo.app.defaultPlaytestSubredditId;
+      await this.#refreshAppInfoAndSetSubreddit();
       // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
+    }
+
+    if (!this.#subreddit) {
+      this.error(
+        'Something went wrong: we should have a subreddit by now. Please playtest on a different subreddit using `devvit playtest <your_subreddit>` instead.'
+      );
     }
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
@@ -587,4 +610,19 @@ export default class Playtest extends DevvitCommand {
 
     process.exit(0);
   };
+
+  async #refreshAppInfoAndSetSubreddit(): Promise<void> {
+    this.#appInfo = await getAppBySlug(this.#appClient, {
+      slug: this.project.name,
+      limit: 1, // fetched version limit; we only need the latest one
+    });
+    if (!this.#appInfo?.app) {
+      this.error('Something went wrong: we could not find your app. Please try again.');
+    } else if (!this.#appInfo.app.defaultPlaytestSubredditId && !this.#subreddit) {
+      this.error(
+        'Something went wrong: we could not find the newly created playtest subreddit. Please playtest on a different subreddit using `devvit playtest <your_subreddit>` instead.'
+      );
+    }
+    this.#subreddit ??= this.#appInfo.app.defaultPlaytestSubredditId;
+  }
 }
