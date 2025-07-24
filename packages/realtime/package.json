@@ -8,14 +8,17 @@
   },
   "type": "module",
   "exports": {
-    ".": {
-      "browser": "./dist/index-browser.js",
-      "default": "./dist/index.js"
+    "./client": {
+      "browser": "./dist/client.js",
+      "default": "./dist/clientImportInServerCodePanic.js"
+    },
+    "./server": {
+      "browser": "./dist/serverImportInClientCodePanic.js",
+      "default": "./dist/server.js"
     },
     "./package.json": "./package.json",
     "./*": "./dist/*"
   },
-  "main": "./dist/index.js",
   "files": [
     "dist/**"
   ],
@@ -30,7 +33,6 @@
     "test": "yarn test:types && yarn lint",
     "test:types": "tsc --noEmit"
   },
-  "types": "./dist/index.d.ts",
   "dependencies": {
     "@devvit/protos": "0.11.18",
     "@devvit/shared": "0.11.18"
@@ -49,6 +51,5 @@
   },
   "publishConfig": {
     "directory": "dist"
-  },
-  "source": "./src/index.ts"
+  }
 }
