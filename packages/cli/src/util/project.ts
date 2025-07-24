@@ -104,7 +104,7 @@ export class Project {
 
   // to-do: just return post once classic is removed.
   get clientDir(): string | undefined {
-    return isAppConfig(this.#config) ? this.#config.post?.client.dir : 'webroot';
+    return isAppConfig(this.#config) ? this.#config.post?.dir : 'webroot';
   }
 
   // to-do: just return media once classic is removed.
@@ -242,20 +242,19 @@ export function validateConfig(
     missingFiles.push(`\`config.media.dir\` (${config.media.dir})`);
 
   if (config.post) {
-    if (!fileExists(config.post.client.dir) && mode === 'Static')
-      missingFiles.push(`\`config.post.client.dir\` (${config.post.client.dir})`);
+    if (!fileExists(config.post.dir) && mode === 'Static')
+      missingFiles.push(`\`config.post.dir\` (${config.post.dir})`);
 
-    if (config.post.client.entry.startsWith(apiPathPrefix) || mode === 'Dynamic') {
-      // URL path or user is rebuilding regularly during playtest.
-    } else if (!fileExists(config.post.client.entry))
-      missingFiles.push(`\`config.post.client.entry\` (${config.post.client.entry})`);
-    else {
-      const dir = path.resolve(config.post.client.dir);
-      const entry = path.resolve(config.post.client.entry);
-      if (!entry.startsWith(dir))
-        missingFiles.push(
-          `\`config.post.client.entry\` (${config.post.client.entry}) must exist within \`config.post.client.dir\` (${config.post.client.dir})`
-        );
+    for (const [name, entrypoint] of Object.entries(config.post.entrypoints)) {
+      if (entrypoint.entry.startsWith(apiPathPrefix) || mode === 'Dynamic') {
+        // URL path or user is rebuilding regularly during playtest.
+      } else {
+        const dir = path.resolve(config.post.dir);
+        const entry = path.resolve(dir, entrypoint.entry);
+        if (!fileExists(entry)) {
+          missingFiles.push(`\`config.post.entrypoints.${name}.entry\` (${entrypoint.entry})`);
+        }
+      }
     }
   }
 

@@ -102,55 +102,60 @@ describe('validateConfig()', () => {
       }
   });
 
-  test('post.client.dir', () => {
-    for (const exists of [false, true])
-      for (const mode of ['Static', 'Dynamic'] as const) {
+  for (const exists of [false, true])
+    for (const mode of ['Static', 'Dynamic'] as const)
+      test(`post.dir (${exists}, ${mode})`, () => {
         const config: AppConfig = {
           schema: 'v1',
           name: 'name',
           permissions: noPermissions,
           post: {
-            client: { dir: 'dir', entry: 'dir/entry' },
+            dir: 'dir',
+            entrypoints: {
+              default: { name: 'default', entry: 'entry', height: 'tall' },
+            },
           },
           json: { name: 'name' },
         };
         expect(
           validateConfig(config, (filename: string) => (filename === 'dir' ? exists : true), mode)
-        ).toStrictEqual(exists || mode === 'Dynamic' ? [] : ['`config.post.client.dir` (dir)']);
-      }
-  });
+        ).toStrictEqual(exists || mode === 'Dynamic' ? [] : ['`config.post.dir` (dir)']);
+      });
 
-  test('post.client.entry file', () => {
-    for (const exists of [false, true])
-      for (const mode of ['Static', 'Dynamic'] as const) {
+  for (const exists of [false, true])
+    for (const mode of ['Static', 'Dynamic'] as const)
+      test(`post.entrypoints.entry file (${exists}, ${mode})`, () => {
         const config: AppConfig = {
           schema: 'v1',
           name: 'name',
           permissions: noPermissions,
           post: {
-            client: { dir: 'dir', entry: 'dir/entry' },
+            dir: 'dir',
+            entrypoints: { default: { name: 'default', entry: 'entry', height: 'tall' } },
           },
           json: { name: 'name' },
         };
         expect(
           validateConfig(
             config,
-            (filename: string) => (filename === 'dir/entry' ? exists : true),
+            (filename: string) => (filename.endsWith('dir/entry') ? exists : true),
             mode
           )
         ).toStrictEqual(
-          exists || mode === 'Dynamic' ? [] : ['`config.post.client.entry` (dir/entry)']
+          exists || mode === 'Dynamic' ? [] : ['`config.post.entrypoints.default.entry` (entry)']
         );
-      }
-  });
+      });
 
-  test('post.client.entry API', () => {
+  test('post.entrypoints.entry API', () => {
     const config: AppConfig = {
       schema: 'v1',
       name: 'name',
       permissions: noPermissions,
       post: {
-        client: { dir: 'dir', entry: '/api/entry' },
+        dir: 'dir',
+        entrypoints: {
+          default: { name: 'default', entry: '/api/entry', height: 'tall' },
+        },
       },
       json: { name: 'name' },
     };
