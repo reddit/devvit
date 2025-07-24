@@ -1,6 +1,5 @@
 import type { UnknownMessage } from '@devvit/protos';
 import * as protos from '@devvit/protos';
-import { Scope } from '@devvit/protos';
 import type { PaymentsService } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
@@ -105,7 +104,6 @@ export type DevvitDebug = {
 export class Devvit extends Actor {
   static debug: DevvitDebug = {};
   static #appSettings: SettingsFormField[] | undefined;
-  static #assets: AssetMap = {};
   static #config: Configuration = {};
   static #customPostType: CustomPostType | undefined;
   static readonly #formDefinitions: Map<FormKey, FormDefinition> = new Map();
@@ -118,7 +116,7 @@ export class Devvit extends Actor {
   > = new Map();
   static #webViewAssets: AssetMap = {};
   static #domains: string[] = [];
-  static #scopes: Scope[] = [];
+  static #scopes: protos.Scope[] = [];
 
   static #additionallyProvides: protos.Definition[] = [];
 
@@ -199,7 +197,7 @@ export class Devvit extends Actor {
 
     if (pluginIsEnabled(pluginEnabled)) {
       this.use(protos.UserActionsDefinition);
-      const scopes = Devvit.#getUserScopesFromConfig(config);
+      const scopes = this.#getUserScopesFromConfig(config);
       if (scopes.length > 0) {
         this.#scopes = scopes;
       }
@@ -717,9 +715,9 @@ export class Devvit extends Actor {
     return this.#triggerOnEventHandlers;
   }
 
-  /** @internal */
+  /** Do not cache. @internal */
   static get assets(): AssetMap {
-    return this.#assets;
+    return globalThis.devvit?.assets ?? {};
   }
 
   /** @internal */
@@ -731,7 +729,8 @@ export class Devvit extends Actor {
   constructor(config: Config) {
     super(config);
 
-    Devvit.#assets = config.assets ?? {};
+    globalThis.devvit ??= {};
+    globalThis.devvit.assets ??= config.assets;
     Devvit.#webViewAssets = config.webviewAssets ?? {};
 
     for (const fullName in Devvit.#uses) {
@@ -784,7 +783,7 @@ export class Devvit extends Actor {
     }
   }
 
-  static #getUserScopesFromConfig(config: Configuration): Scope[] {
+  static #getUserScopesFromConfig(config: Configuration): protos.Scope[] {
     const configUserActions = config.userActions;
     if (!configUserActions) return [];
     if (
@@ -1125,12 +1124,24 @@ declare global {
 
 declare global {
   namespace globalThis {
+    /**
+     * Webbit apps have two copies of the Devvit singleton in two
+     * bundles (concatenated JavaScript): 1) blocks.template.ts
+     * 2) `@devvit/*` package dependencies on `@devvit/public-api`. Only the first
+     * is actually constructed by the classic bootstrap. The second is referenced
+     * indirectly by API calls like BlocksHandler but static state is never
+     * initialized. Isolate that state here.
+     * @internal
+     */
     // eslint-disable-next-line no-var
-    var devvit: {
-      settings?: {
-        app?: FormField[] | undefined;
-        installation?: FormField[] | undefined;
-      };
-    };
+    var devvit:
+      | {
+          assets?: AssetMap;
+          settings?: {
+            app?: FormField[] | undefined;
+            installation?: FormField[] | undefined;
+          };
+        }
+      | undefined;
   }
 }
