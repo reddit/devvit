@@ -191,10 +191,18 @@ export class Devvit extends Actor {
       this.use(protos.RealtimeDefinition);
     }
 
-    const scopes = Devvit.#getUserScopesFromConfig(config);
-    if (scopes.length > 0) {
+    const userActionsConfig = config.userActions;
+    const hasScopes = typeof userActionsConfig === 'object' && 'scopes' in userActionsConfig;
+    const pluginEnabled: PluginSettings | boolean | undefined = hasScopes
+      ? { enabled: true }
+      : userActionsConfig;
+
+    if (pluginIsEnabled(pluginEnabled)) {
       this.use(protos.UserActionsDefinition);
-      this.#scopes = scopes;
+      const scopes = Devvit.#getUserScopesFromConfig(config);
+      if (scopes.length > 0) {
+        this.#scopes = scopes;
+      }
     }
   }
 
@@ -779,9 +787,15 @@ export class Devvit extends Actor {
   static #getUserScopesFromConfig(config: Configuration): Scope[] {
     const configUserActions = config.userActions;
     if (!configUserActions) return [];
-    if (typeof configUserActions === 'boolean') return [];
-    if ('enabled' in configUserActions) return [];
-    return configUserActions.scopes;
+    if (
+      typeof configUserActions === 'object' &&
+      'enabled' in configUserActions &&
+      configUserActions.enabled
+    )
+      return [];
+    if (typeof configUserActions === 'object' && 'scopes' in configUserActions)
+      return configUserActions.scopes;
+    return [];
   }
 }
 
