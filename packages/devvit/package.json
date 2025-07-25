@@ -13,11 +13,7 @@
       "default": "./dist/index.js"
     },
     "./package.json": "./package.json",
-    "./bin/devvit": "./bin/devvit.js",
-    "./api": {
-      "types": "./dist/api.d.ts",
-      "default": "./dist/api.js"
-    }
+    "./bin/devvit": "./bin/devvit.js"
   },
   "main": "./dist/index.js",
   "bin": "bin/devvit.js",
@@ -40,8 +36,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/cli": "0.11.18",
-    "@devvit/public-api": "0.11.18"
+    "@devvit/cli": "0.11.18"
   },
   "devDependencies": {
     "@devvit/tsconfig": "0.11.18",
