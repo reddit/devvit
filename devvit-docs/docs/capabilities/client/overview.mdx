@@ -1,0 +1,189 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Overview
+
+Client-side effects enable your Devvit app to provide interactive feedback and navigation to users. These effects include showing toasts, displaying forms & menu items, navigating to different pages, and more.
+
+## Overview
+
+Devvit provides client-side functionality through two different architectures:
+
+- **Devvit Web**: Uses dedicated client-side functions from `@devvit/web/client`
+- **Devvit Blocks**: Uses context methods available in the `@devvit/public-api`
+
+Both approaches provide:
+
+* **UI Effects**: Show toasts, forms, and navigation
+* **User Feedback**: Immediate responses to user interactions
+* **Navigation**: Redirect users to Reddit content or external websites
+
+:::note
+For realtime communication and payments functionality, see the dedicated documentation for those features.
+:::
+
+## Available Client Effects
+
+| Effect | Description | Devvit Web | Devvit Blocks |
+|--------|-------------|------------|---------------|
+| Toast | Show temporary notification messages | `showToast()` | `context.ui.showToast()` |
+| Form | Display interactive forms to users | `showForm()` | `context.ui.showForm()` |
+| Navigation | Redirect to Reddit content or external URLs | `navigateTo()` | `context.ui.navigateTo()` |
+| Menu items | Add menu items in different Reddit entrypoints | `menu.items[]` | `Devvit.addMenuItem()` |
+
+## Setup and Usage
+
+<Tabs>
+  <TabItem value="web" label="Devvit Web">
+  
+  The client package is included by default in Devvit Web projects and provides direct function imports for client-side effects.
+
+  ```ts
+  import { showToast, showForm, navigateTo } from '@devvit/web/client';
+
+  // Show a toast notification
+  showToast('Hello from Devvit Web!');
+
+  // Navigate to a URL
+  navigateTo('https://www.reddit.com/r/webdev');
+
+  // Show a form (example)
+  showForm({
+    title: 'User Input',
+    fields: [
+      {
+        type: 'string',
+        name: 'username',
+        label: 'Username'
+      }
+    ]
+  });
+```
+
+### Menu Items
+
+Menu items are defined within devvit.json and can respond with a client side effect.
+
+```json
+  // devvit.json
+  {
+   ...
+    "menu":
+      {
+        "items":
+          [
+            {
+              "description": "Create post",
+              "endpoint": "/internal/menu/post-create",
+              "forUserType": "moderator",
+              "location": "subreddit",
+              "label": "Create post"
+            }
+          ]
+      }
+  ... 
+  }
+  ```
+
+  ### Server Response Format
+
+  Client effects can also be triggered from server endpoints by returning them in the response:
+
+  ```ts
+  // In your server endpoint
+  router.post("/internal/my-action", async (_req, res: Response<UiResponse>) => {
+    try {
+      // Perform server-side logic
+      await performAction();
+      
+      res.json({
+        showToast: {
+          text: 'Action completed successfully!',
+          appearance: 'success'
+        }
+      });
+    } catch (error) {
+      res.json({
+        showToast: 'Something went wrong. Please try again.'
+      });
+    }
+  });
+  ```
+
+  </TabItem>
+  <TabItem value="blocks" label="Devvit Blocks / Mod Tools">
+  
+  Client effects are available through the context object passed to event handlers and component render functions.
+
+  ```tsx
+  import { Devvit } from '@devvit/public-api';
+
+  // In a menu action
+  Devvit.addMenuItem({
+    label: 'Show Toast',
+    location: 'post',
+    onPress: async (event, context) => {
+      // Show a toast notification
+      context.ui.showToast('Hello from Devvit Blocks!');
+      
+      // Navigate to a URL
+      context.ui.navigateTo('https://www.reddit.com/r/webdev');
+    },
+  });
+
+  // In a custom post component
+  Devvit.addCustomPostType({
+    name: 'Interactive Post',
+    render: (context) => {
+      return (
+        <vstack height="100%" alignment="middle center">
+          <button
+            onPress={() => {
+              context.ui.showToast('Button clicked!');
+            }}
+          >
+            Click me
+          </button>
+          <button
+            onPress={() => {
+              context.ui.showForm({
+                title: 'User Input',
+                fields: [
+                  {
+                    type: 'string',
+                    name: 'username',
+                    label: 'Username'
+                  }
+                ]
+              });
+            }}
+          >
+            Show Form
+          </button>
+        </vstack>
+      );
+    },
+  });
+  ```
+
+  ### Context Availability
+
+  The context object is available in:
+  - Menu action `onPress` handlers
+  - Custom post component render functions
+  - Button `onPress` handlers within components
+  - Form submission handlers
+  - Scheduled job handlers
+
+  </TabItem>
+</Tabs>
+
+## Next Steps
+
+Explore the specific documentation for each client effect:
+
+- [Toasts](./toasts.mdx) - Temporary notification messages
+- [Forms](./forms.mdx) - Interactive user input
+- [Navigation](./adding-links.mdx) - Redirecting users
+- [Realtime](../realtime/overview.md) - Live updates and communication
+- [Payments](../payments/overview.md) - Transaction handling

@@ -8,7 +8,7 @@ Before upgrading `@devvit/public-api` in your project, always update the CLI fir
 
 **Release Date: Jul 21, 2025**
 
-Fun fact: most redditors (over 80%!) play Reddit games on their phones. Conversely, most devvitors create apps on desktop. Release 0.11.19 bridges this gap with [UI simulator](./ui_simulator). This tool renders your app in a mobile viewport, lets you test light/dark modes, and helps you build and test apps for a mobile audience.
+Fun fact: most redditors (over 80%!) play Reddit games on their phones. Conversely, most devvitors create apps on desktop. Release 0.11.19 bridges this gap with [UI simulator](./guides/tools/ui_simulator.mdx). This tool renders your app in a mobile viewport, lets you test light/dark modes, and helps you build and test apps for a mobile audience.
 
 ![UI Simulator Header](./assets/ui_simulator_header.png)
 
@@ -21,7 +21,7 @@ Fun fact: most redditors (over 80%!) play Reddit games on their phones. Converse
 
 **Release Date: Jul 1, 2025**
 
-We made app development even smoother with auto-generated [playtest subreddits](./playtest.md). When you run `devvit upload` for the first time, u/devvit-dev-bot automatically creates a playtest subreddit for your app that:
+We made app development even smoother with auto-generated [playtest subreddits](./guides/tools/playtest.md). When you run `devvit upload` for the first time, u/devvit-dev-bot automatically creates a playtest subreddit for your app that:
 
 - Is private by default
 - Makes you a moderator automatically
@@ -30,13 +30,13 @@ We made app development even smoother with auto-generated [playtest subreddits](
 
 Just run `devvit playtest` to use the auto-generated subreddit.
 
-You can also still use your own subreddits for playtesting (with fewer than 200 subscribers) by specifying the subreddit in the CLI or adding a default subreddit in your app. Learn more about playtesting [here](./playtest.md#playtest-on-an-alternate-subreddit).
+You can also still use your own subreddits for playtesting (with fewer than 200 subscribers) by specifying the subreddit in the CLI or adding a default subreddit in your app. Learn more about playtesting [here](./guides/tools/playtest.md#playtest-on-an-alternate-subreddit).
 
 **CLI improvements**
 
 Here’s what’s new:
 
-- A [`devvit view`](./devvit_cli.md#devvit-view) command that lets you see the latest version of your app (since it’s not updated in devvit.yaml anymore).
+- A [`devvit view`](./guides/tools/devvit_cli.md#devvit-view) command that lets you see the latest version of your app (since it’s not updated in devvit.yaml anymore).
 - CLI updates are now less disruptive and don’t require a forced update for non-breaking changes. (Note that this update does require a forced update to take effect.)
 
 Use `npm install -g devvit@latest` to update your CLI .
@@ -66,7 +66,7 @@ Devvit.configure({
 ```
 
 :::note
-Domains on the [global allow list](./capabilities/http-fetch-allowlist.md) don’t need approval—they just work.
+Domains on the global allow list don’t need approval—they just work.
 :::
 
 There’s also a new section in your app’s Developer Settings (https://developers.reddit.com/apps/[app-slug]/developer-setings) tab that lets you check the status of a domain.
@@ -75,7 +75,7 @@ There’s also a new section in your app’s Developer Settings (https://develop
 
 To use this feature, you’ll need to be on the latest version of the public api. You can do this by running: `npm i @devvit/public-api` in your app.
 
-Learn more about [HTTP fetch](./capabilities/http-fetch.md) and the[allow-listed domains](./capabilities/http-fetch-allowlist.md) in our docs.
+Learn more about [HTTP fetch](./capabilities/server/http-fetch.mdx) and the allow-listed domains in our docs.
 
 ## Devvit 0.11.16: CLI improvements and updated guidelines
 
@@ -111,7 +111,7 @@ This little release updates typescript to 5.8.3 and fixes an internal issue that
 
 **Release Date: May 6, 2025**
 
-We’ve released a new [app version panel](./publishing.md#app-versions) that lets you track all the versions of your app, so you can see your app’s status, visibility, and number of installations for each app version. The panel displays the most recent versions of your app, and you can download a complete list of published versions via CSV.
+We’ve released a new app version panel that lets you track all the versions of your app, so you can see your app’s status, visibility, and number of installations for each app version. The panel displays the most recent versions of your app, and you can download a complete list of published versions via CSV.
 
 **Other fixes**  
 This release also includes some small but mighty fixes:
@@ -140,11 +140,11 @@ In this release, Devvit introduces a new way for apps to let users create conten
 - **Saves the user time and effort**. It’s easy for users to jump into the conversation.
 - **Improves retention**. When people interact with your app, they’re more likely to stick around, and continued user engagement helps your app reach new people. Total positive feedback loop!
 
-Check out our new [user action API](./capabilities/userActions.md) to see how you can add this to your own app.
+Check out our new [user action API](./capabilities/server/userActions.md) to see how you can add this to your own app.
 
-Also in this release, we’ve streamlined developer communication. New devs will get automatic email notifications when they [upload](./dev_guide.mdx) their first app and every time an app is approved for [publishing](./publishing.md).
+Also in this release, we’ve streamlined developer communication. New devs will get automatic email notifications when they upload their first app and every time an app is approved for publishing.
 
-Last but certainly not least, we’ve added a way for you to garner user support while you develop your app! Use the [support this app](./payments/support_this_app.md) payments molecule to let your biggest fans show their love.
+Last but certainly not least, we’ve added a way for you to garner user support while you develop your app! Use the [support this app](./earn-money/payments/support_this_app.md) payments molecule to let your biggest fans show their love.
 
 ## Devvit 0.11.12: Everything but the kitchen sink updates
 
@@ -154,12 +154,12 @@ Here’s what you can find in 0.11.12.
 
 **Feature improvements**
 
-- [Logging](./debug.md) improvements:
+- Logging improvements:
   - Retention has been increased from 100 events to the last 5,000 events.
   - There's a new CLI flag to turn on timestamps when requested.
 - There's a new CLI command to easily generate payment products.
   - CLI helper to add/edit existing payment products
-- Updated app [publishing](./publishing.md) workflow:
+- Updated app publishing workflow:
   - All apps are published unlisted by default.
   - We’ve added a new flag if you want to publish your app publicly: `devvit publish --public`.
 
@@ -170,7 +170,7 @@ Patched an issue that prevented some payments playtest errors from being logged 
 
 **Release Date: Mar 24, 2025**
 
-We've been working on making the web view experience better and more consistent across all platforms, and one new change we’re including is a `webview.unmount` function. This lets you unmount a [web view](./webviews.md#usewebview) that's in focus mode programmatically.
+We've been working on making the web view experience better and more consistent across all platforms, and one new change we’re including is a `webview.unmount` function. This lets you unmount a web view that's in focus mode programmatically.
 
 :::note
 Unmount is only available in v2025.12+ on iOS and v2025.11+ on Android.
@@ -238,7 +238,7 @@ Focus mode enables web view apps that:
 
 ![Web views example](./assets/webviews_snakepit_example.png)
 
-The <webview> component is being deprecated in favor of the new useWebView hook. Please follow the [migration guide](./webviews.md#migration-guide) to migrate over your existing web view apps and check out the updated[web view docs](./webviews.md). Apps using the <webview> component are no longer publishable.
+The <webview> component is being deprecated in favor of the new useWebView hook. Please follow the migration guide to migrate over your existing web view apps and check out the updatedweb view docs. Apps using the <webview> component are no longer publishable.
 
 Once your web view app is migrated to useWebView and works on all platforms, publish your app!
 
@@ -252,11 +252,11 @@ Once your web view app is migrated to useWebView and works on all platforms, pub
 
 ## Special Devvit Announcement: Payments
 
-We’ve got a big update for our [payments pilot](./payments/payments_overview.md) that makes [testing payments](./payments/payments_test.md) in your apps even easier!
+We’ve got a big update for our [payments pilot](./earn-money/payments/payments_overview.md) that makes [testing payments](./earn-money/payments/payments_test.md) in your apps even easier!
 
-- **Instant Access to Sandbox Testing** – Now, all developers can immediately test sandbox payment products in their apps without needing to request allowlist access first. This means you can start experimenting with in-app purchasing right away! (You'll still need to complete the [verification process](./payments/payments_overview.md#prerequisites) before submitting your app for approval.)
+- **Instant Access to Sandbox Testing** – Now, all developers can immediately test sandbox payment products in their apps without needing to request allowlist access first. This means you can start experimenting with in-app purchasing right away! (You'll still need to complete the [verification process](./earn-money/payments/payments_overview.md#prerequisites) before submitting your app for approval.)
 
-- **New Developer Showcase** – We’re highlighting how fellow developers are using payments in their apps! First up: [Dark Dungeon](./showcase/payments_examples.md), a game with in-app purchasing thoughtfully integrated in. Check it out for inspiration on what’s possible!
+- **New Developer Showcase** – We’re highlighting how fellow developers are using payments in their apps! First up: Dark Dungeon, a game with in-app purchasing thoughtfully integrated in. Check it out for inspiration on what’s possible!
 
 We can’t wait to see what you build! If you have questions or feedback, drop questions here or in the [Payments Discord channel](https://discord.com/channels/1050224141732687912/1295856497917431879).
 
@@ -296,7 +296,7 @@ You may notice additional logs about CSRF tokens. These will be removed in the n
 
 **New features**
 
-- Added an [`hMGet`](./capabilities/redis.md#hash) method to Redis to get the value of multiple keys from a hash.
+- Added an [`hMGet`](./capabilities/server/redis.mdx#hash) method to Redis to get the value of multiple keys from a hash.
 - Redis is available to all apps now, so you don't have to define `redis: true` within the configuration object.
 
 **Fixes**
@@ -308,7 +308,7 @@ You may notice additional logs about CSRF tokens. These will be removed in the n
 
 **Release Date: Dec 9, 2024**
 
-Release 0.11.4 introduces [payments](./capabilities/payments.md)! This pilot program lets you add products to your app and get paid for what you sell. The payments plugin enables the capability for users to purchase in-app products, like additional lives in a game or custom flair.
+Release 0.11.4 introduces [payments](./earn-money/payments/payments_overview.md)! This pilot program lets you add products to your app and get paid for what you sell. The payments plugin enables the capability for users to purchase in-app products, like additional lives in a game or custom flair.
 
 Since this is a pilot program, you'll need to submit an [enrollment form](https://forms.gle/TuTV5jbUwFKTcerUA) before developing and playtesting payments in your app. Before you publish your app, you’ll need to complete additional steps outlined in the payments documentation.
 
@@ -317,9 +317,9 @@ We’ve also added a new [template](https://developers.reddit.com/docs/capabilit
 **New features**
 This release also includes:
 
-- A `finally:` parameter for [useAsync](./working_with_useasync.md) that lets your app setState when an async response is returned.
+- A `finally:` parameter for [useAsync](./capabilities/blocks/working_with_useasync.md) that lets your app setState when an async response is returned.
 - The ability to use runAs with [setCustomPostPreview](https://developers.reddit.com/docs/api/redditapi/classes/models.Post#-setcustompostpreview).
-- Experimental [web views](./webviews.md) functionality on the latest iOS and Android clients.
+- Experimental web views functionality on the latest iOS and Android clients.
 
 **Fixes**
 Release 0.11.4 corrected issues with duplicate logs and fixed the 502 error that was occurring during Redis transactions.
@@ -330,48 +330,48 @@ Release 0.11.4 corrected issues with duplicate logs and fixed the 502 error that
 
 0.11.3 adds a new way for developers to build UI with web views and server-side functions.
 
-**[Web views](./webviews.md)** - is an experimental alternative to Devvit blocks, where you can build interactive posts and bring your own html/css/js into apps. This allows you to have access to standard web APIs and frameworks and access to animations and gestures not available in blocks. Note that this is an experimental feature that only works on web and is subject to significant changes over the next few months.
+**Web views** - is an experimental alternative to Devvit blocks, where you can build interactive posts and bring your own html/css/js into apps. This allows you to have access to standard web APIs and frameworks and access to animations and gestures not available in blocks. Note that this is an experimental feature that only works on web and is subject to significant changes over the next few months.
 
-**Server-side functions** - We heard that developers are concerned that their app code for interactive posts is exposed to clients (which is done for performance purposes). This release includes new [server-side functions](./capabilities/server-side-functions.md) so that you can run functions from a `/*.server.ts` or `/server/*.ts` file to keep your codebase private. Those functions will run server-side and trigger a re-render.
+**Server-side functions** - We heard that developers are concerned that their app code for interactive posts is exposed to clients (which is done for performance purposes). This release includes new server-side functions so that you can run functions from a `/*.server.ts` or `/server/*.ts` file to keep your codebase private. Those functions will run server-side and trigger a re-render.
 
 We also made a few other changes to our public API in this release:
 
-- [post.getEnrichedThumbnail](./api/redditapi/classes/models.Post.md#getenrichedthumbnail) allows developers to get a better thumbnail
-- Community fix: Allow [WikiPage revision author](./api/redditapi/classes/models.WikiPage.md) to be undefined (Thanks PitchforkAssistant)
-- Community fix: Include conversations IDs sorted array from [modMail.getConversations](./api/redditapi/classes/models.ModMailService.md#getconversations) (Thanks Pitchfork Assistant x2!)
+- [post.getEnrichedThumbnail](./api/redditapi/models/classes/Post.md#getenrichedthumbnail) allows developers to get a better thumbnail
+- Community fix: Allow [WikiPage revision author](./api/redditapi/models/classes/WikiPage.md) to be undefined (Thanks PitchforkAssistant)
+- Community fix: Include conversations IDs sorted array from [modMail.getConversations](./api/redditapi/models/classes/ModMailService.md#getconversations) (Thanks Pitchfork Assistant x2!)
 
 ## Devvit 0.11.2: Text fallback and post API client changes
 
 **Release Date: Oct 31, 2024**
 
-0.11.2 adds [textFallback](./text_fallback.md) functionality to ensure that text in your app is accessible and functional on every surface. Old Reddit doesn't render interactive posts, and this ensures that your app can have a text fallback for those cases.
+0.11.2 adds [textFallback](./capabilities/server/text_fallback.mdx) functionality to ensure that text in your app is accessible and functional on every surface. Old Reddit doesn't render interactive posts, and this ensures that your app can have a text fallback for those cases.
 
 This release also includes a few API updates:
 
-- [setCustomPostPreview](./api/redditapi/classes/models.Post.md#setcustompostpreview) lets you update and [customize the post preview](./interactive_posts.md#customize-the-post-preview) with real content in the loading screen after the post has been created.
-- [setSuggestedCommentSort](./api/redditapi/classes/models.Post.md#setsuggestedcommentsort) provides options for sorting comments on a post.
+- [setCustomPostPreview](./api/redditapi/models/classes/Post.md#setcustompostpreview) lets you update and customize the post preview with real content in the loading screen after the post has been created.
+- [setSuggestedCommentSort](./api/redditapi/models/classes/Post.md#setsuggestedcommentsort) provides options for sorting comments on a post.
 - `forUserType: member’` has been removed from menu items. If you want a menu action to be visible to all users, omit the `forUserType` field.
 
 ## Devvit 0.11.1: New automod filter trigger, playtest connect, and other improvements
 
 **Release Date: Oct 21, 2024**
 
-0.11.1 includes [a new trigger](capabilities/triggers.md) for when posts and comments are filtered by automod. We’ve also included some other improvements including:
+0.11.1 includes [a new trigger](./capabilities/server/triggers.md) for when posts and comments are filtered by automod. We’ve also included some other improvements including:
 
-- Playtest now defaults to using `--connect`, which sends client side logs that are in your browser into your CLI/terminal if you use the `?playtest` [parameter](playtest.md).
+- Playtest now defaults to using `--connect`, which sends client side logs that are in your browser into your CLI/terminal if you use the `?playtest` [parameter](./guides/tools/playtest.md).
 - Public API changes:
   - Updated parameters to improve modmail conversation routing:
     - Added `createModInboxConversation()`, which sends a message from the app account to subreddit mods via Mod Inbox.
     - Added `createModDiscussionConversation()`, which does the same thing via Mod Discussions.
     - Deprecated `modMail.createConversation()`.
-  - Fixed [`modMail.muteConversation`](api/redditapi/classes/models.ModMailService.md) to take in proper values for numHours (defaults to 72).
+  - Fixed [`modMail.muteConversation`](./api/redditapi/models/classes/ModMailService.md) to take in proper values for numHours (defaults to 72).
   - Fixed context that was not being properly passed in `reddit.banUser` methods (thanks to fsv for the community contribution!).
 
 ## Devvit 0.11.0: Platform updates, breaking changes, and useAsync
 
 **Release Date: October 9, 2024**
 
-One of the biggest issues for devs who are building experiences is that data fetching slows down the render of the app. Devvit 0.11.0 introduces a new platform architecture for improved performance and scalability. This release includes a new, experimental [useAsync](working_with_useasync.md) feature that allows you to fetch data in a non-blocking way and a new hook architecture that lets you build composable hooks.
+One of the biggest issues for devs who are building experiences is that data fetching slows down the render of the app. Devvit 0.11.0 introduces a new platform architecture for improved performance and scalability. This release includes a new, experimental [useAsync](./capabilities/blocks/working_with_useasync.md) feature that allows you to fetch data in a non-blocking way and a new hook architecture that lets you build composable hooks.
 
 These platform upgrades create breaking changes for some apps. We’re releasing 0.11.0 on [@Next](https://developers.reddit.com/docs/next/) (the experimental branch of Devvit), so current app functionality will still work as you migrate your apps over to the updated platform.
 

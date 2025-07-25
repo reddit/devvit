@@ -39,7 +39,7 @@ Use `context.cache` to reduce the amount of requests to optimize performance and
 
 ### Leverage scheduled jobs to fetch or update data
 
-Use [scheduler](./capabilities/scheduler.md) to make large data requests in the background and store it in [Redis](./capabilities/redis.md) for later use. You can also [fetch data for multiple users](#how-to-use-the-cache-helper​).
+Use [scheduler](./capabilities/scheduler.md) to make large data requests in the background and store it in [Redis](./capabilities/redis.md) for later use. You can also [fetch data for multiple users](#how-to-cache-data).
 
 ### Batch API calls to make parallel requests
 

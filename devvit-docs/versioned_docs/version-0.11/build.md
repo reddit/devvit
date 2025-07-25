@@ -12,7 +12,7 @@ npm install -g @devvit/cli
 
 :::note
 
-If you are running into errors, check out our guide for how to set up your [development environment](./dev_guide.mdx#environmentsetup).
+If you are running into errors, check out our guide for how to set up your [development environment](./dev_guide.mdx#1-environment-setup).
 
 :::
 

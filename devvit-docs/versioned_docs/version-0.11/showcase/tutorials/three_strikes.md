@@ -279,7 +279,7 @@ async function strike(event: MenuItemOnPressEvent, context: Devvit.Context) {
 
 ### Compose a message
 
-When a mod selects the **Remove and strike** menu option, a private message is sent to the user with the appropriate warning based on the user’s number of strikes. There is boilerplate text in the [strike functionality](#Remove-and-strike) you added earlier. If you would like to modify the messages, edit that file under the appropriate strike count.
+When a mod selects the **Remove and strike** menu option, a private message is sent to the user with the appropriate warning based on the user’s number of strikes. There is boilerplate text in the [strike functionality](#remove-and-strike) you added earlier. If you would like to modify the messages, edit that file under the appropriate strike count.
 
 ## Add menu actions
 

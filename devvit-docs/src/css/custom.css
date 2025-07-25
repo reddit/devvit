@@ -171,3 +171,37 @@ table tbody tr {
 table tbody tr:nth-of-type(even) {
   background-color: inherit;
 }
+
+div.themed-col {
+  transition: transform 0.25s cubic-bezier(0.4,0.2,0.2,1), box-shadow 0.25s cubic-bezier(0.4,0.2,0.2,1);
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
+}
+div.themed-col:hover {
+  transform: scale(1.04) translateY(-4px);
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+  z-index: 2;
+}
+
+/* Sidebar custom styling */
+
+.sidebar-icon-link a::before{
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  content: '';
+  display: inline-block;
+  max-width: 20px;
+  max-height: 20px;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.discord-link a::before{
+  background-image: url('../../static/img/icon-discord.png');  
+}
+
+.subreddit-link a::before{
+  background-image: url('../../static/img/icon-reddit.png');
+}

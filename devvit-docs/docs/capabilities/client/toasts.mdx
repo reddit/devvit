@@ -1,0 +1,136 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Toasts
+
+Display temporary notification messages to users at the bottom of the screen.
+
+## Overview
+
+Toasts are brief, non-intrusive messages that appear temporarily at the bottom of the screen to provide feedback to users about their actions. They automatically disappear after a few seconds and are ideal for confirming successful operations or displaying status updates.
+
+:::note
+Toasts will not work from scheduled jobs or triggers.
+:::
+
+## Toast Appearance Types
+
+| Appearance | Description                                               |
+| ---------- | --------------------------------------------------------- |
+| `neutral`  | Default gray appearance for general notifications         |
+| `success`  | Green appearance for successful operations               |
+
+## Example
+
+<Tabs>
+  <TabItem value="web" label="Devvit Web">
+  ```ts
+  import { showToast } from '@devvit/client';
+
+  // Simple text toast
+  showToast('Operation completed successfully!');
+
+  // Toast with custom appearance
+  showToast({
+    text: 'Data saved successfully!',
+    appearance: 'success', // 'neutral' | 'success'
+  });
+
+
+  // From the server you can show a toast within a UIResponse object
+  // Example in an endpoint handler like responding to a menu item
+  router.post("/internal/save-data", async (_req, res: Response<UiResponse>) => {
+    try {
+      // Perform data saving operation
+      await saveUserData();
+      
+      res.json({
+        showToast: {
+          text: 'Your data has been saved!',
+          appearance: 'success'
+        }
+      });
+    } catch (error) {
+      res.json({
+        showToast: 'Something went wrong. Please try again.'
+      });
+    }
+  });
+  ```
+
+  ### Parameters
+
+  **`showToast(text)`**
+
+  - `textOrToast`: Either a string message or a `Toast` object
+
+  **Toast Object Properties:**
+
+  - `text` (string): The message to display
+  - `appearance` (string, optional): The visual style (`'neutral'` | `'success'`). Defaults to `'neutral'`
+
+  </TabItem>
+  <TabItem value="blocks" label="Devvit Blocks / Mod Tools">
+  ```ts
+  import { Devvit } from '@devvit/public-api';
+
+  // Example with menu action
+  Devvit.addMenuItem({
+    label: 'Save Data',
+    location: 'post',
+    forUserType: 'moderator',
+    onPress: async (event, context) => {
+      try {
+        // Perform some operation
+        await performAction();
+        
+        // Show success toast
+        context.ui.showToast({
+          text: 'Data saved successfully!',
+          appearance: 'success'
+        });
+      } catch (error) {
+        // Show error toast
+        context.ui.showToast('Something went wrong. Please try again.');
+      }
+    },
+  });
+
+  // Example in blocks
+  Devvit.addCustomPostType({
+    name: 'My Custom Post',
+    render: (context) => {
+      return (
+        <vstack>
+          <button
+            onPress={() => {
+              context.ui.showToast('Button clicked!');
+            }}
+          >
+            Click me
+          </button>
+        </vstack>
+      );
+    },
+  });
+  ```
+
+  ### Parameters
+
+  **`context.ui.showToast(textOrToast)`**
+
+  - `textOrToast`: Either a string message or a `Toast` object
+
+  **Toast Object Properties:**
+
+  - `text` (string): The message to display
+  - `appearance` (string, optional): The visual style (`'neutral'` | `'success'`). Defaults to `'neutral'`
+
+  </TabItem>
+</Tabs>
+
+## Best Practices
+
+- Keep toast messages concise and clear
+- Avoid showing multiple toasts in quick succession
+- Don't rely on toasts for critical information that users must see

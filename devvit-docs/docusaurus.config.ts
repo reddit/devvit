@@ -57,12 +57,6 @@ const config: Config = {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: './sidebars.ts',
           lastVersion: '0.11',
-          versions: {
-            experimental: {
-              label: 'Experimental',
-              banner: 'unreleased',
-            },
-          },
         },
         blog: {
           path: 'blog',
