@@ -131,8 +131,8 @@ const sidebars: SidebarsConfig = {
           label: 'Realtime',
           items: [
             'capabilities/realtime/overview',
-            'capabilities/realtime/devvit-blocks',
-            'capabilities/realtime/devvit-web',
+            'capabilities/realtime/realtime_in_devvit_blocks',
+            'capabilities/realtime/realtime_in_devvit_web',
           ],
         },
         {

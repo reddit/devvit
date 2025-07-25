@@ -1,4 +1,4 @@
-# Devvit Blocks
+# Realtime in Devvit Blocks
 
 This guide walks through step-by-step instructions on how to set up [Realtime](./overview.md) in a [Devvit Blocks](../blocks/overview.md) application
 

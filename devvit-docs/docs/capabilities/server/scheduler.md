@@ -12,7 +12,7 @@ To create a regularly occurring event in your app, declare a task in your `devvi
 
 Ensure the endpoint follows the format `/internal/.+` and specify a `cron` schedule:
 
-```json
+```json title="devvit.json"
 "scheduler": {
   "tasks": {
     "regular-interval-example-task": {
@@ -23,24 +23,21 @@ Ensure the endpoint follows the format `/internal/.+` and specify a `cron` sched
 },
 ```
 
-:::note
-
-> - The `cron` parameter uses the standard [UNIX cron format](https://en.wikipedia.org/wiki/Cron):
->   ```
->   # * * * * *
->   # | | | | |
->   # | | | | day of the week (0–6, Sunday to Saturday; 7 is also Sunday on some systems)
->   # | | | month (1–12)
->   # | | day of the month (1–31)
->   # | hour (0–23)
->   # minute (0–59)
->   ```
-> - We recommend using [Cronitor](https://crontab.guru/) to build cron strings.
->   :::
+- The `cron` parameter uses the standard [UNIX cron format](https://en.wikipedia.org/wiki/Cron):
+  ```
+  # * * * * *
+  # | | | | |
+  # | | | | day of the week (0–6, Sunday to Saturday; 7 is also Sunday on some systems)
+  # | | | month (1–12)
+  # | | day of the month (1–31)
+  # | hour (0–23)
+  # minute (0–59)
+  ```
+- We recommend using [Cronitor](https://crontab.guru/) to build cron strings.
 
 ### 2. Handle the event in your server
 
-```ts
+```ts title=/server/index.ts
 router.post('/internal/scheduler/regular-interval-task-example', async (req, res) => {
   console.log(`Handle event for cron example at ${new Date().toISOString()}!`);
   // Handle the event here
@@ -56,7 +53,7 @@ One-off tasks must also be declared in `devvit.json`.
 
 ### 1. Add the tasks to `devvit.json`
 
-```json
+```json title='devvit.json'
 "scheduler": {
   "tasks": {
     "regular-interval-task-example": {
@@ -70,40 +67,26 @@ One-off tasks must also be declared in `devvit.json`.
 }
 ```
 
-### 2. Install the scheduler package
-
-Add `@devvit/scheduler` to your `package.json` dependencies and run `npm install`:
-
-```json
-"dependencies": {
-  ...
-  "@devvit/scheduler": "0.11.19",
-  ...
-}
-```
-
-### 3. Schedule a job at runtime
+### 2. Schedule a job at runtime
 
 Example usage:
 
 ```ts
-import { scheduler } from '@devvit/scheduler';
-import { ScheduledJob } from '@devvit/public-api';
-
-const oneMinuteFromNow = new Date(Date.now() + 1000 * 60);
-
-let scheduledJob: ScheduledJob = {
-  id: `job-one-off-for-post${postId}`,
-  name: 'one-off-task-example',
-  data: { postId },
-  runAt: oneMinuteFromNow,
-};
-
-let jobId = await scheduler.runJob(scheduledJob);
-console.log(`Scheduled job ${jobId} for post ${postId}`);
+import { scheduler } from '@devvit/web/server';
 
 // Handle the occurrence of the event
 router.post('/internal/scheduler/one-off-task-example', async (req, res) => {
+  const oneMinuteFromNow = new Date(Date.now() + 1000 * 60);
+
+  let scheduledJob: ScheduledJob = {
+    id: `job-one-off-for-post${postId}`,
+    name: 'one-off-task-example',
+    data: { postId },
+    runAt: oneMinuteFromNow,
+  };
+
+  let jobId = await scheduler.runJob(scheduledJob);
+  console.log(`Scheduled job ${jobId} for post ${postId}`);
   console.log(`Handle event for one-off event at ${new Date().toISOString()}!`);
   // Handle the event here
   res.status(200).json({ status: 'ok' });

@@ -10,5 +10,5 @@ Realtime is supported in both [Devvit Web](../devvit-web/devvit_web_overview.mdx
 
 ## Further Reading
 
-- [Realtime in Devvit Web](./devvit-web.md)
-- [Realtime in Devvit Blocks](./devvit-blocks.md)
+- [Realtime in Devvit Web](./realtime_in_devvit_web.md)
+- [Realtime in Devvit Blocks](./realtime_in_devvit_blocks.md)

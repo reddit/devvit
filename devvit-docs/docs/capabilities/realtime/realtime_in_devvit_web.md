@@ -1,4 +1,4 @@
-# Devvit Web
+# Realtime in Devvit Web
 
 This guide walks through step-by-step instructions on how to set up [Realtime](./overview.md) in a [Devvit Web](../devvit-web/devvit_web_overview.mdx) application
 
