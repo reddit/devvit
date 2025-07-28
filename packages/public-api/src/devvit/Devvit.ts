@@ -421,7 +421,7 @@ export class Devvit extends Actor {
     // Save the settings to the global devvit object so that they can be accessed by the settings
     // plugin.
     // TODO: This should be set in the devvit.json config, saved on the bundle by the CLI,
-    //  and loaded into the globalThis.devvitSettings object by the bootstrap code.
+    //  and loaded into the globalThis.devvit.settings object by the bootstrap code.
     globalThis.devvit ??= {};
     globalThis.devvit.settings ??= {};
     globalThis.devvit.settings.app = this.#appSettings;

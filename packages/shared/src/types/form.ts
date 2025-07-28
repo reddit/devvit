@@ -121,7 +121,7 @@ export type FormFieldGroup = {
   /** The label of the group that will be displayed to the user */
   label: string;
   /** The fields that will be displayed in the group */
-  fields: readonly FormField[];
+  fields: FormField[];
   /** An optional help text that will be displayed below the group */
   helpText?: string | undefined;
   required?: never;
