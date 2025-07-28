@@ -116,18 +116,15 @@ export class UIClient implements _UIClient {
   navigateTo(comment: Pick<Comment, 'url'>): void;
   navigateTo(user: Pick<User, 'url'>): void;
   navigateTo(thingOrUrl: string | { url: string }): void {
-    let url: string;
-
-    if (typeof thingOrUrl === 'string') {
-      // Validate URL
-      url = new URL(thingOrUrl).toString();
-    } else {
-      url = new URL(thingOrUrl.url).toString();
+    const inputUrl = typeof thingOrUrl === 'string' ? thingOrUrl : thingOrUrl.url;
+    if (!URL.canParse(inputUrl)) {
+      throw new TypeError(`Invalid URL: ${inputUrl}`);
     }
-    this.#renderContext.emitEffect(url, {
+    const normalizedUrl = new URL(inputUrl).toString();
+    this.#renderContext.emitEffect(normalizedUrl, {
       type: EffectType.EFFECT_NAVIGATE_TO_URL,
       navigateToUrl: {
-        url,
+        url: normalizedUrl,
       },
     });
   }

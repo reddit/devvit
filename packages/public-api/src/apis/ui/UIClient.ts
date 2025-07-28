@@ -119,18 +119,15 @@ export class UIClient implements _UIClient {
   navigateTo(comment: Comment): void;
   navigateTo(user: User): void;
   navigateTo(thingOrUrl: string | Subreddit | Post | Comment | User): void {
-    let url: string;
-
-    if (typeof thingOrUrl === 'string') {
-      // Validate URL
-      url = new URL(thingOrUrl).toString();
-    } else {
-      url = new URL(thingOrUrl.url).toString();
+    const inputUrl = typeof thingOrUrl === 'string' ? thingOrUrl : thingOrUrl.url;
+    if (!URL.canParse(inputUrl)) {
+      throw new TypeError(`Invalid URL: ${inputUrl}`);
     }
+    const normalizedUrl = new URL(inputUrl).toString();
     this.#effects.push({
       type: EffectType.EFFECT_NAVIGATE_TO_URL,
       navigateToUrl: {
-        url,
+        url: normalizedUrl,
       },
     });
   }

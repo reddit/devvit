@@ -15,18 +15,14 @@ export function navigateTo(user: Readonly<User>): void;
 export function navigateTo(
   thingOrUrl: string | Readonly<Subreddit> | Readonly<Post> | Readonly<Comment> | Readonly<User>
 ): void {
-  let url: string;
-
-  if (typeof thingOrUrl === 'string') {
-    // Validate URL
-    url = new URL(thingOrUrl).toString();
-  } else {
-    url = new URL(thingOrUrl.url).toString();
+  const inputUrl = typeof thingOrUrl === 'string' ? thingOrUrl : thingOrUrl.url;
+  if (!URL.canParse(inputUrl)) {
+    throw new TypeError(`Invalid URL: ${inputUrl}`);
   }
-
+  const normalizedUrl = new URL(inputUrl).toString();
   void emitEffect({
     navigateToUrl: {
-      url,
+      url: normalizedUrl,
     },
     type: 5 satisfies EffectType.EFFECT_NAVIGATE_TO_URL,
   });
