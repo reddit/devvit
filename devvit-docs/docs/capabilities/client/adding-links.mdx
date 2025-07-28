@@ -5,41 +5,35 @@ import TabItem from '@theme/TabItem';
 
 Use navigation functions to redirect users to Reddit content or external websites in response to user actions, such as button clicks. You can redirect to a `url` string or to objects such as [`Subreddit`](/api/redditapi/models/classes/Subreddit.md), [`Post`](/api/redditapi/models/classes/Post.md), or [`Comment`](/api/redditapi/models/classes/Comment.md).
 
+**For most navigation interactions, use the direct client library functions.** These provide immediate navigation and are perfect for user interactions within your app components.
+
 :::warning
 When linking to Reddit content, the navigation function requires the app account to have access to the content. If the app account does not have access, the redirect will fail.
 :::
 
-## Example
+## Basic Navigation
 
 <Tabs>
   <TabItem value="web" label="Devvit Web">
   ```ts
-  import { navigateTo } from '@devvit/client';
+  import { navigateTo } from '@devvit/web/client';
   
-  // Navigate to URL directly
-  navigateTo('https://www.reddit.com/r/movies/comments/tzxev3/');
+  // Navigate to external URLs
   navigateTo('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-  const subreddit = await reddit.getSubredditById('t5_2qh1o')
-  navigateTo(subreddit);
-  const post = await context.reddit.getPostById(postId);
-  context.ui.navigateTo(post);
   
-  // From the server with UIResponse you can navigate as a response
-  // Navigate with response from endpoint
-  router.post("/internal/navigate-to-post", async (_req, res: Response<UiResponse>) => {
-    try {
-      const postId = 't3_tzxev3';
-      const post = await reddit.getPostById(postId);
-      
-      res.json({
-        navigateTo: post
-      });
-    } catch (error) {
-      res.json({
-        showToast: 'Failed to navigate to post'
-      });
-    }
-  });
+  // Navigate to Reddit URLs
+  navigateTo('https://www.reddit.com/r/movies/comments/tzxev3/');
+  
+  // Navigate to Reddit objects
+  async function goToPost() {
+    const post = await fetch('/api/getPost').then(r => r.json());
+    navigateTo(post);
+  }
+  
+  // Use in button handlers or user interactions
+  function handleNavigateClick() {
+    navigateTo('https://www.reddit.com/r/webdev');
+  }
   ```
 
   ### Parameters
@@ -146,6 +140,10 @@ When linking to Reddit content, the navigation function requires the app account
 
   </TabItem>
 </Tabs>
+
+:::tip Menu response navigation
+For navigation in menu response workflows (when you need server processing before navigation), see the [Menu Actions](./menu-actions.mdx) documentation.
+:::
 
 ## External URLs
 

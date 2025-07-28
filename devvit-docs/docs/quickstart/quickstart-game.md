@@ -1,4 +1,4 @@
-# Build a Game
+# Game Quickstart
 
 This tutorial takes you through the step-by-step process of building your first game with Devvit. It should take you about 15 minutes to complete. Once complete, you'll be able to play your game in a Reddit post
 

@@ -9,6 +9,8 @@ Display temporary notification messages to users at the bottom of the screen.
 
 Toasts are brief, non-intrusive messages that appear temporarily at the bottom of the screen to provide feedback to users about their actions. They automatically disappear after a few seconds and are ideal for confirming successful operations or displaying status updates.
 
+**For most toast interactions, use the direct client library functions.** These provide immediate feedback and are perfect for user interactions within your app components.
+
 :::note
 Toasts will not work from scheduled jobs or triggers.
 :::
@@ -20,12 +22,12 @@ Toasts will not work from scheduled jobs or triggers.
 | `neutral`  | Default gray appearance for general notifications         |
 | `success`  | Green appearance for successful operations               |
 
-## Example
+## Basic Toast Usage
 
 <Tabs>
   <TabItem value="web" label="Devvit Web">
   ```ts
-  import { showToast } from '@devvit/client';
+  import { showToast } from '@devvit/web/client';
 
   // Simple text toast
   showToast('Operation completed successfully!');
@@ -36,31 +38,25 @@ Toasts will not work from scheduled jobs or triggers.
     appearance: 'success', // 'neutral' | 'success'
   });
 
-
-  // From the server you can show a toast within a UIResponse object
-  // Example in an endpoint handler like responding to a menu item
-  router.post("/internal/save-data", async (_req, res: Response<UiResponse>) => {
+  // Use in button handlers or user interactions
+  function handleButtonClick() {
     try {
-      // Perform data saving operation
-      await saveUserData();
+      // Perform some operation
+      processUserData();
       
-      res.json({
-        showToast: {
-          text: 'Your data has been saved!',
-          appearance: 'success'
-        }
+      showToast({
+        text: 'Your data has been processed!',
+        appearance: 'success'
       });
     } catch (error) {
-      res.json({
-        showToast: 'Something went wrong. Please try again.'
-      });
+      showToast('Something went wrong. Please try again.');
     }
-  });
+  }
   ```
 
   ### Parameters
 
-  **`showToast(text)`**
+  **`showToast(textOrToast)`**
 
   - `textOrToast`: Either a string message or a `Toast` object
 
@@ -128,6 +124,10 @@ Toasts will not work from scheduled jobs or triggers.
 
   </TabItem>
 </Tabs>
+
+:::tip Menu response toasts
+For toasts in menu response workflows (when you need server processing before showing toasts), see the [Menu Actions](./menu-actions.mdx) documentation.
+:::
 
 ## Best Practices
 

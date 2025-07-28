@@ -1,4 +1,4 @@
-# Build a Mod Tool
+# Mod Tool Quickstart
 
 Devvit allows you to build Mod Tools \- subreddit-installed applications that help moderators of that community to take action on conversations, keeping their communities safe and engaged.
 

@@ -3,22 +3,20 @@ import TabItem from '@theme/TabItem';
 
 # Forms
 
-A form lets your app ask users to input and submit data. Forms can be defined with a simple [form object](#form-object) that takes a [list of fields](#supported-fields-types), and an [onSubmit handler](#onsubmit-handler).
+A form lets your app ask users to input and submit data. Forms can be defined with a simple [form object](#form-object) that takes a [list of fields](#supported-fields-types), and return user responses directly as promises.
 
 ![A form dialog](../../assets/capabilities/forms/forms-dialog.png)
 
 ## Using forms
 
-There are several ways to add a form to your app, and the method you'll use depends on what platform you're using.
-
 <Tabs>
   <TabItem value="web" label="Devvit Web">
   
-  **Client-side approach (Promise-based):**
+  **Promise-based forms:**
   ```ts title="client/index.ts"
   import { showForm } from '@devvit/web/client';
 
-  // Client-side form with promise handling
+  // Show form and get user response directly
   const result = await showForm({
     form: {
       fields: [
@@ -29,21 +27,24 @@ There are several ways to add a form to your app, and the method you'll use depe
         },
       ],
     },
-    data: { otherData: 'Other data' } // Optional initial data
+    data: { name: 'Default value' } // Optional initial data
   });
 
-  // Handle form submission result
+  // Handle form submission result immediately
   if (result) {
-    const { name, otherData } = result;
+    const { name } = result;
     
-    // Chain actions after form completion
+    // Process the data directly
+    console.log(`User entered: ${name}`);
+    
+    // Chain additional actions
     await fetch('/api/save-name', {
       method: 'POST',
-      body: JSON.stringify({ name, otherData })
+      body: JSON.stringify({ name })
     });
     
-    // Or show another form
-    await showForm({
+    // Or show another form in sequence
+    const step2 = await showForm({
       form: {
         fields: [
           {
@@ -54,60 +55,21 @@ There are several ways to add a form to your app, and the method you'll use depe
         ],
       }
     });
-  }
-  ```
-
-  **Server-side approach (UIResponse):**
-  ```json title="devvit.json"
-  {
-    "forms": {
-      "nameForm": "/internal/form/name-submit",
-      "foodForm": "/internal/form/food-submit"
-    }
-  }
-  ```
-
-  ```ts title="server/index.ts"
-  // Server endpoint for form submission (when using UIResponse)
-  router.post("/internal/form/name-submit", async (req, res: Response<UiResponse>) => {
-    const { name } = req.body;
     
-    res.json({
-      showToast: `Hello ${name}!`
-    });
-  });
-
-  // Form triggered from menu action (server-side)
-  router.post("/internal/menu/show-form", async (_req, res: Response<UiResponse>) => {
-    res.json({
-      showForm: {
-        name: 'nameForm',
-        form: {
-          fields: [
-            {
-              type: 'string',
-              name: 'food',
-              label: 'What is your favorite food?',
-            },
-          ],
-        },
-        data: { food: 'pizza' } // Optional initial data
-      }
-    });
-  });
+    if (step2) {
+      console.log(`Multi-step complete: ${name}, ${step2.food}`);
+    }
+  } else {
+    console.log('User cancelled the form');
+  }
   ```
 
   ### Parameters
 
-  **Client-side `showForm(options)` (returns Promise)**
+  **`showForm(options)` → Returns Promise**
   - `form` (Form): The form specification object
   - `data` (FormValues, optional): Initial form field values
-  - Returns: `Promise<FormValues | null>` - Resolves with form data or null if cancelled
-
-  **Server-side `UiResponse.showForm`**
-  - `name` (string): Form name that must match a configured form in devvit.json
-  - `form` (Form): The form specification object  
-  - `data` (FormValues, optional): Initial form field values
+  - **Returns**: `Promise<FormValues | null>` - Resolves with form data or null if cancelled
 
   </TabItem>
   <TabItem value="blocks" label="Devvit Blocks / Mod Tools">
@@ -116,7 +78,7 @@ There are several ways to add a form to your app, and the method you'll use depe
 
   // Interactive post with form
   Devvit.addCustomPostType({
-    name: 'TemplateName',
+    name: 'FormExample',
     render: (context) => {
       const [name, setName] = useState('unknown');
 
@@ -190,6 +152,136 @@ There are several ways to add a form to your app, and the method you'll use depe
   </TabItem>
 </Tabs>
 
+## Menu Response Forms
+
+For forms that open from a menu item, you can use menu responses. This is useful since you do not have access to the `@devvit/web/client` library from a menu item endpoint.
+
+<Tabs>
+  <TabItem value="web" label="Devvit Web">
+  
+  **Configure forms in devvit.json:**
+  ```json title="devvit.json"
+  {
+    "forms": {
+      "nameForm": "/internal/form/name-submit",
+      "reviewForm": "/internal/form/review-submit"
+    }
+  }
+  ```
+
+  **Server endpoint that shows form via menu response:**
+  ```ts title="server/index.ts"
+  import { UIResponse } from '@devvit/web/shared';
+
+  // Menu action that triggers menu response form
+  router.post("/internal/menu/start-workflow", async (_req, res: Response<UIResponse>) => {
+    // Server processing before showing form
+    const userData = await fetchUserData();
+    
+    res.json({
+      showForm: {
+        name: 'nameForm',
+        form: {
+          fields: [
+            {
+              type: 'string',
+              name: 'name',
+              label: 'Name',
+            },
+          ],
+        },
+        data: { name: userData.name } // Pre-populate from server
+      }
+    });
+  });
+
+  // Form submission handler that can chain to another form
+  router.post("/internal/form/name-submit", async (req, res: Response<UIResponse>) => {
+    const { name } = req.body;
+    
+    // Server processing
+    await saveUserName(name);
+    
+    // Show next form in workflow
+    res.json({
+      showForm: {
+        name: 'reviewForm',
+        form: {
+          fields: [
+            {
+              type: 'paragraph',
+              name: 'review',
+              label: 'How was your experience?',
+            },
+          ],
+        }
+      }
+    });
+  });
+
+  router.post("/internal/form/review-submit", async (req, res: Response<UIResponse>) => {
+    const { review } = req.body;
+    
+    await saveReview(review);
+    
+    res.json({
+      showToast: 'Thank you for your feedback!'
+    });
+  });
+  ```
+
+  </TabItem>
+  <TabItem value="blocks" label="Devvit Blocks / Mod Tools">
+  
+  For Devvit Blocks, use the standard promise-based approach even in menu actions:
+
+  ```tsx
+  Devvit.addMenuItem({
+    label: 'Multi-step workflow',
+    location: 'subreddit',
+    onPress: async (_event, context) => {
+      // Step 1: Get user data from server
+      const userData = await fetchUserData();
+      
+      // Step 2: Show form with server data
+      const step1 = await context.ui.showForm({
+        fields: [
+          {
+            type: 'string',
+            name: 'name',
+            label: 'Name',
+          },
+        ],
+        data: { name: userData.name }
+      });
+      
+      if (!step1) return;
+      
+      // Step 3: Save and continue to next form
+      await saveUserName(step1.name);
+      
+      const step2 = await context.ui.showForm({
+        fields: [
+          {
+            type: 'paragraph',
+            name: 'review',
+            label: 'How was your experience?',
+          },
+        ],
+      });
+      
+      if (step2) {
+        await saveReview(step2.review);  
+        context.ui.showToast('Thank you for your feedback!');
+      }
+    },
+  });
+  ```
+
+  </TabItem>
+</Tabs>
+
+
 ## Form object
 
 The form object enables you to customize the form container and the [list of form fields](#supported-fields-types) included. The form object structure is the same for both Devvit Web and Devvit Blocks.
@@ -226,86 +318,6 @@ const myForm = {
 | `fields`      | `FormField[]`        | The fields that will be displayed in the form |
 | `acceptLabel` | `string` `undefined` | An optional label for the submit button       |
 | `cancelLabel` | `string` `undefined` | An optional label for the cancel button       |
-
-## onSubmit handler
-
-<Tabs>
-  <TabItem value="web" label="Devvit Web">
-  
-  **Client-side approach:**
-  Form submissions return a Promise that resolves with the form data. You handle the result using async/await or .then().
-
-  ```ts
-  const result = await showForm({
-    form: {
-      fields: [
-        {
-          type: 'string',
-          name: 'food',
-          label: 'What is your favorite food?',
-        },
-      ],
-    }
-  });
-
-  if (result) {
-    // Handle form submission
-    console.log('Form submitted:', result);
-    
-    // Chain additional actions
-    await fetch('/api/save-data', {
-      method: 'POST',
-      body: JSON.stringify(result)
-    });
-  } else {
-    // User cancelled the form
-    console.log('Form was cancelled');
-  }
-  ```
-
-  **Server-side approach:**
-  Form submissions are handled by server endpoints defined in `devvit.json`. The endpoint receives form data in the request body.
-
-  ```ts
-  router.post("/internal/form/submit", async (req, res: Response<UiResponse>) => {
-    const formData = req.body;
-    
-    // Process form data
-    console.log('Form submitted:', formData);
-    
-    res.json({
-      showToast: `Form submitted successfully!`
-    });
-  });
-  ```
-  </TabItem>
-  <TabItem value="blocks" label="Devvit Blocks / Mod Tools">
-  When creating a form, you specify a callback function that is called when the form is submitted. It takes two parameters: `event` and `context`.
-
-  ```ts
-  const onSubmitHandler = (event, context) => {
-    context.ui.showToast({ text: event.values.food });
-  };
-
-  const myForm = Devvit.createForm(
-    {
-      fields: [
-        {
-          type: 'string',
-          name: 'food',
-          label: 'What is your favorite food?',
-        },
-      ],
-    },
-    onSubmitHandler
-  );
-  ```
-
-  :::note
-  The `context` object is not available in onSubmit handlers within the `useForm` hook. For interactive posts, you already have access to the context element via the outer function's scope.
-  :::
-  </TabItem>
-</Tabs>
 
 ## Supported fields types
 
