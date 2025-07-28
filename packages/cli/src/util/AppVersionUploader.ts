@@ -77,6 +77,13 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
       })
     );
 
+    // Send the devvit.json file with the creation request, if it exists.
+    const appConfig = this.#cmd.project.appConfig;
+    let devvitJson: string | undefined;
+    if (appConfig) {
+      devvitJson = JSON.stringify(appConfig);
+    }
+
     ux.action.start(`Uploading new version "${appInfo.appSemver.toString()}" to Reddit`);
     try {
       // Actually create the app version
@@ -94,6 +101,7 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         marketingInfo: {
           icon: iconAsset,
         },
+        devvitJson,
       });
       ux.action.stop();
 

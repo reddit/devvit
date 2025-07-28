@@ -15,7 +15,11 @@ import {
   MAX_ASSET_NON_GIF_SIZE,
   prettyPrintSize,
 } from '@devvit/shared-types/Assets.js';
-import { ASSET_HASHING_ALGO, ASSET_UPLOAD_BATCH_SIZE } from '@devvit/shared-types/constants.js';
+import {
+  ASSET_HASHING_ALGO,
+  ASSET_UPLOAD_BATCH_SIZE,
+  ICON_FILE_PATH,
+} from '@devvit/shared-types/constants.js';
 import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { ux } from '@oclif/core';
 import { createHash } from 'crypto';
@@ -29,7 +33,6 @@ import type { DevvitCommand } from './commands/DevvitCommand.js';
 import { dirExists } from './files.js';
 
 export const DEVVIT_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
-export const ICON_FILE_PATH = '$_icon.png'; // Uses special characters intentionally to avoid conflicts with real asset paths
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
