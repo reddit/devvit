@@ -12,14 +12,6 @@ The realtime client allows you to:
 - **Manage** multiple channel subscriptions
 - **Disconnect** from channels when no longer needed
 
-## Installation
-
-Add `@devvit/realtime` to your project:
-
-```bash
-npm install @devvit/realtime
-```
-
 ## Architecture
 
 Realtime functionality in Devvit follows a client/server architecture:
@@ -36,7 +28,7 @@ This separation ensures that message sending is controlled by server-side logic 
 Connects to a realtime channel for receiving messages.
 
 ```tsx
-import { connectRealtime } from '@devvit/realtime';
+import { connectRealtime } from '@devvit/web/client';
 
 const connection = await connectRealtime({
   channel: 'my-channel',
@@ -91,7 +83,7 @@ This method:
 The server-side plugin for sending messages to realtime channels.
 
 ```tsx
-import { realtime } from '@devvit/realtime';
+import { realtime } from '@devvit/web/server';
 
 // Send a message to a channel
 await realtime.send('my-channel', {
@@ -114,7 +106,7 @@ Sends a message to a specific channel.
 ### Client-Side: Basic Channel Connection
 
 ```tsx
-import { connectRealtime } from '@devvit/realtime';
+import { connectRealtime } from '@devvit/web/client';
 
 // Connect to a channel
 const connection = await connectRealtime({
@@ -132,7 +124,7 @@ await connection.disconnect();
 ### Client-Side: Connection Lifecycle Management
 
 ```tsx
-import { connectRealtime } from '@devvit/realtime';
+import { connectRealtime } from '@devvit/web/client';
 
 const connection = await connectRealtime({
   channel: 'live-chat',
@@ -156,7 +148,7 @@ const connection = await connectRealtime({
 ### Server-Side: Sending Messages
 
 ```tsx
-import { realtime } from '@devvit/realtime';
+import { realtime } from '@devvit/web/server';
 
 // Send a simple message
 await realtime.send('notifications', 'New user joined!');
