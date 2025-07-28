@@ -1,5 +1,4 @@
-import { runWithContext } from '@devvit/server/context.js';
-import { RequestContext } from '@devvit/server/request-context.js';
+import { RequestContext, runWithContext } from '@devvit/server';
 import { Header } from '@devvit/shared-types/Header.js';
 
 export function runWithTestContext<T>(

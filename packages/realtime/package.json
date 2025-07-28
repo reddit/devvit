@@ -16,8 +16,7 @@
       "browser": "./dist/serverImportInClientCodePanic.js",
       "default": "./dist/server.js"
     },
-    "./package.json": "./package.json",
-    "./*": "./dist/*"
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/**"
@@ -35,7 +34,8 @@
   },
   "dependencies": {
     "@devvit/protos": "0.11.18",
-    "@devvit/shared": "0.11.18"
+    "@devvit/shared": "0.11.18",
+    "@devvit/shared-types": "0.11.18"
   },
   "peerDependencies": {
     "@devvit/client": "*",

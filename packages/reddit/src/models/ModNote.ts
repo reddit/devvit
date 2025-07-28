@@ -12,7 +12,7 @@ import type { Prettify } from '@devvit/shared-types/Prettify.js';
 import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, asT5ID, asTID } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import type { ModAction } from './ModAction.js';

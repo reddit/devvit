@@ -1,12 +1,12 @@
 // @vitest-environment jsdom
 
-import { emitEffect } from '@devvit/client/effects/emit-effect.js';
 import { RealtimeEvent } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import type {
   RealtimeSubscriptionEvent,
   RealtimeSubscriptionStatus,
 } from '@devvit/protos/types/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { __clearConnections, connectRealtime } from './realtime.js';

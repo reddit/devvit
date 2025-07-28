@@ -1,11 +1,11 @@
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import { WebViewImmersiveMode } from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { emitEffect } from './emit-effect.js';
 import { exitImmersiveMode, requestImmersiveMode } from './immersive-mode.js';
 
-vi.mock('./emit-effect.js', () => ({
+vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(() => Promise.resolve(undefined)),
 }));
 

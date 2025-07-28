@@ -11,9 +11,9 @@ import type { Prettify } from '@devvit/shared-types/Prettify.js';
 import type { T5ID } from '@devvit/shared-types/tid.js';
 import { asT5ID } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import { Comment } from './Comment.js';
 import type {
   CreateFlairTemplateOptions,

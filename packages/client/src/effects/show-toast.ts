@@ -4,8 +4,7 @@ import type {
   ToastAppearance,
 } from '@devvit/protos/types/devvit/ui/toast/toast.js';
 import type { Toast } from '@devvit/shared';
-
-import { emitEffect } from './emit-effect.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 /**
  * Shows a toast message.

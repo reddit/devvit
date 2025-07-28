@@ -9,8 +9,7 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json",
-    "./*": "./dist/*"
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
@@ -36,6 +35,7 @@
   },
   "devDependencies": {
     "@devvit/server": "0.11.18",
+    "@devvit/shared-types": "0.11.18",
     "@devvit/tsconfig": "0.11.18",
     "eslint": "9.11.1",
     "typescript": "5.8.3"

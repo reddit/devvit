@@ -1,7 +1,6 @@
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import type { Comment, Post, Subreddit, User } from '@devvit/reddit';
-
-import { emitEffect } from './emit-effect.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 /**
  * Navigates to a URL, subreddit, post, comment, or user.

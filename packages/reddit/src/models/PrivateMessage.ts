@@ -5,8 +5,8 @@ import type { Prettify } from '@devvit/shared-types/Prettify.js';
 import type { T2ID, T5ID, TID } from '@devvit/shared-types/tid.js';
 import { asT2ID, asT5ID, asTID } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions } from './Listing.js';
 import { Listing } from './Listing.js';
 import type { Subreddit } from './Subreddit.js';

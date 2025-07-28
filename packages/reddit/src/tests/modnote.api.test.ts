@@ -4,10 +4,12 @@ import { describe, expect, test, vi } from 'vitest';
 import { RedditClient } from '../RedditClient.js';
 import { redditApiPlugins } from './utils/redditApiPluginsMock.js';
 import { runWithTestContext } from './utils/runWithTestContext.js';
+import { userActionsPlugin } from './utils/userActionsPluginMock.js';
 
-vi.mock('../getRedditApiPlugins.js', () => {
+vi.mock('../plugin.js', () => {
   return {
     getRedditApiPlugins: () => redditApiPlugins,
+    getUserActionsPlugin: () => userActionsPlugin,
   };
 });
 

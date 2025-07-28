@@ -2,7 +2,7 @@ import type { Metadata, QueryResponse } from '@devvit/protos';
 import { context } from '@devvit/server';
 import type { JSONObject } from '@devvit/shared';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
+import { getRedditApiPlugins } from '../plugin.js';
 
 export class GraphQL {
   /** @internal */

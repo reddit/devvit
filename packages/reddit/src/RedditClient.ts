@@ -1,11 +1,9 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
-import { context } from '@devvit/server';
-import { getContextCache, setContextCache } from '@devvit/server/context.js';
+import { context, getContextCache, setContextCache } from '@devvit/server';
 import { Header } from '@devvit/shared-types/Header.js';
 import { asT2ID, type T1ID, type T2ID, type T3ID, type T5ID } from '@devvit/shared-types/tid.js';
 import { asT3ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from './getRedditApiPlugins.js';
 import type {
   AboutSubredditTypes,
   AddRemovalNoteOptions,
@@ -72,6 +70,7 @@ import {
   Widget,
   WikiPage,
 } from './models/index.js';
+import { getRedditApiPlugins } from './plugin.js';
 
 const CACHE_KEY_CURRENT_USER = 'RedditClient.currentUser';
 

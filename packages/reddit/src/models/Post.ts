@@ -17,12 +17,11 @@ import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
 
 import { RunAs, type UserGeneratedContent } from '../common.js';
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
-import { getUserActionsPlugin } from '../getUserActionsPlugin.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
+import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';

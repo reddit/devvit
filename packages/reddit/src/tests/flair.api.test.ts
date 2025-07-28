@@ -5,10 +5,12 @@ import type { SetUserFlairBatchConfig } from '../models/index.js';
 import { RedditClient } from '../RedditClient.js';
 import { redditApiPlugins } from './utils/redditApiPluginsMock.js';
 import { runWithTestContext } from './utils/runWithTestContext.js';
+import { userActionsPlugin } from './utils/userActionsPluginMock.js';
 
-vi.mock('../getRedditApiPlugins.js', () => {
+vi.mock('../plugin.js', () => {
   return {
     getRedditApiPlugins: () => redditApiPlugins,
+    getUserActionsPlugin: () => userActionsPlugin,
   };
 });
 

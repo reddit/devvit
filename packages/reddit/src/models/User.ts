@@ -10,10 +10,10 @@ import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { T2ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { formatModeratorPermissions, validModPermissions } from '../helpers/permissions.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import type { GetCommentsByUserOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { UserFlair } from './Flair.js';

@@ -11,8 +11,8 @@ import type {
   SelectField,
   SettingScopeType,
   StringField,
-} from '@devvit/shared/types/form.js';
-import { SettingScope } from '@devvit/shared/types/form.js';
+} from '@devvit/shared';
+import { SettingScope } from '@devvit/shared';
 import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 

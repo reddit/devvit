@@ -9,8 +9,7 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json",
-    "./*": "./dist/*"
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
@@ -31,7 +30,8 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.11.18"
+    "@devvit/protos": "0.11.18",
+    "@devvit/shared-types": "0.11.18"
   },
   "peerDependencies": {
     "@devvit/server": "*"

@@ -7,8 +7,8 @@ import {
 import { context } from '@devvit/server';
 import { asT5ID, type T5ID } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { GraphQL } from '../graphql/GraphQL.js';
+import { getRedditApiPlugins } from '../plugin.js';
 
 export type SubredditData = {
   id?: string | undefined;

@@ -1,7 +1,6 @@
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import { WebViewImmersiveMode } from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
-
-import { emitEffect } from './emit-effect.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 /**
  * The presentation mode of the web view.

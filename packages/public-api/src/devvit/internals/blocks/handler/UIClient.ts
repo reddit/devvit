@@ -4,7 +4,7 @@ import {
   type Toast as ToastProto,
   ToastAppearance,
 } from '@devvit/protos';
-import type { Form } from '@devvit/shared/types/form.js';
+import type { Form } from '@devvit/shared';
 import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 

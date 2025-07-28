@@ -1,4 +1,4 @@
-import type { MenuItemLocation, MenuItemRequest } from '@devvit/shared/types/menu-item.js';
+import type { MenuItemLocation, MenuItemRequest } from '@devvit/shared';
 
 import type { Devvit } from '../devvit/Devvit.js';
 

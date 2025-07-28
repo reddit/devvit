@@ -7,7 +7,7 @@ import { RedisClient } from './RedisClient.js';
 //  you change this code, please make sure to update the other package as well. Eventually, that
 //  copy of the code will be deleted, when we move to a fully Devvit Web world.
 
-vi.mock('@devvit/server/get-devvit-config.js', () => {
+vi.mock('@devvit/shared-types/server/get-devvit-config.js', () => {
   return {
     getDevvitConfig: () => {
       return {

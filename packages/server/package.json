@@ -9,8 +9,7 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json",
-    "./*": "./dist/*"
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [

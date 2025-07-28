@@ -12,10 +12,9 @@ import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT1ID, asT2ID, asT3ID, asT5ID, isCommentId, isT1ID } from '@devvit/shared-types/tid.js';
 
 import { RunAs } from '../common.js';
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
-import { getUserActionsPlugin } from '../getUserActionsPlugin.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
+import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
 import type { ListingFetchOptions, ListingFetchResponse, MoreObject } from './Listing.js';
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';

@@ -1,10 +1,10 @@
-import { emitEffect } from '@devvit/client/effects/emit-effect.js';
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import type {
   RealtimeSubscriptionEvent,
   RealtimeSubscriptionStatus,
 } from '@devvit/protos/types/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
 import type { JSONValue } from '@devvit/shared';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 type ConnectRealtimeOptions = {
   channel: string;

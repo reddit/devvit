@@ -27,8 +27,8 @@ function getContext(): RequestContext {
 
 /**
  * Runs an async callback with the given RequestContext. Code in the callback can use
- * `getContext()` to get the context.
- * @internal
+ * `getContext()` to get the context. For testing.
+ * @experimental
  * @param context The context to run the callback with
  * @param callback The callback to run
  */
@@ -54,6 +54,7 @@ export const context = new Proxy<RequestContext>({} as RequestContext, {
   },
 });
 
+/** For testing. @experimental */
 export function setContextCache(key: string, value: unknown): void {
   const context = getContext();
   if (!context.cache) {
@@ -62,6 +63,7 @@ export function setContextCache(key: string, value: unknown): void {
   context.cache[key] = value;
 }
 
+/** For testing. @experimental */
 export function getContextCache<T>(key: string): T | undefined {
   const context = getContext();
   if (!context.cache) {

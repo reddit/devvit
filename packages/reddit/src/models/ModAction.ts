@@ -2,7 +2,7 @@ import type { AboutLogResponse } from '@devvit/protos';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 

@@ -1,3 +1,2 @@
-export { redis, type RedisClient } from './RedisClient.js';
-export { RedisKeyScope } from './RedisClient.js';
+export { redis, type RedisClient, RedisKeyScope } from './RedisClient.js';
 export type * from './types/redis.js';

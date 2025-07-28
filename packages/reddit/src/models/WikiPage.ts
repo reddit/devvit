@@ -8,8 +8,8 @@ import type {
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import { Listing } from './Listing.js';
 import { User } from './User.js';
 

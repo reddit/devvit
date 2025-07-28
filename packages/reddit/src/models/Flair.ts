@@ -9,8 +9,8 @@ import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { T3ID } from '@devvit/shared-types/tid.js';
 import { asT3ID } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
+import { getRedditApiPlugins } from '../plugin.js';
 
 export enum FlairType {
   User = 'USER_FLAIR',

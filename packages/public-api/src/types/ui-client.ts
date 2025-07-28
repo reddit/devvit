@@ -1,4 +1,4 @@
-import type { Form } from '@devvit/shared/types/form.js';
+import type { Form } from '@devvit/shared';
 import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
