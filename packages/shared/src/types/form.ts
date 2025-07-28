@@ -11,6 +11,7 @@ import type { Prettify } from '@devvit/shared-types/Prettify.js';
 
 // FormValues is input for pre-populated form values
 export type FormValues<T extends JSONObject> = T;
+
 // FormRequest is equivalent to FormValues, but a semantically named alias for use in application code.
 export type FormRequest<T extends JSONObject> = T;
 
