@@ -360,6 +360,9 @@ export default class Playtest extends DevvitCommand {
       assetPaths.push(
         path.join(path.dirname(path.join(this.project.root, this.project.server.entry)), '..')
       );
+    if (this.project.appConfig?.marketingAssets?.icon) {
+      assetPaths.push(path.join(this.project.root, this.project.appConfig.marketingAssets.icon));
+    }
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
 
     this.#watchAssets.on('all', () => {
