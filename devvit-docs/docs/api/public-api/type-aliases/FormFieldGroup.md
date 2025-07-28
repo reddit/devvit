@@ -14,7 +14,7 @@ A grouping of fields
 
 ### fields
 
-> **fields**: readonly [`FormField`](FormField.md)[]
+> **fields**: [`FormField`](FormField.md)[]
 
 The fields that will be displayed in the group
 
