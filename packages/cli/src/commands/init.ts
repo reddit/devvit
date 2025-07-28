@@ -158,8 +158,6 @@ export default class Init extends DevvitCommand {
     });
 
     // TODO: DX_9807 - Fire successful init telemetry event
-
-    process.exit(0);
   }
 
   #unpackCode(base64code: string): InitAppResponse | undefined {
@@ -238,7 +236,8 @@ export default class Init extends DevvitCommand {
       }
     }
 
-    return localCodeServer({
+    const line = readLine();
+    return await localCodeServer({
       serverListeningCallback: ({ port, state }) => {
         const redirectUrl = new URL(`http://localhost:${port}`);
         redirectUrl.searchParams.set(`state`, state);
@@ -251,9 +250,7 @@ export default class Init extends DevvitCommand {
             'Press enter to open this link immediately...'
         );
         // Don't await. Start the server immediately, so we don't miss a callback.
-        readLine()
-          .then(() => open(creationWizardUrl))
-          .catch(() => {});
+        line.then(() => open(creationWizardUrl)).catch(() => {});
       },
       requestHandler: async (queryParams) => {
         if (!queryParams.code) {
@@ -262,7 +259,7 @@ export default class Init extends DevvitCommand {
         const queryCode = queryParams.code;
         return typeof queryCode === 'string' ? queryCode : queryCode[0];
       },
-    });
+    }).finally(() => line.reject());
   }
 
   async #gitInitIfNeeded(): Promise<void> {
