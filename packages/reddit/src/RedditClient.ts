@@ -309,7 +309,11 @@ export class RedditClient {
    *  textFallback: {
    *    text: 'This is a Devvit post!',
    *  },
-   *  splash: {appDisplayName: 'Pixelary'},
+   *  preview: (
+   *    <vstack height="100%" width="100%" alignment="middle center">
+   *      <text size="large">Loading...</text>
+   *    </vstack>
+   *  ),
    * });
    * ```
    */

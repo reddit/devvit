@@ -32,10 +32,8 @@
   "dependencies": {
     "@devvit/protos": "0.11.18",
     "@devvit/public-api": "0.11.18",
-    "@devvit/redis": "0.11.18",
     "@devvit/shared": "0.11.18",
-    "@devvit/shared-types": "0.11.18",
-    "@devvit/splash": "0.11.18"
+    "@devvit/shared-types": "0.11.18"
   },
   "peerDependencies": {
     "@devvit/server": "*"
