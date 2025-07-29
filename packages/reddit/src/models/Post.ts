@@ -6,15 +6,21 @@ import type {
   SubmitResponse,
 } from '@devvit/protos';
 import type { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos';
-import { Block, UIResponse } from '@devvit/protos';
-import { BlocksReconciler } from '@devvit/public-api/devvit/internals/blocks/BlocksReconciler.js';
+import { Block, DevvitPostData, UIResponse } from '@devvit/protos';
+import type { SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import type { Height } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
+import { redis } from '@devvit/redis';
 import { context } from '@devvit/server';
+import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import { devvitPostDataRedisKey } from '@devvit/shared-types/post-data.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
 import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
+import { Loading } from '@devvit/splash/loading.js';
+import { type SplashProps } from '@devvit/splash/splash.js';
 
 import { RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
@@ -206,11 +212,13 @@ export type SubmitCustomPostTextFallbackOptions = {
   textFallback?: CustomPostTextFallbackOptions;
 };
 
+export type SubmitCustomPostSplashOptions = SplashProps;
+
 export type SubmitCustomPostOptions = CommonSubmitPostOptions &
   SubmitCustomPostTextFallbackOptions & {
-    preview: JSX.Element;
     userGeneratedContent?: UserGeneratedContent;
     postData?: PostData;
+    splash: SubmitCustomPostSplashOptions;
   };
 
 export type CommonSubmitPostOptions = {
@@ -231,12 +239,6 @@ export type SubmitPostOptions = (
 ) & {
   subredditName: string;
 };
-
-const SetCustomPostPreviewRequestBodyType = {
-  NONE: 0,
-  BLOCKS: 1,
-  UNRECOGNIZED: -1,
-} as const;
 
 export type CrosspostOptions = CommonSubmitPostOptions & {
   subredditName: string;
@@ -891,7 +893,7 @@ export class Post {
   /**
    * Set the postData on a custom post.
    *
-   * @param {PostData} postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
+   * @param postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
    * @throws {Error} Throws an error if the postData could not be set.
    * @example
    * ```ts
@@ -903,36 +905,31 @@ export class Post {
    * ```
    */
   async setPostData(postData: PostData): Promise<void> {
-    await Post.setPostData({ postId: this.id, postData });
+    const json = context.metadata[Header.PostData]?.values[0];
+    const prev: DevvitPostData = json ? JSON.parse(json) : {};
+    await Post.setPostData({ postId: this.id, postData: { ...prev, developerData: postData } });
   }
 
   /**
-   * Set a lightweight UI that shows while the custom post renders
+   * Set the launch and loading screens of a custom post.
    *
-   * @param {JSX.ComponentFunction} ui - A JSX component function that returns a simple ui to be rendered.
-   * @throws {Error} Throws an error if the preview could not be set.
    * @example
    * ```ts
-   * const preview = (
-   *   <vstack height="100%" width="100%" alignment="middle center">
-   *     <text size="large">An updated preview!</text>
-   *   </vstack>
-   * );
    * const post = await reddit.getPostById(context.postId);
-   * await post.setCustomPostPreview(() => preview);
+   * await post.setSplash({ appDisplayName: "Pixelary" });
    * ```
    */
-  async setCustomPostPreview(ui: JSX.ComponentFunction): Promise<void> {
-    await Post.setCustomPostPreview({
-      id: this.id,
-      ui,
-    });
+  async setSplash(opts: Readonly<SubmitCustomPostSplashOptions>): Promise<void> {
+    const json = context.metadata[Header.PostData]?.values[0];
+    const prev: DevvitPostData = json ? JSON.parse(json) : {};
+    const postData = { ...prev, splash: SplashPostData(opts, this.title) };
+    await Post.setPostData({ postId: this.id, postData });
   }
 
   /**
    * Set a text fallback for the custom post
    *
-   * @param {CustomPostTextFallbackOptions} options - A text or a richtext to render in a fallback
+   * @param options - A text or a richtext to render in a fallback
    * @throws {Error} Throws an error if the fallback could not be set.
    * @example
    * ```ts
@@ -1130,22 +1127,16 @@ export class Post {
 
     let response: SubmitResponse;
 
-    if ('preview' in options) {
+    if ('splash' in options) {
       if (runAsType === RunAs.USER) {
         assertNonNull(
           options.userGeneratedContent,
-          'userGeneratedContent must be set in `SubmitPostOptions` when RunAs=USER for experience posts'
+          'userGeneratedContent must be set in `SubmitPostOptions` when RunAs=USER for custom posts'
         );
       }
-      const reconciler = new BlocksReconciler(
-        () => options.preview,
-        undefined,
-        {},
-        this.#metadata,
-        undefined
-      );
-      const previewBlock = await reconciler.buildBlocksUI();
-      const encodedCached = Block.encode(previewBlock).finish();
+      const handler = new BlocksHandler(() => Loading(options.splash));
+      const rsp = UIResponse.fromJSON(await handler.handle({ events: [] }, this.#metadata));
+      const encodedCached = Block.encode(rsp.blocks!).finish();
 
       const { textFallback, ...sanitizedOptions } = options;
       const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
@@ -1157,12 +1148,10 @@ export class Post {
           }
         : undefined;
 
-      const devvitPostData = options.postData
-        ? {
-            developerData: options.postData,
-          }
-        : undefined;
-
+      const postData: DevvitPostData = {
+        developerData: options.postData,
+        splash: SplashPostData(options.splash, options.title),
+      };
       const submitRequest: SubmitRequest = {
         kind: 'custom',
         sr: options.subredditName,
@@ -1171,10 +1160,10 @@ export class Post {
         ...sanitizedOptions,
         userGeneratedContent,
         runAs: runAsType,
-        postData: devvitPostData,
+        postData,
       };
-
       response = await client.SubmitCustomPost(submitRequest, this.#metadata);
+      if (response.json?.data?.id) await setRedisPostData(`t3_${response.json.data.id}`, postData);
     } else {
       response = await client.Submit(
         {
@@ -1290,47 +1279,20 @@ export class Post {
   }
 
   /** @internal */
-  static async setPostData(options: { postId: T3ID; postData: PostData }): Promise<void> {
-    const devvitPostData = options.postData
-      ? {
-          developerData: options.postData,
-        }
-      : undefined;
-
-    const res = await getRedditApiPlugins().LinksAndComments.EditCustomPost(
-      {
-        thingId: options.postId,
-        postData: devvitPostData,
-      },
-      this.#metadata
-    );
+  static async setPostData(options: { postId: T3ID; postData: DevvitPostData }): Promise<void> {
+    const [res] = await Promise.all([
+      getRedditApiPlugins().LinksAndComments.EditCustomPost(
+        {
+          thingId: options.postId,
+          postData: options.postData,
+        },
+        this.#metadata
+      ),
+      setRedisPostData(options.postId, options.postData),
+    ]);
     if (res.json?.errors?.length) {
       throw new Error(`Failed to set post data, errors: ${res.json?.errors}`);
     }
-  }
-
-  /** @internal */
-  static async setCustomPostPreview(options: {
-    id: T3ID;
-    ui: JSX.ComponentFunction;
-  }): Promise<void> {
-    const client = getRedditApiPlugins().LinksAndComments;
-
-    const handler = new BlocksHandler(options.ui);
-    const handlerResponse = UIResponse.fromJSON(
-      await handler.handle({ events: [] }, this.#metadata)
-    );
-    const block = handlerResponse.blocks as Block;
-    const blocksRenderContent = Buffer.from(Block.encode(block).finish()).toString('base64');
-
-    await client.SetCustomPostPreview(
-      {
-        thingId: options.id,
-        bodyType: SetCustomPostPreviewRequestBodyType.BLOCKS,
-        blocksRenderContent,
-      },
-      this.#metadata
-    );
   }
 
   /** @internal */
@@ -1788,5 +1750,29 @@ async function getThumbnailV2(options: { id: T3ID }): Promise<EnrichedThumbnail 
         height: thumbnail.obfuscatedImage.dimensions.height,
       },
     }),
+  };
+}
+
+// to-do: delete and only use post data.
+/** @internal */
+export async function setRedisPostData(t3: T3ID, data: Readonly<DevvitPostData>): Promise<void> {
+  await redis.hSet(devvitPostDataRedisKey, { [t3]: JSON.stringify(data) });
+}
+
+function SplashPostData(
+  opts: Readonly<SubmitCustomPostSplashOptions>,
+  title: string | undefined
+): SplashPostData {
+  return {
+    appDisplayName: opts.appDisplayName,
+    appIconUri: opts.appIconURI,
+    backgroundUri: opts.backgroundURI,
+    buttonLabel: opts.buttonLabel,
+    description: opts.description,
+    // to-do: use entry _name_ and fish out URL in Splash component using
+    //        entrypoints recorded in LinkedBundle.
+    entryUri: opts.entryURI,
+    height: opts.height === 'tall' ? (2 satisfies Height.TALL) : (1 satisfies Height.REGULAR),
+    title: opts.title ?? title,
   };
 }
