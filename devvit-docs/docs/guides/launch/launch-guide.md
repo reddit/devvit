@@ -28,7 +28,7 @@ Guidelines:
 
 #### Beta \- broader player testing
 
-When you’re ready for redditors to play your game, the best place to launch your game is on r/GamesOnreddit. Once your game is launched in your public subreddit, cross post a game post to r/GamesOnReddit with flair “Beta Launch”.
+When you’re ready for redditors to play your game, the best place to launch your game is on r/GamesOnreddit. Once your game is launched in your public subreddit, cross post a game post to r/GamesOnReddit with flair "Feedback”.
 
 Engage with game players that give you feedback and start growing your community. **Apps that have strong post engagement metrics will automatically move to the next launch phase.**
 
@@ -36,7 +36,8 @@ Engage with game players that give you feedback and start growing your community
 
 When you're ready go publically release your game, publish your app with:
 
-`npm run publish`
+`npx devvit upload`, which uploads the latest version of your app
+`npx devvit publish`
 
 If your app does well in the Beta, we may automatically publish your app on your behalf. Publishing will trigger a thorough app review. Once approved, your game will be eligible for our featuring mechanisms:
 
@@ -78,13 +79,14 @@ Guidelines:
 
 Once you’ve received feedback it’s time to test your app in a larger subreddit. If you’re a mod of a subreddit you can publish your app as unlisted:
 
-`npm run publish`
+`npx devvit upload`, which uploads the latest version of your app
+`npx devvit publish`
 
 Once approved, your app will not show up in the app store, but you can install the app to any large subreddit that you moderate.
 
 #### GA \- public release to the app store
 
-Once you’re ready to launch, you’ll need to publish to our app store so any mod can install your app. You can do this by running `npm run publish --listed`. Once approved, your app will be installable by any mod and visible for others to see in the app store.
+Once you’re ready to launch, you’ll need to publish to our app store so any mod can install your app. You can do this by running `npx devvit publish --listed`. Once approved, your app will be installable by any mod and visible for others to see in the app store.
 
 ### Additional resources
 
