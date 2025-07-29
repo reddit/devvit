@@ -41,6 +41,7 @@ import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredd
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
+import { isWebContainer } from '../util/platform-util.js';
 import { devvitClassicConfigFilename, devvitV1ConfigFilename } from '../util/project.js';
 import Logs from './logs.js';
 
@@ -142,7 +143,9 @@ export default class Playtest extends DevvitCommand {
     this.project.flag.watchDebounceMillis = this.#flags?.['debounce'] as number | undefined;
     this.project.flag.subreddit = args.subreddit;
 
-    const token = await getAccessTokenAndLoginIfNeeded('LocalSocket');
+    const token = await getAccessTokenAndLoginIfNeeded(
+      isWebContainer() ? 'CopyPaste' : 'LocalSocket'
+    );
     const username = await this.getUserDisplayName(token);
     await this.checkDeveloperAccount();
 
