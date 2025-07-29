@@ -10,11 +10,9 @@ import { Block, DevvitPostData, UIResponse } from '@devvit/protos';
 import type { SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import type { Height } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
-import { redis } from '@devvit/redis';
 import { context } from '@devvit/server';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import { devvitPostDataRedisKey } from '@devvit/shared-types/post-data.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
@@ -1163,7 +1161,6 @@ export class Post {
         postData,
       };
       response = await client.SubmitCustomPost(submitRequest, this.#metadata);
-      if (response.json?.data?.id) await setRedisPostData(`t3_${response.json.data.id}`, postData);
     } else {
       response = await client.Submit(
         {
@@ -1288,7 +1285,6 @@ export class Post {
         },
         this.#metadata
       ),
-      setRedisPostData(options.postId, options.postData),
     ]);
     if (res.json?.errors?.length) {
       throw new Error(`Failed to set post data, errors: ${res.json?.errors}`);
@@ -1751,12 +1747,6 @@ async function getThumbnailV2(options: { id: T3ID }): Promise<EnrichedThumbnail 
       },
     }),
   };
-}
-
-// to-do: delete and only use post data.
-/** @internal */
-export async function setRedisPostData(t3: T3ID, data: Readonly<DevvitPostData>): Promise<void> {
-  await redis.hSet(devvitPostDataRedisKey, { [t3]: JSON.stringify(data) });
 }
 
 function SplashPostData(
