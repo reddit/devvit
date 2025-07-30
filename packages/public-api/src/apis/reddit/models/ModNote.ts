@@ -8,10 +8,10 @@ import type {
 } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, asT5ID, asTID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import type { T1ID, T2ID, T3ID, T5ID } from '../../../types/tid.js';
+import { asT2ID, asT5ID, asTID } from '../../../types/tid.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import type { ModAction } from './ModAction.js';

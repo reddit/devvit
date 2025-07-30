@@ -5,7 +5,7 @@ import {
   type ModActionData as ProtosModActionData,
 } from '@devvit/protos';
 import { context } from '@devvit/server';
-import { asT5ID, type T5ID } from '@devvit/shared-types/tid.js';
+import { T5 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 import { getRedditApiPlugins } from '../plugin.js';
@@ -580,7 +580,7 @@ export class ModMailService {
     return createModmailConversation({
       subject: params.subject,
       bodyMarkdown: params.bodyMarkdown,
-      subredditId: asT5ID(params.subredditId),
+      subredditId: T5(params.subredditId),
       isInternal: true,
       participantType: 'MODERATOR',
       conversationType: 'INTERNAL',
@@ -611,7 +611,7 @@ export class ModMailService {
     return createModmailConversation({
       subject: params.subject,
       bodyMarkdown: params.bodyMarkdown,
-      subredditId: asT5ID(params.subredditId),
+      subredditId: T5(params.subredditId),
       isInternal: false,
       participantType: 'PARTICIPANT_USER',
       conversationType: 'SR_USER',
@@ -649,7 +649,7 @@ export class ModMailService {
     return createModmailConversation({
       subject: notificationSubject,
       bodyMarkdown: params.bodyMarkdown,
-      subredditId: asT5ID(params.subredditId),
+      subredditId: T5(params.subredditId),
       isInternal: false,
       participantType: 'PARTICIPANT_USER',
       conversationType: 'SR_USER',
@@ -1162,7 +1162,7 @@ export class ModMailService {
 async function createModmailConversation(params: {
   subject: string;
   bodyMarkdown: string;
-  subredditId: T5ID;
+  subredditId: T5;
   isInternal: boolean;
   participantType: string;
   conversationType: string;

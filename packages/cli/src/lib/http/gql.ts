@@ -1,5 +1,5 @@
 import type { JSONObject } from '@devvit/shared-types/json.js';
-import { isT5ID } from '@devvit/shared-types/tid.js';
+import { isT5 } from '@devvit/shared-types/tid.js';
 
 import { GQL_QUERY_URL } from '../../util/config.js';
 import type { StoredToken } from '../auth/StoredToken.js';
@@ -75,7 +75,7 @@ export async function fetchSubredditSubscriberCount(
   // Hack: GQL is failing below on snoodev.
   if (MY_PORTAL_ENABLED) return 0;
 
-  if (isT5ID(subreddit)) {
+  if (isT5(subreddit)) {
     const subredditInfo = await gqlQuery<
       { subredditInfoById: { subscribersCount: number } | null },
       { id: string }

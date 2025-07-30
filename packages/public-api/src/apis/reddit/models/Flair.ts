@@ -5,10 +5,10 @@ import {
   type UserFlair as UserFlairProto,
 } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { T3ID } from '@devvit/shared-types/tid.js';
-import { asT3ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import type { T3ID } from '../../../types/tid.js';
+import { asT3ID } from '../../../types/tid.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 
 export enum FlairType {

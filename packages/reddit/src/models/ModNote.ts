@@ -9,8 +9,7 @@ import type {
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, asT5ID, asTID } from '@devvit/shared-types/tid.js';
+import { asTid, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
 import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
@@ -41,22 +40,22 @@ export type UserNoteLabel =
 
 export type UserNote = {
   note?: string | undefined;
-  redditId?: T1ID | T3ID | T5ID | undefined;
+  redditId?: T1 | T3 | T5 | undefined;
   label?: UserNoteLabel | undefined;
 };
 
 export interface ModNote {
   id: string;
   operator: {
-    id?: T2ID | undefined;
+    id?: T2 | undefined;
     name?: string | undefined;
   };
   user: {
-    id?: T2ID | undefined;
+    id?: T2 | undefined;
     name?: string | undefined;
   };
   subreddit: {
-    id?: T5ID | undefined;
+    id?: T5 | undefined;
     name?: string | undefined;
   };
   type: ModNoteType;
@@ -73,7 +72,7 @@ export type GetModNotesOptions = Prettify<
 
 export type CreateModNoteOptions = Prettify<
   PostNotesRequest & {
-    redditId?: T1ID | T3ID;
+    redditId?: T1 | T3;
     label?: UserNoteLabel;
   }
 >;
@@ -105,22 +104,22 @@ export class ModNote {
     return {
       id: protoModNote.id,
       user: {
-        id: asT2ID(protoModNote.userId ?? ''),
+        id: T2(protoModNote.userId ?? ''),
         name: protoModNote.user,
       },
       subreddit: {
-        id: asT5ID(protoModNote.subredditId ?? ''),
+        id: T5(protoModNote.subredditId ?? ''),
         name: protoModNote.subreddit,
       },
       operator: {
-        id: asT2ID(protoModNote.operatorId ?? ''),
+        id: T2(protoModNote.operatorId ?? ''),
         name: protoModNote.operator,
       },
       createdAt: new Date(protoModNote.createdAt! * 1000), // convert to ms
       userNote: {
         note: protoModNote.userNoteData?.note,
         redditId: protoModNote.userNoteData?.redditId
-          ? asTID<T1ID | T3ID | T5ID>(protoModNote.userNoteData?.redditId)
+          ? asTid<T1 | T3 | T5>(protoModNote.userNoteData?.redditId)
           : undefined,
         label: protoModNote.userNoteData?.label as UserNoteLabel,
       },

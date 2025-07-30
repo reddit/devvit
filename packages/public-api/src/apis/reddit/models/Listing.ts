@@ -1,5 +1,4 @@
-import type { T1ID, T3ID } from '@devvit/shared-types/tid.js';
-
+import type { T1ID, T3ID } from '../../../types/tid.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 
 export type MoreObject = {

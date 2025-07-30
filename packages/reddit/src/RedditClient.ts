@@ -1,8 +1,7 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
 import { context, getContextCache, setContextCache } from '@devvit/server';
 import { Header } from '@devvit/shared-types/Header.js';
-import { asT2ID, type T1ID, type T2ID, type T3ID, type T5ID } from '@devvit/shared-types/tid.js';
-import { asT3ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
+import { asTid, isT1, isT3, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
 import type {
   AboutSubredditTypes,
@@ -153,7 +152,7 @@ export class RedditClient {
    * ```
    */
   getSubredditById(id: string): Promise<Subreddit | undefined> {
-    return Subreddit.getById(asTID<T5ID>(id));
+    return Subreddit.getById(T5(id));
   }
 
   /**
@@ -270,7 +269,7 @@ export class RedditClient {
    * @returns A Promise that resolves to a Post object.
    */
   getPostById(id: string): Promise<Post> {
-    return Post.getById(asTID<T3ID>(id));
+    return Post.getById(T3(id));
   }
 
   /**
@@ -341,7 +340,7 @@ export class RedditClient {
    * ```
    */
   getUserById(id: string): Promise<User | undefined> {
-    return User.getById(asTID<T2ID>(id));
+    return User.getById(T2(id));
   }
 
   /**
@@ -396,7 +395,7 @@ export class RedditClient {
     // Get the user from cache; if we miss, fetch the user and cache it.
     let curUser = getContextCache<User>(CACHE_KEY_CURRENT_USER);
     if (!curUser) {
-      curUser = await User.getById(asT2ID(userId));
+      curUser = await User.getById(T2(userId));
       if (!curUser) {
         return undefined;
       }
@@ -448,7 +447,7 @@ export class RedditClient {
    * ```
    */
   getCommentById(id: string): Promise<Comment> {
-    return Comment.getById(asTID<T1ID>(id));
+    return Comment.getById(T1(id));
   }
 
   /**
@@ -512,7 +511,7 @@ export class RedditClient {
   submitComment(options: CommentSubmissionOptions & { id: string }): Promise<Comment> {
     return Comment.submit({
       ...options,
-      id: asTID<T3ID | T1ID>(options.id),
+      id: asTid<T3 | T1>(options.id),
     });
   }
 
@@ -1041,7 +1040,7 @@ export class RedditClient {
   addModNote(options: CreateModNoteOptions): Promise<ModNote> {
     const req = {
       ...options,
-      ...(options.redditId ? { redditId: asTID<T1ID | T3ID>(options.redditId) } : {}),
+      ...(options.redditId ? { redditId: asTid<T1 | T3>(options.redditId) } : {}),
     };
     return ModNote.add(req);
   }
@@ -1090,9 +1089,9 @@ export class RedditClient {
    * ```
    */
   async approve(id: string): Promise<void> {
-    if (isT1ID(id)) {
+    if (isT1(id)) {
       return Comment.approve(id);
-    } else if (isT3ID(id)) {
+    } else if (isT3(id)) {
       return Post.approve(id);
     }
 
@@ -1111,9 +1110,9 @@ export class RedditClient {
    * ```
    */
   async remove(id: string, isSpam: boolean): Promise<void> {
-    if (isT1ID(id)) {
+    if (isT1(id)) {
       return Comment.remove(id, isSpam);
-    } else if (isT3ID(id)) {
+    } else if (isT3(id)) {
       return Post.remove(id, isSpam);
     }
 
@@ -1273,7 +1272,7 @@ export class RedditClient {
    * @param postId - The ID of the post to remove the flair from.
    */
   async removePostFlair(subredditName: string, postId: string): Promise<void> {
-    return Flair.removePostFlair(subredditName, asT3ID(postId));
+    return Flair.removePostFlair(subredditName, T3(postId));
   }
 
   /**
@@ -1631,7 +1630,7 @@ export class RedditClient {
    * ```
    */
   getVaultByUserId(userId: string): Promise<Vault> {
-    return getVaultByUserId(asTID<T2ID>(userId));
+    return getVaultByUserId(T2(userId));
   }
 
   /**

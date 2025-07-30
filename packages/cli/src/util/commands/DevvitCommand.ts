@@ -1,4 +1,4 @@
-import type { T2ID } from '@devvit/shared-types/tid.js';
+import type { T2 } from '@devvit/shared-types/tid.js';
 import { Command, Flags } from '@oclif/core';
 import { parse } from '@oclif/core/lib/parser/index.js';
 import inquirer from 'inquirer';
@@ -155,7 +155,7 @@ export abstract class DevvitCommand extends Command {
   /**
    * @description Get the user's t2 id from the stored token.
    */
-  protected async getUserT2Id(token: StoredToken): Promise<T2ID> {
+  protected async getUserT2Id(token: StoredToken): Promise<T2> {
     const res = await fetchUserT2Id(token);
     if (!res.ok) {
       this.error(`${res.error}. Try again or re-login with \`devvit login\`.`);

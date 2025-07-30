@@ -1,6 +1,5 @@
 import type { JSONObject } from '@devvit/shared-types/json.js';
-import type { T2ID } from '@devvit/shared-types/tid.js';
-import { asT2ID } from '@devvit/shared-types/tid.js';
+import { T2 } from '@devvit/shared-types/tid.js';
 
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { authHeaders } from '../auth.js';
@@ -25,7 +24,7 @@ export async function fetchUserDisplayName(token: StoredToken): Promise<Result<s
   return Result.Ok(username);
 }
 
-export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2ID>> {
+export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2>> {
   const fetchUserRes = await fetchUserInfo(token);
   if (!fetchUserRes.ok) {
     return Result.Err(fetchUserRes.error);
@@ -42,14 +41,14 @@ export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2ID>> {
     userId = 't2_' + userId;
   }
 
-  let t2Id: T2ID;
+  let t2: T2;
   try {
-    t2Id = asT2ID(userId);
+    t2 = T2(userId);
   } catch {
-    return Result.Err(`Failed to convert user id to T2ID. Got: ${userId}`);
+    return Result.Err(`Failed to convert user id to T2. Got: ${userId}`);
   }
 
-  return Result.Ok(t2Id);
+  return Result.Ok(t2);
 }
 
 async function fetchUserInfo(token: StoredToken): Promise<Result<JSONObject>> {

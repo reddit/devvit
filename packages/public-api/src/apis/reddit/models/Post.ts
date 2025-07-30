@@ -14,13 +14,13 @@ import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
-import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
 import { fromByteArray } from 'base64-js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
 import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
 import { BlocksHandler } from '../../../devvit/internals/blocks/handler/BlocksHandler.js';
+import type { T2ID, T3ID, T5ID } from '../../../types/tid.js';
+import { asT2ID, asT3ID, asT5ID, isT3ID } from '../../../types/tid.js';
 import { RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';

@@ -5,9 +5,9 @@ import {
   type ModActionData as ProtosModActionData,
 } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
-import { asT5ID, type T5ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import { asT5ID, type T5ID } from '../../../types/tid.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 
 export type SubredditData = {

@@ -15,8 +15,7 @@ import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
-import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
+import { isT3, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { Loading } from '@devvit/splash/loading.js';
 import { type SplashProps } from '@devvit/splash/splash.js';
 
@@ -403,11 +402,11 @@ export type GalleryMedia = {
 };
 
 export class Post {
-  #id: T3ID;
-  #authorId: T2ID | undefined;
+  #id: T3;
+  #authorId: T2 | undefined;
   #authorName: string;
   #createdAt: Date;
-  #subredditId: T5ID;
+  #subredditId: T5;
   #subredditName: string;
   #permalink: string;
   #title: string;
@@ -462,11 +461,11 @@ export class Post {
     assertNonNull(data.url, 'Post is missing url');
     assertNonNull(data.permalink, 'Post is missing permalink');
 
-    this.#id = asT3ID(`t3_${data.id}`);
+    this.#id = T3(`t3_${data.id}`);
 
     this.#authorName = data.author;
-    this.#authorId = data.authorFullname ? asT2ID(data.authorFullname) : undefined;
-    this.#subredditId = asT5ID(data.subredditId);
+    this.#authorId = data.authorFullname ? T2(data.authorFullname) : undefined;
+    this.#subredditId = T5(data.subredditId);
     this.#subredditName = data.subreddit;
     this.#score = data.score ?? 0;
     this.#numberOfComments = data.numComments ?? 0;
@@ -560,11 +559,11 @@ export class Post {
     }
   }
 
-  get id(): T3ID {
+  get id(): T3 {
     return this.#id;
   }
 
-  get authorId(): T2ID | undefined {
+  get authorId(): T2 | undefined {
     return this.#authorId;
   }
 
@@ -572,7 +571,7 @@ export class Post {
     return this.#authorName;
   }
 
-  get subredditId(): T5ID {
+  get subredditId(): T5 {
     return this.#subredditId;
   }
 
@@ -1090,10 +1089,10 @@ export class Post {
   // TODO: flair methods
 
   /** @internal */
-  static async getById(id: T3ID): Promise<Post> {
+  static async getById(id: T3): Promise<Post> {
     const client = getRedditApiPlugins().LinksAndComments;
 
-    const postId: T3ID = isT3ID(id) ? id : `t3_${id}`;
+    const postId: T3 = isT3(id) ? id : `t3_${id}`;
 
     const response = await client.Info(
       {
@@ -1210,7 +1209,7 @@ export class Post {
       {
         kind: 'crosspost',
         sr: subredditName,
-        crosspostFullname: asT3ID(postId),
+        crosspostFullname: T3(postId),
         ...rest,
         runAs: runAsType,
       },
@@ -1225,7 +1224,7 @@ export class Post {
   }
 
   /** @internal */
-  static async edit(options: PostTextOptions & { id: T3ID }): Promise<Post> {
+  static async edit(options: PostTextOptions & { id: T3 }): Promise<Post> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     const { id } = options;
@@ -1257,8 +1256,8 @@ export class Post {
   /** @internal */
   static async setSuggestedCommentSort(options: {
     suggestedSort: PostSuggestedCommentSort;
-    id: T3ID;
-    subredditId: T5ID;
+    id: T3;
+    subredditId: T5;
   }): Promise<void> {
     const operationName = 'SetSuggestedSort';
     const persistedQueryHash = 'cf6052acc7fefaa65b710625b81dba8041f258313aafe9730e2a3dc855e5d10d';
@@ -1276,7 +1275,7 @@ export class Post {
   }
 
   /** @internal */
-  static async setPostData(options: { postId: T3ID; postData: DevvitPostData }): Promise<void> {
+  static async setPostData(options: { postId: T3; postData: DevvitPostData }): Promise<void> {
     const [res] = await Promise.all([
       getRedditApiPlugins().LinksAndComments.EditCustomPost(
         {
@@ -1292,10 +1291,7 @@ export class Post {
   }
 
   /** @internal */
-  static async setTextFallback(
-    options: CustomPostTextFallbackOptions,
-    postId: T3ID
-  ): Promise<Post> {
+  static async setTextFallback(options: CustomPostTextFallbackOptions, postId: T3): Promise<Post> {
     if (!('text' in options) && !('richtext' in options)) {
       throw new Error(`No text fallback provided for post ${postId}.`);
     }
@@ -1320,7 +1316,7 @@ export class Post {
   }
 
   /** @internal */
-  static async delete(id: T3ID): Promise<void> {
+  static async delete(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Del(
@@ -1332,7 +1328,7 @@ export class Post {
   }
 
   /** @internal */
-  static async approve(id: T3ID): Promise<void> {
+  static async approve(id: T3): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.Approve(
@@ -1344,7 +1340,7 @@ export class Post {
   }
 
   /** @internal */
-  static async remove(id: T3ID, isSpam: boolean = false): Promise<void> {
+  static async remove(id: T3, isSpam: boolean = false): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.Remove(
@@ -1357,7 +1353,7 @@ export class Post {
   }
 
   /** @internal */
-  static async hide(id: T3ID): Promise<void> {
+  static async hide(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Hide(
@@ -1369,7 +1365,7 @@ export class Post {
   }
 
   /** @internal */
-  static async unhide(id: T3ID): Promise<void> {
+  static async unhide(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Unhide(
@@ -1381,7 +1377,7 @@ export class Post {
   }
 
   /** @internal */
-  static async markAsNsfw(id: T3ID): Promise<void> {
+  static async markAsNsfw(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.MarkNSFW(
@@ -1392,7 +1388,7 @@ export class Post {
     );
   }
   /** @internal */
-  static async unmarkAsNsfw(id: T3ID): Promise<void> {
+  static async unmarkAsNsfw(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.UnmarkNSFW(
@@ -1404,7 +1400,7 @@ export class Post {
   }
 
   /** @internal */
-  static async markAsSpoiler(id: T3ID): Promise<void> {
+  static async markAsSpoiler(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Spoiler(
@@ -1416,7 +1412,7 @@ export class Post {
   }
 
   /** @internal */
-  static async unmarkAsSpoiler(id: T3ID): Promise<void> {
+  static async unmarkAsSpoiler(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Unspoiler(
@@ -1428,7 +1424,7 @@ export class Post {
   }
 
   /** @internal */
-  static async sticky(id: T3ID, position: 1 | 2 | 3 | 4 | undefined): Promise<void> {
+  static async sticky(id: T3, position: 1 | 2 | 3 | 4 | undefined): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.SetSubredditSticky(
@@ -1442,7 +1438,7 @@ export class Post {
   }
 
   /** @internal */
-  static async unsticky(id: T3ID): Promise<void> {
+  static async unsticky(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.SetSubredditSticky(
@@ -1455,7 +1451,7 @@ export class Post {
   }
 
   /** @internal */
-  static async lock(id: T3ID): Promise<void> {
+  static async lock(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Lock(
@@ -1467,7 +1463,7 @@ export class Post {
   }
 
   /** @internal */
-  static async unlock(id: T3ID): Promise<void> {
+  static async unlock(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Unlock(
@@ -1480,7 +1476,7 @@ export class Post {
 
   /** @internal */
   static async distinguish(
-    id: T3ID,
+    id: T3,
     asAdmin: boolean
   ): Promise<{ distinguishedBy: string | undefined }> {
     const client = getRedditApiPlugins().Moderation;
@@ -1504,7 +1500,7 @@ export class Post {
   }
 
   /** @internal */
-  static async undistinguish(id: T3ID): Promise<{ distinguishedBy: string | undefined }> {
+  static async undistinguish(id: T3): Promise<{ distinguishedBy: string | undefined }> {
     const client = getRedditApiPlugins().Moderation;
 
     const response = await client.Distinguish(
@@ -1526,7 +1522,7 @@ export class Post {
   }
 
   /** @internal */
-  static async ignoreReports(id: T3ID): Promise<void> {
+  static async ignoreReports(id: T3): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.IgnoreReports(
@@ -1538,7 +1534,7 @@ export class Post {
   }
 
   /** @internal */
-  static async unignoreReports(id: T3ID): Promise<void> {
+  static async unignoreReports(id: T3): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.UnignoreReports(
@@ -1716,7 +1712,7 @@ function listingProtosToPosts(listingProto: ListingProto): ListingFetchResponse<
 }
 
 /** @internal */
-async function getThumbnailV2(options: { id: T3ID }): Promise<EnrichedThumbnail | undefined> {
+async function getThumbnailV2(options: { id: T3 }): Promise<EnrichedThumbnail | undefined> {
   const operationName = 'GetThumbnailV2';
   const persistedQueryHash = '81580ce4e23d748c5a59a1618489b559bf4518b6a73af41f345d8d074c8b2ce9';
   const response = await GraphQL.query(operationName, persistedQueryHash, {

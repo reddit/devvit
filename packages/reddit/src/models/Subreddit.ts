@@ -8,8 +8,7 @@ import type {
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { T5ID } from '@devvit/shared-types/tid.js';
-import { asT5ID } from '@devvit/shared-types/tid.js';
+import { T5 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
@@ -388,7 +387,7 @@ export class PostFlairSettings {
  * A class representing information about a Subreddit.
  */
 export type SubredditInfo = {
-  id?: T5ID;
+  id?: T5;
   name?: string;
   createdAt?: Date;
   type?: SubredditType;
@@ -423,7 +422,7 @@ export type SubredditInfo = {
  * A class representing a subreddit.
  */
 export class Subreddit {
-  #id: T5ID;
+  #id: T5;
   #name: string;
   #createdAt: Date;
   #type: SubredditType;
@@ -446,7 +445,7 @@ export class Subreddit {
     assertNonNull(data.id, 'Subreddit id is missing or undefined');
     assertNonNull(data.displayName, 'Subreddit name is missing or undefined');
 
-    this.#id = asT5ID(`t5_${data.id}`);
+    this.#id = T5(`t5_${data.id}`);
     this.#name = data.displayName;
 
     assertNonNull(data.createdUtc, 'Subreddit is missing created date');
@@ -522,7 +521,7 @@ export class Subreddit {
   /**
    * The ID (starting with t5_) of the subreddit to retrieve. e.g. t5_2qjpg
    */
-  get id(): T5ID {
+  get id(): T5 {
     return this.#id;
   }
 
@@ -1196,11 +1195,11 @@ export class Subreddit {
 
     const subredditId = context.subredditId;
     assertNonNull<string | undefined>(subredditId);
-    return Subreddit.getById(asT5ID(subredditId));
+    return Subreddit.getById(T5(subredditId));
   }
 
   /** @internal */
-  static async getById(id: T5ID): Promise<Subreddit | undefined> {
+  static async getById(id: T5): Promise<Subreddit | undefined> {
     const subredditName = await getSubredditNameById(id);
     if (!subredditName) {
       return;
@@ -1370,7 +1369,7 @@ function parseListing(listing: ProtoListing): ListingFetchResponse<Post | Commen
 }
 
 /** @internal */
-export async function getSubredditNameById(id: T5ID): Promise<string | undefined> {
+export async function getSubredditNameById(id: T5): Promise<string | undefined> {
   const client = getRedditApiPlugins().LinksAndComments;
 
   const response = await client.Info({ thingIds: [id], subreddits: [] }, context.metadata);

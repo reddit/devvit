@@ -8,8 +8,7 @@ import type {
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
-import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT1ID, asT2ID, asT3ID, asT5ID, isCommentId, isT1ID } from '@devvit/shared-types/tid.js';
+import { asTid, isT1, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
 import { RunAs } from '../common.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
@@ -40,8 +39,8 @@ export type GetCommentsOptions = {
 };
 
 type GetCommentsListingOptions = {
-  postId: T3ID;
-  commentId?: T1ID | undefined;
+  postId: T3;
+  commentId?: T1 | undefined;
   depth?: number;
   pageSize?: number;
   limit?: number;
@@ -72,14 +71,14 @@ export type GetCommentsByUserOptions = {
 };
 
 export class Comment {
-  #id: T1ID;
-  #authorId: T2ID | undefined;
+  #id: T1;
+  #authorId: T2 | undefined;
   #authorName: string;
   #body: string;
   #createdAt: Date;
-  #parentId: T1ID | T3ID;
-  #postId: T3ID;
-  #subredditId: T5ID;
+  #parentId: T1 | T3;
+  #postId: T3;
+  #subredditId: T5;
   #subredditName: string;
   #replies: Listing<Comment>;
   #approved: boolean;
@@ -116,14 +115,14 @@ export class Comment {
     assertNonNull(data.subreddit, 'Comment is missing subreddit name');
     assertNonNull(data.subredditId, 'Comment is missing subreddit id');
 
-    this.#id = asT1ID(`t1_${data.id}`);
-    this.#authorId = data.authorFullname ? asT2ID(data.authorFullname) : undefined;
+    this.#id = T1(`t1_${data.id}`);
+    this.#authorId = data.authorFullname ? T2(data.authorFullname) : undefined;
     this.#authorName = data.author;
     this.#body = data.body;
-    this.#subredditId = asT5ID(data.subredditId);
+    this.#subredditId = T5(data.subredditId);
     this.#subredditName = data.subreddit;
-    this.#parentId = isCommentId(data.parentId) ? asT1ID(data.parentId) : asT3ID(data.parentId);
-    this.#postId = asT3ID(data.linkId);
+    this.#parentId = asTid<T1 | T3>(data.parentId);
+    this.#postId = T3(data.linkId);
     this.#edited = data.edited ?? false;
     this.#locked = data.locked ?? false;
     this.#removed = data.removed ?? false;
@@ -158,11 +157,11 @@ export class Comment {
     });
   }
 
-  get id(): T1ID {
+  get id(): T1 {
     return this.#id;
   }
 
-  get authorId(): T2ID | undefined {
+  get authorId(): T2 | undefined {
     return this.#authorId;
   }
 
@@ -170,7 +169,7 @@ export class Comment {
     return this.#authorName;
   }
 
-  get subredditId(): T5ID {
+  get subredditId(): T5 {
     return this.#subredditId;
   }
 
@@ -186,11 +185,11 @@ export class Comment {
     return this.#createdAt;
   }
 
-  get parentId(): T1ID | T3ID {
+  get parentId(): T1 | T3 {
     return this.#parentId;
   }
 
-  get postId(): T3ID {
+  get postId(): T3 {
     return this.#postId;
   }
 
@@ -443,10 +442,10 @@ export class Comment {
   }
 
   /** @internal */
-  static async getById(id: T1ID): Promise<Comment> {
+  static async getById(id: T1): Promise<Comment> {
     const client = getRedditApiPlugins().LinksAndComments;
 
-    const commentId: T1ID = isT1ID(id) ? id : `t1_${id}`;
+    const commentId: T1 = isT1(id) ? id : `t1_${id}`;
 
     const response = await client.Info(
       {
@@ -467,14 +466,14 @@ export class Comment {
   static getComments(options: GetCommentsOptions): Listing<Comment> {
     const { postId, commentId, ...rest } = options;
     return Comment.#getCommentsListing({
-      postId: asT3ID(postId),
-      commentId: commentId ? asT1ID(commentId) : undefined,
+      postId: T3(postId),
+      commentId: commentId ? T1(commentId) : undefined,
       ...rest,
     });
   }
 
   /** @internal */
-  static async edit(options: CommentSubmissionOptions & { id: T1ID }): Promise<Comment> {
+  static async edit(options: CommentSubmissionOptions & { id: T1 }): Promise<Comment> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     const { id } = options;
@@ -505,7 +504,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async delete(id: T1ID): Promise<void> {
+  static async delete(id: T1): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Del(
@@ -517,7 +516,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async approve(id: T1ID): Promise<void> {
+  static async approve(id: T1): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.Approve(
@@ -529,7 +528,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async remove(id: T1ID, isSpam: boolean = false): Promise<void> {
+  static async remove(id: T1, isSpam: boolean = false): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.Remove(
@@ -542,7 +541,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async lock(id: T1ID): Promise<void> {
+  static async lock(id: T1): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Lock(
@@ -554,7 +553,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async unlock(id: T1ID): Promise<void> {
+  static async unlock(id: T1): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Unlock(
@@ -566,7 +565,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async submit(options: CommentSubmissionOptions & { id: T1ID | T3ID }): Promise<Comment> {
+  static async submit(options: CommentSubmissionOptions & { id: T1 | T3 }): Promise<Comment> {
     const { runAs = 'APP' } = options;
     const runAsType = RunAs[runAs];
     const client =
@@ -601,7 +600,7 @@ export class Comment {
 
   /** @internal */
   static async distinguish(
-    id: T1ID,
+    id: T1,
     sticky: boolean,
     asAdmin: boolean
   ): Promise<{
@@ -630,7 +629,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async undistinguish(id: T1ID): Promise<{
+  static async undistinguish(id: T1): Promise<{
     distinguishedBy: string | undefined;
     stickied: boolean;
   }> {
@@ -688,7 +687,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async ignoreReports(id: T1ID): Promise<void> {
+  static async ignoreReports(id: T1): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.IgnoreReports(
@@ -700,7 +699,7 @@ export class Comment {
   }
 
   /** @internal */
-  static async unignoreReports(id: T1ID): Promise<void> {
+  static async unignoreReports(id: T1): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.UnignoreReports(
@@ -758,7 +757,7 @@ export class Comment {
             return { children, more: more.children.length ? more : undefined };
           } else {
             // parentId is only ever T3 for the MoreChildren case.
-            commentId = fetchOptions.more.parentId as T1ID;
+            commentId = fetchOptions.more.parentId as T1;
             depthOffset = depthOffset + fetchOptions.more.depth;
           }
         }
@@ -868,9 +867,7 @@ export class Comment {
         }
       } else if (child.kind === 'more' && child.data.parentId && child.data.depth != null) {
         const thisMore = {
-          parentId: isCommentId(child.data.parentId)
-            ? asT1ID(child.data.parentId)
-            : asT3ID(child.data.parentId),
+          parentId: asTid<T1 | T3>(child.data.parentId),
           children: child.data.children ?? [],
           depth: child.data.depth,
         };

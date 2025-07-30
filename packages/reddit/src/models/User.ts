@@ -7,8 +7,7 @@ import type {
 } from '@devvit/protos';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { T2ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
+import { isT2, T2 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
@@ -154,7 +153,7 @@ type UserSocialLinkResponse = Omit<UserSocialLink, 'handle'> & { handle: string 
  * A class representing a user.
  */
 export class User {
-  #id: T2ID;
+  #id: T2;
   #username: string;
   #createdAt: Date;
   #linkKarma: number;
@@ -179,7 +178,7 @@ export class User {
     assertNonNull(data.createdUtc, 'User is missing created date');
 
     // UserDataByAccountIds returns the ID without the t2_ prefix
-    this.#id = asT2ID(isT2ID(data.id) ? data.id : `t2_${data.id}`);
+    this.#id = T2(isT2(data.id) ? data.id : `t2_${data.id}`);
     this.#username = data.name;
     this.#nsfw = data.over18 ?? false;
     this.#isAdmin = data.isEmployee ?? false;
@@ -206,7 +205,7 @@ export class User {
    * The ID (starting with t2_) of the user to retrieve.
    * @example 't2_1w72'
    */
-  get id(): T2ID {
+  get id(): T2 {
     return this.#id;
   }
 
@@ -411,7 +410,7 @@ export class User {
   }
 
   /** @internal */
-  static async getById(id: T2ID): Promise<User | undefined> {
+  static async getById(id: T2): Promise<User | undefined> {
     const username = await getUsernameById(id);
 
     return username == null ? undefined : User.getByUsername(username);

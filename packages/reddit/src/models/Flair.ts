@@ -6,8 +6,7 @@ import {
 } from '@devvit/protos';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { T3ID } from '@devvit/shared-types/tid.js';
-import { asT3ID } from '@devvit/shared-types/tid.js';
+import { T3 } from '@devvit/shared-types/tid.js';
 
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { getRedditApiPlugins } from '../plugin.js';
@@ -267,11 +266,11 @@ export type SetUserFlairOptions = SetFlairOptions & {
 
 export type SetPostFlairOptions = SetFlairOptions & {
   /** The ID of the post to set the flair on */
-  postId: string;
+  t3: string;
 };
 
 export type InternalSetPostFlairOptions = SetFlairOptions & {
-  postId: T3ID;
+  t3: T3;
 };
 
 export type SetUserFlairBatchConfig = {
@@ -374,13 +373,13 @@ export class Flair {
   static setPostFlair(options: SetPostFlairOptions): Promise<void> {
     return Flair.#setFlair({
       ...options,
-      postId: asT3ID(options.postId),
+      postId: T3(options.t3),
     });
   }
 
   /** @internal */
   static async #setFlair(
-    options: (Omit<SetPostFlairOptions, 'postId'> & { postId: T3ID }) | SetUserFlairOptions
+    options: (Omit<SetPostFlairOptions, 'postId'> & { postId: T3 }) | SetUserFlairOptions
   ): Promise<void> {
     const client = getRedditApiPlugins().Flair;
 
@@ -390,7 +389,7 @@ export class Flair {
         flairTemplateId: options.flairTemplateId ?? '',
         text: options.text ?? '',
         name: (options as SetUserFlairOptions).username,
-        link: (options as InternalSetPostFlairOptions).postId,
+        link: (options as InternalSetPostFlairOptions).t3,
         backgroundColor: options.backgroundColor ?? '',
         textColor: options.textColor ?? 'dark',
         cssClass: options.cssClass ?? '',
@@ -442,7 +441,7 @@ export class Flair {
   }
 
   /** @internal */
-  static async removePostFlair(subredditName: string, postId: T3ID): Promise<void> {
+  static async removePostFlair(subredditName: string, postId: T3): Promise<void> {
     return Flair.#removeFlair(subredditName, postId, undefined);
   }
 
