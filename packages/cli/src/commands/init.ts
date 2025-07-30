@@ -207,10 +207,10 @@ export default class Init extends DevvitCommand {
     }
     const creationWizardUrl = `${DEVVIT_PORTAL_URL}/new?${querystring.stringify(queryParams)}`;
 
-    console.log('Please open Reddit to continue:');
-    console.log();
-    console.log(creationWizardUrl.replace('*', '%2A'));
-    console.log();
+    this.log('Please open Reddit to continue:');
+    this.log();
+    this.log(creationWizardUrl.replace('*', '%2A'));
+    this.log();
 
     let codeOrEnter = '';
     while (codeOrEnter === '') {
@@ -260,7 +260,7 @@ export default class Init extends DevvitCommand {
         queryParams.redirect_url = redirectUrl.toString();
 
         const creationWizardUrl = `${DEVVIT_PORTAL_URL}/new?${querystring.stringify(queryParams)}`;
-        console.log(
+        this.log(
           'Please open Reddit to continue:\n\n' +
             `${creationWizardUrl.replace('*', '%2A')}\n\n` +
             'Press enter to open this link immediately...'
@@ -357,8 +357,6 @@ export default class Init extends DevvitCommand {
       const installInstructions = `• ${chalk.cyan(`\`npm install\``)} to install dependencies`;
       welcomeInstructions.push(installInstructions);
     }
-    const uploadInstructions = `• ${chalk.cyan(`\`npm run deploy\``)} to upload your app`;
-    welcomeInstructions.push(uploadInstructions);
 
     const playtestInstructions = `• ${chalk.cyan(
       `\`npm run dev\``
