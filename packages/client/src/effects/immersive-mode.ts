@@ -1,5 +1,6 @@
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import { WebViewImmersiveMode } from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
+import type { WebViewInternalEventMessage } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 /**
@@ -78,20 +79,26 @@ async function emitImmersiveModeEffect(mode: WebViewImmersiveMode, event: Event)
   await emitEffect({ type, immersiveMode: { immersiveMode: mode } });
 }
 
+type MessageEventData = {
+  type: string;
+  data: WebViewInternalEventMessage;
+};
+
 /**
  * Handles incoming messages from the client, like when the user closes the immersive modal
  */
 if (typeof addEventListener === 'function') {
-  addEventListener('message', (event: MessageEvent) => {
+  addEventListener('message', (event: MessageEvent<MessageEventData>) => {
     const { type, data } = event.data;
 
     if (type !== 'devvit-message') {
       return;
     }
-    if (!data.immersiveMode) {
+    if (!data.immersiveModeEvent) {
       return;
     }
-    const immersiveMode = event.data.data?.immersiveMode?.immersiveMode;
+    const immersiveMode = event.data.data?.immersiveModeEvent?.immersiveMode;
+
     const modeString =
       immersiveMode === (2 satisfies WebViewImmersiveMode.IMMERSIVE_MODE) ? 'immersive' : 'inline';
 

@@ -17,7 +17,7 @@ describe('showImmersiveMode', () => {
       data: {
         type: 'devvit-message',
         data: {
-          immersiveMode: {
+          immersiveModeEvent: {
             immersiveMode: 2 satisfies WebViewImmersiveMode.IMMERSIVE_MODE,
           },
         },
@@ -27,7 +27,7 @@ describe('showImmersiveMode', () => {
     window.dispatchEvent(messageEvent);
     expect(callback).toHaveBeenCalledWith('immersive');
 
-    messageEvent.data.data.immersiveMode.immersiveMode =
+    messageEvent.data.data.immersiveModeEvent.immersiveMode =
       1 satisfies WebViewImmersiveMode.INLINE_MODE;
     window.dispatchEvent(messageEvent);
     expect(callback).toHaveBeenCalledWith('inline');
@@ -41,7 +41,7 @@ describe('showImmersiveMode', () => {
       data: {
         type: 'devvit-message',
         data: {
-          immersiveMode: {
+          immersiveModeEvent: {
             immersiveMode: 2 satisfies WebViewImmersiveMode.IMMERSIVE_MODE,
           },
         },
