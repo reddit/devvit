@@ -1230,10 +1230,10 @@ export class Post {
       }
     }
 
-    if (!response.json?.data?.id || response.json?.errors?.length) {
-      throw new Error(
-        `failed to submit post - either post ID is empty or request failed with errors: ${response.json?.errors}`
-      );
+    if (response.json?.errors?.length) {
+      throw new Error(`failed to submit post - errors: ${response.json?.errors.join(', ')}`);
+    } else if (!response.json?.data?.id) {
+      throw new Error(`failed to submit post - no post ID returned but no error details found`);
     }
 
     return Post.getById(`t3_${response.json.data.id}`, metadata);
