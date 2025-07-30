@@ -8,7 +8,7 @@ import util from 'node:util';
 
 import { InitAppResponse } from '@devvit/protos/types/devvit/cli/init.js';
 import { isDevvitDependency } from '@devvit/shared-types/isDevvitDependency.js';
-import { Args } from '@oclif/core';
+import { Args, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import git from 'isomorphic-git';
@@ -34,6 +34,10 @@ const require = createRequire(import.meta.url);
 const cliPackageJSON = require(require.resolve(`@devvit/cli/package.json`));
 const CLI_VERSION = semver.parse(cliPackageJSON.version)!;
 
+type InitAppFlags = {
+  template: string | undefined;
+};
+
 export default class Init extends DevvitCommand {
   static override description = 'Initialize a new app';
 
@@ -47,7 +51,16 @@ export default class Init extends DevvitCommand {
     }),
   } as const;
 
+  static override flags = {
+    template: Flags.string({
+      description: 'Optional template name to skip template selection in the wizard.',
+      required: false,
+    }),
+  } as const;
+
   #initAppParams: InitAppResponse | undefined;
+
+  #initAppFlags: InitAppFlags | undefined;
 
   get #projectPath(): string {
     if (!this.#initAppParams?.appName) {
@@ -64,7 +77,8 @@ export default class Init extends DevvitCommand {
   override async run(): Promise<void> {
     // TODO: DX-9807 - 0. Fire the init telemetry event
 
-    const { args } = await this.parse(Init);
+    const { args, flags } = await this.parse(Init);
+    this.#initAppFlags = flags;
 
     let rawCode = args.code;
     if (!rawCode) {
@@ -86,7 +100,9 @@ export default class Init extends DevvitCommand {
         `Invalid code provided. Run 'npm run init' or visit ${DEVVIT_PORTAL_URL}/new to get a new code.`
       );
     }
-    this.log('Successfully unpacked app code.');
+    if (this.#initAppFlags?.template) {
+      this.#initAppParams.templateName = this.#initAppFlags.template;
+    }
 
     // Login to CLI with one-time auth code
     if (this.#initAppParams.authCode) {
@@ -183,11 +199,11 @@ export default class Init extends DevvitCommand {
     if (await getAccessToken()) {
       queryParams.skip_oauth = 'true';
     }
-    if (this.isRunningInAppDirectory()) {
+    if (this.isRunningInAppDirectory() || this.#initAppFlags?.template) {
       queryParams.skip_template = 'true';
-      if (this.project.name) {
-        queryParams.app_name = this.project.name;
-      }
+    }
+    if (this.isRunningInAppDirectory() && this.project.name) {
+      queryParams.app_name = this.project.name;
     }
     const creationWizardUrl = `${DEVVIT_PORTAL_URL}/new?${querystring.stringify(queryParams)}`;
 
@@ -229,11 +245,11 @@ export default class Init extends DevvitCommand {
     if (await getAccessToken()) {
       queryParams.skip_oauth = 'true';
     }
-    if (this.isRunningInAppDirectory()) {
+    if (this.isRunningInAppDirectory() || this.#initAppFlags?.template) {
       queryParams.skip_template = 'true';
-      if (this.project.name) {
-        queryParams.app_name = this.project.name;
-      }
+    }
+    if (this.isRunningInAppDirectory() && this.project.name) {
+      queryParams.app_name = this.project.name;
     }
 
     const line = readLine();
