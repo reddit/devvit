@@ -498,6 +498,18 @@ describe('Post API', () => {
 
         const mockedPost = new Post({ ...defaultPostData, selftext });
 
+        const spyGql = vi.spyOn(GraphQL, 'query');
+        spyGql.mockImplementationOnce(async () => ({
+          data: {
+            postInfoById: {
+              devvit: {
+                postData: '{"developerData":{"riddle":"hello"}}',
+              },
+            },
+          },
+          errors: [],
+        }));
+
         const spyPlugin = redditApiPlugins.LinksAndComments.EditCustomPost;
         spyPlugin.mockImplementationOnce(async () => ({
           json: { data: { things: [{ kind: 'post' }] }, errors: [] },
@@ -510,7 +522,7 @@ describe('Post API', () => {
             {
               thingId: 't3_qwerty',
               postData: {
-                developerData: undefined,
+                developerData: { riddle: 'hello' },
                 splash: {
                   appDisplayName: 'appDisplayName',
                   appIconUri: undefined,

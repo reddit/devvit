@@ -727,6 +727,27 @@ const enrichedThumbnail = await post.getEnrichedThumbnail();
 
 ---
 
+<a id="getpostdata"></a>
+
+### getPostData()
+
+> **getPostData**(): `Promise`\<`undefined` \| `JSONObject`\>
+
+Get the postData for the post.
+
+#### Returns
+
+`Promise`\<`undefined` \| `JSONObject`\>
+
+#### Example
+
+```ts
+const post = await context.reddit.getPostById(context.postId);
+const postData = await post.getPostData();
+```
+
+---
+
 <a id="hide"></a>
 
 ### hide()

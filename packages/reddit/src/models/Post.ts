@@ -11,7 +11,6 @@ import type { SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_v
 import type { Height } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
-import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
@@ -888,6 +887,20 @@ export class Post {
   }
 
   /**
+   * Get the postData for the post.
+   *
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   * const postData = await post.getPostData();
+   * ```
+   */
+  async getPostData(): Promise<PostData | undefined> {
+    const devvitPostData = await Post.getDevvitPostData(this.id);
+    return devvitPostData?.developerData;
+  }
+
+  /**
    * Set the postData on a custom post.
    *
    * @param postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
@@ -902,8 +915,7 @@ export class Post {
    * ```
    */
   async setPostData(postData: PostData): Promise<void> {
-    const json = context.metadata[Header.PostData]?.values[0];
-    const prev: DevvitPostData = json ? JSON.parse(json) : {};
+    const prev = await Post.getDevvitPostData(this.id);
     await Post.setPostData({ postId: this.id, postData: { ...prev, developerData: postData } });
   }
 
@@ -917,8 +929,7 @@ export class Post {
    * ```
    */
   async setSplash(opts: Readonly<SubmitCustomPostSplashOptions>): Promise<void> {
-    const json = context.metadata[Header.PostData]?.values[0];
-    const prev: DevvitPostData = json ? JSON.parse(json) : {};
+    const prev = await Post.getDevvitPostData(this.id);
     const postData = { ...prev, splash: SplashPostData(opts, this.title) };
     await Post.setPostData({ postId: this.id, postData });
   }
@@ -1272,6 +1283,30 @@ export class Post {
     if (!response.data?.setSuggestedSort?.ok) {
       throw new Error('Failed to set suggested sort');
     }
+  }
+
+  /** @internal */
+  static async getDevvitPostData(id: T3): Promise<DevvitPostData | undefined> {
+    const operationName = 'GetDevvitPostData';
+    const persistedQueryHash = 'd349c9bee385336e44837c4a041d4b366fa32f16121cef7f12e1e3f230340696';
+    const response = await GraphQL.query(operationName, persistedQueryHash, {
+      id,
+    });
+
+    if (response.data?.postInfoById?.errors) {
+      throw new Error(
+        `Failed to get devvit post data due to errors: ${response.data?.postInfoById?.errors.join(', ')}`
+      );
+    }
+
+    // GQL returns postData as a JSON string
+    const devvitPostData: string = response.data?.postInfoById?.devvit?.postData;
+
+    if (!devvitPostData) {
+      return undefined;
+    }
+
+    return JSON.parse(devvitPostData) as DevvitPostData;
   }
 
   /** @internal */

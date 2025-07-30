@@ -10,6 +10,7 @@ import type {
   SetCustomPostPreviewRequest_BodyType,
 } from '@devvit/protos';
 import { Block, UIResponse } from '@devvit/protos';
+import type { DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
@@ -903,6 +904,20 @@ export class Post {
   }
 
   /**
+   * Get the postData for the post.
+   *
+   * @example
+   * ```ts
+   * const post = await context.reddit.getPostById(context.postId);
+   * const postData = await post.getPostData();
+   * ```
+   */
+  async getPostData(): Promise<PostData | undefined> {
+    const devvitPostData = await Post.getDevvitPostData(this.id, this.#metadata);
+    return devvitPostData?.developerData;
+  }
+
+  /**
    * Set the postData on a custom post.
    *
    * @param {PostData} postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
@@ -917,7 +932,11 @@ export class Post {
    * ```
    */
   async setPostData(postData: PostData): Promise<void> {
-    await Post.setPostData({ postId: this.id, postData }, this.#metadata);
+    const prev = await Post.getDevvitPostData(this.id, this.#metadata);
+    await Post.setPostData(
+      { postId: this.id, postData: { ...prev, developerData: postData } },
+      this.#metadata
+    );
   }
 
   /**
@@ -1326,20 +1345,46 @@ export class Post {
   }
 
   /** @internal */
+  static async getDevvitPostData(
+    id: T3ID,
+    metadata: Metadata | undefined
+  ): Promise<DevvitPostData | undefined> {
+    const operationName = 'GetDevvitPostData';
+    const persistedQueryHash = 'd349c9bee385336e44837c4a041d4b366fa32f16121cef7f12e1e3f230340696';
+    const response = await GraphQL.query(
+      operationName,
+      persistedQueryHash,
+      {
+        id,
+      },
+      metadata
+    );
+
+    if (response.data?.postInfoById?.errors) {
+      throw new Error(
+        `Failed to get devvit post data due to errors: ${response.data?.postInfoById?.errors.join(', ')}`
+      );
+    }
+
+    // GQL returns postData as a JSON string
+    const devvitPostData: string = response.data?.postInfoById?.devvit?.postData;
+
+    if (!devvitPostData) {
+      return undefined;
+    }
+
+    return JSON.parse(devvitPostData) as DevvitPostData;
+  }
+
+  /** @internal */
   static async setPostData(
-    options: { postId: T3ID; postData: PostData },
+    options: { postId: T3ID; postData: DevvitPostData },
     metadata: Metadata | undefined
   ): Promise<void> {
-    const devvitPostData = options.postData
-      ? {
-          developerData: options.postData,
-        }
-      : undefined;
-
     const res = await Devvit.redditAPIPlugins.LinksAndComments.EditCustomPost(
       {
         thingId: options.postId,
-        postData: devvitPostData,
+        postData: options.postData,
       },
       metadata
     );
