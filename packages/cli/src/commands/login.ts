@@ -3,6 +3,7 @@ import { Flags } from '@oclif/core';
 import { getAccessTokenAndLoginIfNeeded, getOAuthSvc } from '../util/auth.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { sendEvent } from '../util/metrics.js';
+import type { BuildMode } from '../util/project.js';
 
 export default class Login extends DevvitCommand {
   static override description = 'Log in to Devvit via reddit.com';
@@ -27,6 +28,11 @@ export default class Login extends DevvitCommand {
       cli_command: 'login',
     } as Record<string, string | boolean | undefined>,
   };
+
+  override init(_mode?: BuildMode | 'None'): Promise<void> {
+    // We don't need to initialize the project for the login command.
+    return super.init('None');
+  }
 
   async run(): Promise<void> {
     const {

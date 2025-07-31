@@ -11,6 +11,7 @@ import { Args, ux } from '@oclif/core';
 import { getAccessTokenAndLoginIfNeeded } from '../../util/auth.js';
 import { createInstallationsClient } from '../../util/clientGenerators.js';
 import { DevvitCommand, toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
+import type { BuildMode } from '../../util/project.js';
 
 enum SearchType {
   MINE,
@@ -31,6 +32,11 @@ export default class ListInstalls extends DevvitCommand {
   } as const;
 
   readonly #installationsClient = createInstallationsClient();
+
+  override init(_mode?: BuildMode | 'None'): Promise<void> {
+    // We don't need to initialize a project to list the installations you've made.
+    return super.init('None');
+  }
 
   async run(): Promise<void> {
     const { args } = await this.parse(ListInstalls);

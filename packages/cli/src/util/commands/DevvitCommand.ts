@@ -51,7 +51,7 @@ export abstract class DevvitCommand extends Command {
     return this.#project !== undefined;
   }
 
-  protected override async init(mode?: BuildMode): Promise<void> {
+  protected override async init(mode?: BuildMode | 'None'): Promise<void> {
     await super.init();
 
     // to-do: avoid subclassing and compose instead. subclasses cause bugs
@@ -70,14 +70,17 @@ export abstract class DevvitCommand extends Command {
       flags: DevvitCommand.baseFlags,
     });
 
-    this.#project = await newProject(flags.config, mode ?? 'Static');
-    if (flags.config && !this.#project) this.error(`Project config "${flags.config}" not found.`);
-    if (
-      flags.config &&
-      flags.config !== devvitClassicConfigFilename &&
-      flags.config !== devvitV1ConfigFilename
-    ) {
-      this.log(`Using custom config file: ${flags.config}`);
+    // If we're in 'None' mode, we don't need to initialize a project, and in fact shouldn't try.
+    if (mode !== 'None') {
+      this.#project = await newProject(flags.config, mode ?? 'Static');
+      if (flags.config && !this.#project) this.error(`Project config "${flags.config}" not found.`);
+      if (
+        flags.config &&
+        flags.config !== devvitClassicConfigFilename &&
+        flags.config !== devvitV1ConfigFilename
+      ) {
+        this.log(`Using custom config file: ${flags.config}`);
+      }
     }
   }
 
