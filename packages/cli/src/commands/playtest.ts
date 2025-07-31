@@ -204,9 +204,6 @@ export default class Playtest extends DevvitCommand {
         owner: username,
         version: firstVersion.toString(),
       });
-      this.log(
-        "We'll create a non-playtest version of your app first, so you can revert back to it later."
-      );
       this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
       latestVersion = await appVersionCreator.createVersion(
         {

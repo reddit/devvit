@@ -320,10 +320,15 @@ export default class Init extends DevvitCommand {
 
   async #installAppDependencies(): Promise<{ success: boolean }> {
     this.log(`${chalk.bold.yellow(' 🔧 Installing dependencies...')}`);
-    const npmInstallationOutput = await exec(`npm i --loglevel=error --no-fund`, {
-      cwd: this.#projectPath,
-    });
-    return { success: npmInstallationOutput.stderr === '' };
+    try {
+      await exec(`npm i --loglevel=error --no-fund`, {
+        cwd: this.#projectPath,
+      });
+      // If `exec` resolves, the install exited with code 0, so we consider it a success.
+      return { success: true };
+    } catch {
+      return { success: false };
+    }
   }
 
   // mutates the deps object
