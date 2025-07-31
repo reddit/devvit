@@ -85,7 +85,7 @@ export class AssetUploader {
             'Client',
             clientVersion
           )
-        : [],
+        : ([] as MediaSignatureWithContents[]),
     ]);
 
     const iconAssetPath = this.#cmd.project.appConfig?.marketingAssets?.icon;
@@ -112,6 +112,7 @@ export class AssetUploader {
         isWebviewAsset: false,
       };
       regularAssets.push(iconAssetDetails);
+      webViewAssets.push(iconAssetDetails);
     }
 
     // Return early if no assets
