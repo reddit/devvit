@@ -258,8 +258,9 @@ export function validateConfig(
     }
   }
 
-  if (config.server && !fileExists(config.server.entry) && mode === 'Static')
-    missingFiles.push(`\`config.server.entry\` (${config.server.entry})`);
+  const serverEntry = config.server ? path.join(config.server.dir, config.server.entry) : undefined;
+  if (serverEntry && !fileExists(serverEntry) && mode === 'Static')
+    missingFiles.push(`\`config.server\` (${serverEntry})`);
 
   return missingFiles;
 }

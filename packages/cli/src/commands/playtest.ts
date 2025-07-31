@@ -358,11 +358,9 @@ export default class Playtest extends DevvitCommand {
     if (this.project.mediaDir) assetPaths.push(path.join(this.project.root, this.project.mediaDir));
     if (this.project.clientDir)
       assetPaths.push(path.join(this.project.root, this.project.clientDir));
-    if (this.project.server?.entry)
+    if (this.project.server)
       // Watch the server directory to allow the watched file to be renamed or deleted.
-      assetPaths.push(
-        path.join(path.dirname(path.join(this.project.root, this.project.server.entry)), '..')
-      );
+      assetPaths.push(path.join(this.project.root, this.project.server.dir, '..'));
     if (this.project.appConfig?.marketingAssets?.icon) {
       assetPaths.push(path.join(this.project.root, this.project.appConfig.marketingAssets.icon));
     }
@@ -449,7 +447,9 @@ export default class Playtest extends DevvitCommand {
 
     if (
       this.project.server &&
-      !existsSync(path.resolve(this.project.root, this.project.server.entry))
+      !existsSync(
+        path.resolve(this.project.root, this.project.server.dir, this.project.server.entry)
+      )
     ) {
       // User may be in the process of building a server entry. Wait.
       return;

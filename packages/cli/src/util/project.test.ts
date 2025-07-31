@@ -169,11 +169,11 @@ describe('validateConfig()', () => {
           schema: 'v1',
           name: 'name',
           permissions: noPermissions,
-          server: { entry: 'entry' },
+          server: { dir: 'dir', entry: 'entry' },
           json: { name: 'name' },
         };
         expect(validateConfig(config, () => exists, mode)).toStrictEqual(
-          exists || mode === 'Dynamic' ? [] : ['`config.server.entry` (entry)']
+          exists || mode === 'Dynamic' ? [] : ['`config.server` (dir/entry)']
         );
       }
   });
