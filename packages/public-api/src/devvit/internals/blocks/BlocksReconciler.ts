@@ -10,7 +10,6 @@ import type {
 } from '@devvit/protos';
 import { BlockRenderEventType, EffectType } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
-import type { JSONObject, PartialJSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { AssetsClient } from '../../../apis/AssetsClient/AssetsClient.js';
@@ -33,6 +32,7 @@ import type {
   UseIntervalHookState,
   UseStateHook,
 } from '../../../types/index.js';
+import type { JSONObject, PartialJSONObject } from '../../../types/json.js';
 import type { KVStore } from '../../../types/kvStore.js';
 import type { RedisClient } from '../../../types/redis.js';
 import type { BlockElement } from '../../Devvit.js';

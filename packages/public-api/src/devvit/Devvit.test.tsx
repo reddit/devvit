@@ -1,8 +1,7 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
-
+import type { JSONObject, JSONValue } from '../types/json.js';
 import { Devvit } from './Devvit.js';
 
 const Box: Devvit.BlockComponent = ({ children }) => {

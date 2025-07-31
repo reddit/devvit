@@ -93,7 +93,7 @@ describe('Post API', () => {
     ],
   };
 
-  describe('RedditAPIClient', () => {
+  describe('RedditClient', () => {
     test('Post matches JSON snapshot', () => {
       const post = new Post({ ...defaultPostData });
 
@@ -149,11 +149,11 @@ describe('Post API', () => {
             postData: { abc: 'def' },
             splash: {
               appDisplayName: 'appDisplayName',
-              appIconURI: 'appIconURI',
-              backgroundURI: 'backgroundURI',
+              appIconUri: 'appIconUri',
+              backgroundUri: 'backgroundUri',
               buttonLabel: 'buttonLabel',
               description: 'description',
-              entryURI: 'entryURI',
+              entryUri: 'entryUri',
               height: 'tall',
             },
             runAs: 'USER',
@@ -170,22 +170,22 @@ describe('Post API', () => {
               userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
               splash: {
                 appDisplayName: 'appDisplayName',
-                appIconURI: 'appIconURI',
-                backgroundURI: 'backgroundURI',
+                appIconUri: 'appIconUri',
+                backgroundUri: 'backgroundUri',
                 buttonLabel: 'buttonLabel',
                 description: 'description',
-                entryURI: 'entryURI',
+                entryUri: 'entryUri',
                 height: 'tall',
               },
               postData: {
                 developerData: { abc: 'def' },
                 splash: {
                   appDisplayName: 'appDisplayName',
-                  appIconUri: 'appIconURI',
-                  backgroundUri: 'backgroundURI',
+                  appIconUri: 'appIconUri',
+                  backgroundUri: 'backgroundUri',
                   buttonLabel: 'buttonLabel',
                   description: 'description',
-                  entryUri: 'entryURI',
+                  entryUri: 'entryUri',
                   height: 2,
                   title: 'My First Post',
                 },
@@ -257,7 +257,7 @@ describe('Post API', () => {
                   backgroundUri: undefined,
                   buttonLabel: undefined,
                   description: undefined,
-                  entryURI: undefined,
+                  entryUri: undefined,
                   height: 1,
                   title: 'My First Post',
                 },

@@ -6,14 +6,14 @@ import type {
   FieldConfig_Selection_Item,
   FieldConfig_String,
 } from '@devvit/protos';
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { JsonObject } from '@devvit/shared-types/json.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
 
 // FormValues is input for pre-populated form values
-export type FormValues<T extends JSONObject> = T;
+export type FormValues<T extends JsonObject> = T;
 
 // FormRequest is equivalent to FormValues, but a semantically named alias for use in application code.
-export type FormRequest<T extends JSONObject> = T;
+export type FormRequest<T extends JsonObject> = T;
 
 export type Form = {
   /** The fields that will be displayed in the form */

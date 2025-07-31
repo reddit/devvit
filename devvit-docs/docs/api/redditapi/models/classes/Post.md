@@ -731,13 +731,13 @@ const enrichedThumbnail = await post.getEnrichedThumbnail();
 
 ### getPostData()
 
-> **getPostData**(): `Promise`\<`undefined` \| `JSONObject`\>
+> **getPostData**(): `Promise`\<`undefined` \| `JsonObject`\>
 
 Get the postData for the post.
 
 #### Returns
 
-`Promise`\<`undefined` \| `JSONObject`\>
+`Promise`\<`undefined` \| `JsonObject`\>
 
 #### Example
 
@@ -1032,7 +1032,7 @@ Set the postData on a custom post.
 
 ##### postData
 
-`JSONObject`
+`JsonObject`
 
 Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
 

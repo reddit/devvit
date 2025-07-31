@@ -1,4 +1,4 @@
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { JsonObject } from '@devvit/shared-types/json.js';
 
 import type { Form, FormValues } from './form.js';
 
@@ -8,7 +8,7 @@ import type { Form, FormValues } from './form.js';
  * This will create client-side UI effects in Reddit clients as responses to user
  * actions in cases where the Devvit app is not in the direct code path.
  */
-export type UiResponse<InitFormData extends JSONObject = JSONObject> = {
+export type UiResponse<InitFormData extends JsonObject = JsonObject> = {
   /** Navigate the user's reddit client to this URL or Reddit Thing (containing `url`). */
   navigateTo?: string | { url: string };
   /** Show a toast to the user's reddit client. */

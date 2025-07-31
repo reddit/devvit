@@ -1,4 +1,4 @@
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { JsonObject } from '@devvit/shared-types/json.js';
 import { isT5 } from '@devvit/shared-types/tid.js';
 
 import { GQL_QUERY_URL } from '../../util/config.js';
@@ -14,7 +14,7 @@ const GET_REDDITOR_INFO_BY_NAME_QUERY_HASH =
 const GET_SUBREDDIT_INFO_BY_ID_QUERY_HASH =
   '109b67500ceb4e883d6a0e15e1699948e957bf85dc630651f1e10463b6ed5db6';
 
-export type GQLQueryConfig<T extends JSONObject> = {
+export type GqlQueryConfig<T extends JsonObject> = {
   accessToken?: string;
   hash: string;
   /** GraphQL query name. Used for logging. */
@@ -22,8 +22,8 @@ export type GQLQueryConfig<T extends JSONObject> = {
   variables?: T;
 };
 
-export async function gqlQuery<T, V extends JSONObject>(
-  config: GQLQueryConfig<V>
+export async function gqlQuery<T, V extends JsonObject>(
+  config: GqlQueryConfig<V>
 ): Promise<{ data: T }> {
   const resp = await fetch(`${GQL_QUERY_URL}`, {
     method: 'POST',

@@ -6,8 +6,7 @@ import type {
   FieldConfig_Selection_Item,
   FieldConfig_String,
 } from '@devvit/protos';
-
-import type { JSONObject } from '../types.js';
+import type { JsonObject } from '@devvit/shared-types/json.js';
 
 type Prettify<T> = { [K in keyof T]: T[K] };
 
@@ -15,7 +14,7 @@ export type FormAction = 'CANCELED' | 'SUBMITTED';
 
 export type FormEffectResponse<T> = { action: 'CANCELED' } | { action: 'SUBMITTED'; values: T };
 
-export type FormValues = JSONObject;
+export type FormValues = JsonObject;
 
 export type BaseField<ValueType> = {
   /**

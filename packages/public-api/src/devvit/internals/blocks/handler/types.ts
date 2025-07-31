@@ -1,6 +1,6 @@
 import type { UIEvent } from '@devvit/protos';
-import type { JSONValue } from '@devvit/shared-types/json.js';
 
+import type { JSONValue } from '../../../../types/json.js';
 import type { RenderContext, Tombstone } from './RenderContext.js';
 
 export type BlocksState = { [hookID: string]: JSONValue | Tombstone };

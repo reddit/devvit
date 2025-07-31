@@ -8,7 +8,6 @@ import {
   assertRequestedFetchDomainsLimit,
   normalizeDomains,
 } from '@devvit/shared-types/fetch-domains.js';
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { assertValidFormFields } from '../apis/ui/helpers/assertValidFormFields.js';
@@ -38,6 +37,7 @@ import type {
   TriggerOnEventHandler,
 } from '../types/index.js';
 import { SettingScope } from '../types/index.js';
+import type { JSONObject, JSONValue } from '../types/json.js';
 import { registerAppSettings } from './internals/app-settings.js';
 import { registerCustomPost } from './internals/custom-post.js';
 import { registerInstallationSettings } from './internals/installation-settings.js';

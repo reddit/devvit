@@ -6,11 +6,11 @@ import {
   ToastAppearance,
 } from '@devvit/protos';
 import type { Form } from '@devvit/shared';
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
 import type { BlocksReconciler } from '../../devvit/internals/blocks/BlocksReconciler.js';
+import type { JSONObject, JSONValue } from '../../types/json.js';
 import type { Toast } from '../../types/toast.js';
 import type { UIClient as _UIClient } from '../../types/ui-client.js';
 import type { WebViewUIClient } from '../../types/web-view-ui-client.js';

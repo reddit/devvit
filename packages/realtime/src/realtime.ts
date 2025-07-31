@@ -3,14 +3,14 @@ import type {
   RealtimeSubscriptionEvent,
   RealtimeSubscriptionStatus,
 } from '@devvit/protos/types/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
-import type { JSONValue } from '@devvit/shared';
+import type { JsonValue } from '@devvit/shared';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 type ConnectRealtimeOptions = {
   channel: string;
   onConnect?: (channel: string) => void;
   onDisconnect?: (channel: string) => void;
-  onMessage: (data: JSONValue) => void;
+  onMessage: (data: JsonValue) => void;
 };
 
 const connectionsByChannel = new Map<string, Connection>();

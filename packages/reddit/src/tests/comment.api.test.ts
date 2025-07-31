@@ -74,7 +74,7 @@ describe('Commment API', () => {
     },
   };
 
-  describe('RedditAPIClient:Comment', () => {
+  describe('RedditClient:Comment', () => {
     test('Comment matches JSON snapshot', () => {
       const comment = new Comment({ ...defaultCommentData });
 

@@ -1,6 +1,6 @@
 import type { Metadata } from '@devvit/protos';
-import type { JSONObject } from '@devvit/shared-types/json.js';
 
+import type { JSONObject } from '../../../types/json.js';
 import type { T2ID } from '../../../types/tid.js';
 import { asT2ID } from '../../../types/tid.js';
 import { GraphQL } from '../graphql/GraphQL.js';

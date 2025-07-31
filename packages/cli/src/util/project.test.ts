@@ -1,4 +1,4 @@
-import type { JSONObject } from '@devvit/public-api';
+import type { JsonObject } from '@devvit/shared-types/json.js';
 import type {
   AppConfig,
   AppPermissionConfig,
@@ -195,7 +195,7 @@ describe('parseClassicConfig()', () => {
   test('no name', () =>
     expect(() => parseClassicConfig({})).toThrow('devvit.yaml must have `name` property.'));
   test('superset', () => {
-    const config: JSONObject & DevvitConfig = { name: 'name', abc: 'def' };
+    const config: JsonObject & DevvitConfig = { name: 'name', abc: 'def' };
     expect(parseClassicConfig(config)).toStrictEqual(config);
   });
 });

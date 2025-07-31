@@ -13,11 +13,11 @@ import type {
   StringField,
 } from '@devvit/shared';
 import { SettingScope } from '@devvit/shared';
-import type { JSONObject } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Devvit } from '../devvit/Devvit.js';
 import type { FormToFormValues } from './index.js';
+import type { JSONObject } from './json.js';
 
 type UntypedFormValues = FormValuesTyped<JSONObject>;
 

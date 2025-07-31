@@ -1,4 +1,4 @@
-import type { JSONObject } from '@devvit/shared';
+import type { JsonObject } from '@devvit/shared';
 import { T2 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
@@ -61,7 +61,7 @@ export async function getVaultByUserId(userId: T2): Promise<Vault> {
 async function getVaultByParams(
   operationName: string,
   queryHash: string,
-  params: JSONObject
+  params: JsonObject
 ): Promise<Vault> {
   const response = await GraphQL.query(operationName, queryHash, params);
   const contact = response?.data?.vault?.contact;

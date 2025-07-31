@@ -1,4 +1,4 @@
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { JsonObject } from '@devvit/shared-types/json.js';
 import { T2 } from '@devvit/shared-types/tid.js';
 
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
@@ -51,7 +51,7 @@ export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2>> {
   return Result.Ok(t2);
 }
 
-async function fetchUserInfo(token: StoredToken): Promise<Result<JSONObject>> {
+async function fetchUserInfo(token: StoredToken): Promise<Result<JsonObject>> {
   const headers = authHeaders(token);
 
   const response = await fetch(`${REDDIT_OAUTH_API}/api/v1/me.json`, {

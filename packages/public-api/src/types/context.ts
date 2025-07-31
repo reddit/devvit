@@ -1,6 +1,5 @@
 import type { Metadata, UIDimensions, UIEnvironment } from '@devvit/protos';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 
 import type { AssetsClient } from '../apis/AssetsClient/AssetsClient.js';
@@ -16,6 +15,7 @@ import type {
   UseIntervalHook,
   UseStateResult,
 } from './hooks.js';
+import type { JSONValue } from './json.js';
 import type { KVStore } from './kvStore.js';
 import type { MediaPlugin } from './media.js';
 import type { ChannelOptions } from './realtime.js';

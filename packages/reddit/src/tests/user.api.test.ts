@@ -31,7 +31,7 @@ describe('User API', () => {
     users: [mockUserFliar],
   };
 
-  describe('RedditAPIClient:getCurrentUser()', () => {
+  describe('RedditClient:getCurrentUser()', () => {
     const currentUsername = 'test_user';
     const currentUserId = 't2_1234';
 
@@ -86,7 +86,7 @@ describe('User API', () => {
     });
   });
 
-  describe('RedditAPIClient:getSnoovatarUrl()', () => {
+  describe('RedditClient:getSnoovatarUrl()', () => {
     const currentUsername = 'test_user';
     const currentUserSnoovatarUrl = 'https://example.com/my-snoovatar.png';
 
@@ -163,7 +163,7 @@ describe('User API', () => {
     });
   });
 
-  describe('RedditAPIClient:User', () => {
+  describe('RedditClient:User', () => {
     test('getUserFlairBySubreddit()', async () => {
       const user = new User({
         id: 'someID',

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Subreddit API > RedditAPIClient:Subreddit > getCommentsAndPostsByUser() 1`] = `
+exports[`Subreddit API > RedditClient:Subreddit > getCommentsAndPostsByUser() 1`] = `
 [
   {
     "approved": false,
@@ -81,7 +81,7 @@ exports[`Subreddit API > RedditAPIClient:Subreddit > getCommentsAndPostsByUser()
 ]
 `;
 
-exports[`Subreddit API > RedditAPIClient:Subreddit > getSubredditRemovalReasons() 1`] = `
+exports[`Subreddit API > RedditClient:Subreddit > getSubredditRemovalReasons() 1`] = `
 [
   {
     "id": "uuid-abc",

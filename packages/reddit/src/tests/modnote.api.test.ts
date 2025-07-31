@@ -16,7 +16,7 @@ vi.mock('../plugin.js', () => {
 describe('ModNote API', () => {
   const redditAPI = new RedditClient();
 
-  describe('RedditAPIClient:ModNote', () => {
+  describe('RedditClient:ModNote', () => {
     test('addRemovalNote()', async () => {
       const spyPlugin = redditApiPlugins.ModNote.PostRemovalNote;
       spyPlugin.mockImplementationOnce(async () => ({}));

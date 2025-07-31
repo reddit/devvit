@@ -1,6 +1,5 @@
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
-
 import type { ContextAPIClients } from './context.js';
+import type { JSONObject, JSONValue } from './json.js';
 
 describe('useForm() typing is intuitive', () => {
   const ctx = { useForm() {} } as unknown as ContextAPIClients;

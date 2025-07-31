@@ -1786,13 +1786,13 @@ function SplashPostData(
 ): SplashPostData {
   return {
     appDisplayName: opts.appDisplayName,
-    appIconUri: opts.appIconURI,
-    backgroundUri: opts.backgroundURI,
+    appIconUri: opts.appIconUri,
+    backgroundUri: opts.backgroundUri,
     buttonLabel: opts.buttonLabel,
     description: opts.description,
     // to-do: use entry _name_ and fish out URL in Splash component using
     //        entrypoints recorded in LinkedBundle.
-    entryUri: opts.entryURI,
+    entryUri: opts.entryUri,
     height: opts.height === 'tall' ? (2 satisfies Height.TALL) : (1 satisfies Height.REGULAR),
     title: opts.title ?? title,
   };

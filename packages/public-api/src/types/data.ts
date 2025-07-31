@@ -1,4 +1,4 @@
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { JSONObject } from './json.js';
 
 /** @deprecated Use JSONObject instead. */
 export type Data = JSONObject;

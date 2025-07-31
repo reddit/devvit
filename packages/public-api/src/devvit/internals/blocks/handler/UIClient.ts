@@ -5,12 +5,12 @@ import {
   ToastAppearance,
 } from '@devvit/protos';
 import type { Form } from '@devvit/shared';
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Comment, Post, Subreddit, User } from '../../../../apis/reddit/models/index.js';
 import { assertValidFormFields } from '../../../../apis/ui/helpers/assertValidFormFields.js';
 import { transformFormFields } from '../../../../apis/ui/helpers/transformForm.js';
+import type { JSONObject, JSONValue } from '../../../../types/json.js';
 import type { Toast } from '../../../../types/toast.js';
 import type { UIClient as _UIClient } from '../../../../types/ui-client.js';
 import type { WebViewUIClient } from '../../../../types/web-view-ui-client.js';

@@ -92,7 +92,7 @@ describe('Subreddit API', () => {
     },
   };
 
-  describe('RedditAPIClient:Subreddit', () => {
+  describe('RedditClient:Subreddit', () => {
     test('getCommentsAndPostsByUser()', async () => {
       const spyPlugin = redditApiPlugins.Users.UserWhere;
       spyPlugin.mockImplementationOnce(async () => mockListingWithPostsAndComments);

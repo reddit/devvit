@@ -10,7 +10,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { apiPathPrefix } from '@devvit/shared-types/constants.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import type { JsonValue } from '@devvit/shared-types/json.js';
 import {
   type AppConfig,
   type AppPermissionConfig,
@@ -198,7 +198,7 @@ export function isAppConfig(config: Readonly<DevvitConfig>): config is AppConfig
 }
 
 /** @internal */
-export function parseClassicConfig(json: JSONValue): DevvitConfig {
+export function parseClassicConfig(json: JsonValue): DevvitConfig {
   if (json == null || typeof json !== 'object' || Array.isArray(json))
     throw Error(`${devvitClassicConfigFilename} must be an object \`{"name": "foo", ...}\`.`);
 
