@@ -6,6 +6,7 @@ export {
   requestImmersiveMode,
 } from './effects/immersive-mode.js';
 export { navigateTo } from './effects/navigate-to.js';
+export { getShareData, type ShareSheetOpts, showShareSheet } from './effects/share.js';
 export { showForm } from './effects/show-form.js';
 export { showToast } from './effects/show-toast.js';
 export type { PostData } from '@devvit/shared-types/PostData.js';
