@@ -1,5 +1,6 @@
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { maxShareParamUserDataChars } from '@devvit/shared-types/client/share.js';
 import { ICON_FILE_PATH } from '@devvit/shared-types/constants.js';
 
 export type ShareSheetOpts = {
@@ -14,8 +15,10 @@ export type ShareSheetOpts = {
 // to-do: unit test.
 // to-do: move to web view scripts.
 export async function showShareSheet(opts: Readonly<ShareSheetOpts>): Promise<void> {
-  if (opts.data && opts.data.length > 1024)
-    throw Error(`data must be <= 1024 characters but was ${opts.data.length} characters`);
+  if (opts.data && opts.data.length > maxShareParamUserDataChars)
+    throw Error(
+      `data must be <= ${maxShareParamUserDataChars} characters but was ${opts.data.length} characters`
+    );
 
   const iconURL = `${new URL(ICON_FILE_PATH, location.origin)}`;
   let iconRsp;
