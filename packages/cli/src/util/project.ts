@@ -26,10 +26,13 @@ import { dumpJsonToYaml, readYamlToJson } from './files.js';
 import { type DevvitPackageConfig, readPackageJSON } from './package-managers/package-util.js';
 
 /**
- * Whether the user may be building code while evaluating the project config
- * (playtest). Used as a hueristic on when to print which errors.
+ * Whether the user may be building code while evaluating the project config.
+ * Used as a hueristic on when to print which errors.
+ * - Dynamic: User is building code (playtest).
+ * - Static: User is not building code.
+ * - Uninitialized: The app isn't initialized yet. Allows for project name '<% name %>', which is overwritten during initialization.
  */
-export type BuildMode = 'Dynamic' | 'Static';
+export type BuildMode = 'Dynamic' | 'Static' | 'Uninitialized';
 
 /** @deprecated Use AppConfig. */
 export type ClassicAppConfig = {
@@ -50,7 +53,7 @@ export class Project {
    * @arg filename Project config filename.
    */
   static async new(root: string, filename: string, mode: BuildMode): Promise<Project> {
-    const config = await readConfig(root, filename);
+    const config = await readConfig(root, filename, mode === 'Uninitialized');
     let packageJSON;
     try {
       packageJSON = await readPackageJSON(root);
@@ -209,7 +212,11 @@ export function parseClassicConfig(json: JsonValue): DevvitConfig {
   return { ...json, name: json.name.toLowerCase() };
 }
 
-async function readConfig(root: string, filename: string): Promise<DevvitConfig> {
+async function readConfig(
+  root: string,
+  filename: string,
+  allowUninitializedConfig: boolean
+): Promise<DevvitConfig> {
   const configFilename = path.join(root, filename);
   if (!(await isFile(configFilename))) throw new Error(`${configFilename} does not exist`);
 
@@ -221,7 +228,7 @@ async function readConfig(root: string, filename: string): Promise<DevvitConfig>
       throw Error(`cannot read config ${configFilename}`, { cause: err });
     }
 
-    return parseAppConfig(str);
+    return parseAppConfig(str, allowUninitializedConfig);
   }
 
   return parseClassicConfig(await readYamlToJson(configFilename));

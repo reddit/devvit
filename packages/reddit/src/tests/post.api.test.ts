@@ -245,7 +245,7 @@ describe('Post API', () => {
             {
               ...commonPostFields,
               richtextJson:
-                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEMAC',
+                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
               richtextFallback: 'This is a post with text as a fallback',
               runAs: RunAs.APP,
               splash: { appDisplayName: 'appDisplayName' },
@@ -298,7 +298,7 @@ describe('Post API', () => {
             {
               ...commonPostFields,
               richtextJson:
-                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEMAC',
+                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
               richtextFallback:
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               runAs: RunAs.APP,
@@ -314,6 +314,7 @@ describe('Post API', () => {
                   entryUri: undefined,
                   height: 1,
                   title: 'My First Post',
+                  userGeneratedContent: undefined,
                 },
               },
             },
@@ -353,7 +354,7 @@ describe('Post API', () => {
             {
               ...commonPostFields,
               richtextJson:
-                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEMAC',
+                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
               richtextFallback:
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               runAs: RunAs.APP,
@@ -369,6 +370,7 @@ describe('Post API', () => {
                   entryUri: undefined,
                   height: 1,
                   title: 'My First Post',
+                  userGeneratedContent: undefined,
                 },
               },
             },

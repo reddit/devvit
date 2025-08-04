@@ -8,6 +8,7 @@ import util from 'node:util';
 
 import { InitAppResponse } from '@devvit/protos/types/devvit/cli/init.js';
 import { isDevvitDependency } from '@devvit/shared-types/isDevvitDependency.js';
+import { UNINITIALIZED_APP_NAME } from '@devvit/shared-types/schemas/constants.js';
 import { Args, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
@@ -74,12 +75,20 @@ export default class Init extends DevvitCommand {
     return path.join(process.cwd(), this.#initAppParams.appName);
   }
 
+  override async init(): Promise<void> {
+    await super.init('Uninitialized');
+  }
+
   override async run(): Promise<void> {
     // TODO: DX-9807 - 0. Fire the init telemetry event
 
     const { args, flags } = await this.parse(Init);
-    this.#initAppFlags = flags;
 
+    if (this.isRunningInAppDirectory() && this.project.name !== UNINITIALIZED_APP_NAME) {
+      return;
+    }
+
+    this.#initAppFlags = flags;
     let rawCode = args.code;
     if (!rawCode) {
       // Redirect to web app creation wizard
@@ -202,7 +211,7 @@ export default class Init extends DevvitCommand {
     if (this.isRunningInAppDirectory() || this.#initAppFlags?.template) {
       queryParams.skip_template = 'true';
     }
-    if (this.isRunningInAppDirectory() && this.project.name) {
+    if (this.isRunningInAppDirectory() && this.project.name !== UNINITIALIZED_APP_NAME) {
       queryParams.app_name = this.project.name;
     }
     const creationWizardUrl = `${DEVVIT_PORTAL_URL}/new?${querystring.stringify(queryParams)}`;
@@ -248,7 +257,7 @@ export default class Init extends DevvitCommand {
     if (this.isRunningInAppDirectory() || this.#initAppFlags?.template) {
       queryParams.skip_template = 'true';
     }
-    if (this.isRunningInAppDirectory() && this.project.name) {
+    if (this.isRunningInAppDirectory() && this.project.name !== UNINITIALIZED_APP_NAME) {
       queryParams.app_name = this.project.name;
     }
 
@@ -349,14 +358,15 @@ export default class Init extends DevvitCommand {
   #logWelcomeMessage(newProjectPath: string, props: { dependenciesInstalled: boolean }): void {
     this.log(`${chalk.bold.green(' 🚀🚀🚀 Devvit app successfully initialized! ')}`);
 
+    // If we're running inside an app directory, it's likely during `npm run dev` and the welcome box is redundant.
+    if (this.isRunningInAppDirectory()) return;
+
     const welcomeInstructions: string[] = [];
 
-    if (!this.isRunningInAppDirectory()) {
-      const cdInstructions = `• ${chalk.cyan(
-        `\`cd ${newProjectPath}\``
-      )} to open your project directory`;
-      welcomeInstructions.push(cdInstructions);
-    }
+    const cdInstructions = `• ${chalk.cyan(
+      `\`cd ${newProjectPath}\``
+    )} to open your project directory`;
+    welcomeInstructions.push(cdInstructions);
 
     if (!props.dependenciesInstalled) {
       const installInstructions = `• ${chalk.cyan(`\`npm install\``)} to install dependencies`;
