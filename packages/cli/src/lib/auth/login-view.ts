@@ -3,7 +3,6 @@ import util from 'node:util';
 
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
-import { REDDIT_DEVELOPERS_LOGO_SVG } from './developers-logo.js';
 /**
  * Helper module to generate html for the login commands local http server
  */
@@ -44,11 +43,13 @@ const pageShell = (body: string): string => `
 
         .close-window-msg {
             color: #333D42;
-            font-size: 20px;
+            font-size: 16px;
+            letter-spacing: 0.03em;
         }
         .error-detail {
             color: #333D42;
-            font-size: 20px;
+            font-size: 16px;
+            letter-spacing: 0.03em;
         }
 
         .snoo-logo {
@@ -80,17 +81,20 @@ const pageShell = (body: string): string => `
 export const loginSuccess = (): string =>
   pageShell(`
 <div class="success-msg">
-    ${REDDIT_DEVELOPERS_LOGO_SVG}
-    <h1>You're all set!</h1>
-    <span class="close-window-msg">You can close this tab and return to the terminal.</span>
+    <h1 style="margin-bottom: 8px;">You're all set!</h1>
+    <span class="close-window-msg">
+      Continue in your terminal.
+      <br />
+      <br />
+      You can close this tab.
+    </span>
   </div>
 `);
 
 export const errorPage = (errorMessage: string, extra?: string): string =>
   pageShell(`
 <div class="fail-msg">
-    ${REDDIT_DEVELOPERS_LOGO_SVG}
-    <h1>Failed to fetch credentials</h1>
+    <h1 style="margin-bottom: 8px;">Failed to fetch credentials</h1>
     <span class="error-detail">${errorMessage}</span>
     ${extra ? `<div class="error-detail">${extra}</div>` : ''}
 </div>
