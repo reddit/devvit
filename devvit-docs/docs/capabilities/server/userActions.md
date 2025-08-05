@@ -96,17 +96,8 @@ router.post('/internal/post-create', async (_req, res) => {
       text: "Hello there! This is a new post from the user's account",
     },
     subredditName,
-    title: 'Post Title',
-    preview: Devvit.createElement('blocks', {
-      height: 'tall',
-      children: [
-        Devvit.createElement('vstack', {
-          height: '100%',
-          width: '100%',
-          backgroundColor: '#ffbf0b',
-        }),
-      ],
-    }),
+    title: 'Post Title'
+    splash: { appDisplayName: 'Test App' }
   });
 
   res.json({ status: 'success', message: `Post created in subreddit ${subredditName}` });

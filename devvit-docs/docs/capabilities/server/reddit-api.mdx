@@ -43,8 +43,7 @@ Here's how to obtain a reference to the Reddit client
   <TabItem value="web" label="Devvit Web">
   ```ts
 import { Devvit } from '@devvit/public-api';
-import { context } from '@devvit/server';
-import { reddit } from '@devvit/reddit';
+import { context, reddit } from '@devvit/web/server';
 
 export const createPost = async () => {
   const { subredditName } = context;
@@ -58,16 +57,7 @@ export const createPost = async () => {
     },
     subredditName: subredditName,
     title: 'New Post',
-    preview: Devvit.createElement('blocks', {
-      height: 'tall',
-      children: [
-        Devvit.createElement('vstack', {
-          height: '100%',
-          width: '100%',
-          backgroundColor: '#ffbf0b',
-        }),
-      ],
-    }),
+    splash: { appDisplayName: 'Test App' },
   });
 };
   ```
@@ -91,9 +81,9 @@ function createPost(context: Devvit.Context) {
     title: 'My custom post',
     subredditName: currentSubreddit.name,
     preview: (
-      <blocks height="tall">
-        <vstack height="100%" width="100%" backgroundColor="#ffbf0b" />
-      </blocks>
+      <vstack height="100%" width="100%" alignment="middle center">
+        <text size="large">Loading...</text>
+      </vstack>
     ),
   });
 }
@@ -106,9 +96,7 @@ function createPost(context: Devvit.Context) {
 <Tabs>
     <TabItem value="web" label="Devvit Web">
     ```ts
-        import { context } from '@devvit/server';
-        import { reddit } from '@devvit/reddit';
-        import { RunAs } from '@devvit/public-api';
+        import { context, reddit } from '@devvit/web/server';
 
         export const createComment = async () => {
             const { subredditName } = context;
@@ -119,7 +107,7 @@ function createPost(context: Devvit.Context) {
             reddit.submitComment({
                 postId: 't3_123456', // Replace with the actual post ID
                 text: 'This is a comment from a Devvit app',
-                runAs: RunAs.USER, // Optional: specify the user to run as
+                runAs: 'USER' // Optional: specify the user to run as
             });
         };
 ```

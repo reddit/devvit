@@ -53,6 +53,8 @@ const sidebars: SidebarsConfig = {
                 'capabilities/server/overview',
                 'capabilities/server/redis',
                 'capabilities/server/userActions',
+                'capabilities/server/post-data',
+                'capabilities/server/splash-screen',
                 'capabilities/server/text_fallback',
                 'capabilities/server/scheduler',
                 'capabilities/server/triggers',

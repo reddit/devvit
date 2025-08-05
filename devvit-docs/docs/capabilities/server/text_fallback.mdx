@@ -47,11 +47,7 @@ const post = await reddit.submitPost({
   title: 'Text String',
   subredditName: subreddit.name,
   textFallback: { text: 'You can read this text string on oldreddit because you used textFallback' },
-  preview: (
-    <vstack height="100%" width="100%" alignment="middle center">
-      <text size="large">View me in old.reddit!</text>
-    </vstack>
-  ),
+  splash: { appDisplayName: 'Test App' },
 });
 ```
 
@@ -70,11 +66,7 @@ const post = await reddit.submitPost({
   textFallback: {
     text: 'You can read this _text string with markdown_ on oldreddit because you used **textFallback**',
   },
-  preview: (
-    <vstack height="100%" width="100%" alignment="middle center">
-      <text size="large">View me in old.reddit!</text>
-    </vstack>
-  ),
+  splash: { appDisplayName: 'Test App' },
 });
 ```
 
@@ -97,11 +89,7 @@ const post = await reddit.submitPost({
   title: 'Rich Text',
   subredditName: subreddit.name,
   textFallback: { richtext: textFallbackRichtext },
-  preview: (
-    <vstack height="100%" width="100%" alignment="middle center">
-      <text size="large">View me in old.reddit!</text>
-    </vstack>
-  ),
+  splash: { appDisplayName: 'Test App' },
 });
 ```
 

@@ -118,8 +118,7 @@ npm i express
 import express from 'express';
 // The `@devvit/server` package provides the tools to create a server,
 // and gives you access to the request context.
-import { createServer, context, getServerPort } from '@devvit/server';
-import { redis } from '@devvit/redis';
+import { createServer, context, getServerPort, redis } from '@devvit/web/server';
 
 const app = express();
 
@@ -197,7 +196,7 @@ window.postMessage({ type: 'navigate_to', destination: 'reddit.com' });
 Now
 
 ```ts title=client/app.ts
-import { navigateTo } from '@devvit/client';
+import { navigateTo } from '@devvit/web/client';
 
 navigateTo('reddit.com');
 ```

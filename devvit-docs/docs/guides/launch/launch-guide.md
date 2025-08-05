@@ -92,3 +92,4 @@ Once you’re ready to launch, you’ll need to publish to our app store so any 
 
 - If you have questions join our Discord or post in r/Devvit.
 - Review our app guidelines before publishing
+- Learn more about [earning money](../../earn-money/reddit_developer_funds.md) for apps you launch
