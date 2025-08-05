@@ -16,7 +16,7 @@ All configuration files should include a `$schema` property which many IDEs will
 
 Your `devvit.json` must include:
 
-- **`name`** (required): App account name and Community URL slug. Must be 3-20 characters, start with a letter, and contain only lowercase letters, numbers, and hyphens.
+- **`name`** (required): App account name and Community URL slug. Must be 3-16 characters, start with a letter, and contain only lowercase letters, numbers, and hyphens.
 
 Additionally, you must include at least one of:
 
@@ -30,7 +30,7 @@ Additionally, you must include at least one of:
 
 | Property  | Type   | Description                                                               | Required         |
 | --------- | ------ | ------------------------------------------------------------------------- | ---------------- |
-| `name`    | string | App account name and Community URL slug (3-20 chars, `^[a-z][a-z0-9-]*$`) | Yes              |
+| `name`    | string | App account name and Community URL slug (3-16 chars, `^[a-z][a-z0-9-]*$`) | Yes              |
 | `$schema` | string | Schema version for IDE support                                            | No (recommended) |
 
 ### App Components

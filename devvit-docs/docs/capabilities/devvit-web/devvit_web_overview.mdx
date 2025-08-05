@@ -1,3 +1,5 @@
+import DevvitWebArch from '../../assets/devvit_web/devvit_web_arch.png';
+
 # Devvit Web
 
 Devvit Web includes an easy way to build Devvit apps using a standard web stack.
@@ -24,7 +26,7 @@ As with most experimental features, there are some caveats.
 | Limitation                                       | What it means                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Serverless endpoints                             | The node server will run just long enough to execute your endpoint function and return a response, which means you can’t use packages that require long-running connections like streaming.                                                                                                           |
-| Package limitations                              | Developers cannot use fs or external native packages. For now, we recommend using external services over the native dependencies, such as [StreamPot](https://streampot.io/) (instead of ffmpeg) and [OpenAI](https://platform.openai.com/docs/guides/embeddings) (instead of @xenova/transformers) . |
+| Package limitations                              | Developers cannot use `fs` or external native packages. For now, we recommend using external services over the native dependencies, such as [StreamPot](https://streampot.io/) (instead of ffmpeg) and [OpenAI](https://platform.openai.com/docs/guides/embeddings) (instead of @xenova/transformers) . |
 | Single request and single response handling only | Streaming or chunked responses and websockets are not supported. Long-polling is supported if it’s under the max request time.                                                                                                                                                                        |
 | No external requests from your client            | You can’t have any external requests other than the app's webview domain. All backend responses are locked down to the webview domain via CSP. (Your backend can make external fetch requests though.)                                                                                                |
 
@@ -72,7 +74,7 @@ We also provide an authentication middleware so you don’t have to worry about 
 All server endpoints must start with /api/ (e.g. /api/get-something or /api/widgets/42).
 :::
 
-![devvit web architecture](../../assets/devvit_web/devvit_web_arch.png)
+<img src={DevvitWebArch} alt="devvit web architecture" style={{ maxWidth: '300px', display: 'block', margin: '0 auto' }} />
 
 ### Configuration in `devvit.json`
 

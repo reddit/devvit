@@ -7,16 +7,28 @@ This tutorial should take about 10 minutes to complete. Once complete, you'll be
 ## What you'll need
 
 - Node.JS (version 22.2.0+)
-- Devvit CLI (version 0.12+)
-- A github account and Git CLI
 - A code editor
 
 ## Environment Setup
 
 1. Install Node.JS and NPM ([instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
-2. Check out the demo project (`git clone git@github.com:reddit/devvit-comment-mop-template.git`)
-3. Install dependencies (`cd devvit-comment-mop-template && npm install`)
-4. Create your own subreddit for testing ([instructions](https://support.reddithelp.com/hc/en-us/articles/15484258409492-How-to-create-a-community))
+2. Inside of a your terminal, run `npx devvit@next init --template=mod-tool`. Alternatively, you can go to `https://developers.reddit.com/new` if you would like to select a different starter template.
+3. Go through the wizard. You will need to create a Reddit account and connect it to Reddit developers.
+4. Follow the instructions on your terminal.
+
+On success, you should see something like this:
+
+```sh
+Your Devvit authentication token has been saved to /Users/user.name/.devvit/token
+Fetching and extracting the template...
+Cutting the template to the target directory...
+ 🔧 Installing dependencies...
+ 🚀🚀🚀 Devvit app successfully initialized!
+┌────────────────────────────────────────────────────┐
+│ • `cd my-app` to open your project directory       │
+│ • `npm run dev` to develop in your test community  │
+└────────────────────────────────────────────────────┘
+```
 
 ## Understanding the template
 
@@ -160,15 +172,16 @@ async function* getAllCommentsInThread(comment: Comment): AsyncGenerator<Comment
 To build and run your Mod tool, run the following commands on terminal:
 
 ```shell
-npx devvit upload
-npx devvit playtest
+npm run dev
 ```
 
-If you didn't provide a test subreddit, one will be created for you. Once you run `devvit playtest`, you will receive a link to test the mod tool in your test subreddit.
+If you didn't provide a test subreddit, one will be created for you. Once you run `npm run dev`, you will receive a link to test the mod tool in your test subreddit.
+
+> Note that this mod tool is intended to be run on comments, so you will need to create a post and comment in your subreddit to see it.
 
 ## Conclusion
 
-Now you have a mod tool running from the code that you deployed yourself. Feel free to experiment with the code and run `devvit playtest` again to see the changes. Notice that you don't need to worry about running costs for your mod tool, because Reddit hosts all Devvit applications for free. Also, if your mod tool becomes popular and gets installed by many subreddits, you may become eligible to earn [Reddit Developer Funds](https://developers.reddit.com/docs/reddit_developer_funds).
+Now you have a mod tool running from the code that you deployed yourself. Feel free to experiment with the code and run `npm run dev` again to see the changes. Notice that you don't need to worry about running costs for your mod tool, because Reddit hosts all Devvit applications for free. Also, if your mod tool becomes popular and gets installed by many subreddits, you may become eligible to earn [Reddit Developer Funds](https://developers.reddit.com/docs/reddit_developer_funds).
 
 ## Further Reading
 

@@ -10,7 +10,7 @@ You're using Devvit Web experimental if:
 
 - Your project is based on either of these templates:
   - https://github.com/reddit/devvit-bolt-starter-experimental
-  - https://github.com/reddit/devvit-react-starter-experimental
+  - https://github.com/reddit/devvit-template-react
 - You have a `defineConfig` function in `src/devvit/main.tsx`
 
 ## What's changing
@@ -176,7 +176,7 @@ export default defineConfig({
 
 For the fastest migration:
 
-1. **Start with a new template**: Clone https://github.com/reddit/devvit-react-starter (non-experimental)
+1. **Start with a new template**: Clone https://github.com/reddit/devvit-template-react
 2. **Move your server endpoints**: Copy your server code to the `src/server` folder
 3. **Move your client app**: Copy your React/web code to the `src/client` folder
 4. **Update imports**: Find and replace all `@devvit/X` imports with `@devvit/web/server` or `@devvit/web/client`
