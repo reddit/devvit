@@ -296,7 +296,7 @@ export type LinkFlair = {
  * when a user posts a link to that resource, without having to parse the resource directly.
  * See: https://oembed.com/
  */
-export type OEmbed = {
+export type Oembed = {
   /** The resource type. Valid values, along with value-specific parameters, are described below. E.g. "video" */
   type: string;
   /** A text title, describing the resource. */
@@ -352,9 +352,9 @@ export type RedditVideo = {
 };
 
 export type SecureMedia = {
-  /** The type of the OEmbed media, if present (e.g. "youtube.com") */
+  /** The type of the oEmbed media, if present (e.g. "youtube.com") */
   type?: string | undefined;
-  oembed?: OEmbed | undefined;
+  oembed?: Oembed | undefined;
   redditVideo?: RedditVideo | undefined;
 };
 
