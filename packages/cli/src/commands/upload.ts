@@ -22,7 +22,6 @@ import chalk from 'chalk';
 import type { StoredToken } from '../lib/auth/StoredToken.js';
 import { REDDIT_DESKTOP } from '../lib/config.js';
 import { isCurrentUserEmployee } from '../lib/http/gql.js';
-import { AppUploader } from '../util/AppUploader.js';
 import { AppVersionUploader } from '../util/AppVersionUploader.js';
 import { getAccessTokenAndLoginIfNeeded } from '../util/auth.js';
 import { Bundler } from '../util/Bundler.js';
@@ -36,6 +35,13 @@ import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
+import {
+  getCodeFromWizard,
+  gitInitIfNeeded,
+  installAppDependencies,
+  unpackCode,
+  updatePackageJSON,
+} from './init.js';
 
 export default class Upload extends DevvitCommand {
   static override description = `Upload the app to the App Directory. Uploaded apps are only visible to you (the app owner) and can only be installed to a small test subreddit with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} subscribers`;
@@ -116,6 +122,7 @@ export default class Upload extends DevvitCommand {
     }
 
     let shouldCreateNewApp = false;
+    let shouldCreatePlaytestSubreddit = !this.project.getSubreddit('Dev');
 
     const isOwner = appInfo?.app?.owner?.displayName === username;
     if (!isOwner) {
@@ -138,13 +145,23 @@ export default class Upload extends DevvitCommand {
     ux.action.stop();
 
     if (shouldCreateNewApp || !appInfo) {
-      const appUploader = new AppUploader(this);
+      const appName = await this.#initApp();
 
-      appInfo = await appUploader.createNewApp(flags['copy-paste'], flags['just-do-it']);
+      try {
+        // Reload the project since the name updated
+        appInfo = await getAppBySlug(this.#appClient, {
+          slug: appName,
+          hidePrereleaseVersions: true,
+          limit: 1, // fetched version limit; we only need the latest one
+        });
+      } catch (e) {
+        this.error(StringUtil.caughtToString(e, 'message'));
+      }
 
+      shouldCreatePlaytestSubreddit = true; // If we need to create a new app, we always need to create a playtest subreddit.
       this.#event.devplatform.cli_upload_is_initial = true;
-      this.#event.devplatform.cli_upload_is_nsfw = appInfo.app?.isNsfw;
-      this.#event.devplatform.app_name = appInfo.app?.slug;
+      this.#event.devplatform.cli_upload_is_nsfw = appInfo?.app?.isNsfw;
+      this.#event.devplatform.app_name = appInfo?.app?.slug;
     } else {
       this.#event.devplatform.cli_upload_is_initial = false;
       this.#event.devplatform.cli_upload_is_nsfw = appInfo.app?.isNsfw;
@@ -152,9 +169,10 @@ export default class Upload extends DevvitCommand {
     }
 
     if (!appInfo?.app) {
-      this.error(`App ${this.project.name} is not found`);
+      this.error(
+        `We couldn't find the app ${this.project.name}. Please run \`npm create devvit\` first.`
+      );
     }
-    this.project.app.defaultPlaytestSubredditId = appInfo.app.defaultPlaytestSubredditId;
 
     // Now, create a new version.
     const appVersionNumber = await this.#getNextVersionNumber(appInfo, flags.bump);
@@ -167,7 +185,6 @@ export default class Upload extends DevvitCommand {
 
     try {
       const appVersionUploader = new AppVersionUploader(this, { verbose: flags.verbose });
-      const shouldCreatePlaytestSubreddit = !this.project.getSubreddit('Dev');
 
       if (shouldCreatePlaytestSubreddit) {
         this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
@@ -350,6 +367,29 @@ export default class Upload extends DevvitCommand {
       );
     }
     return undefined;
+  }
+
+  async #initApp(): Promise<string> {
+    const code = await getCodeFromWizard(undefined, undefined, this);
+    const initAppParams = unpackCode(code);
+
+    if (!initAppParams?.appName) {
+      this.error(
+        `Your code was missing an app name. Please run 'npm create devvit' to get a new code.`
+      );
+    }
+
+    // Update app name and ignore provided template, if any
+    this.project.name = initAppParams.appName;
+    this.log(
+      `We've updated the app name to "${this.project.name}" in your ${this.project.filename}.`
+    );
+
+    await gitInitIfNeeded(this.project.root);
+    await updatePackageJSON(this.project.root, this.project.name);
+    await installAppDependencies(this.project.root, this);
+
+    return initAppParams.appName;
   }
 }
 

@@ -282,3 +282,10 @@ function writeConfig(
     isAppConfig(config) ? JSON.stringify(config.json, undefined, 2) : dumpJsonToYaml(config)
   );
 }
+
+export function isRunningInAppDirectory(): boolean {
+  return (
+    existsSync(path.join(process.cwd(), devvitClassicConfigFilename)) ||
+    existsSync(path.join(process.cwd(), devvitV1ConfigFilename))
+  );
+}
