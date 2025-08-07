@@ -45,6 +45,7 @@ export class AppUploader {
         isNsfw,
         categories: [], // TODO: should prompt in the future
         captcha,
+        categoryIds: [],
       });
       this.#cmd.project.name = newApp.slug;
       ux.action.stop('Successfully created your app in Reddit!');
