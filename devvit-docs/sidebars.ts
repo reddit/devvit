@@ -43,7 +43,7 @@ const sidebars: SidebarsConfig = {
               label: 'Client',
               items: [
                 'capabilities/client/overview',
-                'capabilities/client/adding-links',
+                'capabilities/client/navigation',
                 'capabilities/client/forms',
                 'capabilities/client/toasts',
                 'capabilities/client/menu-actions',
