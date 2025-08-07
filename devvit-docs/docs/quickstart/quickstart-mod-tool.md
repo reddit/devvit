@@ -12,7 +12,7 @@ This tutorial should take about 10 minutes to complete. Once complete, you'll be
 ## Environment Setup
 
 1. Install Node.JS and NPM ([instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
-2. Inside of a your terminal, run `npx devvit@next init --template=mod-tool`. Alternatively, you can go to `https://developers.reddit.com/new` if you would like to select a different starter template.
+2. Go to `https://developers.reddit.com/new` and choose Mod Tool under Other templates.
 3. Go through the wizard. You will need to create a Reddit account and connect it to Reddit developers.
 4. Follow the instructions on your terminal.
 
@@ -47,7 +47,7 @@ Devvit.addMenuItem({
   description: 'Remove this comment and all child comments. This might take a few seconds to run.',
   location: 'comment',
   forUserType: 'moderator',
-  onPress: (_, context) => {
+  onPress: (_event, context) => {
     context.ui.showForm(nukeForm);
   },
 });
@@ -185,6 +185,7 @@ Now you have a mod tool running from the code that you deployed yourself. Feel f
 
 ## Further Reading
 
+- Use our [launch guide](../guides/launch/launch-guide.md) to guide you where to get your first users.
 - [Devvit Forms](https://developers.reddit.com/docs/capabilities/forms)
 - [Menu Actions](https://developers.reddit.com/docs/capabilities/menu-actions)
 - [Reddit Developer Funds](https://developers.reddit.com/docs/reddit_developer_funds)

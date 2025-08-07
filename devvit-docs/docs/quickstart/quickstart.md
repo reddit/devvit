@@ -1,10 +1,10 @@
-# Game Quickstart
+# Quickstart
 
-This tutorial takes you through the step-by-step process of building your first game with Devvit. It should take you about 15 minutes to complete. Once complete, you'll be able to play your game in a Reddit post
+This tutorial takes you through the step-by-step process of building your first app with Devvit. It should take you about 1 minute to complete. Once complete, you'll be able to see your app in a Reddit post
 
 ## Try it out first
 
-You can play the game from this tutorial [here](https://www.reddit.com/r/test_devvit_demos/comments/1mk4ql4/test3jsdevvit/). It consists of a simple HTML5 game scene with buttons to call backend functions.
+This starter template will [create an app like this for you](https://www.reddit.com/r/test_devvit_demos/comments/1mk4ql4/test3jsdevvit/) running in reddit. It consists of a simple react-based counter app that calls backend functions.
 
 ## What you'll need
 
@@ -14,7 +14,7 @@ You can play the game from this tutorial [here](https://www.reddit.com/r/test_de
 ## Environment Setup
 
 1. Install Node.JS and NPM ([instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
-2. Inside of a your terminal, run `npx devvit@next init --template=threejs`. Alternatively, you can go to `https://developers.reddit.com/new` if you would like to select a different starter template.
+2. Go to `https://developers.reddit.com/new` and choose the React template.
 3. Go through the wizard. You will need to create a Reddit account and connect it to Reddit developers.
 4. Follow the instructions on your terminal.
 
@@ -32,9 +32,9 @@ Cutting the template to the target directory...
 └────────────────────────────────────────────────────┘
 ```
 
-## Running your game
+## Running your app
 
-To run your game, `cd my-app` and then run `npm run dev`. You should see some logs start up that finish with:
+To run your app, `cd my-app` and then run `npm run dev`. You should see some logs start up that finish with:
 
 ```
 ✨ https://www.reddit.com/r/my-app_dev?playtest=my-app
@@ -44,14 +44,14 @@ The dev command automatically creates a development subreddit for your app and a
 
 ![subreddit view](../assets/quickstart_game_subreddit.png)
 
-Click the `Launch App` button to see your game!
+Click the `Launch App` button to see your app!
 
 ## Devvit Architecture
 
 Once the project is checked out you'll see the following folder structure. Each of the folders is responsible for a part of your app:
 
 **`src/client`:**  
-This contains the client-side code for your application. You can use any web framework for your frontend (React, Vue, Angular, etc.). In this example, we are building a game, so we chose [Three.js](https://threejs.org/).
+This contains the client-side code for your application. You can use any web framework for your frontend (React, Vue, Angular, etc.). In this example, we chose react.
 
 **`src/server`:**  
 This contains the server-side code for your application. You will need to build a node-compatible server that handles API calls from the client-side. This is where you will write code for persistence, real-time message sharing between players, payment validation, etc. For this example we chose to use [express.JS](https://expressjs.com/)
@@ -62,9 +62,9 @@ This contains classes, types and interfaces that are shared between the client a
 **`devvit.json`:**  
 This special file in the root of the project contains configurations for many of the Reddit-specific services that your application can use. For more information on `devvit.json` please refer to Configuration (devvit.json)
 
-## Testing your game on a specific subreddit
+## Testing your app on a specific subreddit
 
-You need to test your game on a subreddit. Your backend calls will not work when testing the game locally. For that we will be leveraging Devvit's Playtest tool. If you have a preference for a specific subreddit to playtest, change the `package.json` file to include your subreddit name in `dev:devvit`:
+You need to test your app on a subreddit. Your backend calls will not work when testing the app locally. For that we will be leveraging Devvit's Playtest tool. If you have a preference for a specific subreddit to playtest, change the `package.json` file to include your subreddit name in `dev:devvit`:
 
 ```javascript
 "scripts": {
@@ -76,18 +76,16 @@ You need to test your game on a subreddit. Your backend calls will not work when
 
 After adding the subreddit, use `npm run dev` to see the app on the new subreddit.
 
-## Launching your game
+## Launching your app
 
-When you are ready to launch your game, run `npm run launch`. This will upload your game to Reddit for our team to review. All apps must be reviewed before they can be installed on subreddits > 200 members. We will send you an email once your app is approved.
+Use our [launch guide](../guides/launch/launch-guide.md) to guide you where to get your first users.
+
+When you are ready to launch your app, run `npm run launch`. This will upload your app to Reddit for our team to review. All apps must be reviewed before they can be installed on subreddits > 200 members. We will send you an email once your app is approved.
 
 ## Conclusion
 
-Now you have an application that runs inside of a Reddit post. You can now use this scaffolding to build your own application or game with Devvit.
+Now you have an application that runs inside of a Reddit post. You can now use this scaffolding to build your own application or app with Devvit.
 
 ## Further Reading
 
-- Build a game using Bolt.new
-- Build a game using Cursor.ai
-- Build a game with real-time multiplayer
-- Build a game with leaderboards
 - [Launching and Promoting your game](../guides/launch/launch-guide.md)

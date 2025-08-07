@@ -1,5 +1,9 @@
 # Secrets storage
 
+:::note
+Secrets storage will be available in Devvit Web in September.
+:::
+
 Store sensitive data in your app.
 
 There are times when you’ll want to store information in your app that should not be visible to users. Secrets are variables that contain sensitive information like API keys, credentials and tokens. Devvit lets you store and access secrets in three steps:

@@ -35,7 +35,7 @@ You’ll want to retrieve and update state at various points in your app. There 
 ```tsx
 import { Devvit, useState } from '@devvit/public-api';
 
-const MyComponent = (_, context) => {
+const MyComponent = (_event, context) => {
   // Setting up state
   const [count, setCount] = useState(async () => {
     return await context.redis.get('count');

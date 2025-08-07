@@ -90,6 +90,6 @@ Once you’re ready to launch, you’ll need to publish to our app store so any 
 
 ### Additional resources
 
-- If you have questions join our Discord or post in r/Devvit.
-- Review our app guidelines before publishing
+- If you have questions join our Discord or post in [r/Devvit](https://reddit.com/r/devvit).
+- Review our [rules](../../devvit_rules.md) before publishing
 - Learn more about [earning money](../../earn-money/reddit_developer_funds.md) for apps you launch

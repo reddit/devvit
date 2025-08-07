@@ -74,7 +74,7 @@ Devvit.configure({
 Devvit.addMenuItem({
   location: 'comment',
   label: 'Sample HTTP request',
-  onPress: async (_, context) => {
+  onPress: async (_event, context) => {
     console.log(`Comment ID:  ${context.commentId}`);
     const response = await fetch('https://example.com', {
       method: 'post',

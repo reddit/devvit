@@ -80,7 +80,7 @@ const dynamicForm = Devvit.createForm(
 Devvit.addMenuItem({
   label: 'Show a dynamic form',
   location: 'post',
-  onPress: async (_, { ui }) => {
+  onPress: async (_event, { ui }) => {
     const randomString = Math.random().toString(36).substring(7);
 
     const formData = {

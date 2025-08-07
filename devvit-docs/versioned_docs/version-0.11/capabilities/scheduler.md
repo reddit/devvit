@@ -85,7 +85,7 @@ Devvit.addMenuItem({
   label: 'clear',
   location: 'post',
   forUserType: 'moderator',
-  onPress: async (_, context) => {
+  onPress: async (_event, context) => {
     const jobId = (await context.redis.get('jobId')) || '0';
     await context.scheduler.cancelJob(jobId);
   },
@@ -154,7 +154,7 @@ import { Devvit } from '@devvit/public-api';
 
 Devvit.addSchedulerJob({
   name: 'daily_thread',
-  onRun: async (_, context) => {
+  onRun: async (_event, context) => {
     console.log('daily_thread handler called');
     const subreddit = await context.reddit.getCurrentSubreddit();
     const resp = await context.reddit.submitPost({
@@ -168,7 +168,7 @@ Devvit.addSchedulerJob({
 
 Devvit.addTrigger({
   event: 'AppInstall',
-  onEvent: async (_, context) => {
+  onEvent: async (_event, context) => {
     try {
       const jobId = await context.scheduler.runJob({
         cron: '0 12 * * *',

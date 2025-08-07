@@ -88,7 +88,7 @@ The `.addMenuItem(menuItem: MenuItem)` function has these parameters:
 Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Add a poll',
-  onPress: async (_, context) => {
+  onPress: async (_event, context) => {
     const currentSubreddit = await context.reddit.getCurrentSubreddit();
     await context.reddit.submitPost({
       title: 'My custom post',

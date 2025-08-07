@@ -42,7 +42,7 @@ Devvit.configure({
 Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Migrate KV Store to Redis Hash',
-  onPress: async (_, { redis, ui, kvStore }) => {
+  onPress: async (_event, { redis, ui, kvStore }) => {
     const keys = await kvStore.list();
     const hashKey = 'custom_hash_key'; // define your hash key here
     keys.forEach(async (key) => {

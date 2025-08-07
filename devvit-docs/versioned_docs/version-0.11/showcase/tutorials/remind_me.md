@@ -168,7 +168,7 @@ Devvit.addMenuItem({
   location: 'post',
   // here we tell the ui client to show `remindMeForm` defined above when the
   // menu item is pressed
-  onPress: (_, context) => {
+  onPress: (_event, context) => {
     context.ui.showForm(remindMeForm);
   },
 });

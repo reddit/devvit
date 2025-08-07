@@ -17,6 +17,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Introduction to Devvit',
+      collapsible: false,
       items: [
         'introduction/introduction',
         'introduction/intro-games',
@@ -26,12 +27,14 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Build your app',
+      collapsible: false,
       items: [
-        'quickstart/quickstart-game',
+        'quickstart/quickstart',
         'quickstart/quickstart-mod-tool',
         {
           type: 'category',
           label: 'Capabilities',
+          collapsible: false,
           items: [
             'capabilities/devvit-web/devvit_web_overview',
             'capabilities/devvit-web/devvit_web_configuration',
@@ -111,7 +114,6 @@ const sidebars: SidebarsConfig = {
               items: [
                 'capabilities/realtime/overview',
                 'capabilities/realtime/realtime_in_devvit_blocks',
-                'capabilities/realtime/realtime_in_devvit_web',
               ],
             },
             {
@@ -152,6 +154,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Earn Money',
+      collapsible: false,
       items: [
         'earn-money/reddit_developer_funds',
         {
@@ -171,11 +174,13 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Examples',
+      collapsible: false,
       items: ['examples/app-showcase', 'examples/template-library'],
     },
     {
       type: 'category',
       label: 'Guides',
+      collapsible: false,
       items: [
         {
           type: 'category',

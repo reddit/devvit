@@ -2,41 +2,35 @@
 
 Triggers allow your app to automatically respond to specific events or actions within a Reddit community. Use triggers to build automation, moderation, and engagement features that react to user or moderator activity.
 
----
-
 ## What are triggers?
 
 A trigger is an action you can build into your app that will occur automatically when a specified condition is met. For example, you can set up a trigger to respond when a new post is submitted, a comment is created, or a moderator takes action.
-
----
 
 ## Supported trigger types
 
 Event triggers let your app automatically respond to a user’s or moderator’s action. The following trigger types are supported:
 
-- `PostSubmit`
-- `PostCreate`
-- `PostUpdate`
-- `PostReport`
-- `PostDelete`
-- `PostFlairUpdate`
-- `CommentCreate`
-- `CommentDelete`
-- `CommentReport`
-- `CommentSubmit`
-- `CommentUpdate`
-- `PostNsfwUpdate`
-- `PostSpoilerUpdate`
-- `AppInstall`
-- `AppUpgrade`
-- `ModActions`
-- `ModMail`
-- `AutomoderatorFilterPost`
-- `AutomoderatorFilterComment`
+- `onPostSubmit`
+- `onPostCreate`
+- `onPostUpdate`
+- `onPostReport`
+- `onPostDelete`
+- `onPostFlairUpdate`
+- `onCommentCreate`
+- `onCommentDelete`
+- `onCommentReport`
+- `onCommentSubmit`
+- `onCommentUpdate`
+- `onPostNsfwUpdate`
+- `onPostSpoilerUpdate`
+- `onAppInstall`
+- `onAppUpgrade`
+- `onModActions`
+- `onModMail`
+- `onAutomoderatorFilterPost`
+- `onAutomoderatorFilterComment`
 
 A full list of events and their payloads can be found in the [EventTypes documentation](https://developers.reddit.com/docs/api/public-api/@devvit/namespaces/EventTypes/). For more details on Mod specific actions, see [ModActions](https://developers.reddit.com/docs/api/redditapi/models/interfaces/ModAction) and [ModMail](https://developers.reddit.com/docs/api/public-api/type-aliases/ModMailDefinition).
-
----
 
 ## Setting up triggers
 

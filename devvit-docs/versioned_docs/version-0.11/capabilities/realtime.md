@@ -81,7 +81,7 @@ channel.subscribe();
 
 Devvit.addTrigger({
   event: 'AppInstall',
-  onEvent: async (_, context) => {
+  onEvent: async (_event, context) => {
     await context.scheduler.runJob({
       name: 'publish_to_channel',
       cron: '* * * * *',
@@ -93,7 +93,7 @@ Devvit.addTrigger({
 // receiving messages which can processed in the onMessage handler to update local state.
 Devvit.addSchedulerJob({
   name: 'publish_to_channel',
-  onRun: async (_, context) => {
+  onRun: async (_event, context) => {
     await context.realtime.send('events', {
       message: payload,
     });

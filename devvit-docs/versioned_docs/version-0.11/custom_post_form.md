@@ -162,7 +162,7 @@ Devvit.addCustomPostType({
 Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Submit custom post',
-  onPress: async (_, context) => {
+  onPress: async (_event, context) => {
     const currentSubreddit = await context.reddit.getCurrentSubreddit();
     await context.reddit.submitPost({
       title: 'My custom post',

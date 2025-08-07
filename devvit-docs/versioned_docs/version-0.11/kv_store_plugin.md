@@ -62,7 +62,7 @@ Devvit.configure({
 Devvit.addMenuItem({
   label: 'Write to KV Store',
   location: 'post',
-  onPress: (_, context) => {
+  onPress: (_event, context) => {
     await context.kvStore.put('animalChoice', 'dog');
     const storedValue = context.kvStore.get('animalChoice');
     context.kvStore.delete('animalChoice');

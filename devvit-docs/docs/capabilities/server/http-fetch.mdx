@@ -11,8 +11,9 @@ Your Devvit app can make network requests to access allow-listed external domain
 
 <Tabs>
   <TabItem value="devvit.json" label="Devvit Web">
-  ```json
+  ```json title="devvit.json"
   {
+    ...
     "permissions": {
       "http": {
         "enable": true,
@@ -134,7 +135,7 @@ Apps must request each individual domain that it intends to fetch, even if the d
   Devvit.addMenuItem({
     location: 'comment',
     label: 'Sample HTTP request',
-    onPress: async (_, context) => {
+    onPress: async (_event, context) => {
       console.log(`Comment ID: ${context.commentId}`);
       const response = await fetch('https://example.com', {
         method: 'post',

@@ -6,7 +6,6 @@ Reddit developer funds is a way for developers to earn money for the apps they b
 
 We want creative new apps that enrich the Reddit community through:
 
-- A new experience, like a [live score board](https://developers.reddit.com/docs/showcase/apps#live-scores) or [community bingo](https://developers.reddit.com/docs/showcase/apps#bingo)
 - An entirely new community created around the app, like [r/pixelary](https://www.reddit.com/r/Pixelary/) or [r/riddonkulous](https://www.reddit.com/r/riddonkulous/)
 - A quality of life improvement that benefits hundreds of subreddits
 
@@ -51,12 +50,12 @@ Apps are not eligible if they previously received a payout under Developer Funds
 - The community comes first. Apps should only be installed where relevant, useful, or enriching
 - Up to three apps per developer can qualify for the funds program.
 - Apps should be unique, original, and created by you.
-  - A significant portion of the code and app UI should be original (see the platform [devviquette](https://developers.reddit.com/docs/guidelines))
+  - A significant portion of the code and app UI should be original and follow our [rules](../devvit_rules.md)
   - Forked versions of apps must be significantly different in concept and function
-  - You are welcome to use elements from example code or templates as a starting point for your project, as well as tools from [Devvit Kit](https://github.com/reddit/devvit-kit)
+  - You are welcome to use elements from example code or templates as a starting point for your project
 - Apps must be on the latest version of Devvit
 
-To be eligible for the program please sign up by [creating a developer account](https://developers.reddit.com/create-account). You must have a verified reddit email in order to receive onboarding instructions.
+To be eligible for the program please sign up by [creating an app](https://developers.reddit.com/new). You must have a verified reddit email in order to receive onboarding instructions.
 
 ## Tracking
 
