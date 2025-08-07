@@ -4,7 +4,7 @@ This tutorial takes you through the step-by-step process of building your first 
 
 ## Try it out first
 
-You can play the game from this tutorial [here](https://www.reddit.com/r/devvit_demos/comments/1lo8xio/twrblx/). It consists of a simple HTML5 game scene with buttons to call backend functions.
+You can play the game from this tutorial [here](https://www.reddit.com/r/test_devvit_demos/comments/1mk4ql4/test3jsdevvit/). It consists of a simple HTML5 game scene with buttons to call backend functions.
 
 ## What you'll need
 

@@ -1,11 +1,18 @@
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 # Post data
 
-You can attach custom data to posts when creating them and update this data at runtime using the `postData` capability. This enables dynamic, stateful experiences available on posts without additional redis calls.
+You can attach custom data to posts when creating them and update this data at runtime using the `postData` capability. This enables dynamic, stateful experiences available on posts without additional redis calls. Post data is scoped to the post, not users.
 
-Post data is useful for storing game state, scores, or any other information that needs to persist with the post.
+Post data is useful for storing game state, scores, or any other information that needs to persist with the post and be shared across all users.
+
+Post data is set when you submitPost and apps can access from the context object or do a server side call to update the post data on a Post object.
+
+:::note
+Post data is sent to the client. Never store secrets or sensitive information.
+:::
 
 ## Creating posts with data
 When creating a post, include the `postData` parameter with your custom data object.
@@ -19,10 +26,22 @@ When creating a post, include the `postData` parameter with your custom data obj
     subredditName: context.subredditName!,
     title: 'Post with custom data',
     postData: {
-      'myKey': 'myValue',
-      'moreStuff': {
-        'secretWord': 'banana'
-      }
+      challengeNumber: 42,
+      totalGuesses: 0,
+      gameState: 'active',
+      pixels: [
+        [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0],
+        [0, 0, 0, 2, 2, 1, 1, 1, 0, 0, 0],
+        [0, 0, 2, 2, 1, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 2, 2, 1, 1, 1, 1, 1, 0, 0],
+        [0, 0, 0, 2, 2, 1, 1, 1, 0, 0, 0],
+        [0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0]
+     ] // Drawing canvas data
     },
   });
   ```
