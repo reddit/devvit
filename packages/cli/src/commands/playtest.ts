@@ -520,12 +520,12 @@ export default class Playtest extends DevvitCommand {
       this.#server?.send({ appInstalled: {} });
 
       const playtestUrl = chalk.bold.green(
-        `${REDDIT_DESKTOP}/r/${this.#subreddit}${
+        `${REDDIT_DESKTOP}/r/${this.#subreddit}/${
           this.#flags?.connect ? `?playtest=${this.#appInfo!.app!.slug}` : ''
         }`
       );
       ux.action.stop(
-        `Success! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
+        `Success! Please visit your test subreddit and refresh to see your latest changes:\n${playtestUrl}\n`
       );
     } catch (err) {
       ux.action.stop('Error'); // Stop any spinner if it's running
