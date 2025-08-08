@@ -1,4 +1,4 @@
-# Configuring your app
+# Configure Your App
 
 ## devvit.json
 
