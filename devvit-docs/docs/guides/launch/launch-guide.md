@@ -11,11 +11,11 @@ How you launch your app in each of these stages depends on the type of app you�
 
 Select your launch stage for instructions and guidelines to maximize your game's development. 
 
-
-<!-- prettier-ignore-start -->
-<Tabs>
-  <TabItem value="Alpha" label="Alpha" default>
-  Launch your game on r/Devvit to get technical feedback from other devs and Reddit admins: 
+<details>
+  <summary>Alpha</summary>
+  <div>
+    <div>
+   Launch your game on r/Devvit to get technical feedback from other devs and Reddit admins: 
 
    1. Create a public subreddit for your game.
    2. Create a game post in your public subreddit.
@@ -26,10 +26,15 @@ Select your launch stage for instructions and guidelines to maximize your game's
    - Post only once for a meaningful update (maybe a 2+ week gaps between versions)
    - Respond to feedback within 24-48 hours.
    - Test other developers' apps, too, to build relationships with your fellow devs. 
-    
-  </TabItem>
-  <TabItem value="Beta" label="Beta">
-  
+</div>
+    <br/>
+  </div>
+</details>    
+
+<details>
+  <summary>Beta</summary>
+  <div>
+    <div>
   When you’re ready for broader player testing, launch your game on r/GamesOnReddit: 
   
   1. Go to your public subreddit for your game.
@@ -40,10 +45,15 @@ Select your launch stage for instructions and guidelines to maximize your game's
    To get the best results, engage with players that give you feedback to start growing your community. 
 
    **Apps that have strong post engagement metrics will automatically move to the next launch phase.**
-   
-  </TabItem>
-  <TabItem value="GA" label="GA" default>
+</div>
+    <br/>
+  </div>
+</details>   
 
+<details>
+  <summary>GA</summary>
+  <div>
+    <div>
   When you're ready to publicly release your game:
   
   1. Upload the latest version of your app with `npx devvit upload`
@@ -51,9 +61,10 @@ Select your launch stage for instructions and guidelines to maximize your game's
   
   Publishing your app triggers a thorough app review.
 
-  </TabItem>
-</Tabs>
-<!-- prettier-ignore-end -->
+</div>
+    <br/>
+  </div>
+</details> 
 
 ### Distribution
 
@@ -78,10 +89,11 @@ Successful games will generate genuine conversation within each post, and create
 
 Apps that are built to use within a community (think mod tools like Bot Bouncer or interactive post apps like Community Hub) also follow the alpha, beta, and GA launch path.
 
-<!-- prettier-ignore-start -->
-<Tabs>
-  <TabItem value="Alpha" label="Alpha" default>
-  Share your app on r/Devvit to validate that your app solves real community problems:  
+<details>
+  <summary>Alpha</summary>
+  <div>
+    <div>
+   Share your app on r/Devvit to validate that your app solves real community problems:  
 
    1. Create a public subreddit for your game.
    2. Create a game post in your public subreddit.
@@ -94,27 +106,37 @@ Apps that are built to use within a community (think mod tools like Bot Bouncer 
    - Post only once for a meaningful update (maybe a 2+ week gaps between versions).
    - Test your app with different permission levels (mod, approved user, regular user).
    - Actively seek feedback from mods in your target communities. 
-    
-  </TabItem>
-  <TabItem value="Beta" label="Beta">
-  
+</div>
+    <br/>
+  </div>
+</details>  
+
+<details>
+  <summary>Beta</summary>
+  <div>
+    <div>
   When you’re ready for broader testing, launch your game on a larger subreddit: 
   
   1. Upload the latest version of your app with `npx devvit upload`
   2. Publish your app as unlisted with `npx devvit publish`
   3. Once your app is approved, your can install it to a larger subreddit that you moderate for further testing. 
-   
-  </TabItem>
-  <TabItem value="GA" label="GA" default>
+</div>
+    <br/>
+  </div>
+</details>
 
-  When you're ready to publicly release your app, you’ll need to add it to the Apps Directory:
+<details>
+  <summary>GA</summary>
+  <div>
+    <div>
+When you're ready to publicly release your app, you’ll need to add it to the Apps Directory:
   
   1. Run  `npx devvit publish --listed`
-  2. Once your app is approved, it will be publicly available in the Apps Directory for any mod to install. 
-
-  </TabItem>
-</Tabs>
-<!-- prettier-ignore-end -->
+  2. Once your app is approved, it will be publicly available in the Apps Directory for any mod to install.
+</div>
+    <br/>
+  </div>
+</details>
 
 ## Resources
 - Got questions? Join our Discord or post in [r/Devvit](https://www.reddit.com/r/Devvit/).
