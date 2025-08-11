@@ -3,8 +3,12 @@
 import type { IncomingMessage, Server, ServerOptions, ServerResponse } from 'node:http';
 import { createServer as nodeCreateServer } from 'node:http';
 
-import { runWithContext } from './context.js';
+import type { Metadata } from '@devvit/protos';
+import type { FormField } from '@devvit/shared';
+
+import { getMetadata, runWithContext } from './context.js';
 import { Context } from './server-context.js';
+
 /**
  * Creates a new Devvit server. This implements the same API as Node.js's `createServer` function,
  * but we do not guarantee that this actually creates an HTTP server of any kind - it may be any
@@ -42,6 +46,9 @@ function _createServer<
     res: InstanceType<Response> & { req: InstanceType<Request> }
   ) => any
 ): Server<Request, Response> {
+  globalThis.devvit ??= {};
+  globalThis.devvit.metadataProvider = getMetadata;
+
   const server = nodeCreateServer(options, async (req, res) => {
     const context = Context(req.headers);
     return runWithContext(context, async () => {
@@ -76,5 +83,13 @@ declare global {
   namespace globalThis {
     // eslint-disable-next-line no-var
     var enableWebbitBundlingHack: boolean;
+    // eslint-disable-next-line no-var
+    var devvit: {
+      metadataProvider?: () => Readonly<Metadata> | undefined;
+      settings?: {
+        app?: FormField[] | undefined;
+        installation?: FormField[] | undefined;
+      };
+    };
   }
 }

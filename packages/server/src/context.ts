@@ -1,5 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
+import type { Metadata } from '@devvit/protos';
+
 import type { Context } from './server-context.js';
 
 let requestContextStorage: AsyncLocalStorage<Context>;
@@ -23,6 +25,14 @@ function getContext(): Context {
     );
   }
   return ctx;
+}
+
+export function getMetadata(): Readonly<Metadata> | undefined {
+  const ctx = requestContextStorage.getStore();
+  if (!ctx) {
+    return undefined;
+  }
+  return ctx.metadata;
 }
 
 /**
