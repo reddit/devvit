@@ -9,6 +9,7 @@ import { T5 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 import { getRedditApiPlugins } from '../plugin.js';
+import { User } from './User.js';
 
 export type SubredditData = {
   id?: string | undefined;
@@ -1167,7 +1168,10 @@ async function createModmailConversation(params: {
   participantType: string;
   conversationType: string;
 }): Promise<string> {
-  const appUserId = context.appAccountId; // TODO: This is deprecated?
+  const appUserId = (await User.getByUsername(context.appName))?.id;
+  if (!appUserId) {
+    throw new Error('App user not found; did the app get banned?');
+  }
 
   const operationName = 'CreateModmailConversation';
   const persistedQueryHash = '5f9ae20b0c7bdffcafb80241728a72e67cd4239bc09f67284b79d4aa706ee0e5';

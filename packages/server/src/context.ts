@@ -1,21 +1,21 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-import type { RequestContext } from './request-context.js';
+import type { Context } from './server-context.js';
 
-let requestContextStorage: AsyncLocalStorage<RequestContext>;
+let requestContextStorage: AsyncLocalStorage<Context>;
 try {
-  requestContextStorage = new AsyncLocalStorage<RequestContext>();
+  requestContextStorage = new AsyncLocalStorage<Context>();
 } catch {
   // Hack: workaround inclusion in Blocks client builds.
 }
 
 /**
- * Gets the current RequestContext. This is set by the server when handling a request. If there is no
+ * Gets the current Context. This is set by the server when handling a request. If there is no
  * context, this will throw an error.
- * @returns The current RequestContext.
+ * @returns The current Context.
  * @throws Error Will throw an error if there is no context.
  */
-function getContext(): RequestContext {
+function getContext(): Context {
   const ctx = requestContextStorage.getStore();
   if (!ctx) {
     throw new Error(
@@ -26,21 +26,18 @@ function getContext(): RequestContext {
 }
 
 /**
- * Runs an async callback with the given RequestContext. Code in the callback can use
+ * Runs an async callback with the given Context. Code in the callback can use
  * `getContext()` to get the context. For testing.
  * @experimental
  * @param context The context to run the callback with
  * @param callback The callback to run
  */
-export async function runWithContext<T>(
-  context: RequestContext,
-  callback: () => Promise<T>
-): Promise<T> {
+export async function runWithContext<T>(context: Context, callback: () => Promise<T>): Promise<T> {
   return requestContextStorage.run(context, callback);
 }
 
-export const context = new Proxy<RequestContext>({} as RequestContext, {
-  get: (_target, prop: keyof RequestContext) => {
+export const context = new Proxy<Context>({} as Context, {
+  get: (_target, prop: keyof Context) => {
     const context = getContext();
     return context[prop];
   },
@@ -49,7 +46,7 @@ export const context = new Proxy<RequestContext>({} as RequestContext, {
   ownKeys(): string[] {
     return Object.keys(getContext());
   },
-  getOwnPropertyDescriptor(_target, key: keyof RequestContext) {
+  getOwnPropertyDescriptor(_target, key: keyof Context) {
     return { enumerable: true, configurable: true, value: getContext()[key] };
   },
 });

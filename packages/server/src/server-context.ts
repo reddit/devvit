@@ -1,28 +1,36 @@
 import type { Metadata } from '@devvit/protos';
-import type { BaseContext } from '@devvit/public-api';
 import { getContextFromMetadata } from '@devvit/public-api/devvit/internals/context.js';
+import { type BaseContext, T2, T3, T5 } from '@devvit/shared';
 import { Header, headerPrefix } from '@devvit/shared-types/Header.js';
 
 /** Devvit server context for the lifetime of a request. */
-export type RequestContext = Omit<BaseContext, 'toJSON'> & {
+export type Context = BaseContext & {
   cache?: { [key: string]: unknown };
+  metadata: Metadata;
 };
 
 /** Designed to be compatible with IncomingHttpHeaders and any KV. */
 type Headers = { [header: string]: string | string[] | undefined };
 
-/** Constructs a new RequestContext. */
-export let RequestContext = (headers: Readonly<Headers>): RequestContext => {
+/** Constructs a new Context. */
+export let Context = (headers: Readonly<Headers>): Context => {
   const meta = metaFromIncomingMessage(headers);
-  return getContextFromMetadata(meta, meta[Header.Post]?.values[0]);
+  const publicApiContext = getContextFromMetadata(meta, meta[Header.Post]?.values[0]);
+  return {
+    ...publicApiContext,
+    subredditId: T5(publicApiContext.subredditId),
+    userId: publicApiContext.userId ? T2(publicApiContext.userId) : undefined,
+    postId: publicApiContext.postId ? T3(publicApiContext.postId) : undefined,
+    subredditName: publicApiContext.subredditName!, // This is guaranteed to be defined
+  };
 };
 
 /**
  * Overwrite the context provider for test.
  * @experimental
  */
-export function setRequestContext(fn: typeof RequestContext): void {
-  RequestContext = fn;
+export function setContext(fn: typeof Context): void {
+  Context = fn;
 }
 
 /** @internal */

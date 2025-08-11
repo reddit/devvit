@@ -1,4 +1,4 @@
-export { context } from './context.js';
+export { context } from './clientContext.js';
 export {
   addImmersiveModeChangeEventListener,
   exitImmersiveMode,

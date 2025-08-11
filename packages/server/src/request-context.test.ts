@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'node:http';
 import { Socket } from 'node:net';
 
-import { metaFromIncomingMessage } from './request-context.js';
+import { metaFromIncomingMessage } from './server-context.js';
 
 describe('metaFromIncomingMessage()', () => {
   test('empty', () => expect(metaFromIncomingMessage({})).toStrictEqual({}));

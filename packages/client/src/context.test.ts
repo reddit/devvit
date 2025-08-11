@@ -7,7 +7,7 @@ import {
 import { _initContext } from '@devvit/web-view-scripts/init-context.js';
 import { expect, test } from 'vitest';
 
-import { context } from './context.js';
+import { context } from './clientContext.js';
 
 const testContext: Readonly<WebViewContext> = {
   subredditId: 't5_testSubreddit',
