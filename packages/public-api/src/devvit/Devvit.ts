@@ -776,7 +776,7 @@ export class Devvit extends Actor {
     }
 
     if (Devvit.#domains.length > 0 || Devvit.#scopes.length > 0) {
-      config.addPermissions({
+      config.addPermissions?.({
         requestedFetchDomains: Devvit.#domains,
         asUserScopes: Devvit.#scopes,
       });
