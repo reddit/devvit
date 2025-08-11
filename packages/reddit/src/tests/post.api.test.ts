@@ -123,7 +123,7 @@ describe('Post API', () => {
       });
     });
 
-    describe('submit()', () => {
+    describe('submitPost()', () => {
       const commonPostFields = {
         kind: 'custom',
         richtextJson: '',
@@ -132,7 +132,67 @@ describe('Post API', () => {
         title: 'My First Post',
       };
 
-      test('submit(): can set runAs: USER when userActions enabled', async () => {
+      test('submitPost(): can set runAs: USER when userActions enabled', async () => {
+        const mockedPost = new Post({ ...defaultPostData });
+
+        const spyPlugin = userActionsPlugin.Submit;
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await runWithTestContext(async () => {
+          await reddit.submitPost({
+            title: mockedPost.title,
+            subredditName: mockedPost.subredditName,
+            runAs: 'USER',
+            text: 'text',
+          });
+
+          expect(spyPlugin).toHaveBeenCalledWith(
+            {
+              ...commonPostFields,
+              richtextJson: undefined,
+              runAs: RunAs.USER,
+              kind: 'self',
+              text: 'text',
+            },
+            context.metadata
+          );
+        });
+      });
+
+      // to-do: don't skip.
+      test.skip('submitPost(): throws error when runAs: USER with userActions disabled', async () => {
+        const spyPlugin = userActionsPlugin.Submit;
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        await runWithTestContext(async () => {
+          await expect(
+            reddit.submitPost({
+              title: 'Some post title',
+              subredditName: 'askReddit',
+              runAs: 'USER',
+              text: 'text',
+            })
+          ).rejects.toThrow(/UserActions is not enabled./);
+        });
+      });
+    });
+
+    describe('submitCustomPost()', () => {
+      const commonPostFields = {
+        kind: 'custom',
+        richtextJson: '',
+        sr: 'askReddit',
+        subredditName: 'askReddit',
+        title: 'My First Post',
+      };
+
+      test('submitCustomPost(): can set runAs: USER when userActions enabled', async () => {
         const mockedPost = new Post({ ...defaultPostData });
 
         const spyPlugin = userActionsPlugin.SubmitCustomPost;
@@ -143,7 +203,7 @@ describe('Post API', () => {
         vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
 
         await runWithTestContext(async () => {
-          await reddit.submitPost({
+          await reddit.submitCustomPost({
             title: mockedPost.title,
             subredditName: mockedPost.subredditName,
             postData: { abc: 'def' },
@@ -196,10 +256,16 @@ describe('Post API', () => {
         });
       });
 
-      test.skip('submit(): throws error when runAs: USER with userActions disabled', async () => {
+      // to-do: don't skip.
+      test.skip('submitCustomPost(): throws error when runAs: USER with userActions disabled', async () => {
+        const spyPlugin = userActionsPlugin.SubmitCustomPost;
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
         await runWithTestContext(async () => {
           await expect(
-            reddit.submitPost({
+            reddit.submitCustomPost({
               title: 'Some post title',
               subredditName: 'askReddit',
               splash: { appDisplayName: 'appDisplayName' },
@@ -210,10 +276,10 @@ describe('Post API', () => {
         });
       });
 
-      test('submit(): throws error when runAs: USER without userGeneratedContent for experience post', async () => {
+      test('submitCustomPost(): throws error when runAs: USER without userGeneratedContent for custom post', async () => {
         await runWithTestContext(async () => {
           await expect(
-            reddit.submitPost({
+            reddit.submitCustomPost({
               title: 'Some post title',
               subredditName: 'askReddit',
               splash: { appDisplayName: 'appDisplayName' },
@@ -234,7 +300,7 @@ describe('Post API', () => {
         vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
 
         await runWithTestContext(async () => {
-          await reddit.submitPost({
+          await reddit.submitCustomPost({
             title: mockedPost.title,
             subredditName: mockedPost.subredditName,
             splash: { appDisplayName: 'appDisplayName' },
@@ -287,7 +353,7 @@ describe('Post API', () => {
           );
 
         await runWithTestContext(async () => {
-          await reddit.submitPost({
+          await reddit.submitCustomPost({
             title: mockedPost.title,
             subredditName: mockedPost.subredditName,
             splash: { appDisplayName: 'appDisplayName' },
@@ -323,7 +389,7 @@ describe('Post API', () => {
         });
       });
 
-      test('adds the built richtext string to the submitPost call', async () => {
+      test('adds the built richtext string to the submitCustomPost call', async () => {
         const mockedPost = new Post({ ...defaultPostData });
 
         const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
@@ -343,7 +409,7 @@ describe('Post API', () => {
           .build();
 
         await runWithTestContext(async () => {
-          await reddit.submitPost({
+          await reddit.submitCustomPost({
             title: mockedPost.title,
             subredditName: mockedPost.subredditName,
             splash: { appDisplayName: 'appDisplayName' },

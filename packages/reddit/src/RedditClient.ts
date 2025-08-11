@@ -38,6 +38,7 @@ import type {
   SetPostFlairOptions,
   SetUserFlairBatchConfig,
   SetUserFlairOptions,
+  SubmitCustomPostOptions,
   SubmitPostOptions,
   SubredditInfo,
   SubredditLeaderboard,
@@ -276,8 +277,6 @@ export class RedditClient {
   /**
    * Submits a new post to a subreddit.
    *
-   * @param opts - Either a self post or a link post.
-   * @returns A Promise that resolves to a Post object.
    * @example
    * ```ts
    * const post = await reddit.submitPost({
@@ -292,15 +291,32 @@ export class RedditClient {
    * });
    * ```
    *
-   * By default, `submitPost()` creates a Post on behalf of the App account, but it may be called on behalf of the User making the request by setting the option `runAs: 'USER'`.
+   * @see {@link RedditClient.submitCustomPost()|submitCustomPost()}
+   * @see {@link RedditClient.crosspost()|crosspost()}
+   */
+  submitPost(opts: Readonly<SubredditOptions & SubmitPostOptions>): Promise<Post> {
+    return Post.submit(opts);
+  }
+
+  /**
+   * Submits a new custom post to a subreddit.
+   *
+   * @example
+   * ```ts
+   * const post = await reddit.submitCustomPost({
+   *   subredditName: 'devvit',
+   *   title: 'Hello World',
+   *   splash: {appDisplayName: 'Field', height: 'regular'},
+   * });
+   * ```
+   * 
+   * By default, `submitCustomPost()` creates a Post on behalf of the App account, but it may be called on behalf of the User making the request by setting the option `runAs: 'USER'`.
    * When using `runAs: 'USER'` to create an experience Post, you must specify the `userGeneratedContent` option. For example:
    * @example
    * ```ts
-   * import { RunAs } from '@devvit/public-api';
-   * 
-   * const post = await reddit.submitPost({
+   * const post = await reddit.submitCustomPost({
    *  title: 'My Devvit Post',
-   *  runAs: RunAs.USER,
+   *  runAs: 'USER',
    *  userGeneratedContent: {
    *    text: "hello there", 
    *    imageUrls: ["https://styles.redditmedia.com/t5_5wa5ww/styles/communityIcon_wyopomb2xb0a1.png", "https://styles.redditmedia.com/t5_49fkib/styles/bannerBackgroundImage_5a4axis7cku61.png"]
@@ -312,9 +328,12 @@ export class RedditClient {
    *  splash: {appDisplayName: 'Pixelary'},
    * });
    * ```
+   *
+   * @see {@link RedditClient.submitPost()|submitPost()}
+   * @see {@link RedditClient.crosspost()|crosspost()}
    */
-  submitPost(opts: Readonly<SubredditOptions & SubmitPostOptions>): Promise<Post> {
-    return Post.submit(opts);
+  submitCustomPost(opts: Readonly<SubredditOptions & SubmitCustomPostOptions>): Promise<Post> {
+    return Post.submitCustomPost(opts);
   }
 
   /**
@@ -325,6 +344,9 @@ export class RedditClient {
    * @param opts.postId - The ID of the post to crosspost
    * @param opts.title - The title of the crosspost
    * @returns - A Promise that resolves to a Post object.
+   *
+   * @see {@link RedditClient.submitPost()|submitPost()}
+   * @see {@link RedditClient.submitCustomPost()|submitCustomPost()}
    */
   crosspost(opts: Readonly<SubredditOptions & CrosspostOptions>): Promise<Post> {
     return Post.crosspost(opts);

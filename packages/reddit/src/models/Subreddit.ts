@@ -27,7 +27,12 @@ import type {
   ModAction,
 } from './ModAction.js';
 import { getModerationLog } from './ModAction.js';
-import type { CrosspostOptions, GetPostsOptionsWithTimeframe, SubmitPostOptions } from './Post.js';
+import type {
+  CrosspostOptions,
+  GetPostsOptionsWithTimeframe,
+  SubmitCustomPostOptions,
+  SubmitPostOptions,
+} from './Post.js';
 import { Post } from './Post.js';
 import type {
   BanUserOptions,
@@ -668,6 +673,10 @@ export class Subreddit {
 
   async submitPost(opts: Readonly<SubmitPostOptions>): Promise<Post> {
     return Post.submit({ ...opts, subredditName: this.#name });
+  }
+
+  async submitCustomPost(opts: Readonly<SubmitCustomPostOptions>): Promise<Post> {
+    return Post.submitCustomPost({ ...opts, subredditName: this.#name });
   }
 
   async crosspost(opts: Readonly<CrosspostOptions>): Promise<Post> {

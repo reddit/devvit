@@ -2,7 +2,6 @@ import type {
   Listing as ListingProto,
   Metadata,
   RedditObject,
-  SubmitRequest,
   SubmitResponse,
 } from '@devvit/protos';
 import type { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos';
@@ -154,7 +153,6 @@ export type SubredditOptions = {
 
 /** Link, self, or media post options exclusively. */
 export type SubmitPostOptions =
-  | (SubmitCustomPostOptions & { richtext?: never; text?: never; kind?: never; url?: never })
   | (SubmitLinkOptions & { richtext?: never; text?: never; kind?: never })
   | (SubmitSelfPostOptions & { kind?: never; url?: never })
   | (SubmitMediaOptions & { richtext?: never; text?: never; url?: never });
@@ -1048,56 +1046,16 @@ export class Post {
     const client =
       runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
 
-    let rsp: SubmitResponse;
-
-    if ('splash' in opts) {
-      if (runAsType === RunAs.USER) {
-        assertNonNull(
-          opts.userGeneratedContent,
-          'userGeneratedContent must be set in `SubmitPostOptions` when RunAs=USER for custom posts'
-        );
-      }
-      const handler = new BlocksHandler(() => Loading(opts.splash));
-      const { blocks } = UIResponse.fromJSON(await handler.handle({ events: [] }, this.#metadata));
-      const encodedCached = Block.encode(blocks!).finish();
-
-      const { textFallback, ...sanitizedOptions } = opts;
-      const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
-
-      const userGeneratedContent = opts.userGeneratedContent
-        ? {
-            text: opts.userGeneratedContent.text ?? '',
-            imageUrls: opts.userGeneratedContent.imageUrls ?? [],
-          }
-        : undefined;
-
-      const postData: DevvitPostData = {
-        developerData: opts.postData,
-        splash: SplashPostData(opts.splash, opts.title),
-      };
-      const submitRequest: SubmitRequest = {
-        kind: 'custom',
+    const rsp = await client.Submit(
+      {
+        kind: 'kind' in opts ? opts.kind : 'url' in opts ? 'link' : 'self',
         sr: opts.subredditName,
-        richtextJson: Buffer.from(encodedCached).toString('base64'),
-        richtextFallback,
-        ...sanitizedOptions,
-        userGeneratedContent,
+        richtextJson: 'richtext' in opts ? richtextToString(opts.richtext) : undefined,
+        ...opts,
         runAs: runAsType,
-        postData,
-      };
-      rsp = await client.SubmitCustomPost(submitRequest, this.#metadata);
-    } else {
-      rsp = await client.Submit(
-        {
-          kind: 'kind' in opts ? opts.kind : 'url' in opts ? 'link' : 'self',
-          sr: opts.subredditName,
-          richtextJson: 'richtext' in opts ? richtextToString(opts.richtext) : undefined,
-          ...opts,
-          runAs: runAsType,
-        },
-        this.#metadata
-      );
-    }
+      },
+      this.#metadata
+    );
 
     // Post Id might not be present as image/video post creation can happen asynchronously
     const isAllowedMediaType = 'kind' in opts && ['image', 'video', 'videogif'].includes(opts.kind);
@@ -1113,6 +1071,51 @@ export class Post {
       }
     }
 
+    return postFromSubmitResponse(rsp);
+  }
+
+  /** @internal */
+  static async submitCustomPost(
+    opts: Readonly<SubredditOptions & SubmitCustomPostOptions>
+  ): Promise<Post> {
+    const runAsType = RunAs[opts.runAs ?? 'APP'];
+    const client =
+      runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
+
+    if (runAsType === RunAs.USER && !opts.userGeneratedContent) {
+      throw Error('userGeneratedContent must be set when `runAs` is `USER`');
+    }
+    const handler = new BlocksHandler(() => Loading(opts.splash));
+    const { blocks } = UIResponse.fromJSON(await handler.handle({ events: [] }, this.#metadata));
+    const encodedCached = Block.encode(blocks!).finish();
+
+    const { textFallback, ...sanitizedOptions } = opts;
+    const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
+
+    const userGeneratedContent = opts.userGeneratedContent
+      ? {
+          text: opts.userGeneratedContent.text ?? '',
+          imageUrls: opts.userGeneratedContent.imageUrls ?? [],
+        }
+      : undefined;
+
+    const postData: DevvitPostData = {
+      developerData: opts.postData,
+      splash: SplashPostData(opts.splash, opts.title),
+    };
+    const rsp = await client.SubmitCustomPost(
+      {
+        kind: 'custom',
+        sr: opts.subredditName,
+        richtextJson: Buffer.from(encodedCached).toString('base64'),
+        richtextFallback,
+        ...sanitizedOptions,
+        userGeneratedContent,
+        runAs: runAsType,
+        postData,
+      },
+      this.#metadata
+    );
     return postFromSubmitResponse(rsp);
   }
 
@@ -1193,19 +1196,19 @@ export class Post {
   static async getDevvitPostData(id: T3): Promise<DevvitPostData | undefined> {
     const operationName = 'GetDevvitPostData';
     const persistedQueryHash = 'd349c9bee385336e44837c4a041d4b366fa32f16121cef7f12e1e3f230340696';
-    const response = await GraphQL.query(operationName, persistedQueryHash, {
+    const rsp = await GraphQL.query(operationName, persistedQueryHash, {
       id,
     });
 
     // to-do: why is postInfoById a `Record<string, any>`?
-    if (response.data?.postInfoById?.errors?.length) {
+    if (rsp.data?.postInfoById?.errors?.length) {
       throw new Error(
-        `Failed to get devvit post data due to errors: ${response.data?.postInfoById?.errors.join(', ')}`
+        `Failed to get devvit post data due to errors: ${rsp.data?.postInfoById?.errors.join(', ')}`
       );
     }
 
     // GQL returns postData as a JSON string
-    const devvitPostData: string = response.data?.postInfoById?.devvit?.postData;
+    const devvitPostData: string = rsp.data?.postInfoById?.devvit?.postData;
 
     if (!devvitPostData) {
       return undefined;
