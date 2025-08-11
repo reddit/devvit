@@ -27,11 +27,7 @@ import type {
   ModAction,
 } from './ModAction.js';
 import { getModerationLog } from './ModAction.js';
-import type {
-  GetPostsOptionsWithTimeframe,
-  SubmitLinkOptions,
-  SubmitSelfPostOptions,
-} from './Post.js';
+import type { CrosspostOptions, GetPostsOptionsWithTimeframe, SubmitPostOptions } from './Post.js';
 import { Post } from './Post.js';
 import type {
   BanUserOptions,
@@ -670,13 +666,12 @@ export class Subreddit {
     };
   }
 
-  async submitPost(options: SubmitLinkOptions | SubmitSelfPostOptions): Promise<Post> {
-    const submitPostOptions = {
-      ...options,
-      subredditName: this.#name,
-    };
+  async submitPost(opts: Readonly<SubmitPostOptions>): Promise<Post> {
+    return Post.submit({ ...opts, subredditName: this.#name });
+  }
 
-    return Post.submit(submitPostOptions);
+  async crosspost(opts: Readonly<CrosspostOptions>): Promise<Post> {
+    return Post.crosspost({ ...opts, subredditName: this.#name });
   }
 
   getControversialPosts(
@@ -1237,7 +1232,7 @@ export class Subreddit {
  * @param {string} subredditId - The ID (starting with t5_) of the subreddit to retrieve. e.g. t5_2qjpg
  * @returns {Promise<SubredditInfo>} A Promise that resolves a SubredditInfo object.
  */
-export async function getSubredditInfoById(subredditId: string): Promise<SubredditInfo> {
+export async function getSubredditInfoById(subredditId: T5): Promise<SubredditInfo> {
   const operationName = 'GetSubredditInfoById';
   const persistedQueryHash = '315a9b75c22a017d526afdf2d274616946156451aacfd56dfb91e7ad3f7a2fde';
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });
@@ -1267,7 +1262,7 @@ export async function getSubredditInfoByName(subredditName: string): Promise<Sub
   return subredditInfo;
 }
 
-export async function getSubredditLeaderboard(subredditId: string): Promise<SubredditLeaderboard> {
+export async function getSubredditLeaderboard(subredditId: T5): Promise<SubredditLeaderboard> {
   const operationName = 'GetSubredditLeaderboard';
   const persistedQueryHash = '18ead70c46b6446d45ecd8b679b16d9a929a933d6ef25d8262a459cb18b72848';
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });
@@ -1283,7 +1278,7 @@ export async function getSubredditLeaderboard(subredditId: string): Promise<Subr
   };
 }
 
-export async function getSubredditStyles(subredditId: string): Promise<SubredditStyles> {
+export async function getSubredditStyles(subredditId: T5): Promise<SubredditStyles> {
   const operationName = 'GetSubredditStyles';
   const persistedQueryHash = 'd491d17ea8858f563ea578b26b9595d64adecf4bf34557d567c7e53c470f5f22';
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });

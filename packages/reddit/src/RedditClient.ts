@@ -41,6 +41,7 @@ import type {
   SubmitPostOptions,
   SubredditInfo,
   SubredditLeaderboard,
+  SubredditOptions,
   SubredditStyles,
   UpdatePageSettingsOptions,
   UpdateWikiPageOptions,
@@ -151,8 +152,8 @@ export class RedditClient {
    * const memes = await reddit.getSubredditById('t5_2qjpg');
    * ```
    */
-  getSubredditById(id: string): Promise<Subreddit | undefined> {
-    return Subreddit.getById(T5(id));
+  getSubredditById(id: T5): Promise<Subreddit | undefined> {
+    return Subreddit.getById(id);
   }
 
   /**
@@ -165,7 +166,7 @@ export class RedditClient {
    * const memes = await reddit.getSubredditInfoById('t5_2qjpg');
    * ```
    */
-  getSubredditInfoById(id: string): Promise<SubredditInfo> {
+  getSubredditInfoById(id: T5): Promise<SubredditInfo> {
     return getSubredditInfoById(id);
   }
 
@@ -268,14 +269,14 @@ export class RedditClient {
    * @param id
    * @returns A Promise that resolves to a Post object.
    */
-  getPostById(id: string): Promise<Post> {
-    return Post.getById(T3(id));
+  getPostById(id: T3): Promise<Post> {
+    return Post.getById(id);
   }
 
   /**
    * Submits a new post to a subreddit.
    *
-   * @param options - Either a self post or a link post.
+   * @param opts - Either a self post or a link post.
    * @returns A Promise that resolves to a Post object.
    * @example
    * ```ts
@@ -291,8 +292,8 @@ export class RedditClient {
    * });
    * ```
    *
-   * By default, `submitPost()` creates a Post on behalf of the App account, but it may be called on behalf of the User making the request by setting the option `runAs: RunAs.USER`.
-   * When using `runAs: RunAs.USER` to create an experience Post, you must specify the `userGeneratedContent` option. For example:
+   * By default, `submitPost()` creates a Post on behalf of the App account, but it may be called on behalf of the User making the request by setting the option `runAs: 'USER'`.
+   * When using `runAs: 'USER'` to create an experience Post, you must specify the `userGeneratedContent` option. For example:
    * @example
    * ```ts
    * import { RunAs } from '@devvit/public-api';
@@ -312,21 +313,21 @@ export class RedditClient {
    * });
    * ```
    */
-  submitPost(options: SubmitPostOptions): Promise<Post> {
-    return Post.submit(options);
+  submitPost(opts: Readonly<SubredditOptions & SubmitPostOptions>): Promise<Post> {
+    return Post.submit(opts);
   }
 
   /**
    * Crossposts a post to a subreddit.
    *
-   * @param options - Options for crossposting a post
-   * @param options.subredditName - The name of the subreddit to crosspost to
-   * @param options.postId - The ID of the post to crosspost
-   * @param options.title - The title of the crosspost
+   * @param opts - Options for crossposting a post
+   * @param opts.subredditName - The name of the subreddit to crosspost to
+   * @param opts.postId - The ID of the post to crosspost
+   * @param opts.title - The title of the crosspost
    * @returns - A Promise that resolves to a Post object.
    */
-  crosspost(options: CrosspostOptions): Promise<Post> {
-    return Post.crosspost(options);
+  crosspost(opts: Readonly<SubredditOptions & CrosspostOptions>): Promise<Post> {
+    return Post.crosspost(opts);
   }
 
   /**
@@ -339,8 +340,8 @@ export class RedditClient {
    * const user = await reddit.getUserById('t2_1qjpg');
    * ```
    */
-  getUserById(id: string): Promise<User | undefined> {
-    return User.getById(T2(id));
+  getUserById(id: T2): Promise<User | undefined> {
+    return User.getById(id);
   }
 
   /**
@@ -446,8 +447,8 @@ export class RedditClient {
    * const comment = await reddit.getCommentById('t1_1qjpg');
    * ```
    */
-  getCommentById(id: string): Promise<Comment> {
-    return Comment.getById(T1(id));
+  getCommentById(id: T1): Promise<Comment> {
+    return Comment.getById(id);
   }
 
   /**
@@ -508,11 +509,8 @@ export class RedditClient {
    * })
    * ```
    */
-  submitComment(options: CommentSubmissionOptions & { id: string }): Promise<Comment> {
-    return Comment.submit({
-      ...options,
-      id: asTid<T3 | T1>(options.id),
-    });
+  submitComment(options: CommentSubmissionOptions & { id: T1 | T3 }): Promise<Comment> {
+    return Comment.submit({ ...options, id: options.id });
   }
 
   /**
@@ -1088,7 +1086,7 @@ export class RedditClient {
    * await reddit.approve('t1_123456');
    * ```
    */
-  async approve(id: string): Promise<void> {
+  async approve(id: T1 | T3): Promise<void> {
     if (isT1(id)) {
       return Comment.approve(id);
     } else if (isT3(id)) {
@@ -1109,7 +1107,7 @@ export class RedditClient {
    * await reddit.remove('t1_123456', true);
    * ```
    */
-  async remove(id: string, isSpam: boolean): Promise<void> {
+  async remove(id: T1 | T3, isSpam: boolean): Promise<void> {
     if (isT1(id)) {
       return Comment.remove(id, isSpam);
     } else if (isT3(id)) {
@@ -1271,8 +1269,8 @@ export class RedditClient {
    * @param subredditName - The name of the subreddit to remove the flair from.
    * @param postId - The ID of the post to remove the flair from.
    */
-  async removePostFlair(subredditName: string, postId: string): Promise<void> {
-    return Flair.removePostFlair(subredditName, T3(postId));
+  async removePostFlair(subredditName: string, postId: T3): Promise<void> {
+    return Flair.removePostFlair(subredditName, postId);
   }
 
   /**
@@ -1629,8 +1627,8 @@ export class RedditClient {
    * const vault = await reddit.getVaultByUserId('t2_1w72');
    * ```
    */
-  getVaultByUserId(userId: string): Promise<Vault> {
-    return getVaultByUserId(T2(userId));
+  getVaultByUserId(userId: T2): Promise<Vault> {
+    return getVaultByUserId(userId);
   }
 
   /**
@@ -1640,7 +1638,7 @@ export class RedditClient {
    *
    * @returns {SubredditLeaderboard} Leaderboard for the given subreddit.
    */
-  getSubredditLeaderboard(subredditId: string): Promise<SubredditLeaderboard> {
+  getSubredditLeaderboard(subredditId: T5): Promise<SubredditLeaderboard> {
     return getSubredditLeaderboard(subredditId);
   }
 
@@ -1651,7 +1649,7 @@ export class RedditClient {
    *
    * @returns {SubredditStyles} Styles for the given subreddit.
    */
-  getSubredditStyles(subredditId: string): Promise<SubredditStyles> {
+  getSubredditStyles(subredditId: T5): Promise<SubredditStyles> {
     return getSubredditStyles(subredditId);
   }
 

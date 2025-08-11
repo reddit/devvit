@@ -5,14 +5,14 @@ import {
   type ModActionData as ProtosModActionData,
 } from '@devvit/protos';
 import { context } from '@devvit/server';
-import { T5 } from '@devvit/shared-types/tid.js';
+import { type T1, T2, type T3, T5 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 import { getRedditApiPlugins } from '../plugin.js';
 import { User } from './User.js';
 
 export type SubredditData = {
-  id?: string | undefined;
+  id?: T5 | undefined;
   name?: string | undefined;
   displayName?: string | undefined;
   communityIcon?: string | undefined;
@@ -78,18 +78,18 @@ export type Participant = {
   isParticipant?: boolean | undefined;
   isApproved?: boolean | undefined;
   isHidden?: boolean | undefined;
-  id?: number | undefined;
+  id?: T2 | undefined;
   isDeleted?: boolean | undefined;
 };
 
 export type ConversationUserData = {
   /** User ID*/
-  id?: string | undefined;
+  id?: T2 | undefined;
   /** Username */
   name?: string | undefined;
   /** Recent comments */
   recentComments: {
-    [id: string]: {
+    [id: T1]: {
       comment?: string | undefined;
       date?: string | undefined;
       permalink?: string | undefined;
@@ -98,7 +98,7 @@ export type ConversationUserData = {
   };
   /** Recent posts */
   recentPosts: {
-    [id: string]: {
+    [id: T3]: {
       date?: string | undefined;
       permalink?: string | undefined;
       title?: string | undefined;
@@ -202,7 +202,7 @@ export type ConversationData = {
   subreddit?:
     | {
         displayName?: string | undefined;
-        id?: string | undefined;
+        id?: T5 | undefined;
       }
     | undefined;
   /**
@@ -274,7 +274,7 @@ export type ModActionData = {
   author?:
     | {
         /** User id  */
-        id?: number | undefined;
+        id?: number | undefined; // to-do: how could this possible be number?
         /** User name */
         name?: string | undefined;
         isMod?: boolean | undefined;
@@ -319,7 +319,7 @@ export type UnreadCountResponse = {
 };
 
 type ParticipantSubreddit = {
-  id: string;
+  id: T5;
   name: string;
 };
 
@@ -334,7 +334,7 @@ export type GetConversationsResponse = {
    * Conversations key-value map
    */
   conversations: { [id: string]: ConversationData };
-  viewerId?: string | undefined;
+  viewerId?: T2 | undefined;
   /**
    * Array of conversation ids, ordered by the sort parameter specified in {@link GetConversationsRequest}.
    */
@@ -430,7 +430,7 @@ export class ModMailService {
 
     return {
       conversations,
-      viewerId: response.viewerId,
+      viewerId: response.viewerId ? T2(response.viewerId) : undefined,
       conversationIds: response.conversationIds,
     };
   }
@@ -466,7 +466,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: response.modActions,
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -488,7 +488,8 @@ export class ModMailService {
 
     const { subreddits } = await client.Subreddits({}, this.#metadata);
 
-    return subreddits;
+    // to-do: what is key?
+    return subreddits as { [key: string]: SubredditData };
   }
 
   /**
@@ -551,7 +552,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: response.modActions,
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -576,12 +577,12 @@ export class ModMailService {
   async createModDiscussionConversation(params: {
     subject: string;
     bodyMarkdown: string;
-    subredditId: string;
+    subredditId: T5;
   }): Promise<string> {
     return createModmailConversation({
       subject: params.subject,
       bodyMarkdown: params.bodyMarkdown,
-      subredditId: T5(params.subredditId),
+      subredditId: params.subredditId,
       isInternal: true,
       participantType: 'MODERATOR',
       conversationType: 'INTERNAL',
@@ -607,12 +608,12 @@ export class ModMailService {
   async createModInboxConversation(params: {
     subject: string;
     bodyMarkdown: string;
-    subredditId: string;
+    subredditId: T5;
   }): Promise<string> {
     return createModmailConversation({
       subject: params.subject,
       bodyMarkdown: params.bodyMarkdown,
-      subredditId: T5(params.subredditId),
+      subredditId: params.subredditId,
       isInternal: false,
       participantType: 'PARTICIPANT_USER',
       conversationType: 'SR_USER',
@@ -639,7 +640,7 @@ export class ModMailService {
   async createModNotification(params: {
     subject: string;
     bodyMarkdown: string;
-    subredditId: string;
+    subredditId: T5;
   }): Promise<string> {
     let notificationSubject = params.subject;
 
@@ -650,7 +651,7 @@ export class ModMailService {
     return createModmailConversation({
       subject: notificationSubject,
       bodyMarkdown: params.bodyMarkdown,
-      subredditId: T5(params.subredditId),
+      subredditId: params.subredditId,
       isInternal: false,
       participantType: 'PARTICIPANT_USER',
       conversationType: 'SR_USER',
@@ -697,7 +698,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: {},
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -848,7 +849,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: response.modActions,
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -878,7 +879,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: response.modActions,
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -950,7 +951,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: response.modActions,
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -982,7 +983,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: response.modActions,
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -1016,7 +1017,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: response.modActions,
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -1046,7 +1047,7 @@ export class ModMailService {
         protoMessages: response.messages,
         protoModActions: response.modActions,
       }),
-      user: response.user,
+      user: response.user as ConversationUserData,
     };
   }
 
@@ -1083,7 +1084,10 @@ export class ModMailService {
   async getUserConversations(conversationId: string): Promise<ConversationUserData> {
     const client = getRedditApiPlugins().NewModmail;
 
-    return await client.UserConversations({ conversationId }, this.#metadata);
+    return (await client.UserConversations(
+      { conversationId },
+      this.#metadata
+    )) as ConversationUserData;
   }
 
   #transformConversationData({
@@ -1100,7 +1104,7 @@ export class ModMailService {
       state: R2_TO_MODMAIL_CONVERSATION_STATE[protoConversation.state!],
       messages: this.#getConversationMessages(protoConversation, protoMessages),
       modActions: this.#getConversationModActions(protoConversation, protoModActions),
-    };
+    } as ConversationData;
   }
 
   #getConversationMessages(
@@ -1115,7 +1119,7 @@ export class ModMailService {
     for (const messageId of messageIds) {
       const protoMessage = protoMessages[messageId];
       if (protoMessage) {
-        messages[messageId] = protoMessage;
+        messages[messageId] = protoMessage as MessageData;
       }
     }
 

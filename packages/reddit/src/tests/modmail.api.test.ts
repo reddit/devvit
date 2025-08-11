@@ -160,7 +160,7 @@ describe('ModMail API', () => {
           msg_1: getFakeMessageData('msg_1'),
         },
         conversationIds: [conversationId],
-        viewerId: 'viewer_fakeId',
+        viewerId: 't2_123',
       }));
     });
 

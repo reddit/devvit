@@ -645,7 +645,7 @@ async function listingProtosToUsers(
 }
 
 /** @internal */
-async function getUsernameById(id: string): Promise<string | undefined> {
+async function getUsernameById(id: T2): Promise<string | undefined> {
   const client = getRedditApiPlugins().Users;
 
   const response = await client.UserDataByAccountIds({ ids: id }, context.metadata);

@@ -30,8 +30,8 @@ export type CommentSort =
   | 'live';
 
 export type GetCommentsOptions = {
-  postId: string;
-  commentId?: string | undefined;
+  postId: T3;
+  commentId?: T1 | undefined;
   depth?: number;
   pageSize?: number;
   limit?: number;
@@ -115,7 +115,7 @@ export class Comment {
     assertNonNull(data.subreddit, 'Comment is missing subreddit name');
     assertNonNull(data.subredditId, 'Comment is missing subreddit id');
 
-    this.#id = T1(`t1_${data.id}`);
+    this.#id = `t1_${data.id}`;
     this.#authorId = data.authorFullname ? T2(data.authorFullname) : undefined;
     this.#authorName = data.author;
     this.#body = data.body;
@@ -356,11 +356,8 @@ export class Comment {
     return Comment.delete(this.id);
   }
 
-  async edit(options: EditCommentOptions): Promise<this> {
-    const newComment = await Comment.edit({
-      id: this.id,
-      ...options,
-    });
+  async edit(opts: Readonly<EditCommentOptions>): Promise<this> {
+    const newComment = await Comment.edit({ id: this.id, ...opts });
 
     this.#body = newComment.body;
     this.#edited = newComment.edited;
@@ -391,11 +388,8 @@ export class Comment {
     this.#locked = false;
   }
 
-  async reply(options: ReplyToCommentOptions): Promise<Comment> {
-    return Comment.submit({
-      id: this.id,
-      ...options,
-    });
+  async reply(opts: Readonly<ReplyToCommentOptions>): Promise<Comment> {
+    return Comment.submit({ id: this.id, ...opts });
   }
 
   async getAuthor(): Promise<User | undefined> {
@@ -437,8 +431,8 @@ export class Comment {
    * @param options.modNote the reason for removal (maximum 100 characters) (optional)
    * @returns
    */
-  addRemovalNote(options: { reasonId: string; modNote?: string }): Promise<void> {
-    return ModNote.addRemovalNote({ itemIds: [this.#id], ...options });
+  addRemovalNote(opts: { readonly reasonId: string; readonly modNote?: string }): Promise<void> {
+    return ModNote.addRemovalNote({ itemIds: [this.#id], ...opts });
   }
 
   /** @internal */
@@ -463,8 +457,8 @@ export class Comment {
   }
 
   /** @internal */
-  static getComments(options: GetCommentsOptions): Listing<Comment> {
-    const { postId, commentId, ...rest } = options;
+  static getComments(opts: Readonly<GetCommentsOptions>): Listing<Comment> {
+    const { postId, commentId, ...rest } = opts;
     return Comment.#getCommentsListing({
       postId: T3(postId),
       commentId: commentId ? T1(commentId) : undefined,
@@ -473,20 +467,20 @@ export class Comment {
   }
 
   /** @internal */
-  static async edit(options: CommentSubmissionOptions & { id: T1 }): Promise<Comment> {
+  static async edit(opts: Readonly<CommentSubmissionOptions & { id: T1 }>): Promise<Comment> {
     const client = getRedditApiPlugins().LinksAndComments;
 
-    const { id } = options;
+    const { id } = opts;
 
     let richtextString: string | undefined;
-    if ('richtext' in options) {
-      richtextString = richtextToString(options.richtext);
+    if ('richtext' in opts) {
+      richtextString = richtextToString(opts.richtext);
     }
 
     const response = await client.EditUserText(
       {
         thingId: id,
-        text: 'text' in options ? options.text : '',
+        text: 'text' in opts ? opts.text : '',
         richtextJson: richtextString,
         runAs: RunAs.APP,
       },
@@ -794,7 +788,7 @@ export class Comment {
 
   static #buildCommentsTree(
     redditObjects: WrappedRedditObject[] | JsonWrappedComment_WrappedComment[],
-    parentId: string,
+    parentId: T1 | T3,
     options: GetCommentsOptions,
     depthOffset: number = 0
   ): ListingFetchResponse<Comment> {
