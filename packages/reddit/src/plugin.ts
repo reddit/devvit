@@ -72,5 +72,10 @@ export function getRedditApiPlugins(): RedditApiPluginClient {
  * @internal
  */
 export function getUserActionsPlugin(): UserActions {
+  if (!getDevvitConfig().uses(UserActionsDefinition)) {
+    throw new Error(
+      `UserActions plugin is not enabled. To use 'runAs: "USER"', set 'permissions.reddit.asUser: [ "PERMISSION_SCOPE_NAME" ]' in your devvit.json file.`
+    );
+  }
   return (userActionsPlugin ??= getDevvitConfig().use(UserActionsDefinition)!);
 }

@@ -8,6 +8,7 @@ import type { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/prot
 import { Block, DevvitPostData, UIResponse } from '@devvit/protos';
 import { SetCustomPostPreviewRequest_BodyType } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import { type SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
@@ -24,7 +25,7 @@ import { Loading, type LoadingProps } from '@devvit/splash/loading.js';
 import { type SplashProps } from '@devvit/splash/splash.js';
 import { backgroundUrl } from '@devvit/splash/utils/assets.js';
 
-import { RunAs, type UserGeneratedContent } from '../common.js';
+import { assertUserScope, RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
@@ -1118,6 +1119,10 @@ export class Post {
     const client =
       runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
 
+    if (runAsType === RunAs.USER) {
+      assertUserScope(Scope.SUBMIT_POST);
+    }
+
     const rsp = await client.Submit(
       {
         kind: 'kind' in opts ? opts.kind : 'url' in opts ? 'link' : 'self',
@@ -1156,6 +1161,9 @@ export class Post {
 
     if (runAsType === RunAs.USER && !opts.userGeneratedContent) {
       throw Error('userGeneratedContent must be set when `runAs` is `USER`');
+    }
+    if (runAsType === RunAs.USER) {
+      assertUserScope(Scope.SUBMIT_POST);
     }
 
     const config = getConfig();
@@ -1213,6 +1221,10 @@ export class Post {
     const client =
       runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
     const { postId, subredditName, ...rest } = opts;
+
+    if (runAsType === RunAs.USER) {
+      assertUserScope(Scope.SUBMIT_POST);
+    }
 
     const rsp = await client.Submit(
       {

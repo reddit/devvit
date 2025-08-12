@@ -5,12 +5,13 @@ import type {
   RedditObject,
   WrappedRedditObject,
 } from '@devvit/protos';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import { asTid, isT1, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
-import { RunAs } from '../common.js';
+import { assertUserScope, RunAs } from '../common.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
@@ -564,6 +565,10 @@ export class Comment {
     const runAsType = RunAs[runAs];
     const client =
       runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
+
+    if (runAsType === RunAs.USER) {
+      assertUserScope(Scope.SUBMIT_COMMENT);
+    }
     const { id } = options;
 
     let richtextString: string | undefined;

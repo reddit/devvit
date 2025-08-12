@@ -4,7 +4,7 @@ import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.j
 import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
 import { describe, expect, test, vi } from 'vitest';
 
-import { RunAs } from '../common.js';
+import { assertUserScope, RunAs } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { GalleryMediaStatus, Post } from '../models/Post.js';
 import { RedditClient } from '../RedditClient.js';
@@ -16,6 +16,17 @@ vi.mock('../plugin.js', () => {
   return {
     getRedditApiPlugins: () => redditApiPlugins,
     getUserActionsPlugin: () => userActionsPlugin,
+  };
+});
+
+vi.mock('../common.js', () => {
+  return {
+    assertUserScope: vi.fn(),
+    RunAs: {
+      APP: 0,
+      USER: 1,
+      UNSPECIFIED: 2,
+    },
   };
 });
 
@@ -244,6 +255,9 @@ describe('Post API', () => {
         spyPlugin.mockImplementationOnce(async () => ({
           json: { data: { id: 'post' }, errors: [] },
         }));
+
+        const mockAssertUserScope = vi.mocked(assertUserScope);
+        mockAssertUserScope.mockImplementation(() => {});
 
         vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
 
