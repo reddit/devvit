@@ -8,14 +8,28 @@ import React from 'react';
 export default function IntroTilePanel({ tiles, gap = '2.5rem' }) {
   return (
     <div style={{ padding: '0 2.5vw' }}>
-      <div className="row" style={{ marginBottom: '1.5rem', gap, display: 'flex' }}>
+      <div
+        className="row"
+        style={{
+          marginBottom: '1.5rem',
+          gap,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}
+      >
         {tiles.map((tile, i) => {
           const isImageLeft = tile.imageSide === 'left';
           return (
             <a
               key={tile.title}
               href={tile.href}
-              style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}
+              style={{
+                textDecoration: 'none',
+                color: 'inherit',
+                flex: '1 1 200px',
+                maxWidth: '450px',
+              }}
               aria-label={tile.ariaLabel || `Go to ${tile.title}`}
             >
               <div
@@ -31,7 +45,7 @@ export default function IntroTilePanel({ tiles, gap = '2.5rem' }) {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'flex-start',
-                  padding: '1.2rem',
+                  padding: '1.2rem 0.8rem',
                   maxWidth: '100%',
                 }}
               >
@@ -41,10 +55,8 @@ export default function IntroTilePanel({ tiles, gap = '2.5rem' }) {
                     alt={tile.alt || tile.title}
                     style={{
                       position: 'relative',
-                      width: 110,
-                      height: 110,
-                      maxWidth: '100%',
-                      maxHeight: '100%',
+                      width: 88,
+                      height: 88,
                       objectFit: 'contain',
                       opacity: 0.8,
                       zIndex: 1,
@@ -52,8 +64,7 @@ export default function IntroTilePanel({ tiles, gap = '2.5rem' }) {
                       marginRight: '1.5rem',
                       background: 'none',
                       ...(tile.imageFlip ? { transform: 'scaleX(-1)' } : {}),
-                      display: 'block',
-                      margin: 'auto',
+                      flexShrink: 0,
                     }}
                   />
                 )}
@@ -63,18 +74,22 @@ export default function IntroTilePanel({ tiles, gap = '2.5rem' }) {
                     zIndex: 2,
                     color: tile.textColor,
                     fontWeight: 'bold',
-                    fontSize: 'clamp(1.1rem, 2vw, 2rem)',
+                    fontSize: 'clamp(1.1rem, 3vw, 1.5rem)',
                     borderRadius: 8,
                     padding: '0.5em 1em',
-                    display: 'inline-block',
-                    maxWidth: 320,
-                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    flex: 1,
+                    minWidth: 0,
                     textAlign: tile.textAlign || (isImageLeft ? 'right' : 'left'),
                     margin: 0,
                     ...(isImageLeft ? { marginRight: '1.5rem' } : { marginLeft: '1.5rem' }),
                     background: 'none',
                     overflow: 'hidden',
-                    whiteSpace: 'normal',
+                    whiteSpace: 'nowrap',
+                    wordBreak: 'keep-all',
+                    hyphens: 'none',
+                    textOverflow: 'ellipsis',
                   }}
                 >
                   {tile.title}
@@ -85,10 +100,8 @@ export default function IntroTilePanel({ tiles, gap = '2.5rem' }) {
                     alt={tile.alt || tile.title}
                     style={{
                       position: 'relative',
-                      width: 110,
-                      height: 110,
-                      maxWidth: '100%',
-                      maxHeight: '100%',
+                      width: 88,
+                      height: 88,
                       objectFit: 'contain',
                       opacity: 0.8,
                       zIndex: 1,
@@ -96,8 +109,7 @@ export default function IntroTilePanel({ tiles, gap = '2.5rem' }) {
                       marginLeft: '1.5rem',
                       background: 'none',
                       ...(tile.imageFlip ? { transform: 'scaleX(-1)' } : {}),
-                      display: 'block',
-                      margin: 'auto',
+                      flexShrink: 0,
                     }}
                   />
                 )}
