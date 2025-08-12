@@ -6,6 +6,7 @@ import type {
 } from '@devvit/protos';
 import type { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos';
 import { Block, DevvitPostData, UIResponse } from '@devvit/protos';
+import { SetCustomPostPreviewRequest_BodyType } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import { type SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
@@ -19,7 +20,7 @@ import type {
 import { defaultPostEntry } from '@devvit/shared-types/schemas/constants.js';
 import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
 import { isT3, T2, T3, T5 } from '@devvit/shared-types/tid.js';
-import { Loading } from '@devvit/splash/loading.js';
+import { Loading, type LoadingProps } from '@devvit/splash/loading.js';
 import { type SplashProps } from '@devvit/splash/splash.js';
 import { backgroundUrl } from '@devvit/splash/utils/assets.js';
 
@@ -903,10 +904,27 @@ export class Post {
     const prev = await Post.getDevvitPostData(this.id);
     const config = getConfig();
     const entry = getEntry(config, opts?.entry);
-    await Post.setPostData({
-      postId: this.id,
-      postData: { ...prev, splash: SplashPostData(config, entry, opts, this.title) },
-    });
+    const splash = SplashPostData(config, entry, opts, this.title);
+    const [, richtextJson] = await Promise.all([
+      Post.setPostData({ postId: this.id, postData: { ...prev, splash } }),
+      renderLoadingAsRichTextJson(
+        {
+          appDisplayName: splash.appDisplayName,
+          backgroundUri: splash.backgroundUri,
+          height: entry.height,
+        },
+        context.metadata
+      ),
+    ]);
+    const client = getRedditApiPlugins().LinksAndComments;
+    await client.SetCustomPostPreview(
+      {
+        thingId: this.id,
+        bodyType: SetCustomPostPreviewRequest_BodyType.BLOCKS,
+        blocksRenderContent: richtextJson,
+      },
+      context.metadata
+    );
   }
 
   /**
@@ -1143,16 +1161,14 @@ export class Post {
     const config = getConfig();
     const entry = getEntry(config, opts.splash?.entry);
     const splash = SplashPostData(config, entry, opts.splash, opts.title);
-
-    const handler = new BlocksHandler(() =>
-      Loading({
+    const richtextJson = await renderLoadingAsRichTextJson(
+      {
         appDisplayName: splash.appDisplayName,
         backgroundUri: splash.backgroundUri,
         height: entry.height,
-      })
+      },
+      this.#metadata
     );
-    const { blocks } = UIResponse.fromJSON(await handler.handle({ events: [] }, this.#metadata));
-    const encodedCached = Block.encode(blocks!).finish();
 
     const richtextFallback = opts.textFallback
       ? getCustomPostRichTextFallback(opts.textFallback)
@@ -1173,7 +1189,7 @@ export class Post {
       {
         kind: 'custom',
         sr: opts.subredditName,
-        richtextJson: Buffer.from(encodedCached).toString('base64'),
+        richtextJson,
         richtextFallback,
         flairId: opts.flairId,
         flairText: opts.flairText,
@@ -1790,7 +1806,7 @@ function SplashPostData(
     buttonLabel: opts?.buttonLabel,
     description: opts?.description,
     entry: entry.name,
-    title: opts?.title ?? title,
+    title: opts?.heading ?? title,
   };
 }
 
@@ -1802,4 +1818,14 @@ function postFromSubmitResponse(rsp: Readonly<SubmitResponse>): Promise<Post> {
     );
 
   return Post.getById(`t3_${rsp.json.data.id}`);
+}
+
+async function renderLoadingAsRichTextJson(
+  props: Readonly<LoadingProps>,
+  meta: Readonly<Metadata>
+): Promise<string> {
+  const handler = new BlocksHandler(() => Loading(props));
+  const { blocks } = UIResponse.fromJSON(await handler.handle({ events: [] }, meta));
+  const encodedCached = Block.encode(blocks!).finish();
+  return Buffer.from(encodedCached).toString('base64');
 }

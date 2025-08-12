@@ -1,4 +1,6 @@
 import type { Metadata } from '@devvit/protos';
+// to-do: inline a copy here. this is the only dependency on @devvit/public-api
+//        and it's a functional one, not a devDependencies.
 import { getContextFromMetadata } from '@devvit/public-api/devvit/internals/context.js';
 import { type BaseContext, T2, T3, T5 } from '@devvit/shared';
 import { Header, headerPrefix } from '@devvit/shared-types/Header.js';

@@ -610,6 +610,9 @@ describe('Post API', () => {
           json: { data: { things: [{ kind: 'post' }] }, errors: [] },
         }));
 
+        const spyPreviewPlugin = redditApiPlugins.LinksAndComments.SetCustomPostPreview;
+        spyPreviewPlugin.mockImplementationOnce(async () => ({}));
+
         await runWithTestContext(async () => {
           await mockedPost.setSplash({ appDisplayName: 'appDisplayName' });
 
@@ -628,6 +631,82 @@ describe('Post API', () => {
                   title: 'My First Post',
                 },
               },
+            },
+            context.metadata
+          );
+
+          expect(spyPreviewPlugin).toHaveBeenCalledWith(
+            {
+              thingId: 't3_qwerty',
+              bodyType: 1,
+              blocksRenderContent:
+                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
+            },
+            context.metadata
+          );
+        });
+      });
+
+      test('sets custom post splash with rendered preview', async () => {
+        const selftext =
+          '# DX_Bundle:\n\n    Gm85Mzk0OTZkZi00NDBmLTQ1NDUtOTFiNC02MjM0ODczNThlODUudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYiuAQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErEBCjgvZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdBIKUmVuZGVyUG9zdCozZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLlJlbmRlclBvc3RSZXF1ZXN0MjRkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlc3BvbnNlEqEBCj8vZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdENvbnRlbnQSEVJlbmRlclBvc3RDb250ZW50KiRkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlcXVlc3QyJWRldnZpdC51aS5ibG9ja19raXQudjFiZXRhLlVJUmVzcG9uc2USowEKQC9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC9SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuIBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpgEKNi9kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXIvSGFuZGxlVUlFdmVudBINSGFuZGxlVUlFdmVudCotZGV2dml0LnVpLmV2ZW50cy52MWFscGhhLkhhbmRsZVVJRXZlbnRSZXF1ZXN0Mi5kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlc3BvbnNlGg5VSUV2ZW50SGFuZGxlcjJQEg4KBG5vZGUSBjIyLjUuMRIcCg5AZGV2dml0L3Byb3RvcxIKMC4xMS4xLWRldhIgChJAZGV2dml0L3B1YmxpYy1hcGkSCjAuMTEuMS1kZXY=\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkUKQwo+CAEqEhIHCgUNAADIQhoHCgUNAADIQhomEiQIAhIaCAIaFhoUChBBIGN1c3RvbSBwb3N0ISEhWAEiBAgBEAEQwAI=\n\n# DX_RichtextFallback:\n\n    This is a text fallback';
+
+        const mockedPost = new Post({ ...defaultPostData, selftext });
+
+        const spyGql = vi.spyOn(GraphQL, 'query');
+        spyGql.mockImplementationOnce(async () => ({
+          data: {
+            postInfoById: {
+              devvit: {
+                postData: '{"developerData":{"riddle":"hello"}}',
+              },
+            },
+          },
+          errors: [],
+        }));
+
+        const spyPlugin = redditApiPlugins.LinksAndComments.EditCustomPost;
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { things: [{ kind: 'post' }] }, errors: [] },
+        }));
+
+        const spyPreviewPlugin = redditApiPlugins.LinksAndComments.SetCustomPostPreview;
+        spyPreviewPlugin.mockImplementationOnce(async () => ({}));
+
+        await runWithTestContext(async () => {
+          await mockedPost.setSplash({
+            appDisplayName: 'Test App',
+            appIconUri: 'https://example.com/icon.png',
+            backgroundUri: 'https://example.com/bg.jpg',
+            buttonLabel: 'Click Me',
+            description: 'Test description',
+          });
+
+          expect(spyPlugin).toHaveBeenCalledWith(
+            {
+              thingId: 't3_qwerty',
+              postData: {
+                developerData: { riddle: 'hello' },
+                splash: {
+                  appDisplayName: 'Test App',
+                  appIconUri: 'https://example.com/icon.png',
+                  backgroundUri: 'https://example.com/bg.jpg',
+                  buttonLabel: 'Click Me',
+                  description: 'Test description',
+                  entry: 'default',
+                  title: 'My First Post',
+                },
+              },
+            },
+            context.metadata
+          );
+
+          expect(spyPreviewPlugin).toHaveBeenCalledWith(
+            {
+              thingId: 't3_qwerty',
+              bodyType: 1,
+              blocksRenderContent:
+                'Gl4KXApXCAQqEhIHCgUNAADIQhoHCgUNAADIQho/Kj0KGmh0dHBzOi8vZXhhbXBsZS5jb20vYmcuanBnEIAQGIAIIhdUZXN0IEFwcCBsb2FkaW5nIHNjcmVlbigCEIAE',
             },
             context.metadata
           );

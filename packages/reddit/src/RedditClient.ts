@@ -522,12 +522,10 @@ export class RedditClient {
    * @returns A Promise that resolves to a Comment object.
    * @example
    * ```ts
-   * import { RunAs } from '@devvit/public-api';
-   *
    * const comment = await reddit.submitComment({
    *  id: 't1_1qgif',
    *  text: 'Hello world!',
-   *  runAs: RunAs.APP,
+   *  runAs: 'APP',
    * })
    * ```
    */
