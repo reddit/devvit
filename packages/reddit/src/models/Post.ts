@@ -6,16 +6,22 @@ import type {
 } from '@devvit/protos';
 import type { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos';
 import { Block, DevvitPostData, UIResponse } from '@devvit/protos';
-import type { SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
-import type { Height } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import { type SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
+import type {
+  AppConfig,
+  AppPostEntrypointConfig,
+} from '@devvit/shared-types/schemas/config-file.v1.js';
+import { defaultPostEntry } from '@devvit/shared-types/schemas/constants.js';
+import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
 import { isT3, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { Loading } from '@devvit/splash/loading.js';
 import { type SplashProps } from '@devvit/splash/splash.js';
+import { backgroundUrl } from '@devvit/splash/utils/assets.js';
 
 import { RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
@@ -127,13 +133,57 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
 
 export type SubmitSelfPostOptions = CommonSubmitPostOptions & PostTextOptions;
 
-export type SubmitCustomPostSplashOptions = SplashProps;
+export type SubmitCustomPostSplashOptions = Omit<
+  SplashProps,
+  'appDisplayName' | 'backgroundUri' | 'entryUri' | 'height'
+> & {
+  /**
+   * Application name.
+   *
+   * @example `'Comment Mop'`.
+   */
+  appDisplayName?: string;
+  /**
+   * Media directory relative background image URL or data URI.
+   *
+   * @example `'background.png'`.
+   */
+  backgroundUri?: string;
+  /**
+   * The loading screen entrypoint name. Must correspond to a `post.entrypoints`
+   * key in the app's `devvit.json`.
+   *
+   * @default The default `devvit.json` entrypoint (`'default'`).
+   *
+   * @example Only `'default'` and `'splash'` are valid entries given the
+   * following `devvit.json` configuration:
+   * ```json
+   * {
+   *   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+   *   "name": "example",
+   *   "post": {
+   *     "entrypoints": {
+   *       "default": {"entry": "game.html"},
+   *       "splash": {"entry": "splash.html"}
+   *     }
+   *   }
+   * }
+   * ```
+   */
+  entry?: string;
+};
 
 export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
+  /**
+   * Arbitrary data to associate to the post. Limited to two kilobytes.
+   *
+   * @see {@link PostData}.
+   */
   postData?: PostData;
+  /** Content to show when rendered on `https://old.reddit.com`. */
   textFallback?: CustomPostTextFallbackOptions;
   userGeneratedContent?: UserGeneratedContent;
-  splash: SubmitCustomPostSplashOptions;
+  splash?: SubmitCustomPostSplashOptions;
 };
 
 export type CommonSubmitPostOptions = {
@@ -849,10 +899,14 @@ export class Post {
    * await post.setSplash({ appDisplayName: "Pixelary" });
    * ```
    */
-  async setSplash(opts: Readonly<SubmitCustomPostSplashOptions>): Promise<void> {
+  async setSplash(opts: Readonly<SubmitCustomPostSplashOptions> | undefined): Promise<void> {
     const prev = await Post.getDevvitPostData(this.id);
-    const postData = { ...prev, splash: SplashPostData(opts, this.title) };
-    await Post.setPostData({ postId: this.id, postData });
+    const config = getConfig();
+    const entry = getEntry(config, opts?.entry);
+    await Post.setPostData({
+      postId: this.id,
+      postData: { ...prev, splash: SplashPostData(config, entry, opts, this.title) },
+    });
   }
 
   /**
@@ -1085,12 +1139,24 @@ export class Post {
     if (runAsType === RunAs.USER && !opts.userGeneratedContent) {
       throw Error('userGeneratedContent must be set when `runAs` is `USER`');
     }
-    const handler = new BlocksHandler(() => Loading(opts.splash));
+
+    const config = getConfig();
+    const entry = getEntry(config, opts.splash?.entry);
+    const splash = SplashPostData(config, entry, opts.splash, opts.title);
+
+    const handler = new BlocksHandler(() =>
+      Loading({
+        appDisplayName: splash.appDisplayName,
+        backgroundUri: splash.backgroundUri,
+        height: entry.height,
+      })
+    );
     const { blocks } = UIResponse.fromJSON(await handler.handle({ events: [] }, this.#metadata));
     const encodedCached = Block.encode(blocks!).finish();
 
-    const { textFallback, ...sanitizedOptions } = opts;
-    const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
+    const richtextFallback = opts.textFallback
+      ? getCustomPostRichTextFallback(opts.textFallback)
+      : '';
 
     const userGeneratedContent = opts.userGeneratedContent
       ? {
@@ -1101,7 +1167,7 @@ export class Post {
 
     const postData: DevvitPostData = {
       developerData: opts.postData,
-      splash: SplashPostData(opts.splash, opts.title),
+      splash,
     };
     const rsp = await client.SubmitCustomPost(
       {
@@ -1109,7 +1175,12 @@ export class Post {
         sr: opts.subredditName,
         richtextJson: Buffer.from(encodedCached).toString('base64'),
         richtextFallback,
-        ...sanitizedOptions,
+        flairId: opts.flairId,
+        flairText: opts.flairText,
+        nsfw: opts.nsfw,
+        sendreplies: opts.sendreplies,
+        spoiler: opts.spoiler,
+        title: opts.title,
         userGeneratedContent,
         runAs: runAsType,
         postData,
@@ -1684,6 +1755,45 @@ async function getThumbnailV2(opts: { id: T3 }): Promise<EnrichedThumbnail | und
   };
 }
 
+function getConfig(): AppConfig {
+  const config = (devvit as DevvitWorkerGlobal)?.appConfig;
+  if (!config) throw Error('no config');
+  return config;
+}
+
+function getEntry(
+  config: Readonly<AppConfig>,
+  entry: string | undefined
+): Readonly<AppPostEntrypointConfig> {
+  entry ??= defaultPostEntry;
+  const entrypoint = config.post?.entrypoints[entry];
+  if (!entrypoint) throw Error(`missing "${entry}" in \`devvit.json\` \`post.entrypoints\``);
+  return entrypoint;
+}
+
+function SplashPostData(
+  config: Readonly<AppConfig>,
+  entry: Readonly<AppPostEntrypointConfig>,
+  opts: Readonly<SubmitCustomPostSplashOptions> | undefined,
+  title: string
+): SplashPostData & { appDisplayName: string; backgroundUri: string } {
+  // Align to `blocks.template.tsx`. The "preview" or loading screen is rendered
+  // at post time so it can't float to whatever the current code default is. The
+  // recorded post data must record the current state for `LoadingProps` and no
+  // defaults for anything else.
+  return {
+    // Loading.
+    appDisplayName: opts?.appDisplayName ?? config.name,
+    backgroundUri: opts?.backgroundUri ?? backgroundUrl,
+
+    appIconUri: opts?.appIconUri,
+    buttonLabel: opts?.buttonLabel,
+    description: opts?.description,
+    entry: entry.name,
+    title: opts?.title ?? title,
+  };
+}
+
 function postFromSubmitResponse(rsp: Readonly<SubmitResponse>): Promise<Post> {
   if (!rsp.json?.data?.id || rsp.json.errors?.length)
     throw Error(
@@ -1692,22 +1802,4 @@ function postFromSubmitResponse(rsp: Readonly<SubmitResponse>): Promise<Post> {
     );
 
   return Post.getById(`t3_${rsp.json.data.id}`);
-}
-
-function SplashPostData(
-  opts: Readonly<SubmitCustomPostSplashOptions>,
-  title: string | undefined
-): SplashPostData {
-  return {
-    appDisplayName: opts.appDisplayName,
-    appIconUri: opts.appIconUri,
-    backgroundUri: opts.backgroundUri,
-    buttonLabel: opts.buttonLabel,
-    description: opts.description,
-    // to-do: use entry _name_ and fish out URL in Splash component using
-    //        entrypoints recorded in LinkedBundle.
-    entryUri: opts.entryUri,
-    height: opts.height === 'tall' ? (2 satisfies Height.TALL) : (1 satisfies Height.REGULAR),
-    title: opts.title ?? title,
-  };
 }

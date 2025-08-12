@@ -1,6 +1,7 @@
 import { context } from '@devvit/server';
 import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
+import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
 import { describe, expect, test, vi } from 'vitest';
 
 import { RunAs } from '../common.js';
@@ -92,6 +93,46 @@ describe('Post API', () => {
       },
     ],
   };
+
+  beforeEach(() => {
+    globalThis.devvit ??= {};
+    (globalThis.devvit as DevvitWorkerGlobal).appConfig ??= {
+      schema: 'v1',
+      name: '',
+      permissions: {
+        http: {
+          enable: false,
+          domains: [],
+        },
+        media: false,
+        menu: false,
+        payments: false,
+        realtime: false,
+        redis: false,
+        reddit: {
+          enable: false,
+          scope: 'moderator',
+          asUser: [],
+        },
+        settings: false,
+        triggers: false,
+      },
+      post: {
+        dir: '',
+        entrypoints: {
+          default: {
+            entry: '',
+            name: 'default',
+            height: 'tall',
+          },
+        },
+      },
+      json: { name: '' },
+    };
+  });
+  afterEach(() => {
+    delete (globalThis as { devvit?: DevvitWorkerGlobal }).devvit;
+  });
 
   describe('RedditClient', () => {
     test('Post matches JSON snapshot', () => {
@@ -185,10 +226,14 @@ describe('Post API', () => {
 
     describe('submitCustomPost()', () => {
       const commonPostFields = {
+        flairId: undefined,
+        flairText: undefined,
         kind: 'custom',
+        nsfw: undefined,
         richtextJson: '',
+        sendreplies: undefined,
+        spoiler: undefined,
         sr: 'askReddit',
-        subredditName: 'askReddit',
         title: 'My First Post',
       };
 
@@ -213,8 +258,6 @@ describe('Post API', () => {
               backgroundUri: 'backgroundUri',
               buttonLabel: 'buttonLabel',
               description: 'description',
-              entryUri: 'entryUri',
-              height: 'tall',
             },
             runAs: 'USER',
             userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
@@ -228,15 +271,6 @@ describe('Post API', () => {
               richtextFallback: '',
               runAs: RunAs.USER,
               userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
-              splash: {
-                appDisplayName: 'appDisplayName',
-                appIconUri: 'appIconUri',
-                backgroundUri: 'backgroundUri',
-                buttonLabel: 'buttonLabel',
-                description: 'description',
-                entryUri: 'entryUri',
-                height: 'tall',
-              },
               postData: {
                 developerData: { abc: 'def' },
                 splash: {
@@ -245,8 +279,7 @@ describe('Post API', () => {
                   backgroundUri: 'backgroundUri',
                   buttonLabel: 'buttonLabel',
                   description: 'description',
-                  entryUri: 'entryUri',
-                  height: 2,
+                  entry: 'default',
                   title: 'My First Post',
                 },
               },
@@ -314,17 +347,15 @@ describe('Post API', () => {
                 'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
               richtextFallback: 'This is a post with text as a fallback',
               runAs: RunAs.APP,
-              splash: { appDisplayName: 'appDisplayName' },
               postData: {
                 developerData: undefined,
                 splash: {
                   appDisplayName: 'appDisplayName',
                   appIconUri: undefined,
-                  backgroundUri: undefined,
+                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
                   buttonLabel: undefined,
                   description: undefined,
-                  entryUri: undefined,
-                  height: 1,
+                  entry: 'default',
                   title: 'My First Post',
                 },
               },
@@ -368,17 +399,15 @@ describe('Post API', () => {
               richtextFallback:
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               runAs: RunAs.APP,
-              splash: { appDisplayName: 'appDisplayName' },
               postData: {
                 developerData: undefined,
                 splash: {
                   appDisplayName: 'appDisplayName',
                   appIconUri: undefined,
-                  backgroundUri: undefined,
+                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
                   buttonLabel: undefined,
                   description: undefined,
-                  entryUri: undefined,
-                  height: 1,
+                  entry: 'default',
                   title: 'My First Post',
                   userGeneratedContent: undefined,
                 },
@@ -424,21 +453,19 @@ describe('Post API', () => {
               richtextFallback:
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               runAs: RunAs.APP,
-              splash: { appDisplayName: 'appDisplayName' },
               postData: {
                 developerData: undefined,
                 splash: {
                   appDisplayName: 'appDisplayName',
                   appIconUri: undefined,
-                  backgroundUri: undefined,
+                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
                   buttonLabel: undefined,
                   description: undefined,
-                  entryUri: undefined,
-                  height: 1,
+                  entry: 'default',
                   title: 'My First Post',
-                  userGeneratedContent: undefined,
                 },
               },
+              userGeneratedContent: undefined,
             },
             context.metadata
           );
@@ -594,11 +621,10 @@ describe('Post API', () => {
                 splash: {
                   appDisplayName: 'appDisplayName',
                   appIconUri: undefined,
-                  backgroundUri: undefined,
+                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
                   buttonLabel: undefined,
                   description: undefined,
-                  entryUri: undefined,
-                  height: 1,
+                  entry: 'default',
                   title: 'My First Post',
                 },
               },

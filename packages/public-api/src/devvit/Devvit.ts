@@ -731,6 +731,10 @@ export class Devvit extends Actor {
 
     globalThis.devvit ??= {};
     globalThis.devvit.assets ??= config.assets;
+    // __devvit__ is initialized by ESBuildPack for Webbit apps only.
+    // @ts-expect-error no type.
+    globalThis.devvit.appConfig ??= globalThis.__devvit__?.config;
+
     Devvit.#webViewAssets = config.webviewAssets ?? {};
 
     for (const fullName in Devvit.#uses) {
