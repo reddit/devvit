@@ -1,6 +1,5 @@
 import type { JsonObject } from '@devvit/shared-types/json.js';
-
-import type { Form, FormValues } from './form.js';
+import type { Form, FormValues } from '@devvit/shared-types/shared/form.js';
 
 /**
  * Response format that can be returned from menu action handlers and form handlers.

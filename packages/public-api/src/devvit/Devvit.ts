@@ -8,6 +8,7 @@ import {
   assertRequestedFetchDomainsLimit,
   normalizeDomains,
 } from '@devvit/shared-types/fetch-domains.js';
+import type {} from '@devvit/shared-types/shared/devvit-worker-global.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { assertValidFormFields } from '../apis/ui/helpers/assertValidFormFields.js';
@@ -18,7 +19,6 @@ import type {
   CustomPostType,
   Form,
   FormDefinition,
-  FormField,
   FormFunction,
   FormOnSubmitEventHandler,
   FormToFormValues,
@@ -1119,29 +1119,5 @@ declare global {
     type Props<T extends {} = {}> = T & { children?: Devvit.ElementChildren };
 
     type ComponentFunction = (props: JSX.Props, context: Devvit.Context) => JSX.Element;
-  }
-}
-
-declare global {
-  namespace globalThis {
-    /**
-     * Webbit apps have two copies of the Devvit singleton in two
-     * bundles (concatenated JavaScript): 1) blocks.template.ts
-     * 2) `@devvit/*` package dependencies on `@devvit/public-api`. Only the first
-     * is actually constructed by the classic bootstrap. The second is referenced
-     * indirectly by API calls like BlocksHandler but static state is never
-     * initialized. Isolate that state here.
-     * @internal
-     */
-    // eslint-disable-next-line no-var
-    var devvit:
-      | {
-          assets?: AssetMap;
-          settings?: {
-            app?: FormField[] | undefined;
-            installation?: FormField[] | undefined;
-          };
-        }
-      | undefined;
   }
 }
