@@ -31,7 +31,6 @@ const testBridgeCtx: Readonly<BridgeContext> = {
   webViewContext: testContext,
   devvitDebug: 'hello',
   client: Client.SHREDDIT,
-  appPermissionState: undefined,
 };
 
 describe('get context', () => {
