@@ -62,7 +62,7 @@ const sidebars: SidebarsConfig = {
                 'capabilities/server/scheduler',
                 'capabilities/server/triggers',
                 'capabilities/server/media-uploads',
-                'capabilities/server/secrets-storage',
+                'capabilities/server/settings-and-secrets',
                 'capabilities/server/http-fetch',
                 {
                   type: 'category',
