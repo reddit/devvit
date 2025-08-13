@@ -1,4 +1,4 @@
-# Building community games
+# Building Community Games
 
 Reddit offers a unique platform for a new category of social games. This guide will help you create engaging community games that thrive in Reddit's ecosystem with lessons from some of the games we've seen so far.
 

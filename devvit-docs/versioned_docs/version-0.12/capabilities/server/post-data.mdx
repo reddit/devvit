@@ -2,7 +2,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Post data
+# Post Data
 
 You can attach custom data to posts when creating them and update this data at runtime using the `postData` capability. This enables dynamic, stateful experiences available on posts without additional redis calls. Post data is scoped to the post, not users.
 
@@ -25,13 +25,13 @@ When creating a post, include the `postData` parameter with your custom data obj
   const post = await reddit.submitCustomPost({
     subredditName: context.subredditName!,
     title: 'Post with custom data',
+    splash: {
+      appDisplayName: 'Test App',
+    },
     postData: {
       challengeNumber: 42,
       totalGuesses: 0,
       gameState: 'active',
-      splash: {
-        appDisplayName: 'Test App',
-      },
       pixels: [
         [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0],

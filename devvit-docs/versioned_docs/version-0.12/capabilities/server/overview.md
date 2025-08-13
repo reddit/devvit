@@ -4,11 +4,11 @@ Devvit offers a wide variety of features that help you integrate your app with R
 
 Below is a brief explanation of all features in this section:
 
-## [HTTP Fetch](./http-fetch.mdx)
+## [HTTP fetch](./http-fetch.mdx)
 
 Allows you to make HTTP requests to external servers, subject to a review of the specific domains you are requesting from.
 
-## [Media Uploads](./media-uploads.mdx)
+## [Media uploads](./media-uploads.mdx)
 
 Allows you to build apps where the end user can upload custom images to Reddit's CDN. Uploaded media is subject to the same safety checks as every other media content uploaded to Reddit, ensuring community safety.
 
@@ -24,7 +24,7 @@ Allows you to store app data in a scalable database, free of charge. Limited to 
 
 Allows you to run automated server-side tasks on a schedule, for example, checking for updates every hour.
 
-## [Secrets Storage](./secrets-storage.md)
+## [Secrets storage](./secrets-storage.md)
 
 Allows you to build an app where the moderator can store secret keys in a safe and scalable way. For example, if your app needs the installing moderator to provide their own keys to an external API.
 
@@ -32,10 +32,10 @@ Allows you to build an app where the moderator can store secret keys in a safe a
 
 Allows you to run automated server-side tasks when certain events happen on Reddit, for example: when a new post is created, or when a new comment is created.
 
-## [User Actions](./userActions.md)
+## [User actions](./userActions.md)
 
 Allows you to execute some actions, like posting or commenting, on behalf of the user. This means that these new posts or comments will not show up as created by the app, but by the user that is currently using the app. Access to this feature is subject to review by Admins.
 
-## [Text Fallback](./text_fallback.mdx)
+## [Text fallback](./text_fallback.mdx)
 
 Allows you to specify how your interactive post is displayed on platforms that don't support Devvit, for example old.reddit.com

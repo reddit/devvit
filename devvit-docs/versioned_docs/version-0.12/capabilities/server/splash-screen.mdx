@@ -1,7 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Splash screens
+# Splash Screens
 
 Splash screens provide a personalized entry point for your Reddit Dev Platform apps, displaying a customized loading view before users interact with your post. A well-designed splash screen improves first impressions and drives better user engagement.
 
@@ -61,10 +61,25 @@ The `splash` object supports the following customization options:
 Images can be referenced in two ways:
 
 1. **Local assets**: Place images in your app's client/public directory and reference them by filename:
-   ```ts
+
+    :::note
+    To access assets in the client/public directory from the server, add the `media` property to your `devvit.json` file. The directory path should be relative to the `client/public` folder. 
+    :::
+    For example, to use an image at `client/public/assets/splash-background.png`: 
+   ```json title="devvit.json"
+   "media": {
+     "dir": "assets"
+   }
+   ```
+
+  
+
+   ```ts title="server/index.ts"
    backgroundUri: '/splash-background.png'
    appIconUri: '/app-icon.png'
    ```
+
+   
 
 2. **External URLs**: Use full HTTPS URLs for hosted images:
    ```ts

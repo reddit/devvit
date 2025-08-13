@@ -6,7 +6,7 @@ This guide covers migrating traditional Devvit apps (using only Blocks or Mod To
 
 The migration primarily involves switching from `devvit.yaml` to `devvit.json` configuration. Your existing Blocks and Mod Tools code will continue to work with minimal changes.
 
-## Migration Steps
+## Migration steps
 
 ### 1. Create devvit.json
 

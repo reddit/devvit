@@ -1,4 +1,4 @@
-# Adding images
+# Adding Images
 
 Add images to your interactive post.
 

@@ -35,7 +35,7 @@ We may require you to provide additional information to us in order to complete 
 
 If you have questions about Reddit’s App Review and approval process or these Devvit Rules, please reach out for [help](https://developers.reddit.com/docs/help).
 
-## General Rules
+## General rules
 
 ### Build for a quality experience
 
@@ -96,7 +96,7 @@ If your app violates any of these Devvit Rules or any other Reddit Terms & Polic
 
 All apps we deem to have potential safety issues will need to provide additional information. We expect you to be able to quickly and effectively handle any concerns raised about safety.
 
-## Privacy and Data Rules
+## Privacy and data rules
 
 ### Handle data with care
 
@@ -132,7 +132,7 @@ If your app links to any third-party site that may collect redditor personal dat
 
 You’ll also need permission during App Review to direct redditors outside of Reddit or otherwise collect personal information about them. To request HTTP Fetch functionality for a specific domain, please follow [these instructions](https://developers.reddit.com/docs/capabilities/http-fetch).
 
-## Content Rules
+## Content rules
 
 ### Keep user and app content safe
 
@@ -166,7 +166,7 @@ Whether your app uses existing user content or otherwise allows users to create 
 
 Any retention of content and data that has been deleted, even if disassociated, de-identified or anonymized, is a violation of our terms and policies.
 
-## Reddit Brand and IP Rules
+## Reddit brand and IP rules
 
 ### Don’t use Reddit IP
 
@@ -210,7 +210,7 @@ We’re currently piloting Devvit Payments with a small number of developers. Ch
 
 If your app links to any third-party site that facilitates financial transactions, you are solely responsible for verifying the legitimacy and security of the third-party site and should ensure that they are in compliance with all applicable laws. For example, you should ensure that a charitable organization collecting donations is registered as a 501(c)(3) organization (or local equivalent) and provides necessary tax receipts. To the extent that you intend to include links to such third-party sites, you must provide your own terms of service and privacy policy.
 
-## Generative AI/LLM Rules
+## Generative AI/LLM rules
 
 ### Only use approved LLMs
 
@@ -234,7 +234,7 @@ For the avoidance of doubt, self-hosted LLMs (e.g. LLama, mistral, hugging face)
 
 Reddit reserves the right to update these guidelines, including approved LLMs, at any time. It is your responsibility to ensure your app is compliant with the latest guidelines.
 
-## Reporting Rules
+## Reporting rules
 
 ### Contact your app users
 

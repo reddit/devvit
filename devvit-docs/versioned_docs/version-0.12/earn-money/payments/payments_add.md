@@ -1,4 +1,4 @@
-# Add payments
+# Add Payments
 
 :::note
 Payments is a beta feature. As of this moment Payments is still not supported in [Devvit Web](../../capabilities/devvit-web/devvit_web_overview.mdx) applications. Only applications built with [Devvit Blocks](../../capabilities/blocks/overview.md) can support Payments

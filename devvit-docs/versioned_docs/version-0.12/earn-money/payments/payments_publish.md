@@ -1,4 +1,4 @@
-# Publish your app
+# Publish Your App
 
 :::note
 The Developer Platform team reviews and approves apps and their products before products can be sold.

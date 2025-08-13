@@ -23,6 +23,7 @@ Select your launch stage for instructions and guidelines to maximize your game's
 3.  On a Friday, cross-post your game to r/Devvit with the flair "Feedback Friday”.
 
 **Guidelines**
+
 To get the best feedback:
 
 - Post only once for a meaningful update (maybe a 2+ week gaps between versions)
@@ -44,6 +45,7 @@ To get the best feedback:
   3. Cross-post a game post to r/GamesOnReddit with flair "Feedback”.
 
 **Guidelines**
+
 To get the best results, engage with players that give you feedback to start growing your community.
 
 **Apps that have strong post engagement metrics will automatically move to the next launch phase.**
@@ -107,6 +109,7 @@ Apps that are built to use within a community (think mod tools like Bot Bouncer 
 You can also solicit feedback on the #mod-discussion Discord channel. Write a short description of your app that explains the problem your app solves, target community types, and how it fits into existing mod workflows. Include screenshots of the mode interface, and see what the community has to say.
 
 **Guidelines**
+
 To get the best feedback:
 
 - Post only once for a meaningful update (maybe a 2+ week gaps between versions).

@@ -15,20 +15,20 @@ You're using Devvit Web experimental if:
 
 ## What's changing
 
-### Before (Experimental)
+### Before (experimental)
 
 - Uses `defineConfig` function in blocks
 - Multiple `@devvit/X` packages for different capabilities
 - Webroot-based dist outputs
 
-### After (Final Version)
+### After (final version)
 
 - Uses `devvit.json` for all configuration
 - Single `@devvit/web` package with submodule imports
 - Cleaner dist folder structure
 - Clear separation of client and server code
 
-## Migration Steps
+## Migration steps
 
 ### 1. Install the latest @devvit/web
 

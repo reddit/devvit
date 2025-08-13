@@ -81,7 +81,7 @@ router.post('/internal/on-post-submit', async (req, res) => {
 });
 ```
 
-## Best Practices
+## Best practices
 
 - Avoid creating recursive triggers that could cause infinite loops or crashes (for example, a comment trigger that creates a comment).
 - Always check the event payload to ensure your app is not the source of the event before taking action.
