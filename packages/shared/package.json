@@ -1,6 +1,6 @@
 {
   "name": "@devvit/shared",
-  "version": "0.11.18",
+  "version": "0.11.19",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -30,11 +30,11 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.11.18",
-    "@devvit/shared-types": "0.11.18"
+    "@devvit/protos": "0.11.19",
+    "@devvit/shared-types": "0.11.19"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.11.18",
+    "@devvit/tsconfig": "0.11.19",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"

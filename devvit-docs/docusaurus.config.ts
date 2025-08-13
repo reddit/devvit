@@ -56,7 +56,7 @@ const config: Config = {
         docs: {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: './sidebars.ts',
-          lastVersion: '0.11',
+          lastVersion: '0.12',
         },
         blog: {
           path: 'blog',
