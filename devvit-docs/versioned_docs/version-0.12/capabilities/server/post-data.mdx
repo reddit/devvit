@@ -22,13 +22,16 @@ When creating a post, include the `postData` parameter with your custom data obj
   ```ts title="server/index.ts"
   import { reddit } from '@devvit/web/server';
 
-  const post = await reddit.submitPost({
+  const post = await reddit.submitCustomPost({
     subredditName: context.subredditName!,
     title: 'Post with custom data',
     postData: {
       challengeNumber: 42,
       totalGuesses: 0,
       gameState: 'active',
+      splash: {
+        appDisplayName: 'Test App',
+      },
       pixels: [
         [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0],

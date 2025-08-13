@@ -45,7 +45,7 @@ nce to the Reddit API client in both Devvit Web and Devvit Blocks.
 ```tsx
 import { reddit } from '@devvit/web/server';
 
-const post = await reddit.submitPost({
+const post = await reddit.submitCustomPost({
   title: 'Text String',
   subredditName: subreddit.name,
   textFallback: { text: 'You can read this text string on oldreddit because you used textFallback' },
@@ -62,7 +62,7 @@ const post = await reddit.submitPost({
 ```tsx
 import { reddit } from '@devvit/web/server';
 
-const post = await reddit.submitPost({
+const post = await reddit.submitCustomPost({
   title: 'Text string with markdown',
   subredditName: subreddit.name,
   textFallback: {
@@ -87,7 +87,7 @@ const textFallbackRichtext = new RichTextBuilder()
   })
   .codeBlock({}, (cb) => cb.rawText('You can read this rich text on old.reddit because you used textFallback'));
 
-const post = await reddit.submitPost({
+const post = await reddit.submitCustomPost({
   title: 'Rich Text',
   subredditName: subreddit.name,
   textFallback: { richtext: textFallbackRichtext },

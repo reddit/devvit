@@ -22,7 +22,7 @@ When creating a post, include the `splash` parameter to customize the splash scr
   ```ts title="server/index.ts"
   import { reddit } from '@devvit/web/server';
 
-  const post = await reddit.submitPost({
+  const post = await reddit.submitCustomPost({
     subredditName: context.subredditName!,
     title: 'My Interactive Post',
     splash: {
@@ -94,7 +94,7 @@ async function createThemedPost(theme: 'light' | 'dark', context: any) {
 
   const selectedTheme = themes[theme];
   
-  return await reddit.submitPost({
+  return await reddit.submitCustomPost({
     subredditName: context.subredditName!,
     title: `${selectedTheme.heading} - Interactive Post`,
     splash: {
