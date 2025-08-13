@@ -2,7 +2,9 @@
 
 While we're always shipping fixes and improvements, our team bundles new features, breaking changes, and other user-facing updates into regular releases. This page logs the changes to each version of Devvit.
 
-Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
+To use the latest version of Devvit:
+1. Run `npm install devvit@latest` to update your CLI.
+2. Run `npx devvit update app` to update your @devvit dependencies.
 
 ## Devvit 0.12.0: Devvit Web
 **Release Date: August 13, 2025**
