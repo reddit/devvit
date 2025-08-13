@@ -9,6 +9,8 @@ We want creative new apps that enrich the Reddit community through:
 - An entirely new community created around the app, like [r/pixelary](https://www.reddit.com/r/Pixelary/) or [r/riddonkulous](https://www.reddit.com/r/riddonkulous/)
 - A quality of life improvement that benefits hundreds of subreddits
 
+Check your [eligibility from your settings page](https://developers.reddit.com/my/settings) or [enroll here](https://www.reddit.com/earn/enroll).
+
 ## How it works
 
 The Reddit Developer Funds 2025 program (the “Program”) will run from April 1, 2025 - Dec 31, 2025. The Program is focused on reach, and success will be measured by Daily Qualified Engagers and Qualified Installs defined as:
