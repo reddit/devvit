@@ -1,7 +1,7 @@
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Menu actions
+# Menu Actions
 
 Add an item to the three dot menu for posts, comments, or subreddits. Menu actions can perform immediate client effects or trigger server processing followed by client effects.
 
@@ -101,7 +101,7 @@ You can decide where the menu action shows up by specifying the location propert
 For moderator permission security, when opening a form from a menu action with `forUserType: moderator`, the user initiating the action must complete all actions within 10 minutes.
 :::
 
-## Menu Responses
+## Menu responses
 
 In Devvit Web, your menu item should respond with a client side effect to give feedback to users. This is available as a UIResponse as you do not have access to the `@devvit/web/client` library from your server endpoints.
 
@@ -192,7 +192,7 @@ In Devvit Web, your menu item should respond with a client side effect to give f
   </TabItem>
 </Tabs>
 
-### Menu Response Examples
+### Menu response examples
 
 Menu responses can trigger any client effect after server processing:
 

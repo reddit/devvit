@@ -1,4 +1,4 @@
-# Mod resources
+# Mod Resources
 
 Devvit apps are programs hosted and run on Reddit’s Developer Platform. Moderators can install an app on their subreddits to customize a community with bespoke mod tools, discussion bots, new governance tools, games, leaderboards, and more.
 

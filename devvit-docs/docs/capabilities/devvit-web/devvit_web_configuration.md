@@ -12,7 +12,7 @@ All configuration files should include a `$schema` property which many IDEs will
 }
 ```
 
-## Required Properties
+## Required properties
 
 Your `devvit.json` must include:
 
@@ -24,16 +24,16 @@ Additionally, you must include at least one of:
 - **`server`**: For Node.js server apps
 - **`blocks`**: For Blocks
 
-## Configuration Sections
+## Configuration sections
 
-### Core Properties
+### Core properties
 
 | Property  | Type   | Description                                                               | Required         |
 | --------- | ------ | ------------------------------------------------------------------------- | ---------------- |
 | `name`    | string | App account name and Community URL slug (3-16 chars, `^[a-z][a-z0-9-]*$`) | Yes              |
 | `$schema` | string | Schema version for IDE support                                            | No (recommended) |
 
-### App Components
+### App components
 
 | Property | Type   | Description                        | Required                  |
 | -------- | ------ | ---------------------------------- | ------------------------- |
@@ -41,7 +41,7 @@ Additionally, you must include at least one of:
 | `server` | object | Node.js server configuration       | One of post/server/blocks |
 | `blocks` | object | Blocks                             | One of post/server/blocks |
 
-### Permissions & Capabilities
+### Permissions & capabilities
 
 | Property          | Type   | Description                    | Required |
 | ----------------- | ------ | ------------------------------ | -------- |
@@ -49,14 +49,14 @@ Additionally, you must include at least one of:
 | `media`           | object | Static asset configuration     | No       |
 | `marketingAssets` | object | Assets for featuring your app  | No       |
 
-### Event Handling
+### Event handling
 
 | Property    | Type   | Description                  | Required             |
 | ----------- | ------ | ---------------------------- | -------------------- |
 | `triggers`  | object | Event trigger endpoints      | No (requires server) |
 | `scheduler` | object | Scheduled task configuration | No                   |
 
-### UI & Interaction
+### UI & interaction
 
 | Property | Type   | Description                               | Required |
 | -------- | ------ | ----------------------------------------- | -------- |
@@ -69,9 +69,9 @@ Additionally, you must include at least one of:
 | -------- | ------ | ------------------------- | -------- |
 | `dev`    | object | Development configuration | No       |
 
-## Detailed Configuration
+## Detailed configuration
 
-### Post Configuration
+### Post configuration
 
 Configure web views for custom post types:
 
@@ -97,7 +97,7 @@ Configure web views for custom post types:
   - `entry` (string): HTML file path or `/api/` endpoint
   - `height` (enum): `"regular"` or `"tall"` (default: `"regular"`)
 
-### Server Configuration
+### Server configuration
 
 Configure Node.js server functionality:
 
@@ -113,7 +113,7 @@ Configure Node.js server functionality:
 
 - `entry` (string): Server bundle filename (default: `"src/server/index.js"`)
 
-### Permissions Configuration
+### Permissions configuration
 
 Control what your app can access:
 
@@ -137,25 +137,25 @@ Control what your app can access:
 }
 ```
 
-**HTTP Plugin:**
+**HTTP plugin:**
 
 - `enable` (boolean): Enable HTTP plugin (default: `true`)
 - `domains` (array): Allowed domains for `fetch()` calls
 
-**Reddit API Plugin:**
+**Reddit API plugin:**
 
 - `enable` (boolean): Enable Reddit API (default: `true`)
 - `scope` (enum): `"user"` or `"moderator"` (default: `"user"`)
 - `asUser` (array): APIs to execute as user account
 
-**Other Permissions:**
+**Other permissions:**
 
 - `media` (boolean): Enable media uploads (default: `false`)
 - `payments` (boolean): Enable payments plugin (default: `false`)
 - `realtime` (boolean): Enable realtime messaging (default: `false`)
 - `redis` (boolean): Enable Redis storage (default: `false`)
 
-### Triggers Configuration
+### Triggers configuration
 
 Handle Reddit events:
 
@@ -169,7 +169,7 @@ Handle Reddit events:
 }
 ```
 
-**Available Triggers:**
+**Available triggers:**
 
 - `onAppInstall`, `onAppUpgrade`
 - `onPostCreate`, `onPostDelete`, `onPostSubmit`, `onPostUpdate`, `onPostReport`, `onPostFlairUpdate`, `onPostNsfwUpdate`, `onPostSpoilerUpdate`
@@ -179,7 +179,7 @@ Handle Reddit events:
 
 **Note:** All trigger endpoints must start with `/internal/` and will receive POST requests with JSON data.
 
-### Menu Configuration
+### Menu configuration
 
 Add menu items to subreddit interfaces:
 
@@ -207,7 +207,7 @@ Add menu items to subreddit interfaces:
 }
 ```
 
-**Menu Item Properties:**
+**Menu item properties:**
 
 - `label` (string): Display text (required)
 - `description` (string): Short description
@@ -216,7 +216,7 @@ Add menu items to subreddit interfaces:
 - `endpoint` (string): Internal endpoint to call (required)
 - `postFilter` (enum): `"none"` or `"currentApp"` (default: `"none"`)
 
-### Scheduler Configuration
+### Scheduler configuration
 
 Configure scheduled tasks:
 
@@ -241,15 +241,15 @@ Configure scheduled tasks:
 }
 ```
 
-**Task Configuration:**
+**Task configuration:**
 
 - `endpoint` (string): Internal endpoint to call (required)
 - `cron` (string): Cron schedule (optional, for automatic scheduling)
 - `data` (object): Additional data passed to cron tasks (optional)
 
-**Cron Format:** Standard five-part (`0 2 * * *`) or six-part (`*/30 * * * * *`) format.
+**Cron format:** Standard five-part (`0 2 * * *`) or six-part (`*/30 * * * * *`) format.
 
-### Forms Configuration
+### Forms configuration
 
 Map form identifiers to submission endpoints:
 
@@ -262,7 +262,7 @@ Map form identifiers to submission endpoints:
 }
 ```
 
-### Marketing Assets
+### Marketing assets
 
 Configure app presentation:
 
@@ -278,7 +278,7 @@ Configure app presentation:
 
 - `icon` (string): Path to 1024x1024 PNG icon (required)
 
-### Development Configuration
+### Development configuration
 
 Configure development settings:
 
@@ -304,7 +304,7 @@ Configure development settings:
 6. If the app has a Node.js server, set `server` in `devvit.json`.
 7. (Optional) Set `blocks.entry` to `src/main.tsx` (or `src.main.ts`) to continue using `@devvit/public-api` legacy APIs.
 
-## Validation Rules
+## Validation rules
 
 The `devvit.json` configuration is validated against the JSON Schema at build time. Many IDEs will also underline errors as you write. Common validation errors include:
 
@@ -316,7 +316,7 @@ The `devvit.json` configuration is validated against the JSON Schema at build ti
 - **Permissions:** Missing required permissions for used features
 - **Pattern Validation:** Invalid patterns for names, paths, or endpoints
 
-## Best Practices
+## Best practices
 
 1. **Always include the `$schema` property** for IDE autocompletion and validation.
 2. **Use specific permission scopes.** Only request permissions your app actually uses.
@@ -325,11 +325,11 @@ The `devvit.json` configuration is validated against the JSON Schema at build ti
 5. **Use meaningful names.** Choose descriptive names for entrypoints, tasks, and forms.
 6. **Test configurations.** Validate your config with `devvit build` before deployment.
 
-## Environment Variables
+## Environment variables
 
 - `DEVVIT_SUBREDDIT`: Override the `dev.subreddit` value used during `devvit playtest`.
 
-## Complete Example
+## Complete example
 
 ```json
 {

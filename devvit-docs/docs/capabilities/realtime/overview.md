@@ -33,7 +33,7 @@ Realtime functionality in Devvit follows a client/server architecture:
 
 This separation ensures that message sending is controlled by server-side logic while clients can freely subscribe to channels they're interested in.
 
-## Client-Side API Reference
+## Client-side API reference
 
 ### connectRealtime
 
@@ -88,9 +88,9 @@ This method:
 - Cleans up event listeners
 - Calls the `onDisconnect` callback if provided
 
-## Server-Side API Reference
+## Server-side API reference
 
-### Realtime Plugin
+### Realtime plugin
 
 The server-side plugin for sending messages to realtime channels.
 
@@ -113,9 +113,9 @@ Sends a message to a specific channel.
 - `channel` (string) - The name of the channel to send the message to
 - `msg` (JSONValue) - The message data to send
 
-## Usage Examples
+## Usage examples
 
-### Client-Side: Basic Channel Connection
+### Client-side: basic channel connection
 
 ```tsx
 import { connectRealtime } from '@devvit/web/client';
@@ -133,7 +133,7 @@ const connection = await connectRealtime({
 await connection.disconnect();
 ```
 
-### Client-Side: Connection Lifecycle Management
+### Client-side: connection lifecycle management
 
 ```tsx
 import { connectRealtime } from '@devvit/web/client';
@@ -157,7 +157,7 @@ const connection = await connectRealtime({
 });
 ```
 
-### Server-Side: Sending Messages
+### Server-side: sending messages
 
 ```tsx
 import { realtime } from '@devvit/web/server';

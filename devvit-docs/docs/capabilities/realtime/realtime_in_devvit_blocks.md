@@ -4,7 +4,7 @@ This guide walks through step-by-step instructions on how to set up [Realtime](.
 
 ## Create a live interactive post
 
-#### 1. Configure realtime.
+#### 1. Configure realtime
 
 ```tsx
 Devvit.configure({
@@ -12,7 +12,7 @@ Devvit.configure({
 });
 ```
 
-#### 2. Create and subscribe to a channel.
+#### 2. Create and subscribe to a channel
 
 `useChannel` hook allows interactive posts to subscribe and send to an event stream.
 
@@ -49,7 +49,7 @@ const channel = useChannel({
 channel.subscribe();
 ```
 
-#### 3. Send messages to a channel.
+#### 3. Send messages to a channel
 
 `channel.send` is recommended for peer-to-peer synchronization across clients. See [Mini Place](#mini-place) and [Snoo Club](#snoo-club)
 
@@ -97,7 +97,7 @@ Devvit.addSchedulerJob({
 });
 ```
 
-## Limits and Quotas
+## Limits and quotas
 
 - Messages/sec per installation: 100
 - Maximum message payload: 1 MB
@@ -109,35 +109,35 @@ Devvit.addSchedulerJob({
 Try the demos with multiple browser windows and see local changes sync across sessions without any lag.
 :::
 
-### Mini Place
+### Mini place
 
 ![mini_place_high](../../assets/realtime/mini_place_high.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1bumd7e/mini_place/)**,
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/mini-place)**
 
-### Snoo Club
+### Snoo club
 
 ![snoo_club](../../assets/realtime/snoo_club.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1bunpzv/interactive_snooclub/)**,
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/snooclub)**
 
-### Synced Progress Bar
+### Synced progress bar
 
 ![synced_progress_bar](../../assets/realtime/synced_progress_bar.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1b3ccp9/synced_progress_bar/),**
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/synced-progress-bar)**
 
-### Devvit Emoji Chat
+### Devvit emoji chat
 
 ![devvit_emoji_chat](../../assets/realtime/devvit_emoji_chat.gif)
 
 **[Demo](https://sh.reddit.com/r/devvit_sandbox/comments/1bvf6if/emoji_chat/),**
 **[Source Code](https://github.com/reddit/devvit/tree/main/packages/apps/devvit-emoji-chat)**
 
-### Server Push
+### Server push
 
 ![server_push](../../assets/realtime/server_push.gif)
 

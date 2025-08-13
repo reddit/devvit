@@ -9,7 +9,7 @@ This tutorial should take about 10 minutes to complete. Once complete, you'll be
 - Node.JS (version 22.2.0+)
 - A code editor
 
-## Environment Setup
+## Environment setup
 
 1. Install Node.JS and NPM ([instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
 2. Go to `https://developers.reddit.com/new` and choose Mod Tool under Other templates.
@@ -34,7 +34,7 @@ Cutting the template to the target directory...
 
 This tutorial lets you build your own version of [Comment Mop](https://developers.reddit.com/apps/comment-nuke). This tool allows moderators to remove and/or lock a full comment tree with a single menu action, avoiding repetitive mechanical tasks for community moderators.
 
-### Create a Menu Action for Moderators
+### Create a menu action for moderators
 
 The template leverages [Menu Actions](https://developers.reddit.com/docs/capabilities/menu-actions) to enable moderators to Delete/Lock child comments of a post or comment. Menu Actions appear in the moderator menu:  
 ![menu actions](../assets/quickstart/quickstart-mod-tool-1.png)
@@ -55,7 +55,7 @@ Devvit.addMenuItem({
 
 You'll notice that the `onPress` handler of this Menu Item action invokes a form with `context.ui.showForm()`. This will be explained in the next step.
 
-### Devvit Forms
+### Devvit forms
 
 Optionally, some moderator tools might need to request some additional information from the moderator before they can execute. In these cases we can leverage [Devvit Forms](https://developers.reddit.com/docs/capabilities/forms). Comment Mop will display a form with some options regarding the action to be taken:
 
@@ -179,11 +179,11 @@ If you didn't provide a test subreddit, one will be created for you. Once you ru
 
 > Note that this mod tool is intended to be run on comments, so you will need to create a post and comment in your subreddit to see it.
 
-## Conclusion
+## Result
 
 Now you have a mod tool running from the code that you deployed yourself. Feel free to experiment with the code and run `npm run dev` again to see the changes. Notice that you don't need to worry about running costs for your mod tool, because Reddit hosts all Devvit applications for free. Also, if your mod tool becomes popular and gets installed by many subreddits, you may become eligible to earn [Reddit Developer Funds](https://developers.reddit.com/docs/reddit_developer_funds).
 
-## Further Reading
+## Further reading
 
 - Use our [launch guide](../guides/launch/launch-guide.md) to guide you where to get your first users.
 - [Devvit Forms](https://developers.reddit.com/docs/capabilities/forms)

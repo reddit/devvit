@@ -1,4 +1,4 @@
-# Manage payments
+# Manage Payments
 
 Once your app and products have been approved, you’re ready to use Reddit’s production payments system. Real payments will be triggered automatically when invoked from approved app versions. No code changes are required.
 

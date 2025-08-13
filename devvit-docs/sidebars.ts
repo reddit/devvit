@@ -26,7 +26,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Build your app',
+      label: 'Build Your App',
       collapsible: false,
       items: [
         'quickstart/quickstart',
@@ -148,7 +148,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'doc',
-      label: 'Launch your app',
+      label: 'Launch Your App',
       id: 'guides/launch/launch-guide',
     },
     {

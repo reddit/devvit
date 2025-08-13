@@ -1,17 +1,17 @@
-# Quickstart
+# Games Quickstart
 
 This tutorial takes you through the step-by-step process of building your first app with Devvit. It should take you about 1 minute to complete. Once complete, you'll be able to see your app in a Reddit post
 
-## Try it out first
+## Try it out
 
-This starter template will [create an app like this for you](https://www.reddit.com/r/test_devvit_demos/comments/1mk4ql4/test3jsdevvit/) running in reddit. It consists of a simple react-based counter app that calls backend functions.
+This starter template will [create an app like this for you](https://www.reddit.com/r/test_devvit_demos/comments/1mk4ql4/test3jsdevvit/) running on Reddit. It consists of a simple react-based counter app that calls backend functions.
 
 ## What you'll need
 
 - Node.JS (version 22.2.0+)
 - A code editor
 
-## Environment Setup
+## Environment setup
 
 1. Install Node.JS and NPM ([instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
 2. Go to `https://developers.reddit.com/new` and choose the React template.
@@ -46,7 +46,7 @@ The dev command automatically creates a development subreddit for your app and a
 
 Click the `Launch App` button to see your app!
 
-## Devvit Architecture
+## Devvit architecture
 
 Once the project is checked out you'll see the following folder structure. Each of the folders is responsible for a part of your app:
 
@@ -82,10 +82,10 @@ Use our [launch guide](../guides/launch/launch-guide.md) to guide you where to g
 
 When you are ready to launch your app, run `npm run launch`. This will upload your app to Reddit for our team to review. All apps must be reviewed before they can be installed on subreddits > 200 members. We will send you an email once your app is approved.
 
-## Conclusion
+## Result
 
 Now you have an application that runs inside of a Reddit post. You can now use this scaffolding to build your own application or app with Devvit.
 
-## Further Reading
+## Further reading
 
 - [Launching and Promoting your game](../guides/launch/launch-guide.md)
