@@ -176,6 +176,54 @@ describe('Post API', () => {
         ).rejects.toThrow(/userGeneratedContent must be set/);
       });
 
+      test('submit(): does not throw when runAs: USER with userActions: true', async () => {
+        const { reddit, metadata } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: true,
+        });
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await expect(
+          reddit.submitPost({
+            title: 'Some post title',
+            subredditName: 'askReddit',
+            preview: createPreview(),
+            runAs: 'USER',
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+          })
+        ).resolves.not.toThrow();
+      });
+
+      test('submit(): does not throw when runAs: USER with userActions: {enabled: true}', async () => {
+        const { reddit, metadata } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: { enabled: true },
+        });
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await expect(
+          reddit.submitPost({
+            title: 'Some post title',
+            subredditName: 'askReddit',
+            preview: createPreview(),
+            runAs: 'USER',
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+          })
+        ).resolves.not.toThrow();
+      });
+
       test('sets plain text as the richtext fallback', async () => {
         const { reddit, metadata } = createTestRedditApiClient();
         const mockedPost = new Post({ ...defaultPostData }, metadata);

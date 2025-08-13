@@ -1,5 +1,6 @@
 import type { UnknownMessage } from '@devvit/protos';
 import * as protos from '@devvit/protos';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import type { PaymentsService } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
@@ -197,10 +198,7 @@ export class Devvit extends Actor {
 
     if (pluginIsEnabled(pluginEnabled)) {
       this.use(protos.UserActionsDefinition);
-      const scopes = this.#getUserScopesFromConfig(config);
-      if (scopes.length > 0) {
-        this.#scopes = scopes;
-      }
+      this.#scopes = this.#getUserScopesFromConfig(config);
     }
   }
 
@@ -678,6 +676,11 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
+  static get scopes(): Scope[] {
+    return this.#scopes;
+  }
+
+  /** @internal */
   static get menuItems(): MenuItem[] {
     return this.#menuItems;
   }
@@ -787,18 +790,47 @@ export class Devvit extends Actor {
     }
   }
 
-  static #getUserScopesFromConfig(config: Configuration): protos.Scope[] {
+  // For Blocks apps that enable UserActions but do not specify any scopes, they are implicitly granted SUBMIT_POST and SUBMIT_COMMENT.
+  // This is to maintain backwards compatibility with existing Blocks apps and allow them to omit scopes.
+  static #getUserScopesFromConfig(config: Configuration): Scope[] {
     const configUserActions = config.userActions;
     if (!configUserActions) return [];
+
+    // Case: Devvit.configure({ userActions: true })
+    if (typeof configUserActions === 'boolean' && configUserActions)
+      return [Scope.SUBMIT_POST, Scope.SUBMIT_COMMENT];
+
+    // Case: Devvit.configure({ userActions: { enabled: true } })
     if (
       typeof configUserActions === 'object' &&
       'enabled' in configUserActions &&
       configUserActions.enabled
-    )
-      return [];
+    ) {
+      return 'scopes' in configUserActions
+        ? (configUserActions.scopes as Scope[])
+        : [Scope.SUBMIT_POST, Scope.SUBMIT_COMMENT];
+    }
+
+    // Case: Devvit.configure({ userActions: { scopes: [...scopes] } })
     if (typeof configUserActions === 'object' && 'scopes' in configUserActions)
       return configUserActions.scopes;
+
+    // If none of the above cases are true, return no scopes.
     return [];
+  }
+
+  /**
+   * Throws an error if the specified scope is not present in the Devvit.scopes configuration.
+   * @internal
+   * @param scope - The scope to check for.
+   */
+  static assertUserScope(scope: Scope): void {
+    const scopeName = Scope[scope];
+    if (!Devvit.scopes.includes(scope)) {
+      throw Error(
+        `To call this API with 'runAs: "USER"', set 'userActions: { scopes: [ Scope.${scopeName} ] }' in your Devvit.configure().`
+      );
+    }
   }
 }
 

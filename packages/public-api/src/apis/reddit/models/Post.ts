@@ -11,6 +11,7 @@ import type {
 } from '@devvit/protos';
 import { Block, UIResponse } from '@devvit/protos';
 import type { DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
@@ -1173,6 +1174,10 @@ export class Post {
         ? Devvit.userActionsPlugin
         : Devvit.redditAPIPlugins.LinksAndComments;
 
+    if (runAsType === RunAs.USER) {
+      Devvit.assertUserScope(Scope.SUBMIT_POST);
+    }
+
     let response: SubmitResponse;
 
     if ('preview' in options) {
@@ -1267,6 +1272,10 @@ export class Post {
         ? Devvit.userActionsPlugin
         : Devvit.redditAPIPlugins.LinksAndComments;
     const { postId, subredditName, ...rest } = options;
+
+    if (runAsType === RunAs.USER) {
+      Devvit.assertUserScope(Scope.SUBMIT_POST);
+    }
 
     const response = await client.Submit(
       {

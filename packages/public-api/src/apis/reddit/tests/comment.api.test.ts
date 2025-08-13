@@ -186,4 +186,38 @@ describe('Commment API', () => {
     });
     expect(resp.toJSON()).toMatchSnapshot();
   });
+
+  test('submitComment(): does not throw when runAs: USER with userActions: true', async () => {
+    const { reddit } = createTestRedditApiClient({
+      redditAPI: true,
+      userActions: true,
+    });
+
+    const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'Comment');
+    spyPlugin.mockImplementationOnce(async () => mockJsonWrappedComment);
+
+    const resp = await reddit.submitComment({
+      id: 't1_commentid',
+      text: 'body',
+      runAs: 'USER',
+    });
+    expect(resp.toJSON()).toMatchSnapshot();
+  });
+
+  test('submitComment(): does not throw when runAs: USER with userActions: { enabled: true }', async () => {
+    const { reddit } = createTestRedditApiClient({
+      redditAPI: true,
+      userActions: { enabled: true },
+    });
+
+    const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'Comment');
+    spyPlugin.mockImplementationOnce(async () => mockJsonWrappedComment);
+
+    const resp = await reddit.submitComment({
+      id: 't1_commentid',
+      text: 'body',
+      runAs: 'USER',
+    });
+    expect(resp.toJSON()).toMatchSnapshot();
+  });
 });

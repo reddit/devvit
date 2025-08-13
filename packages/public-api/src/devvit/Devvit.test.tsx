@@ -1,6 +1,8 @@
 /** @jsx Devvit.createElement */
 /** @jsxFrag Devvit.Fragment */
 
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+
 import type { JSONObject, JSONValue } from '../types/json.js';
 import { Devvit } from './Devvit.js';
 
@@ -182,5 +184,26 @@ describe('createForm() typing is intuitive', () => {
     D.createForm(local, (data) => {
       data.values.strVal satisfies string | undefined;
     });
+  });
+});
+
+describe('assertUserScope', () => {
+  test('should throw when scopes does not contain desired scope', () => {
+    Devvit.configure({ userActions: { scopes: [Scope.SUBMIT_POST, Scope.SUBMIT_COMMENT] } });
+    expect(() => Devvit.assertUserScope(Scope.SUBSCRIBE_TO_SUBREDDIT)).toThrow(
+      "To call this API with 'runAs: \"USER\"', set 'userActions: { scopes: [ Scope.SUBSCRIBE_TO_SUBREDDIT ] }' in your Devvit.configure()."
+    );
+  });
+
+  test('should throw when scopes are empty', () => {
+    Devvit.configure({ userActions: { scopes: [] } });
+    expect(() => Devvit.assertUserScope(Scope.SUBMIT_POST)).toThrow(
+      "To call this API with 'runAs: \"USER\"', set 'userActions: { scopes: [ Scope.SUBMIT_POST ] }' in your Devvit.configure()."
+    );
+  });
+
+  test('should not throw when scopes contains desired scope', () => {
+    Devvit.configure({ userActions: { scopes: [Scope.SUBMIT_POST, Scope.SUBMIT_COMMENT] } });
+    expect(() => Devvit.assertUserScope(Scope.SUBMIT_POST)).not.toThrow();
   });
 });
