@@ -65,17 +65,15 @@ Devvit.addCustomPostType({
 
 ### addMenuItem()
 
-> `static` **addMenuItem**(`menuItem`): `void`
+> `static` **addMenuItem**(`item`): `void`
 
 Add a menu item to the Reddit UI.
 
 #### Parameters
 
-##### menuItem
+##### item
 
 [`MenuItem`](../type-aliases/MenuItem.md)
-
-The menu item to add.
 
 #### Returns
 

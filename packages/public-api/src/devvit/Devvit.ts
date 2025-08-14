@@ -107,15 +107,15 @@ export class Devvit extends Actor {
   static #appSettings: SettingsFormField[] | undefined;
   static #config: Configuration = {};
   static #customPostType: CustomPostType | undefined;
-  static readonly #formDefinitions: Map<FormKey, FormDefinition> = new Map();
+  static #formDefinitions: Map<FormKey, FormDefinition> | undefined;
   static #installationSettings: SettingsFormField[] | undefined;
-  static readonly #menuItems: MenuItem[] = [];
-  static readonly #scheduledJobHandlers: Map<string, ScheduledJobHandler> = new Map();
+  static #menuItems: MenuItem[] | undefined;
+  static #scheduledJobHandlers: Map<string, ScheduledJobHandler> | undefined;
   static readonly #triggerOnEventHandlers: Map<
     TriggerEvent,
     TriggerOnEventHandler<OnTriggerRequest>[]
   > = new Map();
-  static #webViewAssets: AssetMap = {};
+  static #webViewAssets: Readonly<AssetMap> = {};
   static #domains: string[] = [];
   static #scopes: protos.Scope[] = [];
 
@@ -219,8 +219,9 @@ export class Devvit extends Actor {
    * });
    * ```
    */
-  static addMenuItem(menuItem: MenuItem): void {
-    this.#menuItems.push(menuItem);
+  static addMenuItem(item: MenuItem): void {
+    this._initMenu();
+    this.#menuItems!.push(item);
   }
 
   /**
@@ -264,8 +265,9 @@ export class Devvit extends Actor {
     form: T,
     onSubmit: FormOnSubmitEventHandler<FormToFormValues<T>>
   ): FormKey {
-    const formKey: FormKey = `form.${this.#formDefinitions.size}`;
-    this.#formDefinitions.set(formKey, {
+    this._initForms();
+    const formKey: FormKey = `form.${this.#formDefinitions!.size}`;
+    this.#formDefinitions!.set(formKey, {
       form,
       onSubmit,
     } as FormDefinition);
@@ -304,15 +306,13 @@ export class Devvit extends Actor {
    * ```
    */
   static addSchedulerJob<T extends JSONObject | undefined>(job: ScheduledJobType<T>): void {
-    if (!this.#pluginClients[protos.SchedulerDefinition.fullName]) {
-      this.use(protos.SchedulerDefinition);
-    }
+    this._initScheduler();
 
-    if (this.#scheduledJobHandlers.has(job.name)) {
+    if (this.#scheduledJobHandlers!.has(job.name)) {
       throw new Error(`Job ${job.name} is already defined`);
     }
 
-    this.#scheduledJobHandlers.set(
+    this.#scheduledJobHandlers!.set(
       job.name,
       job.onRun as ScheduledJobHandler<JSONObject | undefined>
     );
@@ -398,16 +398,16 @@ export class Devvit extends Actor {
       (field) => field.type !== 'group' && field.scope === SettingScope.App
     );
 
+    this._initSettings(appSettings.length > 0, installSettings.length > 0);
+
     if (installSettings.length > 0) {
       // initialize the installation settings with empty array if it is not initialized
-      this.#installationSettings ??= [];
-      this.#installationSettings.push(...installSettings);
+      this.#installationSettings!.push(...installSettings);
     }
 
     if (appSettings.length > 0) {
       // initialize the app settings with empty array if it is not initialized
-      this.#appSettings ??= [];
-      this.#appSettings.push(...appSettings);
+      this.#appSettings!.push(...appSettings);
     }
 
     assertValidFormFields([...(this.#installationSettings ?? []), ...(this.#appSettings ?? [])]);
@@ -682,7 +682,7 @@ export class Devvit extends Actor {
 
   /** @internal */
   static get menuItems(): MenuItem[] {
-    return this.#menuItems;
+    return this.#menuItems ?? [];
   }
 
   /** @internal */
@@ -691,12 +691,12 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static get formDefinitions(): Map<FormKey, FormDefinition> {
+  static get formDefinitions(): ReadonlyMap<FormKey, FormDefinition> | undefined {
     return this.#formDefinitions;
   }
 
   /** @internal */
-  static get scheduledJobHandlers(): Map<string, ScheduledJobHandler> {
+  static get scheduledJobHandlers(): ReadonlyMap<string, ScheduledJobHandler> | undefined {
     return this.#scheduledJobHandlers;
   }
 
@@ -711,7 +711,7 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static get triggerOnEventHandlers(): Map<
+  static get triggerOnEventHandlers(): ReadonlyMap<
     TriggerEvent,
     TriggerOnEventHandler<OnTriggerRequest>[]
   > {
@@ -719,13 +719,49 @@ export class Devvit extends Actor {
   }
 
   /** Do not cache. @internal */
-  static get assets(): AssetMap {
+  static get assets(): Readonly<AssetMap> {
     return globalThis.devvit?.assets ?? {};
   }
 
   /** @internal */
-  static get webViewAssets(): AssetMap {
+  static get webViewAssets(): Readonly<AssetMap> {
     return this.#webViewAssets;
+  }
+
+  /**
+   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * @internal
+   */
+  private static _initForms(): void {
+    this.#formDefinitions ??= new Map();
+  }
+
+  /**
+   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * @internal
+   */
+  private static _initMenu(): void {
+    this.#menuItems ??= [];
+  }
+
+  /**
+   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * @internal
+   */
+  private static _initScheduler(): void {
+    if (!this.#pluginClients[protos.SchedulerDefinition.fullName]) {
+      this.use(protos.SchedulerDefinition);
+    }
+    this.#scheduledJobHandlers ??= new Map();
+  }
+
+  /**
+   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * @internal
+   */
+  private static _initSettings(global: boolean, sub: boolean): void {
+    if (global) this.#appSettings ??= [];
+    if (sub) this.#installationSettings ??= [];
   }
 
   /** @internal */
@@ -745,11 +781,15 @@ export class Devvit extends Actor {
       use.handler = config.use<UseHandler>(use.def);
     }
 
-    if (Devvit.#menuItems.length > 0) {
+    // Check for nonnullish provides, not length, since `devvit.json` may
+    // declare a service is provided but not actually populate it with any
+    // items. Any `LinkedBundle`  provides must have a server implementation.
+
+    if (Devvit.#menuItems) {
       registerMenuItems(config);
     }
 
-    if (Devvit.#scheduledJobHandlers.size > 0) {
+    if (Devvit.#scheduledJobHandlers) {
       registerScheduler(config);
     }
 
@@ -762,7 +802,7 @@ export class Devvit extends Actor {
       registerUIRequestHandlers(config);
     }
 
-    if (Devvit.#customPostType || Devvit.#formDefinitions.size > 0) {
+    if (Devvit.#customPostType || Devvit.#formDefinitions) {
       registerUIEventHandler(config);
     }
 

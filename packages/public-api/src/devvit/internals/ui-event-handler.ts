@@ -52,7 +52,7 @@ async function handleUIEvent(
       }
     }
 
-    const formDefinition = Devvit.formDefinitions.get(formKey);
+    const formDefinition = Devvit.formDefinitions?.get(formKey);
 
     if (!formDefinition) {
       throw new Error(`Form with key ${formKey} not found`);

@@ -43,7 +43,7 @@ export class UIClient implements _UIClient {
     data?: JSONObject | undefined,
     formInternalOverride?: Form | undefined
   ): void {
-    let formDefinition = Devvit.formDefinitions.get(formKey);
+    let formDefinition = Devvit.formDefinitions?.get(formKey);
 
     if (!formDefinition && this.#reconciler) {
       const hookForm = this.#reconciler.forms.get(formKey);

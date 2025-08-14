@@ -59,7 +59,9 @@ const ASSETS: AssetMap = {
 
 describe('useWebView', () => {
   beforeAll(() => {
-    Object.keys(ASSETS).forEach((asset) => (Devvit.webViewAssets[asset] = ASSETS[asset]));
+    Object.keys(ASSETS).forEach(
+      (asset) => ((Devvit.webViewAssets as AssetMap)[asset] = ASSETS[asset])
+    );
   });
 
   test('getUrl defaults to index.html when omitted', async () => {
