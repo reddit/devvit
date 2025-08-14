@@ -24,3 +24,22 @@ test('typing is intuitive', () => {
   // @ts-expect-error: can't mix SubmitLinkOptions and SubmitSelfPostOptions.
   sub.submitPost({ title: 'title', resubmit: true, text: 'text' });
 });
+
+test('subreddit listing data can be used to populate Subreddit constructor', () => {
+  // Subreddit from a Listing (like /subreddits/mine/subscriber) come with a subset
+  // of the data that the Subreddit constructor expects. Make sure we can create
+  // this without error.
+  const subreddit = new Subreddit({
+    created: 1755202932,
+    createdUtc: 1755202932,
+    id: 'f6bhb3',
+    name: 't5_f6bhb3',
+    subredditType: 'private',
+    over18: false,
+    quarantine: false,
+    title: 'r4r_bot_dev',
+    url: '/r/r4r_bot_dev/',
+    displayName: 'r4r_bot_dev',
+  });
+  expect(subreddit.name).toBe('r4r_bot_dev');
+});

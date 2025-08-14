@@ -96,6 +96,13 @@ export type GetUserFlairOptions = UserFlairPageOptions & {
   usernames?: string[];
 };
 
+export type GetSubscribedSubredditsForCurrentUserOptions = {
+  limit?: number;
+  pageSize?: number;
+  after?: string;
+  before?: string;
+};
+
 /**
  * An individual Removal Reason object.
  */
@@ -458,8 +465,7 @@ export class Subreddit {
     this.#title = data.title;
     this.#description = data.description;
 
-    assertNonNull(data.lang, 'Subreddit is missing language');
-    this.#language = data.lang;
+    this.#language = data.lang ?? '';
 
     this.#numberOfSubscribers = data.subscribers ?? 0;
     this.#numberOfActiveUsers = data.activeUserCount ?? 0;
@@ -960,6 +966,40 @@ export class Subreddit {
     }
   }
 
+  static getSubscribedSubredditsForCurrentUser(
+    options: GetSubscribedSubredditsForCurrentUserOptions = {}
+  ): Listing<Subreddit> {
+    const client = getRedditApiPlugins().Subreddits;
+    return new Listing<Subreddit>({
+      hasMore: true,
+      before: options.before,
+      after: options.after,
+      pageSize: options.pageSize,
+      limit: options.limit,
+      fetch: async (fetchOptions) => {
+        const response = await client.SubredditsMineWhere(
+          {
+            where: 'subscriber',
+            show: 'all',
+            ...fetchOptions,
+          },
+          this.#metadata
+        );
+
+        assertNonNull(response.data, 'Failed to get subscribed subreddits for user');
+        console.log(JSON.stringify(response));
+
+        const children = response.data.children?.map((child) => new Subreddit(child.data!)) || [];
+
+        return {
+          children,
+          before: response.data.before,
+          after: response.data.after,
+        };
+      },
+    });
+  }
+
   /**
    * Return a listing of things requiring moderator review, such as reported things and items.
    *
@@ -1319,6 +1359,11 @@ function asSubredditType(type?: string): SubredditType {
 function asAllowedPostType(type?: string): 'any' | 'link' | 'self' {
   if (type === 'any' || type === 'link' || type === 'self') {
     return type;
+  }
+
+  // Default to 'any' if no type is specified
+  if (!type) {
+    return 'any';
   }
 
   throw new Error(`invalid allowed post type: ${type}`);

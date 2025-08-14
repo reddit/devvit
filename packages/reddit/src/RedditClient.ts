@@ -27,6 +27,7 @@ import type {
   GetPostsOptionsWithTimeframe,
   GetPrivateMessagesOptions,
   GetSubredditUsersByTypeOptions,
+  GetSubscribedSubredditsForCurrentUserOptions,
   GetUserOverviewOptions,
   Listing,
   ModAction,
@@ -1671,6 +1672,17 @@ export class RedditClient {
    */
   getSubredditStyles(subredditId: T5): Promise<SubredditStyles> {
     return getSubredditStyles(subredditId);
+  }
+
+  /**
+   * Returns a listing of subreddits that the current user is subscribed to.
+   * This method will execute as the app account by default.
+   * To execute this on behalf of a user, please contact Reddit.
+   */
+  getSubscribedSubredditsForCurrentUser(
+    options: GetSubscribedSubredditsForCurrentUserOptions
+  ): Listing<Subreddit> {
+    return Subreddit.getSubscribedSubredditsForCurrentUser(options);
   }
 
   /**
