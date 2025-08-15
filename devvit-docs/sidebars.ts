@@ -76,7 +76,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'html',
-      value: '<span><tab>Capabilities</span>',
+      value: '<span>Capabilities</span>',
       className: 'sidebar-section-header',
       defaultStyle: false,
     },

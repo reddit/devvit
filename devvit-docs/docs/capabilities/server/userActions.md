@@ -54,8 +54,8 @@ After enabling, you can call certain Reddit APIs on behalf of the user by passin
 
 Currently, the following APIs support this option:
 
-- [submitPost()](/api/redditapi/models/classes/RedditAPIClient.md#submitpost)
-- [submitComment()](/api/redditapi/models/classes/RedditAPIClient.md#submitcomment)
+- [submitPost()](../../api/redditapi/RedditAPIClient/classes/RedditAPIClient.md#submitpost)
+- [submitComment()](../../api/redditapi/RedditAPIClient/classes/RedditAPIClient.md#submitcomment)
 
 If `runAs` is not specified, the API will use `runAs: 'APP'` by default.
 

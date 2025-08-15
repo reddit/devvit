@@ -98,7 +98,7 @@ export default Devvit;
 
 ### Schedule a one-off action
 
-You can schedule an action to run once at a specific time, like sending a private message in the [Remind Me](/docs/showcase/tutorials/remind_me.md) tutorial.
+You can schedule an action to run once at a specific time, like sending a private message in the [Remind Me](../showcase/tutorials/remind_me.md) tutorial.
 
 ```ts
 import { Devvit } from '@devvit/public-api';

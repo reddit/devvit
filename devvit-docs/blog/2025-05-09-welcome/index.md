@@ -25,7 +25,7 @@ Reddit is becoming a home for developers, not just to build but to grow real com
 Here’s what developers get:
 
 - <strong>Distribution</strong> hands-on support from our team and out-of-the-box discovery via feeds and our app directory
-- <strong>Monetization options</strong> including payments and our [Developer Funds program](https://developers.reddit.com/docs/reddit_developer_funds)
+- <strong>Monetization options</strong> including payments and our [Developer Funds program](https://developers.reddit.com/docs/earn-money/reddit_developer_funds)
 - <strong>Community</strong> of their own for games and experiences
 
 ### The Future of Developer Platform

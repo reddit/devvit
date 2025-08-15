@@ -4,7 +4,7 @@ Create live and event-driven interactive posts. Realtime provides a set of primi
 
 - **Live**. Users engaging with the same interactive post see each others’ changes without any observable lag.
 - **Event-driven**. Posts render automatically in response to server events.
-- **Synced**. Using realtime with [Redis](/docs/capabilities/redis.md) lets you build persistent community experiences that are backed by high performance data synchronization.
+- **Synced**. Using realtime with [Redis](./redis.md) lets you build persistent community experiences that are backed by high performance data synchronization.
 
 ## Create a live interactive post
 

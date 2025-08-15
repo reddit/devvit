@@ -25,7 +25,7 @@ const [count, setCount] = useState(async () => await redis.get('count'));
 :::info
 If the initializer function is async it will block render under the value is resolved. This is a common performance pitfall so please use it sparingly or group async calls together into one state variable using [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all).
 
-A non-blocking equivalent for fetching data is [useAsync](/docs/working_with_useasync.md).
+A non-blocking equivalent for fetching data is [useAsync](./working_with_useasync.md).
 :::
 
 ## Updating state

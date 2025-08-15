@@ -1,6 +1,6 @@
 # Forms
 
-A form lets your app ask users to input and submit data. Forms can be defined with a simple [form object](#form-object) that takes a [list of fields](#supported-fields-types), and an [onSubmit handler](#on-submit-handler).
+A form lets your app ask users to input and submit data. Forms can be defined with a simple [form object](#form-object) that takes a [list of fields](#supported-fields-types), and an [onSubmit handler](#onsubmit-handler).
 
 ![A form dialog](../assets/capabilities/forms/forms-dialog.png)
 
@@ -9,12 +9,12 @@ A form lets your app ask users to input and submit data. Forms can be defined wi
 There are several ways to add a form to your app, and the method you'll use depends on what you’re doing.
 
 - For [interactive posts](#interactive-posts), use the `context.ui.useForm` hook.
-- For [menu actions](#menu-actions), use the [`devvit.createForm`](/docs/api/public-api/classes/Devvit-1.md#createform) method.
-- For [app configurations](#app-configurations), use the [`devvit.addSettings`](/docs/api/public-api/classes/Devvit-1.md#addsettings) method.
+- For [menu actions](#menu-actions), use the [`devvit.createForm`](../api/public-api/classes/Devvit.md#createform) method.
+- For [app configurations](#app-configurations), use the [`devvit.addSettings`](../api/public-api/classes/Devvit.md#addsettings) method.
 
 ### Interactive posts
 
-This example shows an interactive post with a text label and a button that triggers a form. When the form is submitted, the onSubmit handler takes the form input and manipulates state with [`useState`](/docs/working_with_usestate.md). The state update triggers a rerender and the new data is displayed.
+This example shows an interactive post with a text label and a button that triggers a form. When the form is submitted, the onSubmit handler takes the form input and manipulates state with [`useState`](../working_with_usestate.md). The state update triggers a rerender and the new data is displayed.
 
 ```tsx
 import { Devvit, useState, useForm } from '@devvit/public-api';
@@ -100,7 +100,7 @@ For more details see the [app configurations page](./app-configurations.md).
 
 ## Form object
 
-The form object enables you to customize the form container and the [list of form fields](#supported-fields-types) included. The form object is passed along to `context.ui.useForm`, [`devvit.createForm`](/docs/api/public-api/classes/Devvit-1.md#createform), or [`devvit.addSettings`](/docs/api/public-api/classes/Devvit-1.md#addsettings) to create the form.
+The form object enables you to customize the form container and the [list of form fields](#supported-fields-types) included. The form object is passed along to `context.ui.useForm`, [`devvit.createForm`](../api/public-api/classes/Devvit.md#createform), or [`devvit.addSettings`](../api/public-api/classes/Devvit.md#addsettings) to create the form.
 
 #### Usage
 
@@ -193,7 +193,7 @@ const stringField = {
 | `required`     | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
 | `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
 | `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
-| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `scope`        | [`SettingScopeType`](../api/public-api/type-aliases/SettingScopeType) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
 | `placeholder`  | `string` `undefined`                                                              | Placeholder text for display before a value is present.                                                                                                          |
 | `isSecret`     | `boolean` `undefined`                                                             | Makes the form field secret.                                                                                                                                     |
 
@@ -232,7 +232,7 @@ const selectField = {
 | `required`     | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
 | `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
 | `defaultValue` | ` string[]` `undefined`                                                           | The default value of the field. Note that the default value is wrapped in an array to support multiple selected values.                                          |
-| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `scope`        | [`SettingScopeType`](../api/public-api/type-aliases/SettingScopeType) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
 | `multiSelect`  | `boolean` `undefined`                                                             | Enables users to select more than 1 item from the set.                                                                                                           |
 
 ### Paragraph
@@ -262,7 +262,7 @@ const paragraphField = {
 | `required`     | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
 | `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
 | `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
-| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `scope`        | [`SettingScopeType`](../api/public-api/type-aliases/SettingScopeType) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
 | `placeholder`  | `string` `undefined`                                                              | Placeholder text for display before a value is present.                                                                                                          |
 | `lineHeight`   | `number` `undefined`                                                              | Sets the field height by number of lines.                                                                                                                        |
 
@@ -293,7 +293,7 @@ const numberField = {
 | `required`     | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
 | `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
 | `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
-| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `scope`        | [`SettingScopeType`](../api/public-api/type-aliases/SettingScopeType) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
 
 ### Boolean
 
@@ -321,7 +321,7 @@ const booleanField = {
 | `helpText`     | `string` `undefined`                                                              | An optional help text that will be displayed below the field.                                                                                                    |
 | `disabled`     | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
 | `defaultValue` | ` ValueType` `undefined`                                                          | The default value of the field.                                                                                                                                  |
-| `scope`        | [`SettingScopeType`](/docs/api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `scope`        | [`SettingScopeType`](../api/public-api/type-aliases/SettingScopeType) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
 
 ### Image
 
@@ -342,17 +342,17 @@ const imageField = {
 
 #### Properties
 
-| Property      | Supported types                                                                | Description                                                                                                                                                      |
-| :------------ | :----------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`        | `string`                                                                       | The desired field type.                                                                                                                                          |
-| `name`        | `string`                                                                       | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                                           |
-| `label`       | `string`                                                                       | The label of the field. This will be displayed to the user.                                                                                                      |
-| `helpText`    | `string` `undefined`                                                           | An optional help text that will be displayed below the field.                                                                                                    |
-| `required`    | `boolean` `undefined`                                                          | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
-| `disabled`    | `boolean` `undefined`                                                          | If true the field will be disabled. Defaults to `false`.                                                                                                         |
-| `scope`       | [`SettingScopeType`](../api/public-api/README.md#settingscopetype) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
-| `placeholder` | `string` `undefined`                                                           | Placeholder text for display before a value is present.                                                                                                          |
-| `isSecret`    | `boolean` `undefined`                                                          | Makes the form field secret.                                                                                                                                     |
+| Property      | Supported types                                                                   | Description                                                                                                                                                      |
+| :------------ | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`        | `string`                                                                          | The desired field type.                                                                                                                                          |
+| `name`        | `string`                                                                          | The name of the field. This will be used as the key in the `values` object when the form is submitted.                                                           |
+| `label`       | `string`                                                                          | The label of the field. This will be displayed to the user.                                                                                                      |
+| `helpText`    | `string` `undefined`                                                              | An optional help text that will be displayed below the field.                                                                                                    |
+| `required`    | `boolean` `undefined`                                                             | If true the field will be required and the user will not be able to submit the form without filling it in. Defaults to `false`.                                  |
+| `disabled`    | `boolean` `undefined`                                                             | If true the field will be disabled. Defaults to `false`.                                                                                                         |
+| `scope`       | [`SettingScopeType`](../api/public-api/type-aliases/SettingScopeType) `undefined` | This indicates whether the field (setting) is an app level or install level setting. App setting values can be used by any installation. `undefined` by default. |
+| `placeholder` | `string` `undefined`                                                              | Placeholder text for display before a value is present.                                                                                                          |
+| `isSecret`    | `boolean` `undefined`                                                             | Makes the form field secret.                                                                                                                                     |
 
 ### Group
 

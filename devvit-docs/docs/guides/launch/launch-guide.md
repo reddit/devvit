@@ -150,5 +150,5 @@ When you're ready to publicly release your app, you’ll need to add it to the A
 ## Resources
 
 - Got questions? Join our Discord or post in [r/Devvit](https://www.reddit.com/r/Devvit/).
-- Review the [rules](/devvit-docs/docs/devvit_rules.md) before publishing.
-- Learn more about [how to earn](/devvit-docs/docs/earn-money/payments/payments_overview.md) for apps you launch.
+- Review the [rules](../../devvit_rules.md) before publishing.
+- Learn more about [how to earn](../../earn-money/payments/payments_overview.md) for apps you launch.

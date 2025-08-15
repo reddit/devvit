@@ -255,4 +255,4 @@ If the input was invalid or left blank, you'll see the corresponding error toast
 Congratulations on getting your Remind Me app running! Next up:
 
 - Learn how to use Redis in our [Three Strikes tutorial](./three_strikes.md).
-- Add [logging](../../get-started/debug.md) to your app to help you debug.
+- Add [logging](../../debug.md) to your app to help you debug.

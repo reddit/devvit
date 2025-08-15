@@ -23,7 +23,7 @@ Devvit Web transforms how you build Reddit apps:
 - **Unified SDK**: @devvit/web package with clear client/server separation
   Better AI compatibility: Standard web technologies work seamlessly with AI coding tools
 
-There's also a new [web-based creation flow](developers.reddit.com/new) that makes creating new apps faster:
+There's also a new [web-based creation flow](https://developers.reddit.com/new/) that makes creating new apps faster:
 
 - A step-by-step UI guides you through the initial steps to create an app
 - Automatically builds a playtest subreddit for testing

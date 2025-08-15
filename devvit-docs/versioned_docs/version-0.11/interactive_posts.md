@@ -1,6 +1,6 @@
 # Overview
 
-Interactive posts allow you to build apps like [live scoreboards](./showcase/apps.mdx#livescores), [polls](./showcase/playgrounds.mdx#polls), or [community games](./community_games.md) on Reddit. This guide will help you understand how to build them effectively.
+Interactive posts allow you to build apps like [live scoreboards](./showcase/apps#live-scores), [polls](./showcase/playgrounds), or [community games](./community_games.md) on Reddit. This guide will help you understand how to build them effectively.
 
 ## What’s supported
 
@@ -22,7 +22,7 @@ You can also create your own interactive post from scratch.
 
 ### Devvit blocks
 
-[Blocks](./blocks/overview.mdx) is a Reddit native declarative UI framework that provides:
+[Blocks](./blocks/overview) is a Reddit native declarative UI framework that provides:
 
 - ✅ Reddit-styled components
 - ✅ Cross-platform compatibility
@@ -31,7 +31,7 @@ You can also create your own interactive post from scratch.
 
 Perfect for: Polls, scoreboards, simple & fast interactive games
 
-You can see code examples of apps built with blocks [here](./showcase/apps.mdx) or in our [playground](https://developers.reddit.com/play).
+You can see code examples of apps built with blocks [here](./showcase/apps) or in our [playground](https://developers.reddit.com/play).
 
 ### Webviews
 
@@ -43,7 +43,7 @@ You can see code examples of apps built with blocks [here](./showcase/apps.mdx) 
 
 Perfect for: Games, complex visualizations, rich interactions
 
-You can find some webview example games [here](./webviews.md#examples)
+You can find some webview example games [here](./webviews#basic-example)
 
 # Should I use blocks or webviews?
 

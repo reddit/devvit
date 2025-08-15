@@ -64,6 +64,8 @@ const config: Config = {
           // Optional blog settings
           postsPerPage: 10,
           showReadingTime: true,
+          onInlineAuthors: 'ignore',
+          onUntruncatedBlogPosts: 'ignore',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -144,7 +146,7 @@ const config: Config = {
         },
         {
           label: 'The Reddit Developer Fund',
-          to: '/reddit_developer_funds',
+          to: '/earn-money/reddit_developer_funds',
         },
 
         {

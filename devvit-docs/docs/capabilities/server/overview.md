@@ -24,7 +24,7 @@ Allows you to store app data in a scalable database, free of charge. Limited to 
 
 Allows you to run automated server-side tasks on a schedule, for example, checking for updates every hour.
 
-## [Secrets storage](./secrets-storage.md)
+## [Secrets storage](./settings-and-secrets.mdx)
 
 Allows you to build an app where the moderator can store secret keys in a safe and scalable way. For example, if your app needs the installing moderator to provide their own keys to an external API.
 

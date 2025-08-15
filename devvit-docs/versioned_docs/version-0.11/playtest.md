@@ -82,4 +82,4 @@ $ devvit upload
 
 This will automatically bump your app version to the next patch release. For example, if your playtest version is 0.0.1.6, the upload command will remove the playtest version increment and change your app version to 0.0.2.
 
-Once you [publish your app](./dev_guide.mdx/#9publish) to the Apps Directory, it will be available for users to install.
+Once you [publish your app](./publishing) to the Apps Directory, it will be available for users to install.

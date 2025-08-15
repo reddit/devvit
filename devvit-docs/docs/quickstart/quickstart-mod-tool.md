@@ -181,11 +181,11 @@ If you didn't provide a test subreddit, one will be created for you. Once you ru
 
 ## Result
 
-Now you have a mod tool running from the code that you deployed yourself. Feel free to experiment with the code and run `npm run dev` again to see the changes. Notice that you don't need to worry about running costs for your mod tool, because Reddit hosts all Devvit applications for free. Also, if your mod tool becomes popular and gets installed by many subreddits, you may become eligible to earn [Reddit Developer Funds](https://developers.reddit.com/docs/reddit_developer_funds).
+Now you have a mod tool running from the code that you deployed yourself. Feel free to experiment with the code and run `npm run dev` again to see the changes. Notice that you don't need to worry about running costs for your mod tool, because Reddit hosts all Devvit applications for free. Also, if your mod tool becomes popular and gets installed by many subreddits, you may become eligible to earn [Reddit Developer Funds](https://developers.reddit.com/docs/earn-money/reddit_developer_funds).
 
 ## Further reading
 
 - Use our [launch guide](../guides/launch/launch-guide.md) to guide you where to get your first users.
 - [Devvit Forms](https://developers.reddit.com/docs/capabilities/forms)
 - [Menu Actions](https://developers.reddit.com/docs/capabilities/menu-actions)
-- [Reddit Developer Funds](https://developers.reddit.com/docs/reddit_developer_funds)
+- [Reddit Developer Funds](https://developers.reddit.com/docs/earn-money/reddit_developer_funds)

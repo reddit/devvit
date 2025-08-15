@@ -1,6 +1,6 @@
 # Publishing an app
 
-Once you [upload](./dev_guide.mdx#7upload) your app, a private version of it is added to the [Apps](https://developers.reddit.com/apps) directory. Only you will be able to see your app in the directory, and it’s available for you to use in small subreddits with fewer than 200 subscribers for testing purposes.
+Once you [upload](./dev_guide#7-upload-your-app) your app, a private version of it is added to the [Apps](https://developers.reddit.com/apps) directory. Only you will be able to see your app in the directory, and it’s available for you to use in small subreddits with fewer than 200 subscribers for testing purposes.
 
 To use your app in larger subreddits, you’ll need to publish your app. To do this from the CLI, run:
 
@@ -33,13 +33,13 @@ Public apps are discoverable on our apps directory for anyone on Reddit. These a
   - Changelogs for new versions
 - Test your app across viewport sizes and user states
 - Ensure app contents can be moderated
-- Ensure app complies with our [Developer Terms](https://redditinc.com/policies/developer-terms) and [guidelines](guidelines.md)
+- Ensure app complies with our [Developer Terms](https://redditinc.com/policies/developer-terms)
 
 ### Requirements for unlisted apps
 
 - Add an app description file to the root of your project directory with an app overview
 - Ensure app contents can be moderated
-- Ensure app complies with our [Developer Terms](https://redditinc.com/policies/developer-terms) and [guidelines](guidelines.md)
+- Ensure app complies with our [Developer Terms](https://redditinc.com/policies/developer-terms)
 
 ## App review
 

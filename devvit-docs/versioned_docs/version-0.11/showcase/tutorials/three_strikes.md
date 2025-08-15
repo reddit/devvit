@@ -14,7 +14,7 @@ This app allows a moderator to remove rule-breaking content and use a "three str
 
 ## Start a project
 
-To create a Three Strikes app, use the default empty [template](../../get-started/create-app.md#templates) to start a new project.
+To create a Three Strikes app, use the default empty [template](../../dev_guide.mdx) to start a new project.
 
 1. From the terminal, navigate to a directory where you'll store your project.
 2. Enter the following command to create a project folder on your local machine.
@@ -43,7 +43,7 @@ import { Devvit, MenuItemOnPressEvent, User } from '@devvit/public-api';
 
 Importing this code adds core classes and plugins from the Reddit Developer Platform (`@devvit/public-api`).
 
-5. Add the [Redis plugin](/docs/capabilities/redis.md). This plugin allows you to store data in your app that will be there the next time it’s run. You also need to enable access to the Reddit API.
+5. Add the [Redis plugin](../../capabilities/redis.md). This plugin allows you to store data in your app that will be there the next time it’s run. You also need to enable access to the Reddit API.
 
 ```typescript
 Devvit.configure({
