@@ -4,6 +4,8 @@ import { themes as prismThemes } from 'prism-react-renderer';
 
 const baseUrl = process.env.DOCUSAURUS_BASE_URL ?? '/';
 
+const LATEST_DEVVIT_VERSION = '0.12'; // update-versioned-docs.mjs sets this automatically
+
 const config: Config = {
   future: {
     v4: true,
@@ -56,7 +58,12 @@ const config: Config = {
         docs: {
           routeBasePath: '/', // Serve the docs at the site's root
           sidebarPath: './sidebars.ts',
-          lastVersion: '0.12',
+          lastVersion: LATEST_DEVVIT_VERSION,
+          versions: {
+            [LATEST_DEVVIT_VERSION]: {
+              badge: false,
+            },
+          },
         },
         blog: {
           path: 'blog',

@@ -30,7 +30,7 @@ export default function RotatingImage({ images, interval = 1800, style }) {
     };
   }, [images, interval, idx]);
 
-  // CSS classes for transition (X axis only)
+  // CSS classes for transition (don't use translateX, it'll get minified into translate and cause a hydration bailout)
   // .rotating-img { ...base styles... }
   // .rotating-img.next { transform: translateX(100%); z-index:2; }
   // .rotating-img.current { transform: translateX(0); z-index:1; }
@@ -63,13 +63,16 @@ export default function RotatingImage({ images, interval = 1800, style }) {
         background: '#fff',
       }}
     >
-      <style>{`
-        .rotating-img { will-change: transform; }
-        .rotating-img.next { transform: translateX(100%); z-index:2; }
-        .rotating-img.current { transform: translateX(0); z-index:1; }
-        .rotating-img.do-transition.next { transform: translateX(0); }
-        .rotating-img.do-transition.current { transform: translateX(-100%); }
-      `}</style>
+      <style>
+        {
+          // This has to be pre-minified, or it'll cause a hydration mismatch
+          `.rotating-img{will-change:transform}` +
+            `.rotating-img.next{z-index:2;transform:translate(100%)}` +
+            `.rotating-img.current{z-index:1;transform:translate(0)}` +
+            `.rotating-img.do-transition.next{transform:translate(0)}` +
+            `.rotating-img.do-transition.current{transform:translate(-100%)}`
+        }
+      </style>
       {isTransitioning && nextIdx !== null && (
         <>
           <img
@@ -96,7 +99,7 @@ export default function RotatingImage({ images, interval = 1800, style }) {
           style={{
             ...baseImgStyle,
             zIndex: 2,
-            transform: 'translateX(0)',
+            transform: 'translate(0)',
           }}
         />
       )}
