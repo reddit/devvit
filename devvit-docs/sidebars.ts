@@ -62,11 +62,15 @@ const sidebars: SidebarsConfig = {
       id: 'quickstart/quickstart-mod-tool',
       label: 'Quickstart for Mod Tools',
     },
-
     {
       type: 'doc',
       label: 'Launch Your App',
       id: 'guides/launch/launch-guide',
+    },
+    {
+      type: 'doc',
+      label: 'AI Tools',
+      id: 'guides/ai/ai',
     },
     {
       type: 'html',

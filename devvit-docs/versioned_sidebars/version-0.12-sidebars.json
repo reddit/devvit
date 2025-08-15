@@ -53,6 +53,11 @@
       "id": "guides/launch/launch-guide"
     },
     {
+      "type": "doc",
+      "label": "AI Tools",
+      "id": "guides/ai/ai"
+    },
+    {
       "type": "html",
       "value": "<hr/>",
       "className": "sidebar-divider",
