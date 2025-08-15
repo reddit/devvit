@@ -36,7 +36,7 @@ This tutorial lets you build your own version of [Comment Mop](https://developer
 
 ### Create a menu action for moderators
 
-The template leverages [Menu Actions](https://developers.reddit.com/docs/capabilities/menu-actions) to enable moderators to Delete/Lock child comments of a post or comment. Menu Actions appear in the moderator menu:  
+The template leverages [Menu Actions](../capabilities/client/menu-actions) to enable moderators to Delete/Lock child comments of a post or comment. Menu Actions appear in the moderator menu:  
 ![menu actions](../assets/quickstart/quickstart-mod-tool-1.png)
 
 The following code adds a menu action to comments. Once the app is installed on a subreddit, all moderators of the subreddit will see this option appear in the moderator menu for all comments.
@@ -57,7 +57,7 @@ You'll notice that the `onPress` handler of this Menu Item action invokes a form
 
 ### Devvit forms
 
-Optionally, some moderator tools might need to request some additional information from the moderator before they can execute. In these cases we can leverage [Devvit Forms](https://developers.reddit.com/docs/capabilities/forms). Comment Mop will display a form with some options regarding the action to be taken:
+Optionally, some moderator tools might need to request some additional information from the moderator before they can execute. In these cases we can leverage [Devvit Forms](../capabilities/client/forms). Comment Mop will display a form with some options regarding the action to be taken:
 
 ![forms](../assets/quickstart/quickstart-mod-tool-2.png)
 
@@ -181,11 +181,11 @@ If you didn't provide a test subreddit, one will be created for you. Once you ru
 
 ## Result
 
-Now you have a mod tool running from the code that you deployed yourself. Feel free to experiment with the code and run `npm run dev` again to see the changes. Notice that you don't need to worry about running costs for your mod tool, because Reddit hosts all Devvit applications for free. Also, if your mod tool becomes popular and gets installed by many subreddits, you may become eligible to earn [Reddit Developer Funds](https://developers.reddit.com/docs/earn-money/reddit_developer_funds).
+Now you have a mod tool running from the code that you deployed yourself. Feel free to experiment with the code and run `npm run dev` again to see the changes. Notice that you don't need to worry about running costs for your mod tool, because Reddit hosts all Devvit applications for free. Also, if your mod tool becomes popular and gets installed by many subreddits, you may become eligible to earn [Reddit Developer Funds](../earn-money/reddit_developer_funds).
 
 ## Further reading
 
 - Use our [launch guide](../guides/launch/launch-guide.md) to guide you where to get your first users.
-- [Devvit Forms](https://developers.reddit.com/docs/capabilities/forms)
-- [Menu Actions](https://developers.reddit.com/docs/capabilities/menu-actions)
-- [Reddit Developer Funds](https://developers.reddit.com/docs/earn-money/reddit_developer_funds)
+- [Devvit Forms](../capabilities/client/forms)
+- [Menu Actions](../capabilities/client/menu-actions)
+- [Reddit Developer Funds](../earn-money/reddit_developer_funds)

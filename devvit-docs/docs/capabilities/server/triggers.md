@@ -30,7 +30,7 @@ Event triggers let your app automatically respond to a user’s or moderator’s
 - `onAutomoderatorFilterPost`
 - `onAutomoderatorFilterComment`
 
-A full list of events and their payloads can be found in the [EventTypes documentation](https://developers.reddit.com/docs/api/public-api/@devvit/namespaces/EventTypes/). For more details on Mod specific actions, see [ModActions](https://developers.reddit.com/docs/api/redditapi/models/interfaces/ModAction) and [ModMail](https://developers.reddit.com/docs/api/public-api/type-aliases/ModMailDefinition).
+A full list of events and their payloads can be found in the [EventTypes documentation](../../api/public-api/@devvit/namespaces/EventTypes/). For more details on Mod specific actions, see [ModActions](../../api/redditapi/models/interfaces/ModAction) and [ModMail](../../api/public-api/type-aliases/ModMailDefinition).
 
 ## Setting up triggers
 
@@ -85,4 +85,4 @@ router.post('/internal/on-post-submit', async (req, res) => {
 
 - Avoid creating recursive triggers that could cause infinite loops or crashes (for example, a comment trigger that creates a comment).
 - Always check the event payload to ensure your app is not the source of the event before taking action.
-- Review the [EventTypes documentation](https://developers.reddit.com/docs/api/public-api/@devvit/namespaces/EventTypes/) for details on event payloads.
+- Review the [EventTypes documentation](../../api/public-api/@devvit/namespaces/EventTypes/) for details on event payloads.

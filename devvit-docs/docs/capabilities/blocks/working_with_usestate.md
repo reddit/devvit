@@ -151,11 +151,11 @@ Devvit.addCustomPostType({
 });
 ```
 
-In this example, when a user session ends, state will no longer be available to the app. To save and persist data between sessions you will need to [store data server-side via the Redis](https://developers.reddit.com/docs/redis).
+In this example, when a user session ends, state will no longer be available to the app. To save and persist data between sessions you will need to [store data server-side via the Redis](../server/redis).
 
 ## Redis vs useState
 
-The `redis` [plugin](https://developers.reddit.com/docs/redis) serves as your app’s long-term, server-side memory, while `useState` serves as its short-term, client-side memory.
+The `redis` [plugin](../server/redis) serves as your app’s long-term, server-side memory, while `useState` serves as its short-term, client-side memory.
 
 `useState` will keep your custom posts performant and responsive. UI that relies on too many server-side calls will slow down your app.
 

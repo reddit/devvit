@@ -6,7 +6,7 @@ Reddit developer funds is a way for developers to earn money for the apps they b
 
 We want creative new apps that enrich the Reddit community through:
 
-- A new experience, like a [live score board](https://developers.reddit.com/docs/showcase/apps#live-scores) or [community bingo](https://developers.reddit.com/docs/showcase/apps#bingo)
+- A new experience, like a [live score board](./showcase/apps#live-scores) or [community bingo](./showcase/apps#bingo)
 - An entirely new community created around the app, like [r/pixelary](https://www.reddit.com/r/Pixelary/) or [r/riddonkulous](https://www.reddit.com/r/riddonkulous/)
 - A quality of life improvement that benefits hundreds of subreddits
 
