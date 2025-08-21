@@ -1,6 +1,6 @@
 # Reddit Developer Funds 2025
 
-Reddit developer funds is a way for developers to earn money for the apps they build.
+Reddit developer funds is a way for developers to earn money for the apps they build. Devs can earn up to $500,000 for their apps, or $167,000 per app.
 
 ## What we’re looking for
 
@@ -28,9 +28,11 @@ Measurement and eligibility are further defined in our terms. Please reference o
 | Tier 1 - Engagers | 500 daily qualified engagers       | $500    | $500              |
 | Tier 2 - Engagers | 1,000 daily qualified engagers     | $1,000  | $1,500            |
 | Tier 3 - Engagers | 10,000 daily qualified engagers    | $5,000  | $6,500            |
-| Tier 4 - Engagers | 50,000 daily qualified engagers    | $10,000 | $16,500           |
-| Tier 5 - Engagers | 250,000 daily qualified engagers   | $25,000 | $41,500           |
-| Tier 6 - Engagers | 1,000,000 daily qualified engagers | $75,000 | $116,500          |
+| Tier 4 - Engagers | 25,000 daily qualified engagers    | $10,500 | $17,000           |
+| Tier 5 - Engagers | 50,000 daily qualified engagers    | $25,000 | $42,000           |
+| Tier 6 - Engagers | 100,000 daily qualified engagers   | $25,000 | $67,000           |
+| Tier 7 - Engagers | 250,000 daily qualified engagers   | $25,000 | $92,000           |
+| Tier 8 - Engagers | 1,000,000 daily qualified engagers | $75,000 | $167,000          |
 
 The Daily Qualified Engagers threshold(s) are determined on a rolling seven day average, which means that the average Daily Qualified Engagers for your app over the prior seven days exceeds a given threshold.
 
