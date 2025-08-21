@@ -17,7 +17,7 @@ const config: Config = {
   baseUrl,
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/orangered_icon_devvit_fill.svg',
+  favicon: '/img/devvit_icon.png',
   markdown: {
     format: 'detect',
   },
@@ -73,6 +73,22 @@ const config: Config = {
           showReadingTime: true,
           onInlineAuthors: 'ignore',
           onUntruncatedBlogPosts: 'ignore',
+        },
+        sitemap: {
+          changefreq: 'weekly',
+          priority: 0.5,
+          createSitemapItems: async (params) => {
+            const { defaultCreateSitemapItems, ...rest } = params;
+            const items = await defaultCreateSitemapItems(rest);
+            return items.filter((item) => {
+              if (!/firehose|snapshot|next|\/\d+\.\d+\//.test(item.url)) {
+                return true;
+              } else {
+                console.log('excluding', item.url);
+                return false;
+              }
+            });
+          },
         },
         theme: {
           customCss: './src/css/custom.css',
