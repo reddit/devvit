@@ -1,19 +1,12 @@
 # Overview
 
-Devvit Blocks is a framework that allows you to build apps that run inside of a Reddit post.
-Apps built with Devvit Blocks follow the Reddit design system and are optimized for in-feed performance and cross-platform compatibility.
+Devvit Blocks is a framework that allows you to build apps with Reddit native components. Blocks is optimized for speed and ease of use, but is not recommended for games due to technical constraints and limitations.
 
 ## Examples
 
-### [r/Pixelary](https://www.reddit.com/r/pixelary)
+### [r/WallStreetBets](https://www.reddit.com/r/wallstreetbets)
 
-Pixelary is an pixel drawing-based game built with Devvit Blocks by u/OppDagger. You can play the whole game inside the Reddit post as you're scrolling through the feed. It never takes you to a full-screen experience on mobile or a modal on Web. The full source code is available [here](https://github.com/reddit/devvit/tree/main/packages/apps/pixelary).
-
-### [r/Riddonkulous](https://www.reddit.com/r/riddonkulous)
-
-Riddonkulous is a riddle building and solving game built with Devvit Blocks by u/hammertimestudio. Similarly to r/Pixelary above, you can play the game without leaving the Reddit feed, given that it was built on Devvit Blocks. You can read more about u/hammertimestudio's experience developing with Devvit Blocks in our [blog](https://developers.reddit.com/docs/blog/riddonkulous).
-
-### [r/Syllacrostic](https://www.reddit.com/r/syllacrostic)
+Wall Street Bets's daily thread tracks stock performance and discussion on r/wallstreetbets. It's able to render in the feed quickly, and refresh automatically as new data is available.
 
 Syllacrostic is a word game built with Devvit Blocks by u/JeffBritches. Note that playing the game also does not trigger a modal or full screen experience, because it is built completely in Devvit Blocks.
 
