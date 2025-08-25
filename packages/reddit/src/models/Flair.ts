@@ -266,11 +266,11 @@ export type SetUserFlairOptions = SetFlairOptions & {
 
 export type SetPostFlairOptions = SetFlairOptions & {
   /** The ID of the post to set the flair on */
-  t3: string;
+  postId: T3;
 };
 
 export type InternalSetPostFlairOptions = SetFlairOptions & {
-  t3: T3;
+  postId: T3;
 };
 
 export type SetUserFlairBatchConfig = {
@@ -373,7 +373,7 @@ export class Flair {
   static setPostFlair(options: SetPostFlairOptions): Promise<void> {
     return Flair.#setFlair({
       ...options,
-      postId: T3(options.t3),
+      postId: T3(options.postId),
     });
   }
 
@@ -389,7 +389,7 @@ export class Flair {
         flairTemplateId: options.flairTemplateId ?? '',
         text: options.text ?? '',
         name: (options as SetUserFlairOptions).username,
-        link: (options as InternalSetPostFlairOptions).t3,
+        link: (options as InternalSetPostFlairOptions).postId,
         backgroundColor: options.backgroundColor ?? '',
         textColor: options.textColor ?? 'dark',
         cssClass: options.cssClass ?? '',
