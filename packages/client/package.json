@@ -33,7 +33,6 @@
   "types": "./dist/index.d.ts",
   "dependencies": {
     "@devvit/protos": "0.11.19",
-    "@devvit/reddit": "0.11.19",
     "@devvit/shared": "0.11.19",
     "@devvit/shared-types": "0.11.19",
     "@devvit/web-view-scripts": "0.11.19"
@@ -51,8 +50,8 @@
   },
   "filesize": {
     "dist/client.min.js": {
-      "gzip": "25 KB",
-      "none": "118 KB"
+      "gzip": "23 KB",
+      "none": "99 KB"
     }
   },
   "source": "./src/index.ts"
