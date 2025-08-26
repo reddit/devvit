@@ -1,8 +1,6 @@
+import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
-import type {
-  RealtimeSubscriptionEvent,
-  RealtimeSubscriptionStatus,
-} from '@devvit/protos/types/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
+import type { RealtimeSubscriptionStatus } from '@devvit/protos/types/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
 import type { JsonValue } from '@devvit/shared';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
@@ -84,18 +82,18 @@ class Connection {
     connectionsByChannel.delete(this.#opts.channel);
   }
 
-  onMessage = (ev: MessageEvent): void => {
+  onMessage = (ev: MessageEvent<WebViewMessageEvent_MessageData>): void => {
     const { type, data } = ev.data;
 
     if (type !== 'devvit-message') {
       return;
     }
 
-    if (!data.realtimeEvent) {
+    if (!data?.realtimeEvent) {
       return;
     }
 
-    const { status, event } = data.realtimeEvent as RealtimeSubscriptionEvent;
+    const { status, event } = data.realtimeEvent;
 
     if (!event?.channel.endsWith(this.#opts.channel)) {
       return;
