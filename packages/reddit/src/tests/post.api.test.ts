@@ -729,6 +729,33 @@ describe('Post API', () => {
     });
   });
 
+  describe('mergePostData()', () => {
+    test('merges postData with existing postData', async () => {
+      const mockedPost = new Post({ ...defaultPostData });
+      const spyPlugin = redditApiPlugins.LinksAndComments.EditCustomPost;
+      spyPlugin.mockImplementationOnce(async () => ({
+        json: { data: { things: [{ kind: 'post' }] }, errors: [] },
+      }));
+
+      vi.spyOn(Post, 'getDevvitPostData').mockResolvedValueOnce({
+        developerData: { currentScore: 55, settings: { theme: 'dark', fontSize: 12 } },
+      });
+
+      await runWithTestContext(async () => {
+        await mockedPost.mergePostData({ settings: { fontSize: 14 } });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            thingId: 't3_qwerty',
+            postData: {
+              developerData: { currentScore: 55, settings: { fontSize: 14 } },
+            },
+          },
+          context.metadata
+        );
+      });
+    });
+  });
   describe('setSuggestedCommentSort()', () => {
     test('sets custom post sort', async () => {
       const selftext =

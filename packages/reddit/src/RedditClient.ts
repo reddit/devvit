@@ -1,6 +1,7 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
 import { context, getContextCache, setContextCache } from '@devvit/server';
 import { Header } from '@devvit/shared-types/Header.js';
+import type { PostData } from '@devvit/shared-types/PostData.js';
 import { asTid, isT1, isT3, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
 import type {
@@ -1729,6 +1730,50 @@ export class RedditClient {
 
   get #metadata(): Metadata {
     return context.metadata;
+  }
+
+  /**
+   * Set the postData for a custom post. This will replace the existing postData with the postData specified in the input.
+   *
+   * @param postId - The ID of the post to set the postData for.
+   * @param postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
+   * @throws {Error} Throws an error if the postData could not be set.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   *
+   * // Existing postData: { settings: { theme: 'dark', fontSize: 12 } }
+   *
+   * await post.setPostData({
+   *   currentScore: 55,
+   *   secretWord: 'barbeque',
+   * });
+   * // Result: { currentScore: 55, secretWord: 'barbeque' }
+   * ```
+   */
+  async setPostData(postId: T3, postData: PostData): Promise<void> {
+    const post = await Post.getById(postId);
+    await post.setPostData(postData);
+  }
+
+  /**
+   * Merge the postData on a custom post with the postData specified in the input. This performs a shallow merge.
+   *
+   * @param postData - Represents the postData to be merged with the existing postData.
+   * @throws {Error} Throws an error if the postData could not be merged.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   *
+   * // Existing postData: { currentScore: 55, settings: { theme: 'dark', fontSize: 12 } }
+   *
+   * await post.mergePostData({ settings: { fontSize: 14 } });
+   * // Result: { currentScore: 55, settings: { fontSize: 14 } }
+   * ```
+   */
+  async mergePostData(postId: T3, postData: PostData): Promise<void> {
+    const post = await Post.getById(postId);
+    await post.mergePostData(postData);
   }
 }
 

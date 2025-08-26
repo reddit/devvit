@@ -874,22 +874,50 @@ export class Post {
   }
 
   /**
-   * Set the postData on a custom post.
+   * Set the postData on a custom post. This will replace the existing postData with the postData specified in the input.
    *
    * @param postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
    * @throws {Error} Throws an error if the postData could not be set.
    * @example
    * ```ts
    * const post = await reddit.getPostById(context.postId);
+   *
+   * // Existing postData: { settings: { theme: 'dark', fontSize: 12 } }
+   *
    * await post.setPostData({
    *   currentScore: 55,
    *   secretWord: 'barbeque',
    * });
+   * // Result: { currentScore: 55, secretWord: 'barbeque' }
    * ```
    */
   async setPostData(postData: PostData): Promise<void> {
     const prev = await Post.getDevvitPostData(this.id);
     await Post.setPostData({ postId: this.id, postData: { ...prev, developerData: postData } });
+  }
+
+  /**
+   * Merge the postData on a custom post with the postData specified in the input. This performs a shallow merge.
+   *
+   * @param postData - Represents the postData to be merged with the existing postData.
+   * @throws {Error} Throws an error if the postData could not be merged.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   *
+   * // Existing postData: { currentScore: 55, settings: { theme: 'dark', fontSize: 12 } }
+   *
+   * await post.mergePostData({ settings: { fontSize: 14 } });
+   * // Result: { currentScore: 55, settings: { fontSize: 14 } }
+   * ```
+   */
+  async mergePostData(postData: PostData): Promise<void> {
+    const prev = await Post.getDevvitPostData(this.id);
+    const mergedDeveloperData = { ...prev?.developerData, ...postData };
+    await Post.setPostData({
+      postId: this.id,
+      postData: { ...prev, developerData: mergedDeveloperData },
+    });
   }
 
   /**
