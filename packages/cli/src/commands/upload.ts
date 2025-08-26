@@ -170,7 +170,7 @@ export default class Upload extends DevvitCommand {
 
     if (!appInfo?.app) {
       this.error(
-        `We couldn't find the app ${this.project.name}. Please run \`npm create devvit\` first.`
+        `We couldn't find the app ${this.project.name}. Please run \`npx devvit init\` first.`
       );
     }
 
@@ -375,7 +375,7 @@ export default class Upload extends DevvitCommand {
 
     if (!initAppParams?.appName) {
       this.error(
-        `Your code was missing an app name. Please run 'npm create devvit' to get a new code.`
+        `Your code was missing an app name. Please run 'npx devvit init' to get a new code.`
       );
     }
 

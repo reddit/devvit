@@ -92,6 +92,7 @@ export default class Init extends DevvitCommand {
 
     const { args, flags } = await this.parse(Init);
     if (!flags.force && isRunningInAppDirectory() && this.project.name !== UNINITIALIZED_APP_NAME) {
+      this.log("This app already exists, you don't need to init.");
       return;
     }
 
@@ -109,7 +110,7 @@ export default class Init extends DevvitCommand {
     this.#initAppParams = unpackCode(rawCode);
     if (!this.#initAppParams) {
       this.error(
-        `Invalid code provided. Run 'npm run init' or visit ${DEVVIT_PORTAL_URL}/new to get a new code.`
+        `Invalid code provided. Run 'npx devvit init' or visit ${DEVVIT_PORTAL_URL}/new to get a new code.`
       );
     }
     if (this.#initAppFlags?.template) {
@@ -124,7 +125,7 @@ export default class Init extends DevvitCommand {
         newToken = await oAuthSvc.fetchAccessToken(this.#initAppParams.authCode, true);
       } catch {
         this.error(
-          `Failed to login with the provided code. Please run 'npm run init' then try 'npm create devvit' again.`
+          `Failed to login with the provided code. Please run 'npx devvit init' or visit ${DEVVIT_PORTAL_URL}/new to get a new code.`
         );
       }
       await oAuthSvc.authTokenStore.writeFSToken(newToken, true);

@@ -169,7 +169,7 @@ export default class Playtest extends DevvitCommand {
 
     if (!this.#appInfo?.app) {
       this.error(
-        "Your app doesn't exist yet - you'll need to run 'npm create devvit' before you can playtest your app."
+        "Your app doesn't exist yet - you'll need to run 'npx devvit init' before you can playtest your app."
       );
     }
     this.project.app.defaultPlaytestSubredditId = this.#appInfo.app.defaultPlaytestSubredditId;
