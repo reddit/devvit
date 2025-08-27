@@ -134,10 +134,11 @@ describe('useForm() typing is intuitive', () => {
     ));
 
   test('parameter function local', () => {
-    const local = (data: JSONObject) =>
-      ({
-        fields: [{ label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' }],
-      }) as const;
+    const local = (data: JSONObject) => ({
+      fields: [
+        { label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' } as const,
+      ],
+    });
     ctx.useForm(local, (data) => {
       data.strVal satisfies string | undefined;
     });

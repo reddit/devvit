@@ -177,10 +177,11 @@ describe('createForm() typing is intuitive', () => {
     ));
 
   test('parameter function local', () => {
-    const local = (data: JSONObject) =>
-      ({
-        fields: [{ label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' }],
-      }) as const;
+    const local = (data: JSONObject) => ({
+      fields: [
+        { label: `${data.boolVal satisfies JSONValue}`, type: 'string', name: 'strVal' } as const,
+      ],
+    });
     D.createForm(local, (data) => {
       data.values.strVal satisfies string | undefined;
     });

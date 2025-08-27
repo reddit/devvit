@@ -42,7 +42,7 @@ An optional description for the form
 
 ### fields
 
-> **fields**: readonly [`FormField`](FormField.md)[]
+> **fields**: [`FormField`](FormField.md)[]
 
 The fields that will be displayed in the form
 
