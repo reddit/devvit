@@ -146,7 +146,8 @@ export type SubmitCustomPostSplashOptions = Omit<
    */
   appDisplayName?: string;
   /**
-   * Media directory relative background image URL or data URI.
+   * Media directory relative background image URL without a leading slash or
+   * data URI.
    *
    * @example `'background.png'`.
    */

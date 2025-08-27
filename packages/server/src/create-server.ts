@@ -87,7 +87,9 @@ declare global {
     var devvit: {
       metadataProvider?: () => Readonly<Metadata> | undefined;
       settings?: {
+        /** Global settings. */
         app?: FormField[] | undefined;
+        /** Subreddit settings. */
         installation?: FormField[] | undefined;
       };
     };
