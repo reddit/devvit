@@ -86,6 +86,9 @@ describe('canRunAsUser', () => {
     const result = await canRunAsUser();
     expect(emitEffect).toHaveBeenCalledWith({
       type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
+      canRunAsUser: {
+        postId: globalThis.devvit.context.postId,
+      },
     });
     expect(result, 'result').toBe(true);
   });
@@ -100,6 +103,9 @@ describe('canRunAsUser', () => {
     const result = await canRunAsUser();
     expect(emitEffect).toHaveBeenCalledWith({
       type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
+      canRunAsUser: {
+        postId: globalThis.devvit.context.postId,
+      },
     });
     expect(result, 'result').toBe(true);
   });
