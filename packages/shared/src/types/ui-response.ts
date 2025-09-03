@@ -13,14 +13,16 @@ export type UiResponse<InitFormData extends JsonObject = JsonObject> = {
   /** Show a toast to the user's reddit client. */
   showToast?: string | Toast;
   /** Display a form in the user's reddit client. */
-  showForm?: {
-    /** Name of the form. This must match a configured form in devvit.json. */
-    name: string;
-    /** Specification for the form to display to the user */
-    form: Form;
-    /** Data to initially populate form fields with */
-    data?: FormValues<InitFormData> | undefined;
-  };
+  showForm?: ShowForm<InitFormData>;
+};
+
+export type ShowForm<InitFormData extends JsonObject> = {
+  /** Name of the form. This must match a configured form in devvit.json. */
+  name: string;
+  /** Specification for the form to display to the user */
+  form: Form;
+  /** Data to initially populate form fields with */
+  data?: FormValues<InitFormData> | undefined;
 };
 
 export type Toast = {
