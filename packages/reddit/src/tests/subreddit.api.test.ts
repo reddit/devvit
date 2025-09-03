@@ -15,6 +15,17 @@ vi.mock('../plugin.js', () => {
   };
 });
 
+vi.mock('../common.js', () => {
+  return {
+    assertUserScope: vi.fn(),
+    RunAs: {
+      APP: 0,
+      USER: 1,
+      UNSPECIFIED: 2,
+    },
+  };
+});
+
 function createTestSub(options: Partial<SubredditAboutResponse_AboutData>): Subreddit {
   return new Subreddit({
     id: 'someId',

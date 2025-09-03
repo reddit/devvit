@@ -1,9 +1,11 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { context, getContextCache, setContextCache } from '@devvit/server';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { asTid, isT1, isT3, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
+import { assertUserScope } from './common.js';
 import type {
   AboutSubredditTypes,
   AddRemovalNoteOptions,
@@ -1688,10 +1690,12 @@ export class RedditClient {
 
   /**
    * Subscribes to the subreddit in which the app is installed. No-op if the user is already subscribed.
-   * This method will execute as the app account by default.
-   * To subscribe on behalf of a user, please contact Reddit.
+   * This method will run as user by default. Therefore, you must include SUBSCRIBE_TO_SUBREDDIT
+   * in `permissions.reddit.asUser` in your devvit.json file.
    */
   async subscribeToCurrentSubreddit(): Promise<void> {
+    assertUserScope(Scope.SUBSCRIBE_TO_SUBREDDIT);
+
     const currentSubreddit = await this.getCurrentSubreddit();
     const client = getRedditApiPlugins().Subreddits;
 
