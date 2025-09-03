@@ -50,7 +50,7 @@
     "@types/clone-deep": "4.0.1",
     "@vitest/coverage-c8": "0.32.0",
     "chokidar-cli": "3.0.0",
-    "esbuild": "0.23.0",
+    "esbuild": "0.25.9",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
