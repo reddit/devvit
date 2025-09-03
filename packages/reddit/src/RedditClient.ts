@@ -57,6 +57,7 @@ import type {
 import {
   AboutLocations,
   Comment,
+  createShareUrl,
   Flair,
   FlairTemplate,
   getModerationLog,
@@ -1675,6 +1676,25 @@ export class RedditClient {
    */
   getSubredditStyles(subredditId: T5): Promise<SubredditStyles> {
     return getSubredditStyles(subredditId);
+  }
+
+  /**
+   * Create a short share URL for a Reddit location.
+   *
+   * Valid inputs:
+   * - Absolute Reddit URLs without a query string (e.g., https://reddit.com/r/gamesonreddit)
+   * - URLs with a query string limited to: utm_source, utm_medium, context
+   *
+   * @note old.reddit.com URLs can be shortened but they will redirect to reddit.com.
+   *
+   * @param url Full Reddit URL to shorten. Must be absolute and either have no query string or only the allowed query params.
+   *
+   * @returns The shortened share URL (e.g., 'https://reddit.com/s/abc123').
+   *
+   * @throws If the input URL is invalid, contains unsupported query parameters, or the share URL cannot be created.
+   */
+  createShareUrl(url: string): Promise<string> {
+    return createShareUrl(url);
   }
 
   /**
