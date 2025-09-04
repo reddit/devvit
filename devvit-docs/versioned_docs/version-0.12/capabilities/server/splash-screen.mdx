@@ -65,10 +65,10 @@ Images can be referenced in two ways:
     :::note
     To access assets in the client/public directory from the server, add the `media` property to your `devvit.json` file. The directory path should be relative to the `client/public` folder. 
     :::
-    For example, to use an image at `client/public/assets/splash-background.png`: 
+    For example, to use an image at `client/public/assets/splash-background.png` (which the build outputs it to `dist/client/assets`): 
    ```json title="devvit.json"
    "media": {
-     "dir": "assets"
+     "dir": "dist/client/assets"
    }
    ```
 
