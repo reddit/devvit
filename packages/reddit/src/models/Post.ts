@@ -21,7 +21,7 @@ import type {
 import { defaultPostEntry } from '@devvit/shared-types/schemas/constants.js';
 import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
 import { isT3, T2, T3, T5 } from '@devvit/shared-types/tid.js';
-import { Loading, type LoadingProps } from '@devvit/splash/loading.js';
+import { Loading } from '@devvit/splash/loading.js';
 import { type SplashProps } from '@devvit/splash/splash.js';
 import { backgroundUrl } from '@devvit/splash/utils/assets.js';
 
@@ -186,6 +186,23 @@ export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
   /** Content to show when rendered on `https://old.reddit.com`. */
   textFallback?: CustomPostTextFallbackOptions;
   userGeneratedContent?: UserGeneratedContent;
+  /**
+   * Override the splash loading screen with the provided Blocks component.
+   * @example
+   * ```ts
+   * Devvit.createElement(
+   *   'blocks',
+   *   {height: 'tall'},
+   *   Devvit.createElement(
+   *     'vstack',
+   *     {backgroundColor: '#abc123', height: '100%'},
+   *     Devvit.createElement('text', {}, 'hello'),
+   *   ),
+   * )
+   * ```
+   * @deprecated Use only `splash` instead.
+   */
+  loading?: JSX.Element;
   splash?: SubmitCustomPostSplashOptions;
 };
 
@@ -861,7 +878,7 @@ export class Post {
   }
 
   /**
-   * Get the postData for the post.
+   * Get the postData for the custom post.
    *
    * @example
    * ```ts
@@ -875,7 +892,8 @@ export class Post {
   }
 
   /**
-   * Set the postData on a custom post. This will replace the existing postData with the postData specified in the input.
+   * Set the postData for the custom post. This will replace the existing
+   * postData with the postData specified in the input.
    *
    * @param postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
    * @throws {Error} Throws an error if the postData could not be set.
@@ -922,7 +940,7 @@ export class Post {
   }
 
   /**
-   * Set the launch and loading screens of a custom post.
+   * Set the launch and loading screens for the custom post.
    *
    * @example
    * ```ts
@@ -935,30 +953,44 @@ export class Post {
     const config = getConfig();
     const entry = getEntry(config, opts?.entry);
     const splash = SplashPostData(config, entry, opts, this.title);
-    const [, richtextJson] = await Promise.all([
+    await Promise.all([
       Post.setPostData({ postId: this.id, postData: { ...prev, splash } }),
-      renderLoadingAsRichTextJson(
-        {
+      this.#setCustomPostPreview(
+        Loading({
           appDisplayName: splash.appDisplayName,
           backgroundUri: splash.backgroundUri,
           height: entry.height,
-        },
-        context.metadata
+        })
       ),
     ]);
-    const client = getRedditApiPlugins().LinksAndComments;
-    await client.SetCustomPostPreview(
-      {
-        thingId: this.id,
-        bodyType: SetCustomPostPreviewRequest_BodyType.BLOCKS,
-        blocksRenderContent: richtextJson,
-      },
-      context.metadata
-    );
   }
 
   /**
-   * Set a text fallback for the custom post
+   * Override the splash loading screen with the provided Blocks component for
+   * the custom post.
+   *
+   * @example
+   * ```ts
+   * const loading = Devvit.createElement(
+   *   'blocks',
+   *   {height: 'tall'},
+   *   Devvit.createElement(
+   *     'vstack',
+   *     {backgroundColor: '#abc123', height: '100%'},
+   *     Devvit.createElement('text', {}, 'hello'),
+   *   ),
+   * )
+   * const post = await reddit.getPostById(context.postId);
+   * await post.setLoadingScreen(loading);
+   * ```
+   * @deprecated Use only `setSplash()` instead.
+   */
+  async setLoadingScreen(loading: JSX.Element): Promise<void> {
+    await this.#setCustomPostPreview(loading);
+  }
+
+  /**
+   * Set a text fallback for the custom post.
    *
    * @param opts - A text or a richtext to render in a fallback
    * @throws {Error} Throws an error if the fallback could not be set.
@@ -1130,7 +1162,7 @@ export class Post {
         subreddits: [],
         thingIds: [postId],
       },
-      this.#metadata
+      context.metadata
     );
 
     if (!rsp.data?.children?.length) throw Error(`no post ${id}`);
@@ -1160,7 +1192,7 @@ export class Post {
         ...opts,
         runAs: runAsType,
       },
-      this.#metadata
+      context.metadata
     );
 
     // Post Id might not be present as image/video post creation can happen asynchronously
@@ -1185,9 +1217,6 @@ export class Post {
     opts: Readonly<SubredditOptions & SubmitCustomPostOptions>
   ): Promise<Post> {
     const runAsType = RunAs[opts.runAs ?? 'APP'];
-    const client =
-      runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
-
     if (runAsType === RunAs.USER && !opts.userGeneratedContent) {
       throw Error('userGeneratedContent must be set when `runAs` is `USER`');
     }
@@ -1199,12 +1228,14 @@ export class Post {
     const entry = getEntry(config, opts.splash?.entry);
     const splash = SplashPostData(config, entry, opts.splash, opts.title);
     const richtextJson = await renderLoadingAsRichTextJson(
-      {
-        appDisplayName: splash.appDisplayName,
-        backgroundUri: splash.backgroundUri,
-        height: entry.height,
-      },
-      this.#metadata
+      'loading' in opts
+        ? opts.loading
+        : Loading({
+            appDisplayName: splash.appDisplayName,
+            backgroundUri: splash.backgroundUri,
+            height: entry.height,
+          }),
+      context.metadata
     );
 
     const richtextFallback = opts.textFallback
@@ -1218,10 +1249,8 @@ export class Post {
         }
       : undefined;
 
-    const postData: DevvitPostData = {
-      developerData: opts.postData,
-      splash,
-    };
+    const client =
+      runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
     const rsp = await client.SubmitCustomPost(
       {
         kind: 'custom',
@@ -1236,9 +1265,9 @@ export class Post {
         title: opts.title,
         userGeneratedContent,
         runAs: runAsType,
-        postData,
+        postData: { developerData: opts.postData, splash },
       },
-      this.#metadata
+      context.metadata
     );
     return postFromSubmitResponse(rsp);
   }
@@ -1263,7 +1292,7 @@ export class Post {
         ...rest,
         runAs: runAsType,
       },
-      this.#metadata
+      context.metadata
     );
 
     return postFromSubmitResponse(rsp);
@@ -1287,7 +1316,7 @@ export class Post {
         richtextJson: richtextString,
         runAs: RunAs.APP,
       },
-      this.#metadata
+      context.metadata
     );
 
     if (rsp.json?.errors?.length)
@@ -1353,7 +1382,7 @@ export class Post {
           thingId: opts.postId,
           postData: opts.postData,
         },
-        this.#metadata
+        context.metadata
       ),
     ]);
     if (rsp.json?.errors?.length)
@@ -1376,7 +1405,7 @@ export class Post {
         thingId: postId,
         richtextFallback,
       },
-      this.#metadata
+      context.metadata
     );
 
     if (rsp.json?.errors?.length)
@@ -1394,7 +1423,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1406,7 +1435,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1419,7 +1448,7 @@ export class Post {
         id,
         spam: isSpam,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1431,7 +1460,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1443,7 +1472,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1455,7 +1484,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
   /** @internal */
@@ -1466,7 +1495,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1478,7 +1507,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1490,7 +1519,20 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
+    );
+  }
+
+  async #setCustomPostPreview(loading: JSX.Element): Promise<void> {
+    const richtextJson = await renderLoadingAsRichTextJson(loading, context.metadata);
+    const client = getRedditApiPlugins().LinksAndComments;
+    await client.SetCustomPostPreview(
+      {
+        thingId: this.id,
+        bodyType: SetCustomPostPreviewRequest_BodyType.BLOCKS,
+        blocksRenderContent: richtextJson,
+      },
+      context.metadata
     );
   }
 
@@ -1504,7 +1546,7 @@ export class Post {
         state: true,
         num: position,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1517,7 +1559,7 @@ export class Post {
         id,
         state: false,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1529,7 +1571,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1541,7 +1583,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1558,7 +1600,7 @@ export class Post {
         how: asAdmin ? 'admin' : 'yes',
         sticky: false,
       },
-      this.#metadata
+      context.metadata
     );
 
     const post = response.json?.data?.things?.[0]?.data;
@@ -1580,7 +1622,7 @@ export class Post {
         how: 'no',
         sticky: false,
       },
-      this.#metadata
+      context.metadata
     );
 
     const post = response.json?.data?.things?.[0]?.data;
@@ -1600,7 +1642,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1612,7 +1654,7 @@ export class Post {
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
@@ -1645,7 +1687,7 @@ export class Post {
             subreddit: opts.subredditName,
             ...fetchOpts,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
@@ -1675,7 +1717,7 @@ export class Post {
             subreddit: opts.subredditName,
             ...fetchOpts,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
@@ -1700,7 +1742,7 @@ export class Post {
             subreddit: opts.subredditName,
             ...fetchOpts,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
@@ -1725,7 +1767,7 @@ export class Post {
             subreddit: opts.subredditName,
             ...fetchOpts,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
@@ -1749,16 +1791,12 @@ export class Post {
             where: 'submitted',
             ...fetchOptions,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
       },
     });
-  }
-
-  static get #metadata(): Metadata {
-    return context.metadata;
   }
 }
 
@@ -1839,7 +1877,9 @@ function SplashPostData(
   // recorded post data must record the current state for `LoadingProps` and no
   // defaults for anything else.
   return {
-    // Loading.
+    // Loading. In the case that `loading` is provided, a `Loading` component is
+    // never used. If the user wants to change these props, they have to also
+    // provide a `splash` prop.
     appDisplayName: opts?.appDisplayName ?? config.name,
     backgroundUri: opts?.backgroundUri ?? backgroundUrl,
 
@@ -1862,10 +1902,10 @@ function postFromSubmitResponse(rsp: Readonly<SubmitResponse>): Promise<Post> {
 }
 
 async function renderLoadingAsRichTextJson(
-  props: Readonly<LoadingProps>,
+  loading: JSX.Element,
   meta: Readonly<Metadata>
 ): Promise<string> {
-  const handler = new BlocksHandler(() => Loading(props));
+  const handler = new BlocksHandler(() => loading);
   const { blocks } = UIResponse.fromJSON(await handler.handle({ events: [] }, meta));
   const encodedCached = Block.encode(blocks!).finish();
   return Buffer.from(encodedCached).toString('base64');

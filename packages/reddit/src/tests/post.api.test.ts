@@ -1,3 +1,4 @@
+import { Devvit } from '@devvit/public-api';
 import { context } from '@devvit/server';
 import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
@@ -11,6 +12,9 @@ import { RedditClient } from '../RedditClient.js';
 import { redditApiPlugins } from './utils/redditApiPluginsMock.js';
 import { runWithTestContext } from './utils/runWithTestContext.js';
 import { userActionsPlugin } from './utils/userActionsPluginMock.js';
+
+const selftext: string =
+  '# DX_Bundle:\n\n    Gm85Mzk0OTZkZi00NDBmLTQ1NDUtOTFiNC02MjM0ODczNThlODUudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYiuAQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErEBCjgvZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdBIKUmVuZGVyUG9zdCozZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLlJlbmRlclBvc3RSZXF1ZXN0MjRkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlc3BvbnNlEqEBCj8vZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdENvbnRlbnQSEVJlbmRlclBvc3RDb250ZW50KiRkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlcXVlc3QyJWRldnZpdC51aS5ibG9ja19raXQudjFiZXRhLlVJUmVzcG9uc2USowEKQC9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC9SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuIBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpgEKNi9kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXIvSGFuZGxlVUlFdmVudBINSGFuZGxlVUlFdmVudCotZGV2dml0LnVpLmV2ZW50cy52MWFscGhhLkhhbmRsZVVJRXZlbnRSZXF1ZXN0Mi5kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlc3BvbnNlGg5VSUV2ZW50SGFuZGxlcjJQEg4KBG5vZGUSBjIyLjUuMRIcCg5AZGV2dml0L3Byb3RvcxIKMC4xMS4xLWRldhIgChJAZGV2dml0L3B1YmxpYy1hcGkSCjAuMTEuMS1kZXY=\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkUKQwo+CAEqEhIHCgUNAADIQhoHCgUNAADIQhomEiQIAhIaCAIaFhoUChBBIGN1c3RvbSBwb3N0ISEhWAEiBAgBEAEQwAI=\n\n# DX_RichtextFallback:\n\n    This is a text fallback';
 
 vi.mock('../plugin.js', () => {
   return {
@@ -485,6 +489,67 @@ describe('Post API', () => {
           );
         });
       });
+
+      test('submitCustomPost(): uses loading prop when provided', async () => {
+        const mockedPost = new Post({ ...defaultPostData });
+
+        const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        const loading = Devvit.createElement('blocks', {
+          height: 'tall',
+          children: [
+            Devvit.createElement('vstack', {
+              height: '100%',
+              width: '100%',
+              backgroundColor: '#abc123',
+            }),
+          ],
+        });
+
+        await runWithTestContext(async () => {
+          await reddit.submitCustomPost({
+            title: mockedPost.title,
+            subredditName: mockedPost.subredditName,
+            loading,
+            splash: { appDisplayName: 'appDisplayName' },
+          });
+
+          expect(spyPlugin).toHaveBeenCalledWith(
+            {
+              kind: 'custom',
+              sr: 'askReddit',
+              richtextJson: 'GgUKAxCABA==',
+              richtextFallback: '',
+              runAs: RunAs.APP,
+              flairId: undefined,
+              flairText: undefined,
+              nsfw: undefined,
+              sendreplies: undefined,
+              spoiler: undefined,
+              title: 'My First Post',
+              userGeneratedContent: undefined,
+              postData: {
+                developerData: undefined,
+                splash: {
+                  appDisplayName: 'appDisplayName',
+                  appIconUri: undefined,
+                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
+                  buttonLabel: undefined,
+                  description: undefined,
+                  entry: 'default',
+                  title: 'My First Post',
+                },
+              },
+            },
+            context.metadata
+          );
+        });
+      });
     });
 
     describe('setTextFallback()', () => {
@@ -602,9 +667,6 @@ describe('Post API', () => {
 
     describe('setSplash()', () => {
       test('sets custom post splash', async () => {
-        const selftext =
-          '# DX_Bundle:\n\n    Gm85Mzk0OTZkZi00NDBmLTQ1NDUtOTFiNC02MjM0ODczNThlODUudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYiuAQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErEBCjgvZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdBIKUmVuZGVyUG9zdCozZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLlJlbmRlclBvc3RSZXF1ZXN0MjRkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlc3BvbnNlEqEBCj8vZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdENvbnRlbnQSEVJlbmRlclBvc3RDb250ZW50KiRkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlcXVlc3QyJWRldnZpdC51aS5ibG9ja19raXQudjFiZXRhLlVJUmVzcG9uc2USowEKQC9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC9SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuIBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpgEKNi9kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXIvSGFuZGxlVUlFdmVudBINSGFuZGxlVUlFdmVudCotZGV2dml0LnVpLmV2ZW50cy52MWFscGhhLkhhbmRsZVVJRXZlbnRSZXF1ZXN0Mi5kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlc3BvbnNlGg5VSUV2ZW50SGFuZGxlcjJQEg4KBG5vZGUSBjIyLjUuMRIcCg5AZGV2dml0L3Byb3RvcxIKMC4xMS4xLWRldhIgChJAZGV2dml0L3B1YmxpYy1hcGkSCjAuMTEuMS1kZXY=\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkUKQwo+CAEqEhIHCgUNAADIQhoHCgUNAADIQhomEiQIAhIaCAIaFhoUChBBIGN1c3RvbSBwb3N0ISEhWAEiBAgBEAEQwAI=\n\n# DX_RichtextFallback:\n\n    This is a text fallback';
-
         const mockedPost = new Post({ ...defaultPostData, selftext });
 
         const spyGql = vi.spyOn(GraphQL, 'query');
@@ -662,9 +724,6 @@ describe('Post API', () => {
       });
 
       test('sets custom post splash with rendered preview', async () => {
-        const selftext =
-          '# DX_Bundle:\n\n    Gm85Mzk0OTZkZi00NDBmLTQ1NDUtOTFiNC02MjM0ODczNThlODUudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYiuAQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErEBCjgvZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdBIKUmVuZGVyUG9zdCozZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLlJlbmRlclBvc3RSZXF1ZXN0MjRkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlc3BvbnNlEqEBCj8vZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdENvbnRlbnQSEVJlbmRlclBvc3RDb250ZW50KiRkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlcXVlc3QyJWRldnZpdC51aS5ibG9ja19raXQudjFiZXRhLlVJUmVzcG9uc2USowEKQC9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC9SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuIBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpgEKNi9kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXIvSGFuZGxlVUlFdmVudBINSGFuZGxlVUlFdmVudCotZGV2dml0LnVpLmV2ZW50cy52MWFscGhhLkhhbmRsZVVJRXZlbnRSZXF1ZXN0Mi5kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlc3BvbnNlGg5VSUV2ZW50SGFuZGxlcjJQEg4KBG5vZGUSBjIyLjUuMRIcCg5AZGV2dml0L3Byb3RvcxIKMC4xMS4xLWRldhIgChJAZGV2dml0L3B1YmxpYy1hcGkSCjAuMTEuMS1kZXY=\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkUKQwo+CAEqEhIHCgUNAADIQhoHCgUNAADIQhomEiQIAhIaCAIaFhoUChBBIGN1c3RvbSBwb3N0ISEhWAEiBAgBEAEQwAI=\n\n# DX_RichtextFallback:\n\n    This is a text fallback';
-
         const mockedPost = new Post({ ...defaultPostData, selftext });
 
         const spyGql = vi.spyOn(GraphQL, 'query');
@@ -727,6 +786,38 @@ describe('Post API', () => {
         });
       });
     });
+
+    describe('setLoadingScreen()', () => {
+      test('sets custom post loading screen', async () => {
+        const mockedPost = new Post({ ...defaultPostData, selftext });
+
+        const spyPlugin = redditApiPlugins.LinksAndComments.SetCustomPostPreview;
+        spyPlugin.mockImplementationOnce(async () => ({}));
+
+        await runWithTestContext(async () => {
+          const loading = Devvit.createElement('blocks', {
+            height: 'tall',
+            children: [
+              Devvit.createElement('vstack', {
+                height: '100%',
+                width: '100%',
+                backgroundColor: '#abc123',
+              }),
+            ],
+          });
+          await mockedPost.setLoadingScreen(loading);
+
+          expect(spyPlugin).toHaveBeenCalledWith(
+            {
+              blocksRenderContent: 'GgUKAxCABA==',
+              bodyType: 1,
+              thingId: 't3_qwerty',
+            },
+            context.metadata
+          );
+        });
+      });
+    });
   });
 
   describe('mergePostData()', () => {
@@ -758,9 +849,6 @@ describe('Post API', () => {
   });
   describe('setSuggestedCommentSort()', () => {
     test('sets custom post sort', async () => {
-      const selftext =
-        '# DX_Bundle:\n\n    Gm85Mzk0OTZkZi00NDBmLTQ1NDUtOTFiNC02MjM0ODczNThlODUudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYiuAQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErEBCjgvZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdBIKUmVuZGVyUG9zdCozZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLlJlbmRlclBvc3RSZXF1ZXN0MjRkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlc3BvbnNlEqEBCj8vZGV2dml0LnJlZGRpdC5jdXN0b21fcG9zdC52MWFscGhhLkN1c3RvbVBvc3QvUmVuZGVyUG9zdENvbnRlbnQSEVJlbmRlclBvc3RDb250ZW50KiRkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlcXVlc3QyJWRldnZpdC51aS5ibG9ja19raXQudjFiZXRhLlVJUmVzcG9uc2USowEKQC9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC9SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuIBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpgEKNi9kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXIvSGFuZGxlVUlFdmVudBINSGFuZGxlVUlFdmVudCotZGV2dml0LnVpLmV2ZW50cy52MWFscGhhLkhhbmRsZVVJRXZlbnRSZXF1ZXN0Mi5kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlc3BvbnNlGg5VSUV2ZW50SGFuZGxlcjJQEg4KBG5vZGUSBjIyLjUuMRIcCg5AZGV2dml0L3Byb3RvcxIKMC4xMS4xLWRldhIgChJAZGV2dml0L3B1YmxpYy1hcGkSCjAuMTEuMS1kZXY=\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkUKQwo+CAEqEhIHCgUNAADIQhoHCgUNAADIQhomEiQIAhIaCAIaFhoUChBBIGN1c3RvbSBwb3N0ISEhWAEiBAgBEAEQwAI=\n\n# DX_RichtextFallback:\n\n    This is a text fallback';
-
       const mockedPost = new Post({ ...defaultPostData, selftext });
 
       const spyPlugin = vi.spyOn(GraphQL, 'query');
