@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { __clearConnections, connectRealtime } from './realtime.js';
 
-vi.mock('@devvit/client', () => ({
+vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(),
 }));
 

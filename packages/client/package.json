@@ -8,10 +8,12 @@
   },
   "type": "module",
   "exports": {
-    ".": "./dist/index.js",
+    ".": {
+      "server": "./dist/clientImportInServerCodePanic.js",
+      "default": "./dist/index.js"
+    },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
   "files": [
     "dist/**"
   ],
@@ -30,7 +32,6 @@
     "test:unit": "vitest run",
     "test:unit-with-coverage": "vitest run --coverage"
   },
-  "types": "./dist/index.d.ts",
   "dependencies": {
     "@devvit/protos": "0.11.19",
     "@devvit/shared": "0.11.19",
@@ -53,6 +54,5 @@
       "gzip": "24 KB",
       "none": "104 KB"
     }
-  },
-  "source": "./src/index.ts"
+  }
 }

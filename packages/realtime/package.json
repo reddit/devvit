@@ -29,8 +29,10 @@
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",
     "prepublishOnly": "publish-package-json",
-    "test": "yarn test:types && yarn lint",
-    "test:types": "tsc --noEmit"
+    "test": "yarn test:unit && yarn test:types && yarn lint",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@devvit/protos": "0.11.19",
