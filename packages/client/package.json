@@ -9,8 +9,8 @@
   "type": "module",
   "exports": {
     ".": {
-      "server": "./dist/clientImportInServerCodePanic.js",
-      "default": "./dist/index.js"
+      "browser": "./dist/index.js",
+      "default": "./dist/clientImportInServerCodePanic.js"
     },
     "./package.json": "./package.json"
   },
