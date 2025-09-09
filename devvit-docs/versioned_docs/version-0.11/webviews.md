@@ -224,7 +224,7 @@ Web views that are presented in fullscreen without user interaction will not be 
 
 ## Communication between Devvit and web view
 
-Web views let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services ([Redis](./capabilities/redis.md), [fetch](./capabilities/http-fetch.mdx), [scheduler](./capabilities/scheduler.md), [triggers](./capabilities/triggers.md)) via message passing between the two contexts.
+Web views let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services ([Redis](./capabilities/redis.md), [fetch](./capabilities/http-fetch.mdx), [scheduler](./capabilities/scheduler.md), [triggers](./capabilities/triggers)) via message passing between the two contexts.
 
 ![Sample web views post](./assets/webviews-devvit-architecture.png)
 

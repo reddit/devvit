@@ -28,7 +28,7 @@ Allows you to run automated server-side tasks on a schedule, for example, checki
 
 Allows you to build an app where the moderator can store secret keys in a safe and scalable way. For example, if your app needs the installing moderator to provide their own keys to an external API.
 
-## [Triggers](./triggers.md)
+## [Triggers](./triggers)
 
 Allows you to run automated server-side tasks when certain events happen on Reddit, for example: when a new post is created, or when a new comment is created.
 
