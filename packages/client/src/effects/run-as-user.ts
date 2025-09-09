@@ -49,6 +49,8 @@ export const canRunAsUser = async (): Promise<boolean> => {
   const response = await emitEffect({
     canRunAsUser: {
       postId: devvit.context.postId,
+      appSlug: devvit.context.appName,
+      subredditId: devvit.context.subredditId,
     },
     type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
   });
