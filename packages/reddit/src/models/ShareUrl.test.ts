@@ -24,7 +24,7 @@ describe('createShareUrl', () => {
 
   test('throws for non-Reddit domain', async () => {
     await expect(createShareUrl('https://example.com/r/gamesonreddit')).rejects.toThrow(
-      'Invalid domain. Only reddit.com and old.reddit.com URLs are supported.'
+      'Invalid domain. Only reddit.com, www.reddit.com, and old.reddit.com URLs are supported.'
     );
   });
 
