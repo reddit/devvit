@@ -1683,7 +1683,7 @@ export class RedditClient {
    *
    * Valid inputs:
    * - Absolute Reddit URLs without a query string (e.g., https://reddit.com/r/gamesonreddit)
-   * - URLs with a query string limited to: utm_source, utm_medium, context
+   * - URLs with a query string limited to: utm_source, utm_medium, devvitshare
    *
    * @note old.reddit.com URLs can be shortened but they will redirect to reddit.com.
    *

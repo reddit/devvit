@@ -29,7 +29,7 @@ export async function createShareUrl(url: string): Promise<string> {
   }
 
   // Fail fast: the service only accepts these query params; others are not supported
-  const allowedParams = new Set(['utm_source', 'utm_medium', 'context']);
+  const allowedParams = new Set(['utm_source', 'utm_medium', 'devvitshare']);
   const disallowedParams = Array.from(parsedUrl.searchParams.keys()).filter(
     (key) => !allowedParams.has(key)
   );
