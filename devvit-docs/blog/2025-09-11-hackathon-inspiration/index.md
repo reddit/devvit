@@ -8,6 +8,7 @@ tags: [game, devvit, hackathon]
 Did you know? Our hackathon is live right now—with over $49,000 in cash prizes up for grabs! Submit your entry by September 17, 2025 for a chance to win.
 
 ## What we’re looking for
+
 When judging, we go beyond “fun to play.” We also look for:
 
 - Delightful user experiences
@@ -15,8 +16,8 @@ When judging, we go beyond “fun to play.” We also look for:
 - That unique sense of “Reddity-ness”
 - How well the game might work in Reddit feeds
 
-
 ## Past winning apps
+
 To spark some inspiration, we’re shining a spotlight on winning apps from our [Games & Puzzles Hackathon](https://www.reddit.com/r/Devvit/comments/1hvz8s8/announcing_the_games_and_puzzles_hackathon_winners/) earlier this year. Use these standout projects to get your creative gears turning!
 
 ### 📝 Word game winners
@@ -27,7 +28,6 @@ To spark some inspiration, we’re shining a spotlight on winning apps from our 
 
 - [Word Trail Game](https://devpost.com/software/word-trail-game) by _Mihajlo Nestorović_
 
-
 ### 🧩 Puzzle game winners
 
 - [Pixel Together](https://devpost.com/software/pixel-together) by _Fan Fang, Mai Hou, and Allison C_
@@ -35,7 +35,6 @@ To spark some inspiration, we’re shining a spotlight on winning apps from our 
 - [N_0V1](https://devpost.com/software/n_0v1) by _Abdulla Sogay, Mujtaba Naik, and Ajaay P_
 
 - [Laddergram](https://devpost.com/software/laddergram) by _Jenny Ho_
-
 
 ### 🎲 Tabletop game winners
 
@@ -45,12 +44,11 @@ To spark some inspiration, we’re shining a spotlight on winning apps from our 
 
 - [Suspicious Skyscrapers](https://devpost.com/software/suspicious-skyscraper) by _Srivats Shankar_
 
-
 ### 🌟 User generated content award
 
 - [575](https://devpost.com/software/575) by _Thomas Park_
 
-### 📯 Honorable Mentions 
+### 📯 Honorable Mentions
 
 - [Froggy Flight](https://worldslargesthackathon.devpost.com/submissions/701718-froggy-flight) by _u/Due_Analyst_5617_
 
