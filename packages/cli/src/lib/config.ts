@@ -36,7 +36,7 @@ export const REDDIT_DOT_COM = (() => {
 /** @type {string} */
 export const REDDIT_DESKTOP = (() => {
   if (MY_PORTAL_ENABLED) {
-    return `https://reddit-desktop.${STAGE_USER_NAME}.snoo.dev`;
+    return `https://reddit-service-shreddit.${STAGE_USER_NAME}.snoo.dev`;
   }
 
   return 'https://www.reddit.com';
