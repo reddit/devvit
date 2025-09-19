@@ -681,7 +681,9 @@ export class ModMailService {
     conversationId: string;
   }): Promise<ConversationResponse & WithUserData> {
     const client = getRedditApiPlugins().NewModmail;
-
+    if(!params.conversationId){
+      throw new Error("Cannot reply to modmail conversation: conversationId is required")
+    }
     const response = await client.CreateConversationMessage(
       {
         body: params.body,
