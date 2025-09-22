@@ -9,7 +9,7 @@ import type {
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { __clearConnections, connectRealtime } from './realtime.js';
+import { __clearConnections, connectRealtime, disconnectRealtime } from './realtime.js';
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(),
@@ -26,7 +26,7 @@ describe('realtime', () => {
     __clearConnections();
   });
 
-  describe('connectRealtime', () => {
+  describe('connectRealtime()', () => {
     it('should connect to a channel successfully', async () => {
       const mockOnConnect = vi.fn();
       const mockOnMessage = vi.fn();
@@ -125,7 +125,7 @@ describe('realtime', () => {
     });
   });
 
-  describe('Connection.disconnect', () => {
+  describe('disconnectRealtime()', () => {
     it('should disconnect from a channel', async () => {
       const mockOnMessage = vi.fn();
 
@@ -135,12 +135,9 @@ describe('realtime', () => {
         } as RealtimeSubscriptionEvent,
       });
 
-      const connection = await connectRealtime({
-        channel: 'test-channel',
-        onMessage: mockOnMessage,
-      });
+      await connectRealtime({ channel: 'test-channel', onMessage: mockOnMessage });
 
-      await connection.disconnect();
+      await disconnectRealtime('test-channel');
 
       expect(emitEffect).toHaveBeenCalledWith({
         realtimeSubscriptions: { subscriptionIds: [] },

@@ -4,11 +4,11 @@ import type { RealtimeSubscriptionStatus } from '@devvit/protos/types/devvit/ui/
 import type { JsonValue } from '@devvit/shared';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
-type ConnectRealtimeOptions = {
+export type ConnectRealtimeOptions<Msg extends JsonValue> = {
   channel: string;
   onConnect?: (channel: string) => void;
   onDisconnect?: (channel: string) => void;
-  onMessage: (data: JsonValue) => void;
+  onMessage: (data: Msg) => void;
 };
 
 const connectionsByChannel = new Map<string, Connection>();
@@ -22,25 +22,57 @@ const connectionsByChannel = new Map<string, Connection>();
  *
  * @param opts - Connection options including channel name and callbacks
  * @returns A Connection object with a disconnect method
+ *
+ * @example
+ *
+ * ```ts
+ * import {connectRealtime, context} from '@devvit/web/client'
+ * import type {T2} from '@devvit/web/shared'
+ *
+ * type RealtimeMessage = {x: number, y: number, t2: T2}
+ *
+ * connectRealtime<RealtimeMessage>({
+ *   channel: context.postId,
+ *   onConnect() {
+ *     console.log(`${context.userId} connected`)
+ *   },
+ *   onDisconnect() {
+ *     console.log(`${context.userId} disconnected`)
+ *   },
+ *   onMessage(msg) {
+ *     // Filter out current user across all sessions.
+ *     if (msg.t2 === context.userId) return
+ *
+ *     console.log(`user ${msg.t2} at (${msg.x}, ${msg.y})`)
+ *   }
+ * })
+ * ```
  */
-export const connectRealtime = async (
-  opts: Readonly<ConnectRealtimeOptions>
+export const connectRealtime = async <Msg extends JsonValue>(
+  opts: Readonly<ConnectRealtimeOptions<Msg>>
 ): Promise<Connection> => {
   if (connectionsByChannel.has(opts.channel)) {
     return connectionsByChannel.get(opts.channel)!;
   }
 
-  const connection = new Connection(opts);
+  const connection = new Connection(opts as Readonly<ConnectRealtimeOptions<JsonValue>>);
   connectionsByChannel.set(opts.channel, connection);
   addEventListener('message', connection.onMessage);
 
-  await emitEffect({
-    realtimeSubscriptions: { subscriptionIds: [...connectionsByChannel.keys()] },
-    type: 0 satisfies EffectType.EFFECT_REALTIME_SUB,
-  });
+  await emitConnectionsEffect();
 
   return connection;
 };
+
+export async function disconnectRealtime(channel: string): Promise<void> {
+  const connection = connectionsByChannel.get(channel);
+  if (!connection) return;
+
+  connectionsByChannel.delete(channel);
+  removeEventListener('message', connection.onMessage);
+
+  await emitConnectionsEffect();
+}
 
 /**
  * Clears all connections. Used for testing purposes.
@@ -50,36 +82,28 @@ export const __clearConnections = (): void => {
   connectionsByChannel.clear();
 };
 
-class Connection {
-  readonly #opts: Readonly<ConnectRealtimeOptions>;
+/** Emits open connections which may cause subscribe / unsubscribe. */
+async function emitConnectionsEffect(): Promise<void> {
+  await emitEffect({
+    realtimeSubscriptions: { subscriptionIds: [...connectionsByChannel.keys()] },
+    type: 0 satisfies EffectType.EFFECT_REALTIME_SUB,
+  });
+}
 
-  constructor(opts: Readonly<ConnectRealtimeOptions>) {
+export class Connection {
+  readonly #opts: Readonly<ConnectRealtimeOptions<JsonValue>>;
+
+  constructor(opts: Readonly<ConnectRealtimeOptions<JsonValue>>) {
     this.#opts = opts;
   }
 
   /**
    * Disconnects from the realtime channel.
    *
-   * This works by sending a list of all channels we want to remain subscribed to,
-   * excluding the channel we want to disconnect from. The effect handler compares this
-   * new list with existing subscriptions and triggers disconnect for any channel
-   * that's no longer in the list.
+   * @deprecated Use `disconnectRealtime()`.
    */
   async disconnect(): Promise<void> {
-    const connection = connectionsByChannel.get(this.#opts.channel);
-    if (!connection) {
-      return;
-    }
-
-    // Get all current subscriptions except the one we're disconnecting
-    const remainingChannels = [...connectionsByChannel.keys()].filter(
-      (ch) => ch !== this.#opts.channel
-    );
-    await emitEffect({
-      realtimeSubscriptions: { subscriptionIds: remainingChannels },
-      type: 0 satisfies EffectType.EFFECT_REALTIME_SUB,
-    });
-    connectionsByChannel.delete(this.#opts.channel);
+    await disconnectRealtime(this.#opts.channel);
   }
 
   onMessage = (ev: MessageEvent<WebViewMessageEvent_MessageData>): void => {
