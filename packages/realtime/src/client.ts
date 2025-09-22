@@ -3,4 +3,5 @@ export {
   connectRealtime,
   type ConnectRealtimeOptions,
   disconnectRealtime,
+  isRealtimeConnected,
 } from './realtime.js';

@@ -1,6 +1,6 @@
+import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import { RealtimeSubscriptionStatus } from '@devvit/protos/json/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
 import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
-import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
-import type { RealtimeSubscriptionStatus } from '@devvit/protos/types/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
 import type { JsonValue } from '@devvit/shared';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
@@ -70,8 +70,15 @@ export async function disconnectRealtime(channel: string): Promise<void> {
 
   connectionsByChannel.delete(channel);
   removeEventListener('message', connection.onMessage);
+  if (connection.connected) connection.opts.onDisconnect?.(channel);
+  connection.connected = false;
 
   await emitConnectionsEffect();
+}
+
+/** True if the channel socket is connected. */
+export function isRealtimeConnected(channel: string): boolean {
+  return !!connectionsByChannel.get(channel)?.connected;
 }
 
 /**
@@ -86,15 +93,19 @@ export const __clearConnections = (): void => {
 async function emitConnectionsEffect(): Promise<void> {
   await emitEffect({
     realtimeSubscriptions: { subscriptionIds: [...connectionsByChannel.keys()] },
-    type: 0 satisfies EffectType.EFFECT_REALTIME_SUB,
+    type: EffectType.EFFECT_REALTIME_SUB,
   });
 }
 
 export class Connection {
-  readonly #opts: Readonly<ConnectRealtimeOptions<JsonValue>>;
+  /** @internal */
+  connected: boolean = false;
+
+  /** @internal */
+  readonly opts: Readonly<ConnectRealtimeOptions<JsonValue>>;
 
   constructor(opts: Readonly<ConnectRealtimeOptions<JsonValue>>) {
-    this.#opts = opts;
+    this.opts = opts;
   }
 
   /**
@@ -103,9 +114,10 @@ export class Connection {
    * @deprecated Use `disconnectRealtime()`.
    */
   async disconnect(): Promise<void> {
-    await disconnectRealtime(this.#opts.channel);
+    await disconnectRealtime(this.opts.channel);
   }
 
+  /** @internal */
   onMessage = (ev: MessageEvent<WebViewMessageEvent_MessageData>): void => {
     const { type, data } = ev.data;
 
@@ -119,22 +131,24 @@ export class Connection {
 
     const { status, event } = data.realtimeEvent;
 
-    if (!event?.channel.endsWith(this.#opts.channel)) {
+    if (!event?.channel.endsWith(this.opts.channel)) {
       return;
     }
 
     // Normalize the channel name (remove namespacing)
-    event.channel = this.#opts.channel;
+    event.channel = this.opts.channel;
 
-    if (status === (0 satisfies RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED)) {
-      this.#opts.onConnect?.(this.#opts.channel);
-    } else if (status === (1 satisfies RealtimeSubscriptionStatus.REALTIME_UNSUBSCRIBED)) {
-      this.#opts.onDisconnect?.(this.#opts.channel);
+    if (status === RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED) {
+      this.connected = true;
+      this.opts.onConnect?.(this.opts.channel);
+    } else if (status === RealtimeSubscriptionStatus.REALTIME_UNSUBSCRIBED) {
+      this.connected = false;
+      this.opts.onDisconnect?.(this.opts.channel);
     } else if (event.data) {
-      this.#opts.onMessage(event.data.msg);
+      this.opts.onMessage(event.data.msg);
     } else {
       console.error('[realtime] Received event without data:', {
-        channel: this.#opts.channel,
+        channel: this.opts.channel,
         event,
       });
     }
