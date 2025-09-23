@@ -34,6 +34,7 @@ describe('canRunAsUser', () => {
         postId: T3('t3_postId'),
       },
       share: undefined,
+      webViewMode: undefined,
     };
   });
 
