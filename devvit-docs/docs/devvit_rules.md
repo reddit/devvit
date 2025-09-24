@@ -4,7 +4,7 @@
 
 Welcome to Reddit’s Developer Platform (or “**Devvit**”)! Before you build, please read these Devvit Rules along with Reddit’s [Developer Terms](https://www.redditinc.com/policies/developer-terms). We want you and your Devvit app(s) to succeed, and our policies and developer documentation are designed to enable you to provide a fun, safe, and trusted experience for all redditors. We expect you to be honest about your app(s), and to respect the privacy, safety, and other rights of redditors.
 
-You must comply with: these Devvit Rules and Reddit’s [Developer Terms](https://www.redditinc.com/policies/developer-terms), [Developer Data Protection Addendum](https://www.redditinc.com/policies/developer-dpa), and [Data API Terms](https://www.redditinc.com/policies/data-api-terms); our [User Agreement](https://www.redditinc.com/policies/), [Econ Terms](https://www.redditinc.com/policies/econ-terms), [Previews Terms](https://www.redditinc.com/policies/previews-terms), [Privacy Policy](https://www.reddit.com/policies/privacy-policy), [Public Content Policy](https://support.reddithelp.com/hc/en-us/articles/26410290525844-Public-Content-Policy), [Reddit Rules](https://www.redditinc.com/policies/reddit-rules) and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements); and all other policies and developer documentation governing the use of our developer services (collectively, “**Reddit Terms & Policies**”). We may update Reddit Terms & Policies from time to time, so please check in and review them regularly.
+You must comply with: these Devvit Rules and Reddit’s [Developer Terms](https://www.redditinc.com/policies/developer-terms), [Developer Data Protection Addendum](https://www.redditinc.com/policies/developer-dpa), and [Data API Terms](https://www.redditinc.com/policies/data-api-terms); our [User Agreement](https://www.redditinc.com/policies/user-agreement), [Econ Terms](https://www.redditinc.com/policies/econ-terms), [Previews Terms](https://www.redditinc.com/policies/previews-terms), [Privacy Policy](https://www.reddit.com/policies/privacy-policy), [Public Content Policy](https://support.reddithelp.com/hc/en-us/articles/26410290525844-Public-Content-Policy), [Reddit Rules](https://www.redditinc.com/policies/reddit-rules) and [Advertising Policy](https://business.reddithelp.com/s/article/Reddit-Advertising-Policy-Overview); and all other policies and developer documentation governing the use of our developer services (collectively, “**Reddit Terms & Policies**”). We may update Reddit Terms & Policies from time to time, so please check in and review them regularly.
 
 ## Reddit App Review
 
@@ -62,9 +62,9 @@ You and your app(s) must:
 - Comply with our [Reddit Rules](https://www.redditinc.com/policies/reddit-rules) and our [Moderator Code of Conduct](https://www.redditinc.com/policies/moderator-code-of-conduct)
 
 - Avoid facilitating, promoting, or amplifying:
-- Any form of dangerous activities;
-- Harmful or illegal content; or
-- Illegal or legally restricted activities
+  - Any form of dangerous activities;
+  - Harmful or illegal content; or
+  - Illegal or legally restricted activities
 
 - Ensure proper labeling and warning prior to exposing redditors to graphic, sexually-explicit, or offensive content
 
@@ -88,7 +88,7 @@ You and your app(s) must not:
 
 ### Don’t build restricted apps
 
-You should not create an app or functionality that promotes or facilitates transactions in a prohibited or regulated industry such as (but not limited to) gambling, healthcare, financial and cryptocurrency products and services, political, alcohol, recreational drugs, or any other restricted category listed in the [Reddit Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements).
+You should not create an app or functionality that promotes or facilitates transactions in a prohibited or regulated industry such as (but not limited to) gambling, healthcare, financial and cryptocurrency products and services, political, alcohol, recreational drugs, or any other restricted category listed in the [Reddit Advertising Policy](https:https://business.reddithelp.com/s/article/Reddit-Advertising-Policy-Restricted-Advertisements).
 
 ### Apps may be limited or removed
 
@@ -130,7 +130,7 @@ If your app uses [HTTP Fetch](./capabilities/server/http-fetch) or otherwise col
 
 If your app links to any third-party site that may collect redditor personal data, you are solely responsible for verifying the legitimacy and security of the third-party site and should ensure that they are in compliance with all applicable laws. For example, you should ensure that a site collecting personal data provides a privacy policy that clearly discloses what data is collected, how the data is used, and how the data is shared.
 
-You’ll also need permission during App Review to direct redditors outside of Reddit or otherwise collect personal information about them. To request HTTP Fetch functionality for a specific domain, please follow [these instructions](./capabilities/server/http-fetch).
+You’ll also need permission during App Review to direct redditors outside of Reddit or otherwise collect personal information about them. To request HTTP Fetch functionality for a specific domain, please follow [these instructions](./capabilities/server/http-fetch#requesting-a-domain-to-be-allow-listed).
 
 ## Content rules
 
@@ -140,13 +140,13 @@ Any content used or created by your Devvit app must comply with Reddit Terms & P
 
 - **Using Existing User Content** – your app may copy and display existing Reddit user content and modify it for display, but only in compliance with Reddit’s [Developer Terms](https://www.redditinc.com/policies/developer-terms). User content on Reddit is owned by redditors and not by Reddit, so you must also comply with all requirements or restrictions imposed by the owners of user content. Ask redditors for their permission if you want to use existing user content in ways they might not expect (e.g., by building an in-app pop-up asking for redditor approval).
 
-- **Generating New User Content** – your app may allow new user content to be created by redditors, but all user content must comply with Reddit’s [User Agreement](https://www.redditinc.com/policies/developer-terms), [Reddit Rules](https://www.redditinc.com/policies/reddit-rules), and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements).
+- **Generating New User Content** – your app may allow new user content to be created by redditors, but all user content must comply with Reddit’s [User Agreement](https://www.redditinc.com/policies/user-agreement), [Reddit Rules](https://www.redditinc.com/policies/reddit-rules), and [Advertising Policy](https://business.reddithelp.com/s/article/Reddit-Advertising-Policy-Overview).
 
   - _Post or Comment Attribution Rules_ – if your app supports the creation of new posts or comments on Reddit by redditors, then you should create a new post or comment with the content author clearly identified as the author of the submitted content. Until your app is approved by Reddit, new content from your app will be posted from your Devvit app account. If your app is approved, then submitPost will post on behalf of the content author.
 
   - _In-App Content Rules_ – if your app allows users to create new forms of user content within your app (for example, a form submission that modifies the content of your app), your app should limit the available forms of expression to prevent potential abuse. Appropriate examples of limited expression include emojis, symbols (e.g., stock tickers), and predefined, safe dictionaries. If you want to minimize the risk of abuse, avoid allowing users to create new in-app content through free-form text inputs in your app.
 
-- **Displaying Devvit App Content** – your app may include information, materials, and other content that you provide and make available through your app. Your app content must also comply with these Devvit Rules, Reddit’s [User Agreement](https://www.redditinc.com/policies/developer-terms), [Reddit Rules](https://www.redditinc.com/policies/reddit-rules), and [Advertising Policy](https://redditinc.force.com/helpcenter/s/article/Reddit-Advertising-Policy-Restricted-Advertisements). You may not use external logos or trademarks in your app without express written permission.
+- **Displaying Devvit App Content** – your app may include information, materials, and other content that you provide and make available through your app. Your app content must also comply with these Devvit Rules, Reddit’s [User Agreement](https://www.redditinc.com/policies/user-agreement), [Reddit Rules](https://www.redditinc.com/policies/reddit-rules), and [Advertising Policy](https://business.reddithelp.com/s/article/Reddit-Advertising-Policy-Overview). You may not use external logos or trademarks in your app without express written permission.
 
 If any content created or otherwise displayed through your app violates these Devvit Rules or other Reddit Terms & Policies, then Reddit may remove the content and/or request you remove the content. Failure to do so can result in your app being removed from Devvit.
 
@@ -156,11 +156,11 @@ Whether your app uses existing user content or otherwise allows users to create 
 
 - **Deleting Existing User Content** – you are required to remove any user content that has been deleted from Reddit, including from your Devvit app(s). We provide access to post and comment delete events via triggers to help facilitate this.
 
-- _Post/Comment Deletions_ – On PostDelete and CommentDelete event triggers, you must delete all content related to the post and/or comment (for example, title, body, embedded URLs, etc.) from your app. This includes data that is in the Redis/KVstore and data sent to an external service. Metadata required for contextualizing related content (for example, post or comment ID, createdAt, etc.) may be retained.
+  - _Post/Comment Deletions_ – On PostDelete and CommentDelete event triggers, you must delete all content related to the post and/or comment (for example, title, body, embedded URLs, etc.) from your app. This includes data that is in the Redis/KVstore and data sent to an external service. Metadata required for contextualizing related content (for example, post or comment ID, createdAt, etc.) may be retained.
 
-- _Account Deletions_ – When a user account is deleted, the related user ID (t2\_\*) must be completely removed from your hosted datastores (e.g., Redis) and any external systems. You must also delete all references to the author-identifying information (including the author ID, name, profile URL, avatar image URL, user flair, etc.) from posts and comments created by that account. You may continue to keep posts and comments created by deleted accounts, provided that the posts and comments have not been explicitly deleted.
+  - _Account Deletions_ – When a user account is deleted, the related user ID (t2\_\*) must be completely removed from your hosted datastores (e.g., Redis) and any external systems. You must also delete all references to the author-identifying information (including the author ID, name, profile URL, avatar image URL, user flair, etc.) from posts and comments created by that account. You may continue to keep posts and comments created by deleted accounts, provided that the posts and comments have not been explicitly deleted.
 
-- _Setting Up Auto-Deletion_ – To best comply with this policy, we recommend deleting any stored user data within 30 days. For any data you are storing in Redis, you can use the [expire function](./capabilities/server/redis#key-expiration) to ensure data gets deleted automatically.
+  - _Setting Up Auto-Deletion_ – To best comply with this policy, we recommend deleting any stored user data within 30 days. For any data you are storing in Redis, you can use the [expire function](./capabilities/server/redis#key-expiration) to ensure data gets deleted automatically.
 
 - **Enabling Deletions of New User Content** – if your app allows users to create new user content, you must ensure that users have the ability to remove their own content when desired and comply with all legal requirements related to content removals. It is important to have safety guardrails in place if your app allows users to create new user content so that the content can be reported and removed by app users.
 
