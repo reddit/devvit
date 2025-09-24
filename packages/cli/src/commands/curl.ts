@@ -1,6 +1,6 @@
 import { Args } from '@oclif/core';
 
-import { DEVVIT_DEBUG_ENABLED } from '../lib/config.js';
+import { DEVVIT_DEBUG } from '../lib/config.js';
 import { authHeaders, getAccessToken } from '../util/auth.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import type { BuildMode } from '../util/project.js';
@@ -36,7 +36,7 @@ export default class Curl extends DevvitCommand {
       redirect: 'follow',
     });
 
-    if (DEVVIT_DEBUG_ENABLED) {
+    if (DEVVIT_DEBUG) {
       this.log(JSON.stringify(Object.fromEntries([...response.headers.entries()]), null, 2));
     }
     if (!response.ok) {
