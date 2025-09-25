@@ -92,7 +92,9 @@ export default class Init extends DevvitCommand {
 
     const { args, flags } = await this.parse(Init);
     if (!flags.force && isRunningInAppDirectory() && this.project.name !== UNINITIALIZED_APP_NAME) {
-      this.log("This app already exists, you don't need to init.");
+      this.log(
+        'Your app was already initialized. If you really want to create a new app in this directory, run `npx devvit init --force`.'
+      );
       return;
     }
 
