@@ -1404,6 +1404,8 @@ export class Post {
       {
         thingId: postId,
         richtextFallback,
+        // to-do: remove once server doesn't wipe post data (DXC-2359).
+        postData: await this.getDevvitPostData(postId),
       },
       context.metadata
     );

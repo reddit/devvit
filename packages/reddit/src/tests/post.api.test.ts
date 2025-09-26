@@ -1,3 +1,4 @@
+import type { QueryResponse } from '@devvit/protos';
 import { Devvit } from '@devvit/public-api';
 import { context } from '@devvit/server';
 import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
@@ -553,6 +554,23 @@ describe('Post API', () => {
     });
 
     describe('setTextFallback()', () => {
+      beforeEach(() => {
+        const spyGql = vi.spyOn(GraphQL, 'query');
+        spyGql.mockImplementation(
+          async () =>
+            ({
+              data: {
+                postInfoById: {
+                  devvit: {
+                    postData: '{"developerData":{"riddle":"hello"}}',
+                  },
+                },
+              },
+              errors: [],
+            }) satisfies QueryResponse
+        );
+      });
+
       test('throws error if no fallback was set', async () => {
         const selftext =
           '# DX_Bundle:\n\n    Gm9jYzZhYTIyMC0xNmQ1LTQyYzgtOWQwNS0zNmNiNzI3YzAxNjMudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYitQQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErABCjdkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC5SZW5kZXJQb3N0EgpSZW5kZXJQb3N0KjNkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlcXVlc3QyNGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5SZW5kZXJQb3N0UmVzcG9uc2USoAEKPmRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0LlJlbmRlclBvc3RDb250ZW50EhFSZW5kZXJQb3N0Q29udGVudCokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlEqIBCj9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC5SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuEBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpQEKNWRldnZpdC51aS5ldmVudHMudjFhbHBoYS5VSUV2ZW50SGFuZGxlci5IYW5kbGVVSUV2ZW50Eg1IYW5kbGVVSUV2ZW50Ki1kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlcXVlc3QyLmRldnZpdC51aS5ldmVudHMudjFhbHBoYS5IYW5kbGVVSUV2ZW50UmVzcG9uc2UaDlVJRXZlbnRIYW5kbGVyMoEBEg8KBG5vZGUSBzE4LjE5LjESNAoOQGRldnZpdC9wcm90b3MSIjAuMTEuMC1uZXh0LTIwMjQtMDctMTEtZTlmNGJiOWY2LjASOAoSQGRldnZpdC9wdWJsaWMtYXBpEiIwLjExLjAtbmV4dC0yMDI0LTA3LTExLWU5ZjRiYjlmNi4w\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkkKRwpCCAEqFhIJCgcNAACQQxABGgkKBw0AAKBDEAEaJhIkCAISGggCGhYaFAoQQSBjdXN0b20gcG9zdCEhIVgBIgQIARABEMAC';
@@ -595,6 +613,7 @@ describe('Post API', () => {
             {
               richtextFallback: 'This is a post with text as a fallback',
               thingId: 't3_qwerty',
+              postData: { developerData: { riddle: 'hello' } },
             },
             context.metadata
           );
@@ -623,6 +642,7 @@ describe('Post API', () => {
               richtextFallback:
                 '**[Megathread](https://www.reddit.com)** ^([View this post on Reddit redesign for more options](https://www.reddit.com/))',
               thingId: 't3_qwerty',
+              postData: { developerData: { riddle: 'hello' } },
             },
             context.metadata
           );
@@ -658,6 +678,7 @@ describe('Post API', () => {
               richtextFallback:
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               thingId: 't3_qwerty',
+              postData: { developerData: { riddle: 'hello' } },
             },
             context.metadata
           );
@@ -670,16 +691,19 @@ describe('Post API', () => {
         const mockedPost = new Post({ ...defaultPostData, selftext });
 
         const spyGql = vi.spyOn(GraphQL, 'query');
-        spyGql.mockImplementationOnce(async () => ({
-          data: {
-            postInfoById: {
-              devvit: {
-                postData: '{"developerData":{"riddle":"hello"}}',
+        spyGql.mockImplementationOnce(
+          async () =>
+            ({
+              data: {
+                postInfoById: {
+                  devvit: {
+                    postData: '{"developerData":{"riddle":"hello"}}',
+                  },
+                },
               },
-            },
-          },
-          errors: [],
-        }));
+              errors: [],
+            }) satisfies QueryResponse
+        );
 
         const spyPlugin = redditApiPlugins.LinksAndComments.EditCustomPost;
         spyPlugin.mockImplementationOnce(async () => ({
@@ -727,16 +751,19 @@ describe('Post API', () => {
         const mockedPost = new Post({ ...defaultPostData, selftext });
 
         const spyGql = vi.spyOn(GraphQL, 'query');
-        spyGql.mockImplementationOnce(async () => ({
-          data: {
-            postInfoById: {
-              devvit: {
-                postData: '{"developerData":{"riddle":"hello"}}',
+        spyGql.mockImplementationOnce(
+          async () =>
+            ({
+              data: {
+                postInfoById: {
+                  devvit: {
+                    postData: '{"developerData":{"riddle":"hello"}}',
+                  },
+                },
               },
-            },
-          },
-          errors: [],
-        }));
+              errors: [],
+            }) satisfies QueryResponse
+        );
 
         const spyPlugin = redditApiPlugins.LinksAndComments.EditCustomPost;
         spyPlugin.mockImplementationOnce(async () => ({
