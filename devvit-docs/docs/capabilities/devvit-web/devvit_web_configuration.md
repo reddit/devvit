@@ -329,6 +329,7 @@ The `devvit.json` configuration is validated against the JSON Schema at build ti
 ## Environment variables
 
 - `DEVVIT_SUBREDDIT`: Override the `dev.subreddit` value used during `devvit playtest`.
+- `DEVVIT_APP_NAME`: Override the `name` value used during `devvit playtest` (and other similar commands).
 
 ## Complete example
 

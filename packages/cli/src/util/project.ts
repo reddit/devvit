@@ -20,7 +20,11 @@ import {
 } from '@devvit/shared-types/schemas/config-file.v1.js';
 import path from 'path';
 
-import { DEVVIT_SUBREDDIT } from '../constants/Environment.js';
+import {
+  DEFAULT_DOTENV_PATH,
+  DEVVIT_APP_NAME,
+  DEVVIT_SUBREDDIT,
+} from '../constants/Environment.js';
 import { findUpDirContaining, isFile } from './file-util.js';
 import { dumpJsonToYaml, readYamlToJson } from './files.js';
 import { type DevvitPackageConfig, readPackageJSON } from './package-managers/package-util.js';
@@ -116,10 +120,27 @@ export class Project {
   }
 
   get name(): string {
+    const trimmedEnvVar = process.env[DEVVIT_APP_NAME]?.trim();
+    if (trimmedEnvVar) {
+      return trimmedEnvVar;
+    }
+
     return this.#config.name;
   }
 
   set name(name: string) {
+    if (process.env[DEVVIT_APP_NAME]) {
+      // If we had the app name set in an env var, don't overwrite the config
+      process.env[DEVVIT_APP_NAME] = name;
+
+      // If there's a `.env` file that contains the DEVVIT_APP_NAME variable, we should update it
+      // there as well.
+      updateEnvFileIfSettingExists(this.root, DEVVIT_APP_NAME, name);
+
+      // Whether we touched .env or not, we don't want to overwrite the config file.
+      return;
+    }
+
     this.#config.name = name.toLowerCase();
     if (isAppConfig(this.#config)) this.#config.json.name = this.#config.name;
     writeConfig(this.root, this.filename, this.#config);
@@ -164,6 +185,18 @@ export class Project {
   setSubreddit(subreddit: string, mode: 'Dev' | 'Prod') {
     if (mode === 'Prod') {
       throw Error(`Setting Prod subreddits isn't supported yet.`);
+    }
+
+    if (process.env[DEVVIT_SUBREDDIT]) {
+      // If we had the subreddit set in an env var, don't overwrite the config
+      process.env[DEVVIT_SUBREDDIT] = subreddit;
+
+      // If there's a `.env` file that contains the DEVVIT_SUBREDDIT variable, we should update it
+      // there as well.
+      updateEnvFileIfSettingExists(this.root, DEVVIT_SUBREDDIT, subreddit);
+
+      // Whether we touched .env or not, we don't want to overwrite the config file.
+      return;
     }
 
     if (!isAppConfig(this.#config)) return;
@@ -281,6 +314,29 @@ function writeConfig(
     path.join(projectPath, configFile),
     isAppConfig(config) ? JSON.stringify(config.json, undefined, 2) : dumpJsonToYaml(config)
   );
+}
+
+function updateEnvFileIfSettingExists(
+  projectPath: string,
+  variableName: string,
+  value: string
+): void {
+  const envFilePath = path.join(projectPath, DEFAULT_DOTENV_PATH);
+  if (existsSync(envFilePath)) {
+    const envContent = readFileSync(envFilePath, 'utf8');
+    const updatedEnvContent = doEnvFileReplacement(envContent, variableName, value);
+    writeFileSync(envFilePath, updatedEnvContent);
+  }
+}
+
+export function doEnvFileReplacement(
+  envContent: string,
+  variableName: string,
+  value: string
+): string {
+  // eslint-disable-next-line security/detect-non-literal-regexp
+  const regex = new RegExp(`^${variableName}=.*$`, 'm');
+  return envContent.replace(regex, `${variableName}=${value}`);
 }
 
 export function isRunningInAppDirectory(): boolean {

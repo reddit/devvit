@@ -3,12 +3,13 @@ import type {
   AppConfig,
   AppPermissionConfig,
 } from '@devvit/shared-types/schemas/config-file.v1.js';
-import { test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { vi } from 'vitest';
 
 import {
   type ClassicAppConfig,
   type DevvitConfig,
+  doEnvFileReplacement,
   isAppConfig,
   parseClassicConfig,
   Project,
@@ -227,5 +228,23 @@ describe('isAppConfig()', () => {
   test('classic', () => {
     const config = { name: 'name' };
     expect(isAppConfig(config)).toBe(false);
+  });
+});
+
+describe('doEnvFileReplacement()', () => {
+  test('replaces env variables', () => {
+    expect(doEnvFileReplacement('VAR_NAME=something', 'VAR_NAME', 'something-else')).toBe(
+      'VAR_NAME=something-else'
+    );
+  });
+  test(`do nothing if the var isn't in the file`, () => {
+    expect(doEnvFileReplacement('VAR_NAME=something', 'MISSING_VAR', 'something-else')).toBe(
+      'VAR_NAME=something'
+    );
+  });
+  test('handle multi-line fine', () => {
+    expect(
+      doEnvFileReplacement('VAR_1=a\nVAR_NAME=something\nVAR_3=c', 'VAR_NAME', 'something-else')
+    ).toBe('VAR_1=a\nVAR_NAME=something-else\nVAR_3=c');
   });
 });
