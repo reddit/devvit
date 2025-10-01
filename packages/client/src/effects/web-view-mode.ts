@@ -7,12 +7,14 @@ import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
  * The presentation mode of the web view.
  * 'inline' The web view is displayed inline within a feed or post detail page
  * 'expanded' The web view is displayed in a larger modal presentation
+ * @experimental
  */
 export type WebViewMode = 'inline' | 'expanded';
 
 /**
  * A listener that is called when the web view mode changes.
  * @param mode The new mode, either 'inline' or 'expanded'.
+ * @experimental
  */
 export type WebViewModeListener = (mode: WebViewMode) => void;
 
@@ -21,7 +23,7 @@ const modeListeners = new Set<WebViewModeListener>();
 /**
  * Represents the current web view mode state for the application.
  *
- * @defaultValue 'inline'
+ * @experimental
  */
 export const getWebViewMode = (): WebViewMode => webViewMode(devvit.webViewMode);
 
@@ -29,9 +31,13 @@ export const getWebViewMode = (): WebViewMode => webViewMode(devvit.webViewMode)
  * Requests expanded mode for the web view.
  * This will display the web view in a larger modal presentation.
  *
- * @param event The event that triggered the request, must be a trusted event.
+ * @param event The gesture that triggered the request, must be a trusted event.
+ * @param entry The destination URI name. Eg, `'splash'` or `'default'`. Entry
+ *              names are the `devvit.json` `post.entrypoints` keys. Passing the
+ *              same entrypoint as currently loaded causes a reload.
  * @returns A promise that resolves request has been received.
  *
+ * @experimental
  * @example
  * ```ts
  * button.addEventListener('click', async (event) => {
@@ -39,8 +45,8 @@ export const getWebViewMode = (): WebViewMode => webViewMode(devvit.webViewMode)
  * });
  * ```
  */
-export function requestExpandedMode(event: PointerEvent): Promise<void> {
-  return emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event);
+export function requestExpandedMode(event: PointerEvent, entry: string): Promise<void> {
+  return emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry);
 }
 
 /**
@@ -50,6 +56,7 @@ export function requestExpandedMode(event: PointerEvent): Promise<void> {
  * @param event The event that triggered the request, must be a trusted event.
  * @returns A promise that resolves request has been received.
  *
+ * @experimental
  * @example
  * ```ts
  * button.addEventListener('click', async (event) => {
@@ -58,7 +65,7 @@ export function requestExpandedMode(event: PointerEvent): Promise<void> {
  * ```
  */
 export function exitExpandedMode(event: PointerEvent): Promise<void> {
-  return emitModeEffect(WebViewImmersiveMode.INLINE_MODE, event);
+  return emitModeEffect(WebViewImmersiveMode.INLINE_MODE, event, undefined);
 }
 
 /**
@@ -66,6 +73,7 @@ export function exitExpandedMode(event: PointerEvent): Promise<void> {
  * The listener will be called with the new mode, either 'inline' or 'expanded'.
  *
  * @param callback The callback to be called when the mode changes.
+ * @experimental
  */
 export function addWebViewModeListener(callback: WebViewModeListener): void {
   modeListeners.add(callback);
@@ -75,19 +83,35 @@ export function addWebViewModeListener(callback: WebViewModeListener): void {
  * Removes a listener that was previously added with `addWebViewModeListener`.
  *
  * @param callback The callback to be removed.
+ * @experimental
  */
 export function removeWebViewModeListener(callback: WebViewModeListener): void {
   modeListeners.delete(callback);
 }
 
-async function emitModeEffect(mode: WebViewImmersiveMode, event: PointerEvent): Promise<void> {
+async function emitModeEffect(
+  mode: WebViewImmersiveMode,
+  event: PointerEvent,
+  entry: string | undefined
+): Promise<void> {
   if (!event.isTrusted || event.type !== 'click') {
     console.error('Expanded mode effect ignored due to untrusted event');
     throw new Error('Untrusted event');
   }
 
+  if (entry != null && !devvit.entrypoints[entry])
+    throw Error(
+      `no entrypoint named "${entry}"; all entrypoints must appear in \`devvit.json\` \`post.entrypoints\``
+    );
+
   const type = 9 satisfies EffectType.EFFECT_WEB_VIEW;
-  await emitEffect({ type, immersiveMode: { immersiveMode: mode } });
+  await emitEffect({
+    type,
+    immersiveMode: {
+      entryUrl: devvit.entrypoints[entry ?? ''],
+      immersiveMode: mode,
+    },
+  });
 }
 
 /**
@@ -95,7 +119,6 @@ async function emitModeEffect(mode: WebViewImmersiveMode, event: PointerEvent): 
  * Handles incoming messages from the client, like when the user closes the immersive modal
  */
 export function registerListener() {
-  console.log('Registering web view mode listener');
   addEventListener('message', (event: MessageEvent<WebViewMessageEvent_MessageData>) => {
     const { type, data } = event.data;
 

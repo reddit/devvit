@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
 
-import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
-import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import type { WebViewMessageEvent } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
+import { type Effect, emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -10,9 +11,10 @@ import {
   addWebViewModeListener,
   exitExpandedMode,
   getWebViewMode,
+  registerListener,
   removeWebViewModeListener,
   requestExpandedMode,
-} from '../index.js';
+} from './web-view-mode.js';
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(() => Promise.resolve(undefined)),
@@ -22,6 +24,10 @@ describe('showImmersiveMode', () => {
   beforeEach(() => {
     globalThis.devvit = {
       appPermissionState: undefined,
+      entrypoints: {
+        default: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
+        splash: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',
+      },
       context: {
         subredditId: T5('t5_subredditId'),
         subredditName: 'subredditName',
@@ -33,6 +39,7 @@ describe('showImmersiveMode', () => {
       share: undefined,
       webViewMode: undefined,
     };
+    registerListener();
   });
 
   afterEach(() => {
@@ -40,14 +47,15 @@ describe('showImmersiveMode', () => {
   });
 
   it('should emit a message for immersive mode', () => {
-    requestExpandedMode(trustedEvent);
+    requestExpandedMode(trustedEvent, 'default');
 
     expect(emitEffect).toHaveBeenCalledWith({
       immersiveMode: {
-        immersiveMode: 2 satisfies WebViewImmersiveMode.IMMERSIVE_MODE,
+        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
+        immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE,
       },
-      type: 9 satisfies EffectType.EFFECT_WEB_VIEW,
-    });
+      type: EffectType.EFFECT_WEB_VIEW,
+    } satisfies Effect);
   });
 
   it('should emit a message for inline mode', () => {
@@ -55,18 +63,29 @@ describe('showImmersiveMode', () => {
 
     expect(emitEffect).toHaveBeenCalledWith({
       immersiveMode: {
-        immersiveMode: 1 satisfies WebViewImmersiveMode.INLINE_MODE,
+        entryUrl: undefined,
+        immersiveMode: WebViewImmersiveMode.INLINE_MODE,
       },
-      type: 9 satisfies EffectType.EFFECT_WEB_VIEW,
-    });
+      type: EffectType.EFFECT_WEB_VIEW,
+    } satisfies Effect);
   });
 
   it('should throw an error when not called with an untrusted event or click event', async () => {
     const event = { isTrusted: false, type: 'click' } as PointerEvent;
-    await expect(requestExpandedMode(event)).rejects.toThrow('Untrusted event');
+    await expect(requestExpandedMode(event, 'default')).rejects.toThrow('Untrusted event');
 
     const trustedButWrongTypeEvent = { isTrusted: true, type: 'keydown' } as PointerEvent;
-    await expect(requestExpandedMode(trustedButWrongTypeEvent)).rejects.toThrow('Untrusted event');
+    await expect(requestExpandedMode(trustedButWrongTypeEvent, 'default')).rejects.toThrow(
+      'Untrusted event'
+    );
+  });
+
+  it('should throw an error when entrypoint does not exist in devvit.json', async () => {
+    // to-do: tighten Event checking.
+    const ev = { isTrusted: true, type: 'click' } as PointerEvent;
+    await expect(requestExpandedMode(ev, 'missing')).rejects.toThrowErrorMatchingInlineSnapshot(
+      `[Error: no entrypoint named "missing"; all entrypoints must appear in \`devvit.json\` \`post.entrypoints\`]`
+    );
   });
 
   it('should call listeners when a message event is received', () => {
@@ -111,14 +130,13 @@ describe('showImmersiveMode', () => {
       data: {
         type: 'devvit-message',
         data: {
-          immersiveModeEvent: {
-            immersiveMode: mode,
-          },
+          id: 'id',
+          immersiveModeEvent: { immersiveMode: mode },
         },
       },
-    });
+    } satisfies WebViewMessageEvent);
 
-    window.dispatchEvent(messageEvent);
+    dispatchEvent(messageEvent);
   };
 
   const trustedEvent = { isTrusted: true, type: 'click' } as PointerEvent;

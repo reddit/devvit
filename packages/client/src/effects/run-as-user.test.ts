@@ -25,6 +25,7 @@ describe('canRunAsUser', () => {
     vi.clearAllMocks();
     globalThis.devvit = {
       appPermissionState: undefined,
+      entrypoints: {},
       context: {
         subredditId: T5('t5_subredditId'),
         subredditName: 'subredditName',
