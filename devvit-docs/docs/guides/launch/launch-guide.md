@@ -140,7 +140,7 @@ To get the best feedback:
     <div>
 When you're ready to publicly release your app, you’ll need to add it to the Apps Directory:
   
-  1. Run  `npx devvit publish --listed`
+  1. Run  `npx devvit publish --public`
   2. Once your app is approved, it will be publicly available in the Apps Directory for any mod to install.
 </div>
     <br/>
