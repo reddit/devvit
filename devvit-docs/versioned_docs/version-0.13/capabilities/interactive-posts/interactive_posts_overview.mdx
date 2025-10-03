@@ -1,0 +1,120 @@
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
+
+# Overview
+Interactive posts are the core of Reddit Dev Platform apps, enabling rich, engaging experiences that go beyond static content. There are three essential features for creating an interactive post using the Reddit API :
+
+1. First Screen Customization
+2. Post Data
+3. User Actions
+
+## Create an interactive post
+Use reddit.submitCustomPost() from the Reddit library. You’ll want to call this function in response to an action like a user submission, trigger, or menu item.
+
+## Devvit Web
+
+```tsx
+// in server code
+
+import { reddit, context } from '@devvit/web/server'
+
+export const createPost = async () => {
+  const { subredditName } = context;
+  if (!subredditName) {
+    throw new Error('subredditName is required');
+  }
+
+  return await reddit.submitCustomPost({
+    splash: {
+      appDisplayName: 'test-post-flair',
+    },
+    subredditName: subredditName,
+    title: 'test-post-flair',
+  });
+};
+
+// example action in our templates
+// Then, in your devvit.json:
+/*
+ "menu": {
+    "items": [
+      {
+        "label": "Create a new post",
+        "description": "test-post-creator",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/post-create"
+      }
+    ]
+  },
+  "triggers": {
+    "onAppInstall": "/internal/on-app-install"
+  },
+*/
+  ``` 
+
+ ###  🎨 First Screen Customization
+
+Control what users see when they first encounter your post. Choose between:
+- **Splash screens**. A configurable splash screen with a clear call-to-action button, ideal for MVP-stage apps or those benefiting from immersive experiences with longer load times.
+- **Inline web views (Experimental)**. Interactive experiences that load directly in posts for instant-interaction apps or dynamic first screens. This is especially beneficial for developers comfortable optimizing web performance across all devices but is subject to more guidelines and longer approval cycles.
+
+:::tip
+Start simple with a splash screen, then move towards inline web views as your app grows and you want to optimize engagement.
+:::  
+
+Learn more about [First Screen Customization](LINK).
+
+### 💾 Post Data
+ Attach up to 2KB of JSON data directly to your post for instant client-side access. Perfect for:
+
+- Game states and scores
+- Configuration settings
+- Small shared data that all users need to see
+
+For larger amounts of data, you should use [Redis](./capabilities/server/redis). Learn more about Post Data
+
+
+### 👤 User Actions
+
+Enable your app to perform actions on behalf of users (with their permission):
+
+- Create posts or comments as the user
+- Subscribe users to subreddits (coming soon)
+
+Learn more about [User Actions](./capabilities/server/userActions)
+
+## Example
+
+Here's a complete example using all three features together:
+
+```ts title="server/index.ts"
+import { reddit, context } from '@devvit/web/server';
+// Create an interactive post with all features
+
+const post = await reddit.submitCustomPost({
+  subredditName: context.subredditName!,
+  title: 'Interactive Game Post',
+
+  // First Screen Customization (splash screen)
+  splash: {
+    appDisplayName: 'Number Guessing Game',
+    backgroundUri: 'game-bg.png',
+    buttonLabel: 'Start Playing',
+    description: 'Can you guess the secret number?',
+    heading: 'Welcome to the Challenge!'
+  },
+
+  // Post Data for game state
+  postData: {
+    secretNumber: Math.floor(Math.random() * 100) + 1,
+    totalGuesses: 0,
+    gameState: 'active',
+    winner: null
+  }
+});
+
+// Later, update post data when someone wins
+const updatedPost = await reddit.getPostById(post.id); await updatedPost.setPostData({ ...context.postData, gameState: 'completed', winner: currentUsername, totalGuesses: context.postData.totalGuesses + 1 });
+
+// Create a comment as the user announcing their win await reddit.submitComment({ runAs: 'USER', id: post.id, text: 🎉 ${currentUsername} won the game! });
+```

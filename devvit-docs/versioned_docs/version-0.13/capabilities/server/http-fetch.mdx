@@ -1,0 +1,212 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# HTTP Fetch
+
+Make requests to allow-listed external domains.
+
+Your Devvit app can make network requests to access allow-listed external domains using HTTP Fetch. This enables your app to leverage webhooks, personal servers, and other third-party integrations asynchronously across the network.
+
+## Enabling HTTP fetch calls
+
+<Tabs>
+  <TabItem value="devvit.json" label="Devvit Web">
+  ```json title="devvit.json"
+  {
+    ...
+    "permissions": {
+      "http": {
+        "enable": true,
+        "domains": ["my-site.com", "another-domain.net"]
+      }
+    }
+  }
+  ```
+  </TabItem>
+  <TabItem value="devvit.tsx" label="Devvit Blocks / Mod Tools">
+  ```ts
+  import { Devvit } from '@devvit/public-api';
+
+  Devvit.configure({
+    http: {
+      domains: ['my-site.com', 'another-domain.net'],
+    },
+  });
+
+```
+  </TabItem>
+</Tabs>
+
+### Requesting a domain to be allow-listed
+
+Apps may request a domain to be added to the allow-list by specifying `domains` in the `http` configuration.
+This configuration is optional, and apps can still configure `http: true` as before.
+
+Requested domains will be submitted for review when you playtest or upload your app. Admins may approve or deny domain requests.
+
+Domain entries must be exact hostnames only, such as nytimes.com or wikipedia.org. These fetch requests are not allowed:
+
+- Be specific. No using `*.example.com` when you need `api.example.com`
+- No wildcards: `*.example.com`
+- No protocols: `https://api.example.com`
+- No paths: `api.example.com/webhooks`
+
+Domains that are approved for your app will be displayed in the Developer Settings section for your app at `https://developers.reddit.com/apps/{your-app-slug}/developer-settings`.
+These domains are allow-listed for **your app only** and not globally.
+
+Apps must request each individual domain that it intends to fetch, even if the domain is already globally allowed. See the [global fetch allowlist](#global-fetch-allowlist) to view the list of globally allowed domains.
+
+## Limitations
+
+- Access is only allowed to https URIs.
+- Supported HTTP methods: `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS` and `PATCH`.
+- HTTP timeout limit is 30 seconds.
+
+## Example usage
+
+<Tabs>
+  <TabItem value="devvit-web" label="Devvit Web">
+  
+  Devvit Web applications have two different contexts for using fetch:
+  
+  ### Server-side fetch
+  
+  Server-side fetch allows your app to make HTTP requests to allowlisted external domains from your server-side code (e.g., API routes, server actions):
+  
+  ```ts
+  // In your server-side code
+  const response = await fetch('https://example.com/api/data', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  const data = await response.json();
+  console.log('External API response:', data);
+  ```
+  
+  ### Client-side fetch
+  
+  Client-side fetch has different restrictions and can only make requests to your own webview domain:
+  
+  **Client-side restrictions:**
+  - **Domain limitation**: Can only make requests to your own webview domain
+  - **Endpoint requirement**: All requests must target endpoints that end with `/api`
+  - **Authentication**: Handled automatically - no need to manage auth tokens
+  - **No external domains**: Cannot make requests to external domains from client-side code
+  
+  ```ts
+  // In your client-side React components or browser code
+  const handleFetchData = async () => {
+    // ✅ Correct: Fetching your own webview's API endpoint
+    const response = await fetch('/api/user-data', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    const data = await response.json();
+    console.log('API response:', data);
+  };
+  
+  // ❌ Incorrect: Cannot fetch external domains from client-side
+  // const response = await fetch('https://external-api.com/data');
+  
+  // ❌ Incorrect: Endpoint must end with /api
+  // const response = await fetch('/user-data');
+  ```
+  
+  </TabItem>
+  <TabItem value="devvit-blocks" label="Devvit Blocks / Mod Tools">
+  
+  For Devvit Blocks and Mod Tools, fetch is available within menu actions, triggers, and other server-side contexts:
+  
+  ```ts
+  import { Devvit } from '@devvit/public-api';
+  
+  Devvit.configure({
+    http: {
+      domains: ['example.com'],
+    },
+  });
+  
+  Devvit.addMenuItem({
+    location: 'comment',
+    label: 'Sample HTTP request',
+    onPress: async (_event, context) => {
+      console.log(`Comment ID: ${context.commentId}`);
+      const response = await fetch('https://example.com', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: context.commentId }),
+      });
+      context.ui.showToast(
+        `Invoked HTTP request on comment: ${context.commentId}. Completed with status: ${response.status}`
+      );
+    },
+  });
+  
+  export default Devvit;
+  ```
+  
+  </TabItem>
+</Tabs>
+
+## Troubleshooting
+
+If you see the following error, it means HTTP Fetch requests are hitting the internal timeout limits. To resolve this:
+
+- Use a queue or kick off an async request in your back end. You can use [Scheduler](./scheduler.md) to monitor the result.
+- Optimize the overall HTTP request latency if you have a self-hosted server.
+
+```ts
+HTTP request to domain: <domain> timed out with error: context deadline exceeded.
+```
+
+### Terms and conditions
+
+Any app that uses `fetch` must upload Terms and Conditions and a Privacy Policy. Links to each of these documents must be saved in the app details form.
+
+![App configuration form](../../assets/capabilities/http-fetch/http-fetch-legal-links.png)
+
+## Global fetch allowlist {#global-fetch-allowlist}
+
+The following domains are globally allowed and can be fetched by any app:
+
+- example.com
+- site.api.espn.com
+- cdn.espn.com
+- discord.com
+- api.polygon.io
+- polygon.io
+- slack.com
+- lichess.org
+- api.telegram.org
+- commentanalyzer.googleapis.com
+- language.googleapis.com
+- statsapi.mlb.com
+- api.openai.com
+- api.scryfall.com
+- api.nasa.gov
+- api.sportradar.us
+- api.sportradar.com
+- random.org
+- generativelanguage.googleapis.com
+- youtube.googleapis.com
+- api.weather.gov
+- wikipedia.org
+- finance.yahoo.com
+- api.twitter.com
+- api.petfinder.com
+- fonts.googleapis.com
+- nytimes.com
+- npr.org
+- propublica.org
+- pbs.org
+- i.giphy.com
+- chessboardjs.com
+
