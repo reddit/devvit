@@ -33,12 +33,6 @@ node_modules/
 .turbo/
 .eslintcache
 
-# testing
-.coverage
-.coverage-sources
-coverage
-coverage-sources
-
 # build artifacts
 build/
 dist/

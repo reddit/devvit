@@ -16,7 +16,8 @@ Create a `devvit.json` file in your project root with your app configuration:
 {
   "name": "your-app-name",
   "blocks": {
-    "entry": "src/main.tsx"
+    "entry": "src/main.tsx",
+    "triggers": ["onPostCreate"]
   }
 }
 ```
@@ -25,6 +26,7 @@ Replace:
 
 - `"your-app-name"` with your actual app name
 - `"src/main.tsx"` with the path to your main Blocks entry point (where you export your Devvit instance)
+- Include any triggers used in your src/main.tsx in the triggers array (or remove the parameter)
 
 ### 2. Remove devvit.yaml
 
@@ -38,7 +40,8 @@ If your app uses static assets (images, fonts, etc.) from an `assets` folder, yo
 {
   "name": "your-app-name",
   "blocks": {
-    "entry": "src/main.tsx"
+    "entry": "src/main.tsx",
+    "triggers": ["onPostCreate"]
   },
   "media": {
     "dir": "assets/"

@@ -1,6 +1,6 @@
 ---
 slug: mobile-first-development
-tags: [mobile, game, devvit, cross-plaform]
+tags: [mobile, game, devvit, cross-platform]
 ---
 
 # When Building Cross-Platform Developer Apps - Think Mobile-First

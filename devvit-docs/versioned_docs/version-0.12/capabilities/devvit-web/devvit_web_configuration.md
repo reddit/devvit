@@ -1,6 +1,6 @@
 # Configure Your App
 
-The devvit.json file serves as your app's configuration file. Use it to specify entry points, configure features like [event triggers](../server/triggers.md) and [scheduled actions](../server/scheduler.md), and enable app functionality such as [image uploads](../server/media-uploads.mdx). This page covers all available devvit.json configuration options. A complete devvit.json example file is provided [here](#complete-example).
+The devvit.json file serves as your app's configuration file. Use it to specify entry points, configure features like [event triggers](../server/triggers) and [scheduled actions](../server/scheduler.md), and enable app functionality such as [image uploads](../server/media-uploads.mdx). This page covers all available devvit.json configuration options. A complete devvit.json example file is provided [here](#complete-example).
 
 ## devvit.json
 
@@ -132,7 +132,6 @@ Control what your app can access:
     "redis": true,
     "reddit": {
       "enable": true,
-      "scope": "moderator",
       "asUser": ["SUBMIT_POST", "SUBMIT_COMMENT"]
     }
   }
@@ -354,10 +353,7 @@ The `devvit.json` configuration is validated against the JSON Schema at build ti
       "enable": true,
       "domains": ["api.example.com"]
     },
-    "redis": true,
-    "reddit": {
-      "scope": "moderator"
-    }
+    "redis": true
   },
   "triggers": {
     "onPostCreate": "/internal/triggers/post-create"

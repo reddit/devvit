@@ -3,6 +3,8 @@ import path from 'node:path';
 
 /** @type {boolean} See envvar.md. */
 export const MY_PORTAL_ENABLED = !!process.env.MY_PORTAL && process.env.MY_PORTAL !== '0';
+/** @type {boolean} See envvar.md. */
+export const DEVVIT_DEBUG = process.env.DEVVIT_DEBUG;
 
 export const STAGE_USER_NAME =
   // Not every username is `first.last`, if `MY_PORTAL` looks like a username use that directly
@@ -34,7 +36,7 @@ export const REDDIT_DOT_COM = (() => {
 /** @type {string} */
 export const REDDIT_DESKTOP = (() => {
   if (MY_PORTAL_ENABLED) {
-    return `https://reddit-desktop.${STAGE_USER_NAME}.snoo.dev`;
+    return `https://reddit-service-shreddit.${STAGE_USER_NAME}.snoo.dev`;
   }
 
   return 'https://www.reddit.com';

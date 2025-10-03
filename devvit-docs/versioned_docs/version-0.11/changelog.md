@@ -356,7 +356,7 @@ This release also includes a few API updates:
 
 **Release Date: Oct 21, 2024**
 
-0.11.1 includes [a new trigger](capabilities/triggers.md) for when posts and comments are filtered by automod. We’ve also included some other improvements including:
+0.11.1 includes [a new trigger](capabilities/triggers) for when posts and comments are filtered by automod. We’ve also included some other improvements including:
 
 - Playtest now defaults to using `--connect`, which sends client side logs that are in your browser into your CLI/terminal if you use the `?playtest` [parameter](playtest.md).
 - Public API changes:

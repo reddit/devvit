@@ -12,9 +12,11 @@ export async function createShareUrl(url: string): Promise<string> {
   }
 
   // Ensure the URL domain is reddit.com or old.reddit.com
-  const allowedDomains = new Set(['reddit.com', 'old.reddit.com']);
+  const allowedDomains = new Set(['reddit.com', 'www.reddit.com', 'old.reddit.com']);
   if (!allowedDomains.has(parsedUrl.hostname)) {
-    throw new Error('Invalid domain. Only reddit.com and old.reddit.com URLs are supported.');
+    throw new Error(
+      'Invalid domain. Only reddit.com, www.reddit.com, and old.reddit.com URLs are supported.'
+    );
   }
 
   // Ensure the URL has a non-root path and starts with an allowed prefix
@@ -29,7 +31,7 @@ export async function createShareUrl(url: string): Promise<string> {
   }
 
   // Fail fast: the service only accepts these query params; others are not supported
-  const allowedParams = new Set(['utm_source', 'utm_medium', 'context']);
+  const allowedParams = new Set(['utm_source', 'utm_medium', 'devvitshare']);
   const disallowedParams = Array.from(parsedUrl.searchParams.keys()).filter(
     (key) => !allowedParams.has(key)
   );

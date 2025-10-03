@@ -7,6 +7,25 @@ To use the latest version of Devvit:
 1. Run `npm install devvit@latest` to update your CLI.
 2. Run `npx devvit update app` to update your @devvit dependencies.
 
+## Devvit 0.12.1: Inline Web Views (Experimental) and other fixes
+
+**Release Date: September 10, 2025**
+
+Release 0.12.1 includes inline web view support, i.e. the ability for your web view to show up directly in a post unit, and includes a number of fixes from the Devvit Web launch.
+
+Inline web views (experimental) lets you create dynamic and compelling first screens beyond the splash screen. You can choose if and how users open into immersive mode. Learn more about how to implement inline views in the[First Screen Customization](./capabilities/interactive-posts/first_screen_customization.md) docs.
+
+:::note
+We’re still working on full cross platform support and improving performance. Inline web views are subject to additional reviews for performance and to prevent interfering with reddit native gestures.
+:::
+
+**Other Fixes**
+
+- Added a method mergePostData() to append to postData.
+- Fixed reddit.setPostFlair() method.
+- Added a new triggers field that fixed the issue where triggers within the blocks entrypoint weren’t working. The [migration guide](./guides/migrate/devvit-singleton.md) has been updated.
+- Fixed issues where the splash screen was not rendering on mobile, and post data in blocks on mobile should be rolling out in the next few weeks.
+
 ## Devvit 0.12.0: Devvit Web
 
 **Release Date: August 13, 2025**

@@ -1,1 +1,4 @@
-export { realtime, type RealtimeClient } from './RealtimeClient.js';
+import { RealtimeClient } from './RealtimeClient.js';
+
+export type { RealtimeClient } from './RealtimeClient.js';
+export const realtime: RealtimeClient = new RealtimeClient();

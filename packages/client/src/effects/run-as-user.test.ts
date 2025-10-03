@@ -25,15 +25,17 @@ describe('canRunAsUser', () => {
     vi.clearAllMocks();
     globalThis.devvit = {
       appPermissionState: undefined,
+      entrypoints: {},
       context: {
         subredditId: T5('t5_subredditId'),
         subredditName: 'subredditName',
         userId: T2('t2_userId'),
-        appName: 'appName',
+        appName: 'app-slug',
         appVersion: '1.0.0',
         postId: T3('t3_postId'),
       },
       share: undefined,
+      webViewMode: undefined,
     };
   });
 
@@ -88,6 +90,8 @@ describe('canRunAsUser', () => {
       type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
       canRunAsUser: {
         postId: globalThis.devvit.context.postId,
+        appSlug: globalThis.devvit.context.appName,
+        subredditId: globalThis.devvit.context.subredditId,
       },
     });
     expect(result, 'result').toBe(true);
@@ -105,6 +109,8 @@ describe('canRunAsUser', () => {
       type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
       canRunAsUser: {
         postId: globalThis.devvit.context.postId,
+        appSlug: globalThis.devvit.context.appName,
+        subredditId: globalThis.devvit.context.subredditId,
       },
     });
     expect(result, 'result').toBe(true);

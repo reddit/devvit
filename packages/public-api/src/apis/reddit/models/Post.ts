@@ -1450,9 +1450,11 @@ export class Post {
       metadata
     );
 
-    if (response.json?.errors?.length) {
-      throw new Error('Failed to set post text fallback');
-    }
+    if (response.json?.errors?.length)
+      // to-do: why is errors `Any[]`?
+      throw Error(
+        `set post ${postId} text fallback failed: ${JSON.stringify(response.json.errors)}`
+      );
 
     return Post.getById(postId, metadata);
   }

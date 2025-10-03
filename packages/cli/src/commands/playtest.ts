@@ -623,7 +623,7 @@ export default class Playtest extends DevvitCommand {
       this.error('Something went wrong: we could not find your app. Please try again.');
     } else if (!this.#appInfo.app.defaultPlaytestSubredditId && !this.#subreddit) {
       this.error(
-        'Something went wrong: we could not find the newly created playtest subreddit. Please playtest on a different subreddit using `devvit playtest <your_subreddit>` instead.'
+        'Something went wrong: we could not find the newly created playtest subreddit. Please try again or playtest on a different subreddit using `devvit playtest <your_subreddit>`.'
       );
     }
     this.#subreddit ??= this.#appInfo.app.defaultPlaytestSubredditId;

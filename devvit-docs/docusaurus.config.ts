@@ -81,7 +81,7 @@ const config: Config = {
             const { defaultCreateSitemapItems, ...rest } = params;
             const items = await defaultCreateSitemapItems(rest);
             return items.filter((item) => {
-              if (!/firehose|snapshot|next|\/\d+\.\d+\//.test(item.url)) {
+              if (!/firehose|reddit-for-researchers|snapshot|next|\/\d+\.\d+\//.test(item.url)) {
                 return true;
               } else {
                 console.log('excluding', item.url);
@@ -104,6 +104,7 @@ const config: Config = {
   plugins: [
     
     
+    
     [
       '@easyops-cn/docusaurus-search-local',
       {
@@ -113,6 +114,8 @@ const config: Config = {
           /(?:^|\/)api(?:\/|$)/,
           /(?:^|\/)icon$/,
           /(?:^|\/)devvit_rules$/,
+          /(?:^|\/)firehose(?:\/|$)/,
+          /(?:^|\/)reddit-for-researchers(?:\/|$)/,
           /(?:^|\/)migration_guide$/,
           /(?:^|\/)three_strikes$/,
           /(?:^|\/)playgrounds$/,
@@ -130,6 +133,8 @@ const config: Config = {
           '**/changelog.md',
           '**/icon.mdx',
           '**/devvit_rules.md',
+          '**/firehose/**',
+          '**/reddit-for-researchers/**',
           '**/migration_guide.md',
           '**/three_strikes.md',
           '**/playgrounds.mdx',

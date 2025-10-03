@@ -19,9 +19,11 @@ import semver from 'semver';
 import { localCodeServer } from '../lib/auth/local-code-server.js';
 import { StoredToken } from '../lib/auth/StoredToken.js';
 import { getAccessToken, getOAuthSvc } from '../util/auth.js';
+import { createAppClient } from '../util/clientGenerators.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import Cutter from '../util/Cutter.js';
+import { getAppBySlug } from '../util/getAppBySlug.js';
 import { readLine } from '../util/input-util.js';
 import { getPlatformFromEnvironment, isWebContainer } from '../util/platform-util.js';
 import { isRunningInAppDirectory } from '../util/project.js';
@@ -67,6 +69,8 @@ export default class Init extends DevvitCommand {
     }),
   } as const;
 
+  readonly #appClient = createAppClient();
+
   #initAppParams: InitAppResponse | undefined;
 
   #initAppFlags: InitAppFlags | undefined;
@@ -92,7 +96,9 @@ export default class Init extends DevvitCommand {
 
     const { args, flags } = await this.parse(Init);
     if (!flags.force && isRunningInAppDirectory() && this.project.name !== UNINITIALIZED_APP_NAME) {
-      this.log("This app already exists, you don't need to init.");
+      this.log(
+        'Your app was already initialized. If you really want to create a new app in this directory, run `npx devvit init --force`.'
+      );
       return;
     }
 
@@ -118,17 +124,24 @@ export default class Init extends DevvitCommand {
     }
 
     // Login to CLI with one-time auth code
-    if (this.#initAppParams.authCode) {
-      const oAuthSvc = getOAuthSvc();
-      let newToken: StoredToken;
-      try {
-        newToken = await oAuthSvc.fetchAccessToken(this.#initAppParams.authCode, true);
-      } catch {
+    const shouldLogin = await this.#shouldLogin(this.#initAppParams.appName);
+    if (shouldLogin) {
+      if (this.#initAppParams.authCode) {
+        const oAuthSvc = getOAuthSvc();
+        let newToken: StoredToken;
+        try {
+          newToken = await oAuthSvc.fetchAccessToken(this.#initAppParams.authCode, true);
+        } catch {
+          this.error(
+            `Failed to login with the provided code. Please run 'npx devvit init' or visit ${DEVVIT_PORTAL_URL}/new to get a new code.`
+          );
+        }
+        await oAuthSvc.authTokenStore.writeFSToken(newToken, true);
+      } else {
         this.error(
-          `Failed to login with the provided code. Please run 'npx devvit init' or visit ${DEVVIT_PORTAL_URL}/new to get a new code.`
+          `No auth code provided. Please run 'npx devvit init' or visit ${DEVVIT_PORTAL_URL}/new to get a new code.`
         );
       }
-      await oAuthSvc.authTokenStore.writeFSToken(newToken, true);
     }
 
     if (isRunningInAppDirectory()) {
@@ -201,6 +214,11 @@ export default class Init extends DevvitCommand {
   async #copyProjectTemplate(appName: string, templateName: string): Promise<void> {
     const templatePath = await templateResolver.getProjectUrl(templateName);
     const cutter = new Cutter(templatePath);
+    if (existsSync(this.#projectPath)) {
+      this.error(
+        `The directory ${this.#projectPath} already exists. Please rename it or delete it and run this command again.`
+      );
+    }
     await cutter.cut(this.#projectPath, {
       name: appName,
     });
@@ -232,6 +250,44 @@ export default class Init extends DevvitCommand {
     const msg = welcomeInstructions.join('\n');
 
     logInBox(msg, { style: 'SINGLE', color: chalk.magenta });
+  }
+
+  /**
+   * Helper to determine whether it is necessary to login using the one-time oauth code in `initAppParams`.
+   * If the CLI user is the owner of the app being created, we don't need to login.
+   *
+   * @param slug of the app being initialized
+   * @returns whether we need to login or not
+   */
+  async #shouldLogin(slug: string): Promise<boolean> {
+    const token = await getAccessToken();
+    if (!token) {
+      return true;
+    }
+
+    const appInfo = await getAppBySlug(this.#appClient, {
+      slug,
+      limit: 0, // fetched version limit; we only need the latest one
+    });
+    const username = await this.getUserDisplayName(token);
+    if (!appInfo) {
+      this.error(
+        `App with slug "${slug}" not found. The app either doesn't exist or isn't owned by your account logged in the devvit CLI. You're logged in as ${username}.
+        If you created this app, you can either:
+        (1) run 'devvit login' to switch to the same account you used in the web app creation wizard, then run this command again, or
+        (2) visit ${DEVVIT_PORTAL_URL}/new to create a new app, making sure you're logged in as ${username} in your browser.`
+      );
+    }
+    const isOwner = appInfo?.app?.owner?.displayName === username;
+    if (!isOwner) {
+      this.error(
+        `You are logged in as ${username}, and the app "${slug}" isn't owned by this account. You can either:
+        (1) run 'devvit login' to switch to the same account you used in the web app creation wizard, then run this command again, or
+        (2) visit ${DEVVIT_PORTAL_URL}/new to create a new app, making sure you're logged in as ${username} in your browser.`
+      );
+    }
+    // We're logged in and we own this app, so no need to login again
+    return false;
   }
 }
 

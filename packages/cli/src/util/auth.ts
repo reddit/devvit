@@ -6,7 +6,7 @@ import {
   type NodeFSAuthenticationPluginConfig,
 } from '../lib/auth/NodeFSAuthenticationPlugin.js';
 import type { StoredToken } from '../lib/auth/StoredToken.js';
-import { DOT_DEVVIT_DIR_FILENAME, REDDIT_DOT_COM } from '../lib/config.js';
+import { DEVVIT_DEBUG, DOT_DEVVIT_DIR_FILENAME, REDDIT_DOT_COM } from '../lib/config.js';
 import { DEVVIT_PORTAL_URL } from './config.js';
 
 const PORT = 65010; // Has to match exactly to our oauth app settings
@@ -30,6 +30,7 @@ export const authHeaders = (token: StoredToken): Record<string, string> => {
   return {
     Authorization: `Bearer ${token.accessToken}`,
     'User-Agent': HEADER_USER_AGENT()[1],
+    ...(DEVVIT_DEBUG ? { 'devvit-debug': DEVVIT_DEBUG } : {}),
   };
 };
 
