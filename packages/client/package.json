@@ -35,8 +35,7 @@
   "dependencies": {
     "@devvit/protos": "0.11.19",
     "@devvit/shared": "0.11.19",
-    "@devvit/shared-types": "0.11.19",
-    "@devvit/web-view-scripts": "0.11.19"
+    "@devvit/shared-types": "0.11.19"
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
