@@ -5,6 +5,7 @@ import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_
 import type { WebViewMessageEvent } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
 import { type Effect, emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { T2, T3, T5 } from '@devvit/shared-types/tid.js';
+import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -37,6 +38,7 @@ describe('showImmersiveMode', () => {
         postId: T3('t3_postId'),
       },
       share: undefined,
+      webbitToken: noWebbitToken,
       webViewMode: undefined,
     };
     registerListener();

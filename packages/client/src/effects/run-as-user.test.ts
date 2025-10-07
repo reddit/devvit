@@ -5,6 +5,7 @@ import {
 import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { T2, T3, T5 } from '@devvit/shared-types/tid.js';
+import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { canRunAsUser } from './run-as-user.js';
@@ -35,6 +36,7 @@ describe('canRunAsUser', () => {
         postId: T3('t3_postId'),
       },
       share: undefined,
+      webbitToken: noWebbitToken,
       webViewMode: undefined,
     };
   });
