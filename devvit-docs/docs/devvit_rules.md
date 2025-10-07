@@ -218,7 +218,7 @@ Such apps cannot be published in public subreddits until app review is complete.
 
 ### Guidelines for account-linked services
 
-- Anonymize all user-identifying information (user IDs, usernames, profile image, etc.) before sending to external servers. 
+- Anonymize all user-identifying information (user IDs, usernames, profile image, etc.) before sending to external servers.
 - The only permitted linkage between identities on Reddit and external user accounts is a unique ID.
 - Information imported into Reddit must not contain any personal data (including but not limited to PII, real names, or other information that could be used to identify an individual).
 - Users must explicitly opt-in to connecting external services and a corresponding consent prompt must be present.
@@ -230,7 +230,7 @@ Such apps cannot be published in public subreddits until app review is complete.
 
 - External services connecting [Reddit user data](https://www.reddit.com/policies/privacy-policy#policy-h2-3) to external account data must have SOC2 Type II compliance.
 - Provide evidence of recent (12 months prior) penetration test by an accredited third party with no High or Critical findings or appropriate remediation and retest attestation.
-- Account-linked services must be limited to read-only OAuth scopes to external user accounts. Username/password authentication is not permitted to external services. 
+- Account-linked services must be limited to read-only OAuth scopes to external user accounts. Username/password authentication is not permitted to external services.
 
 ## Generative AI/LLM rules
 
