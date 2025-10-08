@@ -147,6 +147,11 @@ export class RedditClient {
     return this.#modMailService;
   }
 
+  /** Returns {@link PostData}, if any, for the post specified by ID. */
+  async getPostData(id: T3): Promise<PostData | undefined> {
+    return (await Post.getDevvitPostData(id))?.developerData;
+  }
+
   /**
    * Gets a {@link Subreddit} object by ID
    *
@@ -1776,6 +1781,7 @@ export class RedditClient {
    * ```
    */
   async setPostData(postId: T3, postData: PostData): Promise<void> {
+    // to-do: optimize. Don't fetch the post when all that's needed is post ID.
     const post = await Post.getById(postId);
     await post.setPostData(postData);
   }
@@ -1796,6 +1802,7 @@ export class RedditClient {
    * ```
    */
   async mergePostData(postId: T3, postData: PostData): Promise<void> {
+    // to-do: optimize. Don't fetch the post when all that's needed is post ID.
     const post = await Post.getById(postId);
     await post.mergePostData(postData);
   }
