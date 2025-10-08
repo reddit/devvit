@@ -1,0 +1,77 @@
+---
+slug: /
+---
+
+import RotatingImage from '@site/src/components/IntroPagesFeatures/RotatingImage.js';
+import BuildItBuilding from '@site/docs/assets/showcase/buildit_building.gif';
+import DarkDungeon from '@site/docs/assets/showcase/dark_dungeon.gif';
+import RiddonkulousGuess from '@site/docs/assets/showcase/riddonkulous_guess.gif';
+import FlappyGoose from '@site/docs/assets/showcase/flappy_goose.gif';
+import SwordAndSupper from '@site/docs/assets/showcase/sword_and_supper.gif';
+import Hightier from '@site/docs/assets/showcase/hightier.gif';
+import RetroController from '@site/docs/assets/introduction/SpotIllustration_RetroController_B.webp';
+import Toolbox from '@site/docs/assets/introduction/SpotIllustration_Color_Toolbox.webp';
+import IntroTilePanel from '@site/src/components/IntroPagesFeatures/IntroTilePanel.js';
+
+# Welcome to Devvit
+
+Meet Devvit: Reddit’s developer platform for building powerful, interactive games and apps. Games and apps that gain traction can earn up to $167,000 with our [Reddit Developer Funds](./earn-money/reddit_developer_funds).
+
+## Bring your imagination to life
+
+Devvit lets you create rich, immersive posts and tools that seamlessly integrate into Reddit’s ecosystem. Build interactive experiences:
+
+<div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap', minHeight: 280 }}>
+  <div style={{ flex: 1, minWidth: 460 }}>
+    <ul>
+      <li>Community Games such as <a href="https://www.reddit.com/r/Pixelary/">Pixelary</a>, <a href="https://www.reddit.com/r/SwordAndSupperGame/">Sword And Supper</a>, and <a href = "https://www.reddit.com/r/RedditGames/"> Flappy Goose.</a></li>
+      <li>Community Apps, like <a href="https://www.reddit.com/r/FortNiteBR/"> Community Hub </a> and <a href="https://www.reddit.com/r/hightier/">Hightier</a></li>
+      <li><a href="https://www.reddit.com/r/ModSupport/comments/1k6szsj/devvit_apps_for_moderation_a_list/">Custom mod tools</a> to automate, moderate, and empower your community</li>
+    </ul>
+  </div>
+  <div style={{ flex: 1, minWidth: 260, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <RotatingImage images={[
+      BuildItBuilding,
+      DarkDungeon,
+      RiddonkulousGuess,
+      FlappyGoose,
+      SwordAndSupper,
+      Hightier,
+    ]} interval={3000} style={{ height: 280, width: 340, maxWidth: '100%', maxHeight: '100%' }} />
+  </div>
+</div>
+
+
+See what others have built and get inspired in the [App Showcase](./examples/app-showcase) and find even more games on [r/GamesOnReddit](https://www.reddit.com/r/GamesOnReddit/).
+
+## Get started
+
+<IntroTilePanel
+  tiles={[
+    {
+      title: 'Games',
+      image: RetroController,
+      href: './introduction/intro-games',
+      background: 'linear-gradient(135deg, #b2f7ef 0%, #4be18a 100%)',
+      textColor: '#003820',
+      imageSide: 'left',
+      textAlign: 'right',
+      imageFlip: true,
+      alt: 'Games Intro',
+    },
+    {
+      title: 'Mod Tools',
+      image: Toolbox,
+      href: './introduction/intro-mod-tools',
+      background: 'linear-gradient(135deg, #ffe066 0%, #ff7c53 100%)',
+      textColor: '#5a2a00',
+      imageSide: 'right',
+      textAlign: 'left',
+      alt: 'Mod Tools Intro',
+    },
+  ]}
+/>
+
+## Community
+
+Have questions or want to share your app? Join [r/devvit](https://www.reddit.com/r/devvit/) or our [Discord](https://discord.gg/Cd43ExtEFS) to connect with other developers, get feedback, and show off your creations.

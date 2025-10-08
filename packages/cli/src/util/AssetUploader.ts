@@ -51,11 +51,14 @@ export class AssetUploader {
   readonly #appClient = createAppClient();
 
   readonly #appSlug: string;
+  readonly #skipWebViewScriptInjection: boolean =
+    !!process.env.DEVVIT_SKIP_WEB_VIEW_SCRIPT_INJECTION;
 
   constructor(cmd: DevvitCommand, appSlug: string, { verbose }: { verbose: boolean }) {
     this.#cmd = cmd;
     this.#verbose = verbose;
     this.#appSlug = appSlug;
+    if (this.#skipWebViewScriptInjection) console.info('Skipping web view script injection.');
   }
 
   /**
@@ -75,7 +78,8 @@ export class AssetUploader {
             path.join(this.#cmd.project.root, this.#cmd.project.mediaDir),
             ALLOWED_ASSET_EXTENSIONS,
             'Media',
-            clientVersion
+            clientVersion,
+            this.#skipWebViewScriptInjection
           )
         : ([] as MediaSignatureWithContents[]),
       this.#cmd.project.clientDir
@@ -83,7 +87,8 @@ export class AssetUploader {
             path.join(this.#cmd.project.root, this.#cmd.project.clientDir),
             [],
             'Client',
-            clientVersion
+            clientVersion,
+            this.#skipWebViewScriptInjection
           )
         : ([] as MediaSignatureWithContents[]),
     ]);
@@ -399,12 +404,15 @@ export class AssetUploader {
  *
  * Asset kind controls transform. Client (historically webroot/) is for web view
  * assets. Media (historically assets/) is for everything else.
+ *
+ * @internal
  */
-async function queryAssets(
+export async function queryAssets(
   dir: string,
   allowedExtensions: readonly string[],
   assetKind: 'Client' | 'Media',
-  clientVersionNum: string | undefined
+  clientVersionNum: string | undefined,
+  skipWebViewScriptInjection: boolean
 ): Promise<MediaSignatureWithContents[]> {
   if (!(await dirExists(dir))) {
     // Return early if there isn't an assets directory
@@ -426,7 +434,7 @@ async function queryAssets(
 
       // If the webview assets is an HTML file, inject the Devvit analytics
       // script.
-      if (assetKind === 'Client' && filename.match(/\.html?$/)) {
+      if (assetKind === 'Client' && filename.match(/\.html?$/) && !skipWebViewScriptInjection) {
         file = transformHTMLBuffer(file, clientVersionNum);
       }
 
