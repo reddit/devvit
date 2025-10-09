@@ -117,6 +117,7 @@ const sidebars: SidebarsConfig = {
         'capabilities/server/media-uploads',
         'capabilities/server/settings-and-secrets',
         'capabilities/server/http-fetch',
+        'capabilities/server/cache-helper',
         {
           type: 'category',
           label: 'Reddit API',
@@ -176,7 +177,6 @@ const sidebars: SidebarsConfig = {
         'capabilities/blocks/working_with_useinterval',
         'capabilities/blocks/working_with_useasync',
         'capabilities/blocks/app_image_assets',
-        'capabilities/blocks/cache',
         {
           type: 'category',
           label: 'Reference',
