@@ -7,24 +7,27 @@ To use the latest version of Devvit:
 1. Run `npm install devvit@latest` to update your CLI.
 2. Run `npx devvit update app` to update your @devvit dependencies.
 
-## Devvit 0.12.1: Inline Web Views (Experimental) and other fixes
+## Devvit 0.12.1: Cache Helper, Analytics dashboard for developers, and smaller fixes
 
-**Release Date: September 10, 2025**
+**Release Date: October 10, 2025**
 
-Release 0.12.1 includes inline web view support, i.e. the ability for your web view to show up directly in a post unit, and includes a number of fixes from the Devvit Web launch.
+In this release, we’ve added back the cache helper for Devvit Web and also included an App Analytics tab for you to track your app’s engagement metrics.
 
-Inline web views (experimental) lets you create dynamic and compelling first screens beyond the splash screen. You can choose if and how users open into immersive mode. Learn more about how to implement inline views in the[First Screen Customization](./capabilities/interactive-posts/first_screen_customization.md) docs.
+**Cache Helper**
+The cache helper helps your app reduce the number of server side calls by caching the response for all users. This is great for any data that you plan to share across users, like a global leaderboard or consistent data from an external source like the score of a sports game. We now have this feature available in Devvit Web, and you can look up how to use it in the [cache helper docs](./capabilities/server/cache-helper.mdx).
 
-:::note
-We’re still working on full cross platform support and improving performance. Inline web views are subject to additional reviews for performance and to prevent interfering with reddit native gestures.
-:::
+**App Analytics**
+There’s a new App Analytics tab in your app settings that lets you track your progress against Reddit Developer Funds.
 
-**Other Fixes**
+![App Analytics](./assets/app_analytics.png)
 
+**Other fixes**
+This release also includes a handful of other fixes including:
 - Added a method mergePostData() to append to postData.
 - Fixed reddit.setPostFlair() method.
-- Added a new triggers field that fixed the issue where triggers within the blocks entrypoint weren’t working. The [migration guide](./guides/migrate/devvit-singleton.md) has been updated.
-- Fixed issues where the splash screen was not rendering on mobile, and post data in blocks on mobile should be rolling out in the next few weeks.
+- Added a new triggers field that fixed the issue where triggers within the blocks entrypoint weren’t working. The migration guide has been updated.
+- Added error handling when trying to `devvit new`on an already existing app name.
+- Added disconnectRealtime() and isRealtimeConnected() as helper methods for the realtime plugin.
 
 ## Devvit 0.12.0: Devvit Web
 
