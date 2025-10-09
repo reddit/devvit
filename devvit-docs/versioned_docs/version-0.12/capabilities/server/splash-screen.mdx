@@ -60,24 +60,27 @@ The `splash` object supports the following customization options:
 
 Images can be referenced in two ways:
 
-1. **Local assets**: Place images in your app's client/public directory and reference them by filename:
-
+1. **Local assets**: Place images in your app's assets directory and reference them by filename:
+    For example, if your image is in `assets/splash-background.png`, then you can just reference it with `splash-background.png`
+    
     :::note
-    To access assets in the client/public directory from the server, add the `media` property to your `devvit.json` file. The directory path should be relative to the `client/public` folder. 
+    If you put the images in a different directory, you can configure that by adding the `media` property to your `devvit.json` file. Set `media.dir` to the directory path you are using.
     :::
-    For example, to use an image at `client/public/assets/splash-background.png`: 
+    For example, if you are putting the image in `assets/images`, then you can write it like this: 
    ```json title="devvit.json"
    "media": {
-     "dir": "assets"
+     "dir": "assets/images"
    }
    ```
 
-  
+    And you can reference them by their filename
 
-   ```ts title="server/index.ts"
-   backgroundUri: '/splash-background.png'
-   appIconUri: '/app-icon.png'
-   ```
+    ```ts title="server/index.ts"
+    backgroundUri: '/splash-background.png'
+    appIconUri: '/app-icon.png'
+    ```
+    Without configuring `media.dir`, you have to reference the images relative to the `assets` directory, which would be `images/splash-background.png` in this example
+
 
    
 
