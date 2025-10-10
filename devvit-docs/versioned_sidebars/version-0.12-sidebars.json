@@ -1,6 +1,18 @@
 {
   "tutorialSidebar": [
     {
+      "type": "doc",
+      "id": "kiro-hackathon",
+      "label": "New: Reddit x Kiro Hackathon",
+      "className": "sidebar-icon-link kiro-link"
+    },
+    {
+      "type": "html",
+      "value": "<hr/>",
+      "className": "sidebar-divider",
+      "defaultStyle": false
+    },
+    {
       "type": "html",
       "value": "<span>Introduction</span>",
       "className": "sidebar-section-header"

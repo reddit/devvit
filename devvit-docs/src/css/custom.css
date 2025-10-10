@@ -206,6 +206,10 @@ div.themed-col:hover {
   background-image: url('../../static/img/icon-reddit.png');
 }
 
+.kiro-link a::before{
+  background-image: url('../../static/img/icon-kiro.png');
+}
+
 /* Sidebar divider styling */
 .sidebar-divider hr {
   margin: 0.2rem 0;
