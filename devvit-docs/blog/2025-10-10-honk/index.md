@@ -20,11 +20,11 @@ Johnny’s path to game dev wasn’t a straight line. After dabbling in coding g
 “On a whim, I jumped into building games full time! I wasn’t making any money, but picked up contract software work on the side to pay the bills. I chose web platforms because I love that web games are accessible to anyone, without downloads or installs. Plus, it’s a fun challenge to optimize for performance since players load the game fresh every time.”
 </div>
 
-That passion for accessibility and optimization laid the foundation for what would become his breakout success.  
+That passion for accessibility and optimization laid the foundation for what would become his breakout success.
 
 ## Discovering Reddit’s Developer Platform
 
-Johnny stumbled across Reddit’s new Developer Platform, [Devvit](https://developers.reddit.com/), in his own feed. At the time, he had already been experimenting with web games for two years.  
+Johnny stumbled across Reddit’s new Developer Platform, [Devvit](https://developers.reddit.com/), in his own feed. At the time, he had already been experimenting with web games for two years.
 
 When Reddit announced a hackathon, he decided to give it a shot — and won first prize with _Chook_, a 3D low-poly multiplayer game where Redditors work together to feed a virtual chicken.
 
@@ -34,7 +34,7 @@ When Reddit announced a hackathon, he decided to give it a shot — and won firs
 
 That “something bigger” arrived just days later.
 
-## The birth of Honk  
+## The birth of Honk
 
 Fresh off the [hackathon win](https://www.reddit.com/r/Devvit/comments/1jwwzsq/announcing_the_winners_of_hack_reddit/), Johnny hacked together another game over a weekend. His goal? A simple spin on _Honk_, designed to feel “Reddit-y,” with a live leaderboard that would draw players in.
 

@@ -23,6 +23,7 @@ There’s a new App Analytics tab in your app settings that lets you track your 
 
 **Other fixes**
 This release also includes a handful of other fixes including:
+
 - Added a method mergePostData() to append to postData.
 - Fixed reddit.setPostFlair() method.
 - Added a new triggers field that fixed the issue where triggers within the blocks entrypoint weren’t working. The migration guide has been updated.

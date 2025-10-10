@@ -267,7 +267,7 @@ export default class Playtest extends DevvitCommand {
 
     if (!this.#subreddit) {
       this.error(
-        'Something went wrong: we should have a subreddit by now. Please playtest on a different subreddit using `devvit playtest <your_subreddit>` instead.'
+        'Automatic subreddit creation failed. Please create a subreddit, and either set DEVVIT_SUBREDDIT in your .env file, or set "dev.subreddit" in devvit.json. Then run this command again.'
       );
     }
 
