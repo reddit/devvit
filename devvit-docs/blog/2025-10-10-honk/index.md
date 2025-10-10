@@ -3,16 +3,12 @@ slug: honk
 tags: [honk, game, devvit, hackathon]
 ---
 
-import honk_1 from '@site/blog/assets/honk_1.gif';
-import honk_2 from '@site/blog/assets/honk_2.gif';
 
 # From Hackathon Win to 300K+ Players: How Honk Took Flight on Reddit
 
 When [u/thejohnnyr](https://www.reddit.com/user/thejohnnyr/) first started coding, he wasn’t dreaming of millions of players or thriving online communities. He was just trying to make his own version of Pokémon. Years later, after a detour into software engineering, he quit his job to chase game development full-time — and ended up building one of Reddit’s most beloved community games: [_Honk_](https://www.reddit.com/r/redditgames/).
 
-<div align="center">
-<img src={honk_1} alt="r/honk" width="300" />
-</div>
+![Play honk](../assets/honk_1.gif)
 
 Today, Honk has more than **300,000 subscribers**, a passionate community of creators, and players who spend hours designing or conquering levels. We talked with Johnny to learn more about his journey, his experience building for Reddit, and what’s next for _Honk_.
 
@@ -66,9 +62,7 @@ Johnny credits Honk’s explosive growth to one feature: the **level builder**.
 
 From self-playing “auto levels” to creative story-driven challenges, the ingenuity of Redditors has kept the game fresh and endlessly re-playable.
 
-<div align="center">
-<img src={honk_2} alt="r/honk" width="300" />
-</div>
+![Honk with cow](../assets/honk_2.gif)
 
 Check out some of Johnny’s favorite player-made levels:
 
