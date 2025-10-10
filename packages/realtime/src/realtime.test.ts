@@ -29,7 +29,7 @@ describe('realtime', () => {
       const mockOnMessage = vi.fn();
 
       const connection = await connectRealtime({
-        channel: 'test-channel',
+        channel: 'test_channel',
         onConnect: mockOnConnect,
         onMessage: mockOnMessage,
       });
@@ -39,7 +39,7 @@ describe('realtime', () => {
           data: {
             id: 'id',
             realtimeEvent: {
-              event: { channel: 'useChannel:test-channel' },
+              event: { channel: 'useChannel:test_channel' },
               status: RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
             },
           },
@@ -48,11 +48,11 @@ describe('realtime', () => {
       dispatchEvent(connect);
 
       expect(emitEffect).toHaveBeenCalledWith({
-        realtimeSubscriptions: { subscriptionIds: ['test-channel'] },
+        realtimeSubscriptions: { subscriptionIds: ['test_channel'] },
         type: EffectType.EFFECT_REALTIME_SUB,
       });
       expect(connection).toBeDefined();
-      expect(isRealtimeConnected('test-channel')).toBe(true);
+      expect(isRealtimeConnected('test_channel')).toBe(true);
     });
 
     it('should return existing connection if channel is already connected', async () => {
@@ -61,7 +61,7 @@ describe('realtime', () => {
 
       // First connection should succeed
       const connection1 = await connectRealtime({
-        channel: 'test-channel',
+        channel: 'test_channel',
         onMessage: mockOnMessage,
         onConnect: mockOnConnect,
       });
@@ -71,7 +71,7 @@ describe('realtime', () => {
 
       // Second connection should return the same connection object
       const connection2 = await connectRealtime({
-        channel: 'test-channel',
+        channel: 'test_channel',
         onMessage: mockOnMessage,
       });
 
@@ -84,7 +84,7 @@ describe('realtime', () => {
       const mockOnMessage = vi.fn();
 
       await connectRealtime({
-        channel: 'test-channel',
+        channel: 'test_channel',
         onMessage: mockOnMessage,
       });
 
@@ -99,7 +99,7 @@ describe('realtime', () => {
             id: 'id',
             realtimeEvent: {
               event: {
-                channel: 'useChannel:test-channel',
+                channel: 'useChannel:test_channel',
                 data: { msg: testMessage },
               },
             },
@@ -110,27 +110,47 @@ describe('realtime', () => {
 
       expect(mockOnMessage).toHaveBeenCalledWith(testMessage);
     });
+
+    test('throws an error for an invalid channel', async () => {
+      const mockOnMessage = vi.fn();
+
+      await expect(
+        connectRealtime({ channel: 'test-channel', onMessage: mockOnMessage })
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: invalid channel name "test-channel"; channels may only contain letters, numbers, and underscores]`
+      );
+    });
+
+    test('throws an error for an empty channel', async () => {
+      const mockOnMessage = vi.fn();
+
+      await expect(
+        connectRealtime({ channel: '', onMessage: mockOnMessage })
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: invalid channel name ""; channels may only contain letters, numbers, and underscores]`
+      );
+    });
   });
 
   describe('disconnectRealtime()', () => {
     it('should disconnect from a channel', async () => {
       const mockOnMessage = vi.fn();
 
-      await connectRealtime({ channel: 'test-channel', onMessage: mockOnMessage });
+      await connectRealtime({ channel: 'test_channel', onMessage: mockOnMessage });
       const connect = new MessageEvent('message', {
         data: {
           type: 'devvit-message',
           data: {
             id: 'id',
             realtimeEvent: {
-              event: { channel: 'useChannel:test-channel' },
+              event: { channel: 'useChannel:test_channel' },
               status: RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
             },
           },
         } satisfies WebViewMessageEvent_MessageData,
       });
       dispatchEvent(connect);
-      expect(isRealtimeConnected('test-channel')).toBe(true);
+      expect(isRealtimeConnected('test_channel')).toBe(true);
 
       const disconnect = new MessageEvent('message', {
         data: {
@@ -138,20 +158,20 @@ describe('realtime', () => {
           data: {
             id: 'id',
             realtimeEvent: {
-              event: { channel: 'useChannel:test-channel' },
+              event: { channel: 'useChannel:test_channel' },
               status: RealtimeSubscriptionStatus.REALTIME_UNSUBSCRIBED,
             },
           },
         } satisfies WebViewMessageEvent_MessageData,
       });
       dispatchEvent(disconnect);
-      await disconnectRealtime('test-channel');
+      await disconnectRealtime('test_channel');
 
       expect(emitEffect).toHaveBeenCalledWith({
         realtimeSubscriptions: { subscriptionIds: [] },
         type: EffectType.EFFECT_REALTIME_SUB,
       });
-      expect(isRealtimeConnected('test-channel')).toBe(false);
+      expect(isRealtimeConnected('test_channel')).toBe(false);
     });
   });
 });

@@ -51,6 +51,11 @@ const connectionsByChannel = new Map<string, Connection>();
 export const connectRealtime = async <Msg extends JsonValue>(
   opts: Readonly<ConnectRealtimeOptions<Msg>>
 ): Promise<Connection> => {
+  if (!opts.channel || /[^a-zA-Z0-9_]/.test(opts.channel))
+    throw Error(
+      `invalid channel name "${opts.channel}"; channels may only contain letters, numbers, and underscores`
+    );
+
   if (connectionsByChannel.has(opts.channel)) {
     return connectionsByChannel.get(opts.channel)!;
   }
