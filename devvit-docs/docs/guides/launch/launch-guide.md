@@ -1,12 +1,12 @@
 # Launch Your App
 
-Once your app is ready, you can launch your it to users and moderators across Reddit. There are a few things you need to do to get your app "launch ready". This guide will walk you through that process.
+Once your app is ready, you can launch it to users and moderators across Reddit. There are a few things you need to do to get your app "launch ready". This guide will walk you through that process.
 
 Once you have created a polished app, you may also apply for **Reddit featuring**, which includes on-platform promotion and boosting of your app. Make sure to read this guide closely before filling out a [Reddit featuring request](https://forms.gle/pLEfhZFf6skc4Rto8).
 
 We've broken the Devvit App Launch guide into four phases:
 
-- **Alpha**: Use this stage to validate your core concept and catch major issues early
+- **Alpha**: Use this stage to validate your core concept and catch major issues early.
 - **Beta**: Test your game with real users on a public subreddit.
 - **General Availability (GA)**: Share your app with all of Reddit!
 - **Featured**: Work with the Reddit team to promote your app across the site.
@@ -89,10 +89,10 @@ In order to have a successful app launch, please ensure your game has the follow
 
 #### Suggested
 
-- A subscribe button - encourage re-engagement
-- Leaderboards - a view into a user's community standing
-- Community Flair - leverage [user flair](https://support.reddithelp.com/hc/en-us/articles/205242695-How-do-I-get-user-flair) to give users special distinction in the community (this can be done programmatically via the API)
-- User Generated Content - provide ways for users to contribute (think: custom post comments, drawings, level builders, etc)
+- A subscribe button - encourage re-engagement.
+- Leaderboards - a view into a user's community standing.
+- Community Flair - leverage [user flair](https://support.reddithelp.com/hc/en-us/articles/205242695-How-do-I-get-user-flair) to give users special distinction in the community (this can be done programmatically via the API).
+- User Generated Content - provide ways for users to contribute (think: custom post comments, drawings, level builders, etc).
 
 
 ### Organic distribution
