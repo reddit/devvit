@@ -94,10 +94,9 @@ In order to have a successful app launch, please ensure your game has the follow
 - Community Flair - leverage [user flair](https://support.reddithelp.com/hc/en-us/articles/205242695-How-do-I-get-user-flair) to give users special distinction in the community (this can be done programmatically via the API).
 - User Generated Content - provide ways for users to contribute (think: custom post comments, drawings, level builders, etc).
 
-
 ### Organic distribution
 
-A published app is automatically shared with a small number of redditors, and engagement metrics will determine if our feed algorithms start to organically pick up your posts. 
+A published app is automatically shared with a small number of redditors, and engagement metrics will determine if our feed algorithms start to organically pick up your posts.
 
 Key engagement metrics for games include:
 
@@ -107,7 +106,6 @@ Key engagement metrics for games include:
 - Post score - upvotes vs downvotes ratio
 
 Successful games will generate genuine conversation within each post, and create compelling content that engages redditors.
-
 
 ### Featuring with Reddit
 
@@ -119,7 +117,6 @@ Once your game has been published and approved, it may be featured by Reddit in 
 - Highlight in Reddit's Games sidebar
 
 If you would like to apply for featuring, please [use this form](https://forms.gle/pLEfhZFf6skc4Rto8). We will respond to requests within two business days.
-
 
 ## Community apps
 
@@ -181,4 +178,3 @@ When you're ready to publicly release your app, you’ll need to add it to the A
 - Got questions? Join our Discord or post in [r/Devvit](https://www.reddit.com/r/Devvit/).
 - Review the [rules](../../devvit_rules.md) before publishing.
 - Learn more about [how to earn](../../earn-money/payments/payments_overview.md) for apps you launch.
-
