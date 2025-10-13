@@ -9,7 +9,9 @@ RESET='\033[0m'
 echo "Generating API docs...";
 yarn gen:api-docs && yarn gen:reddit-api-docs
 echo "Linting API docs...";
-npx prettier --write '**/*.md'
+# Only format markdown files tracked by git (excludes submodules)
+# Explicitly exclude docs/spec/headers.md as it is a generated file that is not formatted correctly by prettier
+git ls-files '*.md' ':!/docs/spec/headers.md' | xargs npx prettier --write
 
 # Check for unstaged changes
 if [ -n "$(git status --porcelain)" ]; then
