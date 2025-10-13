@@ -4,11 +4,11 @@ import TabItem from '@theme/TabItem';
 
 # Post Data
 
-You can attach custom data to posts when creating them and update this data at runtime using the `postData` capability. This enables dynamic, stateful experiences available on posts without additional redis calls. Post data is scoped to the post, not users.
+You can attach small amounts of data (2KB) to a post when creating it and update this data using the `postData` capability. This enables dynamic, stateful experiences available on posts without a server call. Post data is scoped to the post, not users.
 
 Post data is useful for storing game state, scores, or any other information that needs to persist with the post and be shared across all users.
 
-Post data is set when you submitPost and apps can access from the context object or do a server side call to update the post data on a Post object.
+Post data is set when you submitPost and apps can access from the context object or do a server side call to update the post data on a Post object. For larger data, use [./redis.mdx].
 
 :::note
 Post data is sent to the client. Never store secrets or sensitive information.

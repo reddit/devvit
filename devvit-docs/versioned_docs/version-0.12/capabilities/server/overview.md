@@ -39,3 +39,7 @@ Allows you to execute some actions, like posting or commenting, on behalf of the
 ## [Text fallback](./text_fallback.mdx)
 
 Allows you to specify how your interactive post is displayed on platforms that don't support Devvit, for example old.reddit.com
+
+## [Cache helper](./cache-helper.mdx)
+
+Allows you to cache fetch requests on the server side, reducing the number of requests made to external APIs and improving performance.

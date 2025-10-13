@@ -7,6 +7,29 @@ To use the latest version of Devvit:
 1. Run `npm install devvit@latest` to update your CLI.
 2. Run `npx devvit update app` to update your @devvit dependencies.
 
+## Devvit 0.12.1: Cache Helper, Analytics dashboard for developers, and smaller fixes
+
+**Release Date: October 10, 2025**
+
+In this release, we’ve added back the cache helper for Devvit Web and also included an App Analytics tab for you to track your app’s engagement metrics.
+
+**Cache Helper**
+The cache helper helps your app reduce the number of server side calls by caching the response for all users. This is great for any data that you plan to share across users, like a global leaderboard or consistent data from an external source like the score of a sports game. We now have this feature available in Devvit Web, and you can look up how to use it in the [cache helper docs](./capabilities/server/cache-helper.mdx).
+
+**App Analytics**
+There’s a new App Analytics tab in your app settings that lets you track your progress against Reddit Developer Funds.
+
+![App Analytics](./assets/app_analytics.png)
+
+**Other fixes**
+This release also includes a handful of other fixes including:
+
+- Added a method mergePostData() to append to postData.
+- Fixed reddit.setPostFlair() method.
+- Added a new triggers field that fixed the issue where triggers within the blocks entrypoint weren’t working. The migration guide has been updated.
+- Added error handling when trying to `devvit new`on an already existing app name.
+- Added disconnectRealtime() and isRealtimeConnected() as helper methods for the realtime plugin.
+
 ## Devvit 0.12.0: Devvit Web
 
 **Release Date: August 13, 2025**

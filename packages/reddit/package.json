@@ -1,6 +1,6 @@
 {
   "name": "@devvit/reddit",
-  "version": "0.11.19",
+  "version": "0.12.0",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -31,18 +31,18 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.11.19",
-    "@devvit/public-api": "0.11.19",
-    "@devvit/shared": "0.11.19",
-    "@devvit/shared-types": "0.11.19",
-    "@devvit/splash": "0.11.19"
+    "@devvit/protos": "0.12.0",
+    "@devvit/public-api": "0.12.0",
+    "@devvit/shared": "0.12.0",
+    "@devvit/shared-types": "0.12.0",
+    "@devvit/splash": "0.12.0"
   },
   "peerDependencies": {
     "@devvit/server": "*"
   },
   "devDependencies": {
-    "@devvit/server": "0.11.19",
-    "@devvit/tsconfig": "0.11.19",
+    "@devvit/server": "0.12.0",
+    "@devvit/tsconfig": "0.12.0",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"

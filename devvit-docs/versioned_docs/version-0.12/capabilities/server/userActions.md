@@ -1,6 +1,6 @@
 # User actions
 
-User actions allow your app to perform certain actions—such as creating posts, comments, or subscribing to subreddits—on behalf of the user, rather than the app account. This enables richer, more interactive experiences while ensuring user control and transparency.
+User actions allow your app to perform certain actions—such as creating posts, comments, or subscribing to subreddits—on behalf of the user, rather than the app account. This enables stronger user engagement while ensuring user control and transparency.
 
 ---
 

@@ -86,7 +86,6 @@
       "id": "capabilities/devvit-web/devvit_web_configuration",
       "label": "Devvit Web Configuration"
     },
-
     {
       "type": "category",
       "label": "Client",
@@ -113,6 +112,7 @@
         "capabilities/server/media-uploads",
         "capabilities/server/settings-and-secrets",
         "capabilities/server/http-fetch",
+        "capabilities/server/cache-helper",
         {
           "type": "category",
           "label": "Reddit API",
@@ -160,7 +160,10 @@
     {
       "type": "category",
       "label": "Realtime",
-      "items": ["capabilities/realtime/overview", "capabilities/realtime/realtime_in_devvit_blocks"]
+      "items": [
+        "capabilities/realtime/overview",
+        "capabilities/realtime/realtime_in_devvit_blocks"
+      ]
     },
     {
       "type": "category",
@@ -172,7 +175,6 @@
         "capabilities/blocks/working_with_useinterval",
         "capabilities/blocks/working_with_useasync",
         "capabilities/blocks/app_image_assets",
-        "capabilities/blocks/cache",
         {
           "type": "category",
           "label": "Reference",
@@ -264,7 +266,10 @@
     {
       "type": "category",
       "label": "Best Practices",
-      "items": ["guides/best-practices/community_games", "guides/best-practices/mod_resources"]
+      "items": [
+        "guides/best-practices/community_games",
+        "guides/best-practices/mod_resources"
+      ]
     },
     {
       "type": "category",

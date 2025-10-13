@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.12.0-dev**](../../../../README.md)
+[**@devvit/public-api v0.12.1-dev**](../../../../README.md)
 
 ---
 
@@ -124,7 +124,11 @@
 
 ###### subreddit?
 
-\{ `id`: `string`; `name`: `string`; `nsfw`: `boolean`; `permalink`: `string`; `quarantined`: `boolean`; `rating`: `SubredditRating`; `spam`: `boolean`; `subscribersCount`: `number`; `topics`: `string`[]; `type`: `SubredditType`; \}
+\{ `description`: `string`; `id`: `string`; `name`: `string`; `nsfw`: `boolean`; `permalink`: `string`; `quarantined`: `boolean`; `rating`: `SubredditRating`; `spam`: `boolean`; `subscribersCount`: `number`; `title`: `string`; `topics`: `string`[]; `type`: `SubredditType`; \}
+
+###### subreddit.description?
+
+`string`
 
 ###### subreddit.id?
 
@@ -157,6 +161,10 @@
 ###### subreddit.subscribersCount?
 
 `number`
+
+###### subreddit.title?
+
+`string`
 
 ###### subreddit.topics?
 
@@ -330,7 +338,11 @@
 
 ###### subreddit?
 
-\{ `id`: `string`; `name`: `string`; `nsfw`: `boolean`; `permalink`: `string`; `quarantined`: `boolean`; `rating`: `SubredditRating`; `spam`: `boolean`; `subscribersCount`: `number`; `topics`: `string`[]; `type`: `SubredditType`; \}
+\{ `description`: `string`; `id`: `string`; `name`: `string`; `nsfw`: `boolean`; `permalink`: `string`; `quarantined`: `boolean`; `rating`: `SubredditRating`; `spam`: `boolean`; `subscribersCount`: `number`; `title`: `string`; `topics`: `string`[]; `type`: `SubredditType`; \}
+
+###### subreddit.description?
+
+`string`
 
 ###### subreddit.id?
 
@@ -363,6 +375,10 @@
 ###### subreddit.subscribersCount?
 
 `number`
+
+###### subreddit.title?
+
+`string`
 
 ###### subreddit.topics?
 
