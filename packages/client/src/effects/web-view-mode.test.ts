@@ -39,6 +39,7 @@ const trustedEvent = { isTrusted: true, type: 'click' } as PointerEvent;
 beforeEach(() => {
   globalThis.devvit = {
     appPermissionState: undefined,
+    dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
     entrypoints: {
       default: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
       splash: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',

@@ -25,6 +25,7 @@ describe('canRunAsUser', () => {
     vi.clearAllMocks();
     globalThis.devvit = {
       appPermissionState: undefined,
+      dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
       entrypoints: {},
       context: {
         appName: 'appName',
