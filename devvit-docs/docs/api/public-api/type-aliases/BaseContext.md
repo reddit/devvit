@@ -74,9 +74,9 @@ Request headers.
 
 <a id="postdata"></a>
 
-### postData?
+### postData
 
-> `optional` **postData**: `PostData`
+> **postData**: `PostData` \| `undefined`
 
 ---
 

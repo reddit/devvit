@@ -55,7 +55,7 @@ export type BaseContext = {
   subredditName?: string;
   /** The ID of the current post */
   postId?: string | undefined;
-  postData?: PostData | undefined;
+  postData: PostData | undefined;
   /** The current user's ID if this event was triggered by a logged in user */
   userId?: string | undefined;
   /**

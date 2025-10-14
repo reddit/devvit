@@ -1,10 +1,9 @@
+import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import {
   ConsentStatus,
   Scope,
 } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
-import { T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
@@ -28,15 +27,19 @@ describe('canRunAsUser', () => {
       appPermissionState: undefined,
       entrypoints: {},
       context: {
-        subredditId: T5('t5_subredditId'),
-        subredditName: 'subredditName',
-        userId: T2('t2_userId'),
-        appName: 'app-slug',
+        appName: 'appName',
         appVersion: '1.0.0',
-        postId: T3('t3_postId'),
+        postAuthorId: undefined,
+        postData: undefined,
+        postId: 't3_postId',
+        snoovatar: undefined,
+        subredditId: 't5_subredditId',
+        subredditName: 'subredditName',
+        userId: 't2_userId',
+        username: 'username',
       },
       share: undefined,
-      webbitToken: noWebbitToken,
+      token: noWebbitToken,
       webViewMode: undefined,
     };
   });

@@ -2,9 +2,8 @@
 
 import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
-import type { WebViewMessageEvent } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
+import type { WebViewMessageEvent } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import { type Effect, emitEffect } from '@devvit/shared-types/client/emit-effect.js';
-import { T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -21,7 +20,7 @@ vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(() => Promise.resolve(undefined)),
 }));
 
-describe('showImmersiveMode', () => {
+describe('requestExpandedMode()', () => {
   beforeEach(() => {
     globalThis.devvit = {
       appPermissionState: undefined,
@@ -30,15 +29,19 @@ describe('showImmersiveMode', () => {
         splash: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',
       },
       context: {
-        subredditId: T5('t5_subredditId'),
-        subredditName: 'subredditName',
-        userId: T2('t2_userId'),
         appName: 'appName',
         appVersion: '1.0.0',
-        postId: T3('t3_postId'),
+        postAuthorId: undefined,
+        postData: undefined,
+        postId: 't3_postId',
+        snoovatar: undefined,
+        subredditId: 't5_subredditId',
+        subredditName: 'subredditName',
+        userId: 't2_userId',
+        username: 'username',
       },
       share: undefined,
-      webbitToken: noWebbitToken,
+      token: noWebbitToken,
       webViewMode: undefined,
     };
     registerListener();
@@ -48,12 +51,24 @@ describe('showImmersiveMode', () => {
     vi.clearAllMocks();
   });
 
-  it('should emit a message for immersive mode', () => {
+  it('should emit a message for expanded mode', () => {
     requestExpandedMode(trustedEvent, 'default');
 
     expect(emitEffect).toHaveBeenCalledWith({
       immersiveMode: {
-        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
+        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html?token=0.0.0',
+        immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE,
+      },
+      type: EffectType.EFFECT_WEB_VIEW,
+    } satisfies Effect);
+  });
+
+  it('should emit a message for expanded mode nondefault entry', () => {
+    requestExpandedMode(trustedEvent, 'splash');
+
+    expect(emitEffect).toHaveBeenCalledWith({
+      immersiveMode: {
+        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html?token=0.0.0',
         immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE,
       },
       type: EffectType.EFFECT_WEB_VIEW,

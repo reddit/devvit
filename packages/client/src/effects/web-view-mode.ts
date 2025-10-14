@@ -2,6 +2,7 @@ import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/e
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
 import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { tokenParam } from '@devvit/shared-types/webbit.js';
 
 /**
  * The presentation mode of the web view.
@@ -104,13 +105,18 @@ async function emitModeEffect(
       `no entrypoint named "${entry}"; all entrypoints must appear in \`devvit.json\` \`post.entrypoints\``
     );
 
+  let entryUrl;
+  if (entry) {
+    // Only `DevvitPost.entrypointUrl` has a token.
+    const url = new URL(devvit.entrypoints[entry]);
+    url.searchParams.set(tokenParam, devvit.token);
+    entryUrl = `${url}`;
+  }
+
   const type = 9 satisfies EffectType.EFFECT_WEB_VIEW;
   await emitEffect({
     type,
-    immersiveMode: {
-      entryUrl: devvit.entrypoints[entry ?? ''],
-      immersiveMode: mode,
-    },
+    immersiveMode: { entryUrl, immersiveMode: mode },
   });
 }
 
