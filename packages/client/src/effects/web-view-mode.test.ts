@@ -20,37 +20,54 @@ vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(() => Promise.resolve(undefined)),
 }));
 
+const sendEvent = (mode: WebViewImmersiveMode) => {
+  const messageEvent = new MessageEvent('message', {
+    data: {
+      type: 'devvit-message',
+      data: {
+        id: 'id',
+        immersiveModeEvent: { immersiveMode: mode },
+      },
+    },
+  } satisfies WebViewMessageEvent);
+
+  dispatchEvent(messageEvent);
+};
+
+const trustedEvent = { isTrusted: true, type: 'click' } as PointerEvent;
+
+beforeEach(() => {
+  globalThis.devvit = {
+    appPermissionState: undefined,
+    entrypoints: {
+      default: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
+      splash: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',
+    },
+    context: {
+      appName: 'appName',
+      appVersion: '1.0.0',
+      postAuthorId: undefined,
+      postData: undefined,
+      postId: 't3_postId',
+      snoovatar: undefined,
+      subredditId: 't5_subredditId',
+      subredditName: 'subredditName',
+      userId: 't2_userId',
+      username: 'username',
+    },
+    share: undefined,
+    token: noWebbitToken,
+    webViewMode: undefined,
+  };
+  registerListener();
+});
+
+afterEach(() => {
+  delete (globalThis as { devvit?: {} }).devvit;
+  vi.clearAllMocks();
+});
+
 describe('requestExpandedMode()', () => {
-  beforeEach(() => {
-    globalThis.devvit = {
-      appPermissionState: undefined,
-      entrypoints: {
-        default: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
-        splash: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',
-      },
-      context: {
-        appName: 'appName',
-        appVersion: '1.0.0',
-        postAuthorId: undefined,
-        postData: undefined,
-        postId: 't3_postId',
-        snoovatar: undefined,
-        subredditId: 't5_subredditId',
-        subredditName: 'subredditName',
-        userId: 't2_userId',
-        username: 'username',
-      },
-      share: undefined,
-      token: noWebbitToken,
-      webViewMode: undefined,
-    };
-    registerListener();
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
   it('should emit a message for expanded mode', () => {
     requestExpandedMode(trustedEvent, 'default');
 
@@ -75,18 +92,6 @@ describe('requestExpandedMode()', () => {
     } satisfies Effect);
   });
 
-  it('should emit a message for inline mode', () => {
-    exitExpandedMode(trustedEvent);
-
-    expect(emitEffect).toHaveBeenCalledWith({
-      immersiveMode: {
-        entryUrl: undefined,
-        immersiveMode: WebViewImmersiveMode.INLINE_MODE,
-      },
-      type: EffectType.EFFECT_WEB_VIEW,
-    } satisfies Effect);
-  });
-
   it('should throw an error when not called with an untrusted event or click event', async () => {
     const event = { isTrusted: false, type: 'click' } as PointerEvent;
     await expect(requestExpandedMode(event, 'default')).rejects.toThrow('Untrusted event');
@@ -102,6 +107,13 @@ describe('requestExpandedMode()', () => {
     const ev = { isTrusted: true, type: 'click' } as PointerEvent;
     await expect(requestExpandedMode(ev, 'missing')).rejects.toThrowErrorMatchingInlineSnapshot(
       `[Error: no entrypoint named "missing"; all entrypoints must appear in \`devvit.json\` \`post.entrypoints\`]`
+    );
+  });
+
+  test('should throw an error when requestExpandedMode is called while already expanded', () => {
+    globalThis.devvit.webViewMode = WebViewImmersiveMode.IMMERSIVE_MODE;
+    expect(() => requestExpandedMode(trustedEvent, 'default')).toThrow(
+      'web view is already expanded'
     );
   });
 
@@ -141,20 +153,23 @@ describe('requestExpandedMode()', () => {
     sendEvent(WebViewImmersiveMode.INLINE_MODE);
     expect(getWebViewMode()).toBe('inline');
   });
+});
 
-  const sendEvent = (mode: WebViewImmersiveMode) => {
-    const messageEvent = new MessageEvent('message', {
-      data: {
-        type: 'devvit-message',
-        data: {
-          id: 'id',
-          immersiveModeEvent: { immersiveMode: mode },
-        },
+describe('exitExpandedMode()', () => {
+  it('should emit a message for inline mode', () => {
+    exitExpandedMode(trustedEvent);
+
+    expect(emitEffect).toHaveBeenCalledWith({
+      immersiveMode: {
+        entryUrl: undefined,
+        immersiveMode: WebViewImmersiveMode.INLINE_MODE,
       },
-    } satisfies WebViewMessageEvent);
+      type: EffectType.EFFECT_WEB_VIEW,
+    } satisfies Effect);
+  });
 
-    dispatchEvent(messageEvent);
-  };
-
-  const trustedEvent = { isTrusted: true, type: 'click' } as PointerEvent;
+  test('error when already inlined', () => {
+    globalThis.devvit.webViewMode = WebViewImmersiveMode.INLINE_MODE;
+    expect(() => exitExpandedMode(trustedEvent)).toThrow('web view is already inlined');
+  });
 });

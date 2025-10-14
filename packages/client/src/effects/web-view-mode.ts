@@ -37,6 +37,7 @@ export const getWebViewMode = (): WebViewMode => webViewMode(devvit.webViewMode)
  *              names are the `devvit.json` `post.entrypoints` keys. Passing the
  *              same entrypoint as currently loaded causes a reload.
  * @returns A promise that resolves request has been received.
+ * @throws When already expanded.
  *
  * @experimental
  * @example
@@ -47,6 +48,8 @@ export const getWebViewMode = (): WebViewMode => webViewMode(devvit.webViewMode)
  * ```
  */
 export function requestExpandedMode(event: PointerEvent, entry: string): Promise<void> {
+  if (devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE)
+    throw Error('web view is already expanded');
   return emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry);
 }
 
@@ -56,6 +59,7 @@ export function requestExpandedMode(event: PointerEvent, entry: string): Promise
  *
  * @param event The event that triggered the request, must be a trusted event.
  * @returns A promise that resolves request has been received.
+ * @throws When already inlined.
  *
  * @experimental
  * @example
@@ -66,6 +70,8 @@ export function requestExpandedMode(event: PointerEvent, entry: string): Promise
  * ```
  */
 export function exitExpandedMode(event: PointerEvent): Promise<void> {
+  if (devvit.webViewMode === WebViewImmersiveMode.INLINE_MODE)
+    throw Error('web view is already inlined');
   return emitModeEffect(WebViewImmersiveMode.INLINE_MODE, event, undefined);
 }
 
