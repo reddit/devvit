@@ -16,7 +16,14 @@ In this Hackathon we have two main categories:
 
 - **Best Kiro Developer Experience**: How creatively did they integrate Kiro capabilities into their development workflow to make their life easier?
 
-If you need some inspiration, check out our [App Showcase](./examples/app-showcase.mdx).
+## Devvit x Kiro examples
+
+Need some inspiration? Check out these clips from our recent livestream showcasing how to build community games with Devvit and develop games using Kiro. You can also find more examples in our [App Showcase](./examples/app-showcase.mdx).
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+<iframe width="400" height="225" src="https://www.youtube.com/embed/Q6SGJLJJ9Sg" title="Community Games" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<iframe width="400" height="225" src="https://www.youtube.com/embed/4mV5pbwsOsg" title="Build Games With Kiro" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</div>
 
 ## Get started with Kiro
 

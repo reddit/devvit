@@ -2,6 +2,12 @@
 
 This tutorial takes you through the step-by-step process of building your first app with Devvit. It should take you about 1 minute to complete. Once complete, you'll be able to see your app in a Reddit post
 
+## Video Tutorial:
+
+Prefer a video walkthrough? This video shows you how to get started with Devvit and demonstrates a workflow for quickly making changes to your app with an AI-powered IDE.
+
+<iframe width="400" height="225" src="https://www.youtube.com/embed/1ZM1tKI4SnU" title="Devvit Quickstart Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 ## Try it out
 
 This starter template will [create an app like this for you](https://www.reddit.com/r/test_devvit_demos/comments/1mk4ql4/test3jsdevvit/) running on Reddit. It consists of a simple react-based counter app that calls backend functions.
