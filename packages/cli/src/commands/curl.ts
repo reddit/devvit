@@ -1,5 +1,6 @@
 import { Args } from '@oclif/core';
 
+import { HEADER_DEVVIT_CLI, HEADER_USER_AGENT } from '../constants/Headers.js';
 import { DEVVIT_DEBUG } from '../lib/config.js';
 import { authHeaders, getAccessToken } from '../util/auth.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
@@ -29,7 +30,11 @@ export default class Curl extends DevvitCommand {
       this.error('Not currently logged in. Try `devvit login` first');
     }
 
-    const headers = authHeaders(token);
+    const headers = {
+      ...authHeaders(token),
+      [HEADER_USER_AGENT()[0]]: HEADER_USER_AGENT()[1],
+      [HEADER_DEVVIT_CLI()[0]]: HEADER_DEVVIT_CLI()[1],
+    };
 
     const response = await fetch(args.url, {
       headers,
