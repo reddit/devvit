@@ -38,7 +38,7 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/Exciting-Products.svg').default,
     description: (
       <>
-        It's never been easier to code for community. Use modern laguages like Javascript, Python,
+        It's never been easier to code for community. Use modern languages like Javascript, Python,
         and more.
       </>
     ),
