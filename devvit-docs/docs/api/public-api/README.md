@@ -171,6 +171,7 @@
 
 ## Functions
 
+- [fetchDevvitWeb](functions/fetchDevvitWeb.md)
 - [svg](functions/svg.md)
 - [useAsync](functions/useAsync.md)
 - [useChannel](functions/useChannel.md)
