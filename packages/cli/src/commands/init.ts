@@ -25,6 +25,7 @@ import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import Cutter from '../util/Cutter.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { readLine } from '../util/input-util.js';
+import { sendEvent } from '../util/metrics.js';
 import { getPlatformFromEnvironment, isWebContainer } from '../util/platform-util.js';
 import { isRunningInAppDirectory } from '../util/project.js';
 import { ProjectTemplateResolver } from '../util/template-resolvers/ProjectTemplateResolver.js';
@@ -75,6 +76,17 @@ export default class Init extends DevvitCommand {
 
   #initAppFlags: InitAppFlags | undefined;
 
+  #commonEventFields = {
+    source: 'devplatform_cli',
+    noun: 'init',
+    devplatform: {
+      cli_raw_command_line:
+        'devvit ' + process.argv[2] + ' ' + redactCode(process.argv.slice(3)).join(' '),
+      cli_is_valid_command: true,
+      cli_command: 'init',
+    } as Record<string, string | boolean | undefined>,
+  };
+
   get #projectPath(): string {
     if (!this.#initAppParams?.appName) {
       this.error('The project was not properly initialized. Aborting');
@@ -92,7 +104,7 @@ export default class Init extends DevvitCommand {
   }
 
   override async run(): Promise<void> {
-    // TODO: DX-9807 - 0. Fire the init telemetry event
+    await this.#sendRanEvent();
 
     const { args, flags } = await this.parse(Init);
     if (!flags.force && isRunningInAppDirectory() && this.project.name !== UNINITIALIZED_APP_NAME) {
@@ -109,8 +121,7 @@ export default class Init extends DevvitCommand {
     if (!rawCode) {
       // Redirect to web app creation wizard
       rawCode = await getCodeFromWizard(appName, flags.template, this);
-    } /* else { // TODO: DX-9807 - Fire "Code was provided" telemetry event
-    } */
+    }
 
     // Unpack the encoded parameters
     this.#initAppParams = unpackCode(rawCode);
@@ -122,6 +133,11 @@ export default class Init extends DevvitCommand {
     if (this.#initAppFlags?.template) {
       this.#initAppParams.templateName = this.#initAppFlags.template;
     }
+
+    await this.#sendPasteEvent(
+      this.#initAppParams.appName,
+      this.#initAppParams.templateName ?? 'unknown'
+    );
 
     // Login to CLI with one-time auth code
     const shouldLogin = await this.#shouldLogin(this.#initAppParams.appName);
@@ -187,7 +203,10 @@ export default class Init extends DevvitCommand {
       dependenciesInstalled,
     });
 
-    // TODO: DX_9807 - Fire successful init telemetry event
+    await this.#sendCompleteEvent(
+      this.#initAppParams.appName,
+      this.#initAppParams.templateName ?? 'unknown'
+    );
   }
 
   async #promptChooseTemplate(): Promise<string> {
@@ -289,6 +308,31 @@ export default class Init extends DevvitCommand {
     // We're logged in and we own this app, so no need to login again
     return false;
   }
+
+  async #sendRanEvent(): Promise<void> {
+    await sendEvent({
+      ...this.#commonEventFields,
+      action: 'ran',
+    });
+  }
+
+  async #sendPasteEvent(appName: string, appTemplate: string): Promise<void> {
+    await sendEvent({
+      ...this.#commonEventFields,
+      action: 'paste',
+      app_name: appName,
+      app_template: appTemplate,
+    });
+  }
+
+  async #sendCompleteEvent(appName: string, appTemplate: string): Promise<void> {
+    await sendEvent({
+      ...this.#commonEventFields,
+      action: 'complete',
+      app_name: appName,
+      app_template: appTemplate,
+    });
+  }
 }
 
 /**
@@ -313,10 +357,8 @@ export async function getCodeFromWizard(
   // Redirect to web app creation wizard
   if (isWebContainer()) {
     return await getCodeThroughCopyPaste(appName, templateName, logger);
-    // TODO: DX-9807 - Fire "Code retrieved with copyPaste" telemetry event
   } else {
     return await getCodeThroughRedirectURL(appName, templateName, logger);
-    // TODO: DX-9807 - Fire "Code retrieved with redirect URL" telemetry event
   }
 }
 
@@ -488,4 +530,8 @@ function syncDependenciesToCurrentCliVersion(deps: Record<string, string>): void
       }
     }
   }
+}
+
+function redactCode(args: string[]): string[] {
+  return args.map((arg) => (arg.toLowerCase().includes('--') ? arg : '<code redacted>'));
 }
