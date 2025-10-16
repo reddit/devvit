@@ -1,5 +1,9 @@
 import type { FullAppInfo } from '@devvit/protos/community.js';
-import { APP_SLUG_BASE_MAX_LENGTH, makeSlug, sluggable } from '@devvit/shared-types/slug.js';
+import {
+  APP_SLUG_BASE_MAX_LENGTH,
+  makeSlug,
+  validateSluggable,
+} from '@devvit/shared-types/slug.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { ux } from '@oclif/core';
 import inquirer from 'inquirer';
@@ -22,8 +26,9 @@ export class AppUploader {
   }
 
   async createNewApp(copyPaste: boolean, justDoIt: boolean): Promise<FullAppInfo> {
+    const err = validateSluggable(this.#cmd.project.name);
     const appName = await this.#promptNameUntilNotTaken(
-      sluggable(this.#cmd.project.name) ? makeSlug(this.#cmd.project.name) : undefined
+      !err ? makeSlug(this.#cmd.project.name) : undefined
     );
     const description = await this.#getAppDescription();
     const isNsfw = justDoIt ? false : await this.#promptForNSFW();
@@ -82,8 +87,9 @@ export class AppUploader {
           type: 'input',
           message: 'Pick a name for your app:',
           validate: async (input: string) => {
-            if (!sluggable(input)) {
-              return `The name of your app must be between 3 and ${APP_SLUG_BASE_MAX_LENGTH} characters long, and contains only alphanumeric characters, spaces, and dashes.`;
+            const err = validateSluggable(input);
+            if (err) {
+              return `Invalid name: ${err}. The name of your app must be between 3 and ${APP_SLUG_BASE_MAX_LENGTH} characters long, and contains only alphanumeric characters, spaces, and dashes.`;
             }
             return true;
           },
