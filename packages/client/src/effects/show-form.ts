@@ -1,5 +1,5 @@
 import type { Form as FormProto } from '@devvit/protos';
-import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
+import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 

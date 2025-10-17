@@ -1,4 +1,4 @@
-import type { Effect, EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
+import type { Effect, EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 
 import type { Form, FormFieldGroup, SelectField, StringField } from './form-types.js';
 
