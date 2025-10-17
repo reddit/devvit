@@ -67,10 +67,9 @@ Make sure that the post titles are also inviting and unique to each post.
 
 👩‍🏫 **Tips and tricks**:
 
-- If you have a level builder, consider including the level's difficulty on the splash screen (easy, medium, hard)
-- If you're keeping track of how many players tried that level, consider displaying a success rate on the splash screen
+- If you have levels with varying difficulties, consider including the level's difficulty on the splash screen (easy, medium, hard)
 - If you have a daily puzzle, consider including the date of that puzzle on the splash screen
-- If you want, you can consider using bbase64 strings to dynamically set different backgrounds for each post
+- If you have a level builder, can consider using base64 strings to dynamically set different backgrounds for each post
 
 For more info, read the [documentation on splash screens](./capabilities/server/splash-screen.mdx)
 
