@@ -90,6 +90,18 @@ The ID of the current post
 
 ---
 
+<a id="snoovatar"></a>
+
+### snoovatar?
+
+> `optional` **snoovatar**: `string`
+
+**`Experimental`**
+
+The current user's snoovtar URL if logged in
+
+---
+
 <a id="subredditid"></a>
 
 ### subredditId
@@ -117,6 +129,18 @@ The name of the current subreddit
 > `optional` **userId**: `string`
 
 The current user's ID if this event was triggered by a logged in user
+
+---
+
+<a id="username"></a>
+
+### username?
+
+> `optional` **username**: `string`
+
+**`Experimental`**
+
+The current user's handle if logged in
 
 ## Methods
 

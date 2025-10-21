@@ -24,6 +24,8 @@ export let Context = (headers: Readonly<Headers>): Context => {
     userId: publicApiContext.userId ? T2(publicApiContext.userId) : undefined,
     postId: publicApiContext.postId ? T3(publicApiContext.postId) : undefined,
     subredditName: publicApiContext.subredditName!, // This is guaranteed to be defined
+    snoovatar: publicApiContext.snoovatar,
+    username: publicApiContext.username,
   };
 };
 

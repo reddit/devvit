@@ -516,6 +516,16 @@ export class User {
 
   /** @internal */
   static async getSnoovatarUrl(username: string): Promise<string | undefined> {
+    // Check if snoovatar for current user is available in the context
+    const currentUsername = context.username;
+    if (currentUsername && username === currentUsername) {
+      const snoovatarUrl = context.snoovatar;
+      if (snoovatarUrl) {
+        return snoovatarUrl;
+      }
+    }
+
+    // If not, query the API for the snoovatar URL
     const operationName = 'GetSnoovatarUrlByName';
     const persistedQueryHash = 'c47fd42345af268616d2d8904b56856acdc05cf61d3650380f539ad7d596ac0c';
     const response = await GraphQL.query(operationName, persistedQueryHash, { username });
@@ -646,6 +656,12 @@ async function listingProtosToUsers(
 
 /** @internal */
 async function getUsernameById(id: T2): Promise<string | undefined> {
+  // Check if username for current user is available in the context
+  if (context.username && context.userId === id) {
+    return context.username;
+  }
+
+  // If not, query the API for the username
   const client = getRedditApiPlugins().Users;
 
   const response = await client.UserDataByAccountIds({ ids: id }, context.metadata);

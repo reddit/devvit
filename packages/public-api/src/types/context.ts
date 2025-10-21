@@ -69,6 +69,18 @@ export type BaseContext = {
   appVersion: string;
   /** The ID of the current comment */
   commentId?: string | undefined;
+  /**
+   * The current user's snoovtar URL if logged in
+   *
+   * @experimental
+   */
+  snoovatar?: string | undefined;
+  /**
+   * The current user's handle if logged in
+   *
+   * @experimental
+   */
+  username?: string | undefined;
   /** Returns a JSON representation of the context */
   toJSON(): Omit<BaseContext, 'toJSON'>;
   /** More useful things, but probably not for the average developer */

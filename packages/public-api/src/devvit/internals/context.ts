@@ -31,6 +31,8 @@ export function getContextFromMetadata(
   const appAccountId = metadata[Header.AppUser]?.values[0];
   const appName = metadata[Header.App]?.values[0];
   const appVersion = metadata[Header.Version]?.values[0];
+  const snoovatar = metadata[Header.UserSnoovatarUrl]?.values[0];
+  const username = metadata[Header.Username]?.values[0];
 
   const userId = metadata[Header.User]?.values[0];
   const debug = parseDebug(metadata);
@@ -48,6 +50,8 @@ export function getContextFromMetadata(
     commentId,
     appName,
     appVersion,
+    snoovatar,
+    username,
     debug,
     metadata,
     toJSON() {
@@ -61,6 +65,8 @@ export function getContextFromMetadata(
         postId,
         postData,
         commentId,
+        snoovatar,
+        username,
         debug,
         metadata,
       };

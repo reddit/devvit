@@ -1,7 +1,6 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { context, getContextCache, setContextCache } from '@devvit/server';
-import { Header } from '@devvit/shared-types/Header.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { asTid, isT1, isT3, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
@@ -459,13 +458,6 @@ export class RedditClient {
    * @returns A Promise that resolves to a URL of the snoovatar image if it exists.
    */
   async getSnoovatarUrl(username: string): Promise<string | undefined> {
-    const currentUsername = await this.getCurrentUsername();
-    if (currentUsername && username === currentUsername) {
-      const snoovatarUrl = this.#metadata?.[Header.UserSnoovatarUrl]?.values[0];
-      if (snoovatarUrl) {
-        return snoovatarUrl;
-      }
-    }
     return User.getSnoovatarUrl(username);
   }
 
