@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "three-strikes-app",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -9,11 +9,11 @@
     "test:unit": "vitest --run"
   },
   "dependencies": {
-    "@devvit/protos": "0.12.0",
-    "@devvit/public-api": "0.12.0"
+    "@devvit/protos": "0.12.1",
+    "@devvit/public-api": "0.12.1"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.0",
+    "@devvit/tsconfig": "0.12.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
   }
