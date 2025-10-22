@@ -90,44 +90,32 @@ Images can be referenced in two ways:
 
 ## Example: Dynamic splash screens
 
-You can create different splash screens based on context or user preferences:
+You can modify the splash screen to make sure the content is relevant:
 
 ```ts title="server/index.ts"
 import { reddit } from '@devvit/web/server';
 
-async function createThemedPost(theme: 'light' | 'dark', context: any) {
-  const themes = {
-    light: {
-      backgroundUri: 'light-bg.png',
-      heading: 'Bright Adventure',
-      description: 'A cheerful experience awaits'
-    },
-    dark: {
-      backgroundUri: 'dark-bg.png', 
-      heading: 'Night Mode Quest',
-      description: 'Explore the shadows'
-    }
-  };
+  const date = (new Date()).toLocaleString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'});
 
-  const selectedTheme = themes[theme];
-  
   return await reddit.submitCustomPost({
+
     subredditName: context.subredditName!,
-    title: `${selectedTheme.heading} - Interactive Post`,
+    title: `App Post Title`,
+
     splash: {
-      appDisplayName: 'Theme Explorer',
-      backgroundUri: selectedTheme.backgroundUri,
+      appDisplayName: 'test-app',
+      backgroundUri: '/splash-background.png',
       buttonLabel: 'Begin Journey',
-      description: selectedTheme.description,
-      entryUri: 'game.html',
-      heading: selectedTheme.heading
-    },
-    postData: {
-      theme: theme,
-      initialized: false
+      description: `${date}'s game`,
+      entryUri: 'index.html',
+      heading: 'Welcome to the Game!',
+      appIconUri: 'default-icon.png',
     }
   });
-}
 ```
 
 ## Best practices
