@@ -8,10 +8,12 @@ import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
  */
 export function navigateTo(thingOrUrl: string | { readonly url: string }): void {
   const inputUrl = typeof thingOrUrl === 'string' ? thingOrUrl : thingOrUrl.url;
-  if (!URL.canParse(inputUrl)) {
+  let normalizedUrl: string;
+  try {
+    normalizedUrl = new URL(inputUrl).toString();
+  } catch {
     throw new TypeError(`Invalid URL: ${inputUrl}`);
   }
-  const normalizedUrl = new URL(inputUrl).toString();
   void emitEffect({
     navigateToUrl: {
       url: normalizedUrl,
