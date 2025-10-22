@@ -116,8 +116,12 @@ const sidebars: SidebarsConfig = {
         'capabilities/server/triggers',
         'capabilities/server/media-uploads',
         'capabilities/server/settings-and-secrets',
-        'capabilities/server/http-fetch',
         'capabilities/server/cache-helper',
+        {
+          type: 'category',
+          label: 'HTTP Fetch',
+          items: ['capabilities/server/http-fetch', 'capabilities/server/http-fetch-policy'],
+        },
         {
           type: 'category',
           label: 'Reddit API',
