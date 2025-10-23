@@ -1,4 +1,5 @@
 import type { Metadata } from '@devvit/protos';
+import { Scope } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
@@ -142,45 +143,10 @@ describe('Post API', () => {
         title: 'My First Post',
       };
 
-      test('submit(): can set runAs: USER when userActions enabled', async () => {
-        const { reddit, metadata } = createTestRedditApiClient({
-          redditAPI: true,
-          userActions: true,
-        });
-        const mockedPost = new Post({ ...defaultPostData }, metadata);
-
-        const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'SubmitCustomPost');
-        spyPlugin.mockImplementationOnce(async () => ({
-          json: { data: { id: 'post' }, errors: [] },
-        }));
-
-        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
-
-        await reddit.submitPost({
-          title: mockedPost.title,
-          subredditName: mockedPost.subredditName,
-          preview: createPreview(),
-          runAs: 'USER',
-          userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
-        });
-
-        expect(spyPlugin).toHaveBeenCalledWith(
-          {
-            ...commonPostFields,
-            richtextJson:
-              'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
-            richtextFallback: '',
-            runAs: RunAs.USER,
-            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
-          },
-          metadata
-        );
-      });
-
       test('submit(): throws error when runAs: USER with userActions disabled', async () => {
         const { reddit } = createTestRedditApiClient({
           redditAPI: true,
-          userActions: false,
+          userActions: { scopes: [] },
         });
 
         await expect(
@@ -197,7 +163,7 @@ describe('Post API', () => {
       test('submit(): throws error when runAs: USER without userGeneratedContent for experience post', async () => {
         const { reddit } = createTestRedditApiClient({
           redditAPI: true,
-          userActions: true,
+          userActions: { scopes: [Scope.SUBMIT_POST] },
         });
 
         await expect(
@@ -208,6 +174,54 @@ describe('Post API', () => {
             runAs: 'USER',
           })
         ).rejects.toThrow(/userGeneratedContent must be set/);
+      });
+
+      test('submit(): does not throw when runAs: USER with userActions: true', async () => {
+        const { reddit, metadata } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: true,
+        });
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await expect(
+          reddit.submitPost({
+            title: 'Some post title',
+            subredditName: 'askReddit',
+            preview: createPreview(),
+            runAs: 'USER',
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+          })
+        ).resolves.not.toThrow();
+      });
+
+      test('submit(): does not throw when runAs: USER with userActions: {enabled: true}', async () => {
+        const { reddit, metadata } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: { enabled: true },
+        });
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await expect(
+          reddit.submitPost({
+            title: 'Some post title',
+            subredditName: 'askReddit',
+            preview: createPreview(),
+            runAs: 'USER',
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+          })
+        ).resolves.not.toThrow();
       });
 
       test('sets plain text as the richtext fallback', async () => {
@@ -235,6 +249,41 @@ describe('Post API', () => {
               'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
             richtextFallback: 'This is a post with text as a fallback',
             runAs: RunAs.APP,
+          },
+          metadata
+        );
+      });
+
+      test('submit(): can set runAs: USER when userActions enabled', async () => {
+        const { reddit, metadata } = createTestRedditApiClient({
+          redditAPI: true,
+          userActions: { scopes: [Scope.SUBMIT_POST] },
+        });
+        const mockedPost = new Post({ ...defaultPostData }, metadata);
+
+        const spyPlugin = vi.spyOn(Devvit.userActionsPlugin, 'SubmitCustomPost');
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await reddit.submitPost({
+          title: mockedPost.title,
+          subredditName: mockedPost.subredditName,
+          preview: createPreview(),
+          runAs: 'USER',
+          userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            ...commonPostFields,
+            richtextJson:
+              'GmYKZApfCAEqEhIHCgUNAADIQhoHCgUNAADIQhpHEkUIAhI7CAQqEhIHCgUNAADIQhoHCgUNAADIQhojKiEQ3AsYgAgiF1N0cmlwZWQgYmx1ZSBiYWNrZ3JvdW5kKAIiBAgBEAEQwAI=',
+            richtextFallback: '',
+            runAs: RunAs.USER,
+            userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
           },
           metadata
         );
@@ -396,7 +445,7 @@ describe('Post API', () => {
       test('sets richtext builder content as the richtext fallback', async () => {
         const { metadata } = createTestRedditApiClient();
         const selftext =
-          '# DX_Bundle:\n\n    Gm9jYzZhYTIyMC0xNmQ1LTQyYzgtOWQwNS0zNmNiNzI3YzAxNjMudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYitQQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErABCjdkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC5SZW5kZXJQb3N0EgpSZW5kZXJQb3N0KjNkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlcXVlc3QyNGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5SZW5kZXJQb3N0UmVzcG9uc2USoAEKPmRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0LlJlbmRlclBvc3RDb250ZW50EhFSZW5kZXJQb3N0Q29udGVudCokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlEqIBCj9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC5SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuEBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpQEKNWRldnZpdC51aS5ldmVudHMudjFhbHBoYS5VSUV2ZW50SGFuZGxlci5IYW5kbGVVSUV2ZW50Eg1IYW5kbGVVSUV2ZW50Ki1kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlcXVlc3QyLmRldnZpdC51aS5ldmVudHMudjFhbHBoYS5IYW5kbGVVSUV2ZW50UmVzcG9uc2UaDlVJRXZlbnRIYW5kbGVyMoEBEg8KBG5vZGUSBzE4LjE5LjESNAoOQGRldnZpdC9wcm90b3MSIjAuMTEuMC1uZXh0LTIwMjQtMDctMTEtZTlmNGJiOWY2LjASOAoSQGRldnZpdC9wdWJsaWMtYXBpEiIwLjExLjAtbmV4dC0yMDI0LTA3LTExLWU5ZjRiYjlmNi4w\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkkKRwpCCAEqFhIJCgcNAACQQxABGgkKBw0AAKBDEAEaJhIkCAISGggCGhYaFAoQQSBjdXN0b20gcG9zdCEhIVgBIgQIARABEMAC';
+          '# DX_Bundle:\n\n    Gm9jYzZhYTIyMC0xNmQ1LTQyYzgtOWQwNS0zNmNiNzI3YzAxNjMudGVzdG9sZHJlZGRpdC0tMC5tYWluLnJlZGRpdC1zZXJ2aWNlLWRldnZpdC1nYXRld2F5LmFkYW0tZ3Jvc3NtYW4uc25vby5kZXYitQQKLGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0ErABCjdkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG21Qb3N0ErABCjdkZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuUmVuZGVyUG9zdFJlcXVlc3QyNGRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5SZW5kZXJQb3N0UmVzcG9uc2USoAEKPmRldnZpdC5yZWRkaXQuY3VzdG9tX3Bvc3QudjFhbHBoYS5DdXN0b21Qb3N0LlJlbmRlclBvc3RDb250ZW50EhFSZW5kZXJQb3N0Q29udGVudCokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlEqIBCj9kZXZ2aXQucmVkZGl0LmN1c3RvbV9wb3N0LnYxYWxwaGEuQ3VzdG9tUG9zdC5SZW5kZXJQb3N0Q29tcG9zZXISElJlbmRlclBvc3RDb21wb3NlciokZGV2dml0LnVpLmJsb2NrX2tpdC52MWJldGEuVUlSZXF1ZXN0MiVkZXZ2aXQudWkuYmxvY2tfa2l0LnYxYmV0YS5VSVJlc3BvbnNlGgpDdXN0b21Qb3N0IuEBCidkZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuVUlFdmVudEhhbmRsZXISpQEKNWRldnZpdC51aS5ldmVudHMudjFhbHBoYS5VSUV2ZW50SGFuZGxlci5IYW5kbGVVSUV2ZW50Eg1IYW5kbGVVSUV2ZW50Ki1kZXZ2aXQudWkuZXZlbnRzLnYxYWxwaGEuSGFuZGxlVUlFdmVudFJlcXVlc3QyLmRldnZpdC51aS5ldmVudHMudjFhbHBoYS5IYW5kbGVVSUV2ZW50UmVzcG9uc2UaDlVJRXZlbnRIYW5kbGVyMoEBEg8KBG5vZGUSBzE4LjE5LjESNAoOQGRldnZpdC9wcm90b3MSIjAuMTEuMC1uZXh0LTIwMjQtMDctMTEtZTlmNGJiOWY2LjASOAoSQGRldnZpdC9wdWJsaWMtYXBpEiIwLjExLjAtbmV4dC0yMDI0LTA3LTExLWU5ZjRiYjlmNi4w\n\n# DX_Config:\n\n    EgA=\n\n# DX_Cached:\n\n    GkkKRwpCCAEqFhIJCgcNAACQQxABGgkKBw0AAKBDEAEaJhIkCAISGggCGhYaFAoQQSBjdXN0b20gcG9zdCEhIVgBIgQIARABEMAC';
         const mockedPost = new Post({ ...defaultPostData, selftext }, metadata);
 
         const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.LinksAndComments, 'EditCustomPost');

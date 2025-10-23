@@ -14,11 +14,9 @@ function assertValidUrl(path: string): void | never {
 }
 
 export class AssetsClient {
-  readonly #assetMap: AssetMap = {};
   readonly #webViewAssetMap: AssetMap = {};
 
   constructor() {
-    this.#assetMap = Devvit.assets;
     this.#webViewAssetMap = Devvit.webViewAssets;
   }
 
@@ -59,7 +57,7 @@ export class AssetsClient {
 
   #getURL(assetPath: string, options: GetURLOptions): string {
     // Has the assetPath already been resolved?
-    const localUrl = options.webView ? this.#webViewAssetMap[assetPath] : this.#assetMap[assetPath];
+    const localUrl = options.webView ? this.#webViewAssetMap[assetPath] : Devvit.assets[assetPath];
     if (localUrl) {
       return localUrl;
     }
@@ -80,7 +78,7 @@ export class AssetsClient {
 
     // Try and short circuit using the locally available assets list if possible, keeping a list
     // of all the paths that we couldn't find locally to ask the backend about
-    const cache = options.webView ? this.#webViewAssetMap : this.#assetMap;
+    const cache = options.webView ? this.#webViewAssetMap : Devvit.assets;
     if (cache) {
       for (const path of assetPaths) {
         if (cache[path]) {

@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "devvit-docs",
-  "version": "0.11.17",
+  "version": "0.12.1",
   "scripts": {
     "clean": "rm -rf .turbo static/@devvit",
     "clobber": "yarn clean && rm -rf node_modules",
@@ -15,15 +15,16 @@
     "docs:write-heading-ids": "docusaurus write-heading-ids",
     "docs:write-translations": "docusaurus write-translations",
     "docusaurus": "docusaurus",
-    "gen:all": "yarn gen:api-docs && yarn gen:reddit-api-docs && prettier --write '**/*.md'",
+    "gen:all": "yarn gen:api-docs && yarn gen:reddit-api-docs && yarn gen:snapshot-docs && prettier --write '**/*.md'",
     "gen:api-docs": "./scripts/build-api-docs.sh",
     "gen:payments-api-docs": "./scripts/build-payments-api-docs.sh",
     "gen:reddit-api-docs": "./scripts/build-reddit-api-docs.sh",
+    "gen:snapshot-docs": "./scripts/build-snapshot-docs.sh",
     "gen:verify": "./scripts/verify-docs.sh",
     "test:types": "tsc --noEmit"
   },
   "dependencies": {
-    "@devvit/protos": "0.11.17",
+    "@devvit/protos": "0.12.1",
     "@docusaurus/core": "3.8.1",
     "@docusaurus/faster": "3.8.1",
     "@docusaurus/plugin-content-docs": "3.8.1",

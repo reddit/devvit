@@ -5,12 +5,13 @@ import type {
   RedditObject,
   WrappedRedditObject,
 } from '@devvit/protos';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
-import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT1ID, asT2ID, asT3ID, asT5ID, isCommentId, isT1ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import type { T1ID, T2ID, T3ID, T5ID } from '../../../types/tid.js';
+import { asT1ID, asT2ID, asT3ID, asT5ID, isCommentId, isT1ID } from '../../../types/tid.js';
 import { RunAs } from '../common.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
@@ -615,6 +616,10 @@ export class Comment {
         ? Devvit.userActionsPlugin
         : Devvit.redditAPIPlugins.LinksAndComments;
     const { id } = options;
+
+    if (runAsType === RunAs.USER) {
+      Devvit.assertUserScope(Scope.SUBMIT_COMMENT);
+    }
 
     let richtextString: string | undefined;
     if ('richtext' in options) {

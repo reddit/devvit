@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.18-dev**](../../README.md)
+[**@devvit/public-api v0.11.19-dev**](../../README.md)
 
 ---
 
@@ -337,8 +337,8 @@ const userFlair = await user.getUserFlairBySubreddit(subredditName);
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`User`, `"username"` \| `"id"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & `object`
+> **toJSON**(): `Pick`\<`User`, `"username"` \| `"id"` \| `"createdAt"` \| `"nsfw"` \| `"linkKarma"` \| `"commentKarma"`\> & `object`
 
 #### Returns
 
-`Pick`\<`User`, `"username"` \| `"id"` \| `"nsfw"` \| `"createdAt"` \| `"linkKarma"` \| `"commentKarma"`\> & `object`
+`Pick`\<`User`, `"username"` \| `"id"` \| `"createdAt"` \| `"nsfw"` \| `"linkKarma"` \| `"commentKarma"`\> & `object`

@@ -2,11 +2,10 @@ import type { Metadata, RedditObject } from '@devvit/protos';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { T2ID, T5ID, TID } from '@devvit/shared-types/tid.js';
-import { asT2ID, asT5ID, asTID } from '@devvit/shared-types/tid.js';
+import { asTid, T2, T5, type Tid } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions } from './Listing.js';
 import { Listing } from './Listing.js';
 import type { Subreddit } from './Subreddit.js';
@@ -33,11 +32,11 @@ export type GetPrivateMessagesOptions = Prettify<
 >;
 
 type PrivateMessageAuthor =
-  | (Pick<User, 'username'> & { type: 'user'; id?: T2ID | undefined })
-  | (Pick<Subreddit, 'name'> & { type: 'subreddit'; id?: T5ID | undefined });
+  | (Pick<User, 'username'> & { type: 'user'; id?: T2 | undefined })
+  | (Pick<Subreddit, 'name'> & { type: 'subreddit'; id?: T5 | undefined });
 
 export class PrivateMessage {
-  readonly #id: TID;
+  readonly #id: Tid;
   readonly #from: PrivateMessageAuthor;
   readonly #body: string;
   readonly #bodyHtml: string;
@@ -120,19 +119,19 @@ export class PrivateMessage {
     assertNonNull(data.name, 'PrivateMessage: Invalid data, no name');
     assertNonNull(data.created, 'PrivateMessage: Invalid data, no created date');
 
-    this.#id = asTID(data.name);
+    this.#id = asTid(data.name);
 
     if (data.author != null) {
       this.#from = {
         type: 'user',
         username: data.author,
-        id: data.authorFullname ? asT2ID(data.authorFullname) : undefined,
+        id: data.authorFullname ? T2(data.authorFullname) : undefined,
       };
     } else if (data.subreddit != null) {
       this.#from = {
         type: 'subreddit',
         name: data.subreddit,
-        id: data.subredditId ? asT5ID(data.subredditId) : undefined,
+        id: data.subredditId ? T5(data.subredditId) : undefined,
       };
     } else {
       throw new Error('PrivateMessage: Invalid data, no author or subreddit');
@@ -146,7 +145,7 @@ export class PrivateMessage {
     this.#created = created;
   }
 
-  get id(): TID {
+  get id(): Tid {
     return this.#id;
   }
 
@@ -168,10 +167,10 @@ export class PrivateMessage {
 
   async markAsRead(): Promise<void> {
     const client = getRedditApiPlugins().PrivateMessages;
-    await client.ReadMessage({ id: this.#id }, context.debug.metadata);
+    await client.ReadMessage({ id: this.#id }, context.metadata);
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }

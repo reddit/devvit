@@ -12,7 +12,7 @@ Some things can only be executed on the server side, including:
 
 - `onPress` handlers of [menu actions](./capabilities/menu-actions.md)
 - [Scheduled actions](./capabilities/scheduler.md)
-- API requests (such as [Reddit API](./api/redditapi/classes/RedditAPIClient.RedditAPIClient.md), [Redis](./capabilities/redis.md), and [HTTP fetch](./capabilities/http-fetch.md))
+- API requests (such as [Reddit API](./api/redditapi/RedditAPIClient/classes/RedditAPIClient.md), [Redis](./capabilities/redis.md), and [HTTP fetch](./capabilities/http-fetch.mdx))
 
 If the API request is encountered when the app code runs on the client, Devvit switches the code execution to the server side.
 

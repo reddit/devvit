@@ -6,11 +6,10 @@ import {
 } from '@devvit/protos';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { T3ID } from '@devvit/shared-types/tid.js';
-import { asT3ID } from '@devvit/shared-types/tid.js';
+import { T3 } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
+import { getRedditApiPlugins } from '../plugin.js';
 
 export enum FlairType {
   User = 'USER_FLAIR',
@@ -241,7 +240,7 @@ export class FlairTemplate {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 
@@ -267,11 +266,11 @@ export type SetUserFlairOptions = SetFlairOptions & {
 
 export type SetPostFlairOptions = SetFlairOptions & {
   /** The ID of the post to set the flair on */
-  postId: string;
+  postId: T3;
 };
 
 export type InternalSetPostFlairOptions = SetFlairOptions & {
-  postId: T3ID;
+  postId: T3;
 };
 
 export type SetUserFlairBatchConfig = {
@@ -374,13 +373,13 @@ export class Flair {
   static setPostFlair(options: SetPostFlairOptions): Promise<void> {
     return Flair.#setFlair({
       ...options,
-      postId: asT3ID(options.postId),
+      postId: T3(options.postId),
     });
   }
 
   /** @internal */
   static async #setFlair(
-    options: (Omit<SetPostFlairOptions, 'postId'> & { postId: T3ID }) | SetUserFlairOptions
+    options: (Omit<SetPostFlairOptions, 'postId'> & { postId: T3 }) | SetUserFlairOptions
   ): Promise<void> {
     const client = getRedditApiPlugins().Flair;
 
@@ -389,8 +388,8 @@ export class Flair {
         subreddit: options.subredditName,
         flairTemplateId: options.flairTemplateId ?? '',
         text: options.text ?? '',
-        name: (options as SetUserFlairOptions).username,
-        link: (options as InternalSetPostFlairOptions).postId,
+        name: (options as SetUserFlairOptions).username ?? '',
+        link: (options as InternalSetPostFlairOptions).postId ?? '',
         backgroundColor: options.backgroundColor ?? '',
         textColor: options.textColor ?? 'dark',
         cssClass: options.cssClass ?? '',
@@ -442,7 +441,7 @@ export class Flair {
   }
 
   /** @internal */
-  static async removePostFlair(subredditName: string, postId: T3ID): Promise<void> {
+  static async removePostFlair(subredditName: string, postId: T3): Promise<void> {
     return Flair.#removeFlair(subredditName, postId, undefined);
   }
 
@@ -475,7 +474,7 @@ export class Flair {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 

@@ -7,10 +7,10 @@ import type {
 } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { T2ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import type { T2ID } from '../../../types/tid.js';
+import { asT2ID, isT2ID } from '../../../types/tid.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { formatModeratorPermissions, validModPermissions } from '../helpers/permissions.js';

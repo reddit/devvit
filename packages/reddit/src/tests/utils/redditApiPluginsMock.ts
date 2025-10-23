@@ -1,4 +1,4 @@
-import type { RedditApiPluginClient } from '../../getRedditApiPlugins.js';
+import type { RedditApiPluginClient } from '../../plugin.js';
 
 export const redditApiPlugins = {
   Flair: {

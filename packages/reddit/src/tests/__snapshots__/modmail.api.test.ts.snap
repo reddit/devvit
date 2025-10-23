@@ -924,7 +924,7 @@ exports[`ModMail API > getConversations() > with subreddits defined 1`] = `
       "subject": "Lorem ipsum",
     },
   },
-  "viewerId": "viewer_fakeId",
+  "viewerId": "t2_123",
 }
 `;
 
@@ -1013,7 +1013,7 @@ exports[`ModMail API > getConversations() > with subreddits undefined 1`] = `
       "subject": "Lorem ipsum",
     },
   },
-  "viewerId": "viewer_fakeId",
+  "viewerId": "t2_123",
 }
 `;
 

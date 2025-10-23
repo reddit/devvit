@@ -7,13 +7,12 @@ import type {
 } from '@devvit/protos';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { T2ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, isT2ID } from '@devvit/shared-types/tid.js';
+import { isT2, T2 } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { formatModeratorPermissions, validModPermissions } from '../helpers/permissions.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import type { GetCommentsByUserOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { UserFlair } from './Flair.js';
@@ -154,7 +153,7 @@ type UserSocialLinkResponse = Omit<UserSocialLink, 'handle'> & { handle: string 
  * A class representing a user.
  */
 export class User {
-  #id: T2ID;
+  #id: T2;
   #username: string;
   #createdAt: Date;
   #linkKarma: number;
@@ -179,7 +178,7 @@ export class User {
     assertNonNull(data.createdUtc, 'User is missing created date');
 
     // UserDataByAccountIds returns the ID without the t2_ prefix
-    this.#id = asT2ID(isT2ID(data.id) ? data.id : `t2_${data.id}`);
+    this.#id = T2(isT2(data.id) ? data.id : `t2_${data.id}`);
     this.#username = data.name;
     this.#nsfw = data.over18 ?? false;
     this.#isAdmin = data.isEmployee ?? false;
@@ -206,7 +205,7 @@ export class User {
    * The ID (starting with t2_) of the user to retrieve.
    * @example 't2_1w72'
    */
-  get id(): T2ID {
+  get id(): T2 {
     return this.#id;
   }
 
@@ -411,7 +410,7 @@ export class User {
   }
 
   /** @internal */
-  static async getById(id: T2ID): Promise<User | undefined> {
+  static async getById(id: T2): Promise<User | undefined> {
     const username = await getUsernameById(id);
 
     return username == null ? undefined : User.getByUsername(username);
@@ -517,6 +516,16 @@ export class User {
 
   /** @internal */
   static async getSnoovatarUrl(username: string): Promise<string | undefined> {
+    // Check if snoovatar for current user is available in the context
+    const currentUsername = context.username;
+    if (currentUsername && username === currentUsername) {
+      const snoovatarUrl = context.snoovatar;
+      if (snoovatarUrl) {
+        return snoovatarUrl;
+      }
+    }
+
+    // If not, query the API for the snoovatar URL
     const operationName = 'GetSnoovatarUrlByName';
     const persistedQueryHash = 'c47fd42345af268616d2d8904b56856acdc05cf61d3650380f539ad7d596ac0c';
     const response = await GraphQL.query(operationName, persistedQueryHash, { username });
@@ -548,7 +557,7 @@ export class User {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 
@@ -605,7 +614,7 @@ async function listingProtosToUsers(
         {
           ids: userIds.join(','),
         },
-        context.debug.metadata
+        context.metadata
       )
     )
   );
@@ -646,10 +655,16 @@ async function listingProtosToUsers(
 }
 
 /** @internal */
-async function getUsernameById(id: string): Promise<string | undefined> {
+async function getUsernameById(id: T2): Promise<string | undefined> {
+  // Check if username for current user is available in the context
+  if (context.username && context.userId === id) {
+    return context.username;
+  }
+
+  // If not, query the API for the username
   const client = getRedditApiPlugins().Users;
 
-  const response = await client.UserDataByAccountIds({ ids: id }, context.debug.metadata);
+  const response = await client.UserDataByAccountIds({ ids: id }, context.metadata);
 
   return response?.users?.[id]?.name;
 }

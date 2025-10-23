@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.19-dev**](../README.md)
+[**@devvit/public-api v0.12.2-dev**](../README.md)
 
 ---
 
@@ -14,7 +14,7 @@ A grouping of fields
 
 ### fields
 
-> **fields**: readonly [`FormField`](FormField.md)[]
+> **fields**: [`FormField`](FormField.md)[]
 
 The fields that will be displayed in the group
 

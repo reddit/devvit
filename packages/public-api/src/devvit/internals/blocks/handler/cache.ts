@@ -1,5 +1,4 @@
-import type { JSONValue } from '@devvit/shared-types/json.js';
-
+import type { JSONValue } from '../../../../types/json.js';
 import type { RedisClient } from '../../../../types/redis.js';
 import type { CacheOptions, Clock, LocalCache } from './promise_cache.js';
 import { PromiseCache, SystemClock } from './promise_cache.js';

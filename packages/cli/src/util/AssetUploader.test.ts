@@ -1,8 +1,13 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
 import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { JSDOM } from 'jsdom';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { DEVVIT_JS_URL, transformHTML } from './AssetUploader.js';
+import { AssetUploader, DEVVIT_JS_URL, queryAssets, transformHTML } from './AssetUploader.js';
+import type { DevvitCommand } from './commands/DevvitCommand.js';
 
 describe('HTML Transformation', () => {
   describe('transformHTML', () => {
@@ -119,6 +124,98 @@ describe('HTML Transformation', () => {
       const devvitScript = selectScript(document);
       assertScriptExpectations(devvitScript);
     });
+  });
+});
+
+describe('assertAssetCanBeAnIcon', () => {
+  const TEST_IMAGE_FILES = [
+    '1024x1024.gif',
+    '1024x1024.jpg',
+    '1024x1024.png',
+    '256x256.png',
+    '256x512.png',
+    '420x420.png',
+    '512x512.png',
+    'notAnImage.txt',
+  ];
+
+  for (const fileName of TEST_IMAGE_FILES) {
+    it(`should match the snapshot for image file: ${fileName}`, async () => {
+      const cmd = {
+        error: vi.fn(() => {
+          throw new Error('Mocked error');
+        }),
+        warn: vi.fn(),
+      };
+      const assetUploader = new AssetUploader(cmd as unknown as DevvitCommand, 'some-slug', {
+        verbose: false,
+      });
+      const filePath = `../../testing-images/${fileName}`;
+      const fileContent = fs.readFileSync(path.join(__dirname, filePath));
+
+      // Don't care if this resolves or rejects, just want to test the error handling
+      await Promise.allSettled([assetUploader.assertAssetCanBeAnIcon(fileContent)]);
+
+      expect(cmd.error.mock.calls).toMatchSnapshot(`${fileName}-err`);
+      expect(cmd.warn.mock.calls).toMatchSnapshot(`${fileName}-warn`);
+    });
+  }
+});
+
+describe('queryAssets()', () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Test Page</title>
+      </head>
+      <body>
+        <h1>Hello World</h1>
+      </body>
+    </html>
+  `;
+
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'devvit-test-'));
+    fs.writeFileSync(path.join(tmpDir, 'index.html'), htmlContent);
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('should transform HTML files with Devvit script injection', async () => {
+    const assets = await queryAssets(tmpDir, [], 'Client', '1.2.3', false);
+
+    // Verify that one asset was found.
+    expect(assets).toHaveLength(1);
+    expect(assets[0].filePath).toBe('index.html');
+    expect(assets[0].isWebviewAsset).toBe(true);
+
+    // Verify that the HTML was transformed.
+    const transformedContent = new TextDecoder('utf-8').decode(assets[0].contents);
+    expect(transformedContent).toContain(
+      `<script src="${DEVVIT_JS_URL}?${clientVersionQueryParam}=1.2.3"></script>`
+    );
+    expect(transformedContent).toContain('<title>Test Page</title>');
+    expect(transformedContent).toContain('<h1>Hello World</h1>');
+  });
+
+  it('should skip HTML transformation when skipWebViewScriptInjection is true', async () => {
+    const assets = await queryAssets(tmpDir, [], 'Client', '1.2.3', true);
+
+    // Verify that one asset was found.
+    expect(assets).toHaveLength(1);
+    expect(assets[0].filePath).toBe('index.html');
+    expect(assets[0].isWebviewAsset).toBe(true);
+
+    // Verify that the HTML was NOT transformed.
+    const untransformedContent = new TextDecoder('utf-8').decode(assets[0].contents);
+    expect(untransformedContent).not.toContain(DEVVIT_JS_URL);
+    expect(untransformedContent).toContain('<title>Test Page</title>');
+    expect(untransformedContent).toContain('<h1>Hello World</h1>');
   });
 });
 

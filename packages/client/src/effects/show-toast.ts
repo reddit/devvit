@@ -1,11 +1,10 @@
-import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
+import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import type {
   Toast as ToastProto,
   ToastAppearance,
-} from '@devvit/protos/types/devvit/ui/toast/toast.js';
+} from '@devvit/protos/json/devvit/ui/toast/toast.js';
 import type { Toast } from '@devvit/shared';
-
-import { emitEffect } from './emit-effect.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 /**
  * Shows a toast message.

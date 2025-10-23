@@ -1,10 +1,10 @@
-import type { T1ID, T3ID } from '@devvit/shared-types/tid.js';
+import type { T1, T3 } from '@devvit/shared-types/tid.js';
 
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 
 export type MoreObject = {
-  parentId: T1ID | T3ID;
-  children: T1ID[];
+  parentId: T1 | T3;
+  children: T1[];
   depth: number;
 };
 

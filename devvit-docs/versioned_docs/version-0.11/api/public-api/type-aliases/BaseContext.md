@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.18-dev**](../README.md)
+[**@devvit/public-api v0.11.19-dev**](../README.md)
 
 ---
 
@@ -59,6 +59,14 @@ The ID of the current comment
 > **debug**: [`ContextDebugInfo`](ContextDebugInfo.md)
 
 More useful things, but probably not for the average developer
+
+---
+
+<a id="postdata"></a>
+
+### postData?
+
+> `optional` **postData**: `PostData`
 
 ---
 

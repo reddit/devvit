@@ -45,7 +45,7 @@ export class AppVersionUploader {
 
     // Sync and upload assets
     const assetUploader = new AssetUploader(this.#cmd, appInfo.appSlug, { verbose: this.#verbose });
-    const { assetMap, webViewAssetMap } = await assetUploader.syncAssets();
+    const { assetMap, webViewAssetMap, iconAsset } = await assetUploader.syncAssets();
 
     let products: JSONProduct[] | undefined;
 
@@ -77,6 +77,13 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
       })
     );
 
+    // Send the devvit.json file with the creation request, if it exists.
+    const appConfig = this.#cmd.project.appConfig;
+    let devvitJson: string | undefined;
+    if (appConfig) {
+      devvitJson = JSON.stringify(appConfig);
+    }
+
     ux.action.start(`Uploading new version "${appInfo.appSemver.toString()}" to Reddit`);
     try {
       // Actually create the app version
@@ -91,6 +98,10 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         prereleaseVersion: appInfo.appSemver.prerelease,
         actorBundles: bundles,
         preventPlaytestSubredditCreation: preventSubredditCreation,
+        marketingInfo: {
+          icon: iconAsset,
+        },
+        devvitJson,
       });
       ux.action.stop();
 

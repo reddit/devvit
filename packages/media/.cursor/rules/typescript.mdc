@@ -1,0 +1,6 @@
+---
+description: @devvit/media TypeScript and JavaScript rules.
+globs: ["**/*.cjs", "**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cts", "**/*.ts", "**/*.tsx", "**/*.mts"]
+---
+
+- Prefer `@devvit/protos/json/*` descendant imports to `@devvit/protos/types/*`.

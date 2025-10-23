@@ -1,7 +1,7 @@
 # Key value store plugin
 
 :::note
-[Redis](https://developers.reddit.com/docs/redis) is replacing the key value store as Devvit’s hosted data store solution. You’ll need to [migrate](migrate_kv_to_redis.md) your current apps to Redis.
+[Redis](./capabilities/redis) is replacing the key value store as Devvit’s hosted data store solution. You’ll need to [migrate](migrate_kv_to_redis.md) your current apps to Redis.
 :::
 
 Sometimes you might want to store data in your app that will be there the next time it’s run.
@@ -62,7 +62,7 @@ Devvit.configure({
 Devvit.addMenuItem({
   label: 'Write to KV Store',
   location: 'post',
-  onPress: (_, context) => {
+  onPress: (_event, context) => {
     await context.kvStore.put('animalChoice', 'dog');
     const storedValue = context.kvStore.get('animalChoice');
     context.kvStore.delete('animalChoice');

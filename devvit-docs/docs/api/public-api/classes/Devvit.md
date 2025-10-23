@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.19-dev**](../README.md)
+[**@devvit/public-api v0.12.2-dev**](../README.md)
 
 ---
 
@@ -65,17 +65,15 @@ Devvit.addCustomPostType({
 
 ### addMenuItem()
 
-> `static` **addMenuItem**(`menuItem`): `void`
+> `static` **addMenuItem**(`item`): `void`
 
 Add a menu item to the Reddit UI.
 
 #### Parameters
 
-##### menuItem
+##### item
 
 [`MenuItem`](../type-aliases/MenuItem.md)
-
-The menu item to add.
 
 #### Returns
 

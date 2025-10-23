@@ -1,10 +1,10 @@
 import type { Metadata, RedditObject } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { T2ID, T5ID, TID } from '@devvit/shared-types/tid.js';
-import { asT2ID, asT5ID, asTID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import type { T2ID, T5ID, TID } from '../../../types/tid.js';
+import { asT2ID, asT5ID, asTID } from '../../../types/tid.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import type { ListingFetchOptions } from './Listing.js';
 import { Listing } from './Listing.js';

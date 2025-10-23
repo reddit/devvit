@@ -1,6 +1,5 @@
-import type { JSONObject } from '@devvit/shared';
-import type { T2ID } from '@devvit/shared-types/tid.js';
-import { asT2ID } from '@devvit/shared-types/tid.js';
+import type { JsonObject } from '@devvit/shared';
+import { T2 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 
@@ -18,7 +17,7 @@ export type Vault = {
    * The ID (starting with t2_) of the user owning the Vault.
    * @example 't2_1w72'
    */
-  userId: T2ID;
+  userId: T2;
 
   /**
    * The address of the Vault.
@@ -48,7 +47,7 @@ export async function getVaultByAddress(address: string): Promise<Vault> {
   );
 }
 
-export async function getVaultByUserId(userId: T2ID): Promise<Vault> {
+export async function getVaultByUserId(userId: T2): Promise<Vault> {
   return getVaultByParams(
     'GetVaultContactByUserId',
     'a854ddc19d0e22c4f36ed917fdbd568f299f3571427e393aee5e2972080fffe9',
@@ -62,14 +61,14 @@ export async function getVaultByUserId(userId: T2ID): Promise<Vault> {
 async function getVaultByParams(
   operationName: string,
   queryHash: string,
-  params: JSONObject
+  params: JsonObject
 ): Promise<Vault> {
   const response = await GraphQL.query(operationName, queryHash, params);
   const contact = response?.data?.vault?.contact;
 
   return {
     provider: contact?.provider,
-    userId: asT2ID(contact?.userId),
+    userId: T2(contact?.userId),
     address: contact?.address,
     createdAt: contact?.createdAt,
     isActive: contact?.isActive,

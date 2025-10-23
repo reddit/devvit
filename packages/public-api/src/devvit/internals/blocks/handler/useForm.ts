@@ -1,4 +1,3 @@
-import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 import { formKeyToHookId } from '@devvit/shared-types/useForm.js';
 
@@ -10,6 +9,7 @@ import type {
   FormToFormValues,
   FormValues,
 } from '../../../../index.js';
+import type { JSONValue } from '../../../../types/json.js';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { EventHandler, Hook, HookRef } from './types.js';

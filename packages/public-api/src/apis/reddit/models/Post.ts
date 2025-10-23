@@ -10,16 +10,19 @@ import type {
   SetCustomPostPreviewRequest_BodyType,
 } from '@devvit/protos';
 import { Block, UIResponse } from '@devvit/protos';
+import type { DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
-import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
 import { fromByteArray } from 'base64-js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
 import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
 import { BlocksHandler } from '../../../devvit/internals/blocks/handler/BlocksHandler.js';
+import type { T2ID, T3ID, T5ID } from '../../../types/tid.js';
+import { asT2ID, asT3ID, asT5ID, isT3ID } from '../../../types/tid.js';
 import { RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
@@ -213,6 +216,7 @@ export type SubmitCustomPostOptions = CommonSubmitPostOptions &
   SubmitCustomPostTextFallbackOptions & {
     preview: JSX.Element;
     userGeneratedContent?: UserGeneratedContent;
+    postData?: PostData;
   };
 
 export type CommonSubmitPostOptions = {
@@ -901,6 +905,42 @@ export class Post {
   }
 
   /**
+   * Get the postData for the post.
+   *
+   * @example
+   * ```ts
+   * const post = await context.reddit.getPostById(context.postId);
+   * const postData = await post.getPostData();
+   * ```
+   */
+  async getPostData(): Promise<PostData | undefined> {
+    const devvitPostData = await Post.getDevvitPostData(this.id, this.#metadata);
+    return devvitPostData?.developerData;
+  }
+
+  /**
+   * Set the postData on a custom post.
+   *
+   * @param {PostData} postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
+   * @throws {Error} Throws an error if the postData could not be set.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   * await post.setPostData({
+   *   currentScore: 55,
+   *   secretWord: 'barbeque',
+   * });
+   * ```
+   */
+  async setPostData(postData: PostData): Promise<void> {
+    const prev = await Post.getDevvitPostData(this.id, this.#metadata);
+    await Post.setPostData(
+      { postId: this.id, postData: { ...prev, developerData: postData } },
+      this.#metadata
+    );
+  }
+
+  /**
    * Set a lightweight UI that shows while the custom post renders
    *
    * @param {JSX.ComponentFunction} ui - A JSX component function that returns a simple ui to be rendered.
@@ -1134,6 +1174,10 @@ export class Post {
         ? Devvit.userActionsPlugin
         : Devvit.redditAPIPlugins.LinksAndComments;
 
+    if (runAsType === RunAs.USER) {
+      Devvit.assertUserScope(Scope.SUBMIT_POST);
+    }
+
     let response: SubmitResponse;
 
     if ('preview' in options) {
@@ -1164,6 +1208,12 @@ export class Post {
           }
         : undefined;
 
+      const devvitPostData = options.postData
+        ? {
+            developerData: options.postData,
+          }
+        : undefined;
+
       const submitRequest: SubmitRequest = {
         kind: 'custom',
         sr: options.subredditName,
@@ -1172,6 +1222,7 @@ export class Post {
         ...sanitizedOptions,
         userGeneratedContent,
         runAs: runAsType,
+        postData: devvitPostData,
       };
 
       response = await client.SubmitCustomPost(submitRequest, metadata);
@@ -1203,10 +1254,10 @@ export class Post {
       }
     }
 
-    if (!response.json?.data?.id || response.json?.errors?.length) {
-      throw new Error(
-        `failed to submit post - either post ID is empty or request failed with errors: ${response.json?.errors}`
-      );
+    if (response.json?.errors?.length) {
+      throw new Error(`failed to submit post - errors: ${response.json?.errors.join(', ')}`);
+    } else if (!response.json?.data?.id) {
+      throw new Error(`failed to submit post - no post ID returned but no error details found`);
     }
 
     return Post.getById(`t3_${response.json.data.id}`, metadata);
@@ -1221,6 +1272,10 @@ export class Post {
         ? Devvit.userActionsPlugin
         : Devvit.redditAPIPlugins.LinksAndComments;
     const { postId, subredditName, ...rest } = options;
+
+    if (runAsType === RunAs.USER) {
+      Devvit.assertUserScope(Scope.SUBMIT_POST);
+    }
 
     const response = await client.Submit(
       {
@@ -1299,6 +1354,55 @@ export class Post {
   }
 
   /** @internal */
+  static async getDevvitPostData(
+    id: T3ID,
+    metadata: Metadata | undefined
+  ): Promise<DevvitPostData | undefined> {
+    const operationName = 'GetDevvitPostData';
+    const persistedQueryHash = 'd349c9bee385336e44837c4a041d4b366fa32f16121cef7f12e1e3f230340696';
+    const response = await GraphQL.query(
+      operationName,
+      persistedQueryHash,
+      {
+        id,
+      },
+      metadata
+    );
+
+    if (response.data?.postInfoById?.errors) {
+      throw new Error(
+        `Failed to get devvit post data due to errors: ${response.data?.postInfoById?.errors.join(', ')}`
+      );
+    }
+
+    // GQL returns postData as a JSON string
+    const devvitPostData: string = response.data?.postInfoById?.devvit?.postData;
+
+    if (!devvitPostData) {
+      return undefined;
+    }
+
+    return JSON.parse(devvitPostData) as DevvitPostData;
+  }
+
+  /** @internal */
+  static async setPostData(
+    options: { postId: T3ID; postData: DevvitPostData },
+    metadata: Metadata | undefined
+  ): Promise<void> {
+    const res = await Devvit.redditAPIPlugins.LinksAndComments.EditCustomPost(
+      {
+        thingId: options.postId,
+        postData: options.postData,
+      },
+      metadata
+    );
+    if (res.json?.errors?.length) {
+      throw new Error(`Failed to set post data, errors: ${res.json?.errors}`);
+    }
+  }
+
+  /** @internal */
   static async setCustomPostPreview(
     options: { id: T3ID; ui: JSX.ComponentFunction },
     metadata: Metadata | undefined
@@ -1346,9 +1450,11 @@ export class Post {
       metadata
     );
 
-    if (response.json?.errors?.length) {
-      throw new Error('Failed to set post text fallback');
-    }
+    if (response.json?.errors?.length)
+      // to-do: why is errors `Any[]`?
+      throw Error(
+        `set post ${postId} text fallback failed: ${JSON.stringify(response.json.errors)}`
+      );
 
     return Post.getById(postId, metadata);
   }

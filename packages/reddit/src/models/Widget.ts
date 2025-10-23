@@ -28,8 +28,8 @@ import {
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
+import { getRedditApiPlugins } from '../plugin.js';
 
 export type AddWidgetData =
   | (AddImageWidgetRequest & {
@@ -55,7 +55,7 @@ export type AddWidgetData =
     });
 
 function getMetadata(): Metadata {
-  return context.debug.metadata;
+  return context.metadata;
 }
 
 export class Widget {

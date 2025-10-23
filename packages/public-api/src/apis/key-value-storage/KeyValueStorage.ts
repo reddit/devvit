@@ -1,7 +1,7 @@
 import type { Metadata } from '@devvit/protos';
-import type { JSONValue } from '@devvit/shared-types/json.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
+import type { JSONValue } from '../../types/json.js';
 import type { KVStore } from '../../types/kvStore.js';
 
 export class KeyValueStorage implements KVStore {

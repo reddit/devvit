@@ -63,19 +63,17 @@
   ],
   "resolutions": {
     "@babel/traverse": "^7.23.2",
+    "@mdn/browser-compat-data": "^7.1.14",
     "@xmldom/xmldom": "^0.8.4",
     "chalk": "4.1.2",
     "dompurify": "^3.0.0",
     "http-cache-semantics": "^4.1.1",
-    "long": "4.0.0",
     "nan": "2.20.0",
-    "protobufjs": "7.3.2",
+    "protobufjs": "7.5.4",
     "recursive-readdir/minimatch": "3.1.2",
-    "remark-parse/trim": "0.0.3",
     "serve-handler/minimatch": "3.1.2",
     "strip-ansi@3.0.1/ansi-regex": "3.0.1",
-    "vite": "5.4.19",
-    "wait-on/rxjs": "7.8.1",
+    "vite": "5.4.20",
     "yosay/ansi-regex": "3.0.1"
   },
   "dependencies": {
@@ -88,11 +86,12 @@
     "@reddit/eslint-plugin-no-unsafe": "1.0.0",
     "@reddit/faceplate-docs": "0.4.12",
     "@sentry/cli": "2.11.0",
+    "browserslist": "4.27.0",
     "check-dependency-version-consistency": "3.0.3",
     "eslint": "9.11.1",
     "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-compat": "6.0.2",
     "eslint-plugin-lit": "1.13.0",
-    "eslint-plugin-no-unsafe": "0.0.5",
     "eslint-plugin-no-unsanitized": "4.1.2",
     "eslint-plugin-no-wildcard-postmessage": "0.2.0",
     "eslint-plugin-prettier": "5.1.3",
@@ -109,11 +108,11 @@
     "prettier-package-json": "2.8.0",
     "turbo": "1.6.3",
     "typedoc": "0.28.0",
-    "typescript-eslint": "8.8.1",
+    "typescript-eslint": "8.43.0",
     "vitest": "1.6.1"
   },
   "engines": {
     "node": ">=22.2.0"
   },
-  "packageManager": "yarn@4.9.1"
+  "packageManager": "yarn@4.10.3"
 }

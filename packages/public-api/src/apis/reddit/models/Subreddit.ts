@@ -8,10 +8,10 @@ import type {
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { T5ID } from '@devvit/shared-types/tid.js';
-import { asT5ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
+import type { T5ID } from '../../../types/tid.js';
+import { asT5ID } from '../../../types/tid.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { Comment } from './Comment.js';

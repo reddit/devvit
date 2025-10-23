@@ -189,7 +189,7 @@ import { Devvit } from '@devvit/public-api';
 Devvit.addMenuItem({
   label: 'Test Action',
   location: Context.SUBREDDIT,
-  onPress: (_, context) {
+  onPress: (_event, context) {
     // to get all settings
     const settings = await context.settings.getAll();
     // to get an individual setting

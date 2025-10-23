@@ -109,7 +109,8 @@ Supported platforms:
 Create a new web view project:
 
 ```bash
-devvit new --template web-view-post
+devvit new
+# choose the Web View Post template
 cd my-project
 ```
 
@@ -223,7 +224,7 @@ Web views that are presented in fullscreen without user interaction will not be 
 
 ## Communication between Devvit and web view
 
-Web views let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services ([Redis](./capabilities/redis.md), [fetch](./capabilities/http-fetch.md), [scheduler](./capabilities/scheduler.md), [triggers](./capabilities/triggers.md)) via message passing between the two contexts.
+Web views let you build custom UIs with HTML/CSS/JS while accessing Devvit's backend services ([Redis](./capabilities/redis.md), [fetch](./capabilities/http-fetch.mdx), [scheduler](./capabilities/scheduler.md), [triggers](./capabilities/triggers)) via message passing between the two contexts.
 
 ![Sample web views post](./assets/webviews-devvit-architecture.png)
 
@@ -366,7 +367,7 @@ const App = () => {
 
 Adding [payments](payments/payments_add.md) to your app is pretty straightforward, but there are a couple of things to you need to know when also using web views.
 
-For a full working example, see `devvit new --template=payments-web-view`.
+For a full working example, see `devvit new` and choose the Payments Web View template.
 
 ### Using events to handle payments
 

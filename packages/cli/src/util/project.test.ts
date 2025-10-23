@@ -1,14 +1,15 @@
-import type { JSONObject } from '@devvit/public-api';
+import type { JsonObject } from '@devvit/shared-types/json.js';
 import type {
   AppConfig,
   AppPermissionConfig,
 } from '@devvit/shared-types/schemas/config-file.v1.js';
-import { test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { vi } from 'vitest';
 
 import {
   type ClassicAppConfig,
   type DevvitConfig,
+  doEnvFileReplacement,
   isAppConfig,
   parseClassicConfig,
   Project,
@@ -102,72 +103,59 @@ describe('validateConfig()', () => {
       }
   });
 
-  test('post.client.dir', () => {
-    for (const exists of [false, true])
-      for (const mode of ['Static', 'Dynamic'] as const) {
+  for (const exists of [false, true])
+    for (const mode of ['Static', 'Dynamic'] as const)
+      test(`post.dir (${exists}, ${mode})`, () => {
         const config: AppConfig = {
           schema: 'v1',
           name: 'name',
           permissions: noPermissions,
           post: {
-            client: { dir: 'dir', entry: 'dir/entry' },
-            create: {
-              title: 'title',
-              height: 'regular',
-              menu: { enable: false, label: 'label', scope: 'user' },
-              onInstall: false,
+            dir: 'dir',
+            entrypoints: {
+              default: { name: 'default', entry: 'entry', height: 'tall' },
             },
           },
           json: { name: 'name' },
         };
         expect(
           validateConfig(config, (filename: string) => (filename === 'dir' ? exists : true), mode)
-        ).toStrictEqual(exists || mode === 'Dynamic' ? [] : ['`config.post.client.dir` (dir)']);
-      }
-  });
+        ).toStrictEqual(exists || mode === 'Dynamic' ? [] : ['`config.post.dir` (dir)']);
+      });
 
-  test('post.client.entry file', () => {
-    for (const exists of [false, true])
-      for (const mode of ['Static', 'Dynamic'] as const) {
+  for (const exists of [false, true])
+    for (const mode of ['Static', 'Dynamic'] as const)
+      test(`post.entrypoints.entry file (${exists}, ${mode})`, () => {
         const config: AppConfig = {
           schema: 'v1',
           name: 'name',
           permissions: noPermissions,
           post: {
-            client: { dir: 'dir', entry: 'dir/entry' },
-            create: {
-              title: 'title',
-              height: 'regular',
-              menu: { enable: false, label: 'label', scope: 'user' },
-              onInstall: false,
-            },
+            dir: 'dir',
+            entrypoints: { default: { name: 'default', entry: 'entry', height: 'tall' } },
           },
           json: { name: 'name' },
         };
         expect(
           validateConfig(
             config,
-            (filename: string) => (filename === 'dir/entry' ? exists : true),
+            (filename: string) => (filename.endsWith('dir/entry') ? exists : true),
             mode
           )
         ).toStrictEqual(
-          exists || mode === 'Dynamic' ? [] : ['`config.post.client.entry` (dir/entry)']
+          exists || mode === 'Dynamic' ? [] : ['`config.post.entrypoints.default.entry` (entry)']
         );
-      }
-  });
+      });
 
-  test('post.client.entry API', () => {
+  test('post.entrypoints.entry API', () => {
     const config: AppConfig = {
       schema: 'v1',
       name: 'name',
       permissions: noPermissions,
       post: {
-        client: { dir: 'dir', entry: '/api/entry' },
-        create: {
-          title: 'title',
-          height: 'regular',
-          menu: { enable: false, label: 'label', scope: 'user' },
-          onInstall: false,
+        dir: 'dir',
+        entrypoints: {
+          default: { name: 'default', entry: '/api/entry', height: 'tall' },
         },
       },
       json: { name: 'name' },
@@ -182,11 +170,11 @@ describe('validateConfig()', () => {
           schema: 'v1',
           name: 'name',
           permissions: noPermissions,
-          server: { entry: 'entry' },
+          server: { dir: 'dir', entry: 'entry' },
           json: { name: 'name' },
         };
         expect(validateConfig(config, () => exists, mode)).toStrictEqual(
-          exists || mode === 'Dynamic' ? [] : ['`config.server.entry` (entry)']
+          exists || mode === 'Dynamic' ? [] : ['`config.server` (dir/entry)']
         );
       }
   });
@@ -208,7 +196,7 @@ describe('parseClassicConfig()', () => {
   test('no name', () =>
     expect(() => parseClassicConfig({})).toThrow('devvit.yaml must have `name` property.'));
   test('superset', () => {
-    const config: JSONObject & DevvitConfig = { name: 'name', abc: 'def' };
+    const config: JsonObject & DevvitConfig = { name: 'name', abc: 'def' };
     expect(parseClassicConfig(config)).toStrictEqual(config);
   });
 });
@@ -240,5 +228,23 @@ describe('isAppConfig()', () => {
   test('classic', () => {
     const config = { name: 'name' };
     expect(isAppConfig(config)).toBe(false);
+  });
+});
+
+describe('doEnvFileReplacement()', () => {
+  test('replaces env variables', () => {
+    expect(doEnvFileReplacement('VAR_NAME=something', 'VAR_NAME', 'something-else')).toBe(
+      'VAR_NAME=something-else'
+    );
+  });
+  test(`do nothing if the var isn't in the file`, () => {
+    expect(doEnvFileReplacement('VAR_NAME=something', 'MISSING_VAR', 'something-else')).toBe(
+      'VAR_NAME=something'
+    );
+  });
+  test('handle multi-line fine', () => {
+    expect(
+      doEnvFileReplacement('VAR_1=a\nVAR_NAME=something\nVAR_3=c', 'VAR_NAME', 'something-else')
+    ).toBe('VAR_1=a\nVAR_NAME=something-else\nVAR_3=c');
   });
 });

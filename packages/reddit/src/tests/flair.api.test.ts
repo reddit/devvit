@@ -5,10 +5,12 @@ import type { SetUserFlairBatchConfig } from '../models/index.js';
 import { RedditClient } from '../RedditClient.js';
 import { redditApiPlugins } from './utils/redditApiPluginsMock.js';
 import { runWithTestContext } from './utils/runWithTestContext.js';
+import { userActionsPlugin } from './utils/userActionsPluginMock.js';
 
-vi.mock('../getRedditApiPlugins.js', () => {
+vi.mock('../plugin.js', () => {
   return {
     getRedditApiPlugins: () => redditApiPlugins,
+    getUserActionsPlugin: () => userActionsPlugin,
   };
 });
 
@@ -52,7 +54,7 @@ describe('Flair API', () => {
             subreddit: 'test_subreddit',
             flairCsv: 'userA,nice bike,miami',
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(response).toStrictEqual([successResponse]);
@@ -76,7 +78,7 @@ describe('Flair API', () => {
             subreddit: 'test_subreddit',
             flairCsv: 'userB,,',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -137,7 +139,7 @@ describe('Flair API', () => {
             subreddit: 'test_subreddit',
             flairCsv: 'userA,nice bike,miami\nuserB,,',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });

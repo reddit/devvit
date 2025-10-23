@@ -1,6 +1,6 @@
 import { Devvit, useAsync, useChannel, useState } from '@devvit/public-api';
 import { ChannelStatus } from '@devvit/public-api/types/realtime.js';
-import type { T2ID } from '@devvit/shared-types/tid.js';
+import type { T2 } from '@devvit/shared-types/tid.js';
 
 import { ConnectionStatus } from './ui/connection-status.js';
 import { Dpad } from './ui/dpad.js';
@@ -14,7 +14,7 @@ Devvit.configure({
 });
 
 type User = {
-  t2: T2ID;
+  t2: T2;
   name: string;
   snoovatarURL: string | null;
   message?: string;
@@ -25,12 +25,12 @@ type User = {
 type Message = {
   name: string;
   session: string;
-  t2: T2ID;
+  t2: T2;
   x: number;
   y: number;
 };
 
-type World = { [t2: T2ID]: User };
+type World = { [t2: T2]: User };
 
 function SessionID(): string {
   let id = '';

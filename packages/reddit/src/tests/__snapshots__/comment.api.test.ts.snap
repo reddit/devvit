@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Commment API > RedditAPIClient:Comment > Comment matches JSON snapshot 1`] = `
+exports[`Commment API > RedditClient:Comment > Comment matches JSON snapshot 1`] = `
 {
   "approved": false,
   "authorName": "my-user",
@@ -35,7 +35,7 @@ exports[`Commment API > RedditAPIClient:Comment > Comment matches JSON snapshot 
 }
 `;
 
-exports[`Commment API > RedditAPIClient:Comment > submitComment() should return a new comment when successful 1`] = `
+exports[`Commment API > RedditClient:Comment > submitComment() should return a new comment when successful 1`] = `
 {
   "approved": false,
   "authorName": "my-user",
@@ -70,7 +70,7 @@ exports[`Commment API > RedditAPIClient:Comment > submitComment() should return 
 }
 `;
 
-exports[`Commment API > RedditAPIClient:Comment > submitComment(): can set runAs: USER when userActions is enabled 1`] = `
+exports[`Commment API > RedditClient:Comment > submitComment(): can set runAs: USER when userActions is enabled 1`] = `
 {
   "approved": false,
   "authorName": "my-user",

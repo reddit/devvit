@@ -9,7 +9,7 @@ import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 
 async function handleScheduledAction(args: ScheduledAction, metadata: Metadata): Promise<Empty> {
   const jobName = args.type;
-  const scheduledJobHandler = Devvit.scheduledJobHandlers.get(jobName);
+  const scheduledJobHandler = Devvit.scheduledJobHandlers?.get(jobName);
 
   if (!scheduledJobHandler) {
     throw new Error(`Job ${jobName} not found`);

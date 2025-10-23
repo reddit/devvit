@@ -1,9 +1,9 @@
-import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
-import type { WebViewInternalEventMessage } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
+import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import type { WebViewInternalEventMessage } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { emitEffect } from './emit-effect.js';
 import {
   basicFormDefinition,
   complexFormDefinition,
@@ -20,7 +20,7 @@ const mockWindow = {
 };
 vi.stubGlobal('window', mockWindow);
 
-vi.mock('./emit-effect.js', () => ({
+vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(),
 }));
 

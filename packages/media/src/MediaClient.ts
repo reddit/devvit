@@ -1,18 +1,14 @@
 import { type MediaService, MediaServiceDefinition, type Metadata } from '@devvit/protos';
 import { context } from '@devvit/server';
-import { getDevvitConfig } from '@devvit/server/get-devvit-config.js';
+import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
 
 import type { MediaAsset, UploadMediaOptions } from './types/media.js';
 
 export class MediaClient {
-  readonly #mediaPlugin: MediaService;
-
-  constructor() {
-    this.#mediaPlugin = getDevvitConfig().use<MediaService>(MediaServiceDefinition);
-  }
+  #pluginCache?: MediaService;
 
   async upload(opts: UploadMediaOptions): Promise<MediaAsset> {
-    const response = await this.#mediaPlugin.Upload(opts, this.#metadata);
+    const response = await this.#plugin.Upload(opts, this.#metadata);
     if (!response.mediaId) {
       throw new Error('unable to get mediaId via uploads');
     }
@@ -20,7 +16,11 @@ export class MediaClient {
   }
 
   get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
+  }
+
+  get #plugin(): MediaService {
+    return (this.#pluginCache ??= getDevvitConfig().use(MediaServiceDefinition));
   }
 }
 

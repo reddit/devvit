@@ -1,6 +1,6 @@
 {
   "name": "@devvit/shared",
-  "version": "0.11.17",
+  "version": "0.12.1",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -9,10 +9,8 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json",
-    "./*": "./dist/*"
+    "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
   "files": [
     "dist/**"
   ],
@@ -29,19 +27,17 @@
     "test:unit": "vitest run",
     "test:unit-with-coverage": "vitest run --coverage"
   },
-  "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.11.17",
-    "@devvit/shared-types": "0.11.17"
+    "@devvit/protos": "0.12.1",
+    "@devvit/shared-types": "0.12.1"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.11.17",
+    "@devvit/tsconfig": "0.12.1",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
   },
   "publishConfig": {
     "directory": "dist"
-  },
-  "source": "./src/index.ts"
+  }
 }

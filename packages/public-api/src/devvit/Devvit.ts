@@ -1,5 +1,6 @@
 import type { UnknownMessage } from '@devvit/protos';
 import * as protos from '@devvit/protos';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import type { PaymentsService } from '@devvit/protos/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
@@ -8,7 +9,7 @@ import {
   assertRequestedFetchDomainsLimit,
   normalizeDomains,
 } from '@devvit/shared-types/fetch-domains.js';
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
+import type {} from '@devvit/shared-types/shared/devvit-worker-global.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { assertValidFormFields } from '../apis/ui/helpers/assertValidFormFields.js';
@@ -19,7 +20,6 @@ import type {
   CustomPostType,
   Form,
   FormDefinition,
-  FormField,
   FormFunction,
   FormOnSubmitEventHandler,
   FormToFormValues,
@@ -38,6 +38,7 @@ import type {
   TriggerOnEventHandler,
 } from '../types/index.js';
 import { SettingScope } from '../types/index.js';
+import type { JSONObject, JSONValue } from '../types/json.js';
 import { registerAppSettings } from './internals/app-settings.js';
 import { registerCustomPost } from './internals/custom-post.js';
 import { registerInstallationSettings } from './internals/installation-settings.js';
@@ -103,21 +104,20 @@ export type DevvitDebug = {
 
 export class Devvit extends Actor {
   static debug: DevvitDebug = {};
-
   static #appSettings: SettingsFormField[] | undefined;
-  static #assets: AssetMap = {};
   static #config: Configuration = {};
   static #customPostType: CustomPostType | undefined;
-  static readonly #formDefinitions: Map<FormKey, FormDefinition> = new Map();
+  static #formDefinitions: Map<FormKey, FormDefinition> | undefined;
   static #installationSettings: SettingsFormField[] | undefined;
-  static readonly #menuItems: MenuItem[] = [];
-  static readonly #scheduledJobHandlers: Map<string, ScheduledJobHandler> = new Map();
+  static #menuItems: MenuItem[] | undefined;
+  static #scheduledJobHandlers: Map<string, ScheduledJobHandler> | undefined;
   static readonly #triggerOnEventHandlers: Map<
     TriggerEvent,
     TriggerOnEventHandler<OnTriggerRequest>[]
   > = new Map();
-  static #webViewAssets: AssetMap = {};
+  static #webViewAssets: Readonly<AssetMap> = {};
   static #domains: string[] = [];
+  static #scopes: protos.Scope[] = [];
 
   static #additionallyProvides: protos.Definition[] = [];
 
@@ -190,8 +190,15 @@ export class Devvit extends Actor {
       this.use(protos.RealtimeDefinition);
     }
 
-    if (pluginIsEnabled(config.userActions)) {
+    const userActionsConfig = config.userActions;
+    const hasScopes = typeof userActionsConfig === 'object' && 'scopes' in userActionsConfig;
+    const pluginEnabled: PluginSettings | boolean | undefined = hasScopes
+      ? { enabled: true }
+      : userActionsConfig;
+
+    if (pluginIsEnabled(pluginEnabled)) {
       this.use(protos.UserActionsDefinition);
+      this.#scopes = this.#getUserScopesFromConfig(config);
     }
   }
 
@@ -212,8 +219,9 @@ export class Devvit extends Actor {
    * });
    * ```
    */
-  static addMenuItem(menuItem: MenuItem): void {
-    this.#menuItems.push(menuItem);
+  static addMenuItem(item: MenuItem): void {
+    this._initMenu();
+    this.#menuItems!.push(item);
   }
 
   /**
@@ -257,8 +265,9 @@ export class Devvit extends Actor {
     form: T,
     onSubmit: FormOnSubmitEventHandler<FormToFormValues<T>>
   ): FormKey {
-    const formKey: FormKey = `form.${this.#formDefinitions.size}`;
-    this.#formDefinitions.set(formKey, {
+    this._initForms();
+    const formKey: FormKey = `form.${this.#formDefinitions!.size}`;
+    this.#formDefinitions!.set(formKey, {
       form,
       onSubmit,
     } as FormDefinition);
@@ -297,15 +306,13 @@ export class Devvit extends Actor {
    * ```
    */
   static addSchedulerJob<T extends JSONObject | undefined>(job: ScheduledJobType<T>): void {
-    if (!this.#pluginClients[protos.SchedulerDefinition.fullName]) {
-      this.use(protos.SchedulerDefinition);
-    }
+    this._initScheduler();
 
-    if (this.#scheduledJobHandlers.has(job.name)) {
+    if (this.#scheduledJobHandlers!.has(job.name)) {
       throw new Error(`Job ${job.name} is already defined`);
     }
 
-    this.#scheduledJobHandlers.set(
+    this.#scheduledJobHandlers!.set(
       job.name,
       job.onRun as ScheduledJobHandler<JSONObject | undefined>
     );
@@ -391,16 +398,16 @@ export class Devvit extends Actor {
       (field) => field.type !== 'group' && field.scope === SettingScope.App
     );
 
+    this._initSettings(appSettings.length > 0, installSettings.length > 0);
+
     if (installSettings.length > 0) {
       // initialize the installation settings with empty array if it is not initialized
-      this.#installationSettings ??= [];
-      this.#installationSettings.push(...installSettings);
+      this.#installationSettings!.push(...installSettings);
     }
 
     if (appSettings.length > 0) {
       // initialize the app settings with empty array if it is not initialized
-      this.#appSettings ??= [];
-      this.#appSettings.push(...appSettings);
+      this.#appSettings!.push(...appSettings);
     }
 
     assertValidFormFields([...(this.#installationSettings ?? []), ...(this.#appSettings ?? [])]);
@@ -412,7 +419,7 @@ export class Devvit extends Actor {
     // Save the settings to the global devvit object so that they can be accessed by the settings
     // plugin.
     // TODO: This should be set in the devvit.json config, saved on the bundle by the CLI,
-    //  and loaded into the globalThis.devvitSettings object by the bootstrap code.
+    //  and loaded into the globalThis.devvit.settings object by the bootstrap code.
     globalThis.devvit ??= {};
     globalThis.devvit.settings ??= {};
     globalThis.devvit.settings.app = this.#appSettings;
@@ -657,11 +664,11 @@ export class Devvit extends Actor {
   /** @internal */
   static get userActionsPlugin(): protos.UserActions {
     const userActionsAndRedditApiEnabled =
-      pluginIsEnabled(this.#config.userActions) && pluginIsEnabled(this.#config.redditAPI);
+      this.#scopes.length > 0 && pluginIsEnabled(this.#config.redditAPI);
 
     if (!userActionsAndRedditApiEnabled) {
       throw new Error(
-        'UserActions is not enabled. You can enable it by passing both `userActions: true` and `redditAPI: true` to `Devvit.configure`'
+        'UserActions is not enabled. You can enable it by passing scopes in `userActions: { scopes: [...scopes] }` and `redditAPI: true` to `Devvit.configure`'
       );
     }
 
@@ -669,8 +676,13 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
+  static get scopes(): Scope[] {
+    return this.#scopes;
+  }
+
+  /** @internal */
   static get menuItems(): MenuItem[] {
-    return this.#menuItems;
+    return this.#menuItems ?? [];
   }
 
   /** @internal */
@@ -679,12 +691,12 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static get formDefinitions(): Map<FormKey, FormDefinition> {
+  static get formDefinitions(): ReadonlyMap<FormKey, FormDefinition> | undefined {
     return this.#formDefinitions;
   }
 
   /** @internal */
-  static get scheduledJobHandlers(): Map<string, ScheduledJobHandler> {
+  static get scheduledJobHandlers(): ReadonlyMap<string, ScheduledJobHandler> | undefined {
     return this.#scheduledJobHandlers;
   }
 
@@ -699,28 +711,69 @@ export class Devvit extends Actor {
   }
 
   /** @internal */
-  static get triggerOnEventHandlers(): Map<
+  static get triggerOnEventHandlers(): ReadonlyMap<
     TriggerEvent,
     TriggerOnEventHandler<OnTriggerRequest>[]
   > {
     return this.#triggerOnEventHandlers;
   }
 
-  /** @internal */
-  static get assets(): AssetMap {
-    return this.#assets;
+  /** Do not cache. @internal */
+  static get assets(): Readonly<AssetMap> {
+    return globalThis.devvit?.assets ?? {};
   }
 
   /** @internal */
-  static get webViewAssets(): AssetMap {
+  static get webViewAssets(): Readonly<AssetMap> {
     return this.#webViewAssets;
+  }
+
+  /**
+   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * @internal
+   */
+  private static _initForms(): void {
+    this.#formDefinitions ??= new Map();
+  }
+
+  /**
+   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * @internal
+   */
+  private static _initMenu(): void {
+    this.#menuItems ??= [];
+  }
+
+  /**
+   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * @internal
+   */
+  private static _initScheduler(): void {
+    if (!this.#pluginClients[protos.SchedulerDefinition.fullName]) {
+      this.use(protos.SchedulerDefinition);
+    }
+    this.#scheduledJobHandlers ??= new Map();
+  }
+
+  /**
+   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * @internal
+   */
+  private static _initSettings(global: boolean, sub: boolean): void {
+    if (global) this.#appSettings ??= [];
+    if (sub) this.#installationSettings ??= [];
   }
 
   /** @internal */
   constructor(config: Config) {
     super(config);
 
-    Devvit.#assets = config.assets ?? {};
+    globalThis.devvit ??= {};
+    globalThis.devvit.assets ??= config.assets;
+    // __devvit__ is initialized by ESBuildPack for Webbit apps only.
+    // @ts-expect-error no type.
+    globalThis.devvit.appConfig ??= globalThis.__devvit__?.config;
+
     Devvit.#webViewAssets = config.webviewAssets ?? {};
 
     for (const fullName in Devvit.#uses) {
@@ -728,11 +781,15 @@ export class Devvit extends Actor {
       use.handler = config.use<UseHandler>(use.def);
     }
 
-    if (Devvit.#menuItems.length > 0) {
+    // Check for nonnullish provides, not length, since `devvit.json` may
+    // declare a service is provided but not actually populate it with any
+    // items. Any `LinkedBundle`  provides must have a server implementation.
+
+    if (Devvit.#menuItems) {
       registerMenuItems(config);
     }
 
-    if (Devvit.#scheduledJobHandlers.size > 0) {
+    if (Devvit.#scheduledJobHandlers) {
       registerScheduler(config);
     }
 
@@ -745,7 +802,7 @@ export class Devvit extends Actor {
       registerUIRequestHandlers(config);
     }
 
-    if (Devvit.#customPostType || Devvit.#formDefinitions.size > 0) {
+    if (Devvit.#customPostType || Devvit.#formDefinitions) {
       registerUIEventHandler(config);
     }
 
@@ -765,8 +822,54 @@ export class Devvit extends Actor {
       config.provides(provides);
     }
 
-    if (Devvit.#domains.length > 0) {
-      config.addPermissions({ requestedFetchDomains: Devvit.#domains });
+    if (Devvit.#domains.length > 0 || Devvit.#scopes.length > 0) {
+      config.addPermissions?.({
+        requestedFetchDomains: Devvit.#domains,
+        asUserScopes: Devvit.#scopes,
+      });
+    }
+  }
+
+  // For Blocks apps that enable UserActions but do not specify any scopes, they are implicitly granted SUBMIT_POST and SUBMIT_COMMENT.
+  // This is to maintain backwards compatibility with existing Blocks apps and allow them to omit scopes.
+  static #getUserScopesFromConfig(config: Configuration): Scope[] {
+    const configUserActions = config.userActions;
+    if (!configUserActions) return [];
+
+    // Case: Devvit.configure({ userActions: true })
+    if (typeof configUserActions === 'boolean' && configUserActions)
+      return [Scope.SUBMIT_POST, Scope.SUBMIT_COMMENT];
+
+    // Case: Devvit.configure({ userActions: { enabled: true } })
+    if (
+      typeof configUserActions === 'object' &&
+      'enabled' in configUserActions &&
+      configUserActions.enabled
+    ) {
+      return 'scopes' in configUserActions
+        ? (configUserActions.scopes as Scope[])
+        : [Scope.SUBMIT_POST, Scope.SUBMIT_COMMENT];
+    }
+
+    // Case: Devvit.configure({ userActions: { scopes: [...scopes] } })
+    if (typeof configUserActions === 'object' && 'scopes' in configUserActions)
+      return configUserActions.scopes;
+
+    // If none of the above cases are true, return no scopes.
+    return [];
+  }
+
+  /**
+   * Throws an error if the specified scope is not present in the Devvit.scopes configuration.
+   * @internal
+   * @param scope - The scope to check for.
+   */
+  static assertUserScope(scope: Scope): void {
+    const scopeName = Scope[scope];
+    if (!Devvit.scopes.includes(scope)) {
+      throw Error(
+        `To call this API with 'runAs: "USER"', set 'userActions: { scopes: [ Scope.${scopeName} ] }' in your Devvit.configure().`
+      );
     }
   }
 }
@@ -1092,17 +1195,5 @@ declare global {
     type Props<T extends {} = {}> = T & { children?: Devvit.ElementChildren };
 
     type ComponentFunction = (props: JSX.Props, context: Devvit.Context) => JSX.Element;
-  }
-}
-
-declare global {
-  namespace globalThis {
-    // eslint-disable-next-line no-var
-    var devvit: {
-      settings?: {
-        app?: FormField[] | undefined;
-        installation?: FormField[] | undefined;
-      };
-    };
   }
 }

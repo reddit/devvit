@@ -4,13 +4,13 @@ import {
   type Toast as ToastProto,
   ToastAppearance,
 } from '@devvit/protos';
-import type { Form } from '@devvit/shared/types/form.js';
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
+import type { Form } from '@devvit/shared';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Comment, Post, Subreddit, User } from '../../../../apis/reddit/models/index.js';
 import { assertValidFormFields } from '../../../../apis/ui/helpers/assertValidFormFields.js';
 import { transformFormFields } from '../../../../apis/ui/helpers/transformForm.js';
+import type { JSONObject, JSONValue } from '../../../../types/json.js';
 import type { Toast } from '../../../../types/toast.js';
 import type { UIClient as _UIClient } from '../../../../types/ui-client.js';
 import type { WebViewUIClient } from '../../../../types/web-view-ui-client.js';
@@ -116,18 +116,15 @@ export class UIClient implements _UIClient {
   navigateTo(comment: Pick<Comment, 'url'>): void;
   navigateTo(user: Pick<User, 'url'>): void;
   navigateTo(thingOrUrl: string | { url: string }): void {
-    let url: string;
-
-    if (typeof thingOrUrl === 'string') {
-      // Validate URL
-      url = new URL(thingOrUrl).toString();
-    } else {
-      url = new URL(thingOrUrl.url).toString();
+    const inputUrl = typeof thingOrUrl === 'string' ? thingOrUrl : thingOrUrl.url;
+    if (!URL.canParse(inputUrl)) {
+      throw new TypeError(`Invalid URL: ${inputUrl}`);
     }
-    this.#renderContext.emitEffect(url, {
+    const normalizedUrl = new URL(inputUrl).toString();
+    this.#renderContext.emitEffect(normalizedUrl, {
       type: EffectType.EFFECT_NAVIGATE_TO_URL,
       navigateToUrl: {
-        url,
+        url: normalizedUrl,
       },
     });
   }

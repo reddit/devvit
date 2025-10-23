@@ -1,0 +1,120 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Overview
+
+Client-side effects enable your Devvit app to provide interactive feedback and navigation to users. These effects include showing toasts, displaying forms, navigating to different pages, and more.
+
+<Tabs>
+  <TabItem value="web" label="Devvit Web">
+  
+  Import client functions from `@devvit/web/client`:
+
+  ```ts
+  import { showToast, showForm, navigateTo } from '@devvit/web/client';
+
+  // Show a toast notification
+  showToast('Hello from Devvit Web!');
+
+  // Navigate to a URL
+  navigateTo('https://www.reddit.com/r/webdev');
+
+  // Show a form and handle response
+  const result = await showForm({
+    form: {
+      fields: [
+        {
+          type: 'string',
+          name: 'username',
+          label: 'Username'
+        }
+      ]
+    }
+  });
+  
+  if (result) {
+    console.log('Form submitted:', result.username);
+  }
+  ```
+
+  </TabItem>
+  <TabItem value="blocks" label="Devvit Blocks / Mod Tools">
+  
+  Use context methods in event handlers and component render functions:
+
+  ```tsx
+  import { Devvit } from '@devvit/public-api';
+
+  // In a custom post component
+  Devvit.addCustomPostType({
+    name: 'Interactive Post',
+    render: (context) => {
+      return (
+        <vstack height="100%" alignment="middle center">
+          <button
+            onPress={() => {
+              context.ui.showToast('Button clicked!');
+            }}
+          >
+            Click me
+          </button>
+          <button
+            onPress={() => {
+              context.ui.showForm({
+                title: 'User Input',
+                fields: [
+                  {
+                    type: 'string',
+                    name: 'username',
+                    label: 'Username'
+                  }
+                ]
+              }, (values) => {
+                context.ui.showToast(`Hello ${values.username}!`);
+              });
+            }}
+          >
+            Show Form
+          </button>
+        </vstack>
+      );
+    },
+  });
+  ```
+
+  </TabItem>
+</Tabs>
+
+## Available client effects
+
+| Effect | Description | Devvit Web | Devvit Blocks |
+|--------|-------------|------------|---------------|
+| **Toast** | Show temporary notification messages | `showToast()` | `context.ui.showToast()` |
+| **Form** | Display interactive forms with promise-based responses | `showForm()` | `context.ui.showForm()` |
+| **Navigation** | Redirect to Reddit content or external URLs | `navigateTo()` | `context.ui.navigateTo()` |
+
+:::note When to use client library functions
+You should only use client library functions in response to a user-initiated action.
+:::
+
+## Menu responses
+
+In Devvit Web, menu items can respond with client effects after server processing.
+
+Menu responses allow you to:
+- Process data on the server before showing client effects
+- Chain multiple forms together in complex workflows  
+- Validate user permissions before allowing actions
+- Fetch external data to populate forms or display results
+
+For complete details and examples, see the [Menu Actions](./menu-actions.mdx) documentation.
+
+## Next steps
+
+Explore the specific documentation for each client effect:
+
+- [Toasts](./toasts.mdx) - Temporary notification messages
+- [Forms](./forms.mdx) - Interactive user input
+- [Navigation](./navigation.mdx) - Redirecting users
+- [Realtime](../realtime/overview.md) - Live updates and communication
+- Payments (Coming in September) - Transaction handling

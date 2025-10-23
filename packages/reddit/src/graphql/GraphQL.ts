@@ -1,8 +1,8 @@
 import type { Metadata, QueryResponse } from '@devvit/protos';
 import { context } from '@devvit/server';
-import type { JSONObject } from '@devvit/shared';
+import type { JsonObject } from '@devvit/shared';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
+import { getRedditApiPlugins } from '../plugin.js';
 
 export class GraphQL {
   /** @internal */
@@ -16,7 +16,7 @@ export class GraphQL {
   }
 
   /** @internal */
-  static query(operationName: string, id: string, variables: JSONObject): Promise<QueryResponse> {
+  static query(operationName: string, id: string, variables: JsonObject): Promise<QueryResponse> {
     return getRedditApiPlugins().GraphQL.PersistedQuery(
       {
         operationName,
@@ -28,6 +28,6 @@ export class GraphQL {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }

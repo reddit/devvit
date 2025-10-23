@@ -1,0 +1,9 @@
+# This file is used to automatically assign reviewers to PRs.
+# If you are a code owner, you will be automatically assigned to PRs that touch the files you own.
+#
+# Currently, all the teams and members are listed in [@reddit/devplatform](https://github.com/orgs/reddit/teams/devplatform).
+#
+# See GitHub's documentation for more info on CODEOWNERS and its syntax:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+* @reddit/devplatform

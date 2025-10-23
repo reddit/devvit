@@ -1,9 +1,9 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
-import type { T1ID, T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT3ID, asT5ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
+import type { T1ID, T2ID, T3ID, T5ID } from '../../types/tid.js';
+import { asT3ID, asT5ID, asTID, isT1ID, isT3ID } from '../../types/tid.js';
 import type {
   AboutSubredditTypes,
   AddRemovalNoteOptions,

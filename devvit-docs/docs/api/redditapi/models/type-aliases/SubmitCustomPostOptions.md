@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.19-dev**](../../README.md)
+[**@devvit/public-api v0.12.2-dev**](../../README.md)
 
 ---
 
@@ -7,6 +7,10 @@
 > **SubmitCustomPostOptions** = [`CommonSubmitPostOptions`](CommonSubmitPostOptions.md) & [`SubmitCustomPostTextFallbackOptions`](SubmitCustomPostTextFallbackOptions.md) & `object`
 
 ## Type declaration
+
+### postData?
+
+> `optional` **postData**: `PostData`
 
 ### preview
 

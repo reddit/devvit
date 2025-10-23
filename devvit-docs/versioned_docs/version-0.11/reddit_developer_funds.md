@@ -6,7 +6,7 @@ Reddit developer funds is a way for developers to earn money for the apps they b
 
 We want creative new apps that enrich the Reddit community through:
 
-- A new experience, like a [live score board](https://developers.reddit.com/docs/showcase/apps#live-scores) or [community bingo](https://developers.reddit.com/docs/showcase/apps#bingo)
+- A new experience, like a [live score board](./showcase/apps#live-scores) or [community bingo](./showcase/apps#bingo)
 - An entirely new community created around the app, like [r/pixelary](https://www.reddit.com/r/Pixelary/) or [r/riddonkulous](https://www.reddit.com/r/riddonkulous/)
 - A quality of life improvement that benefits hundreds of subreddits
 
@@ -45,7 +45,7 @@ Apps are not eligible if they previously received a payout under Developer Funds
 
 ## Program rules
 
-- After you create your developer account, you'll be able to onboard [here](https://www.reddit.com/contributor-program)
+- After you create your developer account, you'll be able to onboard [here](https://www.reddit.com/earn/enroll)
 - Apps can only qualify once for each reward tier.
 - Don’t use spam, bots, or other forms of view manipulation, which may result in your disqualification from the program
 - The community comes first. Apps should only be installed where relevant, useful, or enriching

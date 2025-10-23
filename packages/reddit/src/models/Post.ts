@@ -2,26 +2,35 @@ import type {
   Listing as ListingProto,
   Metadata,
   RedditObject,
-  SubmitRequest,
   SubmitResponse,
 } from '@devvit/protos';
 import type { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos';
-import { Block, UIResponse } from '@devvit/protos';
-import { BlocksReconciler } from '@devvit/public-api/devvit/internals/blocks/BlocksReconciler.js';
+import { Block, DevvitPostData, UIResponse } from '@devvit/protos';
+import { SetCustomPostPreviewRequest_BodyType } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import { type SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
-import type { T2ID, T3ID, T5ID } from '@devvit/shared-types/tid.js';
-import { asT2ID, asT3ID, asT5ID, isT3ID } from '@devvit/shared-types/tid.js';
+import type {
+  AppConfig,
+  AppPostEntrypointConfig,
+} from '@devvit/shared-types/schemas/config-file.v1.js';
+import { defaultPostEntry } from '@devvit/shared-types/schemas/constants.js';
+import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
+import { isT3, T2, T3, T5 } from '@devvit/shared-types/tid.js';
+import { Loading } from '@devvit/splash/loading.js';
+import { type SplashProps } from '@devvit/splash/splash.js';
+import { backgroundUrl } from '@devvit/splash/utils/assets.js';
 
-import { RunAs, type UserGeneratedContent } from '../common.js';
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
-import { getUserActionsPlugin } from '../getUserActionsPlugin.js';
+import { assertUserScope, RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
+import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
@@ -42,94 +51,19 @@ export type GetSortedPostsOptions = GetPostsOptionsWithTimeframe & {
 };
 
 export type GetHotPostsOptions = GetPostsOptions & {
+  // prettier-ignore
   location?:
-    | 'GLOBAL'
-    | 'US'
-    | 'AR'
-    | 'AU'
-    | 'BG'
-    | 'CA'
-    | 'CL'
-    | 'CO'
-    | 'HR'
-    | 'CZ'
-    | 'FI'
-    | 'FR'
-    | 'DE'
-    | 'GR'
-    | 'HU'
-    | 'IS'
-    | 'IN'
-    | 'IE'
-    | 'IT'
-    | 'JP'
-    | 'MY'
-    | 'MX'
-    | 'NZ'
-    | 'PH'
-    | 'PL'
-    | 'PT'
-    | 'PR'
-    | 'RO'
-    | 'RS'
-    | 'SG'
-    | 'ES'
-    | 'SE'
-    | 'TW'
-    | 'TH'
-    | 'TR'
-    | 'GB'
-    | 'US_WA'
-    | 'US_DE'
-    | 'US_DC'
-    | 'US_WI'
-    | 'US_WV'
-    | 'US_HI'
-    | 'US_FL'
-    | 'US_WY'
-    | 'US_NH'
-    | 'US_NJ'
-    | 'US_NM'
-    | 'US_TX'
-    | 'US_LA'
-    | 'US_NC'
-    | 'US_ND'
-    | 'US_NE'
-    | 'US_TN'
-    | 'US_NY'
-    | 'US_PA'
-    | 'US_CA'
-    | 'US_NV'
-    | 'US_VA'
-    | 'US_CO'
-    | 'US_AK'
-    | 'US_AL'
-    | 'US_AR'
-    | 'US_VT'
-    | 'US_IL'
-    | 'US_GA'
-    | 'US_IN'
-    | 'US_IA'
-    | 'US_OK'
-    | 'US_AZ'
-    | 'US_ID'
-    | 'US_CT'
-    | 'US_ME'
-    | 'US_MD'
-    | 'US_MA'
-    | 'US_OH'
-    | 'US_UT'
-    | 'US_MO'
-    | 'US_MN'
-    | 'US_MI'
-    | 'US_RI'
-    | 'US_KS'
-    | 'US_MT'
-    | 'US_MS'
-    | 'US_SC'
-    | 'US_KY'
-    | 'US_OR'
-    | 'US_SD';
+    | 'GLOBAL' | 'US' | 'AR' | 'AU' | 'BG' | 'CA' | 'CL' | 'CO' | 'HR' | 'CZ'
+    | 'FI' | 'FR' | 'DE' | 'GR' | 'HU' | 'IS' | 'IN' | 'IE' | 'IT' | 'JP' | 'MY'
+    | 'MX' | 'NZ' | 'PH' | 'PL' | 'PT' | 'PR' | 'RO' | 'RS' | 'SG' | 'ES' | 'SE'
+    | 'TW' | 'TH' | 'TR' | 'GB' | 'US_WA' | 'US_DE' | 'US_DC' | 'US_WI'
+    | 'US_WV' | 'US_HI' | 'US_FL' | 'US_WY' | 'US_NH' | 'US_NJ' | 'US_NM'
+    | 'US_TX' | 'US_LA' | 'US_NC' | 'US_ND' | 'US_NE' | 'US_TN' | 'US_NY'
+    | 'US_PA' | 'US_CA' | 'US_NV' | 'US_VA' | 'US_CO' | 'US_AK' | 'US_AL'
+    | 'US_AR' | 'US_VT' | 'US_IL' | 'US_GA' | 'US_IN' | 'US_IA' | 'US_OK'
+    | 'US_AZ' | 'US_ID' | 'US_CT' | 'US_ME' | 'US_MD' | 'US_MA' | 'US_OH'
+    | 'US_UT' | 'US_MO' | 'US_MN' | 'US_MI' | 'US_RI' | 'US_KS' | 'US_MT'
+    | 'US_MS' | 'US_SC' | 'US_KY' | 'US_OR' | 'US_SD';
 };
 
 export type GetPostsByUserOptions = {
@@ -179,7 +113,6 @@ export type CustomPostTextFallbackOptions =
       richtext: CustomPostRichTextFallback;
     };
 
-// TODO - refactor submit post options
 export type SubmitLinkOptions = CommonSubmitPostOptions & {
   url: string;
   /**
@@ -200,17 +133,78 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
   imageUrls?: [string];
 };
 
-export type SubmitSelfPostOptions = PostTextOptions & CommonSubmitPostOptions;
+export type SubmitSelfPostOptions = CommonSubmitPostOptions & PostTextOptions;
 
-export type SubmitCustomPostTextFallbackOptions = {
-  textFallback?: CustomPostTextFallbackOptions;
+export type SubmitCustomPostSplashOptions = Omit<
+  SplashProps,
+  'appDisplayName' | 'backgroundUri' | 'entryUri' | 'height'
+> & {
+  /**
+   * Application name.
+   *
+   * @example `'Comment Mop'`.
+   */
+  appDisplayName?: string;
+  /**
+   * Media directory relative background image URL without a leading slash or
+   * data URI.
+   *
+   * @example `'background.png'`.
+   */
+  backgroundUri?: string;
+  /**
+   * The loading screen entrypoint name. Must correspond to a `post.entrypoints`
+   * key in the app's `devvit.json`.
+   *
+   * @default The default `devvit.json` entrypoint (`'default'`).
+   *
+   * @example Only `'default'` and `'splash'` are valid entries given the
+   * following `devvit.json` configuration:
+   * ```json
+   * {
+   *   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+   *   "name": "example",
+   *   "post": {
+   *     "entrypoints": {
+   *       "default": {"entry": "game.html"},
+   *       "splash": {"entry": "splash.html"}
+   *     }
+   *   }
+   * }
+   * ```
+   */
+  entry?: string;
 };
 
-export type SubmitCustomPostOptions = CommonSubmitPostOptions &
-  SubmitCustomPostTextFallbackOptions & {
-    preview: JSX.Element;
-    userGeneratedContent?: UserGeneratedContent;
-  };
+export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
+  /**
+   * Arbitrary data to associate to the post. Limited to two kilobytes.
+   *
+   * @see {@link PostData}.
+   */
+  postData?: PostData;
+  /** Content to show when rendered on `https://old.reddit.com`. */
+  textFallback?: CustomPostTextFallbackOptions;
+  userGeneratedContent?: UserGeneratedContent;
+  /**
+   * Override the splash loading screen with the provided Blocks component.
+   * @example
+   * ```ts
+   * Devvit.createElement(
+   *   'blocks',
+   *   {height: 'tall'},
+   *   Devvit.createElement(
+   *     'vstack',
+   *     {backgroundColor: '#abc123', height: '100%'},
+   *     Devvit.createElement('text', {}, 'hello'),
+   *   ),
+   * )
+   * ```
+   * @deprecated Use only `splash` instead.
+   */
+  loading?: JSX.Element;
+  splash?: SubmitCustomPostSplashOptions;
+};
 
 export type CommonSubmitPostOptions = {
   title: string;
@@ -222,25 +216,21 @@ export type CommonSubmitPostOptions = {
   runAs?: 'USER' | 'APP';
 };
 
-export type SubmitPostOptions = (
-  | SubmitLinkOptions
-  | SubmitSelfPostOptions
-  | SubmitCustomPostOptions
-  | SubmitMediaOptions
-) & {
+export type SubredditOptions = {
+  /** The name of the subreddit without a leading r/. Eg, `'Pixelary'`. */
   subredditName: string;
 };
 
-const SetCustomPostPreviewRequestBodyType = {
-  NONE: 0,
-  BLOCKS: 1,
-  UNRECOGNIZED: -1,
-} as const;
+/** Link, self, or media post options exclusively. */
+export type SubmitPostOptions =
+  | (SubmitLinkOptions & { richtext?: never; text?: never; kind?: never })
+  | (SubmitSelfPostOptions & { kind?: never; url?: never })
+  | (SubmitMediaOptions & { richtext?: never; text?: never; url?: never });
 
-export type CrosspostOptions = CommonSubmitPostOptions & {
-  subredditName: string;
-  postId: string;
-};
+export type CrosspostOptions = CommonSubmitPostOptions &
+  SubredditOptions & {
+    postId: T3;
+  };
 
 export type LinkFlair = {
   /**
@@ -297,7 +287,7 @@ export type LinkFlair = {
  * when a user posts a link to that resource, without having to parse the resource directly.
  * See: https://oembed.com/
  */
-export type OEmbed = {
+export type Oembed = {
   /** The resource type. Valid values, along with value-specific parameters, are described below. E.g. "video" */
   type: string;
   /** A text title, describing the resource. */
@@ -353,9 +343,9 @@ export type RedditVideo = {
 };
 
 export type SecureMedia = {
-  /** The type of the OEmbed media, if present (e.g. "youtube.com") */
+  /** The type of the oEmbed media, if present (e.g. "youtube.com") */
   type?: string | undefined;
-  oembed?: OEmbed | undefined;
+  oembed?: Oembed | undefined;
   redditVideo?: RedditVideo | undefined;
 };
 
@@ -402,11 +392,11 @@ export type GalleryMedia = {
 };
 
 export class Post {
-  #id: T3ID;
-  #authorId: T2ID | undefined;
+  #id: T3;
+  #authorId: T2 | undefined;
   #authorName: string;
   #createdAt: Date;
-  #subredditId: T5ID;
+  #subredditId: T5;
   #subredditName: string;
   #permalink: string;
   #title: string;
@@ -461,11 +451,11 @@ export class Post {
     assertNonNull(data.url, 'Post is missing url');
     assertNonNull(data.permalink, 'Post is missing permalink');
 
-    this.#id = asT3ID(`t3_${data.id}`);
+    this.#id = `t3_${data.id}`;
 
     this.#authorName = data.author;
-    this.#authorId = data.authorFullname ? asT2ID(data.authorFullname) : undefined;
-    this.#subredditId = asT5ID(data.subredditId);
+    this.#authorId = data.authorFullname ? T2(data.authorFullname) : undefined;
+    this.#subredditId = T5(data.subredditId);
     this.#subredditName = data.subreddit;
     this.#score = data.score ?? 0;
     this.#numberOfComments = data.numComments ?? 0;
@@ -559,11 +549,11 @@ export class Post {
     }
   }
 
-  get id(): T3ID {
+  get id(): T3 {
     return this.#id;
   }
 
-  get authorId(): T2ID | undefined {
+  get authorId(): T2 | undefined {
     return this.#authorId;
   }
 
@@ -571,7 +561,7 @@ export class Post {
     return this.#authorName;
   }
 
-  get subredditId(): T5ID {
+  get subredditId(): T5 {
     return this.#subredditId;
   }
 
@@ -859,10 +849,10 @@ export class Post {
     return this.#distinguishedBy;
   }
 
-  async edit(options: PostTextOptions): Promise<void> {
+  async edit(opts: Readonly<PostTextOptions>): Promise<void> {
     const newPost = await Post.edit({
       id: this.id,
-      ...options,
+      ...opts,
     });
 
     this.#body = newPost.body;
@@ -888,32 +878,121 @@ export class Post {
   }
 
   /**
-   * Set a lightweight UI that shows while the custom post renders
+   * Get the postData for the custom post.
    *
-   * @param {JSX.ComponentFunction} ui - A JSX component function that returns a simple ui to be rendered.
-   * @throws {Error} Throws an error if the preview could not be set.
    * @example
    * ```ts
-   * const preview = (
-   *   <vstack height="100%" width="100%" alignment="middle center">
-   *     <text size="large">An updated preview!</text>
-   *   </vstack>
-   * );
    * const post = await reddit.getPostById(context.postId);
-   * await post.setCustomPostPreview(() => preview);
+   * const postData = await post.getPostData();
    * ```
    */
-  async setCustomPostPreview(ui: JSX.ComponentFunction): Promise<void> {
-    await Post.setCustomPostPreview({
-      id: this.id,
-      ui,
+  async getPostData(): Promise<PostData | undefined> {
+    const devvitPostData = await Post.getDevvitPostData(this.id);
+    return devvitPostData?.developerData;
+  }
+
+  /**
+   * Set the postData for the custom post. This will replace the existing
+   * postData with the postData specified in the input.
+   *
+   * @param postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
+   * @throws {Error} Throws an error if the postData could not be set.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   *
+   * // Existing postData: { settings: { theme: 'dark', fontSize: 12 } }
+   *
+   * await post.setPostData({
+   *   currentScore: 55,
+   *   secretWord: 'barbeque',
+   * });
+   * // Result: { currentScore: 55, secretWord: 'barbeque' }
+   * ```
+   */
+  async setPostData(postData: PostData): Promise<void> {
+    const prev = await Post.getDevvitPostData(this.id);
+    await Post.setPostData({ postId: this.id, postData: { ...prev, developerData: postData } });
+  }
+
+  /**
+   * Merge the postData on a custom post with the postData specified in the input. This performs a shallow merge.
+   *
+   * @param postData - Represents the postData to be merged with the existing postData.
+   * @throws {Error} Throws an error if the postData could not be merged.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   *
+   * // Existing postData: { currentScore: 55, settings: { theme: 'dark', fontSize: 12 } }
+   *
+   * await post.mergePostData({ settings: { fontSize: 14 } });
+   * // Result: { currentScore: 55, settings: { fontSize: 14 } }
+   * ```
+   */
+  async mergePostData(postData: PostData): Promise<void> {
+    const prev = await Post.getDevvitPostData(this.id);
+    const mergedDeveloperData = { ...prev?.developerData, ...postData };
+    await Post.setPostData({
+      postId: this.id,
+      postData: { ...prev, developerData: mergedDeveloperData },
     });
   }
 
   /**
-   * Set a text fallback for the custom post
+   * Set the launch and loading screens for the custom post.
    *
-   * @param {CustomPostTextFallbackOptions} options - A text or a richtext to render in a fallback
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   * await post.setSplash({ appDisplayName: "Pixelary" });
+   * ```
+   */
+  async setSplash(opts: Readonly<SubmitCustomPostSplashOptions> | undefined): Promise<void> {
+    const prev = await Post.getDevvitPostData(this.id);
+    const config = getConfig();
+    const entry = getEntry(config, opts?.entry);
+    const splash = SplashPostData(config, entry, opts, this.title);
+    await Promise.all([
+      Post.setPostData({ postId: this.id, postData: { ...prev, splash } }),
+      this.#setCustomPostPreview(
+        Loading({
+          appDisplayName: splash.appDisplayName,
+          backgroundUri: splash.backgroundUri,
+          height: entry.height,
+        })
+      ),
+    ]);
+  }
+
+  /**
+   * Override the splash loading screen with the provided Blocks component for
+   * the custom post.
+   *
+   * @example
+   * ```ts
+   * const loading = Devvit.createElement(
+   *   'blocks',
+   *   {height: 'tall'},
+   *   Devvit.createElement(
+   *     'vstack',
+   *     {backgroundColor: '#abc123', height: '100%'},
+   *     Devvit.createElement('text', {}, 'hello'),
+   *   ),
+   * )
+   * const post = await reddit.getPostById(context.postId);
+   * await post.setLoadingScreen(loading);
+   * ```
+   * @deprecated Use only `setSplash()` instead.
+   */
+  async setLoadingScreen(loading: JSX.Element): Promise<void> {
+    await this.#setCustomPostPreview(loading);
+  }
+
+  /**
+   * Set a text fallback for the custom post.
+   *
+   * @param opts - A text or a richtext to render in a fallback
    * @throws {Error} Throws an error if the fallback could not be set.
    * @example
    * ```ts
@@ -923,17 +1002,17 @@ export class Post {
    * await post.setTextFallback(newTextFallback);
    * ```
    */
-  async setTextFallback(options: CustomPostTextFallbackOptions): Promise<void> {
-    const newPost = await Post.setTextFallback(options, this.id);
+  async setTextFallback(opts: Readonly<CustomPostTextFallbackOptions>): Promise<void> {
+    const newPost = await Post.setTextFallback(opts, this.id);
 
     this.#body = newPost.body;
     this.#edited = newPost.edited;
   }
 
-  async addComment(options: CommentSubmissionOptions): Promise<Comment> {
+  async addComment(opts: Readonly<CommentSubmissionOptions>): Promise<Comment> {
     return Comment.submit({
       id: this.id,
-      ...options,
+      ...opts,
     });
   }
 
@@ -1037,11 +1116,8 @@ export class Post {
     return User.getByUsername(this.#authorName);
   }
 
-  async crosspost(options: Omit<CrosspostOptions, 'postId'>): Promise<Post> {
-    return Post.crosspost({
-      ...options,
-      postId: this.id,
-    });
+  async crosspost(opts: Readonly<Omit<CrosspostOptions, 'postId'>>): Promise<Post> {
+    return Post.crosspost({ ...opts, postId: this.id });
   }
 
   /**
@@ -1051,8 +1127,8 @@ export class Post {
    * @param options.modNote the reason for removal (maximum 100 characters) (optional)
    * @returns
    */
-  addRemovalNote(options: { reasonId: string; modNote?: string }): Promise<void> {
-    return ModNote.addRemovalNote({ itemIds: [this.#id], ...options });
+  addRemovalNote(opts: { readonly reasonId: string; readonly modNote?: string }): Promise<void> {
+    return ModNote.addRemovalNote({ itemIds: [this.#id], ...opts });
   }
 
   /**
@@ -1076,166 +1152,175 @@ export class Post {
   // TODO: flair methods
 
   /** @internal */
-  static async getById(id: T3ID): Promise<Post> {
+  static async getById(id: T3): Promise<Post> {
     const client = getRedditApiPlugins().LinksAndComments;
 
-    const postId: T3ID = isT3ID(id) ? id : `t3_${id}`;
+    const postId: T3 = isT3(id) ? id : `t3_${id}`;
 
-    const response = await client.Info(
+    const rsp = await client.Info(
       {
         subreddits: [],
         thingIds: [postId],
       },
-      this.#metadata
+      context.metadata
     );
 
-    if (!response.data?.children?.length) {
-      throw new Error('could not find post');
-    }
+    if (!rsp.data?.children?.length) throw Error(`no post ${id}`);
 
-    const postData = response.data.children[0];
+    const postData = rsp.data.children[0];
 
-    if (!postData?.data) {
-      throw new Error('could not find post');
-    }
+    if (!postData?.data) throw Error(`no post ${id}`);
 
     return new Post(postData.data);
   }
 
   /** @internal */
-  static async submit(options: SubmitPostOptions): Promise<Post> {
-    const { runAs = 'APP' } = options;
-    const runAsType = RunAs[runAs];
+  static async submit(opts: Readonly<SubredditOptions & SubmitPostOptions>): Promise<Post> {
+    const runAsType = RunAs[opts.runAs ?? 'APP'];
     const client =
       runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
 
-    let response: SubmitResponse;
-
-    if ('preview' in options) {
-      if (runAsType === RunAs.USER) {
-        assertNonNull(
-          options.userGeneratedContent,
-          'userGeneratedContent must be set in `SubmitPostOptions` when RunAs=USER for experience posts'
-        );
-      }
-      const reconciler = new BlocksReconciler(
-        () => options.preview,
-        undefined,
-        {},
-        this.#metadata,
-        undefined
-      );
-      const previewBlock = await reconciler.buildBlocksUI();
-      const encodedCached = Block.encode(previewBlock).finish();
-
-      const { textFallback, ...sanitizedOptions } = options;
-      const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
-
-      const userGeneratedContent = options.userGeneratedContent
-        ? {
-            text: options.userGeneratedContent.text ?? '',
-            imageUrls: options.userGeneratedContent.imageUrls ?? [],
-          }
-        : undefined;
-
-      const submitRequest: SubmitRequest = {
-        kind: 'custom',
-        sr: options.subredditName,
-        richtextJson: Buffer.from(encodedCached).toString('base64'),
-        richtextFallback,
-        ...sanitizedOptions,
-        userGeneratedContent,
-        runAs: runAsType,
-      };
-
-      response = await client.SubmitCustomPost(submitRequest, this.#metadata);
-    } else {
-      response = await client.Submit(
-        {
-          kind: 'kind' in options ? options.kind : 'url' in options ? 'link' : 'self',
-          sr: options.subredditName,
-          richtextJson: 'richtext' in options ? richtextToString(options.richtext) : undefined,
-          ...options,
-          runAs: runAsType,
-        },
-        this.#metadata
-      );
+    if (runAsType === RunAs.USER) {
+      assertUserScope(Scope.SUBMIT_POST);
     }
+
+    const rsp = await client.Submit(
+      {
+        kind: 'kind' in opts ? opts.kind : 'url' in opts ? 'link' : 'self',
+        sr: opts.subredditName,
+        richtextJson: 'richtext' in opts ? richtextToString(opts.richtext) : undefined,
+        ...opts,
+        runAs: runAsType,
+      },
+      context.metadata
+    );
 
     // Post Id might not be present as image/video post creation can happen asynchronously
-    const isAllowedMediaType =
-      'kind' in options && ['image', 'video', 'videogif'].includes(options.kind);
-    if (isAllowedMediaType && !response.json?.data?.id) {
-      if (options.kind === 'image' && 'imageUrls' in options) {
+    const isAllowedMediaType = 'kind' in opts && ['image', 'video', 'videogif'].includes(opts.kind);
+    if (isAllowedMediaType && !rsp.json?.data?.id) {
+      if (opts.kind === 'image' && 'imageUrls' in opts) {
         throw new Error(
-          `Image post type with ${options.imageUrls} is being created asynchronously and should be updated in the subreddit soon.`
+          `Image post type with ${opts.imageUrls} is being created asynchronously and should be updated in the subreddit soon.`
         );
-      } else if ('videoPosterUrl' in options) {
+      } else if ('videoPosterUrl' in opts) {
         throw new Error(
-          `Post of ${options.kind} type with ${options.videoPosterUrl} is being created asynchronously and should be updated in the subreddit soon.`
+          `Post of ${opts.kind} type with ${opts.videoPosterUrl} is being created asynchronously and should be updated in the subreddit soon.`
         );
       }
     }
 
-    if (!response.json?.data?.id || response.json?.errors?.length) {
-      throw new Error(
-        `failed to submit post - either post ID is empty or request failed with errors: ${response.json?.errors}`
-      );
-    }
-
-    return Post.getById(`t3_${response.json.data.id}`);
+    return postFromSubmitResponse(rsp);
   }
 
   /** @internal */
-  static async crosspost(options: CrosspostOptions): Promise<Post> {
-    const { runAs = 'APP' } = options;
+  static async submitCustomPost(
+    opts: Readonly<SubredditOptions & SubmitCustomPostOptions>
+  ): Promise<Post> {
+    const runAsType = RunAs[opts.runAs ?? 'APP'];
+    if (runAsType === RunAs.USER && !opts.userGeneratedContent) {
+      throw Error('userGeneratedContent must be set when `runAs` is `USER`');
+    }
+    if (runAsType === RunAs.USER) {
+      assertUserScope(Scope.SUBMIT_POST);
+    }
+
+    const config = getConfig();
+    const entry = getEntry(config, opts.splash?.entry);
+    const splash = SplashPostData(config, entry, opts.splash, opts.title);
+    const richtextJson = await renderLoadingAsRichTextJson(
+      'loading' in opts
+        ? opts.loading
+        : Loading({
+            appDisplayName: splash.appDisplayName,
+            backgroundUri: splash.backgroundUri,
+            height: entry.height,
+          }),
+      context.metadata
+    );
+
+    const richtextFallback = opts.textFallback
+      ? getCustomPostRichTextFallback(opts.textFallback)
+      : '';
+
+    const userGeneratedContent = opts.userGeneratedContent
+      ? {
+          text: opts.userGeneratedContent.text ?? '',
+          imageUrls: opts.userGeneratedContent.imageUrls ?? [],
+        }
+      : undefined;
+
+    const client =
+      runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
+    const rsp = await client.SubmitCustomPost(
+      {
+        kind: 'custom',
+        sr: opts.subredditName,
+        richtextJson,
+        richtextFallback,
+        flairId: opts.flairId,
+        flairText: opts.flairText,
+        nsfw: opts.nsfw,
+        sendreplies: opts.sendreplies,
+        spoiler: opts.spoiler,
+        title: opts.title,
+        userGeneratedContent,
+        runAs: runAsType,
+        postData: { developerData: opts.postData, splash },
+      },
+      context.metadata
+    );
+    return postFromSubmitResponse(rsp);
+  }
+
+  /** @internal */
+  static async crosspost(opts: Readonly<CrosspostOptions>): Promise<Post> {
+    const { runAs = 'APP' } = opts;
     const runAsType = RunAs[runAs];
     const client =
       runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
-    const { postId, subredditName, ...rest } = options;
+    const { postId, subredditName, ...rest } = opts;
 
-    const response = await client.Submit(
+    if (runAsType === RunAs.USER) {
+      assertUserScope(Scope.SUBMIT_POST);
+    }
+
+    const rsp = await client.Submit(
       {
         kind: 'crosspost',
         sr: subredditName,
-        crosspostFullname: asT3ID(postId),
+        crosspostFullname: postId,
         ...rest,
         runAs: runAsType,
       },
-      this.#metadata
+      context.metadata
     );
 
-    if (!response.json?.data?.id || response.json?.errors?.length) {
-      throw new Error('failed to crosspost post');
-    }
-
-    return Post.getById(`t3_${response.json.data.id}`);
+    return postFromSubmitResponse(rsp);
   }
 
   /** @internal */
-  static async edit(options: PostTextOptions & { id: T3ID }): Promise<Post> {
+  static async edit(opts: Readonly<PostTextOptions & { id: T3 }>): Promise<Post> {
     const client = getRedditApiPlugins().LinksAndComments;
 
-    const { id } = options;
+    const { id } = opts;
 
     let richtextString: string | undefined;
-    if ('richtext' in options) {
-      richtextString = richtextToString(options.richtext);
+    if ('richtext' in opts) {
+      richtextString = richtextToString(opts.richtext);
     }
 
-    const response = await client.EditUserText(
+    const rsp = await client.EditUserText(
       {
         thingId: id,
-        text: 'text' in options ? options.text : '',
+        text: 'text' in opts ? opts.text : '',
         richtextJson: richtextString,
         runAs: RunAs.APP,
       },
-      this.#metadata
+      context.metadata
     );
 
-    if (response.json?.errors?.length) {
-      throw new Error('Failed to edit post');
-    }
+    if (rsp.json?.errors?.length)
+      throw Error(`post ${id} edit failed: ${rsp.json?.errors.join(', ')}`);
 
     // The LinksAndComments.EditUserText response is wrong and assumes that
     // the API is only used to for comments so we fetch the new post here.
@@ -1243,104 +1328,121 @@ export class Post {
   }
 
   /** @internal */
-  static async setSuggestedCommentSort(options: {
+  static async setSuggestedCommentSort(opts: {
     suggestedSort: PostSuggestedCommentSort;
-    id: T3ID;
-    subredditId: T5ID;
+    id: T3;
+    subredditId: T5;
   }): Promise<void> {
     const operationName = 'SetSuggestedSort';
     const persistedQueryHash = 'cf6052acc7fefaa65b710625b81dba8041f258313aafe9730e2a3dc855e5d10d';
-    const response = await GraphQL.query(operationName, persistedQueryHash, {
+    const rsp = await GraphQL.query(operationName, persistedQueryHash, {
       input: {
-        subredditId: options.subredditId,
-        postId: options.id,
-        sort: options.suggestedSort,
+        subredditId: opts.subredditId,
+        postId: opts.id,
+        sort: opts.suggestedSort,
       },
     });
 
-    if (!response.data?.setSuggestedSort?.ok) {
-      throw new Error('Failed to set suggested sort');
+    if (!rsp.data?.setSuggestedSort?.ok)
+      throw Error(
+        `set post ${opts.id} suggested comment sort failed: ${rsp.errors.map((err) => `error ${err.code} (${err.message})`).join('; ')}`
+      );
+  }
+
+  /** @internal */
+  static async getDevvitPostData(id: T3): Promise<DevvitPostData | undefined> {
+    const operationName = 'GetDevvitPostData';
+    const persistedQueryHash = 'd349c9bee385336e44837c4a041d4b366fa32f16121cef7f12e1e3f230340696';
+    const rsp = await GraphQL.query(operationName, persistedQueryHash, {
+      id,
+    });
+
+    // to-do: why is postInfoById a `Record<string, any>`?
+    if (rsp.data?.postInfoById?.errors?.length) {
+      throw new Error(
+        `Failed to get devvit post data due to errors: ${rsp.data?.postInfoById?.errors.join(', ')}`
+      );
     }
+
+    // GQL returns postData as a JSON string
+    const devvitPostData: string = rsp.data?.postInfoById?.devvit?.postData;
+
+    if (!devvitPostData) {
+      return undefined;
+    }
+
+    return JSON.parse(devvitPostData) as DevvitPostData;
   }
 
   /** @internal */
-  static async setCustomPostPreview(options: {
-    id: T3ID;
-    ui: JSX.ComponentFunction;
-  }): Promise<void> {
-    const client = getRedditApiPlugins().LinksAndComments;
-
-    const handler = new BlocksHandler(options.ui);
-    const handlerResponse = UIResponse.fromJSON(
-      await handler.handle({ events: [] }, this.#metadata)
-    );
-    const block = handlerResponse.blocks as Block;
-    const blocksRenderContent = Buffer.from(Block.encode(block).finish()).toString('base64');
-
-    await client.SetCustomPostPreview(
-      {
-        thingId: options.id,
-        bodyType: SetCustomPostPreviewRequestBodyType.BLOCKS,
-        blocksRenderContent,
-      },
-      this.#metadata
-    );
+  static async setPostData(opts: { postId: T3; postData: DevvitPostData }): Promise<void> {
+    const [rsp] = await Promise.all([
+      getRedditApiPlugins().LinksAndComments.EditCustomPost(
+        {
+          thingId: opts.postId,
+          postData: opts.postData,
+        },
+        context.metadata
+      ),
+    ]);
+    if (rsp.json?.errors?.length)
+      // to-do: why is errors `Any[]`?
+      throw Error(`set post ${opts.postId} data failed: ${JSON.stringify(rsp.json.errors)}`);
   }
 
   /** @internal */
-  static async setTextFallback(
-    options: CustomPostTextFallbackOptions,
-    postId: T3ID
-  ): Promise<Post> {
-    if (!('text' in options) && !('richtext' in options)) {
+  static async setTextFallback(opts: CustomPostTextFallbackOptions, postId: T3): Promise<Post> {
+    if (!('text' in opts) && !('richtext' in opts)) {
       throw new Error(`No text fallback provided for post ${postId}.`);
     }
 
     const client = getRedditApiPlugins().LinksAndComments;
 
-    const richtextFallback = getCustomPostRichTextFallback(options);
+    const richtextFallback = getCustomPostRichTextFallback(opts);
 
-    const response = await client.EditCustomPost(
+    const rsp = await client.EditCustomPost(
       {
         thingId: postId,
         richtextFallback,
+        // to-do: remove once server doesn't wipe post data (DXC-2359).
+        postData: await this.getDevvitPostData(postId),
       },
-      this.#metadata
+      context.metadata
     );
 
-    if (response.json?.errors?.length) {
-      throw new Error('Failed to set post text fallback');
-    }
+    if (rsp.json?.errors?.length)
+      // to-do: why is errors `Any[]`?
+      throw Error(`set post ${postId} text fallback failed: ${JSON.stringify(rsp.json.errors)}`);
 
     return Post.getById(postId);
   }
 
   /** @internal */
-  static async delete(id: T3ID): Promise<void> {
+  static async delete(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Del(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async approve(id: T3ID): Promise<void> {
+  static async approve(id: T3): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.Approve(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async remove(id: T3ID, isSpam: boolean = false): Promise<void> {
+  static async remove(id: T3, isSpam: boolean = false): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.Remove(
@@ -1348,83 +1450,96 @@ export class Post {
         id,
         spam: isSpam,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async hide(id: T3ID): Promise<void> {
+  static async hide(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Hide(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async unhide(id: T3ID): Promise<void> {
+  static async unhide(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Unhide(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async markAsNsfw(id: T3ID): Promise<void> {
+  static async markAsNsfw(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.MarkNSFW(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
   /** @internal */
-  static async unmarkAsNsfw(id: T3ID): Promise<void> {
+  static async unmarkAsNsfw(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.UnmarkNSFW(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async markAsSpoiler(id: T3ID): Promise<void> {
+  static async markAsSpoiler(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Spoiler(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async unmarkAsSpoiler(id: T3ID): Promise<void> {
+  static async unmarkAsSpoiler(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Unspoiler(
       {
         id,
       },
-      this.#metadata
+      context.metadata
+    );
+  }
+
+  async #setCustomPostPreview(loading: JSX.Element): Promise<void> {
+    const richtextJson = await renderLoadingAsRichTextJson(loading, context.metadata);
+    const client = getRedditApiPlugins().LinksAndComments;
+    await client.SetCustomPostPreview(
+      {
+        thingId: this.id,
+        bodyType: SetCustomPostPreviewRequest_BodyType.BLOCKS,
+        blocksRenderContent: richtextJson,
+      },
+      context.metadata
     );
   }
 
   /** @internal */
-  static async sticky(id: T3ID, position: 1 | 2 | 3 | 4 | undefined): Promise<void> {
+  static async sticky(id: T3, position: 1 | 2 | 3 | 4 | undefined): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.SetSubredditSticky(
@@ -1433,12 +1548,12 @@ export class Post {
         state: true,
         num: position,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async unsticky(id: T3ID): Promise<void> {
+  static async unsticky(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.SetSubredditSticky(
@@ -1446,37 +1561,37 @@ export class Post {
         id,
         state: false,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async lock(id: T3ID): Promise<void> {
+  static async lock(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Lock(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async unlock(id: T3ID): Promise<void> {
+  static async unlock(id: T3): Promise<void> {
     const client = getRedditApiPlugins().LinksAndComments;
 
     await client.Unlock(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
   static async distinguish(
-    id: T3ID,
+    id: T3,
     asAdmin: boolean
   ): Promise<{ distinguishedBy: string | undefined }> {
     const client = getRedditApiPlugins().Moderation;
@@ -1487,7 +1602,7 @@ export class Post {
         how: asAdmin ? 'admin' : 'yes',
         sticky: false,
       },
-      this.#metadata
+      context.metadata
     );
 
     const post = response.json?.data?.things?.[0]?.data;
@@ -1500,7 +1615,7 @@ export class Post {
   }
 
   /** @internal */
-  static async undistinguish(id: T3ID): Promise<{ distinguishedBy: string | undefined }> {
+  static async undistinguish(id: T3): Promise<{ distinguishedBy: string | undefined }> {
     const client = getRedditApiPlugins().Moderation;
 
     const response = await client.Distinguish(
@@ -1509,7 +1624,7 @@ export class Post {
         how: 'no',
         sticky: false,
       },
-      this.#metadata
+      context.metadata
     );
 
     const post = response.json?.data?.things?.[0]?.data;
@@ -1522,65 +1637,59 @@ export class Post {
   }
 
   /** @internal */
-  static async ignoreReports(id: T3ID): Promise<void> {
+  static async ignoreReports(id: T3): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.IgnoreReports(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static async unignoreReports(id: T3ID): Promise<void> {
+  static async unignoreReports(id: T3): Promise<void> {
     const client = getRedditApiPlugins().Moderation;
 
     await client.UnignoreReports(
       {
         id,
       },
-      this.#metadata
+      context.metadata
     );
   }
 
   /** @internal */
-  static getControversialPosts(options: GetPostsOptionsWithTimeframe = {}): Listing<Post> {
-    return this.getSortedPosts({
-      ...options,
-      sort: 'controversial',
-    });
+  static getControversialPosts(opts: Readonly<GetPostsOptionsWithTimeframe>): Listing<Post> {
+    return this.getSortedPosts({ ...opts, sort: 'controversial' });
   }
 
   /** @internal */
-  static getTopPosts(options: GetPostsOptionsWithTimeframe = {}): Listing<Post> {
-    return this.getSortedPosts({
-      ...options,
-      sort: 'top',
-    });
+  static getTopPosts(opts: Readonly<GetPostsOptionsWithTimeframe>): Listing<Post> {
+    return this.getSortedPosts({ ...opts, sort: 'top' });
   }
 
   /** @internal */
-  static getSortedPosts(options: GetSortedPostsOptions): Listing<Post> {
+  static getSortedPosts(opts: Readonly<GetSortedPostsOptions>): Listing<Post> {
     const client = getRedditApiPlugins().Listings;
 
     return new Listing({
       hasMore: true,
-      before: options.before,
-      after: options.after,
-      pageSize: options.pageSize,
-      limit: options.limit,
-      fetch: async (fetchOptions: ListingFetchOptions) => {
+      before: opts.before,
+      after: opts.after,
+      pageSize: opts.pageSize,
+      limit: opts.limit,
+      fetch: async (fetchOpts: ListingFetchOptions) => {
         const response = await client.Sort(
           {
             show: 'all',
-            sort: options.sort,
-            t: options.timeframe,
-            subreddit: options.subredditName,
-            ...fetchOptions,
+            sort: opts.sort,
+            t: opts.timeframe,
+            subreddit: opts.subredditName,
+            ...fetchOpts,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
@@ -1590,7 +1699,7 @@ export class Post {
 
   /** @internal */
   static getHotPosts(
-    options: GetHotPostsOptions = {
+    opts: GetHotPostsOptions = {
       location: 'GLOBAL',
     }
   ): Listing<Post> {
@@ -1598,19 +1707,19 @@ export class Post {
 
     return new Listing({
       hasMore: true,
-      before: options.before,
-      after: options.after,
-      pageSize: options.pageSize,
-      limit: options.limit,
-      fetch: async (fetchOptions: ListingFetchOptions) => {
+      before: opts.before,
+      after: opts.after,
+      pageSize: opts.pageSize,
+      limit: opts.limit,
+      fetch: async (fetchOpts: ListingFetchOptions) => {
         const response = await client.Hot(
           {
-            g: options.location,
+            g: opts.location,
             show: 'all',
-            subreddit: options.subredditName,
-            ...fetchOptions,
+            subreddit: opts.subredditName,
+            ...fetchOpts,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
@@ -1619,23 +1728,23 @@ export class Post {
   }
 
   /** @internal */
-  static getNewPosts(options: GetPostsOptions): Listing<Post> {
+  static getNewPosts(opts: Readonly<GetPostsOptions>): Listing<Post> {
     const client = getRedditApiPlugins().Listings;
 
     return new Listing({
       hasMore: true,
-      before: options.before,
-      after: options.after,
-      pageSize: options.pageSize,
-      limit: options.limit,
-      fetch: async (fetchOptions: ListingFetchOptions) => {
+      before: opts.before,
+      after: opts.after,
+      pageSize: opts.pageSize,
+      limit: opts.limit,
+      fetch: async (fetchOpts: ListingFetchOptions) => {
         const response = await client.New(
           {
             show: 'all',
-            subreddit: options.subredditName,
-            ...fetchOptions,
+            subreddit: opts.subredditName,
+            ...fetchOpts,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
@@ -1644,23 +1753,23 @@ export class Post {
   }
 
   /** @internal */
-  static getRisingPosts(options: GetPostsOptions): Listing<Post> {
+  static getRisingPosts(opts: Readonly<GetPostsOptions>): Listing<Post> {
     const client = getRedditApiPlugins().Listings;
 
     return new Listing({
       hasMore: true,
-      before: options.before,
-      after: options.after,
-      pageSize: options.pageSize,
-      limit: options.limit,
-      fetch: async (fetchOptions: ListingFetchOptions) => {
+      before: opts.before,
+      after: opts.after,
+      pageSize: opts.pageSize,
+      limit: opts.limit,
+      fetch: async (fetchOpts: ListingFetchOptions) => {
         const response = await client.Rising(
           {
             show: 'all',
-            subreddit: options.subredditName,
-            ...fetchOptions,
+            subreddit: opts.subredditName,
+            ...fetchOpts,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
@@ -1669,31 +1778,27 @@ export class Post {
   }
 
   /** @internal */
-  static getPostsByUser(options: GetPostsByUserOptions): Listing<Post> {
+  static getPostsByUser(opts: Readonly<GetPostsByUserOptions>): Listing<Post> {
     const client = getRedditApiPlugins().Users;
     return new Listing({
       hasMore: true,
-      before: options.before,
-      after: options.after,
-      pageSize: options.pageSize,
-      limit: options.limit,
+      before: opts.before,
+      after: opts.after,
+      pageSize: opts.pageSize,
+      limit: opts.limit,
       fetch: async (fetchOptions) => {
         const response = await client.UserWhere(
           {
-            username: options.username,
+            username: opts.username,
             where: 'submitted',
             ...fetchOptions,
           },
-          this.#metadata
+          context.metadata
         );
 
         return listingProtosToPosts(response);
       },
     });
-  }
-
-  static get #metadata(): Metadata {
-    return context.debug.metadata;
   }
 }
 
@@ -1712,20 +1817,22 @@ function listingProtosToPosts(listingProto: ListingProto): ListingFetchResponse<
 }
 
 /** @internal */
-async function getThumbnailV2(options: { id: T3ID }): Promise<EnrichedThumbnail | undefined> {
+async function getThumbnailV2(opts: { id: T3 }): Promise<EnrichedThumbnail | undefined> {
   const operationName = 'GetThumbnailV2';
   const persistedQueryHash = '81580ce4e23d748c5a59a1618489b559bf4518b6a73af41f345d8d074c8b2ce9';
-  const response = await GraphQL.query(operationName, persistedQueryHash, {
-    id: options.id,
+  const rsp = await GraphQL.query(operationName, persistedQueryHash, {
+    id: opts.id,
   });
 
-  const thumbnail = response.data?.postInfoById?.thumbnailV2;
+  // to-do: why is postInfoById a `Record<string, any>`?
+  const thumbnail = rsp.data?.postInfoById?.thumbnailV2;
 
-  if (!thumbnail) {
-    throw new Error('Failed to get thumbnail');
-  } else if (!thumbnail.image) {
-    return undefined;
-  }
+  if (!thumbnail || rsp.errors.length)
+    throw Error(
+      `get post ${opts.id} thumbnail failed: ${rsp.errors.map((err) => `error ${err.code} (${err.message})`).join('; ')}`
+    );
+
+  if (!thumbnail.image) return;
 
   return {
     attribution: thumbnail.attribution,
@@ -1743,4 +1850,65 @@ async function getThumbnailV2(options: { id: T3ID }): Promise<EnrichedThumbnail 
       },
     }),
   };
+}
+
+function getConfig(): AppConfig {
+  const config = (devvit as DevvitWorkerGlobal)?.appConfig;
+  if (!config) throw Error('no config');
+  return config;
+}
+
+function getEntry(
+  config: Readonly<AppConfig>,
+  entry: string | undefined
+): Readonly<AppPostEntrypointConfig> {
+  entry ??= defaultPostEntry;
+  const entrypoint = config.post?.entrypoints[entry];
+  if (!entrypoint) throw Error(`missing "${entry}" in \`devvit.json\` \`post.entrypoints\``);
+  return entrypoint;
+}
+
+function SplashPostData(
+  config: Readonly<AppConfig>,
+  entry: Readonly<AppPostEntrypointConfig>,
+  opts: Readonly<SubmitCustomPostSplashOptions> | undefined,
+  title: string
+): SplashPostData & { appDisplayName: string; backgroundUri: string } {
+  // Align to `blocks.template.tsx`. The "preview" or loading screen is rendered
+  // at post time so it can't float to whatever the current code default is. The
+  // recorded post data must record the current state for `LoadingProps` and no
+  // defaults for anything else.
+  return {
+    // Loading. In the case that `loading` is provided, a `Loading` component is
+    // never used. If the user wants to change these props, they have to also
+    // provide a `splash` prop.
+    appDisplayName: opts?.appDisplayName ?? config.name,
+    backgroundUri: opts?.backgroundUri ?? backgroundUrl,
+
+    appIconUri: opts?.appIconUri,
+    buttonLabel: opts?.buttonLabel,
+    description: opts?.description,
+    entry: entry.name,
+    title: opts?.heading ?? title,
+  };
+}
+
+function postFromSubmitResponse(rsp: Readonly<SubmitResponse>): Promise<Post> {
+  if (!rsp.json?.data?.id || rsp.json.errors?.length)
+    throw Error(
+      // to-do: why is errors an `Any[]`?
+      `post ${rsp.json?.data?.id} submission failed: ${JSON.stringify(rsp.json?.errors)}`
+    );
+
+  return Post.getById(`t3_${rsp.json.data.id}`);
+}
+
+async function renderLoadingAsRichTextJson(
+  loading: JSX.Element,
+  meta: Readonly<Metadata>
+): Promise<string> {
+  const handler = new BlocksHandler(() => loading);
+  const { blocks } = UIResponse.fromJSON(await handler.handle({ events: [] }, meta));
+  const encodedCached = Block.encode(blocks!).finish();
+  return Buffer.from(encodedCached).toString('base64');
 }

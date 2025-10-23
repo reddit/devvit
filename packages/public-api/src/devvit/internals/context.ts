@@ -1,7 +1,8 @@
-import type { Metadata } from '@devvit/protos';
+import type { DevvitPostData, Metadata } from '@devvit/protos';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import type { PostData } from '@devvit/shared-types/PostData.js';
 
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
 import pkg from '../../version.json' with { type: 'json' };
@@ -16,10 +17,22 @@ export function getContextFromMetadata(
 
   const subredditName = metadata[Header.SubredditName]?.values[0];
 
+  // 'devvit-post-data' is a JSON string. If set in the header, parse it as
+  // DevvitPostData.
+  let postData: PostData | undefined;
+  const postDataJSON = metadata[Header.PostData]?.values[0];
+  if (postDataJSON) {
+    // Hack: assume DevvitPostData is JSON compatible for outdated iOS releases
+    //       around 2025.39.1.616587.
+    postData = (JSON.parse(postDataJSON) as DevvitPostData).developerData;
+  }
+
   // devvit-app-user is only available in the remote runtime.
   const appAccountId = metadata[Header.AppUser]?.values[0];
   const appName = metadata[Header.App]?.values[0];
   const appVersion = metadata[Header.Version]?.values[0];
+  const snoovatar = metadata[Header.UserSnoovatarUrl]?.values[0];
+  const username = metadata[Header.Username]?.values[0];
 
   const userId = metadata[Header.User]?.values[0];
   const debug = parseDebug(metadata);
@@ -33,10 +46,14 @@ export function getContextFromMetadata(
     subredditName,
     userId,
     postId,
+    postData,
     commentId,
     appName,
     appVersion,
+    snoovatar,
+    username,
     debug,
+    metadata,
     toJSON() {
       return {
         appAccountId,
@@ -46,8 +63,12 @@ export function getContextFromMetadata(
         subredditName,
         userId,
         postId,
+        postData,
         commentId,
+        snoovatar,
+        username,
         debug,
+        metadata,
       };
     },
   };

@@ -6,6 +6,7 @@ export * from './ModMail.js';
 export * from './ModNote.js';
 export * from './Post.js';
 export * from './PrivateMessage.js';
+export * from './ShareUrl.js';
 export * from './Subreddit.js';
 export * from './User.js';
 export * from './Vault.js';

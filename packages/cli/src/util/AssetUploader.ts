@@ -15,21 +15,33 @@ import {
   MAX_ASSET_NON_GIF_SIZE,
   prettyPrintSize,
 } from '@devvit/shared-types/Assets.js';
-import { ASSET_HASHING_ALGO, ASSET_UPLOAD_BATCH_SIZE } from '@devvit/shared-types/constants.js';
+import {
+  ASSET_HASHING_ALGO,
+  ASSET_UPLOAD_BATCH_SIZE,
+  ICON_FILE_PATH,
+} from '@devvit/shared-types/constants.js';
 import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { ux } from '@oclif/core';
 import { createHash } from 'crypto';
+import { fileTypeFromBuffer } from 'file-type';
+import { imageSize } from 'image-size';
 import { JSDOM } from 'jsdom';
 import { default as tinyglob } from 'tiny-glob';
 
-import { dirExists } from '../util/files.js';
 import { createAppClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
+import { dirExists } from './files.js';
 
 export const DEVVIT_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
+};
+
+type SyncAssetsResult = {
+  assetMap?: AssetMap;
+  webViewAssetMap?: AssetMap;
+  iconAsset?: string;
 };
 
 export class AssetUploader {
@@ -39,11 +51,14 @@ export class AssetUploader {
   readonly #appClient = createAppClient();
 
   readonly #appSlug: string;
+  readonly #skipWebViewScriptInjection: boolean =
+    !!process.env.DEVVIT_SKIP_WEB_VIEW_SCRIPT_INJECTION;
 
   constructor(cmd: DevvitCommand, appSlug: string, { verbose }: { verbose: boolean }) {
     this.#cmd = cmd;
     this.#verbose = verbose;
     this.#appSlug = appSlug;
+    if (this.#skipWebViewScriptInjection) console.info('Skipping web view script injection.');
   }
 
   /**
@@ -54,10 +69,7 @@ export class AssetUploader {
    * If present, WebView assets will also be synced but will not be included in
    * the asset map.
    */
-  async syncAssets(): Promise<{
-    assetMap?: AssetMap;
-    webViewAssetMap?: AssetMap;
-  }> {
+  async syncAssets(): Promise<SyncAssetsResult> {
     const clientVersion = readClientVersion(this.#cmd.project.root);
 
     const [regularAssets, webViewAssets] = await Promise.all([
@@ -66,18 +78,47 @@ export class AssetUploader {
             path.join(this.#cmd.project.root, this.#cmd.project.mediaDir),
             ALLOWED_ASSET_EXTENSIONS,
             'Media',
-            clientVersion
+            clientVersion,
+            this.#skipWebViewScriptInjection
           )
-        : [],
+        : ([] as MediaSignatureWithContents[]),
       this.#cmd.project.clientDir
         ? queryAssets(
             path.join(this.#cmd.project.root, this.#cmd.project.clientDir),
             [],
             'Client',
-            clientVersion
+            clientVersion,
+            this.#skipWebViewScriptInjection
           )
-        : [],
+        : ([] as MediaSignatureWithContents[]),
     ]);
+
+    const iconAssetPath = this.#cmd.project.appConfig?.marketingAssets?.icon;
+    let iconAssetDetails: MediaSignatureWithContents | undefined;
+    if (iconAssetPath) {
+      const iconAssetFullPath = path.join(this.#cmd.project.root, iconAssetPath);
+      if (await dirExists(iconAssetFullPath)) {
+        this.#cmd.error(`Icon asset path ${iconAssetPath} is a directory, not a file.`);
+      }
+      if (!(await fsp.stat(iconAssetFullPath)).isFile()) {
+        this.#cmd.error(`Icon asset path ${iconAssetPath} does not point to a file.`);
+      }
+      const iconAssetContents = await fsp.readFile(iconAssetFullPath);
+      const iconAssetSize = Buffer.byteLength(iconAssetContents);
+      const iconAssetHash = createHash(ASSET_HASHING_ALGO).update(iconAssetContents).digest('hex');
+
+      this.assertAssetCanBeAnIcon(iconAssetContents);
+
+      iconAssetDetails = {
+        filePath: ICON_FILE_PATH, // Use a placeholder path for the icon asset
+        size: iconAssetSize,
+        hash: iconAssetHash,
+        contents: new Uint8Array(iconAssetContents),
+        isWebviewAsset: false,
+      };
+      regularAssets.push(iconAssetDetails);
+      webViewAssets.push(iconAssetDetails);
+    }
 
     // Return early if no assets
     if (regularAssets.length + webViewAssets.length === 0) {
@@ -105,7 +146,67 @@ export class AssetUploader {
     // webroot assets go to WebView storage
     const webViewAssetMap = await this.#processWebViewAssets(webViewAssets);
 
-    return { assetMap, webViewAssetMap };
+    const retval: SyncAssetsResult = { assetMap, webViewAssetMap };
+    if (iconAssetDetails) {
+      retval.iconAsset = assetMap[ICON_FILE_PATH];
+    }
+
+    return retval;
+  }
+
+  async assertAssetCanBeAnIcon(data: Buffer): Promise<void> {
+    // Verify the icon. It *must*:
+    // - NOT be a GIF
+    // - be square in shape
+    // - be at least 256x256 pixels
+    // - be at most 1024x1024 pixels
+    // If it doesn't meet these requirements, we throw an error.
+    // Also, we should warn the user in any of these cases:
+    // - if the icon isn't a PNG
+    // - if the icon is smaller than 1024x1024 pixels
+
+    const fileTypeResult = await fileTypeFromBuffer(data);
+    if (!fileTypeResult) {
+      this.#cmd.error(`Icon asset is not a valid image.`);
+    }
+    if (fileTypeResult.mime === 'image/gif') {
+      this.#cmd.error(`Icon asset cannot be a GIF.`);
+    }
+
+    const sizeResult = imageSize(data);
+    if (!sizeResult) {
+      this.#cmd.error(`Icon asset is not a valid image.`);
+    }
+    if (sizeResult.width !== sizeResult.height) {
+      this.#cmd.error(
+        `Icon asset must be square, but it is ${sizeResult.width}x${sizeResult.height}.`
+      );
+    }
+    if (sizeResult.width < 256) {
+      this.#cmd.error(
+        `Icon asset must be at least 256x256 pixels, but it is ${sizeResult.width}x${sizeResult.height}.`
+      );
+    }
+    if (sizeResult.width > 1024) {
+      this.#cmd.error(
+        `Icon asset can be at most 1024x1024 pixels, but it is ${sizeResult.width}x${sizeResult.height}.`
+      );
+    }
+
+    // It's acceptable, but check if there's any warnings we should give the user
+    if (fileTypeResult.mime !== 'image/png') {
+      this.#cmd.warn(`Icon asset is not a PNG, but it will still be uploaded.`);
+    }
+    if (sizeResult.width < 1024) {
+      this.#cmd.warn(
+        `Icon asset is smaller than 1024x1024 pixels. Consider using a larger icon for better quality.`
+      );
+    }
+    if (![1024, 512, 256].includes(sizeResult.width)) {
+      this.#cmd.warn(
+        `Icon asset is ${sizeResult.width}x${sizeResult.height}. Consider using a standard size (preferably 1024x1024) for better compatibility.`
+      );
+    }
   }
 
   async #processRegularAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
@@ -303,12 +404,15 @@ export class AssetUploader {
  *
  * Asset kind controls transform. Client (historically webroot/) is for web view
  * assets. Media (historically assets/) is for everything else.
+ *
+ * @internal
  */
-async function queryAssets(
+export async function queryAssets(
   dir: string,
   allowedExtensions: readonly string[],
   assetKind: 'Client' | 'Media',
-  clientVersionNum: string | undefined
+  clientVersionNum: string | undefined,
+  skipWebViewScriptInjection: boolean
 ): Promise<MediaSignatureWithContents[]> {
   if (!(await dirExists(dir))) {
     // Return early if there isn't an assets directory
@@ -330,7 +434,7 @@ async function queryAssets(
 
       // If the webview assets is an HTML file, inject the Devvit analytics
       // script.
-      if (assetKind === 'Client' && filename.match(/\.html?$/)) {
+      if (assetKind === 'Client' && filename.match(/\.html?$/) && !skipWebViewScriptInjection) {
         file = transformHTMLBuffer(file, clientVersionNum);
       }
 

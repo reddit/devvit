@@ -1,0 +1,179 @@
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Post Data
+
+You can attach small amounts of data (2KB) to a post when creating it and update this data using the `postData` capability. This enables dynamic, stateful experiences available on posts without a server call. Post data is scoped to the post, not users.
+
+Post data is useful for storing game state, scores, or any other information that needs to persist with the post and be shared across all users.
+
+Post data is set when you submitPost and apps can access from the context object or do a server side call to update the post data on a Post object. For larger data, use [./redis.mdx].
+
+:::note
+Post data is sent to the client. Never store secrets or sensitive information.
+:::
+
+## Creating posts with data
+When creating a post, include the `postData` parameter with your custom data object.
+
+<Tabs>
+  <TabItem value="web" label="Devvit Web">
+  ```ts title="server/index.ts"
+  import { reddit } from '@devvit/web/server';
+
+  const post = await reddit.submitCustomPost({
+    subredditName: context.subredditName!,
+    title: 'Post with custom data',
+    splash: {
+      appDisplayName: 'Test App',
+    },
+    postData: {
+      challengeNumber: 42,
+      totalGuesses: 0,
+      gameState: 'active',
+      pixels: [
+        [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0],
+        [0, 0, 0, 2, 2, 1, 1, 1, 0, 0, 0],
+        [0, 0, 2, 2, 1, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 2, 2, 1, 1, 1, 1, 1, 0, 0],
+        [0, 0, 0, 2, 2, 1, 1, 1, 0, 0, 0],
+        [0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0]
+     ] // Drawing canvas data
+    },
+  });
+  ```
+  </TabItem>
+  <TabItem value="blocks" label="Devvit Blocks">
+  ```ts title="main.tsx"
+  import { Devvit } from '@devvit/public-api';
+
+  Devvit.addMenuItem({
+    label: 'Create custom post',
+    location: 'subreddit',
+    onPress: async (_event, context) => {
+      const post = await context.reddit.submitPost({
+        subredditName: context.subredditName!,
+        title: 'My custom post',
+        preview: (
+          <vstack height="100%" width="100%" alignment="middle center">
+            <text size="large">Loading ...</text>
+          </vstack>
+        ),
+        postData: {
+          "riddle": "A very clever riddle",
+          "scores": {
+            "team1": "Team 1",
+            "team2": "Team 2",
+          },
+        }
+      });
+      context.ui.showToast(`Created post with ID ${post.id}`);
+      context.ui.navigateTo(post);
+    },
+  });
+  ```
+  </TabItem>
+</Tabs>
+
+## Updating post data
+To update post data after creation, fetch the post and use the `setPostData()` method.
+
+<Tabs>
+  <TabItem value="web" label="Devvit Web">
+  ```ts title="server/index.ts"
+  import { reddit } from '@devvit/web/server';
+
+  const post = await reddit.getPostById('t3_your_post_id');
+  await post.setPostData({ 'moreStuff': 'hello' });
+  ```
+  </TabItem>
+  <TabItem value="blocks" label="Devvit Blocks">
+  ```ts title="main.tsx"
+  import { Devvit, useForm } from '@devvit/public-api';
+
+  Devvit.addCustomPostType({
+    name: 'InteractivePost',
+    render: (context) => {
+      const updateForm = useForm(
+        {
+          fields: [
+            { type: 'string', name: 'favColor', label: 'Favorite color' },
+          ],
+        },
+        async (values) => {
+          const post = await context.reddit.getPostById(context.postId!);
+          const currentUsername = await context.reddit.getCurrentUsername();
+          
+          await post.setPostData({
+            'favColor': values.favColor || 'unknown',
+            'user': currentUsername!
+          });
+          
+          context.ui.showToast('Updated post data!');
+        }
+      );
+
+      return (
+        <button onPress={() => context.ui.showForm(updateForm)}>
+          Update post data
+        </button>
+      );
+    },
+  });
+  ```
+  </TabItem>
+</Tabs>
+
+:::warning
+`setPostData()` replaces the entire post data object. To update specific fields while preserving others, merge the existing data with your updates.
+:::
+
+## Accessing post data
+Post data is available through `context.postData` in both client and server contexts.
+
+<Tabs>
+  <TabItem value="web" label="Devvit Web">
+  ```tsx title="client/index.tsx"
+  import { context } from '@devvit/web/client';
+
+  export const App = () => {
+    return (
+      <div>
+        <text className='mt-1 font-bold'>Post Data:</text>
+        <text>{JSON.stringify(context.postData, null, 2) ?? 'undefined'}</text>
+      </div>
+    );
+  }
+  ```
+  </TabItem>
+  <TabItem value="blocks" label="Devvit Blocks">
+  ```tsx title="main.tsx"
+  import { Devvit } from '@devvit/public-api';
+
+  Devvit.addCustomPostType({
+    name: 'MyCustomPost',
+    render: (context) => {
+      return (
+        <vstack alignment='middle center'>
+          <text size='medium'>context.postData:</text>
+          <text size='medium'>{JSON.stringify(context.postData, null, 2)}</text>
+        </vstack>
+      );
+    },
+  });
+  ```
+  </TabItem>
+</Tabs>
+
+## Limitations
+Post data supports:
+- JSON-serializable objects only
+- Maximum size of 2KB
+- Data persists with the post lifecycle (deleted when post is deleted)
+- Updates to post data don't trigger automatic re-renders. Implement polling or refresh mechanisms as needed

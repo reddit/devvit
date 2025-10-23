@@ -39,7 +39,7 @@ Use `context.cache` to reduce the amount of requests to optimize performance and
 
 ### Leverage scheduled jobs to fetch or update data
 
-Use [scheduler](./capabilities/scheduler.md) to make large data requests in the background and store it in [Redis](./capabilities/redis.md) for later use. You can also [fetch data for multiple users](#how-to-use-the-cache-helper​).
+Use [scheduler](./capabilities/scheduler.md) to make large data requests in the background and store it in [Redis](./capabilities/redis.md) for later use. You can also [fetch data for multiple users](#how-to-cache-data).
 
 ### Batch API calls to make parallel requests
 
@@ -215,7 +215,7 @@ import { Devvit } from '@devvit/public-api';
 
 Devvit.addSchedulerJob({
   name: 'fetch_weather_data',
-  onRun: async (_, context) => {
+  onRun: async (_event, context) => {
     const response = await fetch('https://external.weather.com');
     const responseData = await response.json();
     await context.redis.set('weather_data', JSON.stringify(responseData));
@@ -224,7 +224,7 @@ Devvit.addSchedulerJob({
 
 Devvit.addTrigger({
   event: 'AppInstall',
-  onEvent: async (_, context) => {
+  onEvent: async (_event, context) => {
     await context.scheduler.runJob({
       cron: '0 */2 * * *', // runs at the top of every second hour
       name: 'fetch_weather_data',

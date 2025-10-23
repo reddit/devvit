@@ -1,8 +1,8 @@
-**@devvit/public-api v0.11.19-dev**
+**@devvit/public-api v0.12.2-dev**
 
 ---
 
-# @devvit/public-api v0.11.19-dev
+# @devvit/public-api v0.12.2-dev
 
 ## Namespaces
 
@@ -80,6 +80,7 @@
 - [MenuItemOnPressEvent](type-aliases/MenuItemOnPressEvent.md)
 - [MenuItemPostFilter](type-aliases/MenuItemPostFilter.md)
 - [MenuItemUserType](type-aliases/MenuItemUserType.md)
+- [Metadata](type-aliases/Metadata.md)
 - [ModActionDefinition](type-aliases/ModActionDefinition.md)
 - [ModActionTrigger](type-aliases/ModActionTrigger.md)
 - [ModMailDefinition](type-aliases/ModMailDefinition.md)
@@ -170,6 +171,7 @@
 
 ## Functions
 
+- [fetchDevvitWeb](functions/fetchDevvitWeb.md)
 - [svg](functions/svg.md)
 - [useAsync](functions/useAsync.md)
 - [useChannel](functions/useChannel.md)
