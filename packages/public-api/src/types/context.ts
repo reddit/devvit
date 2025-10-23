@@ -1,6 +1,6 @@
 import type { Metadata, UIDimensions, UIEnvironment } from '@devvit/protos';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import type { PostData } from '@devvit/shared-types/PostData.js';
 
 import type { AssetsClient } from '../apis/AssetsClient/AssetsClient.js';
 import type { ModLogClient } from '../apis/modLog/ModLogClient.js';
@@ -15,6 +15,7 @@ import type {
   UseIntervalHook,
   UseStateResult,
 } from './hooks.js';
+import type { JSONValue } from './json.js';
 import type { KVStore } from './kvStore.js';
 import type { MediaPlugin } from './media.js';
 import type { ChannelOptions } from './realtime.js';
@@ -23,8 +24,11 @@ import type { Scheduler } from './scheduler.js';
 import type { SettingsClient } from './settings.js';
 import type { UIClient } from './ui-client.js';
 
+export type { Metadata };
+
 export type ContextDebugInfo = {
   effects?: EffectEmitter;
+  /** @deprecated Use Context.metadata. */
   metadata: Metadata;
 } & {
   /**
@@ -51,6 +55,7 @@ export type BaseContext = {
   subredditName?: string;
   /** The ID of the current post */
   postId?: string | undefined;
+  postData: PostData | undefined;
   /** The current user's ID if this event was triggered by a logged in user */
   userId?: string | undefined;
   /**
@@ -64,10 +69,24 @@ export type BaseContext = {
   appVersion: string;
   /** The ID of the current comment */
   commentId?: string | undefined;
+  /**
+   * The current user's snoovtar URL if logged in
+   *
+   * @experimental
+   */
+  snoovatar?: string | undefined;
+  /**
+   * The current user's handle if logged in
+   *
+   * @experimental
+   */
+  username?: string | undefined;
   /** Returns a JSON representation of the context */
   toJSON(): Omit<BaseContext, 'toJSON'>;
   /** More useful things, but probably not for the average developer */
   debug: ContextDebugInfo;
+  /** Request headers. */
+  metadata: Metadata;
 };
 
 export type ContextAPIClients = {

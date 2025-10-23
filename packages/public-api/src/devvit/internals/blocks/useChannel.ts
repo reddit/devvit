@@ -1,7 +1,6 @@
 import type { RealtimeSubscriptionEvent } from '@devvit/protos';
 import { RealtimeSubscriptionStatus } from '@devvit/protos';
 import { Header } from '@devvit/shared-types/Header.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
 import type {
@@ -10,6 +9,7 @@ import type {
   UseChannelResult,
 } from '../../../types/hooks.js';
 import { Hook } from '../../../types/hooks.js';
+import type { JSONValue } from '../../../types/json.js';
 import type { ChannelOptions } from '../../../types/realtime.js';
 import { ChannelStatus } from '../../../types/realtime.js';
 import type { BlocksReconciler } from './BlocksReconciler.js';

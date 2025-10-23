@@ -4,14 +4,20 @@ import { ux } from '@oclif/core';
 import { getAccessTokenAndLoginIfNeeded } from '../../util/auth.js';
 import { createAppClient } from '../../util/clientGenerators.js';
 import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
+import type { BuildMode } from '../../util/project.js';
 
 export default class ListApps extends DevvitCommand {
   static override description = 'List all apps that you have published';
 
   readonly #appService = createAppClient();
 
+  override init(_mode?: BuildMode | 'None'): Promise<void> {
+    // We don't need to initialize a project to list the apps you've made.
+    return super.init('None');
+  }
+
   async run(): Promise<void> {
-    const token = await getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded('LocalSocket');
     const t2_id = await this.getUserT2Id(token);
 
     ux.action.start('Fetching');

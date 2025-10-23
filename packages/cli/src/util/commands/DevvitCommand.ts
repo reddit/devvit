@@ -1,4 +1,4 @@
-import type { T2ID } from '@devvit/shared-types/tid.js';
+import type { T2 } from '@devvit/shared-types/tid.js';
 import { Command, Flags } from '@oclif/core';
 import { parse } from '@oclif/core/lib/parser/index.js';
 import inquirer from 'inquirer';
@@ -47,7 +47,11 @@ export abstract class DevvitCommand extends Command {
     this.#project = project;
   }
 
-  protected override async init(mode?: BuildMode): Promise<void> {
+  isRunningInAppDirectory(): boolean {
+    return this.#project !== undefined;
+  }
+
+  protected override async init(mode?: BuildMode | 'None'): Promise<void> {
     await super.init();
 
     // to-do: avoid subclassing and compose instead. subclasses cause bugs
@@ -66,14 +70,17 @@ export abstract class DevvitCommand extends Command {
       flags: DevvitCommand.baseFlags,
     });
 
-    this.#project = await newProject(flags.config, mode ?? 'Static');
-    if (flags.config && !this.#project) this.error(`Project config "${flags.config}" not found.`);
-    if (
-      flags.config &&
-      flags.config !== devvitClassicConfigFilename &&
-      flags.config !== devvitV1ConfigFilename
-    ) {
-      this.log(`Using custom config file: ${flags.config}`);
+    // If we're in 'None' mode, we don't need to initialize a project, and in fact shouldn't try.
+    if (mode !== 'None') {
+      this.#project = await newProject(flags.config, mode ?? 'Static');
+      if (flags.config && !this.#project) this.error(`Project config "${flags.config}" not found.`);
+      if (
+        flags.config &&
+        flags.config !== devvitClassicConfigFilename &&
+        flags.config !== devvitV1ConfigFilename
+      ) {
+        this.log(`Using custom config file: ${flags.config}`);
+      }
     }
   }
 
@@ -151,7 +158,7 @@ export abstract class DevvitCommand extends Command {
   /**
    * @description Get the user's t2 id from the stored token.
    */
-  protected async getUserT2Id(token: StoredToken): Promise<T2ID> {
+  protected async getUserT2Id(token: StoredToken): Promise<T2> {
     const res = await fetchUserT2Id(token);
     if (!res.ok) {
       this.error(`${res.error}. Try again or re-login with \`devvit login\`.`);

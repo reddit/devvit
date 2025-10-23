@@ -1,5 +1,5 @@
 import { updateBundleServer, updateBundleVersion } from '@devvit/build-pack/esbuild/ESBuildPack.js';
-import type { FullInstallationInfo } from '@devvit/protos/community.js';
+import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
 import { type FullAppInfo, InstallationType, VersionVisibility } from '@devvit/protos/community.js';
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import {
@@ -41,6 +41,7 @@ import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredd
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
+import { isWebContainer } from '../util/platform-util.js';
 import { devvitClassicConfigFilename, devvitV1ConfigFilename } from '../util/project.js';
 import Logs from './logs.js';
 
@@ -142,7 +143,9 @@ export default class Playtest extends DevvitCommand {
     this.project.flag.watchDebounceMillis = this.#flags?.['debounce'] as number | undefined;
     this.project.flag.subreddit = args.subreddit;
 
-    const token = await getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded(
+      isWebContainer() ? 'CopyPaste' : 'LocalSocket'
+    );
     const username = await this.getUserDisplayName(token);
     await this.checkDeveloperAccount();
 
@@ -166,7 +169,7 @@ export default class Playtest extends DevvitCommand {
 
     if (!this.#appInfo?.app) {
       this.error(
-        "Your app doesn't exist yet - you'll need to run 'devvit upload' before you can playtest your app."
+        "Your app doesn't exist yet - you'll need to run 'npx devvit init' before you can playtest your app."
       );
     }
     this.project.app.defaultPlaytestSubredditId = this.#appInfo.app.defaultPlaytestSubredditId;
@@ -187,7 +190,35 @@ export default class Playtest extends DevvitCommand {
     }
     const shouldWriteToConfig = !this.#subreddit;
 
-    let latestVersion = this.#appInfo.versions[0];
+    let latestVersion: AppVersionInfo;
+    if (this.#appInfo.versions.length > 0 && this.#appInfo.versions[0]) {
+      latestVersion = this.#appInfo.versions[0];
+    } else {
+      // Need to upload version 0.0.1
+      const firstVersion = new DevvitVersion(0, 0, 1);
+      const appVersionCreator = new AppVersionUploader(this, {
+        verbose: Boolean(this.#flags?.verbose),
+      });
+      const bundles = await this.#bundler.bundle(this.project, {
+        name: ACTOR_SRC_PRIMARY_NAME,
+        owner: username,
+        version: firstVersion.toString(),
+      });
+      this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
+      latestVersion = await appVersionCreator.createVersion(
+        {
+          appId: this.#appInfo.app.id,
+          appSlug: this.#appInfo.app.slug,
+          appSemver: firstVersion,
+          visibility: VersionVisibility.PRIVATE,
+        },
+        bundles,
+        false
+      );
+      await this.#refreshAppInfoAndSetSubreddit();
+      // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
+    }
+
     this.#version = new DevvitVersion(
       latestVersion.majorVersion,
       latestVersion.minorVersion,
@@ -230,22 +261,14 @@ export default class Playtest extends DevvitCommand {
         false
       );
 
-      // Since we created a subreddit, we reload the app info to get the newly created subreddit ID
-      this.#appInfo = await getAppBySlug(this.#appClient, {
-        slug: this.project.name,
-        limit: 1, // fetched version limit; we only need the latest one
-      });
-      if (!this.#appInfo?.app) {
-        this.error(
-          'Something went wrong: we could not find your app after creating a new playtest subreddit. Please try again.'
-        );
-      } else if (!this.#appInfo.app.defaultPlaytestSubredditId) {
-        this.error(
-          'Something went wrong: we could not find the newly created playtest subreddit. Please playtest on a different subreddit using `devvit playtest <your_subreddit>` instead.'
-        );
-      }
-      this.#subreddit = this.#appInfo.app.defaultPlaytestSubredditId;
+      await this.#refreshAppInfoAndSetSubreddit();
       // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
+    }
+
+    if (!this.#subreddit) {
+      this.error(
+        'Automatic subreddit creation failed. Please create a subreddit, and either set DEVVIT_SUBREDDIT in your .env file, or set "dev.subreddit" in devvit.json. Then run this command again.'
+      );
     }
 
     // before starting playtest session, make sure app has been installed to the test subreddit:
@@ -332,11 +355,12 @@ export default class Playtest extends DevvitCommand {
     if (this.project.mediaDir) assetPaths.push(path.join(this.project.root, this.project.mediaDir));
     if (this.project.clientDir)
       assetPaths.push(path.join(this.project.root, this.project.clientDir));
-    if (this.project.server?.entry)
+    if (this.project.server)
       // Watch the server directory to allow the watched file to be renamed or deleted.
-      assetPaths.push(
-        path.join(path.dirname(path.join(this.project.root, this.project.server.entry)), '..')
-      );
+      assetPaths.push(path.join(this.project.root, this.project.server.dir, '..'));
+    if (this.project.appConfig?.marketingAssets?.icon) {
+      assetPaths.push(path.join(this.project.root, this.project.appConfig.marketingAssets.icon));
+    }
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
 
     this.#watchAssets.on('all', () => {
@@ -350,11 +374,11 @@ export default class Playtest extends DevvitCommand {
     const files = this.#flags?.config
       ? [path.dirname(path.resolve(this.project.root, this.project.filename))]
       : [path.resolve(this.project.root)];
-    this.#watchAssets = chokidar.watch(files, {
+    this.#watchConfigFile = chokidar.watch(files, {
       ignoreInitial: true,
       depth: 0,
     });
-    this.#watchAssets.on('all', this.#onConfigFileModified);
+    this.#watchConfigFile.on('all', this.#onConfigFileModified);
   }
 
   #onConfigFileModified = async (
@@ -420,7 +444,9 @@ export default class Playtest extends DevvitCommand {
 
     if (
       this.project.server &&
-      !existsSync(path.resolve(this.project.root, this.project.server.entry))
+      !existsSync(
+        path.resolve(this.project.root, this.project.server.dir, this.project.server.entry)
+      )
     ) {
       // User may be in the process of building a server entry. Wait.
       return;
@@ -494,12 +520,12 @@ export default class Playtest extends DevvitCommand {
       this.#server?.send({ appInstalled: {} });
 
       const playtestUrl = chalk.bold.green(
-        `${REDDIT_DESKTOP}/r/${this.#subreddit}${
+        `${REDDIT_DESKTOP}/r/${this.#subreddit}/${
           this.#flags?.connect ? `?playtest=${this.#appInfo!.app!.slug}` : ''
         }`
       );
       ux.action.stop(
-        `Success! Please visit your test subreddit and refresh to see your latest changes:\n✨ ${playtestUrl}\n`
+        `Success! Please visit your test subreddit and refresh to see your latest changes:\n${playtestUrl}\n`
       );
     } catch (err) {
       ux.action.stop('Error'); // Stop any spinner if it's running
@@ -587,4 +613,19 @@ export default class Playtest extends DevvitCommand {
 
     process.exit(0);
   };
+
+  async #refreshAppInfoAndSetSubreddit(): Promise<void> {
+    this.#appInfo = await getAppBySlug(this.#appClient, {
+      slug: this.project.name,
+      limit: 1, // fetched version limit; we only need the latest one
+    });
+    if (!this.#appInfo?.app) {
+      this.error('Something went wrong: we could not find your app. Please try again.');
+    } else if (!this.#appInfo.app.defaultPlaytestSubredditId && !this.#subreddit) {
+      this.error(
+        'Something went wrong: we could not find the newly created playtest subreddit. Please try again or playtest on a different subreddit using `devvit playtest <your_subreddit>`.'
+      );
+    }
+    this.#subreddit ??= this.#appInfo.app.defaultPlaytestSubredditId;
+  }
 }

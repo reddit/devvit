@@ -5,12 +5,12 @@ import {
   type Toast as ToastProto,
   ToastAppearance,
 } from '@devvit/protos';
-import type { Form } from '@devvit/shared/types/form.js';
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
+import type { Form } from '@devvit/shared';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
 import type { BlocksReconciler } from '../../devvit/internals/blocks/BlocksReconciler.js';
+import type { JSONObject, JSONValue } from '../../types/json.js';
 import type { Toast } from '../../types/toast.js';
 import type { UIClient as _UIClient } from '../../types/ui-client.js';
 import type { WebViewUIClient } from '../../types/web-view-ui-client.js';
@@ -43,7 +43,7 @@ export class UIClient implements _UIClient {
     data?: JSONObject | undefined,
     formInternalOverride?: Form | undefined
   ): void {
-    let formDefinition = Devvit.formDefinitions.get(formKey);
+    let formDefinition = Devvit.formDefinitions?.get(formKey);
 
     if (!formDefinition && this.#reconciler) {
       const hookForm = this.#reconciler.forms.get(formKey);
@@ -119,18 +119,15 @@ export class UIClient implements _UIClient {
   navigateTo(comment: Comment): void;
   navigateTo(user: User): void;
   navigateTo(thingOrUrl: string | Subreddit | Post | Comment | User): void {
-    let url: string;
-
-    if (typeof thingOrUrl === 'string') {
-      // Validate URL
-      url = new URL(thingOrUrl).toString();
-    } else {
-      url = new URL(thingOrUrl.url).toString();
+    const inputUrl = typeof thingOrUrl === 'string' ? thingOrUrl : thingOrUrl.url;
+    if (!URL.canParse(inputUrl)) {
+      throw new TypeError(`Invalid URL: ${inputUrl}`);
     }
+    const normalizedUrl = new URL(inputUrl).toString();
     this.#effects.push({
       type: EffectType.EFFECT_NAVIGATE_TO_URL,
       navigateToUrl: {
-        url,
+        url: normalizedUrl,
       },
     });
   }

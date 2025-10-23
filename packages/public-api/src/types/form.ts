@@ -4,20 +4,22 @@ import type {
   Form,
   FormField,
   FormFieldGroup,
-  FormValues,
+  FormValues as FormValuesTyped,
   ImageField,
   NumberField,
   ParagraphField,
   SelectField,
   SettingScopeType,
   StringField,
-} from '@devvit/shared/types/form.js';
-import { SettingScope } from '@devvit/shared/types/form.js';
-import type { JSONObject } from '@devvit/shared-types/json.js';
+} from '@devvit/shared';
+import { SettingScope } from '@devvit/shared';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Devvit } from '../devvit/Devvit.js';
 import type { FormToFormValues } from './index.js';
+import type { JSONObject } from './json.js';
+
+type UntypedFormValues = FormValuesTyped<JSONObject>;
 
 export type {
   BaseField,
@@ -26,7 +28,7 @@ export type {
   FormField,
   FormFieldGroup,
   FormKey,
-  FormValues,
+  UntypedFormValues as FormValues,
   ImageField,
   NumberField,
   ParagraphField,

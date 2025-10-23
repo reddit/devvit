@@ -62,7 +62,7 @@ export default class Install extends DevvitCommand {
     await this.checkIfUserLoggedIn();
     await this.checkDeveloperAccount();
 
-    const token = await getAccessTokenAndLoginIfNeeded();
+    const token = await getAccessTokenAndLoginIfNeeded('LocalSocket');
     const userT2Id = await this.getUserT2Id(token);
 
     let appInfo: FullAppInfo | undefined;

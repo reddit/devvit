@@ -4,7 +4,7 @@ Create live and event-driven interactive posts. Realtime provides a set of primi
 
 - **Live**. Users engaging with the same interactive post see each others’ changes without any observable lag.
 - **Event-driven**. Posts render automatically in response to server events.
-- **Synced**. Using realtime with [Redis](/docs/capabilities/redis.md) lets you build persistent community experiences that are backed by high performance data synchronization.
+- **Synced**. Using realtime with [Redis](./redis.md) lets you build persistent community experiences that are backed by high performance data synchronization.
 
 ## Create a live interactive post
 
@@ -81,7 +81,7 @@ channel.subscribe();
 
 Devvit.addTrigger({
   event: 'AppInstall',
-  onEvent: async (_, context) => {
+  onEvent: async (_event, context) => {
     await context.scheduler.runJob({
       name: 'publish_to_channel',
       cron: '* * * * *',
@@ -93,7 +93,7 @@ Devvit.addTrigger({
 // receiving messages which can processed in the onMessage handler to update local state.
 Devvit.addSchedulerJob({
   name: 'publish_to_channel',
-  onRun: async (_, context) => {
+  onRun: async (_event, context) => {
     await context.realtime.send('events', {
       message: payload,
     });

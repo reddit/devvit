@@ -6,6 +6,7 @@
       "outputs": [
         "dist/**",
         "packages/public-api/src/devvit/internals/semanticColors.ts",
+        "packages/protos/src/json/**",
         "packages/protos/src/types/**"
       ]
     },

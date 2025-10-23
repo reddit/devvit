@@ -16,12 +16,6 @@ The **Remind Me Later** option is located in the overflow menu of a post (look f
 
 ## Start a project
 
-<!-- :::info -->
-
-<!-- The fully-functioning code in this tutorial is also available in the `remind-me` template. Simply type `devvit new --template remind-me <replace-with-your-app-name>` to start a project with the code below already written. -->
-
-<!-- ::: -->
-
 To create a Remind Me app starting from an empty template:
 
 1. From the terminal, navigate to a directory where you'll store your project (e.g. `cd ~/my/project/directory`).
@@ -174,7 +168,7 @@ Devvit.addMenuItem({
   location: 'post',
   // here we tell the ui client to show `remindMeForm` defined above when the
   // menu item is pressed
-  onPress: (_, context) => {
+  onPress: (_event, context) => {
     context.ui.showForm(remindMeForm);
   },
 });
@@ -261,4 +255,4 @@ If the input was invalid or left blank, you'll see the corresponding error toast
 Congratulations on getting your Remind Me app running! Next up:
 
 - Learn how to use Redis in our [Three Strikes tutorial](./three_strikes.md).
-- Add [logging](../../get-started/debug.md) to your app to help you debug.
+- Add [logging](../../debug.md) to your app to help you debug.

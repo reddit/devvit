@@ -399,7 +399,7 @@ Devvit.addCustomPostType({
   name: 'Scoreboard',
   render: (context) => {
     const { useState, postId, redis } = context;
-    const debugId = context.debug.metadata?.['debug-id']?.values?.[0];
+    const debugId = context.metadata?.['debug-id']?.values?.[0];
 
     const [spoilerFree, setSpoilerFree] = useState(async () => {
       if (debugId) {
@@ -529,7 +529,7 @@ Devvit.addCustomPostType({
     }
 
     const [lastComment, _setLastComment] = context.useState<CommentData>(async () => {
-      if (context.debug.metadata?.['debug-id']?.values?.[0]) {
+      if (context.metadata?.['debug-id']?.values?.[0]) {
         return debugComment;
       }
       return await getLastComment(context, context.postId);

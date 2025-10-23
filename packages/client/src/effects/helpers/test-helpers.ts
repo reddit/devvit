@@ -1,5 +1,4 @@
-import type { Effect, EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
-import type { Comment, Post, Subreddit, User } from '@devvit/reddit';
+import type { Effect, EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 
 import type { Form, FormFieldGroup, SelectField, StringField } from './form-types.js';
 
@@ -56,7 +55,7 @@ export const mockSubreddit = {
     url: 'https://www.reddit.com/r/test',
   },
   url: 'https://www.reddit.com/r/test',
-} as const as unknown as Readonly<Subreddit>;
+} as const;
 
 export const mockPost = {
   id: 't3_123',
@@ -92,7 +91,7 @@ export const mockPost = {
   secureMedia: undefined,
   userReportReasons: [],
   modReportReasons: [],
-} as unknown as Readonly<Post>;
+} as const;
 
 export const mockComment = {
   id: 't1_123',
@@ -119,7 +118,7 @@ export const mockComment = {
   modReportReasons: [],
   url: 'https://www.reddit.com/r/test/comments/123/test_post/comment',
   ignoringReports: false,
-} as unknown as Readonly<Comment>;
+} as const;
 
 export const mockUser = {
   id: 't2_123',
@@ -133,7 +132,7 @@ export const mockUser = {
   url: 'https://www.reddit.com/user/testuser',
   permalink: '/user/testuser',
   hasVerifiedEmail: true,
-} as unknown as Readonly<User>;
+} as const;
 
 // Forms
 

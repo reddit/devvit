@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -17,7 +18,6 @@ import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/Product.
 import { filterToReservedDevvitMetadataKeys } from '@devvit/shared-types/reservedDevvitMetadataKeys.js';
 import { validateProductsJSON } from '@devvit/shared-types/schemas/productsSchemaJSONValidator.js';
 import { imageSize } from 'image-size';
-import type { ISizeCalculationResult } from 'image-size/dist/types/interface.js';
 
 // The JSONProduct type is a Product with the metadata field as optional
 // We don't require developers to provide metadata in the products.json file
@@ -176,9 +176,10 @@ export function makePaymentsConfig(products: Readonly<JSONProduct[]>): PaymentsC
 }
 
 export function validateProductIcon(assetPath: string): void {
-  let size: ISizeCalculationResult;
+  const file = fs.readFileSync(assetPath);
+  let size: ReturnType<typeof imageSize>;
   try {
-    size = imageSize(assetPath);
+    size = imageSize(file);
   } catch {
     throw new Error(`Product icon ${assetPath} is not a valid image`);
   }

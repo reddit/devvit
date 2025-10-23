@@ -1,8 +1,8 @@
-import type { Form } from '@devvit/shared/types/form.js';
-import type { JSONObject } from '@devvit/shared-types/json.js';
+import type { Form } from '@devvit/shared';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Comment, Post, Subreddit, User } from '../apis/reddit/models/index.js';
+import type { JSONObject } from './json.js';
 import type { Toast } from './toast.js';
 import type { WebViewUIClient } from './web-view-ui-client.js';
 

@@ -1,4 +1,4 @@
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import type { JSONValue } from './json.js';
 
 export enum ChannelStatus {
   Unknown,

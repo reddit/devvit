@@ -25,11 +25,11 @@ When you want to make server-side calls, or use server-side capabilities, you’
 
 ## Server folder
 
-This folder is for server-side code. We provide a node server, and you can use typical node server frameworks like Koa or Express. This is where you can access key capabilities like [Redis](../capabilities/Redis), Reddit API client, and [fetch](..capabilities/http-fetch), and you no longer need to add these to a devvit.configure object in order for them to work.
+This folder is for server-side code. We provide a node server, and you can use typical node server frameworks like Koa or Express. This is where you can access key capabilities like [Redis](../capabilities/redis), Reddit API client, and [fetch](../capabilities/http-fetch), and you no longer need to add these to a devvit.configure object in order for them to work.
 
 We also provide an authentication middleware so you don’t have to worry about authentication.
 
-::note
+:::note
 All server endpoints must start with /api/ (e.g. /api/get-something or /api/widgets/42).
 :::
 

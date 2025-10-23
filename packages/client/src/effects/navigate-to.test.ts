@@ -1,11 +1,11 @@
-import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
+import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { emitEffect } from './emit-effect.js';
 import { mockComment, mockPost, mockSubreddit, mockUser } from './helpers/test-helpers.js';
 import { navigateTo } from './navigate-to.js';
 
-vi.mock('./emit-effect.js', () => ({
+vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(),
 }));
 

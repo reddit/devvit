@@ -1,4 +1,3 @@
-import type { JSONValue } from '@devvit/shared-types/json.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Context } from './context.js';
@@ -14,6 +13,7 @@ import type {
   SelectField,
   StringField,
 } from './form.js';
+import type { JSONValue } from './json.js';
 import type { ChannelOptions, ChannelStatus } from './realtime.js';
 
 export type Dispatch<A> = (value: A) => void;

@@ -2,20 +2,28 @@ import { type JsonWrappedComment } from '@devvit/protos';
 import { context } from '@devvit/server';
 import { describe, expect, test, vi } from 'vitest';
 
+import { assertUserScope } from '../common.js';
 import { Comment } from '../models/Comment.js';
 import { RedditClient } from '../RedditClient.js';
 import { redditApiPlugins } from './utils/redditApiPluginsMock.js';
 import { runWithTestContext } from './utils/runWithTestContext.js';
 import { userActionsPlugin } from './utils/userActionsPluginMock.js';
 
-vi.mock('../getRedditApiPlugins.js', () => {
+vi.mock('../plugin.js', () => {
   return {
     getRedditApiPlugins: () => redditApiPlugins,
+    getUserActionsPlugin: () => userActionsPlugin,
   };
 });
-vi.mock('../getUserActionsPlugin.js', () => {
+
+vi.mock('../common.js', () => {
   return {
-    getUserActionsPlugin: () => userActionsPlugin,
+    assertUserScope: vi.fn(),
+    RunAs: {
+      APP: 0,
+      USER: 1,
+      UNSPECIFIED: 2,
+    },
   };
 });
 
@@ -78,7 +86,7 @@ describe('Commment API', () => {
     },
   };
 
-  describe('RedditAPIClient:Comment', () => {
+  describe('RedditClient:Comment', () => {
     test('Comment matches JSON snapshot', () => {
       const comment = new Comment({ ...defaultCommentData });
 
@@ -103,7 +111,7 @@ describe('Commment API', () => {
             thingId: 't1_commentid',
             usernames: 'my-user',
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -138,6 +146,9 @@ describe('Commment API', () => {
     test('submitComment(): can set runAs: USER when userActions is enabled', async () => {
       const spyPlugin = userActionsPlugin.Comment;
       spyPlugin.mockImplementationOnce(async () => mockJsonWrappedComment);
+
+      const mockAssertUserScope = vi.mocked(assertUserScope);
+      mockAssertUserScope.mockImplementation(() => {});
 
       await runWithTestContext(async () => {
         const resp = await reddit.submitComment({

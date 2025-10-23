@@ -1,7 +1,7 @@
 import { EffectType, type UIEvent } from '@devvit/protos';
 import { WebViewVisibility } from '@devvit/protos';
 import type { WebViewAppMessage } from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/post_message.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import { apiPathPrefix } from '@devvit/shared-types/constants.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
 import type {
@@ -9,6 +9,7 @@ import type {
   UseWebViewOptions,
   UseWebViewResult,
 } from '../../../../index.js';
+import type { JSONValue } from '../../../../types/json.js';
 import { webViewMessageIsInternalAndClientScope } from '../../helpers/devvitInternalMessage.js';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
@@ -108,8 +109,13 @@ class WebViewHook<From extends JSONValue, To extends JSONValue> implements Hook 
 
     const assets = this.#renderContext?.devvitContext?.assets;
 
+    let url;
+    if (this.#url.startsWith(apiPathPrefix)) url = this.#url;
     // Get the public URL for the asset. Returns an empty string if the asset is not found.
-    const url = assets.getURL(this.#url, { webView: true });
+    else {
+      const asset = this.#url.replace(/[#?].*/, '');
+      url = `${assets.getURL(asset, { webView: true })}${this.#url.slice(asset.length)}`;
+    }
 
     if (!url) {
       throw Error(`useWebView fullscreen request failed; web view asset could not be found`);

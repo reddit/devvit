@@ -43,4 +43,4 @@ The `devvit.json` configuration is validated against the JSON Schema at build ti
 
 ## Environment variables
 
-- `DEVVIT_DEV_SUBREDDIT`: Override the `devvit.json` development subreddit used during `devvit playtest`.
+- `DEVVIT_SUBREDDIT`: Override the `devvit.json` development subreddit used during `devvit playtest`.

@@ -1,11 +1,11 @@
 import { type UIEvent, UIEventScope } from '@devvit/protos';
-import type { JSONValue } from '@devvit/shared-types/json.js';
 
 import type {
   SetStateAction,
   UseStateInitializer,
   UseStateResult,
 } from '../../../../types/hooks.js';
+import type { JSONValue } from '../../../../types/json.js';
 import { registerHook } from './BlocksHandler.js';
 import type { RenderContext } from './RenderContext.js';
 import type { Hook, HookParams } from './types.js';

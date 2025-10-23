@@ -27,6 +27,19 @@ export function getMenuItemById(id: string): MenuItem | undefined {
   return Devvit.menuItems.find((_, index) => getActionId(index) === id);
 }
 
+export function menuItemPertainsToLocation(
+  menuItem: MenuItem | undefined,
+  location: 'subreddit' | 'post' | 'comment'
+): boolean {
+  if (!menuItem) {
+    return false;
+  }
+  if (Array.isArray(menuItem.location)) {
+    return menuItem.location.includes(location);
+  }
+  return menuItem.location === location;
+}
+
 async function getActions(_: Empty, _metadata: Metadata | undefined): Promise<ContextActionList> {
   const menuItems = Devvit.menuItems;
 

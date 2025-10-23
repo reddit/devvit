@@ -5,7 +5,7 @@ You can use the payments template to build your app or add payment functionality
 To start with a template, select the payments template when you create a new project or run:
 
 ```bash
-devvit new --template=payments
+devvit new
 ```
 
 To add payments functionality to an existing app, run:
@@ -60,7 +60,7 @@ Product prices are predefined and must be one of the following gold values:
 - 2500 gold ($50)
 
 :::note
-Actual payments will not be processed until your products are approved. While your app is under development, you can use sandbox payments to [simulate purchases](#simulate-purchases).
+Actual payments will not be processed until your products are approved. While your app is under development, you can use sandbox payments to [simulate purchases](./payments_test#simulate-purchases).
 :::
 
 ## Design guidelines

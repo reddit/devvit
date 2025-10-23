@@ -2,6 +2,7 @@ import { Flags } from '@oclif/core';
 
 import { getAccessToken } from '../util/auth.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
+import type { BuildMode } from '../util/project.js';
 
 export default class Whoami extends DevvitCommand {
   static override description = 'Display the currently logged in reddit.com user';
@@ -13,6 +14,11 @@ export default class Whoami extends DevvitCommand {
       hidden: true,
     }),
   } as const;
+
+  override init(_mode?: BuildMode | 'None'): Promise<void> {
+    // We don't need to initialize the project for the whoami command.
+    return super.init('None');
+  }
 
   async run(): Promise<void> {
     const { flags } = await this.parse(Whoami);

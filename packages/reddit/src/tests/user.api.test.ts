@@ -7,10 +7,12 @@ import { User } from '../models/User.js';
 import { RedditClient } from '../RedditClient.js';
 import { redditApiPlugins } from './utils/redditApiPluginsMock.js';
 import { runWithTestContext } from './utils/runWithTestContext.js';
+import { userActionsPlugin } from './utils/userActionsPluginMock.js';
 
-vi.mock('../getRedditApiPlugins.js', () => {
+vi.mock('../plugin.js', () => {
   return {
     getRedditApiPlugins: () => redditApiPlugins,
+    getUserActionsPlugin: () => userActionsPlugin,
   };
 });
 
@@ -29,7 +31,7 @@ describe('User API', () => {
     users: [mockUserFliar],
   };
 
-  describe('RedditAPIClient:getCurrentUser()', () => {
+  describe('RedditClient:getCurrentUser()', () => {
     const currentUsername = 'test_user';
     const currentUserId = 't2_1234';
 
@@ -68,7 +70,7 @@ describe('User API', () => {
           {
             username: currentUsername,
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(user?.id).toStrictEqual(currentUserId);
@@ -84,7 +86,7 @@ describe('User API', () => {
     });
   });
 
-  describe('RedditAPIClient:getSnoovatarUrl()', () => {
+  describe('RedditClient:getSnoovatarUrl()', () => {
     const currentUsername = 'test_user';
     const currentUserSnoovatarUrl = 'https://example.com/my-snoovatar.png';
 
@@ -115,7 +117,7 @@ describe('User API', () => {
               username: currentUsername,
             },
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(snoovatarUrl).toStrictEqual(currentUserSnoovatarUrl);
@@ -153,7 +155,7 @@ describe('User API', () => {
               username: otherUsername,
             },
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(snoovatarUrl).toStrictEqual(otherSnoovatarUrl);
@@ -161,7 +163,7 @@ describe('User API', () => {
     });
   });
 
-  describe('RedditAPIClient:User', () => {
+  describe('RedditClient:User', () => {
     test('getUserFlairBySubreddit()', async () => {
       const user = new User({
         id: 'someID',
@@ -181,7 +183,7 @@ describe('User API', () => {
             subreddit: subredditName,
             name: username,
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(userFlair).toEqual({

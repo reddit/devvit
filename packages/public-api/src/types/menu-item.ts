@@ -1,8 +1,8 @@
-import type { MenuItemLocation, MenuItemOnPressEvent } from '@devvit/shared/types/menu-item.js';
+import type { MenuItemLocation, MenuItemRequest } from '@devvit/shared';
 
 import type { Devvit } from '../devvit/Devvit.js';
 
-export type { MenuItemLocation, MenuItemOnPressEvent };
+export type { MenuItemLocation, MenuItemRequest as MenuItemOnPressEvent };
 
 export type MenuItemUserType = 'loggedOut' | 'moderator';
 
@@ -26,5 +26,5 @@ export type MenuItem = {
   /** The user type(s) that the menu item should be displayed for */
   forUserType?: MenuItemUserType | MenuItemUserType[];
   /** A function that is called when the menu item is pressed */
-  onPress: (event: MenuItemOnPressEvent, context: Devvit.Context) => void | Promise<void>;
+  onPress: (event: MenuItemRequest, context: Devvit.Context) => void | Promise<void>;
 };

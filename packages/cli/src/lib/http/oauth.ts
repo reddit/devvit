@@ -1,5 +1,5 @@
 import { isObject } from '@devvit/shared-types/isObject.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import type { JsonValue } from '@devvit/shared-types/json.js';
 
 /** Reddit API (r2) OAuth 2 config. */
 export type R2OAuthConfig = {
@@ -70,7 +70,7 @@ export async function fetchR2OAuthGrant(
   });
   if (!rsp.ok) throw Error(`HTTP error ${rsp.status}: ${rsp.statusText}`);
 
-  const grant = (await rsp.json()) as JSONValue;
+  const grant = (await rsp.json()) as JsonValue;
   assertR2OAuthGrant(grant);
   return grant;
 }
@@ -91,12 +91,12 @@ export async function fetchR2OAuthRefresh(
   });
   if (!rsp.ok) throw Error(`HTTP error ${rsp.status}: ${rsp.statusText}`);
 
-  const refresh = (await rsp.json()) as JSONValue;
+  const refresh = (await rsp.json()) as JsonValue;
   assertR2OAuthGrant(refresh);
   return refresh;
 }
 
-function assertR2OAuthGrant(json: JSONValue): asserts json is R2OAuthGrant {
+function assertR2OAuthGrant(json: JsonValue): asserts json is R2OAuthGrant {
   if (
     !isObject(json) ||
     typeof json.access_token !== 'string' ||

@@ -1,8 +1,9 @@
 import type { AboutLogResponse } from '@devvit/protos';
 import { context } from '@devvit/server';
+import type { T2, T5 } from '@devvit/shared';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 
@@ -18,10 +19,10 @@ export interface ModAction {
   id: string;
   type: ModActionType;
   moderatorName: string;
-  moderatorId: string;
+  moderatorId: T2;
   createdAt: Date;
   subredditName: string;
-  subredditId: string;
+  subredditId: T5;
   description?: string | undefined;
   details?: string | undefined;
   target?: ModActionTarget | undefined;
@@ -141,7 +142,7 @@ export function getModerationLog(options: GetModerationLogOptions): Listing<ModA
           type: options.type,
           ...fetchOptions,
         },
-        context.debug.metadata
+        context.metadata
       );
 
       return aboutLogResponseToModActions(response);

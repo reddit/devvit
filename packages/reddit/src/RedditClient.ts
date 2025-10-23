@@ -1,10 +1,10 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
-import { context } from '@devvit/server';
-import { Header } from '@devvit/shared-types/Header.js';
-import { asT2ID, type T1ID, type T2ID, type T3ID, type T5ID } from '@devvit/shared-types/tid.js';
-import { asT3ID, asTID, isT1ID, isT3ID } from '@devvit/shared-types/tid.js';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+import { context, getContextCache, setContextCache } from '@devvit/server';
+import type { PostData } from '@devvit/shared-types/PostData.js';
+import { asTid, isT1, isT3, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from './getRedditApiPlugins.js';
+import { assertUserScope } from './common.js';
 import type {
   AboutSubredditTypes,
   AddRemovalNoteOptions,
@@ -29,6 +29,7 @@ import type {
   GetPostsOptionsWithTimeframe,
   GetPrivateMessagesOptions,
   GetSubredditUsersByTypeOptions,
+  GetSubscribedSubredditsForCurrentUserOptions,
   GetUserOverviewOptions,
   Listing,
   ModAction,
@@ -40,9 +41,11 @@ import type {
   SetPostFlairOptions,
   SetUserFlairBatchConfig,
   SetUserFlairOptions,
+  SubmitCustomPostOptions,
   SubmitPostOptions,
   SubredditInfo,
   SubredditLeaderboard,
+  SubredditOptions,
   SubredditStyles,
   UpdatePageSettingsOptions,
   UpdateWikiPageOptions,
@@ -53,6 +56,7 @@ import type {
 import {
   AboutLocations,
   Comment,
+  createShareUrl,
   Flair,
   FlairTemplate,
   getModerationLog,
@@ -71,6 +75,9 @@ import {
   Widget,
   WikiPage,
 } from './models/index.js';
+import { getRedditApiPlugins } from './plugin.js';
+
+const CACHE_KEY_CURRENT_USER = 'RedditClient.currentUser';
 
 type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;
 
@@ -119,8 +126,6 @@ export type MuteUserOptions = {
  */
 export class RedditClient {
   readonly #modMailService: ModMailService;
-  #currentUser: Promise<User | undefined> | undefined;
-  #currentUsername: string | undefined;
 
   constructor() {
     this.#modMailService = new ModMailService();
@@ -141,6 +146,11 @@ export class RedditClient {
     return this.#modMailService;
   }
 
+  /** Returns {@link PostData}, if any, for the post specified by ID. */
+  async getPostData(id: T3): Promise<PostData | undefined> {
+    return (await Post.getDevvitPostData(id))?.developerData;
+  }
+
   /**
    * Gets a {@link Subreddit} object by ID
    *
@@ -152,8 +162,8 @@ export class RedditClient {
    * const memes = await reddit.getSubredditById('t5_2qjpg');
    * ```
    */
-  getSubredditById(id: string): Promise<Subreddit | undefined> {
-    return Subreddit.getById(asTID<T5ID>(id));
+  getSubredditById(id: T5): Promise<Subreddit | undefined> {
+    return Subreddit.getById(id);
   }
 
   /**
@@ -166,7 +176,7 @@ export class RedditClient {
    * const memes = await reddit.getSubredditInfoById('t5_2qjpg');
    * ```
    */
-  getSubredditInfoById(id: string): Promise<SubredditInfo> {
+  getSubredditInfoById(id: T5): Promise<SubredditInfo> {
     return getSubredditInfoById(id);
   }
 
@@ -269,15 +279,13 @@ export class RedditClient {
    * @param id
    * @returns A Promise that resolves to a Post object.
    */
-  getPostById(id: string): Promise<Post> {
-    return Post.getById(asTID<T3ID>(id));
+  getPostById(id: T3): Promise<Post> {
+    return Post.getById(id);
   }
 
   /**
    * Submits a new post to a subreddit.
    *
-   * @param options - Either a self post or a link post.
-   * @returns A Promise that resolves to a Post object.
    * @example
    * ```ts
    * const post = await reddit.submitPost({
@@ -292,15 +300,32 @@ export class RedditClient {
    * });
    * ```
    *
-   * By default, `submitPost()` creates a Post on behalf of the App account, but it may be called on behalf of the User making the request by setting the option `runAs: RunAs.USER`.
-   * When using `runAs: RunAs.USER` to create an experience Post, you must specify the `userGeneratedContent` option. For example:
+   * @see {@link RedditClient.submitCustomPost()|submitCustomPost()}
+   * @see {@link RedditClient.crosspost()|crosspost()}
+   */
+  submitPost(opts: Readonly<SubredditOptions & SubmitPostOptions>): Promise<Post> {
+    return Post.submit(opts);
+  }
+
+  /**
+   * Submits a new custom post to a subreddit.
+   *
    * @example
    * ```ts
-   * import { RunAs } from '@devvit/public-api';
+   * const post = await reddit.submitCustomPost({
+   *   subredditName: 'devvit',
+   *   title: 'Hello World',
+   *   splash: {appDisplayName: 'Field', height: 'regular'},
+   * });
+   * ```
    * 
-   * const post = await reddit.submitPost({
+   * By default, `submitCustomPost()` creates a Post on behalf of the App account, but it may be called on behalf of the User making the request by setting the option `runAs: 'USER'`.
+   * When using `runAs: 'USER'` to create an experience Post, you must specify the `userGeneratedContent` option. For example:
+   * @example
+   * ```ts
+   * const post = await reddit.submitCustomPost({
    *  title: 'My Devvit Post',
-   *  runAs: RunAs.USER,
+   *  runAs: 'USER',
    *  userGeneratedContent: {
    *    text: "hello there", 
    *    imageUrls: ["https://styles.redditmedia.com/t5_5wa5ww/styles/communityIcon_wyopomb2xb0a1.png", "https://styles.redditmedia.com/t5_49fkib/styles/bannerBackgroundImage_5a4axis7cku61.png"]
@@ -309,29 +334,31 @@ export class RedditClient {
    *  textFallback: {
    *    text: 'This is a Devvit post!',
    *  },
-   *  preview: (
-   *    <vstack height="100%" width="100%" alignment="middle center">
-   *      <text size="large">Loading...</text>
-   *    </vstack>
-   *  ),
+   *  splash: {appDisplayName: 'Pixelary'},
    * });
    * ```
+   *
+   * @see {@link RedditClient.submitPost()|submitPost()}
+   * @see {@link RedditClient.crosspost()|crosspost()}
    */
-  submitPost(options: SubmitPostOptions): Promise<Post> {
-    return Post.submit(options);
+  submitCustomPost(opts: Readonly<SubredditOptions & SubmitCustomPostOptions>): Promise<Post> {
+    return Post.submitCustomPost(opts);
   }
 
   /**
    * Crossposts a post to a subreddit.
    *
-   * @param options - Options for crossposting a post
-   * @param options.subredditName - The name of the subreddit to crosspost to
-   * @param options.postId - The ID of the post to crosspost
-   * @param options.title - The title of the crosspost
+   * @param opts - Options for crossposting a post
+   * @param opts.subredditName - The name of the subreddit to crosspost to
+   * @param opts.postId - The ID of the post to crosspost
+   * @param opts.title - The title of the crosspost
    * @returns - A Promise that resolves to a Post object.
+   *
+   * @see {@link RedditClient.submitPost()|submitPost()}
+   * @see {@link RedditClient.submitCustomPost()|submitCustomPost()}
    */
-  crosspost(options: CrosspostOptions): Promise<Post> {
-    return Post.crosspost(options);
+  crosspost(opts: Readonly<SubredditOptions & CrosspostOptions>): Promise<Post> {
+    return Post.crosspost(opts);
   }
 
   /**
@@ -344,8 +371,8 @@ export class RedditClient {
    * const user = await reddit.getUserById('t2_1qjpg');
    * ```
    */
-  getUserById(id: string): Promise<User | undefined> {
-    return User.getById(asTID<T2ID>(id));
+  getUserById(id: T2): Promise<User | undefined> {
+    return User.getById(id);
   }
 
   /**
@@ -377,12 +404,7 @@ export class RedditClient {
    * ```
    */
   async getCurrentUsername(): Promise<string | undefined> {
-    const curUser = await this.getCurrentUser();
-    if (!curUser) {
-      return undefined;
-    }
-    this.#currentUsername ??= curUser.username;
-    return this.#currentUsername;
+    return (await this.getCurrentUser())?.username;
   }
 
   /**
@@ -396,12 +418,23 @@ export class RedditClient {
    * ```
    */
   async getCurrentUser(): Promise<User | undefined> {
+    // If there's no user logged in, return undefined.
     const userId = context.userId;
     if (!userId) {
       return undefined;
     }
-    this.#currentUser ??= User.getById(asT2ID(userId));
-    return this.#currentUser;
+
+    // Get the user from cache; if we miss, fetch the user and cache it.
+    let curUser = getContextCache<User>(CACHE_KEY_CURRENT_USER);
+    if (!curUser) {
+      curUser = await User.getById(T2(userId));
+      if (!curUser) {
+        return undefined;
+      }
+      setContextCache(CACHE_KEY_CURRENT_USER, curUser);
+    }
+
+    return curUser;
   }
 
   /**
@@ -425,13 +458,6 @@ export class RedditClient {
    * @returns A Promise that resolves to a URL of the snoovatar image if it exists.
    */
   async getSnoovatarUrl(username: string): Promise<string | undefined> {
-    const currentUsername = await this.getCurrentUsername();
-    if (currentUsername && username === currentUsername) {
-      const snoovatarUrl = this.#metadata?.[Header.UserSnoovatarUrl]?.values[0];
-      if (snoovatarUrl) {
-        return snoovatarUrl;
-      }
-    }
     return User.getSnoovatarUrl(username);
   }
 
@@ -445,8 +471,8 @@ export class RedditClient {
    * const comment = await reddit.getCommentById('t1_1qjpg');
    * ```
    */
-  getCommentById(id: string): Promise<Comment> {
-    return Comment.getById(asTID<T1ID>(id));
+  getCommentById(id: T1): Promise<Comment> {
+    return Comment.getById(id);
   }
 
   /**
@@ -498,20 +524,15 @@ export class RedditClient {
    * @returns A Promise that resolves to a Comment object.
    * @example
    * ```ts
-   * import { RunAs } from '@devvit/public-api';
-   *
    * const comment = await reddit.submitComment({
    *  id: 't1_1qgif',
    *  text: 'Hello world!',
-   *  runAs: RunAs.APP,
+   *  runAs: 'APP',
    * })
    * ```
    */
-  submitComment(options: CommentSubmissionOptions & { id: string }): Promise<Comment> {
-    return Comment.submit({
-      ...options,
-      id: asTID<T3ID | T1ID>(options.id),
-    });
+  submitComment(options: CommentSubmissionOptions & { id: T1 | T3 }): Promise<Comment> {
+    return Comment.submit({ ...options, id: options.id });
   }
 
   /**
@@ -1039,7 +1060,7 @@ export class RedditClient {
   addModNote(options: CreateModNoteOptions): Promise<ModNote> {
     const req = {
       ...options,
-      ...(options.redditId ? { redditId: asTID<T1ID | T3ID>(options.redditId) } : {}),
+      ...(options.redditId ? { redditId: asTid<T1 | T3>(options.redditId) } : {}),
     };
     return ModNote.add(req);
   }
@@ -1087,10 +1108,10 @@ export class RedditClient {
    * await reddit.approve('t1_123456');
    * ```
    */
-  async approve(id: string): Promise<void> {
-    if (isT1ID(id)) {
+  async approve(id: T1 | T3): Promise<void> {
+    if (isT1(id)) {
       return Comment.approve(id);
-    } else if (isT3ID(id)) {
+    } else if (isT3(id)) {
       return Post.approve(id);
     }
 
@@ -1108,10 +1129,10 @@ export class RedditClient {
    * await reddit.remove('t1_123456', true);
    * ```
    */
-  async remove(id: string, isSpam: boolean): Promise<void> {
-    if (isT1ID(id)) {
+  async remove(id: T1 | T3, isSpam: boolean): Promise<void> {
+    if (isT1(id)) {
       return Comment.remove(id, isSpam);
-    } else if (isT3ID(id)) {
+    } else if (isT3(id)) {
       return Post.remove(id, isSpam);
     }
 
@@ -1270,8 +1291,8 @@ export class RedditClient {
    * @param subredditName - The name of the subreddit to remove the flair from.
    * @param postId - The ID of the post to remove the flair from.
    */
-  async removePostFlair(subredditName: string, postId: string): Promise<void> {
-    return Flair.removePostFlair(subredditName, asT3ID(postId));
+  async removePostFlair(subredditName: string, postId: T3): Promise<void> {
+    return Flair.removePostFlair(subredditName, postId);
   }
 
   /**
@@ -1628,8 +1649,8 @@ export class RedditClient {
    * const vault = await reddit.getVaultByUserId('t2_1w72');
    * ```
    */
-  getVaultByUserId(userId: string): Promise<Vault> {
-    return getVaultByUserId(asTID<T2ID>(userId));
+  getVaultByUserId(userId: T2): Promise<Vault> {
+    return getVaultByUserId(userId);
   }
 
   /**
@@ -1639,7 +1660,7 @@ export class RedditClient {
    *
    * @returns {SubredditLeaderboard} Leaderboard for the given subreddit.
    */
-  getSubredditLeaderboard(subredditId: string): Promise<SubredditLeaderboard> {
+  getSubredditLeaderboard(subredditId: T5): Promise<SubredditLeaderboard> {
     return getSubredditLeaderboard(subredditId);
   }
 
@@ -1650,16 +1671,48 @@ export class RedditClient {
    *
    * @returns {SubredditStyles} Styles for the given subreddit.
    */
-  getSubredditStyles(subredditId: string): Promise<SubredditStyles> {
+  getSubredditStyles(subredditId: T5): Promise<SubredditStyles> {
     return getSubredditStyles(subredditId);
   }
 
   /**
-   * Subscribes to the subreddit in which the app is installed. No-op if the user is already subscribed.
+   * Create a short share URL for a Reddit location.
+   *
+   * Valid inputs:
+   * - Absolute Reddit URLs without a query string (e.g., https://reddit.com/r/gamesonreddit)
+   * - URLs with a query string limited to: utm_source, utm_medium, devvitshare
+   *
+   * @note old.reddit.com URLs can be shortened but they will redirect to reddit.com.
+   *
+   * @param url Full Reddit URL to shorten. Must be absolute and either have no query string or only the allowed query params.
+   *
+   * @returns The shortened share URL (e.g., 'https://reddit.com/s/abc123').
+   *
+   * @throws If the input URL is invalid, contains unsupported query parameters, or the share URL cannot be created.
+   */
+  createShareUrl(url: string): Promise<string> {
+    return createShareUrl(url);
+  }
+
+  /**
+   * Returns a listing of subreddits that the current user is subscribed to.
    * This method will execute as the app account by default.
-   * To subscribe on behalf of a user, please contact Reddit.
+   * To execute this on behalf of a user, please contact Reddit.
+   */
+  getSubscribedSubredditsForCurrentUser(
+    options: GetSubscribedSubredditsForCurrentUserOptions
+  ): Listing<Subreddit> {
+    return Subreddit.getSubscribedSubredditsForCurrentUser(options);
+  }
+
+  /**
+   * Subscribes to the subreddit in which the app is installed. No-op if the user is already subscribed.
+   * This method will run as user by default. Therefore, you must include SUBSCRIBE_TO_SUBREDDIT
+   * in `permissions.reddit.asUser` in your devvit.json file.
    */
   async subscribeToCurrentSubreddit(): Promise<void> {
+    assertUserScope(Scope.SUBSCRIBE_TO_SUBREDDIT);
+
     const currentSubreddit = await this.getCurrentSubreddit();
     const client = getRedditApiPlugins().Subreddits;
 
@@ -1697,7 +1750,53 @@ export class RedditClient {
   }
 
   get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
+  }
+
+  /**
+   * Set the postData for a custom post. This will replace the existing postData with the postData specified in the input.
+   *
+   * @param postId - The ID of the post to set the postData for.
+   * @param postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
+   * @throws {Error} Throws an error if the postData could not be set.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   *
+   * // Existing postData: { settings: { theme: 'dark', fontSize: 12 } }
+   *
+   * await post.setPostData({
+   *   currentScore: 55,
+   *   secretWord: 'barbeque',
+   * });
+   * // Result: { currentScore: 55, secretWord: 'barbeque' }
+   * ```
+   */
+  async setPostData(postId: T3, postData: PostData): Promise<void> {
+    // to-do: optimize. Don't fetch the post when all that's needed is post ID.
+    const post = await Post.getById(postId);
+    await post.setPostData(postData);
+  }
+
+  /**
+   * Merge the postData on a custom post with the postData specified in the input. This performs a shallow merge.
+   *
+   * @param postData - Represents the postData to be merged with the existing postData.
+   * @throws {Error} Throws an error if the postData could not be merged.
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById(context.postId);
+   *
+   * // Existing postData: { currentScore: 55, settings: { theme: 'dark', fontSize: 12 } }
+   *
+   * await post.mergePostData({ settings: { fontSize: 14 } });
+   * // Result: { currentScore: 55, settings: { fontSize: 14 } }
+   * ```
+   */
+  async mergePostData(postId: T3, postData: PostData): Promise<void> {
+    // to-do: optimize. Don't fetch the post when all that's needed is post ID.
+    const post = await Post.getById(postId);
+    await post.mergePostData(postData);
   }
 }
 

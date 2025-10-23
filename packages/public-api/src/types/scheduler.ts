@@ -1,6 +1,5 @@
-import type { JSONObject } from '@devvit/shared-types/json.js';
-
 import type { Devvit } from '../devvit/Devvit.js';
+import type { JSONObject } from './json.js';
 
 export type ScheduledJob = {
   /** ID of the scheduled job. Use this with scheduler.cancelJob to cancel the job. */

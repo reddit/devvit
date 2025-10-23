@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.11.19-dev**](../README.md)
+[**@devvit/public-api v0.12.2-dev**](../README.md)
 
 ---
 
@@ -62,6 +62,24 @@ More useful things, but probably not for the average developer
 
 ---
 
+<a id="metadata"></a>
+
+### metadata
+
+> **metadata**: [`Metadata`](Metadata.md)
+
+Request headers.
+
+---
+
+<a id="postdata"></a>
+
+### postData
+
+> **postData**: `PostData` \| `undefined`
+
+---
+
 <a id="postid"></a>
 
 ### postId?
@@ -69,6 +87,18 @@ More useful things, but probably not for the average developer
 > `optional` **postId**: `string`
 
 The ID of the current post
+
+---
+
+<a id="snoovatar"></a>
+
+### snoovatar?
+
+> `optional` **snoovatar**: `string`
+
+**`Experimental`**
+
+The current user's snoovtar URL if logged in
 
 ---
 
@@ -99,6 +129,18 @@ The name of the current subreddit
 > `optional` **userId**: `string`
 
 The current user's ID if this event was triggered by a logged in user
+
+---
+
+<a id="username"></a>
+
+### username?
+
+> `optional` **username**: `string`
+
+**`Experimental`**
+
+The current user's handle if logged in
 
 ## Methods
 

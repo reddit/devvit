@@ -3,7 +3,7 @@ import { Header } from '@devvit/shared-types/Header.js';
 
 // Internal function for getting the current user's moderator permissions in the current subreddit
 async function getPermissions(context: Context): Promise<Set<ModeratorPermission>> {
-  const metadataPermissions = context.debug.metadata[Header.ModPermissions]?.values as string[];
+  const metadataPermissions = context.metadata[Header.ModPermissions]!.values;
   if (metadataPermissions) {
     // For each permission header value, parse and add to the permission set
     return metadataPermissions.reduce((out, permission) => {

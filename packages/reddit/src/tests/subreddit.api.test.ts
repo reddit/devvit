@@ -6,10 +6,23 @@ import { AboutLocations, Subreddit } from '../models/Subreddit.js';
 import { RedditClient } from '../RedditClient.js';
 import { redditApiPlugins } from './utils/redditApiPluginsMock.js';
 import { runWithTestContext } from './utils/runWithTestContext.js';
+import { userActionsPlugin } from './utils/userActionsPluginMock.js';
 
-vi.mock('../getRedditApiPlugins.js', () => {
+vi.mock('../plugin.js', () => {
   return {
     getRedditApiPlugins: () => redditApiPlugins,
+    getUserActionsPlugin: () => userActionsPlugin,
+  };
+});
+
+vi.mock('../common.js', () => {
+  return {
+    assertUserScope: vi.fn(),
+    RunAs: {
+      APP: 0,
+      USER: 1,
+      UNSPECIFIED: 2,
+    },
   };
 });
 
@@ -90,7 +103,7 @@ describe('Subreddit API', () => {
     },
   };
 
-  describe('RedditAPIClient:Subreddit', () => {
+  describe('RedditClient:Subreddit', () => {
     test('getCommentsAndPostsByUser()', async () => {
       const spyPlugin = redditApiPlugins.Users.UserWhere;
       spyPlugin.mockImplementationOnce(async () => mockListingWithPostsAndComments);
@@ -111,7 +124,7 @@ describe('Subreddit API', () => {
             username: 'unusual_setup',
             where: 'overview',
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(items).toMatchSnapshot();
@@ -137,7 +150,7 @@ describe('Subreddit API', () => {
       await runWithTestContext(async () => {
         const result = await redditAPI.getSubredditRemovalReasons('askReddit');
 
-        expect(spyPlugin).toHaveBeenCalledWith({ subreddit: 'askReddit' }, context.debug.metadata);
+        expect(spyPlugin).toHaveBeenCalledWith({ subreddit: 'askReddit' }, context.metadata);
 
         expect(result).toMatchSnapshot();
       });
@@ -163,7 +176,7 @@ describe('Subreddit API', () => {
             subreddit: 'askReddit',
             title: 'Spam',
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(result).toEqual('uuid-abc');
@@ -201,7 +214,7 @@ describe('Subreddit API', () => {
             sr: '',
             skipInitialDefaults: true,
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -237,7 +250,7 @@ describe('Subreddit API', () => {
             sr: '',
             skipInitialDefaults: false,
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -268,7 +281,7 @@ describe('Subreddit API', () => {
             subreddits: ['t5_t5_abc123'],
             thingIds: ['t3_abc123', 't1_xyz123'],
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(items).toMatchSnapshot();
@@ -299,7 +312,7 @@ describe('Subreddit API', () => {
           {
             subreddit: subredditName,
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(response.users).toEqual([
@@ -348,7 +361,7 @@ describe('Subreddit API', () => {
             subreddit: subredditName,
             name: 'user1',
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(spyPlugin).toHaveBeenNthCalledWith(
@@ -357,7 +370,7 @@ describe('Subreddit API', () => {
             subreddit: subredditName,
             name: 'user2',
           },
-          context.debug.metadata
+          context.metadata
         );
 
         expect(response.users).toEqual([
@@ -397,7 +410,7 @@ describe('Subreddit API', () => {
             more: undefined,
             only: undefined,
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -424,7 +437,7 @@ describe('Subreddit API', () => {
             before: undefined,
             more: undefined,
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });
@@ -451,7 +464,7 @@ describe('Subreddit API', () => {
             before: undefined,
             more: undefined,
           },
-          context.debug.metadata
+          context.metadata
         );
       });
     });

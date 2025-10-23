@@ -1,5 +1,5 @@
 import { isObject } from '@devvit/shared-types/isObject.js';
-import type { JSONValue } from '@devvit/shared-types/json.js';
+import type { JsonValue } from '@devvit/shared-types/json.js';
 
 import type { R2OAuthGrant } from '../http/oauth.js';
 
@@ -87,7 +87,7 @@ export class StoredToken {
   }
 }
 
-function isStoredTokenJSON(json: JSONValue): json is StoredTokenJSON {
+function isStoredTokenJSON(json: JsonValue): json is StoredTokenJSON {
   return (
     isObject(json) &&
     typeof json.accessToken === 'string' &&

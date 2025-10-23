@@ -15,7 +15,7 @@ import { BlocksReconciler } from './blocks/BlocksReconciler.js';
 import { getContextFromMetadata } from './context.js';
 import { validateCSRFToken } from './csrf.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
-import { getMenuItemById } from './menu-items.js';
+import { getMenuItemById, menuItemPertainsToLocation } from './menu-items.js';
 
 async function handleUIEvent(
   req: HandleUIEventRequest,
@@ -52,7 +52,7 @@ async function handleUIEvent(
       }
     }
 
-    const formDefinition = Devvit.formDefinitions.get(formKey);
+    const formDefinition = Devvit.formDefinitions?.get(formKey);
 
     if (!formDefinition) {
       throw new Error(`Form with key ${formKey} not found`);
@@ -65,9 +65,9 @@ async function handleUIEvent(
       const { actionId, thingId } = state.__contextAction;
       const menuItem = getMenuItemById(actionId);
 
-      if (menuItem?.location === 'post') {
+      if (menuItemPertainsToLocation(menuItem, 'post')) {
         postId = thingId;
-      } else if (menuItem?.location === 'comment') {
+      } else if (menuItemPertainsToLocation(menuItem, 'comment')) {
         commentId = thingId;
       }
     }

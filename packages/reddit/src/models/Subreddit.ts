@@ -8,12 +8,11 @@ import type {
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import type { T5ID } from '@devvit/shared-types/tid.js';
-import { asT5ID } from '@devvit/shared-types/tid.js';
+import { T5 } from '@devvit/shared-types/tid.js';
 
-import { getRedditApiPlugins } from '../getRedditApiPlugins.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
+import { getRedditApiPlugins } from '../plugin.js';
 import { Comment } from './Comment.js';
 import type {
   CreateFlairTemplateOptions,
@@ -29,9 +28,10 @@ import type {
 } from './ModAction.js';
 import { getModerationLog } from './ModAction.js';
 import type {
+  CrosspostOptions,
   GetPostsOptionsWithTimeframe,
-  SubmitLinkOptions,
-  SubmitSelfPostOptions,
+  SubmitCustomPostOptions,
+  SubmitPostOptions,
 } from './Post.js';
 import { Post } from './Post.js';
 import type {
@@ -94,6 +94,13 @@ export type GetUserFlairOptions = UserFlairPageOptions & {
   /** If provide the method will return the flairs for the provided users, if not provided
    * it will return a list of all users assigned flairs in the subreddit */
   usernames?: string[];
+};
+
+export type GetSubscribedSubredditsForCurrentUserOptions = {
+  limit?: number;
+  pageSize?: number;
+  after?: string;
+  before?: string;
 };
 
 /**
@@ -388,7 +395,7 @@ export class PostFlairSettings {
  * A class representing information about a Subreddit.
  */
 export type SubredditInfo = {
-  id?: T5ID;
+  id?: T5;
   name?: string;
   createdAt?: Date;
   type?: SubredditType;
@@ -423,7 +430,7 @@ export type SubredditInfo = {
  * A class representing a subreddit.
  */
 export class Subreddit {
-  #id: T5ID;
+  #id: T5;
   #name: string;
   #createdAt: Date;
   #type: SubredditType;
@@ -446,7 +453,7 @@ export class Subreddit {
     assertNonNull(data.id, 'Subreddit id is missing or undefined');
     assertNonNull(data.displayName, 'Subreddit name is missing or undefined');
 
-    this.#id = asT5ID(`t5_${data.id}`);
+    this.#id = T5(`t5_${data.id}`);
     this.#name = data.displayName;
 
     assertNonNull(data.createdUtc, 'Subreddit is missing created date');
@@ -458,8 +465,7 @@ export class Subreddit {
     this.#title = data.title;
     this.#description = data.description;
 
-    assertNonNull(data.lang, 'Subreddit is missing language');
-    this.#language = data.lang;
+    this.#language = data.lang ?? '';
 
     this.#numberOfSubscribers = data.subscribers ?? 0;
     this.#numberOfActiveUsers = data.activeUserCount ?? 0;
@@ -522,7 +528,7 @@ export class Subreddit {
   /**
    * The ID (starting with t5_) of the subreddit to retrieve. e.g. t5_2qjpg
    */
-  get id(): T5ID {
+  get id(): T5 {
     return this.#id;
   }
 
@@ -671,13 +677,16 @@ export class Subreddit {
     };
   }
 
-  async submitPost(options: SubmitLinkOptions | SubmitSelfPostOptions): Promise<Post> {
-    const submitPostOptions = {
-      ...options,
-      subredditName: this.#name,
-    };
+  async submitPost(opts: Readonly<SubmitPostOptions>): Promise<Post> {
+    return Post.submit({ ...opts, subredditName: this.#name });
+  }
 
-    return Post.submit(submitPostOptions);
+  async submitCustomPost(opts: Readonly<SubmitCustomPostOptions>): Promise<Post> {
+    return Post.submitCustomPost({ ...opts, subredditName: this.#name });
+  }
+
+  async crosspost(opts: Readonly<CrosspostOptions>): Promise<Post> {
+    return Post.crosspost({ ...opts, subredditName: this.#name });
   }
 
   getControversialPosts(
@@ -957,6 +966,40 @@ export class Subreddit {
     }
   }
 
+  static getSubscribedSubredditsForCurrentUser(
+    options: GetSubscribedSubredditsForCurrentUserOptions = {}
+  ): Listing<Subreddit> {
+    const client = getRedditApiPlugins().Subreddits;
+    return new Listing<Subreddit>({
+      hasMore: true,
+      before: options.before,
+      after: options.after,
+      pageSize: options.pageSize,
+      limit: options.limit,
+      fetch: async (fetchOptions) => {
+        const response = await client.SubredditsMineWhere(
+          {
+            where: 'subscriber',
+            show: 'all',
+            ...fetchOptions,
+          },
+          this.#metadata
+        );
+
+        assertNonNull(response.data, 'Failed to get subscribed subreddits for user');
+        console.log(JSON.stringify(response));
+
+        const children = response.data.children?.map((child) => new Subreddit(child.data!)) || [];
+
+        return {
+          children,
+          before: response.data.before,
+          after: response.data.after,
+        };
+      },
+    });
+  }
+
   /**
    * Return a listing of things requiring moderator review, such as reported things and items.
    *
@@ -1145,7 +1188,7 @@ export class Subreddit {
       fetch: async () => {
         const listing = await client.Info(
           { thingIds: ids, subreddits: [this.#id] },
-          context.debug.metadata
+          context.metadata
         );
 
         return parseListing(listing);
@@ -1196,11 +1239,11 @@ export class Subreddit {
 
     const subredditId = context.subredditId;
     assertNonNull<string | undefined>(subredditId);
-    return Subreddit.getById(asT5ID(subredditId));
+    return Subreddit.getById(T5(subredditId));
   }
 
   /** @internal */
-  static async getById(id: T5ID): Promise<Subreddit | undefined> {
+  static async getById(id: T5): Promise<Subreddit | undefined> {
     const subredditName = await getSubredditNameById(id);
     if (!subredditName) {
       return;
@@ -1228,7 +1271,7 @@ export class Subreddit {
   }
 
   static get #metadata(): Metadata {
-    return context.debug.metadata;
+    return context.metadata;
   }
 }
 
@@ -1238,7 +1281,7 @@ export class Subreddit {
  * @param {string} subredditId - The ID (starting with t5_) of the subreddit to retrieve. e.g. t5_2qjpg
  * @returns {Promise<SubredditInfo>} A Promise that resolves a SubredditInfo object.
  */
-export async function getSubredditInfoById(subredditId: string): Promise<SubredditInfo> {
+export async function getSubredditInfoById(subredditId: T5): Promise<SubredditInfo> {
   const operationName = 'GetSubredditInfoById';
   const persistedQueryHash = '315a9b75c22a017d526afdf2d274616946156451aacfd56dfb91e7ad3f7a2fde';
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });
@@ -1268,7 +1311,7 @@ export async function getSubredditInfoByName(subredditName: string): Promise<Sub
   return subredditInfo;
 }
 
-export async function getSubredditLeaderboard(subredditId: string): Promise<SubredditLeaderboard> {
+export async function getSubredditLeaderboard(subredditId: T5): Promise<SubredditLeaderboard> {
   const operationName = 'GetSubredditLeaderboard';
   const persistedQueryHash = '18ead70c46b6446d45ecd8b679b16d9a929a933d6ef25d8262a459cb18b72848';
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });
@@ -1284,7 +1327,7 @@ export async function getSubredditLeaderboard(subredditId: string): Promise<Subr
   };
 }
 
-export async function getSubredditStyles(subredditId: string): Promise<SubredditStyles> {
+export async function getSubredditStyles(subredditId: T5): Promise<SubredditStyles> {
   const operationName = 'GetSubredditStyles';
   const persistedQueryHash = 'd491d17ea8858f563ea578b26b9595d64adecf4bf34557d567c7e53c470f5f22';
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });
@@ -1316,6 +1359,11 @@ function asSubredditType(type?: string): SubredditType {
 function asAllowedPostType(type?: string): 'any' | 'link' | 'self' {
   if (type === 'any' || type === 'link' || type === 'self') {
     return type;
+  }
+
+  // Default to 'any' if no type is specified
+  if (!type) {
+    return 'any';
   }
 
   throw new Error(`invalid allowed post type: ${type}`);
@@ -1370,9 +1418,9 @@ function parseListing(listing: ProtoListing): ListingFetchResponse<Post | Commen
 }
 
 /** @internal */
-export async function getSubredditNameById(id: T5ID): Promise<string | undefined> {
+export async function getSubredditNameById(id: T5): Promise<string | undefined> {
   const client = getRedditApiPlugins().LinksAndComments;
 
-  const response = await client.Info({ thingIds: [id], subreddits: [] }, context.debug.metadata);
+  const response = await client.Info({ thingIds: [id], subreddits: [] }, context.metadata);
   return response.data?.children[0]?.data?.displayName;
 }

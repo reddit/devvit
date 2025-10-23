@@ -1,23 +1,13 @@
-import type { Devvit } from '@devvit/public-api';
+import type { Context, Metadata } from '@devvit/public-api';
 import { Header } from '@devvit/shared-types/Header.js';
 
 import { currentUserHasModPermissions } from './index.js';
 
-test('index', () => {
-  expect(currentUserHasModPermissions).toBeDefined();
-});
-
 describe('currentUserHasModPermissions', () => {
   it('should check mod permissions from metadata', async () => {
-    const context = {
-      debug: {
-        metadata: {
-          [Header.ModPermissions]: {
-            values: ['posts'],
-          },
-        },
-      },
-    } as unknown as Devvit.Context;
+    const context = TestContext({
+      [Header.ModPermissions]: { values: ['posts'] },
+    });
 
     const callback = vi.fn();
 
@@ -27,15 +17,9 @@ describe('currentUserHasModPermissions', () => {
   });
 
   it('should support multiple mod permissions', async () => {
-    const context = {
-      debug: {
-        metadata: {
-          [Header.ModPermissions]: {
-            values: ['posts', 'flair'],
-          },
-        },
-      },
-    } as unknown as Devvit.Context;
+    const context = TestContext({
+      [Header.ModPermissions]: { values: ['posts', 'flair'] },
+    });
 
     const callback = vi.fn();
 
@@ -45,15 +29,7 @@ describe('currentUserHasModPermissions', () => {
   });
 
   it('should throw when called with missing permissions', async () => {
-    const context = {
-      debug: {
-        metadata: {
-          [Header.ModPermissions]: {
-            values: [],
-          },
-        },
-      },
-    } as unknown as Devvit.Context;
+    const context = TestContext({ [Header.ModPermissions]: { values: [] } });
 
     const callback = vi.fn();
 
@@ -66,15 +42,9 @@ describe('currentUserHasModPermissions', () => {
   });
 
   it('can parse merged headers', async () => {
-    const context = {
-      debug: {
-        metadata: {
-          [Header.ModPermissions]: {
-            values: ['config, flair'],
-          },
-        },
-      },
-    } as unknown as Devvit.Context;
+    const context = TestContext({
+      [Header.ModPermissions]: { values: ['config, flair'] },
+    });
 
     const callback = vi.fn();
 
@@ -83,3 +53,7 @@ describe('currentUserHasModPermissions', () => {
     expect(callback).toHaveBeenCalled();
   });
 });
+
+function TestContext(metadata: Metadata): Context {
+  return { metadata } as unknown as Context;
+}

@@ -39,7 +39,7 @@ export default class Uninstall extends DevvitCommand {
 
     const appName = args.app || this.project.name;
 
-    await getAccessTokenAndLoginIfNeeded();
+    await getAccessTokenAndLoginIfNeeded('LocalSocket');
 
     ux.action.start(`Finding installation of the app "${appName}" in r/${subreddit}`);
     let id: string;

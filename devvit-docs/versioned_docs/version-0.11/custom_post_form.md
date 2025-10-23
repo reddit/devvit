@@ -10,13 +10,13 @@ Read through our [custom post tutorial](./basic_custom_post.md) to learn what a 
 
 ### Start a project
 
-To create a form, use the `custom-post` template to start a new custom post project.
+To create a form, use the `Blocks Post` template to start a new custom post project.
 
 1. From the terminal, navigate to a directory where you'll store your project.
 2. Enter the following command to create a project folder on your local machine.
 
 ```bash
-devvit new <replace-with-your-app-name> --template=custom-post
+devvit new <replace-with-your-app-name>
 ```
 
 ### Install dependencies
@@ -162,7 +162,7 @@ Devvit.addCustomPostType({
 Devvit.addMenuItem({
   location: 'subreddit',
   label: 'Submit custom post',
-  onPress: async (_, context) => {
+  onPress: async (_event, context) => {
     const currentSubreddit = await context.reddit.getCurrentSubreddit();
     await context.reddit.submitPost({
       title: 'My custom post',

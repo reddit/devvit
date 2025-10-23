@@ -4,6 +4,19 @@ While we're always shipping fixes and improvements, our team bundles new feature
 
 Before upgrading `@devvit/public-api` in your project, always update the CLI first by running `npm install -g devvit`.
 
+## Devvit 0.11.19: UI Simulator
+
+**Release Date: Jul 21, 2025**
+
+Fun fact: most redditors (over 80%!) play Reddit games on their phones. Conversely, most devvitors create apps on desktop. Release 0.11.19 bridges this gap with [UI simulator](./ui_simulator). This tool renders your app in a mobile viewport, lets you test light/dark modes, and helps you build and test apps for a mobile audience.
+
+![UI Simulator Header](./assets/ui_simulator_header.png)
+
+**Other Fixes**
+
+- We fixed `devvit upload --copy-paste` for users who were not logged in
+- We fixed the data object on scheduled cron jobs so that the data is passed as `event.data` rather than `event.data.data`
+
 ## Devvit 0.11.18: Playtest subreddits and CLI improvements
 
 **Release Date: Jul 1, 2025**
@@ -62,7 +75,7 @@ There’s also a new section in your app’s Developer Settings (https://develop
 
 To use this feature, you’ll need to be on the latest version of the public api. You can do this by running: `npm i @devvit/public-api` in your app.
 
-Learn more about [HTTP fetch](./capabilities/http-fetch.md) and the[allow-listed domains](./capabilities/http-fetch-allowlist.md) in our docs.
+Learn more about [HTTP fetch](./capabilities/http-fetch.mdx) and the[allow-listed domains](./capabilities/http-fetch-allowlist.md) in our docs.
 
 ## Devvit 0.11.16: CLI improvements and updated guidelines
 
@@ -243,7 +256,7 @@ We’ve got a big update for our [payments pilot](./payments/payments_overview.m
 
 - **Instant Access to Sandbox Testing** – Now, all developers can immediately test sandbox payment products in their apps without needing to request allowlist access first. This means you can start experimenting with in-app purchasing right away! (You'll still need to complete the [verification process](./payments/payments_overview.md#prerequisites) before submitting your app for approval.)
 
-- **New Developer Showcase** – We’re highlighting how fellow developers are using payments in their apps! First up: [Dark Dungeon](./showcase/payments_examples.md), a game with in-app purchasing thoughtfully integrated in. Check it out for inspiration on what’s possible!
+- **New Developer Showcase** – We’re highlighting how fellow developers are using payments in their apps! First up: [Dark Dungeon](./showcase/monetization_examples#dark-dungeon), a game with in-app purchasing thoughtfully integrated in. Check it out for inspiration on what’s possible!
 
 We can’t wait to see what you build! If you have questions or feedback, drop questions here or in the [Payments Discord channel](https://discord.com/channels/1050224141732687912/1295856497917431879).
 
@@ -295,17 +308,17 @@ You may notice additional logs about CSRF tokens. These will be removed in the n
 
 **Release Date: Dec 9, 2024**
 
-Release 0.11.4 introduces [payments](./capabilities/payments.md)! This pilot program lets you add products to your app and get paid for what you sell. The payments plugin enables the capability for users to purchase in-app products, like additional lives in a game or custom flair.
+Release 0.11.4 introduces [payments](./payments/payments_overview.md)! This pilot program lets you add products to your app and get paid for what you sell. The payments plugin enables the capability for users to purchase in-app products, like additional lives in a game or custom flair.
 
 Since this is a pilot program, you'll need to submit an [enrollment form](https://forms.gle/TuTV5jbUwFKTcerUA) before developing and playtesting payments in your app. Before you publish your app, you’ll need to complete additional steps outlined in the payments documentation.
 
-We’ve also added a new [template](https://developers.reddit.com/docs/capabilities/payments#add-payments-to-your-app) to help you set up payments functionality without needing to code a full app from scratch.
+We’ve also added a new [template](./payments/payments_add.md) to help you set up payments functionality without needing to code a full app from scratch.
 
 **New features**
 This release also includes:
 
 - A `finally:` parameter for [useAsync](./working_with_useasync.md) that lets your app setState when an async response is returned.
-- The ability to use runAs with [setCustomPostPreview](https://developers.reddit.com/docs/api/redditapi/classes/models.Post#-setcustompostpreview).
+- The ability to use runAs with [setCustomPostPreview](https://developers.reddit.com/docs/0.11/api/redditapi/models/classes/Post#setcustompostpreview).
 - Experimental [web views](./webviews.md) functionality on the latest iOS and Android clients.
 
 **Fixes**
@@ -323,9 +336,9 @@ Release 0.11.4 corrected issues with duplicate logs and fixed the 502 error that
 
 We also made a few other changes to our public API in this release:
 
-- [post.getEnrichedThumbnail](./api/redditapi/classes/models.Post.md#getenrichedthumbnail) allows developers to get a better thumbnail
-- Community fix: Allow [WikiPage revision author](./api/redditapi/classes/models.WikiPage.md) to be undefined (Thanks PitchforkAssistant)
-- Community fix: Include conversations IDs sorted array from [modMail.getConversations](./api/redditapi/classes/models.ModMailService.md#getconversations) (Thanks Pitchfork Assistant x2!)
+- [post.getEnrichedThumbnail](./api/redditapi/models/classes/Post.md#getenrichedthumbnail) allows developers to get a better thumbnail
+- Community fix: Allow [WikiPage revision author](./api/redditapi/models/classes/WikiPage) to be undefined (Thanks PitchforkAssistant)
+- Community fix: Include conversations IDs sorted array from [modMail.getConversations](./api/redditapi/models/classes//ModMailService.md#getconversations) (Thanks Pitchfork Assistant x2!)
 
 ## Devvit 0.11.2: Text fallback and post API client changes
 
@@ -335,15 +348,15 @@ We also made a few other changes to our public API in this release:
 
 This release also includes a few API updates:
 
-- [setCustomPostPreview](./api/redditapi/classes/models.Post.md#setcustompostpreview) lets you update and [customize the post preview](./interactive_posts.md#customize-the-post-preview) with real content in the loading screen after the post has been created.
-- [setSuggestedCommentSort](./api/redditapi/classes/models.Post.md#setsuggestedcommentsort) provides options for sorting comments on a post.
+- [setCustomPostPreview](./api/redditapi/models/classes/Post.md#setcustompostpreview) lets you update and [customize the post preview](./custom_post_preview) with real content in the loading screen after the post has been created.
+- [setSuggestedCommentSort](./api/redditapi/models/classes/Post.md#setsuggestedcommentsort) provides options for sorting comments on a post.
 - `forUserType: member’` has been removed from menu items. If you want a menu action to be visible to all users, omit the `forUserType` field.
 
 ## Devvit 0.11.1: New automod filter trigger, playtest connect, and other improvements
 
 **Release Date: Oct 21, 2024**
 
-0.11.1 includes [a new trigger](capabilities/triggers.md) for when posts and comments are filtered by automod. We’ve also included some other improvements including:
+0.11.1 includes [a new trigger](capabilities/triggers) for when posts and comments are filtered by automod. We’ve also included some other improvements including:
 
 - Playtest now defaults to using `--connect`, which sends client side logs that are in your browser into your CLI/terminal if you use the `?playtest` [parameter](playtest.md).
 - Public API changes:
@@ -351,7 +364,7 @@ This release also includes a few API updates:
     - Added `createModInboxConversation()`, which sends a message from the app account to subreddit mods via Mod Inbox.
     - Added `createModDiscussionConversation()`, which does the same thing via Mod Discussions.
     - Deprecated `modMail.createConversation()`.
-  - Fixed [`modMail.muteConversation`](api/redditapi/classes/models.ModMailService.md) to take in proper values for numHours (defaults to 72).
+  - Fixed [`modMail.muteConversation`](api/redditapi/models/classes/ModMailService.md) to take in proper values for numHours (defaults to 72).
   - Fixed context that was not being properly passed in `reddit.banUser` methods (thanks to fsv for the community contribution!).
 
 ## Devvit 0.11.0: Platform updates, breaking changes, and useAsync

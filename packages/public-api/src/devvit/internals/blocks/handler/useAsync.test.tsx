@@ -3,9 +3,9 @@
 
 import { type UIEvent, UIEventScope, type UIRequest, UIResponse } from '@devvit/protos';
 import { CircuitBreak } from '@devvit/shared-types/CircuitBreaker.js';
-import type { JSONObject, JSONValue } from '@devvit/shared-types/json.js';
 
 import { Devvit, useState } from '../../../../index.js';
+import type { JSONObject, JSONValue } from '../../../../types/json.js';
 import { BlocksHandler } from './BlocksHandler.js';
 import { captureHookRef } from './refs.js';
 import { findHookState, getEmptyRequest, mockMetadata } from './test-helpers.js';

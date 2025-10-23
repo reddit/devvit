@@ -1,4 +1,0 @@
-{
-  "files": [], // only build references.
-  "references": [{ "path": "src" }, { "path": "webroot" }],
-}

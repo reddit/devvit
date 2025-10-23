@@ -1,7 +1,6 @@
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import { beforeAll, describe, expect, test } from 'vitest';
 
-import { Devvit } from '../../devvit/Devvit.js';
 import { AssetsClient } from './AssetsClient.js';
 
 const ASSET_1 = 'test1.jpg';
@@ -16,7 +15,14 @@ const DATA_URL = 'data:image/svg+xml;charset=UTF-8;base64,foo';
 
 describe('AssetsClient', () => {
   beforeAll(() => {
-    Object.keys(ASSETS).forEach((asset) => (Devvit.assets[asset] = ASSETS[asset]));
+    Object.keys(ASSETS).forEach((asset) => {
+      globalThis.devvit ??= {};
+      globalThis.devvit.assets ??= {};
+      globalThis.devvit.assets[asset] = ASSETS[asset];
+    });
+  });
+  afterAll(() => {
+    delete globalThis.devvit;
   });
 
   test('should work when getting a single asset URL', () => {

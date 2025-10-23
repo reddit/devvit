@@ -1,69 +1,67 @@
 // @vitest-environment jsdom
 
-import { emitEffect } from '@devvit/client';
-import { RealtimeEvent } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
-import type { EffectType } from '@devvit/protos/types/devvit/ui/effects/v1alpha/effect.js';
-import type {
-  RealtimeSubscriptionEvent,
-  RealtimeSubscriptionStatus,
-} from '@devvit/protos/types/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import { RealtimeSubscriptionStatus } from '@devvit/protos/json/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
+import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { __clearConnections, connectRealtime } from './realtime.js';
+import {
+  __clearConnections,
+  connectRealtime,
+  disconnectRealtime,
+  isRealtimeConnected,
+} from './realtime.js';
 
-vi.mock('@devvit/client', () => ({
+vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(),
 }));
 
 describe('realtime', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   afterEach(() => {
     vi.resetAllMocks();
-    // Clean up any remaining connections
     __clearConnections();
   });
 
-  describe('connectRealtime', () => {
+  describe('connectRealtime()', () => {
     it('should connect to a channel successfully', async () => {
       const mockOnConnect = vi.fn();
       const mockOnMessage = vi.fn();
 
-      (emitEffect as ReturnType<typeof vi.fn>).mockResolvedValue({
-        realtimeEvent: {
-          status: 0 satisfies RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
-        } as RealtimeSubscriptionEvent,
-      });
-
       const connection = await connectRealtime({
-        channel: 'test-channel',
+        channel: 'test_channel',
         onConnect: mockOnConnect,
         onMessage: mockOnMessage,
       });
+      const connect = new MessageEvent('message', {
+        data: {
+          type: 'devvit-message',
+          data: {
+            id: 'id',
+            realtimeEvent: {
+              event: { channel: 'useChannel:test_channel' },
+              status: RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
+            },
+          },
+        } satisfies WebViewMessageEvent_MessageData,
+      });
+      dispatchEvent(connect);
 
       expect(emitEffect).toHaveBeenCalledWith({
-        realtimeSubscriptions: { subscriptionIds: ['test-channel'] },
-        type: 0 satisfies EffectType.EFFECT_REALTIME_SUB,
+        realtimeSubscriptions: { subscriptionIds: ['test_channel'] },
+        type: EffectType.EFFECT_REALTIME_SUB,
       });
       expect(connection).toBeDefined();
-      expect(typeof connection.disconnect).toBe('function');
+      expect(isRealtimeConnected('test_channel')).toBe(true);
     });
 
     it('should return existing connection if channel is already connected', async () => {
       const mockOnMessage = vi.fn();
       const mockOnConnect = vi.fn();
 
-      (emitEffect as ReturnType<typeof vi.fn>).mockResolvedValue({
-        realtimeEvent: {
-          status: 0 satisfies RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
-        } as RealtimeSubscriptionEvent,
-      });
-
       // First connection should succeed
       const connection1 = await connectRealtime({
-        channel: 'test-channel',
+        channel: 'test_channel',
         onMessage: mockOnMessage,
         onConnect: mockOnConnect,
       });
@@ -73,7 +71,7 @@ describe('realtime', () => {
 
       // Second connection should return the same connection object
       const connection2 = await connectRealtime({
-        channel: 'test-channel',
+        channel: 'test_channel',
         onMessage: mockOnMessage,
       });
 
@@ -85,14 +83,8 @@ describe('realtime', () => {
     it('should call onMessage when receiving a message', async () => {
       const mockOnMessage = vi.fn();
 
-      (emitEffect as ReturnType<typeof vi.fn>).mockResolvedValue({
-        realtimeEvent: {
-          status: 0 satisfies RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
-        } as RealtimeSubscriptionEvent,
-      });
-
       await connectRealtime({
-        channel: 'test-channel',
+        channel: 'test_channel',
         onMessage: mockOnMessage,
       });
 
@@ -100,52 +92,86 @@ describe('realtime', () => {
       const testMessage = {
         counter: 10,
       };
-
-      // Create and dispatch a message event
       const messageEvent = new MessageEvent('message', {
         data: {
           type: 'devvit-message',
           data: {
-            hook: 'useChannel:test-channel',
+            id: 'id',
             realtimeEvent: {
               event: {
-                channel: 'useChannel:test-channel',
-                data: {
-                  msg: testMessage,
-                },
-              } satisfies RealtimeEvent,
+                channel: 'useChannel:test_channel',
+                data: { msg: testMessage },
+              },
             },
           },
-        },
+        } satisfies WebViewMessageEvent_MessageData,
       });
-
-      window.dispatchEvent(messageEvent);
+      dispatchEvent(messageEvent);
 
       expect(mockOnMessage).toHaveBeenCalledWith(testMessage);
     });
+
+    test('throws an error for an invalid channel', async () => {
+      const mockOnMessage = vi.fn();
+
+      await expect(
+        connectRealtime({ channel: 'test-channel', onMessage: mockOnMessage })
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: invalid channel name "test-channel"; channels may only contain letters, numbers, and underscores]`
+      );
+    });
+
+    test('throws an error for an empty channel', async () => {
+      const mockOnMessage = vi.fn();
+
+      await expect(
+        connectRealtime({ channel: '', onMessage: mockOnMessage })
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: invalid channel name ""; channels may only contain letters, numbers, and underscores]`
+      );
+    });
   });
 
-  describe('Connection.disconnect', () => {
+  describe('disconnectRealtime()', () => {
     it('should disconnect from a channel', async () => {
       const mockOnMessage = vi.fn();
 
-      (emitEffect as ReturnType<typeof vi.fn>).mockResolvedValue({
-        realtimeEvent: {
-          status: 0 satisfies RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
-        } as RealtimeSubscriptionEvent,
+      await connectRealtime({ channel: 'test_channel', onMessage: mockOnMessage });
+      const connect = new MessageEvent('message', {
+        data: {
+          type: 'devvit-message',
+          data: {
+            id: 'id',
+            realtimeEvent: {
+              event: { channel: 'useChannel:test_channel' },
+              status: RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
+            },
+          },
+        } satisfies WebViewMessageEvent_MessageData,
       });
+      dispatchEvent(connect);
+      expect(isRealtimeConnected('test_channel')).toBe(true);
 
-      const connection = await connectRealtime({
-        channel: 'test-channel',
-        onMessage: mockOnMessage,
+      const disconnect = new MessageEvent('message', {
+        data: {
+          type: 'devvit-message',
+          data: {
+            id: 'id',
+            realtimeEvent: {
+              event: { channel: 'useChannel:test_channel' },
+              status: RealtimeSubscriptionStatus.REALTIME_UNSUBSCRIBED,
+            },
+          },
+        } satisfies WebViewMessageEvent_MessageData,
       });
-
-      await connection.disconnect();
+      dispatchEvent(disconnect);
+      await disconnectRealtime('test_channel');
 
       expect(emitEffect).toHaveBeenCalledWith({
         realtimeSubscriptions: { subscriptionIds: [] },
-        type: 0 satisfies EffectType.EFFECT_REALTIME_SUB,
+        type: EffectType.EFFECT_REALTIME_SUB,
       });
+      expect(isRealtimeConnected('test_channel')).toBe(false);
     });
   });
 });
