@@ -103,6 +103,11 @@ describe('requestExpandedMode()', () => {
     );
   });
 
+  test('typing supports `MouseEvent`s for React', async () => {
+    const ev = { isTrusted: true, type: 'click' } as MouseEvent;
+    await requestExpandedMode(ev, 'default');
+  });
+
   it('should throw an error when entrypoint does not exist in devvit.json', async () => {
     // to-do: tighten Event checking.
     const ev = { isTrusted: true, type: 'click' } as PointerEvent;
