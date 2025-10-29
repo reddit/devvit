@@ -19,3 +19,7 @@ You can use the sandbox to build and test payments, but before you can publish y
 - Accept and comply with our [Earn Terms](https://redditinc.com/policies/earn-terms) and [Earn Policy](https://www.redditinc.com/policies/earn-policy).
 
 All products will be reviewed by the Developer Platform team to ensure compliance with our content policy. Products are approved during the app review process after you publish your app.
+
+:::note
+Payment functionality is supported on [Devvit Blocks](../../capabilities/blocks/overview.md) only. [Devvit Web](../../capabilities/devvit-web/devvit_web_overview.mdx) is currently not supported.
+:::
