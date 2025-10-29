@@ -1,0 +1,56 @@
+{
+  "name": "@devvit/shared-types",
+  "version": "0.12.1",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./*": "./dist/*"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc && yarn postbuild:copy-schemas",
+    "clean": "rm -rf .turbo coverage dist",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "dev": "tsc -w",
+    "dev:build": "chokidar ./src --command 'yarn build && echo \"BUILD COMPLETE\"'",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "postbuild:copy-schemas": "cp -af src/schemas/*.json dist/schemas/",
+    "prepublishOnly": "publish-package-json",
+    "test": "yarn test:unit && yarn test:types",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@devvit/protos": "0.12.1",
+    "jsonschema": "1.4.1",
+    "uuid": "9.0.0"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "0.12.1",
+    "@types/redis-mock": "0.17.1",
+    "@types/uuid": "9.0.0",
+    "chokidar-cli": "3.0.0",
+    "eslint": "9.11.1",
+    "lit": "2.5.0",
+    "redis": "4.6.6",
+    "redis-mock": "0.56.3",
+    "typescript": "5.8.3",
+    "vitest": "1.6.1"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  },
+  "source": "./src/index.ts"
+}

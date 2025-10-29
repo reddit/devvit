@@ -1,0 +1,60 @@
+{
+  "name": "@devvit/web-view-scripts",
+  "version": "0.12.1",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./*": "./dist/*"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc --build && yarn build:devvit",
+    "build:devvit": "yarn bundle --minify",
+    "bundle": "tools/build.js",
+    "clean": "rm -rf .turbo coverage dist",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "dev": "tsc -w",
+    "dev:wvs": "yarn bundle --watch",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepublishOnly": "publish-package-json",
+    "test": "yarn test:unit && yarn test:types && yarn lint",
+    "test:size": "yarn build:devvit && filesize",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@devvit/protos": "0.12.1",
+    "@devvit/shared": "0.12.1",
+    "@devvit/shared-types": "0.12.1",
+    "jwt-decode": "4.0.0"
+  },
+  "devDependencies": {
+    "@ampproject/filesize": "4.3.0",
+    "@devvit/tsconfig": "0.12.1",
+    "esbuild": "0.25.9",
+    "eslint": "9.11.1",
+    "typescript": "5.8.3",
+    "vitest": "1.6.1"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  },
+  "filesize": {
+    "dist/scripts/devvit.v1.min.js": {
+      "gzip": "1.7 KB",
+      "none": "4.0 KB"
+    }
+  },
+  "source": "./src/index.ts"
+}

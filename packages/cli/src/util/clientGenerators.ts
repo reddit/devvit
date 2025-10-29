@@ -144,11 +144,14 @@ export function createFeedbackClient(): FeedbackClient {
 }
 
 export function createRemoteLoggerClient(): RemoteLogConsumer {
+  const headers = getHeaders();
+  // Uncomment the below line to route all RemoteLog requests to gateway-execute in snoodev
+  // headers.set('devvit-gateway-v2', 'true');
   return new RemoteLogConsumerClientImpl(
     new GrpcWebRpc({
       baseUrl: DEVVIT_GATEWAY_URL,
       getToken: getAccessToken,
-      headers: getHeaders(),
+      headers,
     })
   );
 }

@@ -1,0 +1,46 @@
+{
+  "name": "@devvit/cache",
+  "version": "0.12.1",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "browser": "./dist/serverImportInClientCodePanic.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf .turbo coverage dist",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "dev": "tsc -w",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepublishOnly": "publish-package-json",
+    "test": "yarn test:unit && yarn test:types && yarn lint",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@devvit/redis": "0.12.1",
+    "@devvit/shared-types": "0.12.1"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "0.12.1",
+    "eslint": "9.11.1",
+    "typescript": "5.8.3",
+    "vitest": "1.6.1"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  }
+}

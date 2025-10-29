@@ -1,10 +1,10 @@
 # Add Payments
 
-:::note
-Payments is a beta feature. As of this moment Payments is still not supported in [Devvit Web](../../capabilities/devvit-web/devvit_web_overview.mdx) applications. Only applications built with [Devvit Blocks](../../capabilities/blocks/overview.md) can support Payments
-:::
-
 You can use the payments template to build your app or add payment functionality to an existing app.
+
+:::note
+Payment functionality is supported on [Devvit Blocks](../../capabilities/blocks/overview.md) only. [Devvit Web](../../capabilities/devvit-web/devvit_web_overview.mdx) is currently not supported.
+:::
 
 To start with a template, select the payments template when you create a new project or run:
 

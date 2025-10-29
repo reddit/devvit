@@ -47,7 +47,7 @@ export const getWebViewMode = (): WebViewMode => webViewMode(devvit.webViewMode)
  * });
  * ```
  */
-export function requestExpandedMode(event: PointerEvent, entry: string): Promise<void> {
+export function requestExpandedMode(event: MouseEvent, entry: string): Promise<void> {
   if (devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE)
     throw Error('web view is already expanded');
   return emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry);
@@ -98,7 +98,7 @@ export function removeWebViewModeListener(callback: WebViewModeListener): void {
 
 async function emitModeEffect(
   mode: WebViewImmersiveMode,
-  event: PointerEvent,
+  event: Event,
   entry: string | undefined
 ): Promise<void> {
   if (!event.isTrusted || event.type !== 'click') {

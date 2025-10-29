@@ -1,0 +1,744 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developers.reddit.com/schema/config-file.v1.json",
+  "title": "Devvit app config file schema",
+  "type": "object",
+  "description": "A JSON representation of a Devvit app config file.",
+  "$defs": {
+    "CronSchedule": {
+      "type": "string",
+      "description": "The cron schedule for the task. Uses standard five-part UNIX cron format, or a six-part version with second-level granularity. If not provided, you'll need to schedule the task manually using `@devvit/web/server`.",
+      "examples": ["0 * * * *", "*/30 * * * * *"]
+    },
+    "Entrypoint": {
+      "type": "object",
+      "description": "Key-value pairs mapping entrypoint name to a specific post entrypoint configuration.",
+      "additionalProperties": true,
+      "properties": {
+        "entry": {
+          "type": "string",
+          "description": "Web view document shown in the post. Can be an HTML file path (resolved relative to the web view domain root) or a server endpoint path starting with `/api/`. May include query parameters.",
+          "pattern": "^(/api/)?[^/].*$"
+        },
+        "height": {
+          "description": "The height configuration for this post view. Height is only applicable when app is shown inline and ignored when expanded.",
+          "enum": ["regular", "tall"],
+          "default": "tall"
+        }
+      }
+    },
+    "InternalEndpoint": {
+      "type": "string",
+      "description": "HTTP path. Requests are POSTed JSON, and response bodies must also be in JSON format.",
+      "examples": [
+        "/internal/menu/post-create",
+        "/internal/triggers/delete-post",
+        "/internal/cron/daily-job"
+      ],
+      "pattern": "^/internal/.+"
+    },
+    "Path": {
+      "type": "string",
+      "pattern": "^[^\\\\\\\\]+$"
+    },
+    "StringSetting": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "string"
+        },
+        "label": {
+          "type": "string",
+          "description": "The display label for this setting."
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text to explain the purpose or usage of this setting."
+        },
+        "validationEndpoint": {
+          "$ref": "#/$defs/InternalEndpoint",
+          "description": "Optional endpoint for server-side validation of this setting value."
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "Placeholder text to show in the input field."
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "Default value for this setting."
+        }
+      }
+    },
+    "ParagraphSetting": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "paragraph"
+        },
+        "label": {
+          "type": "string",
+          "description": "The display label for this setting."
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text to explain the purpose or usage of this setting."
+        },
+        "validationEndpoint": {
+          "$ref": "#/$defs/InternalEndpoint",
+          "description": "Optional endpoint for server-side validation of this setting value."
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "Placeholder text to show in the textarea."
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "Default value for this setting."
+        }
+      }
+    },
+    "NumberSetting": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "number"
+        },
+        "label": {
+          "type": "string",
+          "description": "The display label for this setting."
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text to explain the purpose or usage of this setting."
+        },
+        "validationEndpoint": {
+          "$ref": "#/$defs/InternalEndpoint",
+          "description": "Optional endpoint for server-side validation of this setting value."
+        },
+        "defaultValue": {
+          "type": "number",
+          "description": "Default value for this setting."
+        }
+      }
+    },
+    "BooleanSetting": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "boolean"
+        },
+        "label": {
+          "type": "string",
+          "description": "The display label for this setting."
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text to explain the purpose or usage of this setting."
+        },
+        "validationEndpoint": {
+          "$ref": "#/$defs/InternalEndpoint",
+          "description": "Optional endpoint for server-side validation of this setting value."
+        },
+        "defaultValue": {
+          "type": "boolean",
+          "description": "Default value for this setting."
+        }
+      }
+    },
+    "SelectSetting": {
+      "type": "object",
+      "required": ["type", "options"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "select"
+        },
+        "label": {
+          "type": "string",
+          "description": "The display label for this setting."
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text to explain the purpose or usage of this setting."
+        },
+        "validationEndpoint": {
+          "$ref": "#/$defs/InternalEndpoint",
+          "description": "Optional endpoint for server-side validation of this setting value."
+        },
+        "options": {
+          "type": "array",
+          "description": "List of available options for this select setting.",
+          "items": {
+            "type": "object",
+            "description": "An option for a select-type setting.",
+            "additionalProperties": false,
+            "required": ["label", "value"],
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "The display label for this option."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value that will be stored when this option is selected."
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "Default selected option."
+        }
+      }
+    },
+    "MultiSelectSetting": {
+      "type": "object",
+      "required": ["type", "options"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "multiSelect"
+        },
+        "label": {
+          "type": "string",
+          "description": "The display label for this setting."
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text to explain the purpose or usage of this setting."
+        },
+        "validationEndpoint": {
+          "$ref": "#/$defs/InternalEndpoint",
+          "description": "Optional endpoint for server-side validation of this setting value."
+        },
+        "options": {
+          "type": "array",
+          "description": "List of available options for this select setting.",
+          "items": {
+            "type": "object",
+            "description": "An option for a select-type setting.",
+            "additionalProperties": false,
+            "required": ["label", "value"],
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "The display label for this option."
+              },
+              "value": {
+                "type": "string",
+                "description": "The value that will be stored when this option is selected."
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "defaultValue": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Default selected options."
+        }
+      }
+    },
+    "GlobalStringSetting": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "string"
+        },
+        "label": {
+          "type": "string",
+          "description": "The display label for this setting."
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text to explain the purpose or usage of this setting."
+        },
+        "validationEndpoint": {
+          "$ref": "#/$defs/InternalEndpoint",
+          "description": "Optional endpoint for server-side validation of this setting value."
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "Placeholder text to show in the input field."
+        },
+        "defaultValue": {
+          "type": "string",
+          "description": "Default value for this setting."
+        },
+        "isSecret": {
+          "type": "boolean",
+          "description": "Whether this setting contains secret/sensitive information."
+        }
+      },
+      "if": {
+        "properties": { "isSecret": { "const": true } },
+        "required": ["isSecret"]
+      },
+      "then": { "not": { "required": ["defaultValue"] } }
+    },
+    "GlobalSetting": {
+      "oneOf": [
+        { "$ref": "#/$defs/GlobalStringSetting" },
+        { "$ref": "#/$defs/ParagraphSetting" },
+        { "$ref": "#/$defs/NumberSetting" },
+        { "$ref": "#/$defs/BooleanSetting" },
+        { "$ref": "#/$defs/SelectSetting" },
+        { "$ref": "#/$defs/MultiSelectSetting" }
+      ]
+    },
+    "SubredditSetting": {
+      "oneOf": [
+        { "$ref": "#/$defs/StringSetting" },
+        { "$ref": "#/$defs/ParagraphSetting" },
+        { "$ref": "#/$defs/NumberSetting" },
+        { "$ref": "#/$defs/BooleanSetting" },
+        { "$ref": "#/$defs/SelectSetting" },
+        { "$ref": "#/$defs/MultiSelectSetting" }
+      ]
+    }
+  },
+  "required": ["name"],
+  "anyOf": [{ "required": ["post"] }, { "required": ["server"] }, { "required": ["blocks"] }],
+  "dependentRequired": { "triggers": ["server"] },
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "The app configuration schema URI.",
+      "default": "https://developers.reddit.com/schema/config-file.v1.json"
+    },
+    "name": {
+      "type": "string",
+      "description": "App account name and Community URL slug.",
+      "minLength": 3,
+      "maxLength": 16,
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "media": {
+      "type": "object",
+      "description": "Static asset config. All assets are available to the app client and server via the asset plugin. No overlap with the media plugin or permission.",
+      "additionalProperties": false,
+      "properties": {
+        "dir": {
+          "$ref": "#/$defs/Path",
+          "description": "Public assets path relative project root. All files within are uploaded to Reddit.",
+          "default": "assets"
+        }
+      }
+    },
+    "permissions": {
+      "type": "object",
+      "description": "What an app is allowed to do.",
+      "additionalProperties": false,
+      "properties": {
+        "http": {
+          "type": "object",
+          "description": "HTTP plugin config (`fetch()`).",
+          "additionalProperties": false,
+          "properties": {
+            "enable": {
+              "type": "boolean",
+              "description": "Enables the HTTP plugin.",
+              "default": true
+            },
+            "domains": {
+              "type": "array",
+              "description": "Domains the app may communicate with. `/api/` is implied and `\"reddit.com\"` or subdomains should not be included.",
+              "items": {
+                "type": "string",
+                "description": "Allowed domain.",
+                "examples": ["example.com", "wikipedia.org", "query.wikidata.org"]
+              },
+              "uniqueItems": true,
+              "default": []
+            }
+          }
+        },
+        "media": {
+          "type": "boolean",
+          "description": "Enables the media plugin (uploads).",
+          "default": false
+        },
+        "payments": {
+          "type": "boolean",
+          "description": "Enables the payments plugin.",
+          "default": false
+        },
+        "realtime": {
+          "type": "boolean",
+          "description": "Enables the realtime plugin (client and server messaging).",
+          "default": false
+        },
+        "redis": {
+          "type": "boolean",
+          "description": "Enables the Redis plugin (storage).",
+          "default": false
+        },
+        "reddit": {
+          "oneOf": [
+            {
+              "type": "object",
+              "description": "Reddit API plugin config.",
+              "additionalProperties": false,
+              "properties": {
+                "enable": {
+                  "type": "boolean",
+                  "description": "Enables the Reddit API plugin.",
+                  "default": true
+                },
+                "scope": {
+                  "description": "APIs available. `\"moderator\"` includes all of `\"user\"`.",
+                  "enum": ["user", "moderator"],
+                  "default": "user"
+                },
+                "asUser": {
+                  "type": "array",
+                  "description": "APIs to execute from the user account instead of the app account (`name`). These are not currently in use, please set scope to `\"user\"` instead to submit posts or comments as the user.",
+                  "items": {
+                    "enum": ["SUBMIT_POST", "SUBMIT_COMMENT", "SUBSCRIBE_TO_SUBREDDIT"]
+                  },
+                  "uniqueItems": true,
+                  "default": []
+                }
+              }
+            },
+            {
+              "type": "boolean",
+              "description": "Enables the Reddit API plugin with defaults.",
+              "default": false
+            }
+          ]
+        }
+      }
+    },
+    "post": {
+      "type": "object",
+      "description": "Custom post config. Web views can only fetch from `/api/` endpoints when `server` is enabled.",
+      "additionalProperties": false,
+      "properties": {
+        "dir": {
+          "$ref": "#/$defs/Path",
+          "description": "Client directory relative to project root for all public web view assets. All files within are uploaded to Reddit.",
+          "default": "public"
+        },
+        "entrypoints": {
+          "type": "object",
+          "description": "Map of named entrypoints for post rendering.",
+          "additionalProperties": false,
+          "required": ["default"],
+          "properties": {
+            "default": {
+              "$ref": "#/$defs/Entrypoint",
+              "properties": { "entry": { "default": "index.html" } }
+            }
+          },
+          "patternProperties": {
+            "^[a-zA-Z0-9_-]+$": {
+              "$ref": "#/$defs/Entrypoint",
+              "required": ["entry"]
+            }
+          }
+        }
+      }
+    },
+    "server": {
+      "type": "object",
+      "description": "Node.js server config. Enables server usage and `/api/` calls from the web view.",
+      "additionalProperties": false,
+      "properties": {
+        "dir": {
+          "$ref": "#/$defs/Path",
+          "description": "Server bundle directory relative to project root. This directory is private and server-side only.",
+          "default": "dist/server"
+        },
+        "entry": {
+          "$ref": "#/$defs/Path",
+          "description": "Server bundle filename within `server.dir`. Must be a self-contained JavaScript file except for standard Node.js API imports in CommonJS format. This code is private and server-side only.",
+          "default": "index.js"
+        }
+      }
+    },
+    "triggers": {
+      "type": "object",
+      "description": "Event triggers config.",
+      "additionalProperties": false,
+      "properties": {
+        "onAppInstall": { "$ref": "#/$defs/InternalEndpoint" },
+        "onAppUpgrade": { "$ref": "#/$defs/InternalEndpoint" },
+        "onAutomoderatorFilterComment": { "$ref": "#/$defs/InternalEndpoint" },
+        "onAutomoderatorFilterPost": { "$ref": "#/$defs/InternalEndpoint" },
+        "onCommentCreate": { "$ref": "#/$defs/InternalEndpoint" },
+        "onCommentDelete": { "$ref": "#/$defs/InternalEndpoint" },
+        "onCommentReport": { "$ref": "#/$defs/InternalEndpoint" },
+        "onCommentSubmit": { "$ref": "#/$defs/InternalEndpoint" },
+        "onCommentUpdate": { "$ref": "#/$defs/InternalEndpoint" },
+        "onModAction": { "$ref": "#/$defs/InternalEndpoint" },
+        "onModMail": { "$ref": "#/$defs/InternalEndpoint" },
+        "onPostCreate": { "$ref": "#/$defs/InternalEndpoint" },
+        "onPostDelete": { "$ref": "#/$defs/InternalEndpoint" },
+        "onPostFlairUpdate": { "$ref": "#/$defs/InternalEndpoint" },
+        "onPostNsfwUpdate": { "$ref": "#/$defs/InternalEndpoint" },
+        "onPostReport": { "$ref": "#/$defs/InternalEndpoint" },
+        "onPostSpoilerUpdate": { "$ref": "#/$defs/InternalEndpoint" },
+        "onPostSubmit": { "$ref": "#/$defs/InternalEndpoint" },
+        "onPostUpdate": { "$ref": "#/$defs/InternalEndpoint" }
+      }
+    },
+    "blocks": {
+      "type": "object",
+      "description": "Blocks migration config.",
+      "deprecated": true,
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/Path",
+          "description": "TypeScript or JavaScript Blocks client entrypoint relative project root. Use for migration.",
+          "default": "src/main.tsx"
+        },
+        "forms": {
+          "type": "object",
+          "description": "Blocks forms config.",
+          "additionalProperties": false,
+          "properties": {
+            "enable": {
+              "type": "boolean",
+              "description": "Whether forms are added through Blocks.",
+              "default": true
+            }
+          }
+        },
+        "menu": {
+          "type": "object",
+          "description": "Blocks menu config.",
+          "additionalProperties": false,
+          "properties": {
+            "enable": {
+              "type": "boolean",
+              "description": "Whether menu items are added through Blocks.",
+              "default": true
+            }
+          }
+        },
+        "settings": {
+          "type": "object",
+          "description": "Settings plugin config.",
+          "additionalProperties": false,
+          "properties": {
+            "enable": {
+              "type": "boolean",
+              "description": "Whether settings are added through Blocks.",
+              "default": true
+            }
+          }
+        },
+        "triggers": {
+          "type": "array",
+          "description": "Event triggers that are added through Blocks.",
+          "items": {
+            "enum": [
+              "onAppInstall",
+              "onAppUpgrade",
+              "onAutomoderatorFilterComment",
+              "onAutomoderatorFilterPost",
+              "onCommentCreate",
+              "onCommentDelete",
+              "onCommentReport",
+              "onCommentSubmit",
+              "onCommentUpdate",
+              "onModAction",
+              "onModMail",
+              "onPostCreate",
+              "onPostDelete",
+              "onPostFlairUpdate",
+              "onPostNsfwUpdate",
+              "onPostReport",
+              "onPostSpoilerUpdate",
+              "onPostSubmit",
+              "onPostUpdate"
+            ]
+          },
+          "uniqueItems": true,
+          "default": []
+        }
+      }
+    },
+    "menu": {
+      "type": "object",
+      "description": "Menu configuration for the app.",
+      "additionalProperties": false,
+      "required": ["items"],
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "Menu items shown in a subreddit when this app is installed there.",
+          "items": {
+            "type": "object",
+            "required": ["label", "location", "endpoint"],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "Menu item text displayed to users."
+              },
+              "description": {
+                "type": "string",
+                "description": "Short, user-facing sub-label to describe what this action is going to do."
+              },
+              "forUserType": {
+                "type": "string",
+                "enum": ["moderator", "user"],
+                "description": "Types of users who can see and invoke this menu item.",
+                "default": "moderator"
+              },
+              "location": {
+                "oneOf": [
+                  { "enum": ["comment", "post", "subreddit"] },
+                  {
+                    "type": "array",
+                    "items": { "enum": ["comment", "post", "subreddit"] },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  }
+                ],
+                "description": "Locations where this menu item is available within the installed subreddit."
+              },
+              "endpoint": { "$ref": "#/$defs/InternalEndpoint" },
+              "postFilter": {
+                "enum": ["none", "currentApp"],
+                "description": "If 'currentApp', only show this menu item on posts made by this app.",
+                "default": "none"
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "forms": {
+      "type": "object",
+      "description": "Key-value pairs mapping form identifiers to their submit URLs.",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-zA-Z_][a-zA-Z0-9_-]*$": { "$ref": "#/$defs/InternalEndpoint" }
+      }
+    },
+
+    "dev": {
+      "type": "object",
+      "description": "Development config.",
+      "additionalProperties": false,
+      "properties": {
+        "subreddit": {
+          "type": "string",
+          "description": "Default subreddit name without r/ prefix to use for development. Can be overridden by the `DEVVIT_SUBREDDIT` environment variable.",
+          "minLength": 3,
+          "maxLength": 21,
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+        }
+      }
+    },
+
+    "scheduler": {
+      "type": "object",
+      "description": "Scheduler config.",
+      "additionalProperties": false,
+      "required": ["tasks"],
+      "properties": {
+        "tasks": {
+          "type": "object",
+          "description": "List of all scheduled tasks the app might use, and what endpoints they map to.",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^.+$": {
+              "description": "The key is the task name - it can be anything you'd like. If your code uses the scheduler plugin, you'll pass this name in to schedule your tasks.",
+              "oneOf": [
+                {
+                  "description": "An object specifying the task config, with an endpoint to call and optionally a cron schedule.",
+                  "type": "object",
+                  "required": ["endpoint"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "endpoint": { "$ref": "#/$defs/InternalEndpoint" }
+                  }
+                },
+                {
+                  "description": "An object specifying the task config, with an endpoint to call and optionally a cron schedule.",
+                  "type": "object",
+                  "required": ["endpoint", "cron"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "endpoint": { "$ref": "#/$defs/InternalEndpoint" },
+                    "cron": { "$ref": "#/$defs/CronSchedule" },
+                    "data": {
+                      "type": "object",
+                      "description": "Optional data to pass to a cron-based task when it runs.",
+                      "additionalProperties": true
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/$defs/InternalEndpoint"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+
+    "settings": {
+      "type": "object",
+      "description": "Settings config.",
+      "additionalProperties": false,
+      "anyOf": [{ "required": ["global"] }, { "required": ["subreddit"] }],
+      "properties": {
+        "global": {
+          "type": "object",
+          "description": "Settings that apply globally, across all use of this app.",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_-]*$": {
+              "$ref": "#/$defs/GlobalSetting"
+            }
+          }
+        },
+        "subreddit": {
+          "type": "object",
+          "description": "Settings that can be configured by the installer per subreddit.",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_-]*$": {
+              "$ref": "#/$defs/SubredditSetting"
+            }
+          }
+        }
+      }
+    },
+
+    "marketingAssets": {
+      "type": "object",
+      "description": "Marketing assets config.",
+      "additionalProperties": false,
+      "required": ["icon"],
+      "properties": {
+        "icon": {
+          "type": "string",
+          "description": "Path to the icon file relative to the project root. This should be a square PNG image, 1024x1024 pixels."
+        }
+      }
+    }
+  }
+}

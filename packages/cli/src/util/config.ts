@@ -27,7 +27,7 @@ export const DEVVIT_PORTAL_API = `${DEVVIT_PORTAL_URL}/api`;
 
 export const DEVVIT_GATEWAY_URL: string = (() => {
   if (MY_PORTAL_ENABLED) {
-    return `https://reddit-service-devvit-gateway.${STAGE_USER_NAME}.snoo.dev`;
+    return `https://devvit-gateway.${STAGE_USER_NAME}.snoo.dev`;
   }
 
   return 'https://devvit-gateway.reddit.com';

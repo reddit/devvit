@@ -1,0 +1,60 @@
+{
+  "name": "@devvit/build-pack",
+  "version": "0.12.1",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./*": "./dist/*"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf .turbo dist coverage",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "dev": "tsc --watch",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepublishOnly": "publish-package-json",
+    "test": "yarn test:unit && yarn test:types && yarn lint",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@devvit/protos": "0.12.1",
+    "@devvit/shared-types": "0.12.1",
+    "@devvit/splash": "0.12.1",
+    "esbuild": "0.25.9",
+    "rxjs": "7.8.1",
+    "tsv": "0.2.0",
+    "typescript": "5.8.3"
+  },
+  "peerDependencies": {
+    "@devvit/server": "*",
+    "@devvit/shared": "*"
+  },
+  "devDependencies": {
+    "@devvit/public-api": "0.12.1",
+    "@devvit/scheduler": "0.12.1",
+    "@devvit/server": "0.12.1",
+    "@devvit/shared": "0.12.1",
+    "@devvit/tsconfig": "0.12.1",
+    "@types/tsv": "0.2.1",
+    "eslint": "9.11.1",
+    "vitest": "1.6.1"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  },
+  "source": "./src/index.ts"
+}

@@ -115,6 +115,8 @@ Configure Node.js server functionality:
 
 - `entry` (string): Server bundle filename (default: `"src/server/index.js"`)
 
+Server bundles must be compiled to CommonJS (`cjs`). ES module output is not supported by the Devvit Web runtime.
+
 ### Permissions configuration
 
 Control what your app can access:

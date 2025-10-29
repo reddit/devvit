@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://developers.reddit.com/schema/products.json",
+  "title": "Devvit Payments - Product Schema",
+  "description": "Schema for Devvit products",
+  "type": "object",
+  "properties": {
+    "products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sku": {
+            "description": "The product sku used as a unique identifier",
+            "maxLength": 50,
+            "type": "string",
+            "pattern": "^[A-z0-9-_]+$"
+          },
+          "displayName": {
+            "description": "The product display name",
+            "maxLength": 50,
+            "type": "string",
+            "pattern": ".*"
+          },
+          "description": {
+            "description": "The product description",
+            "type": "string",
+            "maxLength": 250
+          },
+          "price": {
+            "description": "The price of the product (unit: Reddit Gold). See https://developers.reddit.com/docs/next/capabilities/payments#pricing for more information.",
+            "type": "integer",
+            "enum": [5, 25, 50, 100, 150, 250, 500, 1000, 2500]
+          },
+          "accountingType": {
+            "description": "The accounting type of the product",
+            "type": "string",
+            "enum": ["INSTANT", "DURABLE", "CONSUMABLE", "VALID_FOR_1D", "VALID_FOR_7D", "VALID_FOR_30D", "VALID_FOR_1Y"]
+          },
+          "images": {
+            "description": "The images associated with this product",
+            "type": "object",
+            "properties": {
+              "icon": {
+                "description": "The icon image URL (should be a path relative to /assets)",
+                "type": "string"
+              }
+            },
+            "patternProperties": {
+              "^.*$": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": ["icon"]
+          },
+          "metadata": {
+            "description": "Additional metadata associated with this product",
+            "type": "object",
+            "maxProperties": 10,
+            "patternProperties": {
+              "^.*$": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "sku",
+          "displayName",
+          "price",
+          "accountingType"
+        ]
+      }
+    }
+  }
+}

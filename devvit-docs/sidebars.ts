@@ -69,6 +69,11 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'doc',
+      label: 'Get Featured',
+      id: 'guides/launch/feature-guide',
+    },
+    {
+      type: 'doc',
       label: 'AI Tools',
       id: 'guides/ai/ai',
     },

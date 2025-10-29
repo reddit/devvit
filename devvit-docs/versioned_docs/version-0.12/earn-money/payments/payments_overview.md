@@ -1,9 +1,5 @@
 # Overview
 
-:::note
-Payments is a beta feature. As of this moment Payments will be supported in [Devvit Web](../../capabilities/devvit-web/devvit_web_overview.mdx) applications in September. Only applications built with [Devvit Blocks](../../capabilities/blocks/overview.md) can support Payments
-:::
-
 Add products to your app and get paid for what you sell. The payments plugin lets you prompt users to buy premium features that you build into your app, like in-game items, additional lives, or exclusive features into your app.
 
 ![Sample payment app screen](../../assets/payments_example.png)
@@ -23,3 +19,7 @@ You can use the sandbox to build and test payments, but before you can publish y
 - Accept and comply with our [Earn Terms](https://redditinc.com/policies/earn-terms) and [Earn Policy](https://www.redditinc.com/policies/earn-policy).
 
 All products will be reviewed by the Developer Platform team to ensure compliance with our content policy. Products are approved during the app review process after you publish your app.
+
+:::note
+Payment functionality is supported on [Devvit Blocks](../../capabilities/blocks/overview.md) only. [Devvit Web](../../capabilities/devvit-web/devvit_web_overview.mdx) is currently not supported.
+:::
