@@ -21,7 +21,7 @@
           "pattern": "^(/api/)?[^/].*$"
         },
         "height": {
-          "description": "The height configuration for this post view.",
+          "description": "The height configuration for this post view. Height is only applicable when app is shown inline and ignored when expanded.",
           "enum": ["regular", "tall"],
           "default": "tall"
         }

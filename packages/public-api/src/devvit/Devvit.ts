@@ -732,7 +732,7 @@ export class Devvit extends Actor {
    * Force service implementation. Keep in sync with `blocks.template.tsx`.
    * @internal
    */
-  static _initForms(): void {
+  private static _initForms(): void {
     this.#formDefinitions ??= new Map();
   }
 
@@ -740,7 +740,7 @@ export class Devvit extends Actor {
    * Force service implementation. Keep in sync with `blocks.template.tsx`.
    * @internal
    */
-  static _initMenu(): void {
+  private static _initMenu(): void {
     this.#menuItems ??= [];
   }
 
@@ -748,7 +748,7 @@ export class Devvit extends Actor {
    * Force service implementation. Keep in sync with `blocks.template.tsx`.
    * @internal
    */
-  static _initScheduler(): void {
+  private static _initScheduler(): void {
     if (!this.#pluginClients[protos.SchedulerDefinition.fullName]) {
       this.use(protos.SchedulerDefinition);
     }
@@ -759,7 +759,7 @@ export class Devvit extends Actor {
    * Force service implementation. Keep in sync with `blocks.template.tsx`.
    * @internal
    */
-  static _initSettings(global: boolean, sub: boolean): void {
+  private static _initSettings(global: boolean, sub: boolean): void {
     if (global) this.#appSettings ??= [];
     if (sub) this.#installationSettings ??= [];
   }
