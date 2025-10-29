@@ -191,9 +191,12 @@ export type ConversationData = {
   /**
    * A ConversationType specifies whether a conversation is with a subreddit
    * itself, with another user, or with another subreddit entirely.
-   * - `sr_user` - This is a conversation with another user outside of the subreddit. The participant ID is that user's ID.
-   * - `internal` - This is a Mod Discussion, internal to the subreddit. There is no other participant.
-   * - `sr_sr` - This is a conversation is with another subreddit. The participant will have a subreddit ID.
+   * - `sr_user` - This is a conversation with another user outside of the
+   *               subreddit. The participant ID is that user's ID.
+   * - `internal` - This is a Mod Discussion, internal to the subreddit. There
+   *                is no other participant.
+   * - `sr_sr` - This is a conversation is with another subreddit. The
+   *             participant will have a subreddit ID.
    */
   conversationType?: string;
   /** Is the conversation automatically generated e.g. from automod, u/reddit */

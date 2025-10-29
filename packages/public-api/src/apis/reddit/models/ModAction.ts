@@ -7,68 +7,75 @@ import { Listing } from './Listing.js';
 
 export type ModActionTarget = {
   /*
-   * the fullname as described at https://www.reddit.com/dev/api . normally called the id
+   * The fullname as described at https://www.reddit.com/dev/api.
    */
   id: string;
   /*
-   * the username of the author the action was taken upon
+   * The username of the author the action was taken upon.
    */
   author?: string;
   /*
-   * the bodytext of the item the action was taken upon
+   * The bodytext of the item the action was taken upon.
    */
   body?: string;
   /*
-   * the permalink relative to (but not including) "[https://www.reddit.com](https://www.reddit.com)"
+   * The permalink relative to (but not including)
+   * "[https://www.reddit.com](https://www.reddit.com)".
    */
   permalink?: string;
   /*
-   * the title of the item the action was taken upon
+   * The title of the item the action was taken upon.
    */
   title?: string;
 };
 
 export interface ModAction {
   /**
-   * a string like `"ModAction_1b1af634-5b87-11f0-a4f1-4ddd27626cc4"` identifying the ModAction
+   * A string like `"ModAction_1b1af634-5b87-11f0-a4f1-4ddd27626cc4"`
+   * identifying the ModAction.
    */
   id: string;
   /**
-   * the type of the action. think of what happend.
+   * The type of the action. Think of what happened.
    */
   type: ModActionType;
   /**
-   * the username of the moderator
+   * The username of the moderator.
    */
   moderatorName: string;
   /**
-   * the t2_ id of the moderator
+   * The t2_ id of the moderator.
    */
   moderatorId: string;
   /**
-   * when the action took place as a Date.
+   * When the action took place.
    */
   createdAt: Date;
   /**
-   * the name of the subreddit the action took place
+   * The name of the subreddit the action took place.
    */
   subredditName: string;
   /**
-   * the t5_ id of the subreddit the action took place
+   * The ID of the subreddit the action took place.
    */
   subredditId: string;
-  /*
-   * the string "Page modmail-stats edited: Daily update of the modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is made up of `description` and `details`. the "Page modmail-stats edited" is the
-   * "description".
+  /**
+   * The string "Page modmail-stats edited: Daily update of the
+   * modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is
+   * made up of `description` and `details`. The "Page modmail-stats edited" is
+   * the "description".
    */
   description?: string;
-  /*
-   * the string "Page modmail-stats edited: Daily update of the modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is made up of `description` and `details`. the "Daily update of the modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is the
-   * "details".
+  /**
+   * The string "Page modmail-stats edited: Daily update of the
+   * modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is
+   * made up of `description` and `details`. The "Daily update of the
+   * modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is
+   * the "details".
    */
   details?: string;
   /**
-   * some context of the affected item of the modaction
+   * Some context of the affected item of the modaction.
    */
   target?: ModActionTarget;
 }

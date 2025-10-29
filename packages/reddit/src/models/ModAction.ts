@@ -8,23 +8,74 @@ import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 
 export type ModActionTarget = {
+  /*
+   * The fullname as described at https://www.reddit.com/dev/api.
+   */
   id: string;
+  /*
+   * The username of the author the action was taken upon.
+   */
   author?: string | undefined;
+  /*
+   * The bodytext of the item the action was taken upon.
+   */
   body?: string | undefined;
+  /*
+   * The permalink relative to (but not including)
+   * "[https://www.reddit.com](https://www.reddit.com)".
+   */
   permalink?: string | undefined;
+  /*
+   * The title of the item the action was taken upon.
+   */
   title?: string | undefined;
 };
 
 export interface ModAction {
+  /**
+   * A string like `"ModAction_1b1af634-5b87-11f0-a4f1-4ddd27626cc4"`
+   * identifying the ModAction.
+   */
   id: string;
+  /**
+   * The type of the action. Think of what happened.
+   */
   type: ModActionType;
+  /**
+   * The username of the moderator.
+   */
   moderatorName: string;
   moderatorId: T2;
+  /**
+   * When the action took place.
+   */
   createdAt: Date;
+  /**
+   * The name of the subreddit the action took place.
+   */
   subredditName: string;
+  /**
+   * The ID of the subreddit the action took place.
+   */
   subredditId: T5;
+  /**
+   * The string "Page modmail-stats edited: Daily update of the
+   * modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is
+   * made up of `description` and `details`. The "Page modmail-stats edited" is
+   * the "description".
+   */
   description?: string | undefined;
+  /**
+   * The string "Page modmail-stats edited: Daily update of the
+   * modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is
+   * made up of `description` and `details`. The "Daily update of the
+   * modmail-stats (Wed Jul 02 2025 08:05:47 UTC+0200 (Europe/Amsterdam))" is
+   * the "details".
+   */
   details?: string | undefined;
+  /**
+   * Some context of the affected item of the modaction.
+   */
   target?: ModActionTarget | undefined;
 }
 

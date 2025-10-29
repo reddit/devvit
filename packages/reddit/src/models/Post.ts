@@ -217,8 +217,8 @@ export type CommonSubmitPostOptions = {
 };
 
 export type SubredditOptions = {
-  /** The name of the subreddit without a leading r/. Eg, `'Pixelary'`. */
-  subredditName: string;
+  /** Defaults to the current subreddit name. */
+  subredditName?: string;
 };
 
 /** Link, self, or media post options exclusively. */
@@ -228,9 +228,7 @@ export type SubmitPostOptions =
   | (SubmitMediaOptions & { richtext?: never; text?: never; url?: never });
 
 export type CrosspostOptions = CommonSubmitPostOptions &
-  SubredditOptions & {
-    postId: T3;
-  };
+  Required<SubredditOptions> & { postId: T3 };
 
 export type LinkFlair = {
   /**
@@ -1187,7 +1185,7 @@ export class Post {
     const rsp = await client.Submit(
       {
         kind: 'kind' in opts ? opts.kind : 'url' in opts ? 'link' : 'self',
-        sr: opts.subredditName,
+        sr: opts.subredditName ?? context.subredditName,
         richtextJson: 'richtext' in opts ? richtextToString(opts.richtext) : undefined,
         ...opts,
         runAs: runAsType,
@@ -1254,7 +1252,7 @@ export class Post {
     const rsp = await client.SubmitCustomPost(
       {
         kind: 'custom',
-        sr: opts.subredditName,
+        sr: opts.subredditName ?? context.subredditName,
         richtextJson,
         richtextFallback,
         flairId: opts.flairId,
