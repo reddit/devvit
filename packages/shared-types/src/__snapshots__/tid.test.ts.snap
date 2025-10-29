@@ -1,0 +1,12 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Thing IDs > never changes 1`] = `
+{
+  "ACCOUNT": "t2_",
+  "AWARD": "t6_",
+  "COMMENT": "t1_",
+  "LINK": "t3_",
+  "MESSAGE": "t4_",
+  "SUBREDDIT": "t5_",
+}
+`;

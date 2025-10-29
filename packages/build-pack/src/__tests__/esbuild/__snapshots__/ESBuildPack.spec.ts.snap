@@ -1,0 +1,1011 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ES Build Pack > Bundle > Case 0: "a simple program (API)" 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "hello-world-api",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "hello-world-api.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "hello-world-api",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "hello-world-api.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > Bundle > Case 1: "a simple program (subclass)" 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "hello-world-class",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "hello-world-class.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "hello-world-class",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "hello-world-class.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > Bundle > Case 2: "an invalid program" 1`] = `
+{
+  "bundles": [],
+  "errors": [
+    {
+      "detail": {
+        "column": 0,
+        "filename": "main.ts",
+        "line": 6,
+        "suggestion": "",
+        "text": "",
+      },
+      "text": "[esbuild] Unexpected end of file",
+    },
+  ],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > Bundle > Case 3: "CommonJS module (API)" 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "cjs-module-api",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "cjs-module-api.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "cjs-module-api",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "cjs-module-api.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > Bundle > Case 4: "CommonJS module (API) require" 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "cjs-module-api-require",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "cjs-module-api-require.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "cjs-module-api-require",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "cjs-module-api-require.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > Bundle > Case 5: "CommonJS module (subclass)" 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "cjs-module-class",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "cjs-module-class.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "cjs-module-class",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "cjs-module-class.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > Bundle > Case 6: "ECMAScript module (API)" 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "es-module-api",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "es-module-api.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "es-module-api",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "es-module-api.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > Bundle > Case 7: "ECMAScript module (subclass)" 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "es-module-class",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "es-module-class.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "es-module-class",
+          "owner": "snoo",
+          "version": "0.0.0",
+        },
+        "hostname": "es-module-class.local",
+        "permissions": [],
+        "provides": [],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > Bundle > correctly returns CompileResponse 1`] = `
+{
+  "bundles": [],
+  "errors": [
+    {
+      "text": "[esbuild] Could not resolve "filename/main.ts"",
+    },
+  ],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > v1 > blocks 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "name",
+          "owner": "owner",
+          "version": "0.0.0",
+        },
+        "hostname": "name.local",
+        "permissions": [],
+        "provides": [
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.reddit.custom_post.v1alpha.CustomPost",
+              "methods": [
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPost",
+                  "name": "RenderPost",
+                  "requestStream": false,
+                  "requestType": "devvit.reddit.custom_post.v1alpha.RenderPostRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.reddit.custom_post.v1alpha.RenderPostResponse",
+                },
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPostContent",
+                  "name": "RenderPostContent",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.block_kit.v1beta.UIRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.block_kit.v1beta.UIResponse",
+                },
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPostComposer",
+                  "name": "RenderPostComposer",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.block_kit.v1beta.UIRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.block_kit.v1beta.UIResponse",
+                },
+              ],
+              "name": "CustomPost",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.ui.events.v1alpha.UIEventHandler",
+              "methods": [
+                {
+                  "fullName": "/devvit.ui.events.v1alpha.UIEventHandler/HandleUIEvent",
+                  "name": "HandleUIEvent",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.events.v1alpha.HandleUIEventRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.events.v1alpha.HandleUIEventResponse",
+                },
+              ],
+              "name": "UIEventHandler",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.actor.reddit.ContextAction",
+              "methods": [
+                {
+                  "fullName": "/devvit.actor.reddit.ContextAction/GetActions",
+                  "name": "GetActions",
+                  "requestStream": false,
+                  "requestType": "google.protobuf.Empty",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.reddit.ContextActionList",
+                },
+                {
+                  "fullName": "/devvit.actor.reddit.ContextAction/OnAction",
+                  "name": "OnAction",
+                  "requestStream": false,
+                  "requestType": "devvit.actor.reddit.ContextActionRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.reddit.ContextActionResponse",
+                },
+              ],
+              "name": "ContextAction",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+        ],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "name",
+          "owner": "owner",
+          "version": "0.0.0",
+        },
+        "hostname": "name.local",
+        "permissions": [],
+        "provides": [
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.reddit.custom_post.v1alpha.CustomPost",
+              "methods": [
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPost",
+                  "name": "RenderPost",
+                  "requestStream": false,
+                  "requestType": "devvit.reddit.custom_post.v1alpha.RenderPostRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.reddit.custom_post.v1alpha.RenderPostResponse",
+                },
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPostContent",
+                  "name": "RenderPostContent",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.block_kit.v1beta.UIRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.block_kit.v1beta.UIResponse",
+                },
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPostComposer",
+                  "name": "RenderPostComposer",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.block_kit.v1beta.UIRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.block_kit.v1beta.UIResponse",
+                },
+              ],
+              "name": "CustomPost",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.ui.events.v1alpha.UIEventHandler",
+              "methods": [
+                {
+                  "fullName": "/devvit.ui.events.v1alpha.UIEventHandler/HandleUIEvent",
+                  "name": "HandleUIEvent",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.events.v1alpha.HandleUIEventRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.events.v1alpha.HandleUIEventResponse",
+                },
+              ],
+              "name": "UIEventHandler",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.actor.reddit.ContextAction",
+              "methods": [
+                {
+                  "fullName": "/devvit.actor.reddit.ContextAction/GetActions",
+                  "name": "GetActions",
+                  "requestStream": false,
+                  "requestType": "google.protobuf.Empty",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.reddit.ContextActionList",
+                },
+                {
+                  "fullName": "/devvit.actor.reddit.ContextAction/OnAction",
+                  "name": "OnAction",
+                  "requestStream": false,
+                  "requestType": "devvit.actor.reddit.ContextActionRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.reddit.ContextActionResponse",
+                },
+              ],
+              "name": "ContextAction",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+        ],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > v1 > no blocks 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "name",
+          "owner": "owner",
+          "version": "0.0.0",
+        },
+        "hostname": "name.local",
+        "permissions": [],
+        "provides": [
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.reddit.custom_post.v1alpha.CustomPost",
+              "methods": [
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPost",
+                  "name": "RenderPost",
+                  "requestStream": false,
+                  "requestType": "devvit.reddit.custom_post.v1alpha.RenderPostRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.reddit.custom_post.v1alpha.RenderPostResponse",
+                },
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPostContent",
+                  "name": "RenderPostContent",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.block_kit.v1beta.UIRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.block_kit.v1beta.UIResponse",
+                },
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPostComposer",
+                  "name": "RenderPostComposer",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.block_kit.v1beta.UIRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.block_kit.v1beta.UIResponse",
+                },
+              ],
+              "name": "CustomPost",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.ui.events.v1alpha.UIEventHandler",
+              "methods": [
+                {
+                  "fullName": "/devvit.ui.events.v1alpha.UIEventHandler/HandleUIEvent",
+                  "name": "HandleUIEvent",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.events.v1alpha.HandleUIEventRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.events.v1alpha.HandleUIEventResponse",
+                },
+              ],
+              "name": "UIEventHandler",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.actor.reddit.ContextAction",
+              "methods": [
+                {
+                  "fullName": "/devvit.actor.reddit.ContextAction/GetActions",
+                  "name": "GetActions",
+                  "requestStream": false,
+                  "requestType": "google.protobuf.Empty",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.reddit.ContextActionList",
+                },
+                {
+                  "fullName": "/devvit.actor.reddit.ContextAction/OnAction",
+                  "name": "OnAction",
+                  "requestStream": false,
+                  "requestType": "devvit.actor.reddit.ContextActionRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.reddit.ContextActionResponse",
+                },
+              ],
+              "name": "ContextAction",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+        ],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "name",
+          "owner": "owner",
+          "version": "0.0.0",
+        },
+        "hostname": "name.local",
+        "permissions": [],
+        "provides": [
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.reddit.custom_post.v1alpha.CustomPost",
+              "methods": [
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPost",
+                  "name": "RenderPost",
+                  "requestStream": false,
+                  "requestType": "devvit.reddit.custom_post.v1alpha.RenderPostRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.reddit.custom_post.v1alpha.RenderPostResponse",
+                },
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPostContent",
+                  "name": "RenderPostContent",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.block_kit.v1beta.UIRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.block_kit.v1beta.UIResponse",
+                },
+                {
+                  "fullName": "/devvit.reddit.custom_post.v1alpha.CustomPost/RenderPostComposer",
+                  "name": "RenderPostComposer",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.block_kit.v1beta.UIRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.block_kit.v1beta.UIResponse",
+                },
+              ],
+              "name": "CustomPost",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.ui.events.v1alpha.UIEventHandler",
+              "methods": [
+                {
+                  "fullName": "/devvit.ui.events.v1alpha.UIEventHandler/HandleUIEvent",
+                  "name": "HandleUIEvent",
+                  "requestStream": false,
+                  "requestType": "devvit.ui.events.v1alpha.HandleUIEventRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.ui.events.v1alpha.HandleUIEventResponse",
+                },
+              ],
+              "name": "UIEventHandler",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.actor.reddit.ContextAction",
+              "methods": [
+                {
+                  "fullName": "/devvit.actor.reddit.ContextAction/GetActions",
+                  "name": "GetActions",
+                  "requestStream": false,
+                  "requestType": "google.protobuf.Empty",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.reddit.ContextActionList",
+                },
+                {
+                  "fullName": "/devvit.actor.reddit.ContextAction/OnAction",
+                  "name": "OnAction",
+                  "requestStream": false,
+                  "requestType": "devvit.actor.reddit.ContextActionRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.reddit.ContextActionResponse",
+                },
+              ],
+              "name": "ContextAction",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+        ],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;
+
+exports[`ES Build Pack > v1 > server only 1`] = `
+{
+  "bundles": [
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 0,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "name",
+          "owner": "owner",
+          "version": "0.0.0",
+        },
+        "hostname": "name.local",
+        "permissions": [],
+        "provides": [
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.actor.webbit.WebbitServer",
+              "methods": [
+                {
+                  "fullName": "/devvit.actor.webbit.WebbitServer/Request",
+                  "name": "Request",
+                  "requestStream": false,
+                  "requestType": "devvit.actor.webbit.WebbitHttpRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.webbit.WebbitHttpResponse",
+                },
+              ],
+              "name": "WebbitServer",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+        ],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "server": {
+        "code": "console.log('hello server');
+",
+        "sourceMap": "",
+      },
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+    {
+      "assetIds": {},
+      "buildInfo": {
+        "created": 1970-01-01T00:00:00.000Z,
+        "dependencies": {},
+        "targetRuntime": 1,
+      },
+      "code": "nonempty",
+      "dependencies": {
+        "actor": {
+          "name": "name",
+          "owner": "owner",
+          "version": "0.0.0",
+        },
+        "hostname": "name.local",
+        "permissions": [],
+        "provides": [
+          {
+            "actor": {
+              "name": "name",
+              "owner": "owner",
+              "version": "0.0.0",
+            },
+            "definition": {
+              "fullName": "devvit.actor.webbit.WebbitServer",
+              "methods": [
+                {
+                  "fullName": "/devvit.actor.webbit.WebbitServer/Request",
+                  "name": "Request",
+                  "requestStream": false,
+                  "requestType": "devvit.actor.webbit.WebbitHttpRequest",
+                  "responseStream": false,
+                  "responseType": "devvit.actor.webbit.WebbitHttpResponse",
+                },
+              ],
+              "name": "WebbitServer",
+              "version": "",
+            },
+            "partitionsBy": [],
+          },
+        ],
+        "uses": [],
+      },
+      "metafile": undefined,
+      "sourceMap": "nonempty",
+      "webviewAssetIds": {},
+    },
+  ],
+  "errors": [],
+  "warnings": [],
+}
+`;

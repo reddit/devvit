@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "../dist",
+    "lib": ["DOM", "ES2023"]
+  },
+  // https://github.com/microsoft/TypeScript/wiki/Performance#misconfigured-include-and-exclude
+  "exclude": ["dist", "node_modules", ".*/"],
+  "extends": "@devvit/tsconfig/base.json",
+  // https://github.com/Microsoft/TypeScript/issues/25636
+  "include": ["**/*", "**/*.json"]
+}

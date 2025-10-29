@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "lib": ["DOM", "ES2023"]
+  },
+  "exclude": ["node_modules"],
+  "extends": "@devvit/tsconfig/base.json",
+  "include": ["src"]
+}
