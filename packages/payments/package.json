@@ -13,6 +13,10 @@
       "browser": "./dist/client/index.js",
       "default": "./dist/client/clientImportInServerCodePanic.js"
     },
+    "./server": {
+      "browser": "./dist/server/serverImportInClientCodePanic.js",
+      "default": "./dist/server/index.js"
+    },
     "./helpers/*": {
       "type": "./dist/helpers/*.d.ts",
       "import": "./dist/helpers/*.js"
@@ -42,6 +46,7 @@
   "dependencies": {
     "@devvit/protos": "0.12.1",
     "@devvit/public-api": "0.12.1",
+    "@devvit/server": "0.12.1",
     "@devvit/shared-types": "0.12.1"
   },
   "devDependencies": {
