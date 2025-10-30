@@ -137,9 +137,14 @@ describe('Post API', () => {
         dir: '',
         entrypoints: {
           default: {
-            entry: '',
+            entry: 'splash.html',
             name: 'default',
             height: 'tall',
+          },
+          game: {
+            entry: 'game.html',
+            name: 'game',
+            height: 'regular',
           },
         },
       },
@@ -550,6 +555,57 @@ describe('Post API', () => {
             context.metadata
           );
         });
+      });
+    });
+
+    test('submitCustomPost() prefers entry to splash.entry', async () => {
+      const mockedPost = new Post({ ...defaultPostData });
+
+      const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
+      spyPlugin.mockImplementationOnce(async () => ({
+        json: { data: { id: 'post' }, errors: [] },
+      }));
+
+      vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+      await runWithTestContext(async () => {
+        await reddit.submitCustomPost({
+          title: mockedPost.title,
+          subredditName: mockedPost.subredditName,
+          entry: 'game',
+          splash: { appDisplayName: 'appDisplayName', entry: 'default' },
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            kind: 'custom',
+            sr: 'askReddit',
+            richtextJson:
+              'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEMAC',
+            richtextFallback: '',
+            runAs: RunAs.APP,
+            flairId: undefined,
+            flairText: undefined,
+            nsfw: undefined,
+            sendreplies: undefined,
+            spoiler: undefined,
+            title: 'My First Post',
+            userGeneratedContent: undefined,
+            postData: {
+              developerData: undefined,
+              splash: {
+                appDisplayName: 'appDisplayName',
+                appIconUri: undefined,
+                backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
+                buttonLabel: undefined,
+                description: undefined,
+                entry: 'game',
+                title: 'My First Post',
+              },
+            },
+          },
+          context.metadata
+        );
       });
     });
 

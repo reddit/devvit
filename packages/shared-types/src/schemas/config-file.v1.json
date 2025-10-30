@@ -13,7 +13,7 @@
     "Entrypoint": {
       "type": "object",
       "description": "Key-value pairs mapping entrypoint name to a specific post entrypoint configuration.",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "properties": {
         "entry": {
           "type": "string",
@@ -24,6 +24,10 @@
           "description": "The height configuration for this post view. Height is only applicable when app is shown inline and ignored when expanded.",
           "enum": ["regular", "tall"],
           "default": "tall"
+        },
+        "inline": {
+          "type": "boolean",
+          "description": "Whether the web view should start in inline or expanded mode. Expanded mode uses a splash launch screen. Splash support will be removed in v0.13 and inline will be the default."
         }
       }
     },
@@ -284,8 +288,8 @@
         }
       },
       "if": {
-        "properties": { "isSecret": { "const": true } },
-        "required": ["isSecret"]
+        "required": ["isSecret"],
+        "properties": { "isSecret": { "const": true } }
       },
       "then": { "not": { "required": ["defaultValue"] } }
     },
@@ -598,7 +602,6 @@
                 "description": "Short, user-facing sub-label to describe what this action is going to do."
               },
               "forUserType": {
-                "type": "string",
                 "enum": ["moderator", "user"],
                 "description": "Types of users who can see and invoke this menu item.",
                 "default": "moderator"
@@ -728,8 +731,8 @@
     "settings": {
       "type": "object",
       "description": "Settings config.",
-      "additionalProperties": false,
       "anyOf": [{ "required": ["global"] }, { "required": ["subreddit"] }],
+      "additionalProperties": false,
       "properties": {
         "global": {
           "type": "object",

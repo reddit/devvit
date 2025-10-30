@@ -60,9 +60,6 @@ export type AppPostEntrypointConfig = {
   entry: string;
   name: string;
   height: AppPostHeightConfig;
-  // this feature is currently experimental and not fully supported
-  // thus addtionaProperties have been enabled from the json schema
-  // TODO: disable additionalProperties once we fully support inline
   inline?: boolean;
 };
 export type AppPostHeightConfig = 'regular' | 'tall';

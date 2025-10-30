@@ -22,7 +22,6 @@ import { defaultPostEntry } from '@devvit/shared-types/schemas/constants.js';
 import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
 import { isT3, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { Loading } from '@devvit/splash/loading.js';
-import { type SplashProps } from '@devvit/splash/splash.js';
 import { backgroundUrl } from '@devvit/splash/utils/assets.js';
 
 import { assertUserScope, RunAs, type UserGeneratedContent } from '../common.js';
@@ -135,16 +134,18 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
 
 export type SubmitSelfPostOptions = CommonSubmitPostOptions & PostTextOptions;
 
-export type SubmitCustomPostSplashOptions = Omit<
-  SplashProps,
-  'appDisplayName' | 'backgroundUri' | 'entryUri' | 'height'
-> & {
+export type SubmitCustomPostSplashOptions = {
   /**
    * Application name.
    *
    * @example `'Comment Mop'`.
    */
   appDisplayName?: string;
+  /**
+   * @deprecated Splash screens should be implemented in HTML as an inline
+   *             entrypoint. Splash support will be removed soon.
+   */
+  appIconUri?: string | undefined;
   /**
    * Media directory relative background image URL without a leading slash or
    * data URI.
@@ -153,12 +154,22 @@ export type SubmitCustomPostSplashOptions = Omit<
    */
   backgroundUri?: string;
   /**
-   * The loading screen entrypoint name. Must correspond to a `post.entrypoints`
+   * @deprecated Splash screens should be implemented in HTML as an inline
+   *             entrypoint. Splash support will be removed soon.
+   */
+  buttonLabel?: string | undefined;
+  /**
+   * @deprecated Splash screens should be implemented in HTML as an inline
+   *             entrypoint. Splash support will be removed soon.
+   */
+  description?: string | undefined;
+  /**
+   * The inline screen entrypoint name. Must correspond to a `post.entrypoints`
    * key in the app's `devvit.json`.
    *
    * @default The default `devvit.json` entrypoint (`'default'`).
    *
-   * @example Only `'default'` and `'splash'` are valid entries given the
+   * @example Only `'default'` and `'game'` are valid entries given the
    * following `devvit.json` configuration:
    * ```json
    * {
@@ -166,17 +177,46 @@ export type SubmitCustomPostSplashOptions = Omit<
    *   "name": "example",
    *   "post": {
    *     "entrypoints": {
-   *       "default": {"entry": "game.html"},
-   *       "splash": {"entry": "splash.html"}
+   *       "default": {"entry": "splash.html"},
+   *       "game": {"entry": "game.html"}
+   *     }
+   *   }
+   * }
+   * ```
+   *
+   * @deprecated Use `SubmitCustomPostOptions.entry`.
+   */
+  entry?: string;
+  /**
+   * @deprecated Splash screens should be implemented in HTML as an inline
+   *             entrypoint. Splash support will be removed soon.
+   */
+  heading?: string | undefined;
+};
+
+export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
+  /**
+   * The entrypoint name. Must correspond to a `post.entrypoints` key in the
+   * app's `devvit.json`.
+   *
+   * @default The default `devvit.json` entrypoint (`'default'`).
+   *
+   * @example Only `'default'` and `'game'` are valid entries given the
+   * following `devvit.json` configuration:
+   * ```json
+   * {
+   *   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+   *   "name": "example",
+   *   "post": {
+   *     "entrypoints": {
+   *       "default": {"entry": "splash.html"},
+   *       "game": {"entry": "game.html"}
    *     }
    *   }
    * }
    * ```
    */
   entry?: string;
-};
-
-export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
   /**
    * Arbitrary data to associate to the post. Limited to two kilobytes.
    *
@@ -200,7 +240,8 @@ export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
    *   ),
    * )
    * ```
-   * @deprecated Use only `splash` instead.
+   * @deprecated Loading screens should be implemented in HTML as an inline
+   *             entrypoint.
    */
   loading?: JSX.Element;
   splash?: SubmitCustomPostSplashOptions;
@@ -981,7 +1022,8 @@ export class Post {
    * const post = await reddit.getPostById(context.postId);
    * await post.setLoadingScreen(loading);
    * ```
-   * @deprecated Use only `setSplash()` instead.
+   * @deprecated Loading screens should be implemented in HTML as an inline
+   *             entrypoint.
    */
   async setLoadingScreen(loading: JSX.Element): Promise<void> {
     await this.#setCustomPostPreview(loading);
@@ -1223,7 +1265,7 @@ export class Post {
     }
 
     const config = getConfig();
-    const entry = getEntry(config, opts.splash?.entry);
+    const entry = getEntry(config, opts.entry ?? opts.splash?.entry);
     const splash = SplashPostData(config, entry, opts.splash, opts.title);
     const richtextJson = await renderLoadingAsRichTextJson(
       'loading' in opts

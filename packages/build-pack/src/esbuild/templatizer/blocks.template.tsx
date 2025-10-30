@@ -5,7 +5,10 @@ import {
 } from '@devvit/payments';
 import type { Logger, Metadata } from '@devvit/protos';
 import { LoggerDefinition, Severity } from '@devvit/protos';
-import { type DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import {
+  type DevvitPostData,
+  type SplashPostData,
+} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import {
   type Context,
   Devvit,
@@ -27,6 +30,7 @@ import type {
   AppPaymentsConfig,
   AppPermissionConfig,
   AppPostConfig,
+  AppPostEntrypointConfig,
   AppSchedulerConfig,
   AppSettingConfig,
   AppTriggersConfig,
@@ -81,16 +85,10 @@ function configurePermissions(permissions: Readonly<AppPermissionConfig>): void 
 }
 
 function configurePost(name: string, post: Readonly<AppPostConfig>): void {
-  const defaultEntrypoint = post.entrypoints.default;
-
-  const renderSplash = (ctx: Context) => {
-    const postDataHeader = ctx.metadata[Header.PostData]?.values[0];
-    const postData: DevvitPostData = postDataHeader
-      ? JSON.parse(postDataHeader)
-      : ({} satisfies DevvitPostData);
-    const splash = postData.splash;
-    const entry = splash?.entry ? post.entrypoints[splash.entry] : undefined;
-
+  const renderSplash = (
+    entrypoint: Readonly<AppPostEntrypointConfig>,
+    splash: SplashPostData | undefined
+  ) => {
     return (
       // Align to `submitCustomPost()`.
       <Splash
@@ -99,25 +97,32 @@ function configurePost(name: string, post: Readonly<AppPostConfig>): void {
         backgroundUri={splash?.backgroundUri ?? backgroundUrl}
         buttonLabel={splash?.buttonLabel}
         description={splash?.description}
-        entryUri={entry?.entry ?? defaultEntrypoint.entry}
+        entryUri={entrypoint.entry}
         heading={splash?.title}
-        height={entry?.height ?? defaultEntrypoint.height}
+        height={entrypoint.height}
       />
     );
   };
 
-  const renderInline = (_ctx: Context) => {
+  const renderInline = (entrypoint: Readonly<AppPostEntrypointConfig>) => {
     return (
-      <blocks height={defaultEntrypoint.height}>
-        <webview url={defaultEntrypoint.entry} width="100%" height="100%" />
+      <blocks height={entrypoint.height}>
+        <webview url={entrypoint.entry} width="100%" height="100%" />
       </blocks>
     );
   };
 
+  const defaultEntrypoint = post.entrypoints.default;
   Devvit.addCustomPostType({
     name: '',
     render: (ctx) => {
-      return defaultEntrypoint.inline ? renderInline(ctx) : renderSplash(ctx);
+      const postDataHeader = ctx.metadata[Header.PostData]?.values[0];
+      const postData: DevvitPostData = postDataHeader
+        ? JSON.parse(postDataHeader)
+        : ({} satisfies DevvitPostData);
+      const splash = postData.splash;
+      const entry = splash?.entry ? post.entrypoints[splash.entry] : defaultEntrypoint;
+      return entry.inline ? renderInline(entry) : renderSplash(entry, splash);
     },
     // to-do: vary dynamically on entrypoint.
     height: defaultEntrypoint.height,
