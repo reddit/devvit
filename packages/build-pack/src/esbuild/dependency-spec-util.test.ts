@@ -287,6 +287,74 @@ test('permissions', () =>
     }
   `));
 
+test('permissions', () =>
+  expect(
+    createDependencySpec(
+      { name: 'actor name', owner: 'actor owner', version: '1.2.3' },
+      {
+        schema: 'v1',
+        name: 'name',
+        permissions: noPermissions,
+        payments: {
+          products: [],
+          endpoints: {
+            fulfillOrder: '/internal/payments/fulfill',
+          },
+        },
+      },
+      { hostname: 'hostname' }
+    )
+  ).toMatchInlineSnapshot(`
+    {
+      "actor": {
+        "name": "actor name",
+        "owner": "actor owner",
+        "version": "1.2.3",
+      },
+      "hostname": "actor name.hostname",
+      "permissions": [],
+      "provides": [
+        {
+          "actor": {
+            "name": "actor name",
+            "owner": "actor owner",
+            "version": "1.2.3",
+          },
+          "definition": {
+            "fullName": "devvit.actor.payments.v1alpha.PaymentProcessor",
+            "methods": [
+              {
+                "fullName": "/devvit.actor.payments.v1alpha.PaymentProcessor/FulfillOrder",
+                "name": "FulfillOrder",
+                "requestStream": false,
+                "requestType": "devvit.actor.payments.v1alpha.FulfillOrderRequest",
+                "responseStream": false,
+                "responseType": "devvit.actor.payments.v1alpha.FulfillOrderResponse",
+              },
+              {
+                "fullName": "/devvit.actor.payments.v1alpha.PaymentProcessor/RefundOrder",
+                "name": "RefundOrder",
+                "requestStream": false,
+                "requestType": "devvit.actor.payments.v1alpha.RefundOrderRequest",
+                "responseStream": false,
+                "responseType": "devvit.actor.payments.v1alpha.RefundOrderResponse",
+              },
+            ],
+            "name": "PaymentProcessor",
+            "version": "",
+          },
+          "partitionsBy": [],
+        },
+      ],
+      "uses": [
+        {
+          "name": "default",
+          "typeName": "devvit.plugin.payments.v1alpha.PaymentsService",
+        },
+      ],
+    }
+  `));
+
 test('post', () =>
   expect(
     createDependencySpec(

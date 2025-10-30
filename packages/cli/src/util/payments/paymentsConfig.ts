@@ -19,9 +19,11 @@ import { filterToReservedDevvitMetadataKeys } from '@devvit/shared-types/reserve
 import { validateProductsJSON } from '@devvit/shared-types/schemas/productsSchemaJSONValidator.js';
 import { imageSize } from 'image-size';
 
+import type { Project } from '../project.js';
+
 // The JSONProduct type is a Product with the metadata field as optional
-// We don't require developers to provide metadata in the products.json file
-// but we require it to be present in the Product type. This is an itermidiate
+// We don't require developers to provide metadata in the products.json file,
+// but we require it to be present in the Product type. This is an intermediate
 // type to handle this discrepancy when generating the PaymentsConfig.
 export type JSONProduct = Omit<Product, 'metadata'> & Partial<Pick<Product, 'metadata'>>;
 
@@ -29,8 +31,13 @@ export type JSONProduct = Omit<Product, 'metadata'> & Partial<Pick<Product, 'met
  * Reads Products from src/products.json
  * @throws if products.json is malformed
  */
-export async function readProducts(projectRoot: string): Promise<JSONProduct[] | undefined> {
-  const productsJSONFile = path.join(projectRoot, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
+export async function readProducts(project: Project): Promise<JSONProduct[] | undefined> {
+  const configProducts = project.appConfig?.payments?.products;
+  if (configProducts && configProducts.length > 0) {
+    return configProducts;
+  }
+
+  const productsJSONFile = path.join(project.root, ACTOR_SRC_DIR, PRODUCTS_JSON_FILE);
   try {
     await access(productsJSONFile);
   } catch {

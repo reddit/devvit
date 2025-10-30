@@ -128,6 +128,11 @@ export function createDependencySpec(
 
   if (config.menu) provide(spec, ContextActionDefinition);
 
+  if (config.payments) {
+    provide(spec, PaymentProcessorDefinition);
+    use(spec, PaymentsServiceDefinition);
+  }
+
   if (config.forms) provide(spec, UIEventHandlerDefinition);
 
   if (config.scheduler) {

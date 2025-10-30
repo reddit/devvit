@@ -3,12 +3,17 @@
  * from client code.
  */
 
+import { readFileSync } from 'node:fs';
+
 import { Scope, scopeFromJSON } from '@devvit/protos';
-import jsonschema from 'jsonschema/lib/index.js';
+import jsonschema, { type Schema } from 'jsonschema/lib/index.js';
 
 import type { JsonObject, JsonValue } from '../json.js';
+import type { Product } from '../payments/Product.js';
 import schema from './config-file.v1.json' with { type: 'json' };
 import { defaultPostEntry, UNINITIALIZED_APP_NAME } from './constants.js';
+import productsSchema from './products.json' with { type: 'json' };
+import { validateProductsJSON } from './productsSchemaJSONValidator.js';
 
 /**
  * devvit.json with defaults. See config-file.v1.json schema. Schema is assumed
@@ -25,6 +30,7 @@ export type AppConfig = {
   blocks?: AppBlocksConfig;
   dev?: AppDevConfig;
   menu?: AppMenuConfig;
+  payments?: AppPaymentsConfig;
   scheduler?: AppSchedulerConfig;
   settings?: AppSettingsConfig;
   forms?: AppFormsConfig;
@@ -101,6 +107,13 @@ export type AppMenuItemConfig = {
 };
 export type AppMenuConfig = {
   items: AppMenuItemConfig[];
+};
+export type AppPaymentsConfig = {
+  products: Product[];
+  endpoints: {
+    fulfillOrder: string;
+    refundOrder?: string;
+  };
 };
 export type AppFormsConfig = {
   [formName: string]: string; // to-do: {entry: string, name: string}.
@@ -188,6 +201,7 @@ export type AppConfigJson = {
   triggers?: AppTriggersConfig;
   blocks?: AppBlocksConfigJson;
   menu?: AppMenuConfigJson;
+  payments?: AppPaymentsConfigJson;
   forms?: AppFormsConfigJson;
   dev?: { subreddit?: string };
   scheduler?: AppSchedulerConfigJson;
@@ -210,6 +224,12 @@ export type AppMenuConfigJson = {
     postFilter: AppMenuPostFilterConfig;
   }[];
 };
+export type AppPaymentsConfigJson = {
+  endpoints: {
+    fulfillOrder: string;
+    refundOrder?: string;
+  };
+} & ({ products: Product[] } | { productsFile: string });
 export type AppPermissionConfigJson = {
   http?: { enable?: boolean; domains?: string[] };
   media?: boolean;
@@ -258,7 +278,7 @@ export function parseAppConfig(str: string, allowUninitializedConfig: boolean): 
 }
 
 export function parseAppConfigJson(json: JsonValue, allowUninitializedConfig: boolean): AppConfig {
-  const unitializedSchema = {
+  const uninitializedSchema = {
     ...schema,
     properties: {
       ...schema.properties,
@@ -269,12 +289,19 @@ export function parseAppConfigJson(json: JsonValue, allowUninitializedConfig: bo
     },
   };
 
-  const ret = jsonschema.validate(json, allowUninitializedConfig ? unitializedSchema : schema);
+  const devvitSchema = (allowUninitializedConfig
+    ? uninitializedSchema
+    : schema) as unknown as Schema;
+
+  const validator = new jsonschema.Validator();
+  validator.addSchema(devvitSchema, schema.$id!);
+  validator.addSchema(productsSchema, productsSchema.$id!);
+  const ret = validator.validate(json, devvitSchema);
   if (!ret.valid)
     throw new Error(
       ret.errors
         .map((err) => {
-          if (!err.path.length && err.name === 'anyOf' && /\[subschema \d\]/.test(err.stack))
+          if (!err.path.length && err.name === 'anyOf' && /\[subschema \d]/.test(err.stack))
             return 'config requires property "post", "server", or "blocks".';
           if (err.stack.includes('name does not match pattern'))
             return err.stack
@@ -338,6 +365,7 @@ function AppConfig(json: Readonly<AppConfigJson>): AppConfig {
       schema.properties.blocks.properties.menu.properties.enable.default)
     : false;
   if (json.menu || blocksMenu) partial.menu = AppMenuConfig(json.menu);
+  if (json.payments) partial.payments = AppPaymentsConfig(json.payments);
   if (json.scheduler) partial.scheduler = AppSchedulerConfig(json.scheduler);
   const blocksSettings = json.blocks
     ? (json.blocks.settings?.enable ??
@@ -478,6 +506,49 @@ function AppMenuConfig(menu: Readonly<AppMenuConfigJson> | undefined): AppMenuCo
     });
   }
   return { items };
+}
+
+function AppPaymentsConfig(payments: Readonly<AppPaymentsConfigJson>): AppPaymentsConfig {
+  if (!payments) {
+    throw Error(`Invalid false-y payments config`);
+  }
+  if (!payments.endpoints?.fulfillOrder) {
+    throw Error(`Order fulfillment endpoint is required`);
+  }
+
+  const rawProducts: Product[] = 'products' in payments ? [...payments.products] : [];
+  if ('productsFile' in payments) {
+    const fileContents = readFileSync(payments.productsFile).toString();
+    rawProducts.push(...validateProductsJSON(JSON.parse(fileContents)));
+  }
+  console.log(`Loaded ${rawProducts.length} products from payments config.`);
+
+  const products: Product[] = [];
+  for (const rawProduct of rawProducts) {
+    const product: Product = {
+      accountingType: rawProduct.accountingType,
+      displayName: rawProduct.displayName,
+      price: rawProduct.price,
+      sku: rawProduct.sku,
+    };
+    if (rawProduct.metadata) {
+      // Shallow copy to make sure any further mutations don't affect the config.
+      product.metadata = {
+        ...rawProduct.metadata,
+      };
+    }
+    if (rawProduct.images) {
+      product.images = rawProduct.images;
+    }
+    if (rawProduct.description) {
+      product.description = rawProduct.description;
+    }
+    products.push(product);
+  }
+  return {
+    endpoints: payments.endpoints,
+    products,
+  };
 }
 
 function AppSettingsConfig(

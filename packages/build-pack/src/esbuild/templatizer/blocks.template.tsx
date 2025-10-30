@@ -1,3 +1,8 @@
+import {
+  addPaymentHandler,
+  type PaymentHandler,
+  type PaymentHandlerResponse,
+} from '@devvit/payments';
 import type { Logger, Metadata } from '@devvit/protos';
 import { LoggerDefinition, Severity } from '@devvit/protos';
 import { type DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
@@ -19,6 +24,7 @@ import type {
   AppConfig,
   AppFormsConfig,
   AppMenuItemConfig,
+  AppPaymentsConfig,
   AppPermissionConfig,
   AppPostConfig,
   AppSchedulerConfig,
@@ -142,6 +148,33 @@ function configureMenuItems(menuItems: Readonly<AppMenuItemConfig[]>): void {
 
     Devvit.addMenuItem(menuItem);
   }
+}
+
+function configurePayments(menuItems: Readonly<AppPaymentsConfig>): void {
+  const paymentHandler: PaymentHandler = {
+    fulfillOrder: async (order, ctx) => {
+      const jsonableOrder = {
+        ...order,
+        createdAt: order.createdAt ? order.createdAt.toISOString() : null,
+        updatedAt: order.updatedAt ? order.updatedAt.toISOString() : null,
+      };
+      const rsp = await fetchWebbit(menuItems.endpoints.fulfillOrder, jsonableOrder, ctx.metadata);
+      return rsp as PaymentHandlerResponse;
+    },
+  };
+
+  if (menuItems.endpoints.refundOrder) {
+    paymentHandler.refundOrder = async (order, ctx) => {
+      const jsonableOrder = {
+        ...order,
+        createdAt: order.createdAt ? order.createdAt.toISOString() : null,
+        updatedAt: order.updatedAt ? order.updatedAt.toISOString() : null,
+      };
+      await fetchWebbit(menuItems.endpoints.fulfillOrder, jsonableOrder, ctx.metadata);
+    };
+  }
+
+  addPaymentHandler(paymentHandler);
 }
 
 function configureForms(forms: Readonly<AppFormsConfig>): void {
@@ -505,6 +538,7 @@ if (config2) {
   if (config2.forms) configureForms(config2.forms);
   if (config2.triggers) configureTriggers(config2.triggers);
   if (config2.settings) configureSettings(config2.settings);
+  if (config2.payments) configurePayments(config2.payments);
 }
 
 export default Devvit;

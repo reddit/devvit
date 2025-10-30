@@ -179,8 +179,8 @@
           "items": {
             "type": "object",
             "description": "An option for a select-type setting.",
-            "additionalProperties": false,
             "required": ["label", "value"],
+            "additionalProperties": false,
             "properties": {
               "label": {
                 "type": "string",
@@ -226,8 +226,8 @@
           "items": {
             "type": "object",
             "description": "An option for a select-type setting.",
-            "additionalProperties": false,
             "required": ["label", "value"],
+            "additionalProperties": false,
             "properties": {
               "label": {
                 "type": "string",
@@ -437,8 +437,8 @@
         "entrypoints": {
           "type": "object",
           "description": "Map of named entrypoints for post rendering.",
-          "additionalProperties": false,
           "required": ["default"],
+          "additionalProperties": false,
           "properties": {
             "default": {
               "$ref": "#/$defs/Entrypoint",
@@ -578,8 +578,8 @@
     "menu": {
       "type": "object",
       "description": "Menu configuration for the app.",
-      "additionalProperties": false,
       "required": ["items"],
+      "additionalProperties": false,
       "properties": {
         "items": {
           "type": "array",
@@ -627,6 +627,32 @@
       }
     },
 
+    "payments": {
+      "allOf": [{
+        "$ref": "https://developers.reddit.com/schema/products.json"
+      }, {
+        "required": ["endpoints"],
+        "oneOf": [{
+          "required": ["products"]
+        }, {
+          "required": ["productsFile"]
+        }],
+        "properties": {
+          "endpoints": {
+            "type": "object",
+            "description": "Internal endpoints for handling various payments-related actions",
+            "required": ["fulfillOrder"],
+            "additionalProperties": false,
+            "properties": {
+              "fulfillOrder": { "$ref": "#/$defs/InternalEndpoint" },
+              "refundOrder": { "$ref": "#/$defs/InternalEndpoint" }
+            }
+          },
+          "productsFile": { "$ref": "#/$defs/Path" }
+        }
+      }]
+    },
+
     "forms": {
       "type": "object",
       "description": "Key-value pairs mapping form identifiers to their submit URLs.",
@@ -654,8 +680,8 @@
     "scheduler": {
       "type": "object",
       "description": "Scheduler config.",
-      "additionalProperties": false,
       "required": ["tasks"],
+      "additionalProperties": false,
       "properties": {
         "tasks": {
           "type": "object",
@@ -731,8 +757,8 @@
     "marketingAssets": {
       "type": "object",
       "description": "Marketing assets config.",
-      "additionalProperties": false,
       "required": ["icon"],
+      "additionalProperties": false,
       "properties": {
         "icon": {
           "type": "string",

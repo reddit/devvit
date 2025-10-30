@@ -55,7 +55,7 @@ export default class BundleActor extends DevvitCommand {
     const actorBundler = new Bundler();
 
     const bundles = await actorBundler.bundle(this.project, actorSpec, includeMetafile);
-    const products = await readProducts(this.project.root);
+    const products = await readProducts(this.project);
 
     await mkdir(path.join(this.project.root, distDirFilename), { recursive: true });
 

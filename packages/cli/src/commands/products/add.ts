@@ -226,7 +226,7 @@ export default class AddProduct extends DevvitCommand {
     };
 
     ux.action.start(`Reading ${PRODUCTS_JSON_FILE}`);
-    const products = await readProducts(this.project.root);
+    const products = await readProducts(this.project);
 
     if (products) {
       ux.action.stop(

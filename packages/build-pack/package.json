@@ -31,6 +31,7 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
+    "@devvit/payments": "0.12.1",
     "@devvit/protos": "0.12.1",
     "@devvit/shared-types": "0.12.1",
     "@devvit/splash": "0.12.1",

@@ -1350,6 +1350,109 @@ describe('parseAppConfigJSON()', () => {
       }
     `));
 
+  test('payments', () => {
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'name',
+          server: {},
+          payments: {
+            endpoints: {
+              fulfillOrder: '/internal/payments/fulfill',
+              refundOrder: '/internal/payments/refund',
+            },
+            products: [
+              {
+                sku: 'askew',
+                displayName: 'Askew! (Get it?)',
+                description: "It's a dumb pun. A SKU == Askew",
+                price: 25,
+                accountingType: 'INSTANT',
+              },
+            ],
+          },
+        },
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "json": {
+          "name": "name",
+          "payments": {
+            "endpoints": {
+              "fulfillOrder": "/internal/payments/fulfill",
+              "refundOrder": "/internal/payments/refund",
+            },
+            "products": [
+              {
+                "accountingType": "INSTANT",
+                "description": "It's a dumb pun. A SKU == Askew",
+                "displayName": "Askew! (Get it?)",
+                "price": 25,
+                "sku": "askew",
+              },
+            ],
+          },
+          "server": {},
+        },
+        "name": "name",
+        "payments": {
+          "endpoints": {
+            "fulfillOrder": "/internal/payments/fulfill",
+            "refundOrder": "/internal/payments/refund",
+          },
+          "products": [
+            {
+              "accountingType": "INSTANT",
+              "description": "It's a dumb pun. A SKU == Askew",
+              "displayName": "Askew! (Get it?)",
+              "price": 25,
+              "sku": "askew",
+            },
+          ],
+        },
+        "permissions": {
+          "http": {
+            "domains": [],
+            "enable": false,
+          },
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": false,
+            "scope": "user",
+          },
+          "redis": false,
+          "settings": false,
+          "triggers": false,
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+        },
+      }
+    `);
+    expect(() =>
+      parseAppConfigJson(
+        {
+          name: 'name',
+          server: {},
+          payments: {
+            endpoints: {},
+            products: [],
+          },
+        },
+        false
+      )
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: payments does not match allOf schema [subschema 1] with 1 error[s]:; payments.endpoints requires property "fulfillOrder"]`
+    );
+  });
+
   test('override triggers', () =>
     expect(
       parseAppConfigJson(

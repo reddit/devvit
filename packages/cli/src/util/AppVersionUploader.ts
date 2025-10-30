@@ -50,7 +50,7 @@ export class AppVersionUploader {
     let products: JSONProduct[] | undefined;
 
     try {
-      products = await readProducts(this.#cmd.project.root);
+      products = await readProducts(this.#cmd.project);
     } catch (err) {
       throw new Error(
         `An error occurred when reading and validating ${PRODUCTS_JSON_FILE}: 

@@ -19,7 +19,11 @@ export {
 export { getOrders, useOrders } from './hooks/use-orders.js';
 export { usePayments } from './hooks/use-payments.js';
 export { getProducts, useProducts } from './hooks/use-products.js';
-export { addPaymentHandler } from './paymentHandler.js';
+export {
+  addPaymentHandler,
+  type PaymentHandler,
+  type PaymentHandlerResponse,
+} from './paymentHandler.js';
 
 // Initialize plugin
 // This import has the side effect of configuring Devvit and setting up

@@ -6,6 +6,7 @@ import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { AccountingType } from '@devvit/shared-types/payments/Product.js';
 import path from 'path';
 
+import type { Project } from '../project.js';
 import {
   getPaymentsConfig,
   makePaymentsConfig,
@@ -56,14 +57,14 @@ describe('Read product.json', () => {
   const PROJECT_ROOT = '/path/to/project';
   it('does not return any products if the files does not exist', async () => {
     vi.mocked(access).mockRejectedValueOnce(new Error('not found'));
-    const products = await readProducts(PROJECT_ROOT);
+    const products = await readProducts({ root: PROJECT_ROOT } as Project);
     expect(products).toBeUndefined();
   });
 
   it('throws an error if products.json is not formatted properly', async () => {
     const products = [{ ...MOCK_PRODUCTS_JSON.products[0], price: 'not a number' }];
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
-    await expect(() => readProducts(PROJECT_ROOT)).rejects.toThrowError(
+    await expect(() => readProducts({ root: PROJECT_ROOT } as Project)).rejects.toThrowError(
       'products.json validation error'
     );
   });

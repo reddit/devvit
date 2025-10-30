@@ -9,10 +9,16 @@
       "type": "array",
       "items": {
         "type": "object",
+        "required": [
+          "sku",
+          "displayName",
+          "price",
+          "accountingType"
+        ],
         "additionalProperties": false,
         "properties": {
           "sku": {
-            "description": "The product sku used as a unique identifier",
+            "description": "The product SKU used as a unique identifier",
             "maxLength": 50,
             "type": "string",
             "pattern": "^[A-z0-9-_]+$"
@@ -21,7 +27,7 @@
             "description": "The product display name",
             "maxLength": 50,
             "type": "string",
-            "pattern": ".*"
+            "pattern": ".+"
           },
           "description": {
             "description": "The product description",
@@ -29,18 +35,21 @@
             "maxLength": 250
           },
           "price": {
-            "description": "The price of the product (unit: Reddit Gold). See https://developers.reddit.com/docs/next/capabilities/payments#pricing for more information.",
-            "type": "integer",
+            "description": "The price of the product (unit: Reddit Gold). See https://developers.reddit.com/docs/earn-money/payments/payments_overview#how-to-get-paid for more information.",
             "enum": [5, 25, 50, 100, 150, 250, 500, 1000, 2500]
           },
           "accountingType": {
             "description": "The accounting type of the product",
-            "type": "string",
             "enum": ["INSTANT", "DURABLE", "CONSUMABLE", "VALID_FOR_1D", "VALID_FOR_7D", "VALID_FOR_30D", "VALID_FOR_1Y"]
           },
           "images": {
             "description": "The images associated with this product",
             "type": "object",
+            "required": ["icon"],
+            "additionalProperties": false,
+            "examples": [{
+              "icon": "/assets/product-icon.png"
+            }],
             "properties": {
               "icon": {
                 "description": "The icon image URL (should be a path relative to /assets)",
@@ -51,12 +60,17 @@
               "^.*$": {
                 "type": "string"
               }
-            },
-            "additionalProperties": false,
-            "required": ["icon"]
+            }
           },
           "metadata": {
             "description": "Additional metadata associated with this product",
+            "examples": [
+              {
+                "itemType": "weapon",
+                "durability": "30",
+                "rarity": "legendary"
+              }
+            ],
             "type": "object",
             "maxProperties": 10,
             "patternProperties": {
@@ -65,13 +79,7 @@
               }
             }
           }
-        },
-        "required": [
-          "sku",
-          "displayName",
-          "price",
-          "accountingType"
-        ]
+        }
       }
     }
   }
