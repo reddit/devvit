@@ -69,7 +69,7 @@ export function requestExpandedMode(event: MouseEvent, entry: string): Promise<v
  * });
  * ```
  */
-export function exitExpandedMode(event: PointerEvent): Promise<void> {
+export function exitExpandedMode(event: MouseEvent): Promise<void> {
   if (devvit.webViewMode === WebViewImmersiveMode.INLINE_MODE)
     throw Error('web view is already inlined');
   return emitModeEffect(WebViewImmersiveMode.INLINE_MODE, event, undefined);
@@ -130,7 +130,7 @@ async function emitModeEffect(
  * @internal
  * Handles incoming messages from the client, like when the user closes the immersive modal
  */
-export function registerListener() {
+export function registerListener(): void {
   addEventListener('message', (event: MessageEvent<WebViewMessageEvent_MessageData>) => {
     const { type, data } = event.data;
 
