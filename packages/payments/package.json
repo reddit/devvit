@@ -9,6 +9,10 @@
   "type": "module",
   "exports": {
     ".": "./dist/index.js",
+    "./client": {
+      "browser": "./dist/client/index.js",
+      "default": "./dist/client/clientImportInServerCodePanic.js"
+    },
     "./helpers/*": {
       "type": "./dist/helpers/*.d.ts",
       "import": "./dist/helpers/*.js"

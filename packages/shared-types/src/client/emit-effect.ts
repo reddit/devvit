@@ -21,6 +21,7 @@ export type Effect = Omit<SharedEffects, 'interval'> & {
 const EFFECTS_WITH_RESPONSE: readonly EffectType[] = [
   EffectType.EFFECT_SHOW_FORM,
   EffectType.EFFECT_CAN_RUN_AS_USER,
+  EffectType.EFFECT_CREATE_ORDER,
 ];
 
 /**
@@ -57,6 +58,8 @@ export const emitEffect = (
       message.navigateToUrl = effect.navigateToUrl;
     } else if (effect.showForm) {
       message.showForm = effect.showForm;
+    } else if (effect.createOrder) {
+      message.createOrder = effect.createOrder;
     } else if (effect.canRunAsUser) {
       message.canRunAsUser = effect.canRunAsUser;
     }
