@@ -110,14 +110,14 @@ For all examples below, we assume that you already have obtained a Redis Client.
 
 ### Simple read/write
 
-| **Command**                                | **Action**                                                            |
-| ------------------------------------------ | --------------------------------------------------------------------- |
-| [get](https://redis.io/commands/get)       | Gets the value of key.                                                |
-| [set](https://redis.io/commands/set)       | Sets key to hold a string value.                                      |
-| [exists](https://redis.io/commands/exists) | Returns number of given keys that exist.                              |
-| [del](https://redis.io/commands/del)       | Removes the specified keys.                                           |
-| [type](https://redis.io/commands/type)     | Returns the string representation of the type of value stored at key. |
-| [rename](https://redis.io/commands/rename) | Renames a key.                                                        |
+| **Command**                                | **Action**                                                            | **Limits** |
+| ------------------------------------------ | --------------------------------------------------------------------- | ---------- |
+| [get](https://redis.io/commands/get)       | Gets the value of key.                                                | None |
+| [set](https://redis.io/commands/set)       | Sets key to hold a string value.                                      | Subject to storage quota gating (writes may be blocked if quota exceeded) |
+| [exists](https://redis.io/commands/exists) | Returns number of given keys that exist.                              | None |
+| [del](https://redis.io/commands/del)       | Removes the specified keys.                                           | None |
+| [type](https://redis.io/commands/type)     | Returns the string representation of the type of value stored at key. | None |
+| [rename](https://redis.io/commands/rename) | Renames a key.                                                        | None |
 
 <details>
   <summary>
@@ -152,10 +152,10 @@ Type: string
 
 ### Batch read/write
 
-| **Command**                            | **Action**                                      |
-| -------------------------------------- | ----------------------------------------------- |
-| [mGet](https://redis.io/commands/mget) | Returns the values of all specified keys.       |
-| [mSet](https://redis.io/commands/mset) | Sets the given keys to their respective values. |
+| **Command**                            | **Action**                                      | **Limits** |
+| -------------------------------------- | ----------------------------------------------- | ---------- |
+| [mGet](https://redis.io/commands/mget) | Returns the values of all specified keys.       | None |
+| [mSet](https://redis.io/commands/mset) | Sets the given keys to their respective values. | Subject to storage quota gating (writes may be blocked if quota exceeded) |
 
 <details>
   <summary>
@@ -184,11 +184,11 @@ Result: Devvit,Developer
 
 ### Strings
 
-| **Command**                                    | **Action**                                                                                                             |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| [getRange](https://redis.io/commands/getrange) | Returns the substring of the string value stored at key, determined by the offsets start and end (both are inclusive). |
-| [setRange](https://redis.io/commands/setrange) | Overwrites part of the string stored at key, starting at the specified offset, for the entire length of value.         |
-| [strLen](https://redis.io/commands/strlen)     | Returns the length of the string value stored at key.                                                                  |
+| **Command**                                    | **Action**                                                                                                             | **Limits** |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------- |
+| [getRange](https://redis.io/commands/getrange) | Returns the substring of the string value stored at key, determined by the offsets start and end (both are inclusive). | None |
+| [setRange](https://redis.io/commands/setrange) | Overwrites part of the string stored at key, starting at the specified offset, for the entire length of value.         | Subject to storage quota gating (writes may be blocked if quota exceeded) |
+| [strLen](https://redis.io/commands/strlen)     | Returns the length of the string value stored at key.                                                                  | None |
 
 <details>
   <summary>
@@ -225,18 +225,18 @@ Word length: 7
 
 Redis hashes can store up to ~ 4.2 billion key-value pairs. We recommend using hash for managing collections of key-value pairs whenever possible and iterating over it using a combination of `hscan`, `hkeys` and `hgetall`.
 
-| **Command**                                   | **Action**                                                                        |
-| --------------------------------------------- | --------------------------------------------------------------------------------- |
-| [hGet](https://redis.io/commands/hget)        | Returns the value associated with field in the hash stored at key.                |
-| [hMGet](https://redis.io/commands/hmget)      | Returns the value of all specified field in the hash stored at multiple keys.     |
-| [hSet](https://redis.io/commands/hset/)       | Sets the specified fields to their respective values in the hash stored at key.   |
-| [hSetNX](https://redis.io/commands/hsetnx/)   | Sets field in the hash stored at key to value, only if field does not yet exist.ƒ |
-| [hDel](https://redis.io/commands/hdel/)       | Removes the specified fields from the hash stored at key.                         |
-| [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash.                      |
-| [hKeys](https://redis.io/commands/hkeys/)     | Returns all field names in the hash stored at key.                                |
-| [hScan](https://redis.io/commands/hscan/)     | Iterates fields of Hash types and their associated values.                        |
-| [hIncrBy](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value.          |
-| [hLen](https://redis.io/commands/hlen/)       | Returns the number of fields contained in the hash stored at key.                 |
+| **Command**                                   | **Action**                                                                        | **Limits** |
+| --------------------------------------------- | --------------------------------------------------------------------------------- | ---------- |
+| [hGet](https://redis.io/commands/hget)        | Returns the value associated with field in the hash stored at key.                | None |
+| [hMGet](https://redis.io/commands/hmget)      | Returns the value of all specified field in the hash stored at multiple keys.     | May be disabled for your app (allowlisted feature) |
+| [hSet](https://redis.io/commands/hset/)       | Sets the specified fields to their respective values in the hash stored at key.   | Subject to storage quota gating (writes may be blocked if quota exceeded) |
+| [hSetNX](https://redis.io/commands/hsetnx/)   | Sets field in the hash stored at key to value, only if field does not yet exist.ƒ | Subject to storage quota gating (writes may be blocked if quota exceeded) |
+| [hDel](https://redis.io/commands/hdel/)       | Removes the specified fields from the hash stored at key.                         | None |
+| [hGetAll](https://redis.io/commands/hgetall/) | Returns a map of fields and their values stored in the hash.                      | None |
+| [hKeys](https://redis.io/commands/hkeys/)     | Returns all field names in the hash stored at key.                                | None |
+| [hScan](https://redis.io/commands/hscan/)     | Iterates fields of Hash types and their associated values.                        | No server-side cap; uses requested count |
+| [hIncrBy](https://redis.io/commands/hincrby/) | Increments the score of member in the sorted set stored at key by value.          | Subject to storage quota gating (writes may be blocked if quota exceeded) |
+| [hLen](https://redis.io/commands/hlen/)       | Returns the number of fields contained in the hash stored at key.                 | None |
 
 <details>
   <summary>
@@ -397,9 +397,9 @@ Number of fields: 4
 
 ### Numbers
 
-| **Command**                                | **Action**                                        |
-| ------------------------------------------ | ------------------------------------------------- |
-| [incrBy](https://redis.io/commands/incrby) | Increments the number stored at key by increment. |
+| **Command**                                | **Action**                                        | **Limits** |
+| ------------------------------------------ | ------------------------------------------------- | ---------- |
+| [incrBy](https://redis.io/commands/incrby) | Increments the number stored at key by increment. | Subject to storage quota gating (writes may be blocked if quota exceeded) |
 
 <details>
   <summary>
@@ -422,10 +422,10 @@ Updated points: 153
 
 ### Key expiration
 
-| **Command**                                         | **Action**                                                        |
-| --------------------------------------------------- | ----------------------------------------------------------------- |
-| [expire](https://redis.io/commands/expire/)         | Sets a timeout on key.                                            |
-| [expireTime](https://redis.io/commands/expiretime/) | Returns the remaining seconds at which the given key will expire. |
+| **Command**                                         | **Action**                                                        | **Limits** |
+| --------------------------------------------------- | ----------------------------------------------------------------- | ---------- |
+| [expire](https://redis.io/commands/expire/)         | Sets a timeout on key.                                            | None |
+| [expireTime](https://redis.io/commands/expiretime/) | Returns the remaining seconds at which the given key will expire. | None |
 
 <details>
   <summary>
@@ -469,13 +469,13 @@ You can sequence all of the above steps in a single transaction using `multi` an
 
 If an error occurs inside a transaction before `exec` is called, Redis discards the transaction automatically. See the Redis docs: [Errors inside a transaction](https://redis.io/docs/latest/develop/interact/transactions/#errors-inside-a-transaction) for more info.
 
-| **Command**                                   | **Action**                                                                                                                                                                                                                                      |
-| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [multi](https://redis.io/commands/multi/)     | Marks the start of a transaction block.                                                                                                                                                                                                         |
-| [exec](https://redis.io/commands/exec/)       | Executes all previously queued commands in a transaction and restores the connection state to normal.                                                                                                                                           |
-| [discard](https://redis.io/commands/discard/) | Flushes all previously queued commands in a transaction and restores the connection state to normal.                                                                                                                                            |
-| [watch](https://redis.io/commands/watch/)     | Marks the given keys to be watched for conditional execution of a transaction. `watch` returns a [TxClientLike](https://developers.reddit.com/docs/api/public-api/#-txclientlike) which should be used to call Redis commands in a transaction. |
-| [unwatch](https://redis.io/commands/unwatch/) | Flushes all the previously watched keys for a transaction.                                                                                                                                                                                      |
+| **Command**                                   | **Action**                                                                                                                                                                                                                                      | **Limits** |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| [multi](https://redis.io/commands/multi/)     | Marks the start of a transaction block.                                                                                                                                                                                                         | Max concurrent transactions per installation: 20 (default) |
+| [exec](https://redis.io/commands/exec/)       | Executes all previously queued commands in a transaction and restores the connection state to normal.                                                                                                                                           | Transaction execution timeout: 5 seconds |
+| [discard](https://redis.io/commands/discard/) | Flushes all previously queued commands in a transaction and restores the connection state to normal.                                                                                                                                            | None |
+| [watch](https://redis.io/commands/watch/)     | Marks the given keys to be watched for conditional execution of a transaction. `watch` returns a [TxClientLike](https://developers.reddit.com/docs/api/public-api/#-txclientlike) which should be used to call Redis commands in a transaction. | None |
+| [unwatch](https://redis.io/commands/unwatch/) | Flushes all the previously watched keys for a transaction.                                                                                                                                                                                      | None |
 
 <details>
   <summary>
@@ -563,19 +563,19 @@ Gold value: 60
 
 ### Sorted set
 
-| **Command**                                                     | **Action**                                                                                                                                                                                                                                                      |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [zAdd](https://redis.io/commands/zadd/)                         | Adds all the specified members with the specified scores to the sorted set stored at key.                                                                                                                                                                       |
-| [zCard](https://redis.io/commands/zcard)                        | Returns the sorted set cardinality (number of elements) of the sorted set stored at key.                                                                                                                                                                        |
-| [zRange](https://redis.io/commands/zrange/)                     | Returns the specified range of elements in the sorted set stored at key. <br /><br /> When using `by: 'lex'`, the start and stop inputs will be prepended with `[` by default, unless they already begin with `[`, `(` or are one of the special values `+` or `-`. |
-| [zRem](https://redis.io/commands/zrem/)                         | Removes the specified members from the sorted set stored at key.                                                                                                                                                                                                |
-| [zScore](https://redis.io/commands/zscore/)                     | Returns the score of member in the sorted set at key.                                                                                                                                                                                                           |
-| [zRank](https://redis.io/commands/zrank/)                       | Returns the rank of member in the sorted set stored at key.                                                                                                                                                                                                     |
-| [zIncrBy](https://redis.io/commands/zincrby/)                   | Increments the score of member in the sorted set stored at key by value.                                                                                                                                                                                        |
-| [zScan](https://redis.io/commands/zscan/)                       | Iterates elements of sorted set types and their associated scores. Note that there is no guaranteed ordering of elements in the result.                                                                                                                         |
-| [zRemRangeByLex](https://redis.io/commands/zremrangebylex/)     | When all elements in a sorted set are inserted with the same score, this command removes the elements at key between the lexicographical range specified by min and max.                                                                                        |
-| [zRemRangeByRank](https://redis.io/commands/zremrangebyrank/)   | Removes all elements in the sorted set stored at key with rank between start and stop.                                                                                                                                                                          |
-| [zRemRangeByScore](https://redis.io/commands/zremrangebyscore/) | Removes all elements in the sorted set stored at key with a score between min and max (inclusive).                                                                                                                                                              |
+| **Command**                                                     | **Action**                                                                                                                                                                                                                                                      | **Limits** |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| [zAdd](https://redis.io/commands/zadd/)                         | Adds all the specified members with the specified scores to the sorted set stored at key.                                                                                                                                                                       | Subject to storage quota gating (writes may be blocked if quota exceeded) |
+| [zCard](https://redis.io/commands/zcard)                        | Returns the sorted set cardinality (number of elements) of the sorted set stored at key.                                                                                                                                                                        | None |
+| [zRange](https://redis.io/commands/zrange/)                     | Returns the specified range of elements in the sorted set stored at key. <br /><br /> When using `by: 'lex'`, the start and stop inputs will be prepended with `[` by default, unless they already begin with `[`, `(` or are one of the special values `+` or `-`. | BYSCORE/BYLEX: LIMIT count capped to 1000 per call (server default). RANK: no server cap. Client default for by: 'score'/'lex' is count=1000 when no limit is provided. |
+| [zRem](https://redis.io/commands/zrem/)                         | Removes the specified members from the sorted set stored at key.                                                                                                                                                                                                | None |
+| [zScore](https://redis.io/commands/zscore/)                     | Returns the score of member in the sorted set at key.                                                                                                                                                                                                           | None |
+| [zRank](https://redis.io/commands/zrank/)                       | Returns the rank of member in the sorted set stored at key.                                                                                                                                                                                                     | None |
+| [zIncrBy](https://redis.io/commands/zincrby/)                   | Increments the score of member in the sorted set stored at key by value.                                                                                                                                                                                        | Subject to storage quota gating (writes may be blocked if quota exceeded) |
+| [zScan](https://redis.io/commands/zscan/)                       | Iterates elements of sorted set types and their associated scores. Note that there is no guaranteed ordering of elements in the result.                                                                                                                         | No server-side cap; uses requested count |
+| [zRemRangeByLex](https://redis.io/commands/zremrangebylex/)     | When all elements in a sorted set are inserted with the same score, this command removes the elements at key between the lexicographical range specified by min and max.                                                                                        | None |
+| [zRemRangeByRank](https://redis.io/commands/zremrangebyrank/)   | Removes all elements in the sorted set stored at key with rank between start and stop.                                                                                                                                                                          | None |
+| [zRemRangeByScore](https://redis.io/commands/zremrangebyscore/) | Removes all elements in the sorted set stored at key with a score between min and max (inclusive).                                                                                                                                                              | None |
 
 <details>
   <summary>
@@ -803,9 +803,9 @@ zScanResponse: {"cursor":0,"members":[{"score":10,"member":"kiwi"},{"score":20,"
 
 ### Bitfield
 
-| **Command**                                                 | **Action**                                        |
-| ----------------------------------------------------------- | ------------------------------------------------- |
-| [bitfield](https://redis.io/docs/latest/commands/bitfield/) | Performs a sequence of operations on a bit string |
+| **Command**                                                 | **Action**                                        | **Limits** |
+| ----------------------------------------------------------- | ------------------------------------------------- | ---------- |
+| [bitfield](https://redis.io/docs/latest/commands/bitfield/) | Performs a sequence of operations on a bit string | Subject to storage quota gating (writes may be blocked if quota exceeded) |
 
 <details>
   <summary>
