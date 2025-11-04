@@ -358,11 +358,12 @@ describe('fetchWebbit()', () => {
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
+      text: () => Promise.resolve('Internal server failure'),
     };
     globalThis.fetch = async () => mockRsp;
 
     await expect(fetchWebbit('/test-endpoint', {}, {})).rejects.toThrow(
-      /Failed to POST to Node.js server endpoint \/test-endpoint; server responded with HTTP status 500: Internal Server Error/
+      /Failed to POST to Node.js server endpoint \/test-endpoint; server responded with HTTP status 500: Internal Server Error; body: Internal server failure/
     );
   });
 
@@ -372,11 +373,27 @@ describe('fetchWebbit()', () => {
       ok: false,
       status: 404,
       statusText: 'File Not Found',
+      text: () => Promise.resolve('{"status":"error","message":"missing"}'),
     };
     globalThis.fetch = async () => mockRsp;
 
     await expect(fetchWebbit('/test-endpoint', {}, {})).rejects.toThrow(
-      /Failed to POST to Node.js server endpoint \/test-endpoint; server responded with HTTP status 404: ensure the server handles the `\/test-endpoint` endpoint/
+      /Failed to POST to Node.js server endpoint \/test-endpoint; server responded with HTTP status 404: ensure the server handles the `\/test-endpoint` endpoint; body: \{"status":"error","message":"missing"\}/
+    );
+  });
+
+  test('includes response body in error message when response is 400', async () => {
+    const mockRsp = {
+      ...baseRsp,
+      ok: false,
+      status: 400,
+      statusText: 'Bad Request',
+      text: () => Promise.resolve('{"status":"error","message":"groupId is required"}'),
+    };
+    globalThis.fetch = async () => mockRsp;
+
+    await expect(fetchWebbit('/test-endpoint', {}, {})).rejects.toThrow(
+      /Failed to POST to Node.js server endpoint \/test-endpoint; server responded with HTTP status 400: Bad Request; body: \{"status":"error","message":"groupId is required"\}/
     );
   });
 
@@ -432,7 +449,7 @@ describe('fetchWebbit()', () => {
     globalThis.fetch = async () => mockRsp;
 
     await expect(fetchWebbit('/test-endpoint', {}, {})).rejects.toThrow(
-      /Failed to POST to Node.js server endpoint \/test-endpoint; server responded with an unreadable JSON body/
+      /Failed to POST to Node.js server endpoint \/test-endpoint; server responded with HTTP status 200: OK; unreadable response body/
     );
   });
 

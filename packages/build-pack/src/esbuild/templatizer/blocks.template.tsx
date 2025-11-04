@@ -356,19 +356,23 @@ export async function fetchWebbit(
     throw `${preamble} error: ${err instanceof Error ? err.message : err}`;
   }
 
-  if (rsp.status === 404)
-    throw Error(
-      `${preamble} HTTP status ${rsp.status}: ensure the server handles the \`${endpoint}\` endpoint`
-    );
-
-  if (!rsp.ok) throw Error(`${preamble} HTTP status ${rsp.status}: ${rsp.statusText}`);
-
-  let text;
+  let text: string;
   try {
     text = await rsp.text();
   } catch {
-    throw Error(`${preamble} an unreadable JSON body`);
+    throw Error(
+      `${preamble} HTTP status ${rsp.status}: ${rsp.statusText}; unreadable response body`
+    );
   }
+
+  const bodySuffix = text ? `; body: ${abbreviate(text)}` : '';
+
+  if (rsp.status === 404)
+    throw Error(
+      `${preamble} HTTP status ${rsp.status}: ensure the server handles the \`${endpoint}\` endpoint${bodySuffix}`
+    );
+
+  if (!rsp.ok) throw Error(`${preamble} HTTP status ${rsp.status}: ${rsp.statusText}${bodySuffix}`);
 
   if (!text) return;
 
