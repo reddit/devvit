@@ -39,7 +39,7 @@ export type GetPageRevisionsOptions = {
   /** The name of the subreddit the page is in. */
   subredditName: string;
   /** The name of the page to get revisions for. */
-  page: string;
+  page?: string;
   /** The number of revisions to get per request. */
   pageSize?: number;
   /** The maximum number of revisions to get. */
@@ -268,7 +268,7 @@ export class WikiPage {
         const response = await client.GetWikiPageRevisions(
           {
             subreddit: options.subredditName,
-            page: options.page,
+            page: options.page ?? '',
             limit: fetchOptions.limit,
             after: fetchOptions.after,
             before: fetchOptions.before,
