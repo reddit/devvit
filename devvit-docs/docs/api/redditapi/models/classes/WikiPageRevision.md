@@ -76,11 +76,11 @@
 
 #### Get Signature
 
-> **get** **id**(): `string`
+> **get** **id**(): `` `${string}-${string}-${string}-${string}-${string}` ``
 
 ##### Returns
 
-`string`
+`` `${string}-${string}-${string}-${string}-${string}` ``
 
 ---
 

@@ -2087,7 +2087,7 @@ A Listing of User objects.
 
 ### getWikiPage()
 
-> **getWikiPage**(`subredditName`, `page`): `Promise`\<[`WikiPage`](../../models/classes/WikiPage.md)\>
+> **getWikiPage**(`subredditName`, `page`, `revisionId`?): `Promise`\<[`WikiPage`](../../models/classes/WikiPage.md)\>
 
 Get a wiki page from a subreddit.
 
@@ -2104,6 +2104,13 @@ The name of the subreddit to get the wiki page from.
 `string`
 
 The name of the wiki page to get.
+
+##### revisionId?
+
+`` `${string}-${string}-${string}-${string}-${string}` ``
+
+The revision ID of the wiki page version to get. Setting this value will return the wiki page
+version at that revision, and leaving it empty will return the latest version.
 
 #### Returns
 

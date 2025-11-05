@@ -159,6 +159,7 @@
 - [Vault](type-aliases/Vault.md)
 - [Visibility](type-aliases/Visibility.md)
 - [WikiEditMode](type-aliases/WikiEditMode.md)
+- [WikiPageRevisionId](type-aliases/WikiPageRevisionId.md)
 - [WithUserData](type-aliases/WithUserData.md)
 
 ## Variables

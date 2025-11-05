@@ -68,12 +68,15 @@ export type UpdatePageSettingsOptions = {
   permLevel: WikiPagePermissionLevel;
 };
 
+/** The revision ID is a v4 UUID */
+export type WikiPageRevisionId = `${string}-${string}-${string}-${string}-${string}`;
+
 export class WikiPage {
   #name: string;
   #subredditName: string;
   #content: string;
   #contentHtml: string;
-  #revisionId: string;
+  #revisionId: WikiPageRevisionId;
   #revisionDate: Date;
   #revisionReason: string;
   #revisionAuthor: User | undefined;
@@ -88,7 +91,7 @@ export class WikiPage {
     this.#subredditName = subredditName;
     this.#content = data.contentMd;
     this.#contentHtml = data.contentHtml;
-    this.#revisionId = data.revisionId;
+    this.#revisionId = data.revisionId as WikiPageRevisionId;
     this.#revisionDate = new Date(data.revisionDate * 1000); // data.revisionDate is represented in seconds, so multiply by 1000 to get milliseconds
     this.#revisionReason = data.reason ?? '';
     this.#revisionAuthor = data.revisionBy?.data ? new User(data.revisionBy.data) : undefined;
@@ -115,7 +118,7 @@ export class WikiPage {
   }
 
   /** The ID of the revision. */
-  get revisionId(): string {
+  get revisionId(): WikiPageRevisionId {
     return this.#revisionId;
   }
 
@@ -180,7 +183,7 @@ export class WikiPage {
   }
 
   /** Revert this page to a previous revision. */
-  async revertTo(revisionId: string): Promise<void> {
+  async revertTo(revisionId: WikiPageRevisionId): Promise<void> {
     return WikiPage.revertPage(this.#subredditName, this.#name, revisionId);
   }
 
@@ -212,12 +215,17 @@ export class WikiPage {
   }
 
   /** @internal */
-  static async getPage(subredditName: string, page: string): Promise<WikiPage> {
+  static async getPage(
+    subredditName: string,
+    page: string,
+    revisionId: WikiPageRevisionId | undefined
+  ): Promise<WikiPage> {
     const client = getRedditApiPlugins().Wiki;
     const response = await client.GetWikiPage(
       {
         subreddit: subredditName,
         page,
+        revisionId,
       },
       this.#metadata
     );
@@ -253,7 +261,7 @@ export class WikiPage {
       this.#metadata
     );
 
-    return WikiPage.getPage(options.subredditName, options.page);
+    return WikiPage.getPage(options.subredditName, options.page, undefined);
   }
 
   /** @internal */

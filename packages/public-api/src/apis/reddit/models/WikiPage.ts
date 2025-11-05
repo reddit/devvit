@@ -67,12 +67,15 @@ export type UpdatePageSettingsOptions = {
   permLevel: WikiPagePermissionLevel;
 };
 
+/** The revision ID is a v4 UUID */
+export type WikiPageRevisionId = `${string}-${string}-${string}-${string}-${string}`;
+
 export class WikiPage {
   #name: string;
   #subredditName: string;
   #content: string;
   #contentHtml: string;
-  #revisionId: string;
+  #revisionId: WikiPageRevisionId;
   #revisionDate: Date;
   #revisionReason: string;
   #revisionAuthor: User | undefined;
@@ -94,7 +97,7 @@ export class WikiPage {
     this.#subredditName = subredditName;
     this.#content = data.contentMd;
     this.#contentHtml = data.contentHtml;
-    this.#revisionId = data.revisionId;
+    this.#revisionId = data.revisionId as WikiPageRevisionId;
     this.#revisionDate = new Date(data.revisionDate * 1000); // data.revisionDate is represented in seconds, so multiply by 1000 to get milliseconds
     this.#revisionReason = data.reason ?? '';
     this.#revisionAuthor = data.revisionBy?.data
@@ -125,7 +128,7 @@ export class WikiPage {
   }
 
   /** The ID of the revision. */
-  get revisionId(): string {
+  get revisionId(): WikiPageRevisionId {
     return this.#revisionId;
   }
 
@@ -196,7 +199,7 @@ export class WikiPage {
   }
 
   /** Revert this page to a previous revision. */
-  async revertTo(revisionId: string): Promise<void> {
+  async revertTo(revisionId: WikiPageRevisionId): Promise<void> {
     return WikiPage.revertPage(this.#subredditName, this.#name, revisionId, this.#metadata);
   }
 
@@ -234,6 +237,7 @@ export class WikiPage {
   static async getPage(
     subredditName: string,
     page: string,
+    revisionId: WikiPageRevisionId | undefined,
     metadata: Metadata | undefined
   ): Promise<WikiPage> {
     const client = Devvit.redditAPIPlugins.Wiki;
@@ -241,6 +245,7 @@ export class WikiPage {
       {
         subreddit: subredditName,
         page,
+        revisionId,
       },
       metadata
     );
@@ -282,7 +287,7 @@ export class WikiPage {
       metadata
     );
 
-    return WikiPage.getPage(options.subredditName, options.page, metadata);
+    return WikiPage.getPage(options.subredditName, options.page, undefined, metadata);
   }
 
   /** @internal */
@@ -413,7 +418,7 @@ export class WikiPage {
 }
 
 export class WikiPageRevision {
-  #id: string;
+  #id: WikiPageRevisionId;
   #page: string;
   #date: Date;
   #author: User;
@@ -421,7 +426,7 @@ export class WikiPageRevision {
   #hidden: boolean;
 
   constructor(data: WikiPageRevisionProto, metadata: Metadata | undefined) {
-    this.#id = data.id;
+    this.#id = data.id as WikiPageRevisionId;
     this.#page = data.page;
     this.#date = new Date(data.timestamp);
 
@@ -432,7 +437,7 @@ export class WikiPageRevision {
     this.#hidden = data.revisionHidden ?? false;
   }
 
-  get id(): string {
+  get id(): WikiPageRevisionId {
     return this.#id;
   }
 

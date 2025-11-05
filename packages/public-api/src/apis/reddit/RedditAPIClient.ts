@@ -47,6 +47,7 @@ import type {
   UpdateWikiPageOptions,
   Vault,
   WikiPageRevision,
+  WikiPageRevisionId,
   WikiPageSettings,
 } from './models/index.js';
 import {
@@ -1403,10 +1404,16 @@ export class RedditAPIClient {
    *
    * @param subredditName - The name of the subreddit to get the wiki page from.
    * @param page - The name of the wiki page to get.
+   * @param revisionId - The revision ID of the wiki page version to get. Setting this value will return the wiki page
+   * version at that revision, and leaving it empty will return the latest version.
    * @returns The requested WikiPage object.
    */
-  async getWikiPage(subredditName: string, page: string): Promise<WikiPage> {
-    return WikiPage.getPage(subredditName, page, this.#metadata);
+  async getWikiPage(
+    subredditName: string,
+    page: string,
+    revisionId?: WikiPageRevisionId | undefined
+  ): Promise<WikiPage> {
+    return WikiPage.getPage(subredditName, page, revisionId, this.#metadata);
   }
 
   /**
