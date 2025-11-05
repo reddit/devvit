@@ -39,6 +39,7 @@
     "@devvit/cache": "0.12.1",
     "@devvit/client": "0.12.1",
     "@devvit/media": "0.12.1",
+    "@devvit/notifications": "0.12.1",
     "@devvit/payments": "0.12.1",
     "@devvit/realtime": "0.12.1",
     "@devvit/reddit": "0.12.1",

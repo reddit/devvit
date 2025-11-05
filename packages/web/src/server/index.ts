@@ -1,5 +1,6 @@
 export * from '@devvit/cache';
 export * from '@devvit/media';
+export * from '@devvit/notifications';
 export * from '@devvit/payments/server';
 export * from '@devvit/realtime/server';
 export * from '@devvit/reddit';
