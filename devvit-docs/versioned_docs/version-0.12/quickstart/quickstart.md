@@ -20,7 +20,7 @@ This starter template will [create an app like this for you](https://www.reddit.
 ## Environment setup
 
 1. Install Node.JS and NPM ([instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
-2. Go to `https://developers.reddit.com/new` and choose the React template.
+2. Go to [developers.reddit.com/new](https://developers.reddit.com/new) and choose the React template.
 3. Go through the wizard. You will need to create a Reddit account and connect it to Reddit developers.
 4. Follow the instructions on your terminal.
 

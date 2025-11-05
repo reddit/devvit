@@ -101,7 +101,6 @@ Devvit.addSchedulerJob({
 
 - Messages/sec per installation: 100
 - Maximum message payload: 1 MB
-- Channels per app installation: 5
 
 ## Examples
 

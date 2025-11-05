@@ -59,7 +59,7 @@ const connection = await connectRealtime({
 #### Parameters
 
 - `opts` - Connection options object
-  - `channel` (string) - The name of the channel to connect to
+  - `channel` (string) - The name of the channel to connect to. Note, you cannot use the `:` character in the channel name
   - `onConnect?` (function) - Optional callback called when connection is established
   - `onDisconnect?` (function) - Optional callback called when connection is lost
   - `onMessage` (function) - Required callback called when a message is received

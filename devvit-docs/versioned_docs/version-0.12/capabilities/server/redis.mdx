@@ -16,9 +16,13 @@ Each app version installed on a subreddit is namespaced, which means Redis data 
 
 ## Limits and quotas
 
-- Max commands per second: 1000
+- Max commands per second: 40000
 - Max request size: 5 MB
 - Max storage: 500 MB
+- [Pipelining](https://redis.io/docs/latest/develop/using-commands/pipelining/) is not supported
+- [Sets](https://redis.io/docs/latest/commands/set/) - only sorted sets are supported
+- No support for listing keys
+- No support for lua scripts to execute custom logic on redis server
 
 All limits are applied at a per-installation granularity.
 
