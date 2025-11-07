@@ -63,6 +63,11 @@ export type CompileLogLineDetail = {
   text: string;
 };
 
+const SERVER_ENTRY_WAIT_TIMEOUT_MS = 10_000;
+const SERVER_ENTRY_INITIAL_DELAY_MS = 100;
+const SERVER_ENTRY_MAX_DELAY_MS = 2_000;
+const SERVER_ENTRY_WARN_THRESHOLD_MS = 5_000;
+
 const FAKE_FACTORY: ClientFactory = {
   // TODO: remove use of any below
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -370,6 +375,42 @@ export class ESBuildPack {
   }
 }
 
+async function waitForServerEntry(
+  root: ProjectRootDir,
+  server: Readonly<AppServerConfig> | undefined
+): Promise<boolean> {
+  if (!server) return true;
+
+  const entryPath = path.resolve(root, path.join(server.dir, server.entry));
+  if (fs.existsSync(entryPath)) return true;
+
+  const start = Date.now();
+  const deadline = start + SERVER_ENTRY_WAIT_TIMEOUT_MS;
+  const warnAt = start + SERVER_ENTRY_WARN_THRESHOLD_MS;
+  let warned = false;
+
+  let delay = SERVER_ENTRY_INITIAL_DELAY_MS;
+  while (Date.now() < deadline) {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+
+    const waitMs = Math.min(delay, remaining);
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+
+    if (fs.existsSync(entryPath)) return true;
+
+    if (!warned && Date.now() >= warnAt) {
+      warned = true;
+      console.warn(
+        `Waiting for \`config.server.entry\` file (${path.relative(root, entryPath)}) to be generated...`
+      );
+    }
+    delay = Math.min(delay * 2, SERVER_ENTRY_MAX_DELAY_MS);
+  }
+
+  return fs.existsSync(entryPath);
+}
+
 async function newCompileResponse(
   config: Readonly<AppConfig> | undefined,
   namespace: Readonly<Namespace>,
@@ -441,15 +482,23 @@ async function newCompileResponse(
     });
   }
 
+  const serverEntry = config?.server
+    ? path.join(config.server.dir, config.server.entry)
+    : undefined;
+
+  if (!(await waitForServerEntry(root, config?.server))) {
+    return unknownToErrorCompileResponse(
+      'Evaluation',
+      `Cannot read \`config.server.entry\` file (${serverEntry}). Make sure the \`server.entry\` value in devvit.json is correct and that your project is built.`
+    );
+  }
+
   try {
     updateBundleServer(bundles, root, config?.server);
   } catch {
-    const serverEntry = config?.server
-      ? path.join(config.server.dir, config.server.entry)
-      : undefined;
     return unknownToErrorCompileResponse(
       'Evaluation',
-      `Cannot read \`config.server.entry\` file (${serverEntry}).`
+      `Cannot read \`config.server.entry\` file (${serverEntry}). Make sure the \`server.entry\` value in devvit.json is correct and that your project is built.`
     );
   }
 
