@@ -40,7 +40,7 @@
     {
       "type": "doc",
       "id": "quickstart/quickstart",
-      "label": "App Quickstart"
+      "label": "Quickstart for Games"
     },
     {
       "type": "doc",
@@ -49,18 +49,16 @@
     },
     {
       "type": "doc",
-      "label": "Launch Your App",
-      "id": "guides/launch/launch-guide"
-    },
-    {
-      "type": "doc",
-      "label": "Get Featured",
-      "id": "guides/launch/feature-guide"
-    },
-    {
-      "type": "doc",
-      "label": "AI Tools",
+      "label": "Using AI Tools",
       "id": "guides/ai/ai"
+    },
+    {
+      "type": "category",
+      "label": "Launch Your App",
+      "items": [
+        "guides/launch/launch-guide",
+        "guides/launch/feature-guide"
+      ]
     },
     {
       "type": "html",
