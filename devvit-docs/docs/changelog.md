@@ -7,6 +7,56 @@ To use the latest version of Devvit:
 1. Run `npm install devvit@latest` to update your CLI.
 2. Run `npx devvit update app` to update your @devvit dependencies.
 
+## Devvit 0.12.2: Inline Mode, Launch Screens,Expanded App Experiences, and Developer Logs
+
+**Release Date: Nov 10, 2025**
+
+Release 0.12.2 delivers a major evolution in how interactive Devvit apps load, display, and engage users. With this update, you can now leverage inline web views, in addition to expanded mode, to build your interactive posts with Devvit Web. We’re also deprecating [Splash Screens]((link) in favor of more customizable HTML inline launch screens.
+
+**Inline Mode**
+
+Your app's web view can now load directly inside the post unit—right in the feed or on the post details page. Users can start interacting immediately, with no extra taps or page loads.
+
+Inline experiences blend smoothly into Reddit’s native post layout, which means that inline apps must meet performance standards and avoid conflicting with Reddit gestures for a native-quality experience. We encourage developers to read the guidance and rules around inline carefully before building with this feature.
+
+Check out [r/HotAndCold](https://www.reddit.com/r/HotAndCold/) and [r/Honk](https://www.reddit.com/r/honk/) for examples, and learn how to add [inline mode](./capabilities/server/launch_screen_and_entry_points/view_modes_entry_points.md#view-modes) to your app.
+
+:::note
+Devvit apps using inline web views are currently seeing inflated metrics in their App Analytics Dashboard. We're working on improving these estimations.
+:::
+
+**Improved Inline Launch Screens**
+
+Splash screens are yesterday’s news. The improved inline launch screens are now fully customizable, HTML-based entry points for your interactive posts. This update gives you control over design, animation, and loading behavior and uses the same tools and styles as the rest of your app.
+
+This is what an inline launch screen looks like:
+
+![Inline launch screen](./assets/quiz_planet_inline_screen.jpg)
+
+The new first screen automatically loads before your app’s main entry point. Read the docs to learn how to [upgrade your app](./capabilities/server/launch_screen_and_entry_points/splash_migration.md) and [customize your launch screen](./capabilities/server/launch_screen_and_entry_points/launch_screen_customization.md).
+
+:::note
+**Deprecation notice**: We're deprecating the splash parameter in submitCustomPost() and removing it in the next major version update. Learn how to [update your app](./capabilities/server/launch_screen_and_entry_points/splash_migration.md).
+:::
+
+**Multiple App Entry Points**
+
+[Entry points](./capabilities/server/launch_screen_and_entry_points/view_modes_entry_points.md#multiple-entry-points) act as a router that organizes your app across different view modes. Each entry point specifies the initial HTML file for the specific context. A user might experience your app inline, when it’s embedded in a post, or launch it in expanded mode for a larger, full-screen mobile experience.
+
+**Expanded Mode**
+
+Expanded Mode lets users open your app or game in a full-screen experience, which is perfect for mobile devices. This feature works hand-in-hand with multiple entry points, letting users start small (interacting inline in the feed) and then expanding into a full experience.
+
+Learn how to add [Expanded Mode](./capabilities/server/launch_screen_and_entry_points/view_modes_entry_points.md#view-modes) functionality to your app.
+
+**Developer Logs**
+
+We’ve also shipped our first installation-level developer permissions. Developer logs read permission lets mods share read-only logs and install history of an installation with you. This is useful for debugging issues with a particular installation without having to be added as a mod to the subreddit.
+
+![Developer permissions](./assets/developer_permissions.png)
+
+We’re really excited about these updates and can’t wait to hear what you think!
+
 ## Devvit 0.12.1: Cache Helper, Analytics dashboard for developers, and smaller fixes
 
 **Release Date: October 10, 2025**

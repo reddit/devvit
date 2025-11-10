@@ -107,6 +107,17 @@ const sidebars: SidebarsConfig = {
       label: 'Server',
       items: [
         'capabilities/server/overview',
+        {
+          type: 'category',
+          label: 'Launch Screen and Entry Points',
+          collapsed: true, //
+          items: [
+            'capabilities/server/launch_screen_and_entry_points/launch_overview',
+            'capabilities/server/launch_screen_and_entry_points/view_modes_entry_points',
+            'capabilities/server/launch_screen_and_entry_points/launch_screen_customization',
+            'capabilities/server/launch_screen_and_entry_points/splash_migration',
+          ],
+        },
         'capabilities/server/redis',
         'capabilities/server/userActions',
         'capabilities/server/post-data',

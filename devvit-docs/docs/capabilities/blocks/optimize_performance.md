@@ -35,7 +35,7 @@ If you only need the subreddit name:
 
 ### Cache requests to RedditAPI or external resources
 
-Use `context.cache` to reduce the amount of requests to optimize performance and running costs of your application. See [cache helper](./cache.md) for details and examples.
+Use `context.cache` to reduce the amount of requests to optimize performance and running costs of your application.
 
 ### Leverage scheduled jobs to fetch or update data
 
@@ -178,7 +178,7 @@ In this case, state is initialized for each user that sees the app. This means t
 
 ### Solution: make one request
 
-You can use a [cache helper](./cache.md) to make one request for data, save the response, and provide this response to all users requesting the same data. The cache lives at the subreddit level (not the app level).
+You can use a cache helper to make one request for data, save the response, and provide this response to all users requesting the same data. The cache lives at the subreddit level (not the app level).
 
 **Example: fetch weather data every 2 hours with cache helper**
 
