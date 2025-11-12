@@ -24,7 +24,7 @@ When creating a post, include the `postData` parameter with your custom data obj
 
   router.post('/api/create-post', async (req, res) => {
     const { subredditName } = context;
-    
+
     if (!subredditName) {
       return res.status(400).json({
         error: 'Subreddit name is required'
@@ -34,9 +34,7 @@ When creating a post, include the `postData` parameter with your custom data obj
     const post = await reddit.submitCustomPost({
       subredditName,
       title: 'Post with custom data',
-      splash: {
-        appDisplayName: 'Test App',
-      },
+      entry: 'default',
       postData: {
         challengeNumber: 42,
         totalGuesses: 0,
@@ -56,8 +54,8 @@ When creating a post, include the `postData` parameter with your custom data obj
         ],
       },
     });
-    
-    res.json({ 
+
+    res.json({
       postId: post.id,
       message: 'Post created successfully'
     });
@@ -102,10 +100,42 @@ To update post data after creation, fetch the post and use the `setPostData()` m
 <Tabs>
   <TabItem value="web" label="Devvit Web">
   ```ts title="server/index.ts"
-  import { reddit } from '@devvit/web/server';
+  import { context, reddit } from '@devvit/web/server';
 
-  const post = await reddit.getPostById('t3_your_post_id');
-  await post.setPostData({ 'moreStuff': 'hello' });
+  router.post('/api/update-post-data', async (req, res) => {
+    const { postId } = context;
+    const { favoriteColor, username } = req.body;
+
+    if (!postId) {
+      return res.status(400).json({
+        error: 'Post ID is required'
+      });
+    }
+
+    try {
+      const post = await reddit.getPostById(postId);
+
+      // Get existing post data to merge with updates
+      const currentData = context.postData || {};
+
+      await post.setPostData({
+        ...currentData,
+        favoriteColor: favoriteColor || 'unknown',
+        lastUpdatedBy: username || 'anonymous',
+        lastUpdatedAt: new Date().toISOString(),
+      });
+
+      res.json({
+        success: true,
+        message: 'Post data updated successfully'
+      });
+    } catch (error) {
+      console.error('Error updating post data:', error);
+      res.status(500).json({
+        error: 'Failed to update post data'
+      });
+    }
+  });
   ```
   </TabItem>
   <TabItem value="blocks" label="Devvit Blocks">
@@ -122,12 +152,21 @@ To update post data after creation, fetch the post and use the `setPostData()` m
           ],
         },
         async (values) => {
-          const post = await context.reddit.getPostById(context.postId!);
+          if (!context.postId) {
+            context.ui.showToast('Post ID not found');
+            return;
+          }
+
+          const post = await context.reddit.getPostById(context.postId);
           const currentUsername = await context.reddit.getCurrentUsername();
           
+          // Get existing post data to merge with updates
+          const currentData = context.postData || {};
+
           await post.setPostData({
-            'favColor': values.favColor || 'unknown',
-            'user': currentUsername!
+            ...currentData,
+            favColor: values.favColor || 'unknown',
+            user: currentUsername || 'anonymous'
           });
           
           context.ui.showToast('Updated post data!');

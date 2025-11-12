@@ -44,7 +44,17 @@ This configuration is optional, and apps can still configure `http: true` as bef
 
 Requested domains will be submitted for review when you playtest or upload your app. Admins may approve or deny domain requests.
 
-Please refer to [HTTP Fetch Policy](./http-fetch-policy.md) to know more about which domains are allowed.
+Domain entries must be exact hostnames only, such as nytimes.com or wikipedia.org. These fetch requests are not allowed:
+
+- Be specific. No using `*.example.com` when you need `api.example.com`
+- No wildcards: `*.example.com`
+- No protocols: `https://api.example.com`
+- No paths: `api.example.com/webhooks`
+
+Domains that are approved for your app will be displayed in the Developer Settings section for your app at `https://developers.reddit.com/apps/{your-app-slug}/developer-settings`.
+These domains are allow-listed for **your app only** and not globally.
+
+Apps must request each individual domain that it intends to fetch, even if the domain is already globally allowed. See the [global fetch allowlist](#global-fetch-allowlist) to view the list of globally allowed domains.
 
 ## Limitations
 
@@ -156,4 +166,47 @@ If you see the following error, it means HTTP Fetch requests are hitting the int
 ```ts
 HTTP request to domain: <domain> timed out with error: context deadline exceeded.
 ```
+
+### Terms and conditions
+
+Any app that uses `fetch` must upload Terms and Conditions and a Privacy Policy. Links to each of these documents must be saved in the app details form.
+
+![App configuration form](../../assets/capabilities/http-fetch/http-fetch-legal-links.png)
+
+## Global fetch allowlist {#global-fetch-allowlist}
+
+The following domains are globally allowed and can be fetched by any app:
+
+- example.com
+- site.api.espn.com
+- cdn.espn.com
+- discord.com
+- api.polygon.io
+- polygon.io
+- slack.com
+- lichess.org
+- api.telegram.org
+- commentanalyzer.googleapis.com
+- language.googleapis.com
+- statsapi.mlb.com
+- api.openai.com
+- api.scryfall.com
+- api.nasa.gov
+- api.sportradar.us
+- api.sportradar.com
+- random.org
+- generativelanguage.googleapis.com
+- youtube.googleapis.com
+- api.weather.gov
+- wikipedia.org
+- finance.yahoo.com
+- api.twitter.com
+- api.petfinder.com
+- fonts.googleapis.com
+- nytimes.com
+- npr.org
+- propublica.org
+- pbs.org
+- i.giphy.com
+- chessboardjs.com
 

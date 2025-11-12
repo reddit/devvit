@@ -31,7 +31,7 @@ Select your launch stage for instructions and guidelines to maximize your game's
 
 To get the best feedback:
 
-- Post only once for a meaningful update (maybe a 2+ week gaps between versions).
+- Post only once for a meaningful update (maybe a 2+ week gaps between versions)
 - Respond to feedback within 24-48 hours.
 - Test other developers' apps, too, to build relationships with your fellow devs.
 </div>

@@ -1,8 +1,8 @@
-**@devvit/public-api v0.12.1-dev**
+**@devvit/public-api v0.12.2-dev**
 
 ---
 
-# @devvit/public-api v0.12.1-dev
+# @devvit/public-api v0.12.2-dev
 
 ## Namespaces
 
@@ -171,6 +171,7 @@
 
 ## Functions
 
+- [fetchDevvitWeb](functions/fetchDevvitWeb.md)
 - [svg](functions/svg.md)
 - [useAsync](functions/useAsync.md)
 - [useChannel](functions/useChannel.md)

@@ -49,7 +49,7 @@ const post = await reddit.submitCustomPost({
   title: 'Text String',
   subredditName: subreddit.name,
   textFallback: { text: 'You can read this text string on oldreddit because you used textFallback' },
-  splash: { appDisplayName: 'Test App' },
+  entry: 'default',
 });
 ```
 
@@ -68,7 +68,7 @@ const post = await reddit.submitCustomPost({
   textFallback: {
     text: 'You can read this _text string with markdown_ on oldreddit because you used **textFallback**',
   },
-  splash: { appDisplayName: 'Test App' },
+  entry: 'default',
 });
 ```
 
@@ -91,7 +91,7 @@ const post = await reddit.submitCustomPost({
   title: 'Rich Text',
   subredditName: subreddit.name,
   textFallback: { richtext: textFallbackRichtext },
-  splash: { appDisplayName: 'Test App' },
+  entry: 'default',
 });
 ```
 

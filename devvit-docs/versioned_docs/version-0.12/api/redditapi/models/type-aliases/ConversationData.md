@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.12.1-dev**](../../README.md)
+[**@devvit/public-api v0.12.2-dev**](../../README.md)
 
 ---
 
@@ -27,9 +27,12 @@ The authors of each message in the modmail conversation.
 A ConversationType specifies whether a conversation is with a subreddit
 itself, with another user, or with another subreddit entirely.
 
-- `internal` - This is a conversation with another user outside of the subreddit. The participant ID is that user's ID.
-- `sr_user` - This is a Mod Discussion, internal to the subreddit. There is no other participant.
-- `sr_sr` - This is a conversation is with another subreddit. The participant will have a subreddit ID.
+- `sr_user` - This is a conversation with another user outside of the
+  subreddit. The participant ID is that user's ID.
+- `internal` - This is a Mod Discussion, internal to the subreddit. There
+  is no other participant.
+- `sr_sr` - This is a conversation is with another subreddit. The
+  participant will have a subreddit ID.
 
 ---
 

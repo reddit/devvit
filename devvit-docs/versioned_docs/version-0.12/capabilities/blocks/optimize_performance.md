@@ -178,7 +178,7 @@ In this case, state is initialized for each user that sees the app. This means t
 
 ### Solution: make one request
 
-You can use a cache helper make one request for data, save the response, and provide this response to all users requesting the same data. The cache lives at the subreddit level (not the app level).
+You can use a cache helper to make one request for data, save the response, and provide this response to all users requesting the same data. The cache lives at the subreddit level (not the app level).
 
 **Example: fetch weather data every 2 hours with cache helper**
 

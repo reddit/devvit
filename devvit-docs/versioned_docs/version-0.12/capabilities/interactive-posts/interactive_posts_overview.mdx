@@ -24,11 +24,9 @@ export const createPost = async () => {
   }
 
   return await reddit.submitCustomPost({
-    splash: {
-      appDisplayName: 'test-post-flair',
-    },
     subredditName: subredditName,
     title: 'test-post-flair',
+    entry: 'default'
   });
 };
 

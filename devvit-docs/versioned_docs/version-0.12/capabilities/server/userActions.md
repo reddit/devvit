@@ -97,7 +97,7 @@ router.post('/internal/post-create', async (_req, res) => {
     },
     subredditName,
     title: 'Post Title'
-    splash: { appDisplayName: 'Test App' }
+     entry: 'default',
   });
 
   res.json({ status: 'success', message: `Post created in subreddit ${subredditName}` });

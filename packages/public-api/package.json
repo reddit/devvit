@@ -1,6 +1,6 @@
 {
   "name": "@devvit/public-api",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -35,17 +35,17 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/metrics": "0.12.1",
-    "@devvit/protos": "0.12.1",
-    "@devvit/shared": "0.12.1",
-    "@devvit/shared-types": "0.12.1",
+    "@devvit/metrics": "0.12.2",
+    "@devvit/protos": "0.12.2",
+    "@devvit/shared": "0.12.2",
+    "@devvit/shared-types": "0.12.2",
     "base64-js": "1.5.1",
     "clone-deep": "4.0.1",
     "moderndash": "4.0.0"
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
-    "@devvit/tsconfig": "0.12.1",
+    "@devvit/tsconfig": "0.12.2",
     "@reddit/faceplate-ui": "18.0.5",
     "@types/clone-deep": "4.0.1",
     "chokidar-cli": "3.0.0",

@@ -1,6 +1,6 @@
 {
   "name": "@devvit/server",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -31,13 +31,13 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.12.1",
-    "@devvit/public-api": "0.12.1",
-    "@devvit/shared": "0.12.1",
-    "@devvit/shared-types": "0.12.1"
+    "@devvit/protos": "0.12.2",
+    "@devvit/public-api": "0.12.2",
+    "@devvit/shared": "0.12.2",
+    "@devvit/shared-types": "0.12.2"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.1",
+    "@devvit/tsconfig": "0.12.2",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"

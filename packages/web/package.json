@@ -1,6 +1,6 @@
 {
   "name": "@devvit/web",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -36,21 +36,21 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/cache": "0.12.1",
-    "@devvit/client": "0.12.1",
-    "@devvit/media": "0.12.1",
-    "@devvit/notifications": "0.12.1",
-    "@devvit/payments": "0.12.1",
-    "@devvit/realtime": "0.12.1",
-    "@devvit/reddit": "0.12.1",
-    "@devvit/redis": "0.12.1",
-    "@devvit/scheduler": "0.12.1",
-    "@devvit/server": "0.12.1",
-    "@devvit/settings": "0.12.1",
-    "@devvit/shared": "0.12.1"
+    "@devvit/cache": "0.12.2",
+    "@devvit/client": "0.12.2",
+    "@devvit/media": "0.12.2",
+    "@devvit/notifications": "0.12.2",
+    "@devvit/payments": "0.12.2",
+    "@devvit/realtime": "0.12.2",
+    "@devvit/reddit": "0.12.2",
+    "@devvit/redis": "0.12.2",
+    "@devvit/scheduler": "0.12.2",
+    "@devvit/server": "0.12.2",
+    "@devvit/settings": "0.12.2",
+    "@devvit/shared": "0.12.2"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.1",
+    "@devvit/tsconfig": "0.12.2",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"

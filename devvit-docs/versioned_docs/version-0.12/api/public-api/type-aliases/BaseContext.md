@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.12.1-dev**](../README.md)
+[**@devvit/public-api v0.12.2-dev**](../README.md)
 
 ---
 
@@ -74,9 +74,9 @@ Request headers.
 
 <a id="postdata"></a>
 
-### postData?
+### postData
 
-> `optional` **postData**: `PostData`
+> **postData**: `PostData` \| `undefined`
 
 ---
 
@@ -87,6 +87,18 @@ Request headers.
 > `optional` **postId**: `string`
 
 The ID of the current post
+
+---
+
+<a id="snoovatar"></a>
+
+### snoovatar?
+
+> `optional` **snoovatar**: `string`
+
+**`Experimental`**
+
+The current user's snoovtar URL if logged in
 
 ---
 
@@ -117,6 +129,18 @@ The name of the current subreddit
 > `optional` **userId**: `string`
 
 The current user's ID if this event was triggered by a logged in user
+
+---
+
+<a id="username"></a>
+
+### username?
+
+> `optional` **username**: `string`
+
+**`Experimental`**
+
+The current user's handle if logged in
 
 ## Methods
 
