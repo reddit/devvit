@@ -1,4 +1,5 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
+import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { context, getContextCache, setContextCache } from '@devvit/server';
 import type { PostData } from '@devvit/shared-types/PostData.js';
@@ -30,6 +31,7 @@ import type {
   GetPrivateMessagesOptions,
   GetSubredditUsersByTypeOptions,
   GetSubscribedSubredditsForCurrentUserOptions,
+  GetUserKarmaForSubredditOptions,
   GetUserOverviewOptions,
   Listing,
   ModAction,
@@ -677,6 +679,20 @@ export class RedditClient {
    */
   getCommentsAndPostsByUser(options: GetUserOverviewOptions): Listing<Post | Comment> {
     return User.getOverview(options);
+  }
+
+  /**
+   * Returns the karma for a given user in the specified subreddit.
+   *
+   * @param options - Options for the request.
+   * @param options.username - The username of the user to get the karma for. e.g. 'spez'
+   * @param options.subredditId - The t5_ ID of the subreddit to get the karma for. e.g. 't5_evua8s'
+   * @returns The GetUserKarmaForSubredditResponse, containing the user's karma for posts and comments in the subreddit.
+   */
+  getUserKarmaForSubreddit(
+    options: GetUserKarmaForSubredditOptions
+  ): Promise<GetUserKarmaForSubredditResponse> {
+    return User.getUserKarmaForSubreddit(options);
   }
 
   /**

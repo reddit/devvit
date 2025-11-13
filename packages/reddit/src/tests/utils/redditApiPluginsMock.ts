@@ -168,6 +168,7 @@ export const redditApiPlugins = {
     UserTrophies: vi.fn(),
     UserAbout: vi.fn(),
     UserWhere: vi.fn(),
+    GetUserKarmaForSubreddit: vi.fn(),
   },
   Widgets: {
     AddButtonWidget: vi.fn(),
