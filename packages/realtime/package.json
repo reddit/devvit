@@ -9,12 +9,12 @@
   "type": "module",
   "exports": {
     "./client": {
-      "browser": "./dist/client.js",
-      "default": "./dist/clientImportInServerCodePanic.js"
+      "browser": "./dist/client/index.js",
+      "default": "./dist/client/clientImportInServerCodePanic.js"
     },
     "./server": {
-      "browser": "./dist/serverImportInClientCodePanic.js",
-      "default": "./dist/server.js"
+      "browser": "./dist/server/serverImportInClientCodePanic.js",
+      "default": "./dist/server/index.js"
     },
     "./package.json": "./package.json"
   },
