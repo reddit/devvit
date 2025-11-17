@@ -168,14 +168,15 @@ function configurePayments(menuItems: Readonly<AppPaymentsConfig>): void {
     },
   };
 
-  if (menuItems.endpoints.refundOrder) {
+  const refundEndpoint = menuItems.endpoints.refundOrder;
+  if (refundEndpoint) {
     paymentHandler.refundOrder = async (order, ctx) => {
       const jsonableOrder = {
         ...order,
         createdAt: order.createdAt ? order.createdAt.toISOString() : null,
         updatedAt: order.updatedAt ? order.updatedAt.toISOString() : null,
       };
-      await fetchWebbit(menuItems.endpoints.fulfillOrder, jsonableOrder, ctx.metadata);
+      await fetchWebbit(refundEndpoint, jsonableOrder, ctx.metadata);
     };
   }
 
