@@ -1,15 +1,17 @@
 import type { DevvitPostData } from '@devvit/protos';
 import type { RequestContext } from '@devvit/protos/json/devvit/platform/request_context.js';
-import type {
-  BridgeContext,
-  WebViewClientData,
-  WebViewContext,
+import {
+  type BridgeContext,
+  Client as ClientName,
+  type WebViewClientData,
+  type WebViewContext,
 } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import type { Context } from '@devvit/shared-types/client/client-context.js';
 import type {
   DevvitGlobal,
   WebViewScriptsVersion,
 } from '@devvit/shared-types/client/devvit-global.js';
+import type { Client } from '@devvit/shared-types/shared/client.js';
 import { T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { type WebbitToken } from '@devvit/shared-types/webbit.js';
 
@@ -32,16 +34,17 @@ export const initDevvitGlobal = (
 ): void => {
   const bridge = getBridgeContext(window.name, location.hash);
 
+  const client = getClient(bridge);
+
   const reqCtx = decodeToken(bridge.signedRequestContext);
 
   let context;
-  if (reqCtx) context = contextFromRequestContext(reqCtx, bridge.postData);
+  if (reqCtx) context = contextFromRequestContext(reqCtx, client, bridge.postData);
   else if (bridge.webViewContext)
-    context = contextFromWebViewContext(bridge.webViewContext, bridge.postData);
+    context = contextFromWebViewContext(bridge.webViewContext, client, bridge.postData);
   if (!context) throw Error('no context');
 
-  // to-do: expose `BridgeContext.client`, `devvitDebug`,
-  // `nativeVersion` / `shredditVersion`.
+  // to-do: expose `devvitDebug`, `shredditVersion`.
 
   const clientData: WebViewClientData | undefined = bridge.webViewClientData;
   globalThis.devvit = {
@@ -61,6 +64,7 @@ export const initDevvitGlobal = (
 /** @internal */
 export function contextFromRequestContext(
   reqCtx: Readonly<RequestContext>,
+  client: Client | undefined,
   postData: Readonly<DevvitPostData> | undefined
 ): Context {
   if (!reqCtx.app) throw Error('no RequestContext.app');
@@ -69,6 +73,7 @@ export function contextFromRequestContext(
   return {
     appName: reqCtx.app.name,
     appVersion: reqCtx.app.version,
+    client,
     postAuthorId: T2(reqCtx.post.author),
     postData: postData?.developerData,
     postId: T3(reqCtx.post.id),
@@ -83,11 +88,13 @@ export function contextFromRequestContext(
 /** @internal */
 export function contextFromWebViewContext(
   webViewCtx: Readonly<WebViewContext>,
+  client: Client | undefined,
   postData: Readonly<DevvitPostData> | undefined
 ): Context {
   return {
     appName: webViewCtx.appName,
     appVersion: webViewCtx.appVersion,
+    client,
     postData: postData?.developerData,
     postAuthorId: undefined,
     postId: T3(webViewCtx.postId),
@@ -108,4 +115,17 @@ export function getBridgeContext(name: string | undefined, hash: string): Bridge
   const json = hash?.slice(1); // Strip the leading '#' from the hash
   if (!json) throw Error('no bridge context');
   return JSON.parse(decodeURIComponent(json));
+}
+
+/** @internal */
+export function getClient(bridge: Readonly<BridgeContext>): Client | undefined {
+  if (
+    (bridge.client !== ClientName.ANDROID && bridge.client !== ClientName.IOS) ||
+    !bridge.nativeVersion
+  )
+    return;
+  return {
+    name: bridge.client === ClientName.ANDROID ? 'ANDROID' : ('IOS' as const),
+    version: bridge.nativeVersion,
+  };
 }

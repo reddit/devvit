@@ -3,7 +3,7 @@
 import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { RealtimeSubscriptionStatus } from '@devvit/protos/json/devvit/ui/effects/v1alpha/realtime_subscriptions.js';
 import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
-import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { type Effect, emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -33,7 +33,7 @@ describe('realtime', () => {
         onConnect: mockOnConnect,
         onMessage: mockOnMessage,
       });
-      const connect = new MessageEvent('message', {
+      const connect = new MessageEvent<WebViewMessageEvent_MessageData>('message', {
         data: {
           type: 'devvit-message',
           data: {
@@ -43,12 +43,12 @@ describe('realtime', () => {
               status: RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
             },
           },
-        } satisfies WebViewMessageEvent_MessageData,
+        },
       });
       dispatchEvent(connect);
 
-      expect(emitEffect).toHaveBeenCalledWith({
-        realtimeSubscriptions: { subscriptionIds: ['test_channel'] },
+      expect(emitEffect).toHaveBeenCalledWith<[Effect]>({
+        realtime: { subscriptionIds: ['test_channel'] },
         type: EffectType.EFFECT_REALTIME_SUB,
       });
       expect(connection).toBeDefined();
@@ -92,7 +92,7 @@ describe('realtime', () => {
       const testMessage = {
         counter: 10,
       };
-      const messageEvent = new MessageEvent('message', {
+      const messageEvent = new MessageEvent<WebViewMessageEvent_MessageData>('message', {
         data: {
           type: 'devvit-message',
           data: {
@@ -104,7 +104,7 @@ describe('realtime', () => {
               },
             },
           },
-        } satisfies WebViewMessageEvent_MessageData,
+        },
       });
       dispatchEvent(messageEvent);
 
@@ -137,7 +137,7 @@ describe('realtime', () => {
       const mockOnMessage = vi.fn();
 
       await connectRealtime({ channel: 'test_channel', onMessage: mockOnMessage });
-      const connect = new MessageEvent('message', {
+      const connect = new MessageEvent<WebViewMessageEvent_MessageData>('message', {
         data: {
           type: 'devvit-message',
           data: {
@@ -147,12 +147,12 @@ describe('realtime', () => {
               status: RealtimeSubscriptionStatus.REALTIME_SUBSCRIBED,
             },
           },
-        } satisfies WebViewMessageEvent_MessageData,
+        },
       });
       dispatchEvent(connect);
       expect(isRealtimeConnected('test_channel')).toBe(true);
 
-      const disconnect = new MessageEvent('message', {
+      const disconnect = new MessageEvent<WebViewMessageEvent_MessageData>('message', {
         data: {
           type: 'devvit-message',
           data: {
@@ -162,13 +162,13 @@ describe('realtime', () => {
               status: RealtimeSubscriptionStatus.REALTIME_UNSUBSCRIBED,
             },
           },
-        } satisfies WebViewMessageEvent_MessageData,
+        },
       });
       dispatchEvent(disconnect);
       await disconnectRealtime('test_channel');
 
-      expect(emitEffect).toHaveBeenCalledWith({
-        realtimeSubscriptions: { subscriptionIds: [] },
+      expect(emitEffect).toHaveBeenCalledWith<[Effect]>({
+        realtime: { subscriptionIds: [] },
         type: EffectType.EFFECT_REALTIME_SUB,
       });
       expect(isRealtimeConnected('test_channel')).toBe(false);

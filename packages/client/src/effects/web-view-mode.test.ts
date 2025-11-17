@@ -47,6 +47,7 @@ beforeEach(() => {
     context: {
       appName: 'appName',
       appVersion: '1.0.0',
+      client: undefined,
       postAuthorId: undefined,
       postData: undefined,
       postId: 't3_postId',

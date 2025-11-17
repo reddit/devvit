@@ -76,8 +76,9 @@ export function exitExpandedMode(event: MouseEvent): Promise<void> {
 }
 
 /**
- * Adds a listener that is called when the web view mode changes.
- * The listener will be called with the new mode, either 'inline' or 'expanded'.
+ * Adds a listener that is called when the web view mode changes. Initial mode
+ * is not reported. Web views in the process of destruction may not receive a
+ * mode change event.
  *
  * @param callback The callback to be called when the mode changes.
  * @experimental

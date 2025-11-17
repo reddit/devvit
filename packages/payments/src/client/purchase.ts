@@ -7,6 +7,7 @@ import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
  *
  * @param skuOrSkus - The SKU, or an array of SKUs, to purchase
  * @param metadata - Optional, custom metadata attached to this purchase
+ * @experimental - This is not finalized yet, may not work, and may change.
  */
 export async function purchase(
   skuOrSkus: string | string[],

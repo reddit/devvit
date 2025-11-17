@@ -97,7 +97,7 @@ export const __clearConnections = (): void => {
 /** Emits open connections which may cause subscribe / unsubscribe. */
 async function emitConnectionsEffect(): Promise<void> {
   await emitEffect({
-    realtimeSubscriptions: { subscriptionIds: [...connectionsByChannel.keys()] },
+    realtime: { subscriptionIds: [...connectionsByChannel.keys()] },
     type: EffectType.EFFECT_REALTIME_SUB,
   });
 }

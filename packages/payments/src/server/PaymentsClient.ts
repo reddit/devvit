@@ -15,9 +15,16 @@ type RequiredGetOrderFields = 'limit';
 export type GetOrdersFilters = Partial<Omit<GetOrdersRequest, RequiredGetOrderFields>> &
   Pick<GetOrdersRequest, RequiredGetOrderFields>;
 
+/**
+ * @experimental - This is not finalized yet, may not work, and may change.
+ */
 export class PaymentsClient {
   #pluginCache?: PaymentsService;
 
+  /**
+   * @param filters - Filters to apply to the products query.
+   * @experimental - This is not finalized yet, may not work, and may change.
+   */
   getProducts(filters: Partial<GetProductsRequest> = {}): Promise<GetProductsResponse> {
     return this.#plugin.GetProducts(
       {
@@ -31,6 +38,10 @@ export class PaymentsClient {
     );
   }
 
+  /**
+   * @param filters - Filters to apply to the orders query.
+   * @experimental - This is not finalized yet, may not work, and may change.
+   */
   getOrders(filters: GetOrdersFilters): Promise<GetOrdersResponse> {
     return this.#plugin.GetOrders(
       {
@@ -47,6 +58,10 @@ export class PaymentsClient {
     );
   }
 
+  /**
+   * @param orderId - The ID of the order to acknowledge delivery for.
+   * @experimental - This is not finalized yet, may not work, and may change.
+   */
   acknowledgeOrderDelivery(orderId: string): Promise<AcknowledgeOrderDeliveryResponse> {
     return this.#plugin.AcknowledgeOrderDelivery({ orderId }, context.metadata);
   }
@@ -56,4 +71,7 @@ export class PaymentsClient {
   }
 }
 
+/**
+ * @experimental - This is not finalized yet, may not work, and may change.
+ */
 export const payments = new PaymentsClient();

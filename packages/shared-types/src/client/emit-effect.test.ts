@@ -1,15 +1,18 @@
 // @vitest-environment jsdom
 
 import type { FormSubmittedEvent } from '@devvit/protos/json/devvit/ui/effect_types/v1alpha/show_form.js';
-import { type Effect, EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
-import { WebViewInternalMessageScope } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
+import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import {
+  type WebViewInternalMessage,
+  WebViewInternalMessageScope,
+} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
+import type { WebViewInternalEventMessage } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
+import { FormFieldType } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/type.js';
+import type { FormFieldValue } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/value.js';
 import { ConsentStatus } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import { WebViewInternalEventMessage } from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js';
-import { FormFieldType } from '@devvit/protos/types/devvit/ui/form_builder/v1alpha/type.js';
-import type { FormFieldValue } from '@devvit/protos/types/devvit/ui/form_builder/v1alpha/value.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { emitEffect } from './emit-effect.js';
+import { type Effect, emitEffect } from './emit-effect.js';
 
 describe('emit-effect', () => {
   let originalParent: Window | null;
@@ -43,7 +46,7 @@ describe('emit-effect', () => {
       },
     };
     const effect: Effect = {
-      type: 3 satisfies EffectType.EFFECT_SHOW_FORM,
+      type: EffectType.EFFECT_SHOW_FORM,
       showForm,
     };
 
@@ -51,8 +54,9 @@ describe('emit-effect', () => {
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(postedMessage).toEqual({
-      scope: 0 satisfies WebViewInternalMessageScope.CLIENT,
+    expect(postedMessage).toStrictEqual({
+      realtimeEffect: undefined,
+      scope: WebViewInternalMessageScope.CLIENT,
       type: 'devvit-internal',
       effect,
       showForm,
@@ -61,15 +65,14 @@ describe('emit-effect', () => {
     expect((mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][1]).toBe('*');
 
     // Create mock response
-    const messageData = {
+    const messageData: WebViewInternalEventMessage = {
       id: postedMessage.id,
       formSubmitted: {
         results: {
-          field1: { fieldType: 0, stringValue: 'value1' },
+          field1: { fieldType: FormFieldType.STRING, stringValue: 'value1' },
         },
       },
     };
-    const responsePayload = WebViewInternalEventMessage.fromJSON(messageData);
 
     dispatchEvent(
       new MessageEvent('message', {
@@ -81,12 +84,34 @@ describe('emit-effect', () => {
     );
 
     const response = await messagePromise;
-    expect(response).toStrictEqual(responsePayload);
+    expect(response).toStrictEqual<WebViewInternalEventMessage>({
+      consentStatus: undefined,
+      formCanceled: undefined,
+      formSubmitted: {
+        formId: undefined,
+        results: {
+          field1: {
+            boolValue: undefined,
+            fieldType: FormFieldType.STRING,
+            groupValue: undefined,
+            isSecret: undefined,
+            listValue: undefined,
+            numberValue: undefined,
+            selectionValue: undefined,
+            stringValue: 'value1',
+          },
+        },
+      },
+      id: postedMessage.id,
+      immersiveModeEvent: undefined,
+      orderResult: undefined,
+      realtimeEvent: undefined,
+    });
   });
 
   it('should include message ID only for effects that require response', async () => {
     const effectWithResponse: Effect = {
-      type: 3 satisfies EffectType.EFFECT_SHOW_FORM,
+      type: EffectType.EFFECT_SHOW_FORM,
       showForm: {
         form: {
           fields: [],
@@ -96,7 +121,7 @@ describe('emit-effect', () => {
       },
     };
     const effectWithoutResponse: Effect = {
-      type: 4 satisfies EffectType.EFFECT_SHOW_TOAST,
+      type: EffectType.EFFECT_SHOW_TOAST,
       showToast: {
         toast: { text: 'Test toast' },
       },
@@ -107,7 +132,7 @@ describe('emit-effect', () => {
     const messageWithId = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(messageWithId.id).toBeDefined();
     expect(typeof messageWithId.id).toBe('string');
-    expect(messageWithId.effect).toEqual(effectWithResponse);
+    expect(messageWithId.effect).toStrictEqual(effectWithResponse);
 
     const mockResponse: WebViewInternalEventMessage = {
       id: messageWithId.id,
@@ -124,7 +149,7 @@ describe('emit-effect', () => {
     const promiseWithoutResponse = emitEffect(effectWithoutResponse);
     const messageWithoutId = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[1][0];
     expect(messageWithoutId.id).toBeUndefined();
-    expect(messageWithoutId.effect).toEqual(effectWithoutResponse);
+    expect(messageWithoutId.effect).toStrictEqual(effectWithoutResponse);
 
     const result = await promiseWithoutResponse;
     expect(result).toBeUndefined();
@@ -132,7 +157,7 @@ describe('emit-effect', () => {
 
   it('should only handle response messages with the correct ID', async () => {
     const effect: Effect = {
-      type: 3 satisfies EffectType.EFFECT_SHOW_FORM,
+      type: EffectType.EFFECT_SHOW_FORM,
       showForm: {
         form: {
           fields: [],
@@ -152,7 +177,7 @@ describe('emit-effect', () => {
       id: 'wrong-id',
       formSubmitted: {
         results: {
-          field: { fieldType: 0, stringValue: 'wrong' },
+          field: { fieldType: FormFieldType.STRING, stringValue: 'wrong' },
         },
       },
     };
@@ -168,16 +193,14 @@ describe('emit-effect', () => {
     await new Promise(process.nextTick);
 
     // Create a message payload that matches the structure that would come from the server
-    const correctMessageData = {
+    const correctMessageData: WebViewInternalEventMessage = {
       id: postedMessage.id,
       formSubmitted: {
         results: {
-          field: { fieldType: 0, stringValue: 'correct' },
+          field: { fieldType: FormFieldType.STRING, stringValue: 'correct' },
         },
       },
     };
-
-    const correctResponsePayload = WebViewInternalEventMessage.fromJSON(correctMessageData);
 
     dispatchEvent(
       new MessageEvent('message', {
@@ -190,17 +213,36 @@ describe('emit-effect', () => {
 
     const response = await messagePromise;
 
-    // Compare individual fields first
-    expect(response?.id).toBe(correctResponsePayload.id);
-    expect(response?.formSubmitted).toEqual(correctResponsePayload.formSubmitted);
-
-    // Then do the full comparison
-    expect(response).toStrictEqual(correctResponsePayload);
+    expect(response?.id).toBe(correctMessageData.id);
+    expect(response?.formSubmitted).toEqual(correctMessageData.formSubmitted);
+    expect(response).toStrictEqual<WebViewInternalEventMessage>({
+      consentStatus: undefined,
+      formCanceled: undefined,
+      formSubmitted: {
+        formId: undefined,
+        results: {
+          field: {
+            boolValue: undefined,
+            fieldType: FormFieldType.STRING,
+            groupValue: undefined,
+            isSecret: undefined,
+            listValue: undefined,
+            numberValue: undefined,
+            selectionValue: undefined,
+            stringValue: 'correct',
+          },
+        },
+      },
+      id: correctMessageData.id,
+      immersiveModeEvent: undefined,
+      orderResult: undefined,
+      realtimeEvent: undefined,
+    });
   });
 
   it('should ignore non-devvit messages', async () => {
     const effect: Effect = {
-      type: 3 satisfies EffectType.EFFECT_SHOW_FORM,
+      type: EffectType.EFFECT_SHOW_FORM,
       showForm: {
         form: {
           fields: [],
@@ -223,7 +265,7 @@ describe('emit-effect', () => {
             id: postedMessage.id,
             formSubmitted: {
               results: {
-                field: { fieldType: 0, stringValue: 'irrelevant' },
+                field: { fieldType: FormFieldType.STRING, stringValue: 'irrelevant' },
               },
             },
           },
@@ -234,15 +276,14 @@ describe('emit-effect', () => {
     await new Promise(process.nextTick);
 
     // Now dispatch a proper devvit message
-    const correctMessageData = {
+    const correctMessageData: WebViewInternalEventMessage = {
       id: postedMessage.id,
       formSubmitted: {
         results: {
-          field: { fieldType: 0, stringValue: 'correct' },
+          field: { fieldType: FormFieldType.STRING, stringValue: 'correct' },
         },
       },
     };
-    const correctResponsePayload = WebViewInternalEventMessage.fromJSON(correctMessageData);
 
     dispatchEvent(
       new MessageEvent('message', {
@@ -254,11 +295,33 @@ describe('emit-effect', () => {
     );
 
     const response = await messagePromise;
-    expect(response).toStrictEqual(correctResponsePayload);
+    expect(response).toStrictEqual<WebViewInternalEventMessage>({
+      consentStatus: undefined,
+      formCanceled: undefined,
+      formSubmitted: {
+        formId: undefined,
+        results: {
+          field: {
+            boolValue: undefined,
+            fieldType: FormFieldType.STRING,
+            groupValue: undefined,
+            isSecret: undefined,
+            listValue: undefined,
+            numberValue: undefined,
+            selectionValue: undefined,
+            stringValue: 'correct',
+          },
+        },
+      },
+      id: postedMessage.id,
+      immersiveModeEvent: undefined,
+      orderResult: undefined,
+      realtimeEvent: undefined,
+    });
   });
 
   it('should clean up its specific event listener after receiving a response', async () => {
-    const effect: Effect = { type: 3 satisfies EffectType.EFFECT_SHOW_FORM };
+    const effect: Effect = { type: EffectType.EFFECT_SHOW_FORM };
     const messagePromise = emitEffect(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
@@ -268,7 +331,10 @@ describe('emit-effect', () => {
     addEventListener('message', handleMessageSpy);
 
     const correctFormResults: { [key: string]: FormFieldValue } = {
-      field: { fieldType: 0 satisfies FormFieldType.STRING, stringValue: 'correct' },
+      field: {
+        fieldType: FormFieldType.STRING,
+        stringValue: 'correct',
+      },
     };
     const correctFormResponse: FormSubmittedEvent = { results: correctFormResults };
     const correctResponsePayload: WebViewInternalEventMessage = {
@@ -296,28 +362,28 @@ describe('emit-effect', () => {
 
   it('should handle can run as user effect with response', async () => {
     const effect: Effect = {
-      type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
+      type: EffectType.EFFECT_CAN_RUN_AS_USER,
     };
 
     const messagePromise = emitEffect(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(postedMessage).toEqual({
-      scope: 0 satisfies WebViewInternalMessageScope.CLIENT,
+    expect(postedMessage).toStrictEqual({
+      scope: WebViewInternalMessageScope.CLIENT,
       type: 'devvit-internal',
       effect,
       id: expect.any(String),
+      realtimeEffect: undefined,
     });
     expect((mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][1]).toBe('*');
 
-    const messageData = {
+    const messageData: WebViewInternalEventMessage = {
       id: postedMessage.id,
       consentStatus: {
         consentStatus: ConsentStatus.GRANTED,
       },
     };
-    const responsePayload = WebViewInternalEventMessage.fromJSON(messageData);
 
     dispatchEvent(
       new MessageEvent('message', {
@@ -329,12 +395,22 @@ describe('emit-effect', () => {
     );
 
     const response = await messagePromise;
-    expect(response).toStrictEqual(responsePayload);
+    expect(response).toStrictEqual<WebViewInternalEventMessage>({
+      consentStatus: {
+        consentStatus: ConsentStatus.GRANTED,
+      },
+      formCanceled: undefined,
+      formSubmitted: undefined,
+      id: messageData.id,
+      immersiveModeEvent: undefined,
+      orderResult: undefined,
+      realtimeEvent: undefined,
+    });
   });
 
-  it('should include navigateToUrl effect in post message payload', async () => {
+  it('should include navigateToUrl effect in post message payload', () => {
     const navigateEffect: Effect = {
-      type: 5 satisfies EffectType.EFFECT_NAVIGATE_TO_URL,
+      type: EffectType.EFFECT_NAVIGATE_TO_URL,
       navigateToUrl: {
         url: 'https://www.reddit.com/r/test',
       },
@@ -344,25 +420,28 @@ describe('emit-effect', () => {
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(postedMessage).toStrictEqual({
-      scope: 0 satisfies WebViewInternalMessageScope.CLIENT,
-      effect: {
-        navigateToUrl: {
-          url: 'https://www.reddit.com/r/test',
+    expect(postedMessage).toMatchInlineSnapshot(`
+      {
+        "effect": {
+          "navigateToUrl": {
+            "url": "https://www.reddit.com/r/test",
+          },
+          "type": 5,
         },
-        type: 5,
-      },
-      navigateToUrl: {
-        url: 'https://www.reddit.com/r/test',
-      },
-      type: 'devvit-internal',
-    });
+        "navigateToUrl": {
+          "url": "https://www.reddit.com/r/test",
+        },
+        "realtimeEffect": undefined,
+        "scope": 0,
+        "type": "devvit-internal",
+      }
+    `);
   });
 
-  it('should include realtime subscriptions effect in post message payload', async () => {
+  it('should include realtime subscriptions effect in post message payload', () => {
     const realtimeEffect: Effect = {
       type: EffectType.EFFECT_REALTIME_SUB,
-      realtimeSubscriptions: {
+      realtime: {
         subscriptionIds: ['channel1', 'channel2'],
       },
     };
@@ -371,19 +450,27 @@ describe('emit-effect', () => {
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(postedMessage).toStrictEqual({
-      scope: WebViewInternalMessageScope.CLIENT,
-      realtime: {
-        subscriptionIds: ['channel1', 'channel2'],
-      },
-      realtimeEffect: {
-        subscriptionIds: ['channel1', 'channel2'],
-      },
-      type: 'devvit-internal',
-    });
+    expect(postedMessage).toMatchInlineSnapshot(`
+      {
+        "realtime": {
+          "subscriptionIds": [
+            "channel1",
+            "channel2",
+          ],
+        },
+        "realtimeEffect": {
+          "subscriptionIds": [
+            "channel1",
+            "channel2",
+          ],
+        },
+        "scope": 0,
+        "type": "devvit-internal",
+      }
+    `);
   });
 
-  it('should include canRunAsUser effect in post message payload', async () => {
+  it('should include canRunAsUser effect in post message payload', () => {
     const canRunAsUserEffect: Effect = {
       type: EffectType.EFFECT_CAN_RUN_AS_USER,
       canRunAsUser: {
@@ -395,19 +482,20 @@ describe('emit-effect', () => {
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
-    expect(postedMessage).toStrictEqual({
-      scope: WebViewInternalMessageScope.CLIENT,
+    expect(postedMessage).toStrictEqual<WebViewInternalMessage>({
+      canRunAsUser: {
+        postId: 't3_post123',
+      },
       effect: {
         canRunAsUser: {
           postId: 't3_post123',
         },
-        type: 11,
+        type: EffectType.EFFECT_CAN_RUN_AS_USER,
       },
-      canRunAsUser: {
-        postId: 't3_post123',
-      },
-      type: 'devvit-internal',
       id: expect.any(String),
+      realtimeEffect: undefined,
+      scope: 0,
+      type: 'devvit-internal',
     });
   });
 });

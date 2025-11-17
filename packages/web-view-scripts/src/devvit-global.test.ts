@@ -12,6 +12,7 @@ import {
   contextFromRequestContext,
   contextFromWebViewContext,
   getBridgeContext,
+  getClient,
   initDevvitGlobal,
 } from './devvit-global.js';
 
@@ -70,7 +71,7 @@ describe('contextFromRequestContext()', () => {
       post: { id: 't3_789', author: 't2_400' },
     };
 
-    const result = contextFromRequestContext(reqCtx, {
+    const result = contextFromRequestContext(reqCtx, undefined, {
       developerData: { score: 42 },
     });
 
@@ -78,6 +79,7 @@ describe('contextFromRequestContext()', () => {
       {
         "appName": "testApp",
         "appVersion": "1.0.0",
+        "client": undefined,
         "postAuthorId": "t2_400",
         "postData": {
           "score": 42,
@@ -99,7 +101,7 @@ describe('contextFromRequestContext()', () => {
       post: { id: 't3_789', author: 't2_400' },
     };
 
-    const result = contextFromRequestContext(reqCtx, undefined);
+    const result = contextFromRequestContext(reqCtx, undefined, undefined);
 
     expect(result.userId).toBeUndefined();
     expect(result.username).toBeUndefined();
@@ -118,6 +120,7 @@ describe('contextFromWebViewContext()', () => {
         appVersion: '1.0.0',
         postId: 't3_789',
       },
+      undefined,
       { developerData: { score: 42 } }
     );
 
@@ -125,6 +128,7 @@ describe('contextFromWebViewContext()', () => {
       {
         "appName": "testApp",
         "appVersion": "1.0.0",
+        "client": undefined,
         "postAuthorId": undefined,
         "postData": {
           "score": 42,
@@ -149,6 +153,7 @@ describe('contextFromWebViewContext()', () => {
         appVersion: '1.0.0',
         postId: 't3_789',
       },
+      undefined,
       undefined
     );
 
@@ -195,6 +200,7 @@ describe('initContext()', () => {
       {
         "appName": "appName",
         "appVersion": "1.2.3",
+        "client": undefined,
         "postAuthorId": undefined,
         "postData": {
           "leaderboard": {
@@ -246,6 +252,7 @@ describe('initContext()', () => {
       {
         "appName": "appName",
         "appVersion": "1.2.3",
+        "client": undefined,
         "postAuthorId": undefined,
         "postData": {
           "leaderboard": {
@@ -298,6 +305,7 @@ describe('initContext()', () => {
       {
         "appName": "appName",
         "appVersion": "1.2.3",
+        "client": undefined,
         "postAuthorId": "t2_400",
         "postData": undefined,
         "postId": "t3_789",
@@ -333,6 +341,7 @@ describe('initContext()', () => {
       {
         "appName": "fromJwt",
         "appVersion": "2.0.0",
+        "client": undefined,
         "postAuthorId": "t2_400",
         "postData": undefined,
         "postId": "t3_789",
@@ -428,5 +437,59 @@ describe('initContext()', () => {
     initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
 
     expect(devvit.token).toBe('webbitToken');
+  });
+});
+
+describe('getClient()', () => {
+  test('Android client', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.ANDROID,
+      nativeVersion: { yyyy: 2025, release: 10, attempt: 0, number: 1234 },
+      webbitToken: noWebbitToken,
+    };
+    const result = getClient(bridge);
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "name": "ANDROID",
+        "version": {
+          "attempt": 0,
+          "number": 1234,
+          "release": 10,
+          "yyyy": 2025,
+        },
+      }
+    `);
+  });
+
+  test('iOS client', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.IOS,
+      nativeVersion: { yyyy: 2025, release: 10, attempt: 0, number: 1234 },
+      webbitToken: noWebbitToken,
+    };
+    const result = getClient(bridge);
+    expect(result).toMatchInlineSnapshot(`
+      {
+        "name": "IOS",
+        "version": {
+          "attempt": 0,
+          "number": 1234,
+          "release": 10,
+          "yyyy": 2025,
+        },
+      }
+    `);
+  });
+
+  test('undefined for non-mobile clients', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.SHREDDIT,
+      webbitToken: noWebbitToken,
+    };
+    const result = getClient(bridge);
+    expect(result).toBeUndefined();
   });
 });
