@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.12.2-dev**](../../README.md)
+[**@devvit/public-api v0.12.3-dev**](../../README.md)
 
 ---
 
@@ -92,13 +92,13 @@ The date of the revision.
 
 #### Get Signature
 
-> **get** **revisionId**(): `string`
+> **get** **revisionId**(): `` `${string}-${string}-${string}-${string}-${string}` ``
 
 The ID of the revision.
 
 ##### Returns
 
-`string`
+`` `${string}-${string}-${string}-${string}-${string}` ``
 
 ---
 
@@ -220,7 +220,7 @@ Revert this page to a previous revision.
 
 ##### revisionId
 
-`string`
+`` `${string}-${string}-${string}-${string}-${string}` ``
 
 #### Returns
 

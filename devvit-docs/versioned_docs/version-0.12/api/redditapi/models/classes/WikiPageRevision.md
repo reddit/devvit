@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.12.2-dev**](../../README.md)
+[**@devvit/public-api v0.12.3-dev**](../../README.md)
 
 ---
 
@@ -76,11 +76,11 @@
 
 #### Get Signature
 
-> **get** **id**(): `string`
+> **get** **id**(): `` `${string}-${string}-${string}-${string}-${string}` ``
 
 ##### Returns
 
-`string`
+`` `${string}-${string}-${string}-${string}-${string}` ``
 
 ---
 

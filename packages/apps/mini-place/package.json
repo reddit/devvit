@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "mini-place-rt",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -15,10 +15,10 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/public-api": "0.12.2"
+    "@devvit/public-api": "0.12.3"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.2",
+    "@devvit/tsconfig": "0.12.3",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
   }

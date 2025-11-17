@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.12.2-dev**](../../README.md)
+[**@devvit/public-api v0.12.3-dev**](../../README.md)
 
 ---
 
@@ -30,9 +30,9 @@ The maximum number of revisions to get.
 
 <a id="page"></a>
 
-### page
+### page?
 
-> **page**: `string`
+> `optional` **page**: `string`
 
 The name of the page to get revisions for.
 
