@@ -20,7 +20,7 @@ import {
   type TriggerEventType,
 } from '@devvit/public-api';
 import type { TaskRequest } from '@devvit/scheduler';
-import type { SettingsValidationResponse, TriggerRequest, UiResponse } from '@devvit/shared';
+import type { SettingsValidationResponse, Toast, TriggerRequest, UiResponse } from '@devvit/shared';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { JsonObject, JsonValue, PartialJsonObject } from '@devvit/shared-types/json.js';
 import type {
@@ -232,9 +232,7 @@ export function assertUiResponse(
       rsp.showToast == null ||
       Array.isArray(rsp.showToast) ||
       (typeof rsp.showToast !== 'string' && typeof rsp.showToast !== 'object') ||
-      (typeof rsp.showToast === 'object' &&
-        (typeof rsp.showToast.text !== 'string' ||
-          (rsp.showToast.appearance !== 'neutral' && rsp.showToast.appearance !== 'success')))
+      (typeof rsp.showToast === 'object' && !isValidToastObject(rsp.showToast))
     )
       throw Error(
         `${preamble} showToast must be a string or \`{"text": string}\`: ${abbreviate(JSON.stringify(rsp.showToast))}`
@@ -265,6 +263,23 @@ export function assertUiResponse(
   if (rsp.navigateTo && rsp.showForm) {
     throw new Error('navigateTo and showForm cannot be used together in UiResponse');
   }
+}
+
+function isValidToastObject(showToast: Readonly<PartialJsonObject>): showToast is Toast {
+  // Check text
+  if (typeof showToast.text !== 'string') {
+    return false;
+  }
+  // Check appearance is either not set, or one of the valid values
+  if (
+    showToast.appearance !== 'neutral' &&
+    showToast.appearance !== 'success' &&
+    showToast.appearance != null
+  ) {
+    return false;
+  }
+  // Check that no other properties exist
+  return Object.keys(showToast).every((key) => ['text', 'appearance'].includes(key));
 }
 
 /** @internal */

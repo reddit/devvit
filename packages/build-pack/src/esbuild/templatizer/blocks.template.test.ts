@@ -35,7 +35,7 @@ describe('assertUiResponse()', () => {
       expectThrows: false,
     },
     {
-      name: 'valid showToast as object with text',
+      name: 'valid showToast as object with text and neutral appearance',
       input: {
         showToast: {
           text: 'This is a valid toast message',
@@ -45,11 +45,20 @@ describe('assertUiResponse()', () => {
       expectThrows: false,
     },
     {
-      name: 'valid showToast as object with text and appearance',
+      name: 'valid showToast as object with text and success appearance',
       input: {
         showToast: {
           text: 'This is a valid toast message',
           appearance: 'success',
+        },
+      },
+      expectThrows: false,
+    },
+    {
+      name: 'valid showToast as object with text, no appearance',
+      input: {
+        showToast: {
+          text: 'This is a valid toast message',
         },
       },
       expectThrows: false,
