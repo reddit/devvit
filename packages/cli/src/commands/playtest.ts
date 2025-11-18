@@ -374,6 +374,12 @@ export default class Playtest extends DevvitCommand {
     const files = this.#flags?.config
       ? [path.dirname(path.resolve(this.project.root, this.project.filename))]
       : [path.resolve(this.project.root)];
+
+    if (this.project.appConfig?.payments?.productsFile) {
+      // Also watch the products file if one is configured
+      files.push(path.resolve(this.project.root, this.project.appConfig.payments.productsFile));
+    }
+
     this.#watchConfigFile = chokidar.watch(files, {
       ignoreInitial: true,
       depth: 0,
@@ -390,14 +396,20 @@ export default class Playtest extends DevvitCommand {
 
     // Is the file the config?
     const baseFile = path.basename(file);
-    if (
-      (this.#flags?.config &&
-        path.resolve(this.project.root, this.#flags.config as string) !== path.resolve(file)) ||
-      (!this.#flags?.config &&
-        baseFile !== devvitV1ConfigFilename &&
-        baseFile !== devvitClassicConfigFilename)
-    )
-      return;
+    const resolvedFile = path.resolve(file);
+
+    const isFlaggedConfigFile =
+      this.#flags?.config &&
+      path.resolve(this.project.root, this.#flags.config as string) === resolvedFile;
+    const isDefaultConfigFile =
+      !this.#flags?.config &&
+      (baseFile === devvitV1ConfigFilename || baseFile === devvitClassicConfigFilename);
+    const isProductsFile =
+      this.project.appConfig?.payments?.productsFile &&
+      resolvedFile ===
+        path.resolve(this.project.root, this.project.appConfig.payments.productsFile);
+
+    if (!isFlaggedConfigFile && !isDefaultConfigFile && !isProductsFile) return;
 
     ux.action.start(`Reloading config`);
     try {

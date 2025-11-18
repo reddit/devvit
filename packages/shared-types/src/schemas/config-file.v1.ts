@@ -107,6 +107,7 @@ export type AppMenuConfig = {
 };
 export type AppPaymentsConfig = {
   products: Product[];
+  productsFile?: string;
   endpoints: {
     fulfillOrder: string;
     refundOrder?: string;
@@ -427,7 +428,9 @@ function AppPermissionConfig(
     },
     media: permissions?.media ?? schema.properties.permissions.properties.media.default,
     menu: !!partial.menu,
-    payments: permissions?.payments ?? schema.properties.permissions.properties.payments.default,
+    payments:
+      !!partial.payments ||
+      (permissions?.payments ?? schema.properties.permissions.properties.payments.default),
     realtime: permissions?.realtime ?? schema.properties.permissions.properties.realtime.default,
     redis:
       permissions?.redis ??
@@ -545,6 +548,7 @@ function AppPaymentsConfig(payments: Readonly<AppPaymentsConfigJson>): AppPaymen
   return {
     endpoints: payments.endpoints,
     products,
+    ...('productsFile' in payments ? { productsFile: payments.productsFile } : {}),
   };
 }
 

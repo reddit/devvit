@@ -1418,7 +1418,7 @@ describe('parseAppConfigJSON()', () => {
           },
           "media": false,
           "menu": false,
-          "payments": false,
+          "payments": true,
           "realtime": false,
           "reddit": {
             "asUser": [],
