@@ -3,10 +3,10 @@ import {
   type WebViewInternalMessage,
   WebViewInternalMessageScope,
 } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
-import {
+import type {
   WebViewInternalEventMessage,
   WebViewMessageEvent_MessageData,
-} from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js'; // to-do: use /json/ not /types/.
+} from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 
 export type Effect = Omit<WebViewInternalMessage, 'id' | 'scope' | 'type'> & { type: EffectType };
 
@@ -59,8 +59,7 @@ export const emitEffect = (
 
       const handleEffect = (event: MessageEvent<WebViewMessageEvent_MessageData>): void => {
         if (event.data?.type === 'devvit-message' && event.data?.data?.id === id) {
-          const serializedMessage = WebViewInternalEventMessage.fromJSON(event.data.data);
-          resolve(serializedMessage);
+          resolve(event.data.data);
           removeEventListener('message', handleEffect);
         }
       };

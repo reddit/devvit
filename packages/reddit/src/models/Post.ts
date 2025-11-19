@@ -134,10 +134,16 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
 
 export type SubmitSelfPostOptions = CommonSubmitPostOptions & PostTextOptions;
 
+/**
+ * @deprecated Splash and loading screens should be implemented in HTML as an
+ *             inline entrypoint. Splash support will be removed soon.
+ */
 export type SubmitCustomPostSplashOptions = {
   /**
    * Application name.
    *
+   * @deprecated Splash and loading screens should be implemented in HTML as an
+   *             inline entrypoint. Splash support will be removed soon.
    * @example `'Comment Mop'`.
    */
   appDisplayName?: string;
@@ -150,6 +156,8 @@ export type SubmitCustomPostSplashOptions = {
    * Media directory relative background image URL without a leading slash or
    * data URI.
    *
+   * @deprecated Splash and loading screens should be implemented in HTML as an
+   *             inline entrypoint. Splash support will be removed soon.
    * @example `'background.png'`.
    */
   backgroundUri?: string;
@@ -244,6 +252,10 @@ export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
    *             entrypoint.
    */
   loading?: JSX.Element;
+  /**
+   * @deprecated Splash and loading screens should be implemented in HTML as an
+   *             inline entrypoint. Splash support will be removed soon.
+   */
   splash?: SubmitCustomPostSplashOptions;
 };
 
@@ -981,6 +993,8 @@ export class Post {
   /**
    * Set the launch and loading screens for the custom post.
    *
+   * @deprecated Splash screens should be implemented in HTML as an inline
+   *             entrypoint. Splash support will be removed soon.
    * @example
    * ```ts
    * const post = await reddit.getPostById(context.postId);
