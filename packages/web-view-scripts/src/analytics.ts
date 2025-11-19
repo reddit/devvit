@@ -25,12 +25,13 @@ export function initAnalytics(): void {
   });
 
   document.addEventListener(
-    'pointerdown',
-    () => {
+    'click',
+    (event: MouseEvent) => {
+      const isStrict = isStrictClick(event);
       postWebViewInternalMessage({
         scope: WebViewInternalMessageScope.CLIENT,
         type: 'devvit-internal',
-        analytics: { event: 'click' },
+        analytics: { event: 'click', definition: isStrict ? 'strict' : 'default' },
       });
     },
     { passive: true }
@@ -39,4 +40,39 @@ export function initAnalytics(): void {
 
 function postWebViewInternalMessage(internalMessage: WebViewInternalMessage): void {
   parent.postMessage(internalMessage, '*');
+}
+
+function isStrictClick(event: MouseEvent): boolean {
+  if (!event.isTrusted) {
+    return false;
+  }
+
+  const eventTarget = event.target as HTMLElement;
+
+  const computedStyles = globalThis.window.getComputedStyle(eventTarget);
+  if (computedStyles?.getPropertyValue('cursor') === 'pointer') {
+    return true;
+  }
+
+  return elementOrParentIsInteractive(eventTarget);
+}
+
+function elementOrParentIsInteractive(element: HTMLElement): boolean {
+  const STRICT_CLICK_TAGNAMES = ['A', 'BUTTON', 'CANVAS', 'INPUT', 'SELECT', 'TEXTAREA', 'LABEL'];
+
+  let currentElement: HTMLElement | null = element;
+
+  while (currentElement && currentElement.tagName !== 'BODY') {
+    if (STRICT_CLICK_TAGNAMES.includes(currentElement.tagName)) {
+      return true;
+    }
+
+    if (['true', 'plaintext-only'].includes(currentElement.getAttribute('contenteditable') ?? '')) {
+      return true;
+    }
+
+    currentElement = currentElement.parentElement;
+  }
+
+  return false;
 }
