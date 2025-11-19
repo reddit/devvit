@@ -159,31 +159,39 @@ All Devvit web view apps load in inline mode by default. Your app loads directly
 
 Apps must meet these requirements for approval and featuring:
 
-1. Performance
+1. **Performance**
 
 - Optimize for mobile devices and slower connections
 - Load initial content in under 1 second
-- Achieve a Lighthouse score >80 (use [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview) to run your post's performance from a post view before submission)
+- Achieve a [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview) score >80.
+  - To find your Lighthouse score you can follow these steps:
+    1. Open your inline post
+    2. Open Developer Tools in Chrome and navigate to the elements tab
+    3. Find the `devvit-blocks-web-view` element and open it in a new tab
+    4. Open Developer Tools in the new tab and navigate to Lighthouse
+    5. Ensure you have mobile selected and select Analyze Page Load
 
-2. Gesture compliance
+![Lighthouse score](../../../assets/lighthouse-score.gif)
+
+2. **Gesture compliance**
 
 - **Only tap or click input is allowed**
 - No scroll traps or scroll hijacking
 - No zoom or pan interference
 - Users must be able to scroll past your post naturally
 
-3. Responsive design
+3. **Responsive design**
 
 - Content must work across all viewport sizes (use chrome devtools to test your app's responsiveness)
 - Keep in mind that the majority of users are on mobile devices
 
-4. User-initiated expanded mode
+4. **User-initiated expanded mode**
 
 - Apps cannot auto-launch into expanded mode or auto-close without a user action
 - Must have explicit user interaction (clearly labeled button or action)
 - Default view should respect standard post boundaries
 
-5. Safe use of sound
+5. **Safe use of sound**
 
 - Audio should not play unless there is a user interaction
 - Include a button to mute in your game

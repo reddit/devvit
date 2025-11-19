@@ -41,12 +41,14 @@ Apps using user actions must follow these guidelines to be approved.
 To enable user actions, add the required permissions to your `devvit.json`:
 
 ```json title="devvit.json"
-"reddit": {
-  "asUser": [
-    "SUBMIT_POST",
-    "SUBMIT_COMMENT",
-    "SUBSCRIBE_TO_SUBREDDIT"
-  ]
+"permissions": {
+  "reddit": {
+    "asUser": [
+      "SUBMIT_POST",
+      "SUBMIT_COMMENT",
+      "SUBSCRIBE_TO_SUBREDDIT"
+    ]
+  }
 }
 ```
 
