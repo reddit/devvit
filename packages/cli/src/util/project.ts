@@ -11,6 +11,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { apiPathPrefix } from '@devvit/shared-types/constants.js';
 import type { JsonValue } from '@devvit/shared-types/json.js';
+import type { Product } from '@devvit/shared-types/payments/Product.js';
 import {
   type AppConfig,
   type AppPermissionConfig,
@@ -206,6 +207,21 @@ export class Project {
 
     this.#config.json.dev ??= {};
     this.#config.json.dev.subreddit = subreddit;
+    writeConfig(this.root, this.filename, this.#config);
+  }
+
+  setProducts(products: Product[]) {
+    if (
+      !isAppConfig(this.#config) ||
+      !this.#config.payments ||
+      !this.#config.json.payments ||
+      !('products' in this.#config.json.payments)
+    ) {
+      return;
+    }
+
+    this.#config.payments.products = products;
+    this.#config.json.payments.products = products;
     writeConfig(this.root, this.filename, this.#config);
   }
 }

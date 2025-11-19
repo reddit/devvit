@@ -131,13 +131,13 @@ export default class AddProduct extends DevvitCommand {
 
     try {
       ux.action.start('Saving product');
-      await writeFile(this.productsFilePath, JSON.stringify(productsJSON, null, 2), 'utf-8');
+      await this.#writeProductsConfig(productsJSON);
       ux.action.stop(`Product "${product.sku}" added successfully!`);
       this.log(
         `Go to ${chalk.underline('https://developers.reddit.com/docs/payments/payments_add#complete-the-payment-flow')} to integrate the product into your app.`
       );
     } catch (error) {
-      this.error(`Failed to write ${PRODUCTS_JSON_FILE}:\n${error}`);
+      this.error(`Failed to save product:\n${error}`);
     }
   }
 
@@ -225,6 +225,12 @@ export default class AddProduct extends DevvitCommand {
       products: [],
     };
 
+    if (this.project.appConfig?.payments) {
+      this.log('Using products from app config payments section.');
+      productsJSON.products = this.project.appConfig.payments.products;
+      return productsJSON;
+    }
+
     ux.action.start(`Reading ${PRODUCTS_JSON_FILE}`);
     const products = await readProducts(this.project);
 
@@ -238,6 +244,30 @@ export default class AddProduct extends DevvitCommand {
     }
 
     return productsJSON;
+  }
+
+  async #writeProductsConfig(productsJSON: ProductsJSON): Promise<void> {
+    if (!this.project.appConfig?.payments) {
+      // Old products.json
+      this.log('Writing to products.json file.');
+      await writeFile(this.productsFilePath, JSON.stringify(productsJSON, null, 2), 'utf-8');
+      return;
+    }
+
+    if (this.project.appConfig.payments.productsFile) {
+      // Custom products file, write to that location
+      this.log('Writing to custom products file defined in app config.');
+      const customProductsFilePath = path.join(
+        this.project.root,
+        this.project.appConfig.payments.productsFile
+      );
+      await writeFile(customProductsFilePath, JSON.stringify(productsJSON, null, 2), 'utf-8');
+      return;
+    }
+
+    // Embedded products in app config
+    this.log('Writing products to app config payments section.');
+    this.project.setProducts(productsJSON.products);
   }
 
   async #getAvailableAssets(): Promise<string[]> {
