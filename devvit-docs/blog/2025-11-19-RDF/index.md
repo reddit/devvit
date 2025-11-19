@@ -18,14 +18,14 @@ From the goose survival game [Honk](https://developers.reddit.com/docs/blog/honk
 And did we mention that hosting a scalable backend is also free? Here's what [u/hammertimestudio](https://www.reddit.com/user/hammertimestudio/) maker of [r/Riddonkulous](https://www.reddit.com/r/riddonkulous/) had to [say](https://developers.reddit.com/docs/blog/riddonkulous) about building on Reddit:
 
 <div style="margin-left: 2em;">
-“When building games or apps for other platforms you typically end up managing a backend, authorization flows, CI/CD (build pipeline and deployment), logging, quality assurance, load balances, and other infrastructure overhead. Devvit simplifies that entire stack into a single suite, making it easy to start and scale it. **This allows you to focus on the most important part, your app in the making**.”  
+“When building games or apps for other platforms you typically end up managing a backend, authorization flows, CI/CD (build pipeline and deployment), logging, quality assurance, load balances, and other infrastructure overhead. Devvit simplifies that entire stack into a single suite, making it easy to start and scale it. <strong>This allows you to focus on the most important part, your app in the making</strong>.”  
 </div>
 <br>
 
 Additionally, here’s what [u/thejohnnyr](https://www.reddit.com/user/thejohnnyr/) maker of the hit game [r/Honk](https://www.reddit.com/r/honk/) had to say:
 
 <div style="margin-left: 2em;">
-“The Reddit team has been fantastic. They’ve helped with promotion, infrastructure, bug fixes, even hotfix approvals at odd hours. ***Honestly, all I’ve had to do is focus on building the game**.”  
+“The Reddit team has been fantastic. They’ve helped with promotion, infrastructure, bug fixes, even hotfix approvals at odd hours. <strong>Honestly, all I’ve had to do is focus on building the game</strong>.”  
 </div>
 <br>
 
