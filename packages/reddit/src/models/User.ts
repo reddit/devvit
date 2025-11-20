@@ -246,9 +246,7 @@ export class User {
     return this.#nsfw;
   }
 
-  /**
-   * Whether the user is admin.
-   */
+  /** Whether the user is a Reddit employee. */
   get isAdmin(): boolean {
     return this.#isAdmin;
   }
