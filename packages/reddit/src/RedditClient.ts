@@ -31,7 +31,6 @@ import type {
   GetPrivateMessagesOptions,
   GetSubredditUsersByTypeOptions,
   GetSubscribedSubredditsForCurrentUserOptions,
-  GetUserKarmaForSubredditOptions,
   GetUserOverviewOptions,
   Listing,
   ModAction,
@@ -682,17 +681,13 @@ export class RedditClient {
   }
 
   /**
-   * Returns the karma for a given user in the specified subreddit.
+   * Returns the karma for a given user in the current subreddit.
    *
-   * @param options - Options for the request.
-   * @param options.username - The username of the user to get the karma for. e.g. 'spez'
-   * @param options.subredditId - The t5_ ID of the subreddit to get the karma for. e.g. 't5_evua8s'
+   * @param username - The username of the user to get the karma for. e.g. 'spez'
    * @returns The GetUserKarmaForSubredditResponse, containing the user's karma for posts and comments in the subreddit.
    */
-  getUserKarmaForSubreddit(
-    options: GetUserKarmaForSubredditOptions
-  ): Promise<GetUserKarmaForSubredditResponse> {
-    return User.getUserKarmaForSubreddit(options);
+  getUserKarmaFromCurrentSubreddit(username: string): Promise<GetUserKarmaForSubredditResponse> {
+    return User.getUserKarmaFromCurrentSubreddit(username);
   }
 
   /**

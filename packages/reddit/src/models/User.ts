@@ -8,7 +8,7 @@ import type {
 import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import { isT2, T2, T5 } from '@devvit/shared-types/tid.js';
+import { isT2, T2 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
@@ -95,11 +95,6 @@ export type GetUserOverviewOptions = {
   limit?: number;
   after?: string;
   before?: string;
-};
-
-export type GetUserKarmaForSubredditOptions = {
-  username: string;
-  subredditId: T5;
 };
 
 export const enum SocialLinkType {
@@ -416,18 +411,14 @@ export class User {
   }
 
   /**
-   * Returns the karma for a given user in the specified subreddit.
+   * Returns the karma for this User in the current subreddit.
    *
-   * @param options - Options for the request
-   * @param options.subredditId - The ID of the subreddit to get the karma for. e.g. 't5_evua8s'
    * @returns The GetUserKarmaForSubredditResponse, containing the user's karma for comments and posts in the subreddit.
    */
-  async getUserKarmaForSubreddit(
-    options: Omit<GetUserKarmaForSubredditOptions, 'username'>
-  ): Promise<GetUserKarmaForSubredditResponse> {
+  async getUserKarmaFromCurrentSubreddit(): Promise<GetUserKarmaForSubredditResponse> {
     return await getRedditApiPlugins().Users.GetUserKarmaForSubreddit({
       username: this.username,
-      subredditId: options.subredditId,
+      subredditId: context.subredditId,
     });
   }
 
@@ -579,12 +570,12 @@ export class User {
   }
 
   /** @internal */
-  static async getUserKarmaForSubreddit(
-    options: GetUserKarmaForSubredditOptions
+  static async getUserKarmaFromCurrentSubreddit(
+    username: string
   ): Promise<GetUserKarmaForSubredditResponse> {
     return await getRedditApiPlugins().Users.GetUserKarmaForSubreddit({
-      username: options.username,
-      subredditId: options.subredditId,
+      username: username,
+      subredditId: context.subredditId,
     });
   }
 
