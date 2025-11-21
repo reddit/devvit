@@ -1,8 +1,6 @@
-import {
-  addPaymentHandler,
-  type PaymentHandler,
-  type PaymentHandlerResponse,
-} from '@devvit/payments';
+import type { PaymentHandlerResponse } from '@devvit/payments';
+import type { PaymentHandler } from '@devvit/payments';
+import { addPaymentHandler, paymentHelpMenuItem } from '@devvit/payments/shared';
 import type { Logger, Metadata } from '@devvit/protos';
 import { LoggerDefinition, Severity } from '@devvit/protos';
 import {
@@ -50,6 +48,15 @@ declare module '@devvit/public-api' {
     function _initScheduler(): void;
     function _initSettings(global: boolean, sub: boolean): void;
   }
+}
+
+declare module '@devvit/payments/shared' {
+  // This is copied over from @devvit/payments/paymentHandler.ts to avoid exposing the unnecessary
+  // internal-only function to Webbit users. If you change this here, change it there too.
+  export const addPaymentHandler: (paymentHandler: PaymentHandler) => void;
+  // This is copied over from @devvit/payments/paymentHelpMenuItem.ts to avoid exposing the unnecessary
+  // internal-only object to Webbit users. If you change this here, change it there too.
+  export const paymentHelpMenuItem: MenuItem;
 }
 
 // Hack: rename config2 to workaround declaration in
@@ -181,6 +188,8 @@ function configurePayments(menuItems: Readonly<AppPaymentsConfig>): void {
   }
 
   addPaymentHandler(paymentHandler);
+  Devvit._initMenu();
+  Devvit.addMenuItem(paymentHelpMenuItem);
 }
 
 function configureForms(forms: Readonly<AppFormsConfig>): void {

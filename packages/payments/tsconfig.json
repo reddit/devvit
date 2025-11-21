@@ -1,5 +1,5 @@
 {
-  "compilerOptions": { "outDir": "dist", "rootDir": "./src" },
+  "compilerOptions": { "outDir": "dist", "rootDir": "./src", "stripInternal": true },
   "exclude": ["node_modules"],
   "extends": "@devvit/tsconfig/base.json",
   "include": ["src"]

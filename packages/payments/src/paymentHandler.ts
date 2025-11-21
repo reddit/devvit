@@ -24,6 +24,9 @@ export type PaymentHandler = {
   refundOrder?(order: Order, ctx: TriggerContext): void | Promise<void>;
 };
 
+// The typed for this are copied over into `packages/build-pack/src/esbuild/templatizer/blocks.template.tsx`
+// to avoid exposing the unnecessary internal-only function to Webbit users. If you change this here,
+// change it there too.
 export function addPaymentHandler(paymentHandler: PaymentHandler): void {
   Devvit.provide(PaymentProcessorDefinition);
   Object.assign(Devvit.prototype, makeWrappedHandler(paymentHandler));
