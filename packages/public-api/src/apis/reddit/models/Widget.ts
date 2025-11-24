@@ -227,13 +227,12 @@ export class ImageWidget extends Widget {
       assertNonNull(data.url, 'Image widget data is missing url');
       assertNonNull(data.height, 'Image widget data is missing height');
       assertNonNull(data.width, 'Image widget data is missing width');
-      assertNonNull(data.linkUrl, 'Image widget data is missing linkUrl');
 
       return {
         url: data.url,
         height: data.height,
         width: data.width,
-        linkUrl: data.linkUrl,
+        linkUrl: data.linkUrl ?? '',
       };
     });
   }
