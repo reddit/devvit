@@ -861,3 +861,221 @@ barResults: [0, 3, 0, 0, 3, 3]
 ```
 
 </details>
+
+## Compression (Experimental)
+
+The Redis package includes a `redisCompressed` client that transparently handles compression and decompression of values. This is useful for storing large strings or JSON objects that exceed the Redis storage limits or to optimize storage usage.
+
+To use it, update your import:
+
+```ts
+// import { redis } from '@devvit/redis';
+import { redisCompressed as redis } from '@devvit/redis';
+```
+
+:::warning
+**One-Way Migration**: Once you start using `redisCompressed` and writing compressed data, switching back to the standard `redis` client will result in errors when reading that data, as the standard client does not know how to decompress the values.
+:::
+
+The `redisCompressed` client automatically:
+- Compresses values on write (`set`, `hSet`, `mSet`, `hSetNX`) if it saves space.
+- Decompresses values on read (`get`, `hGet`, `mGet`, `hMGet`, `hGetAll`).
+
+**Note:** Existing uncompressed data is **not** automatically compressed when read. It is only compressed when you write it back. To migrate existing large datasets, you need to read and re-write the data.
+
+### Migration Example
+
+Migrating large datasets can take time. To avoid the 30-second execution timeout, we recommend using a scheduled job that processes data in chunks and "daisy chains" itself until completion.
+
+Here is an example of how to implement a migration tool using a Menu Item and the Scheduler.
+
+Register your form handler, menu trigger, and scheduler endpoint here.
+
+```json
+{
+  "forms": {
+    "migrateExampleForm": "/internal/form/ops/migrate-example"
+  },
+  "menu": {
+    "items": [
+      {
+        "label": "[ops] Migrate Data to Compression",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/ops/migrate-example"
+      }
+    ]
+  },
+  "scheduler": {
+    "tasks": {
+      "migrate-example-data": {
+        "endpoint": "/internal/scheduler/migrate-example-data"
+      }
+    }
+  }
+}
+```
+
+Add these route handlers to your Express app.
+
+```ts
+import { redis, scheduler } from '@devvit/web/server';
+// Import the compressed client
+import { redisCompressed } from '@devvit/redis';
+
+const MY_DATA_HASH_KEY = 'my:app:large:dataset';
+
+// 1. Menu Endpoint: Returns the form definition
+app.post('/internal/menu/ops/migrate-example', async (_req, res) => {
+  res.json({
+    showForm: {
+      name: 'migrateExampleForm', // Must match key in devvit.json "forms"
+      form: {
+        title: 'Migrate Hash to Compression',
+        acceptLabel: 'Start Migration',
+        fields: [
+          {
+            name: 'startCursor',
+            label: 'Start Cursor (0 for beginning)',
+            type: 'string',
+            defaultValue: '0',
+          },
+          {
+            name: 'chunkSize',
+            label: 'Items per batch',
+            type: 'number',
+            defaultValue: 20000,
+          },
+        ],
+      },
+    },
+  });
+});
+
+// 2. Form Handler: Receives input and schedules the first job
+app.post('/internal/form/ops/migrate-example', async (req, res) => {
+  const { startCursor, chunkSize } = req.body ?? {};
+  const cursor = startCursor || '0';
+  const size = Number(chunkSize) || 20000;
+
+  console.log(`[Migration] Manual start requested. Cursor: ${cursor}, Chunk: ${size}`);
+
+  // Kick off the first job in the chain
+  await scheduler.runJob({
+    name: 'migrate-example-data',
+    runAt: new Date(), // Run immediately
+    data: {
+      cursor,
+      chunkSize: size,
+      processed: 0,
+    },
+  });
+
+  res.json({
+    showToast: {
+      text: 'Migration started in background',
+      appearance: 'success',
+    },
+  });
+});
+
+// 3. Scheduler Endpoint: The recursive worker
+app.post('/internal/scheduler/migrate-example-data', async (req, res) => {
+  const startTime = Date.now();
+
+  try {
+    const body = req.body ?? {};
+    const data = body.data ?? {};
+
+    let cursor = Number(data.cursor) || 0;
+    const chunkSize = Number(data.chunkSize) || 20000;
+    const processedTotal = Number(data.processed) || 0;
+
+    console.log(`[Migration] Job started. Cursor: ${cursor}, Target Chunk: ${chunkSize}`);
+
+    let keepRunning = true;
+    let processedInJob = 0;
+    const SCAN_COUNT = 250; // Internal batch size to keep event loop moving
+
+    while (keepRunning) {
+      // Stop if we've processed enough items for this single execution
+      if (processedInJob >= chunkSize) {
+        break;
+      }
+
+      const { cursor: nextCursor, fieldValues } = await redis.hScan(
+        MY_DATA_HASH_KEY,
+        cursor,
+        undefined, // match pattern
+        SCAN_COUNT
+      );
+
+      // Parallel Processing:
+      // We treat the batch as a set of promises to execute simultaneously.
+      // Promise.allSettled ensures one failure doesn't crash the whole job.
+      await Promise.allSettled(
+        fieldValues.map(async ({ field, value }) => {
+          // LOGIC:
+          // 1. We read the raw value.
+          // 2. We write it back using 'redisCompressed'.
+          //    The proxy detects the write and compresses the string if beneficial.
+          if (value && value.length > 0) {
+            await redisCompressed.hSet(MY_DATA_HASH_KEY, { [field]: value });
+          }
+        })
+      );
+
+      processedInJob += fieldValues.length;
+
+      // Cursor logic: 0 means iteration is complete
+      if (nextCursor === 0) {
+        cursor = 0;
+        keepRunning = false;
+      } else {
+        cursor = nextCursor;
+      }
+
+      // Safety: Check execution time.
+      // If we are close to 30s (Devvit limit), stop early and requeue.
+      if (Date.now() - startTime > 20000) {
+        console.log('[Migration] Time limit approaching, stopping early.');
+        keepRunning = false;
+      }
+    }
+
+    const newTotal = processedTotal + processedInJob;
+
+    // Daisy Chaining:
+    // If the cursor is not 0, we still have more data to scan.
+    // We schedule *this same job* to run again immediately.
+    if (cursor !== 0) {
+      console.log(`[Migration] Requeueing. Next cursor: ${cursor}. Processed so far: ${newTotal}`);
+      await scheduler.runJob({
+        name: 'migrate-example-data',
+        runAt: new Date(),
+        data: {
+          cursor,
+          chunkSize,
+          processed: newTotal,
+        },
+      });
+
+      res.json({ status: 'requeued', processed: newTotal, cursor });
+    } else {
+      console.log(`[Migration] COMPLETE. Total items processed: ${newTotal}`);
+      res.json({ status: 'success', processed: newTotal });
+    }
+  } catch (error) {
+    console.error('[Migration] Critical Job Error', error);
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
+```
+
+Note that the job may timeout, in which case you will need to find the last logged cursor to start the menu item action job again. Try adjusting the chunk size if you experience timeouts.
+
+You can monitor the migration progress using the logs command:
+
+```bash
+devvit logs r/my-subreddit-to-migrate --since=1h --verbose
+```
