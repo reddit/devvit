@@ -2,8 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "exactOptionalPropertyTypes": false,
-    "stripInternal": true,
+    "exactOptionalPropertyTypes": false
   },
   "exclude": ["node_modules"],
   "extends": "@devvit/tsconfig/base.json",

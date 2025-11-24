@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "devvit-dev-bot",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.12.3"
+    "@devvit/public-api": "0.12.4"
   },
   "devDependencies": {
     "typescript": "5.8.3"

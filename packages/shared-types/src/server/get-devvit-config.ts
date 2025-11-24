@@ -2,8 +2,8 @@ import type { Config } from '../Config.js';
 import type {} from '../shared/devvit-worker-global.js';
 
 /**
- * Gets the Config object that the runtime drops on globalThis. For internal use only.
- * @internal
+ * Gets the Config object that the runtime drops on globalThis. For internal use
+ * only.
  */
 export function getDevvitConfig(): Config {
   if (!globalThis.devvit?.config) {
