@@ -1,5 +1,5 @@
 import type { DevvitPostData } from '@devvit/protos';
-import type { RequestContext } from '@devvit/protos/json/devvit/platform/request_context.js';
+import type { RequestContext } from '@devvit/protos/json/devvit/platform/v1/request_context.js';
 import {
   type BridgeContext,
   Client as ClientName,
