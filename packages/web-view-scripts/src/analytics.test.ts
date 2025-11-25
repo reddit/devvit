@@ -161,6 +161,16 @@ it('sends load analytics on window load', async () => {
         timeEnd: expect.any(Number),
         duration: expect.any(Number),
       },
+      realtimeEffect: undefined,
+      telemetry: {
+        event: 'web-view-loaded',
+        loaded: {
+          event: 'web-view-loaded',
+          timeStart: expect.any(Number),
+          timeEnd: expect.any(Number),
+          duration: expect.any(Number),
+        },
+      },
     },
     '*'
   );
@@ -182,6 +192,8 @@ const clickPostMessageWithDefinition = (definition: string): [unknown, string] =
       scope: WebViewInternalMessageScope.CLIENT,
       type: 'devvit-internal',
       analytics: { event: 'click', definition },
+      realtimeEffect: undefined,
+      telemetry: { event: 'click', click: { event: 'click', definition } },
     },
     '*',
   ];

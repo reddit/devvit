@@ -1,7 +1,9 @@
-import {
-  type WebViewInternalMessage,
-  WebViewInternalMessageScope,
-} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
+import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import type {
+  WebViewTelemetryClickEffect,
+  WebViewTelemetryLoadedEffect,
+} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/telemetry.js';
+import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 /**
  * initAnalytics is added to all Devvit apps which use web views.
@@ -14,32 +16,41 @@ export function initAnalytics(): void {
     const timeStart = performance.timeOrigin;
     const duration = performance.now();
     const timeEnd = performance.timeOrigin + duration;
+    const loaded: WebViewTelemetryLoadedEffect = {
+      event: 'web-view-loaded',
+      timeStart,
+      timeEnd,
+      duration,
+    };
 
     // to-do: support devvit.debug.
     // if (devvit.debug.analytics) console.debug(`[analytics] loaded in ${duration} ms`);
-    postWebViewInternalMessage({
-      scope: WebViewInternalMessageScope.CLIENT,
-      type: 'devvit-internal',
-      analytics: { event: 'web-view-loaded', timeStart, timeEnd, duration },
+    void emitEffect({
+      type: EffectType.EFFECT_TELEMETRY,
+      telemetry: { event: 'web-view-loaded', loaded },
+      // to-do: remove once all clients support `telemetry`. Deprecated on
+      //        2025-11-24.
+      analytics: loaded,
     });
   });
 
   document.addEventListener(
     'click',
-    (event: MouseEvent) => {
-      const isStrict = isStrictClick(event);
-      postWebViewInternalMessage({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: 'devvit-internal',
-        analytics: { event: 'click', definition: isStrict ? 'strict' : 'default' },
+    (event) => {
+      const click: WebViewTelemetryClickEffect = {
+        event: 'click',
+        definition: isStrictClick(event) ? 'strict' : 'default',
+      };
+      void emitEffect({
+        type: EffectType.EFFECT_TELEMETRY,
+        telemetry: { event: 'click', click },
+        // to-do: remove once all clients support `telemetry`. Deprecated on
+        //        2025-11-24.
+        analytics: click,
       });
     },
     { passive: true }
   );
-}
-
-function postWebViewInternalMessage(internalMessage: WebViewInternalMessage): void {
-  parent.postMessage(internalMessage, '*');
 }
 
 function isStrictClick(event: MouseEvent): boolean {
