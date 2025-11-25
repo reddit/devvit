@@ -74,6 +74,8 @@ async function getVaultByParams(
   params: JSONObject,
   metadata: Metadata | undefined
 ): Promise<Vault> {
+  // Legacy GQL query. Do not copy this pattern.
+  // eslint-disable-next-line no-restricted-properties
   const response = await GraphQL.query(operationName, queryHash, params, metadata);
   const contact = response?.data?.vault?.contact;
 

@@ -1184,6 +1184,8 @@ async function createModmailConversation(params: {
 
   const operationName = 'CreateModmailConversation';
   const persistedQueryHash = '5f9ae20b0c7bdffcafb80241728a72e67cd4239bc09f67284b79d4aa706ee0e5';
+  // Legacy GQL query. Do not copy this pattern.
+  // eslint-disable-next-line no-restricted-properties
   const response = await GraphQL.query(operationName, persistedQueryHash, {
     subject: params.subject,
     bodyMarkdown: params.bodyMarkdown,

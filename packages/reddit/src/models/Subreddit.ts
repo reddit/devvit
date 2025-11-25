@@ -1284,6 +1284,8 @@ export class Subreddit {
 export async function getSubredditInfoById(subredditId: T5): Promise<SubredditInfo> {
   const operationName = 'GetSubredditInfoById';
   const persistedQueryHash = '315a9b75c22a017d526afdf2d274616946156451aacfd56dfb91e7ad3f7a2fde';
+  // Legacy GQL query. Do not copy this pattern.
+  // eslint-disable-next-line no-restricted-properties
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });
 
   const subredditInfo = response.data?.subredditInfoById;
@@ -1302,6 +1304,8 @@ export async function getSubredditInfoById(subredditId: T5): Promise<SubredditIn
 export async function getSubredditInfoByName(subredditName: string): Promise<SubredditInfo> {
   const operationName = 'GetSubredditInfoByName';
   const persistedQueryHash = '4aa69726c7e3f5d33ab2bee22b3d74fce645824fddd5ea3ec6dfe30bdb4295cb';
+  // Legacy GQL query. Do not copy this pattern.
+  // eslint-disable-next-line no-restricted-properties
   const response = await GraphQL.query(operationName, persistedQueryHash, { name: subredditName });
 
   const subredditInfo = response.data?.subredditInfoByName;
@@ -1314,6 +1318,8 @@ export async function getSubredditInfoByName(subredditName: string): Promise<Sub
 export async function getSubredditLeaderboard(subredditId: T5): Promise<SubredditLeaderboard> {
   const operationName = 'GetSubredditLeaderboard';
   const persistedQueryHash = '18ead70c46b6446d45ecd8b679b16d9a929a933d6ef25d8262a459cb18b72848';
+  // Legacy GQL query. Do not copy this pattern.
+  // eslint-disable-next-line no-restricted-properties
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });
 
   const leaderboard = response.data?.subredditInfoById?.leaderboard;
@@ -1330,6 +1336,8 @@ export async function getSubredditLeaderboard(subredditId: T5): Promise<Subreddi
 export async function getSubredditStyles(subredditId: T5): Promise<SubredditStyles> {
   const operationName = 'GetSubredditStyles';
   const persistedQueryHash = 'd491d17ea8858f563ea578b26b9595d64adecf4bf34557d567c7e53c470f5f22';
+  // Legacy GQL query. Do not copy this pattern.
+  // eslint-disable-next-line no-restricted-properties
   const response = await GraphQL.query(operationName, persistedQueryHash, { id: subredditId });
 
   const styles = response.data?.subredditInfoById?.styles;

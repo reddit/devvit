@@ -6,16 +6,6 @@ import { getRedditApiPlugins } from '../plugin.js';
 
 export class GraphQL {
   /** @internal */
-  static queryWithQueryString(q: string): Promise<QueryResponse> {
-    return getRedditApiPlugins().GraphQL.Query(
-      {
-        query: q,
-      },
-      this.#metadata
-    );
-  }
-
-  /** @internal */
   static query(operationName: string, id: string, variables: JsonObject): Promise<QueryResponse> {
     return getRedditApiPlugins().GraphQL.PersistedQuery(
       {

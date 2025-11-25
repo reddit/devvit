@@ -1389,6 +1389,8 @@ export class Post {
   }): Promise<void> {
     const operationName = 'SetSuggestedSort';
     const persistedQueryHash = 'cf6052acc7fefaa65b710625b81dba8041f258313aafe9730e2a3dc855e5d10d';
+    // Legacy GQL query. Do not copy this pattern.
+    // eslint-disable-next-line no-restricted-properties
     const rsp = await GraphQL.query(operationName, persistedQueryHash, {
       input: {
         subredditId: opts.subredditId,
@@ -1407,6 +1409,8 @@ export class Post {
   static async getDevvitPostData(id: T3): Promise<DevvitPostData | undefined> {
     const operationName = 'GetDevvitPostData';
     const persistedQueryHash = 'd349c9bee385336e44837c4a041d4b366fa32f16121cef7f12e1e3f230340696';
+    // Legacy GQL query. Do not copy this pattern.
+    // eslint-disable-next-line no-restricted-properties
     const rsp = await GraphQL.query(operationName, persistedQueryHash, {
       id,
     });
@@ -1874,6 +1878,8 @@ function listingProtosToPosts(listingProto: ListingProto): ListingFetchResponse<
 async function getThumbnailV2(opts: { id: T3 }): Promise<EnrichedThumbnail | undefined> {
   const operationName = 'GetThumbnailV2';
   const persistedQueryHash = '81580ce4e23d748c5a59a1618489b559bf4518b6a73af41f345d8d074c8b2ce9';
+  // Legacy GQL query. Do not copy this pattern.
+  // eslint-disable-next-line no-restricted-properties
   const rsp = await GraphQL.query(operationName, persistedQueryHash, {
     id: opts.id,
   });

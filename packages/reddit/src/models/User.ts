@@ -394,6 +394,8 @@ export class User {
   async getSocialLinks(): Promise<UserSocialLink[]> {
     const operationName = 'GetUserSocialLinks';
     const persistedQueryHash = '2aca18ef5f4fc75fb91cdaace3e9aeeae2cb3843b5c26ad511e6f01b8521593a';
+    // Legacy GQL query. Do not copy this pattern.
+    // eslint-disable-next-line no-restricted-properties
     const response = await GraphQL.query(operationName, persistedQueryHash, {
       name: this.username,
     });
@@ -539,6 +541,8 @@ export class User {
     // If not, query the API for the snoovatar URL
     const operationName = 'GetSnoovatarUrlByName';
     const persistedQueryHash = 'c47fd42345af268616d2d8904b56856acdc05cf61d3650380f539ad7d596ac0c';
+    // Legacy GQL query. Do not copy this pattern.
+    // eslint-disable-next-line no-restricted-properties
     const response = await GraphQL.query(operationName, persistedQueryHash, { username });
     return response.data?.redditorInfoByName?.snoovatarIcon?.url;
   }

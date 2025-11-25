@@ -9,6 +9,7 @@ vi.mock('../graphql/GraphQL.js', () => ({
 import { GraphQL } from '../graphql/GraphQL.js';
 import { createShareUrl } from './ShareUrl.js';
 
+// eslint-disable-next-line no-restricted-properties
 const mockQuery = GraphQL.query as ReturnType<typeof vi.fn>;
 
 describe('createShareUrl', () => {

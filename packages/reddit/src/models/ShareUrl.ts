@@ -47,6 +47,8 @@ export async function createShareUrl(url: string): Promise<string> {
   const operationName = 'CreateShareUrl';
   const persistedQueryHash = 'efe976f272ac5cf720cde4b0e5d1f88ca0e9e18f3401a95d3c048e94ac53eb90';
 
+  // Legacy GQL query. Do not copy this pattern.
+  // eslint-disable-next-line no-restricted-properties
   const response = await GraphQL.query(operationName, persistedQueryHash, {
     input: { url },
   });
