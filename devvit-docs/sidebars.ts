@@ -187,6 +187,7 @@ const sidebars: SidebarsConfig = {
       label: 'Devvit Blocks',
       items: [
         'capabilities/blocks/overview',
+        'capabilities/blocks/blocks_payments',
         'capabilities/blocks/dimensions',
         'capabilities/blocks/working_with_usestate',
         'capabilities/blocks/working_with_useinterval',
@@ -231,6 +232,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'earn-money/payments/payments_overview',
         'earn-money/payments/payments_add',
+        'earn-money/payments/payments_migrate',
         'earn-money/payments/payments_test',
         'earn-money/payments/payments_publish',
         'earn-money/payments/payments_manage',
