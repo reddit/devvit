@@ -19,6 +19,47 @@ Devvit Web has reached full feature parity with blocks, and we strongly recommen
 
 To keep things clear (and friendlier to AI-assisted IDEs), we're moving all [blocks documentation](./capabilities/blocks/overview.md) into its own dedicated section.
 
+## Devvit 0.12.4:
+
+**Release Date: Nov 24, 2025**
+
+Devvit 0.12.4 is packed with payments (experimental) polish, and new tooling for monitoring WebView traffic
+
+**Devvit Web Payments (experimental) bugfixes and improvements**
+
+- Fixed a bug with payments refunds hitting incorrect backend endpoint
+- Fixed a bug where duplicate “Get Payments Help” menu items were showing
+- The CLI’s `playtest` command watches your products file for live reloads, and `devvit products add` understands both legacy JSON files and the new config block so Devvit Web apps stay in sync.
+- Payments types are re-exported from `@devvit/payments/shared`to `@devvit/web/shared`, preventing mismatched product/order typings downstream.
+
+**WebView analytics and APIs**
+
+- Improved accuracy of clicks measurement for App Directory Analytics
+- Bundle size improvements
+- Deprecated remaining splash screen APIs (`setSplash` and `SubmitCustomPostSplashOptions` fields) a
+
+## Devvit 0.12.3:
+
+**Release Date: Nov 17, 2025**
+
+This release focuses on Reddit data access and instrumenting WebView clients
+
+**Reddit data & proto updates**
+
+- `@devvit/reddit` now exposes `getUserKarmaForSubreddit()`
+- `ModAction` trigger payloads now carries a stable `id` field for downstream tooling.
+
+**Web client & realtime instrumentation**
+
+- `@devvit/realtime` now publishes separate `client/` and `server/` entry points, preventing accidental server-only imports in browser bundles.
+- Bundle size improvements
+- Web clients now annotate the request `Context` with the user’s client name/version
+- Improved accuracy of clicks measurement for App Directory Analytics
+
+**Payments status**
+
+- `@devvit/payments` now taggged as `experimental`
+
 ## Devvit 0.12.2: Inline Mode, Launch Screens,Expanded App Experiences, and Developer Logs
 
 **Release Date: Nov 10, 2025**
