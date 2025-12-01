@@ -1,19 +1,24 @@
 import { OrderStatus } from '@devvit/protos/json/devvit/payments/v1alpha/order.js';
+import type {
+  AcknowledgeOrderDeliveryResponse,
+  GetOrdersRequest,
+  GetOrdersResponse,
+  GetProductsRequest,
+  GetProductsResponse,
+} from '@devvit/protos/json/devvit/plugin/payments/v1alpha/payments.js';
 import {
-  type AcknowledgeOrderDeliveryResponse,
-  type GetOrdersRequest,
-  type GetOrdersResponse,
-  type GetProductsRequest,
-  type GetProductsResponse,
   type PaymentsService,
   PaymentsServiceDefinition,
 } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
 import { context } from '@devvit/server';
+import type { Prettify } from '@devvit/shared-types/Prettify.js';
 import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
 
 type RequiredGetOrderFields = 'limit';
-export type GetOrdersFilters = Partial<Omit<GetOrdersRequest, RequiredGetOrderFields>> &
-  Pick<GetOrdersRequest, RequiredGetOrderFields>;
+export type GetOrdersFilters = Prettify<
+  Partial<Omit<GetOrdersRequest, RequiredGetOrderFields>> &
+    Pick<GetOrdersRequest, RequiredGetOrderFields>
+>;
 
 /**
  * @experimental - This is not finalized yet, may not work, and may change.
@@ -25,15 +30,9 @@ export class PaymentsClient {
    * @param filters - Filters to apply to the products query.
    * @experimental - This is not finalized yet, may not work, and may change.
    */
-  getProducts(filters: Partial<GetProductsRequest> = {}): Promise<GetProductsResponse> {
+  getProducts(filters: Readonly<Partial<GetProductsRequest>> = {}): Promise<GetProductsResponse> {
     return this.#plugin.GetProducts(
-      {
-        // Defaults
-        skus: [],
-        metadata: {},
-        // User provided second, overwrites above
-        ...filters,
-      },
+      { metadata: filters.metadata ?? {}, skus: filters.skus ?? [] },
       context.metadata
     );
   }
@@ -42,20 +41,23 @@ export class PaymentsClient {
    * @param filters - Filters to apply to the orders query.
    * @experimental - This is not finalized yet, may not work, and may change.
    */
-  getOrders(filters: GetOrdersFilters): Promise<GetOrdersResponse> {
-    return this.#plugin.GetOrders(
+  async getOrders(filters: Readonly<GetOrdersFilters>): Promise<GetOrdersResponse> {
+    const orders = await this.#plugin.GetOrders(
       {
-        // Defaults
-        sku: '',
-        buyer: '',
-        status: OrderStatus.ORDER_STATUS_UNSPECIFIED,
-        metadata: {},
-        cursor: '',
-        // User provided second, overwrites above
-        ...filters,
+        metadata: filters.metadata ?? {},
+        start: filters.start ? new Date(filters.start) : undefined,
+        end: filters.end ? new Date(filters.end) : undefined,
+        sku: filters.sku ?? '',
+        buyer: filters.buyer ?? '',
+        status: filters.status ?? OrderStatus.ORDER_STATUS_UNSPECIFIED,
+        cursor: filters.cursor ?? '',
+        limit: filters.limit,
       },
       context.metadata
     );
+    // Convert the hydrated old Protobuf to JSON. Don't use
+    // Protobuf.toJSON() which would omit default values.
+    return JSON.parse(JSON.stringify(orders));
   }
 
   /**
@@ -70,8 +72,3 @@ export class PaymentsClient {
     return (this.#pluginCache ??= getDevvitConfig().use(PaymentsServiceDefinition));
   }
 }
-
-/**
- * @experimental - This is not finalized yet, may not work, and may change.
- */
-export const payments = new PaymentsClient();
