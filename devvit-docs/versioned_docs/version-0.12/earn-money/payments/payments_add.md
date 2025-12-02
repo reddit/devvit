@@ -1,9 +1,9 @@
 # Add Payments
 
-You can use the payments template to build your app or add payment functionality to an existing app.
+The Devvit payments API is available in Devvit Web. Keep reading to learn how to configure your products and accept payments.
 
 :::note
-Payment functionality is supported on [Devvit Blocks](../../capabilities/blocks/overview.md) only. [Devvit Web](../../capabilities/devvit-web/devvit_web_overview.mdx) is currently not supported.
+Devvit Web is recommended for payments. Check out how to [migrate blocks apps](./payments_migrate.md) if you're app is currently using a blocks version of payments.
 :::
 
 To start with a template, select the payments template when you create a new project or run:
@@ -21,6 +21,74 @@ npm install @devvit/payments
 :::note
 Make sure you’re on Devvit 0.11.3 or higher. See the [quickstart](https://developers.reddit.com/docs/next/quickstart) to get up and running.
 :::
+
+## Implement Devvit Web payments
+
+### Configure devvit.json
+
+You can reference an external `products.json` file, or define products directly. Endpoints are required for fulfillment and optional for refunds.
+
+```tsx
+{
+  "payments": {
+    "productsFile": "./products.json",
+    // optionally define products here: "products": [...] instead
+    "endpoints": {
+      "fulfillOrder": "/internal/payments/fulfill",
+      "refundOrder": "/internal/payments/refund"
+    }
+  }
+}
+```
+
+### Server: fulfill (and optional refund)
+
+Create endpoints to fulfill and optionally revoke purchases.
+
+```tsx
+import type { PaymentHandlerResponse } from '@devvit/web/server';
+
+router.post('/internal/payments/fulfill', async (req, res) => {
+  // Fulfill the order (grant entitlements, record delivery, etc.)
+  res.json({ success: true } satisfies PaymentHandlerResponse);
+});
+
+router.post('/internal/payments/refund', async (req, res) => {
+  // Optionally revoke entitlements for a refunded order
+  res.json({ success: true } satisfies PaymentHandlerResponse);
+});
+
+export default router;
+```
+
+### Server: Fetch products
+
+On the server, use `payments.getProducts()` and `payments.getOrders()`. If the client needs product metadata, expose it via your own `/api/` endpoint.
+
+```tsx
+// Example: expose products for client display
+import { payments } from '@devvit/web/server';
+
+const products = await payments.getProducts();
+res.json(products);
+```
+
+### Client: trigger checkout
+
+Use `purchase()` from `@devvit/web/client` with a product SKU (or array of SKUs).
+
+```tsx
+import { purchase, OrderResultStatus } from '@devvit/web/client';
+
+export async function buy(sku: string) {
+  const result = await purchase(sku);
+  if (result.status === OrderResultStatus.STATUS_SUCCESS) {
+    // show success
+  } else {
+    // show error or retry (result.errorMessage may be set)
+  }
+}
+```
 
 ## Register products
 

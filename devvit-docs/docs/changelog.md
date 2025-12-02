@@ -46,7 +46,7 @@ This release focuses on Reddit data access and instrumenting WebView clients
 
 **Reddit data & proto updates**
 
-- `@devvit/reddit` now exposes `getUserKarmaForSubreddit()`
+- `@devvit/reddit` now exposes `getUserKarmaForSubreddit()` (later renamed to `getUserKarmaFromCurrentSubreddit()).
 - `ModAction` trigger payloads now carries a stable `id` field for downstream tooling.
 
 **Web client & realtime instrumentation**

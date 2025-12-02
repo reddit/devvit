@@ -9,6 +9,16 @@ To use the latest version of Devvit:
 
 **Please note**: you may see features available across Devvit packages that are not documented or noted in our changelog. These are experimental features that are not stable and are subject to change, or removal, from the platform. Please use caution when testing or implementing experimental features.
 
+## Devvit 0.12.5: Payments for Devvit Web
+
+**Release Date: Dec 1, 2025**
+
+In this release, we’re excited to bring payment support to Devvit Web. If you’re looking to add payments to your app, check out our [updated docs](./earn-money/payments/payments_overview.md).
+
+Devvit Web has reached full feature parity with blocks, and we strongly recommend using Devvit Web for all new apps. If you want to convert your existing blocks apps (including mod apps) to Devvit Web, check out the [migration guide](./guides/migrate/devvit-singleton.md).
+
+To keep things clear (and friendlier to AI-assisted IDEs), we're moving all [blocks documentation](./capabilities/blocks/overview.md) into its own dedicated section.
+
 ## Devvit 0.12.4:
 
 **Release Date: Nov 24, 2025**

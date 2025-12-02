@@ -1,6 +1,6 @@
 {
   "name": "@devvit/cli",
-  "version": "0.12.4",
+  "version": "0.12.5",
   "description": "Reddit's Dev Platform CLI Tool",
   "license": "BSD-3-Clause",
   "author": "@reddit/dev-platform",
@@ -41,10 +41,10 @@
   },
   "types": "dist/index.d.ts",
   "dependencies": {
-    "@devvit/build-pack": "0.12.4",
-    "@devvit/protos": "0.12.4",
-    "@devvit/public-api": "0.12.4",
-    "@devvit/shared-types": "0.12.4",
+    "@devvit/build-pack": "0.12.5",
+    "@devvit/protos": "0.12.5",
+    "@devvit/public-api": "0.12.5",
+    "@devvit/shared-types": "0.12.5",
     "@improbable-eng/grpc-web": "0.15.0",
     "@improbable-eng/grpc-web-node-http-transport": "0.15.0",
     "@oclif/core": "2.9.4",
@@ -74,7 +74,7 @@
     "ws": "8.18.0"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.4",
+    "@devvit/tsconfig": "0.12.5",
     "@types/file-type": "10.9.1",
     "@types/inquirer": "9.0.3",
     "@types/js-yaml": "4.0.5",
