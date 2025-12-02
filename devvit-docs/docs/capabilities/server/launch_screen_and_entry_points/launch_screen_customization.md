@@ -4,28 +4,25 @@
 
 Create an HTML file that serves as your app's launch screen in inline mode. This is what users see immediately when they encounter your post. Templates include a performant and compliant preview screen.
 
-```tsx
-<!-- preview.html -->
-<!DOCTYPE html>
+```html title="preview.html"
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Game</title>
-  <script src="preview.js"></script>
-</head>
-<body>
-  <div class="preview-container">
-    <h1>Adventure Game</h1>
-    <p>Tap to play in fullscreen</p>
-    <button id="play-button">Play Now</button>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Game</title>
+    <script src="preview.js"></script>
+  </head>
+  <body>
+    <div class="preview-container">
+      <h1>Adventure Game</h1>
+      <p>Tap to play in fullscreen</p>
+      <button id="play-button">Play Now</button>
+    </div>
+  </body>
 </html>
 ```
 
-```tsx
-// preview.js
+```tsx title="preview.js"
 import { requestExpandedMode } from '@devvit/web/client';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -100,8 +97,7 @@ function useWebViewMode() {
 
 ## Complete Example
 
-```tsx
-// game.tsx
+```tsx title="game.tsx"
 import React, { useState, useEffect } from 'react';
 import {
   getWebViewMode,

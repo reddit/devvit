@@ -66,7 +66,7 @@ This special file in the root of the project contains configurations for many of
 
 You need to test your app on a subreddit. Your backend calls will not work when testing the app locally. For that we will be leveraging Devvit's Playtest tool. If you have a preference for a specific subreddit to playtest, change the `package.json` file to include your subreddit name in `dev:devvit`:
 
-```javascript
+```javascript title="package.json"
 "scripts": {
     //...
     "dev:devvit": "devvit playtest r/MY_PREFERRED_SUBREDDIT",

@@ -22,8 +22,7 @@ Devvit apps support two view modes:
 
 Multiple entry points let the user start the game from different contexts or states. For example, you can have a button that launches into a leaderboard view and another for a specific game mode, each of these would be configured as an entry point for your app. You can define multiple entry points in your `devvit.json` and `src/client/vite.config.ts` to create different experiences:
 
-```tsx
-// in devvit.json
+```js title="devvit.json"
 {
   "post": {
     "dir": "dist/client",
@@ -42,8 +41,9 @@ Multiple entry points let the user start the game from different contexts or sta
     }
   }
 }
+```
 
-// in vite.config.ts
+```ts title="vite.config.ts"
 import { defineConfig } from 'vite';
 import tailwind from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -100,7 +100,7 @@ The `dir` property specifies where your built client files are located. During d
 
 Use the `entry` parameter when creating posts to specify which entry point from your `devvit.json` configuration to use. The entry value must match one of the keys defined in `post.entrypoints`.
 
-```tsx
+```tsx title="server/index.ts"
 import { reddit } from '@devvit/web/server';
 
 // Create a post using the default entrypoint

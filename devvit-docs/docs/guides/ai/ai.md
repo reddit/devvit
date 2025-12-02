@@ -26,7 +26,7 @@ Devvit ships with a MCP server to assist with agent driven development. There ar
 2.  Inside `.cursor`, create or open the `mcp.json` file.
 3.  Paste the following configuration into `mcp.json`:
 
-    ```json
+    ```json title="mcp.json"
     {
       "mcpServers": {
         "devvit": {
@@ -74,7 +74,7 @@ Things should work after that!
 2.  Create or open the `mcp.json` file within the `.vscode` directory.
 3.  Insert the following configuration:
 
-    ```json
+    ```json title="mcp.json"
     {
       "servers": {
         "devvit": {

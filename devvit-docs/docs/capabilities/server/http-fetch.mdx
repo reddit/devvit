@@ -73,8 +73,7 @@ Apps must request each individual domain that it intends to fetch, even if the d
   
   Server-side fetch allows your app to make HTTP requests to allowlisted external domains from your server-side code (e.g., API routes, server actions):
   
-  ```ts
-  // In your server-side code
+```tsx title="server/index.ts"
   const response = await fetch('https://example.com/api/data', {
     method: 'GET',
     headers: {
@@ -96,8 +95,7 @@ Apps must request each individual domain that it intends to fetch, even if the d
   - **Authentication**: Handled automatically - no need to manage auth tokens
   - **No external domains**: Cannot make requests to external domains from client-side code
   
-  ```ts
-  // In your client-side React components or browser code
+```tsx title="client/index.ts"
   const handleFetchData = async () => {
     // ✅ Correct: Fetching your own webview's API endpoint
     const response = await fetch('/api/user-data', {

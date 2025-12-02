@@ -80,7 +80,7 @@ Apps that use `submitPost()` with `runAs: 'USER'` require `userGeneratedContent`
 
 This example uses a form to prompt the user for input and then submits a post as the user.
 
-```tsx
+```tsx title="server/index.ts"
 import { reddit } from '@devvit/web/server';
 
 // ...
