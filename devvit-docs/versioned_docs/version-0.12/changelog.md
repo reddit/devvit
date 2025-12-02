@@ -85,7 +85,7 @@ Splash screens are yesterday’s news. The improved inline launch screens are no
 The new first screen automatically loads before your app’s main entry point. Read the docs to learn how to [upgrade your app](./capabilities/server/launch_screen_and_entry_points/splash_migration.md) and [customize your launch screen](./capabilities/server/launch_screen_and_entry_points/launch_screen_customization.md).
 
 :::note
-**Deprecation notice**: We're deprecating the splash parameter in submitCustomPost() and removing it in the next major version update. Learn how to [update your app](./capabilities/server/launch_screen_and_entry_points/splash_migration.md).
+**Deprecation notice**: We're deprecating the splash parameter in submitCustomPost() and removing it in the next major version update. Learn how to [update your app](./capabilities/server/launch_screen_and_entry_points/splash_migration).
 :::
 
 **Multiple App Entry Points**

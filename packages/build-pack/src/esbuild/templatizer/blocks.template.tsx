@@ -131,8 +131,6 @@ function configurePost(name: string, post: Readonly<AppPostConfig>): void {
       const entry = splash?.entry ? post.entrypoints[splash.entry] : defaultEntrypoint;
       return entry.inline ? renderInline(entry) : renderSplash(entry, splash);
     },
-    // to-do: vary dynamically on entrypoint.
-    height: defaultEntrypoint.height,
   });
 }
 

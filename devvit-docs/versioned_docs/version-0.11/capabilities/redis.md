@@ -9,7 +9,7 @@ You can add a database to your app to store and retrieve data. The Redis plugin 
 - [Hashes](#hash) for managing a collection of key-value pairs
 - [Bitfields](#bitfield) for efficient operation on sequences of bits
 
-Each app version installed on a subreddit is namespaced, which means Redis data is siloed from other subreddits. Keep in mind that there won’t be a single source of truth for all installations of your app, since each app installation can only access the data that it has stored in the Redis database.
+Each installation of an app is uniquely name-spaced, which means Redis data is siloed by subreddit. Keep in mind that there won’t be a single source of truth for all installations of your app, since each app installation can only access the data that it has stored in the Redis database.
 
 ## Limits and Quotas
 
