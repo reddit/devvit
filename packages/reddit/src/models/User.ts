@@ -167,6 +167,8 @@ export class User {
   // R2 bug: user object does not contain a permalink field
   #permalink: string;
   #hasVerifiedEmail: boolean;
+  #displayName: string;
+  #about: string;
 
   /**
    * @internal
@@ -200,6 +202,9 @@ export class User {
     this.#url = new URL(data.subreddit?.url ?? '', 'https://www.reddit.com').toString();
     this.#permalink = data.subreddit?.url ?? '';
     this.#hasVerifiedEmail = data.hasVerifiedEmail ?? false;
+
+    this.#displayName = data.subreddit?.title ?? this.#username;
+    this.#about = data.subreddit?.publicDescription ?? '';
   }
 
   /**
@@ -277,6 +282,20 @@ export class User {
    */
   get hasVerifiedEmail(): boolean {
     return this.#hasVerifiedEmail;
+  }
+
+  /**
+   * The display name of the user. May be different from their username.
+   */
+  get displayName(): string {
+    return this.#displayName;
+  }
+
+  /**
+   * The user's public description about themselves. May be empty.
+   */
+  get about(): string {
+    return this.#about;
   }
 
   toJSON(): Pick<User, 'id' | 'username' | 'createdAt' | 'linkKarma' | 'commentKarma' | 'nsfw'> & {

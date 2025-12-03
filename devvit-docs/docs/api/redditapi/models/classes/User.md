@@ -8,6 +8,22 @@ A class representing a user.
 
 ## Accessors
 
+<a id="about"></a>
+
+### about
+
+#### Get Signature
+
+> **get** **about**(): `string`
+
+The user's public description about themselves. May be empty.
+
+##### Returns
+
+`string`
+
+---
+
 <a id="commentkarma"></a>
 
 ### commentKarma
@@ -37,6 +53,22 @@ The date the user was created.
 ##### Returns
 
 `Date`
+
+---
+
+<a id="displayname"></a>
+
+### displayName
+
+#### Get Signature
+
+> **get** **displayName**(): `string`
+
+The display name of the user. May be different from their username.
+
+##### Returns
+
+`string`
 
 ---
 
