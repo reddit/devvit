@@ -235,3 +235,8 @@ div.themed-col:hover {
 [data-theme='dark'] .sidebar-section-header span {
   color: var(--ifm-color-emphasis-500);
 }
+
+/* Hide "Next" version from version dropdown */
+.dropdown__menu a[href*="/next/"] {
+  display: none;
+}

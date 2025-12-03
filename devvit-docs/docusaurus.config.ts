@@ -60,6 +60,11 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           lastVersion: LATEST_DEVVIT_VERSION,
           versions: {
+            current: {
+              label: 'Next',
+              path: 'next',
+              banner: 'none',
+            },
             [LATEST_DEVVIT_VERSION]: {
               badge: false,
             },
