@@ -6,11 +6,13 @@
 export const Header = Object.freeze({
   Actor: 'devvit-actor',
   App: 'devvit-app',
+  AppDependencies: 'devvit-app-dependencies',
   AppUser: 'devvit-app-user',
   AppViewerAuthToken: 'devvit-app-viewer-authorization',
   Caller: 'devvit-caller',
   CallerPortID: 'devvit-caller-port-id',
   Canary: 'devvit-canary',
+  Context: 'devvit-context',
   Debug: 'devvit-debug',
   GQLHost: 'devvit-gql-host',
   Installation: 'devvit-installation',
@@ -34,7 +36,6 @@ export const Header = Object.freeze({
   Language: 'devvit-accept-language',
   Timezone: 'devvit-accept-timezone',
   Traceparent: 'traceparent',
-  AppDependencies: 'devvit-app-dependencies',
 });
 export type Header = (typeof Header)[keyof typeof Header];
 
