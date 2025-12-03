@@ -44,6 +44,11 @@
     },
     {
       "type": "doc",
+      "id": "quickstart/quickstart-unity",
+      "label": "Quickstart for Unity Games"
+    },
+    {
+      "type": "doc",
       "id": "quickstart/quickstart-mod-tool",
       "label": "Quickstart for Mod Tools"
     },

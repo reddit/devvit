@@ -1,0 +1,133 @@
+# Unity Quickstart
+
+This tutorial walks you through building a Unity app for Devvit. Once complete, you'll see your Unity game running directly within a Reddit post.
+
+Many great Unity games are already running on Devvit, including [Blokkit](https://www.reddit.com/r/Blokkit/), [OutFloop](https://www.reddit.com/r/OutFloop/), and [Avatar Arena](https://www.reddit.com/r/AvatarsArena/)
+
+## Try it out
+
+This starter template creates a simple Unity game and demonstrates data exchange between Reddit and Unity. The example game can be played [here.](https://www.reddit.com/r/unity_starter_dev/comments/1p2fm6y/unitystarter/)
+
+<img src={require('../assets/quickstart_unity.gif').default} alt="Unity example" style={{maxWidth: '60%', height: 'auto', display: 'block', margin: '0 auto'}} />
+
+## What you'll need
+
+- Node.js (version 22.2.0+)
+- A code editor
+- Unity 6 (this sample app was built with Unity 6000.2.8f1)
+- A Unity Game, if you don't have one yet, you can use the provided [Unity Sample Project](https://github.com/reddit/devvit-unity-project)
+
+## Environment setup
+
+1. Install Node.js and npm ([instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm))
+2. Go to [developers.reddit.com/new](https://developers.reddit.com/new) and select the Unity template
+3. Complete the setup wizard (you'll need to create a Reddit account and connect it to Reddit Developers)
+4. Follow the instructions in your terminal
+
+On success, you should see something like this:
+
+```sh
+Your Devvit authentication token has been saved to /Users/user.name/.devvit/token
+Fetching and extracting the template...
+Cutting the template to the target directory...
+ 🔧 Installing dependencies...
+ 🚀🚀🚀 Devvit app successfully initialized!
+┌────────────────────────────────────────────────────┐
+│ • `cd my-app` to open your project directory       │
+│ • `npm run dev` to develop in your test community  │
+└────────────────────────────────────────────────────┘
+```
+
+The Devvit Unity Template includes a pre-built Unity project. The full Unity project source is available [here](https://github.com/reddit/devvit-unity-project).
+
+## Running your app
+
+To run your app, navigate to your project directory with `cd my-app` and run `npm run dev`. You should see logs that conclude with:
+
+```
+✨ https://www.reddit.com/r/my-app_dev?playtest=my-app
+```
+
+Follow this link to see your app. 
+
+## Devvit project structure
+
+Your project contains the following folder structure, with each folder handling a specific part of your app:
+
+**`src/client`:**  
+Contains client-side code for your application. This is where you'll export your Unity game and customize your launch screen.
+
+**`src/server`:**  
+Contains server-side code for your application. This is where you communicate between Reddit and your Unity app, send data back and forth, save data on Reddit, handle post creation, and start your experience.
+
+**`src/shared`:**  
+Contains classes, types, and interfaces shared between the client and server.
+
+**`devvit.json`:**  
+Configuration file for Reddit-specific services your application uses. For more information, refer to [Devvit Configuration](../capabilities/devvit-web/devvit_web_configuration).
+
+**`src/client/public/Build`:**  
+The destination for your Unity project exports.
+
+**`src/client/public/TemplateData`:**  
+Contains Unity assets for the Unity loading screen. Customize these as needed for your use case.
+
+**`src/client/splash`:**  
+Contains the code for `splash.html`, the first screen users see when your post appears. From here, users launch into the Unity game.
+
+**`src/client/script.ts`:**  
+Contains the code to load your Unity instance. This script powers `index.html`.
+
+
+## Updating your Unity project
+
+The starter template includes 4 files in the `src/client/public/Build` folder. You'll need to replace these 3 files from your export:
+  
+  - SampleGame.data.unityweb
+  - SampleGame.framework.js
+  - SampleGame.wasm.unityweb
+
+To replace these files, export your project from Unity twice: once with compression and once without.
+
+1. In Unity, select **File > Build Profiles** and switch the active platform to **Web**
+2. In the Build Profiles window, select **Player Settings** to open the Player Settings window
+3. In Player Settings, scroll down to **Publishing Settings** and ensure **Decompression Fallback** is selected
+4. Build your project twice:
+
+   a. Set **Compression Format** to **GZip** and select **Build** in the Build Profiles window  
+   b. Copy these files into your `src/client/Public/Build` folder:  
+      - `exportName.data.unityweb`  
+      - `exportName.wasm.unityweb`  
+
+   c. In Publishing Settings, set **Compression Format** to **Disabled** and select **Build** again  
+   d. Copy this file into your `src/client/Public/Build` folder:  
+      - `exportName.framework.js`
+
+5. If you used a name other than `SampleGame`, update `src/client/script.ts` lines 29-34 to point to your new files
+
+6. Run `npm run dev` in your Devvit project to see your Unity app running on Reddit
+
+
+## Communicate between Unity and Reddit 
+
+The Unity app includes a [DevvitBridge.cs](https://github.com/reddit/devvit-unity-project/blob/main/Assets/Scripts/DevvitBridge.cs) file that uses UnityWebRequests to communicate with the `src/server/index.ts` file.
+
+For example, the following sends a message to the server, which receives the event, loads data from Reddit, and replies with the specified data. 
+
+```csharp
+UnityWebRequest request = UnityWebRequest.Get("/api/init");
+yield return request.SendWebRequest();
+```
+
+:::note
+Be sure that the object structure for the response type (such as `InitResponse` defined in `shared/types/api.ts`) matches the ones outlined in your `DevvitBridge.cs` file.
+:::
+
+### Saving Data to Reddit
+
+This starter project also includes an example of saving the completion time to Reddit through the `LevelCompletedRequest`. For Devvit apps, data is stored in [Redis](../capabilities/server/redis).
+
+  ```ts
+    const redisKey = `${postId}:${username}`;
+    await redis.set(redisKey, time);
+  ```
