@@ -23,5 +23,3 @@ export class MediaClient {
     return (this.#pluginCache ??= getDevvitConfig().use(MediaServiceDefinition));
   }
 }
-
-export const media = new MediaClient();

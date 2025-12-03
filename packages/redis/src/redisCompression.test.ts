@@ -2,28 +2,27 @@ import { gzipSync } from 'node:zlib';
 
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { redis } from './RedisClient.js';
-import { REDIS_COMPRESSION_PREFIX, redisCompressed } from './redisCompression.js';
-
-vi.mock('./RedisClient.js', () => ({
-  redis: {
-    get: vi.fn(),
-    set: vi.fn(),
-    hGet: vi.fn(),
-    hSet: vi.fn(),
-    hSetNX: vi.fn(),
-    hGetAll: vi.fn(),
-    hMGet: vi.fn(),
-    mGet: vi.fn(),
-    mSet: vi.fn(),
-    del: vi.fn(),
-    incrBy: vi.fn(),
-  },
-}));
+import type { RedisClient } from './RedisClient.js';
+import { REDIS_COMPRESSION_PREFIX, RedisCompressionProxy } from './redisCompression.js';
 
 describe('redisCompressed', () => {
+  let redis: RedisClient;
+  let redisCompressed: RedisCompressionProxy;
   beforeEach(() => {
-    vi.clearAllMocks();
+    redis = {
+      get: vi.fn(),
+      set: vi.fn(),
+      hGet: vi.fn(),
+      hSet: vi.fn(),
+      hSetNX: vi.fn(),
+      hGetAll: vi.fn(),
+      hMGet: vi.fn(),
+      mGet: vi.fn(),
+      mSet: vi.fn(),
+      del: vi.fn(),
+      incrBy: vi.fn(),
+    } as unknown as RedisClient;
+    redisCompressed = new RedisCompressionProxy(redis);
   });
 
   const LONG_STRING = 'a'.repeat(1000);

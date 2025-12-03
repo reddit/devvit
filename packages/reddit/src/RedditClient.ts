@@ -1817,5 +1817,3 @@ export class RedditClient {
     await post.mergePostData(postData);
   }
 }
-
-export const reddit: RedditClient = new RedditClient();

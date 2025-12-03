@@ -1,7 +1,20 @@
 import { gunzipSync, gzipSync } from 'node:zlib';
 
-import { redis } from './RedisClient.js';
-import type { SetOptions } from './types/redis.js';
+import {
+  type HScanResponse,
+  RedisKeyScope,
+  type ZMember,
+  type ZScanResponse,
+} from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
+
+import { RedisClient as RedisClientImpl } from './RedisClient.js';
+import type {
+  BitfieldCommand,
+  RedisClient,
+  SetOptions,
+  TxClientLike,
+  ZRangeOptions,
+} from './types/redis.js';
 
 // Envelope parameters
 const COMPRESSION_ALGO = 'gz';
@@ -37,123 +50,227 @@ const decompress = (value: string): string => {
   }
 };
 
-/**
- * Drop-in replacement for the standard Devvit `redis` client that transparently handles
- * compression and decompression of values.
- *
- * Usage:
- * Instead of:
- *   import { redis } from '@devvit/redis';
- *
- * Use:
- *   import { redisCompressed as redis } from '@devvit/redis';
- *
- * It automatically:
- * - Compresses values on write (set, hSet, mSet, etc.) if it saves space
- * - Decompresses values on read (get, hGet, mGet, etc.)
- *
- * @experimental
- */
-export const redisCompressed = new Proxy(redis, {
-  get(target, prop, receiver) {
-    if (prop === 'get') {
-      return async (key: string) => {
-        const val = await target.get(key);
-        if (!val) return val;
-        return val.startsWith(REDIS_COMPRESSION_PREFIX) ? decompress(val) : val;
-      };
-    }
+export class RedisCompressionProxy implements RedisClient {
+  readonly global: Omit<RedisClient, 'global'>;
+  readonly #client: RedisClientImpl;
 
-    if (prop === 'set') {
-      return async (key: string, value: string, options?: SetOptions) => {
-        const compressed = compress(value);
-        // Only store compressed if it saves space
-        const toStore = compressed.length < value.length ? compressed : value;
-        return target.set(key, toStore, options);
-      };
-    }
+  constructor(client: RedisClientImpl) {
+    this.#client = client;
+    this.global =
+      client.scope === RedisKeyScope.INSTALLATION
+        ? new RedisCompressionProxy(client.global as RedisClientImpl)
+        : this;
+  }
 
-    if (prop === 'hGet') {
-      return async (key: string, field: string) => {
-        const val = await target.hGet(key, field);
-        if (!val) return val;
-        return val.startsWith(REDIS_COMPRESSION_PREFIX) ? decompress(val) : val;
-      };
-    }
+  async get(key: string): Promise<string | undefined> {
+    const val = await this.#client.get(key);
+    if (!val) return val;
+    return val.startsWith(REDIS_COMPRESSION_PREFIX) ? decompress(val) : val;
+  }
 
-    if (prop === 'hSet') {
-      return async (key: string, fieldValues: Record<string, string>) => {
-        const newFieldValues: Record<string, string> = {};
-        for (const [field, value] of Object.entries(fieldValues)) {
-          const compressed = compress(value);
-          newFieldValues[field] = compressed.length < value.length ? compressed : value;
-        }
-        return target.hSet(key, newFieldValues);
-      };
-    }
+  async set(key: string, value: string, options?: SetOptions): Promise<string> {
+    const compressed = compress(value);
+    const toStore = compressed.length < value.length ? compressed : value;
+    return this.#client.set(key, toStore, options);
+  }
 
-    if (prop === 'hSetNX') {
-      return async (key: string, field: string, value: string) => {
-        const compressed = compress(value);
-        const toStore = compressed.length < value.length ? compressed : value;
-        return target.hSetNX(key, field, toStore);
-      };
-    }
+  async hGet(key: string, field: string): Promise<string | undefined> {
+    const val = await this.#client.hGet(key, field);
+    if (!val) return val;
+    return val.startsWith(REDIS_COMPRESSION_PREFIX) ? decompress(val) : val;
+  }
 
-    if (prop === 'hGetAll') {
-      return async (key: string) => {
-        const all = await target.hGetAll(key);
-        if (!all) {
-          return all;
-        }
-        const result: Record<string, string> = {};
-        for (const [field, value] of Object.entries(all)) {
-          result[field] = value.startsWith(REDIS_COMPRESSION_PREFIX) ? decompress(value) : value;
-        }
-        return result;
-      };
+  async hSet(key: string, fieldValues: { [field: string]: string }): Promise<number> {
+    const newFieldValues: Record<string, string> = {};
+    for (const [field, value] of Object.entries(fieldValues)) {
+      const compressed = compress(value);
+      newFieldValues[field] = compressed.length < value.length ? compressed : value;
     }
+    return this.#client.hSet(key, newFieldValues);
+  }
 
-    if (prop === 'hMGet') {
-      return async (key: string, fields: string[]) => {
-        const values = await target.hMGet(key, fields);
-        return values.map((val) => {
-          if (val?.startsWith(REDIS_COMPRESSION_PREFIX)) {
-            return decompress(val);
-          }
-          return val;
-        });
-      };
+  async hSetNX(key: string, field: string, value: string): Promise<number> {
+    const compressed = compress(value);
+    const toStore = compressed.length < value.length ? compressed : value;
+    return this.#client.hSetNX(key, field, toStore);
+  }
+
+  async hGetAll(key: string): Promise<Record<string, string>> {
+    const all = await this.#client.hGetAll(key);
+    if (!all) {
+      return all;
     }
-
-    if (prop === 'mGet') {
-      return async (keys: string[]) => {
-        const values = await target.mGet(keys);
-        return values.map((val) => {
-          if (val?.startsWith(REDIS_COMPRESSION_PREFIX)) {
-            return decompress(val);
-          }
-          return val;
-        });
-      };
+    const result: Record<string, string> = {};
+    for (const [field, value] of Object.entries(all)) {
+      result[field] = value.startsWith(REDIS_COMPRESSION_PREFIX) ? decompress(value) : value;
     }
+    return result;
+  }
 
-    if (prop === 'mSet') {
-      return async (keyValues: Record<string, string>) => {
-        const newKeyValues: Record<string, string> = {};
-        for (const [key, value] of Object.entries(keyValues)) {
-          const compressed = compress(value);
-          newKeyValues[key] = compressed.length < value.length ? compressed : value;
-        }
-        return target.mSet(newKeyValues);
-      };
+  async hMGet(key: string, fields: string[]): Promise<(string | null)[]> {
+    const values = await this.#client.hMGet(key, fields);
+    return values.map((val) => {
+      if (val?.startsWith(REDIS_COMPRESSION_PREFIX)) {
+        return decompress(val);
+      }
+      return val;
+    });
+  }
+
+  async mGet(keys: string[]): Promise<(string | null)[]> {
+    const values = await this.#client.mGet(keys);
+    return values.map((val) => {
+      if (val?.startsWith(REDIS_COMPRESSION_PREFIX)) {
+        return decompress(val);
+      }
+      return val;
+    });
+  }
+
+  async mSet(keyValues: { [key: string]: string }): Promise<void> {
+    const newKeyValues: Record<string, string> = {};
+    for (const [key, value] of Object.entries(keyValues)) {
+      const compressed = compress(value);
+      newKeyValues[key] = compressed.length < value.length ? compressed : value;
     }
+    return this.#client.mSet(newKeyValues);
+  }
 
-    // Forward any other properties/methods to the original redis client.
-    // Crucial: We must bind functions to the target because the Devvit redis client
-    // uses private class members (internal slots). If we call them with 'this'
-    // set to the Proxy (default behavior), it throws "TypeError: Cannot read private member...".
-    const value = Reflect.get(target, prop, receiver);
-    return typeof value === 'function' ? value.bind(target) : value;
-  },
-});
+  watch(...keys: string[]): Promise<TxClientLike> {
+    return this.#client.watch(...keys);
+  }
+
+  getBuffer(key: string): Promise<Buffer | undefined> {
+    return this.#client.getBuffer(key);
+  }
+
+  exists(...keys: string[]): Promise<number> {
+    return this.#client.exists(...keys);
+  }
+
+  del(...keys: string[]): Promise<void> {
+    return this.#client.del(...keys);
+  }
+
+  type(key: string): Promise<string> {
+    return this.#client.type(key);
+  }
+
+  rename(key: string, newKey: string): Promise<string> {
+    return this.#client.rename(key, newKey);
+  }
+
+  getRange(key: string, start: number, end: number): Promise<string> {
+    return this.#client.getRange(key, start, end);
+  }
+
+  setRange(key: string, offset: number, value: string): Promise<number> {
+    return this.#client.setRange(key, offset, value);
+  }
+
+  strLen(key: string): Promise<number> {
+    return this.#client.strLen(key);
+  }
+
+  incrBy(key: string, value: number): Promise<number> {
+    return this.#client.incrBy(key, value);
+  }
+
+  expire(key: string, seconds: number): Promise<void> {
+    return this.#client.expire(key, seconds);
+  }
+
+  expireTime(key: string): Promise<number> {
+    return this.#client.expireTime(key);
+  }
+
+  zAdd(key: string, ...members: ZMember[]): Promise<number> {
+    return this.#client.zAdd(key, ...members);
+  }
+
+  zCard(key: string): Promise<number> {
+    return this.#client.zCard(key);
+  }
+
+  zScore(key: string, member: string): Promise<number | undefined> {
+    return this.#client.zScore(key, member);
+  }
+
+  zRank(key: string, member: string): Promise<number | undefined> {
+    return this.#client.zRank(key, member);
+  }
+
+  zIncrBy(key: string, member: string, value: number): Promise<number> {
+    return this.#client.zIncrBy(key, member, value);
+  }
+
+  zRange(
+    key: string,
+    start: number | string,
+    stop: number | string,
+    options?: ZRangeOptions
+  ): Promise<{ member: string; score: number }[]> {
+    return this.#client.zRange(key, start, stop, options);
+  }
+
+  zRem(key: string, members: string[]): Promise<number> {
+    return this.#client.zRem(key, members);
+  }
+
+  zRemRangeByLex(key: string, min: string, max: string): Promise<number> {
+    return this.#client.zRemRangeByLex(key, min, max);
+  }
+
+  zRemRangeByRank(key: string, start: number, stop: number): Promise<number> {
+    return this.#client.zRemRangeByRank(key, start, stop);
+  }
+
+  zRemRangeByScore(key: string, min: number, max: number): Promise<number> {
+    return this.#client.zRemRangeByScore(key, min, max);
+  }
+
+  zScan(
+    key: string,
+    cursor: number,
+    pattern?: string | undefined,
+    count?: number | undefined
+  ): Promise<ZScanResponse> {
+    return this.#client.zScan(key, cursor, pattern, count);
+  }
+
+  hDel(key: string, fields: string[]): Promise<number> {
+    return this.#client.hDel(key, fields);
+  }
+
+  hScan(
+    key: string,
+    cursor: number,
+    pattern?: string | undefined,
+    count?: number | undefined
+  ): Promise<HScanResponse> {
+    return this.#client.hScan(key, cursor, pattern, count);
+  }
+
+  hKeys(key: string): Promise<string[]> {
+    return this.#client.hKeys(key);
+  }
+
+  hIncrBy(key: string, field: string, value: number): Promise<number> {
+    return this.#client.hIncrBy(key, field, value);
+  }
+
+  hLen(key: string): Promise<number> {
+    return this.#client.hLen(key);
+  }
+
+  bitfield(
+    key: string,
+    ...cmds:
+      | []
+      | BitfieldCommand
+      | [...BitfieldCommand, ...BitfieldCommand]
+      | [...BitfieldCommand, ...BitfieldCommand, ...BitfieldCommand, ...(number | string)[]]
+  ): Promise<number[]> {
+    return this.#client.bitfield(key, ...cmds);
+  }
+}

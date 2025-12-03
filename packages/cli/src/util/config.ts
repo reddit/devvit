@@ -1,4 +1,5 @@
 import {
+  DEVVIT_DEBUG,
   DOT_DEVVIT_DIR_FILENAME,
   MY_PORTAL_ENABLED,
   REDDIT_DOT_COM,
@@ -17,7 +18,10 @@ export const REDDIT_OAUTH_API: string = (() => {
 
 export const DEVVIT_PORTAL_URL: string = (() => {
   if (MY_PORTAL_ENABLED) {
-    return `https://developers.${STAGE_USER_NAME}.snoo.dev`;
+    if (DEVVIT_DEBUG) {
+      return `https://developers.${STAGE_USER_NAME}.snoo.dev`;
+    }
+    return `https://reddit-service-devvit-dev-portal.${STAGE_USER_NAME}.snoo.dev`;
   }
 
   return 'https://developers.reddit.com';
