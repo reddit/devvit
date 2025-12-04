@@ -41,6 +41,7 @@ import { getAccessToken } from './auth.js';
 import { DEVVIT_GATEWAY_URL, DEVVIT_PORTAL_API } from './config.js';
 import { GrpcWebRpc } from './grpc-web-rpc.js';
 import { NodeFetchRPC } from './node-fetch-twirp-rpc.js';
+import { generateTraceParent } from './opentelemetry.js';
 import { sleep } from './sleep.js';
 
 const MAX_RETRIES = 3;
@@ -224,6 +225,11 @@ export function getHeaders(): Headers {
   if (process.env.DEVVIT_CANARY) {
     console.warn(`Warning: setting devvit-canary to "${process.env.DEVVIT_CANARY}"`);
     headers.set(...HEADER_DEVVIT_CANARY(process.env.DEVVIT_CANARY));
+  }
+
+  const traceparent = generateTraceParent();
+  if (traceparent) {
+    headers.set('traceparent', traceparent);
   }
 
   return headers;

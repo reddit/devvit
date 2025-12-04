@@ -2,6 +2,7 @@ import type { JsonObject } from '@devvit/shared-types/json.js';
 import { isT5 } from '@devvit/shared-types/tid.js';
 
 import { GQL_QUERY_URL } from '../../util/config.js';
+import { generateTraceParent } from '../../util/opentelemetry.js';
 import type { StoredToken } from '../auth/StoredToken.js';
 import { MY_PORTAL_ENABLED } from '../config.js';
 
@@ -25,12 +26,19 @@ export type GqlQueryConfig<T extends JsonObject> = {
 export async function gqlQuery<T, V extends JsonObject>(
   config: GqlQueryConfig<V>
 ): Promise<{ data: T }> {
+  const headers: Record<string, string> = {
+    authorization: `Bearer ${config.accessToken}`,
+    'content-type': 'application/json',
+  };
+
+  const traceparent = generateTraceParent();
+  if (traceparent) {
+    headers.traceparent = traceparent;
+  }
+
   const resp = await fetch(`${GQL_QUERY_URL}`, {
     method: 'POST',
-    headers: {
-      authorization: `Bearer ${config.accessToken}`,
-      'content-type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({
       operationName: config.name,
       variables: config.variables,
