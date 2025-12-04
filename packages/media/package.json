@@ -12,7 +12,8 @@
       "browser": "./dist/serverImportInClientCodePanic.js",
       "default": "./dist/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./test": "./dist/test/index.js"
   },
   "files": [
     "dist/**"
