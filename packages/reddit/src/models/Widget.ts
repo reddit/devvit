@@ -54,6 +54,29 @@ export type AddWidgetData =
       type: 'custom';
     });
 
+export type UpdateWidgetData =
+  | (UpdateImageWidgetRequest & {
+      type: 'image';
+    })
+  | (UpdateCalendarWidgetRequest & {
+      type: 'calendar';
+    })
+  | (UpdateTextAreaWidgetRequest & {
+      type: 'textarea';
+    })
+  | (UpdateButtonWidgetRequest & {
+      type: 'button';
+    })
+  | (UpdateCommunityListWidgetRequest & {
+      type: 'community-list';
+    })
+  | (UpdatePostFlairWidgetRequest & {
+      type: 'post-flair';
+    })
+  | (UpdateCustomWidgetRequest & {
+      type: 'custom';
+    });
+
 function getMetadata(): Metadata {
   return context.metadata;
 }
@@ -187,6 +210,12 @@ export class Widget {
 
   /** @internal */
   static async add(widgetData: AddWidgetData): Promise<Widget> {
+    // Styles are optional in the proto create requests, but are required by r2
+    widgetData.styles = {
+      backgroundColor: widgetData.styles?.backgroundColor ?? '',
+      headerColor: widgetData.styles?.headerColor ?? '',
+    };
+
     switch (widgetData?.type) {
       case 'image':
         return ImageWidget.create(widgetData);
@@ -203,7 +232,35 @@ export class Widget {
       case 'custom':
         return CustomWidget.create(widgetData);
       default:
-        throw new Error('Unknown widget type');
+        throw new Error(`Unknown widget type: ${widgetData satisfies never}`);
+    }
+  }
+
+  /** @internal */
+  static async patch(widgetData: UpdateWidgetData): Promise<Widget> {
+    // Styles are optional in the proto update requests, but are required by r2
+    widgetData.styles = {
+      backgroundColor: widgetData.styles?.backgroundColor ?? '',
+      headerColor: widgetData.styles?.headerColor ?? '',
+    };
+
+    switch (widgetData?.type) {
+      case 'image':
+        return ImageWidget.update(widgetData);
+      case 'calendar':
+        return CalendarWidget.update(widgetData);
+      case 'textarea':
+        return TextAreaWidget.update(widgetData);
+      case 'button':
+        return ButtonWidget.update(widgetData);
+      case 'community-list':
+        return CommunityListWidget.update(widgetData);
+      case 'post-flair':
+        return PostFlairWidget.update(widgetData);
+      case 'custom':
+        return CustomWidget.update(widgetData);
+      default:
+        throw new Error(`Unknown widget type: ${widgetData satisfies never}`);
     }
   }
 }

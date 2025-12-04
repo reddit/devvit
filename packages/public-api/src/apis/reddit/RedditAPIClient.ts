@@ -44,6 +44,7 @@ import type {
   SubredditLeaderboard,
   SubredditStyles,
   UpdatePageSettingsOptions,
+  UpdateWidgetData,
   UpdateWikiPageOptions,
   Vault,
   WikiPageRevision,
@@ -1387,6 +1388,16 @@ export class RedditAPIClient {
    */
   async addWidget(widgetData: AddWidgetData): Promise<Widget> {
     return Widget.add(widgetData, this.#metadata);
+  }
+
+  /**
+   * Update a widget for a subreddit.
+   *
+   * @param widgetData - The data for the widget to update.
+   * @returns - The updated Widget object.
+   */
+  async updateWidget(widgetData: UpdateWidgetData): Promise<Widget> {
+    return Widget.patch(widgetData, this.#metadata);
   }
 
   /**

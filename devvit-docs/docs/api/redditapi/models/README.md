@@ -150,6 +150,7 @@
 - [SubredditType](type-aliases/SubredditType.md)
 - [UnreadCountResponse](type-aliases/UnreadCountResponse.md)
 - [UpdatePageSettingsOptions](type-aliases/UpdatePageSettingsOptions.md)
+- [UpdateWidgetData](type-aliases/UpdateWidgetData.md)
 - [UpdateWikiPageOptions](type-aliases/UpdateWikiPageOptions.md)
 - [UserFlair](type-aliases/UserFlair.md)
 - [UserFlairPageOptions](type-aliases/UserFlairPageOptions.md)
