@@ -6,22 +6,12 @@ import {
 } from '@devvit/protos';
 
 export class MediaMock implements MediaService {
-  // Static store to persist uploads across instances, scoped by installationId
-  private static _store = new Map<string, MediaUploadRequest[]>();
-  private readonly _installationId: string;
-
-  constructor(installationId?: string) {
-    this._installationId = installationId ?? '';
-    if (this._installationId && !MediaMock._store.has(this._installationId)) {
-      MediaMock._store.set(this._installationId, []);
-    }
-  }
+  private _uploads: MediaUploadRequest[] = [];
 
   async Upload(request: MediaUploadRequest, _metadata?: Metadata): Promise<MediaUploadResponse> {
-    const uploads = this._getUploads();
-    uploads.push(request);
+    this._uploads.push(request);
 
-    const mediaId = `media-${uploads.length}`;
+    const mediaId = `media-${this._uploads.length}`;
 
     const extensionMap: Record<string, string> = {
       image: 'png',
@@ -40,10 +30,10 @@ export class MediaMock implements MediaService {
   }
 
   get uploads(): MediaUploadRequest[] {
-    return this._getUploads();
+    return this._uploads;
   }
 
-  private _getUploads(): MediaUploadRequest[] {
-    return MediaMock._store.get(this._installationId) ?? [];
+  clear(): void {
+    this._uploads = [];
   }
 }

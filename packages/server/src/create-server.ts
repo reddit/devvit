@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import '@devvit/shared-types/shared/devvit-worker-global.js';
+
 import type { IncomingMessage, Server, ServerOptions, ServerResponse } from 'node:http';
 import { createServer as nodeCreateServer } from 'node:http';
-
-import type { Metadata } from '@devvit/protos';
-import type { FormField } from '@devvit/shared';
 
 import { getMetadata, runWithContext } from './context.js';
 import { Context } from './server-context.js';
@@ -83,15 +82,5 @@ declare global {
   namespace globalThis {
     // eslint-disable-next-line no-var
     var enableWebbitBundlingHack: boolean;
-    // eslint-disable-next-line no-var
-    var devvit: {
-      metadataProvider?: () => Readonly<Metadata> | undefined;
-      settings?: {
-        /** Global settings. */
-        app?: FormField[] | undefined;
-        /** Subreddit settings. */
-        installation?: FormField[] | undefined;
-      };
-    };
   }
 }

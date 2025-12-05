@@ -14,19 +14,17 @@ describe('MediaMock', () => {
     expect(res.mediaUrl).toContain(res.mediaId);
   });
 
-  it('should persist uploads across instances with same installationId', async () => {
-    const instId = 'persistent-media-inst';
-    const mock1 = new MediaMock(instId);
-    await mock1.Upload({ url: 'http://example.com/1.jpg', type: 'image/jpeg' });
+  it('should clear uploads', async () => {
+    const mock = new MediaMock();
+    await mock.Upload({ url: 'http://example.com/1.jpg', type: 'image/jpeg' });
 
-    const mock2 = new MediaMock(instId); // Should see previous upload
-    expect(mock2.uploads).toHaveLength(1);
-    expect(mock2.uploads[0].url).toBe('http://example.com/1.jpg');
+    mock.clear();
+    expect(mock.uploads).toHaveLength(0);
   });
 
-  it('should isolate uploads between installationIds', async () => {
-    const mock1 = new MediaMock('inst-A');
-    const mock2 = new MediaMock('inst-B');
+  it('should isolate uploads between instances', async () => {
+    const mock1 = new MediaMock();
+    const mock2 = new MediaMock();
 
     await mock1.Upload({ url: 'http://example.com/A.jpg', type: 'image/jpeg' });
     await mock2.Upload({ url: 'http://example.com/B.jpg', type: 'image/jpeg' });
@@ -41,7 +39,7 @@ describe('MediaMock', () => {
   it('should wire through makeConfig', async () => {
     const config = makeConfig({
       plugins: {
-        [MediaServiceDefinition.fullName]: new MediaMock('inst-config'),
+        [MediaServiceDefinition.fullName]: new MediaMock(),
       },
     });
     const mock = config.use(MediaServiceDefinition) as MediaMock;
