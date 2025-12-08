@@ -12,7 +12,8 @@
       "browser": "./dist/serverImportInClientCodePanic.js",
       "default": "./dist/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./test": "./dist/test/index.js"
   },
   "files": [
     "dist/**"
@@ -41,6 +42,8 @@
     "@devvit/server": "0.12.5",
     "@devvit/tsconfig": "0.12.5",
     "eslint": "9.11.1",
+    "ioredis": "5.7.0",
+    "redis-memory-server": "0.12.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
   },
