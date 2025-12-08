@@ -12,7 +12,7 @@ import type { FormFieldValue } from '@devvit/protos/json/devvit/ui/form_builder/
 import { ConsentStatus } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type Effect, emitEffect } from './emit-effect.js';
+import { type Effect, emitEffect, webViewInternalMessageType } from './emit-effect.js';
 
 describe('emit-effect', () => {
   let originalParent: Window | null;
@@ -57,7 +57,7 @@ describe('emit-effect', () => {
     expect(postedMessage).toStrictEqual({
       realtimeEffect: undefined,
       scope: WebViewInternalMessageScope.CLIENT,
-      type: 'devvit-internal',
+      type: webViewInternalMessageType,
       effect,
       showForm,
       id: expect.any(String),
@@ -335,7 +335,7 @@ describe('emit-effect', () => {
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(postedMessage).toStrictEqual({
       scope: WebViewInternalMessageScope.CLIENT,
-      type: 'devvit-internal',
+      type: webViewInternalMessageType,
       effect,
       id: expect.any(String),
       realtimeEffect: undefined,
@@ -454,7 +454,7 @@ describe('emit-effect', () => {
       id: expect.any(String),
       realtimeEffect: undefined,
       scope: 0,
-      type: 'devvit-internal',
+      type: webViewInternalMessageType,
     });
   });
 });

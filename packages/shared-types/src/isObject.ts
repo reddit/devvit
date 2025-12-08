@@ -8,6 +8,6 @@
  *     return isObject(val) && typeof val.bar === 'string'
  *   }
  */
-export function isObject(val: unknown): val is Record<string | number | symbol, unknown> {
+export function isObject(val: unknown): val is Record<PropertyKey, unknown> {
   return val != null && !Array.isArray(val) && typeof val === 'object';
 }

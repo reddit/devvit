@@ -1,4 +1,5 @@
 import { WebViewInternalMessageScope } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
+import { webViewInternalMessageType } from '@devvit/shared-types/client/emit-effect.js';
 import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
 
@@ -154,7 +155,7 @@ it('sends load analytics on window load', async () => {
   expect(postMessageMock).toHaveBeenCalledWith(
     {
       scope: WebViewInternalMessageScope.CLIENT,
-      type: 'devvit-internal',
+      type: webViewInternalMessageType,
       analytics: {
         event: 'web-view-loaded',
         timeStart: expect.any(Number),
@@ -190,7 +191,7 @@ const clickPostMessageWithDefinition = (definition: string): [unknown, string] =
   return [
     {
       scope: WebViewInternalMessageScope.CLIENT,
-      type: 'devvit-internal',
+      type: webViewInternalMessageType,
       analytics: { event: 'click', definition },
       realtimeEffect: undefined,
       telemetry: { event: 'click', click: { event: 'click', definition } },

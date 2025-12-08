@@ -8,6 +8,9 @@ import type {
   WebViewMessageEvent_MessageData,
 } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 
+/** `WebViewInternalMessage.type`. */
+export const webViewInternalMessageType = 'devvit-internal';
+
 export type Effect = Omit<WebViewInternalMessage, 'id' | 'scope' | 'type'> & { type: EffectType };
 
 const EFFECTS_WITH_RESPONSE: { readonly [fx in EffectType]?: true } = {
@@ -37,7 +40,7 @@ export const emitEffect = (
       ...effect,
       realtimeEffect: effect.realtime, // to-do: remove deprecated field.
       scope: WebViewInternalMessageScope.CLIENT,
-      type: 'devvit-internal',
+      type: webViewInternalMessageType,
     };
 
     // For temporary backward compatibility, we set both `message.effect_type` above, and `effect` below

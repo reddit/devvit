@@ -27,7 +27,7 @@ export function initAnalytics(): void {
     // if (devvit.debug.analytics) console.debug(`[analytics] loaded in ${duration} ms`);
     void emitEffect({
       type: EffectType.EFFECT_TELEMETRY,
-      telemetry: { event: 'web-view-loaded', loaded },
+      telemetry: { event: loaded.event, loaded },
       // to-do: remove once all clients support `telemetry`. Deprecated on
       //        2025-11-24.
       analytics: loaded,
@@ -43,7 +43,7 @@ export function initAnalytics(): void {
       };
       void emitEffect({
         type: EffectType.EFFECT_TELEMETRY,
-        telemetry: { event: 'click', click },
+        telemetry: { event: click.event, click },
         // to-do: remove once all clients support `telemetry`. Deprecated on
         //        2025-11-24.
         analytics: click,
