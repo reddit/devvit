@@ -7,14 +7,7 @@ import { type Effect, emitEffect } from '@devvit/shared-types/client/emit-effect
 import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  addWebViewModeListener,
-  exitExpandedMode,
-  getWebViewMode,
-  registerListener,
-  removeWebViewModeListener,
-  requestExpandedMode,
-} from './web-view-mode.js';
+import { exitExpandedMode, getWebViewMode, requestExpandedMode } from './web-view-mode.js';
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(() => Promise.resolve(undefined)),
@@ -61,7 +54,6 @@ beforeEach(() => {
     token: noWebbitToken,
     webViewMode: undefined,
   };
-  registerListener();
 });
 
 afterEach(() => {
@@ -124,37 +116,12 @@ describe('requestExpandedMode()', () => {
     );
   });
 
-  it('should call listeners when a message event is received', () => {
-    const callback = vi.fn();
-    addWebViewModeListener(callback);
-
-    sendEvent(WebViewImmersiveMode.IMMERSIVE_MODE);
-    expect(callback).toHaveBeenCalledWith('expanded');
-
-    sendEvent(WebViewImmersiveMode.INLINE_MODE);
-    expect(callback).toHaveBeenCalledWith('inline');
-  });
-
-  it('should cleanup listeners', () => {
-    const callback = vi.fn();
-    addWebViewModeListener(callback);
-
-    sendEvent(WebViewImmersiveMode.IMMERSIVE_MODE);
-    expect(callback).toHaveBeenCalledWith('expanded');
-
-    removeWebViewModeListener(callback);
-    callback.mockReset();
-
-    sendEvent(WebViewImmersiveMode.IMMERSIVE_MODE);
-    expect(callback).not.toHaveBeenCalled();
-  });
-
-  it('should maintain the state of immersive mode', async () => {
+  it('should not update the state of immersive mode during transitions to immersive', async () => {
     expect(getWebViewMode()).toBe('inline');
 
     // transitioning to immersive
     sendEvent(WebViewImmersiveMode.IMMERSIVE_MODE);
-    expect(getWebViewMode()).toBe('expanded');
+    expect(getWebViewMode()).toBe('inline');
 
     // transition back to inline
     sendEvent(WebViewImmersiveMode.INLINE_MODE);

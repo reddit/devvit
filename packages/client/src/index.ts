@@ -7,6 +7,3 @@ export * from './effects/show-toast.js';
 export * from './effects/web-view-mode.js';
 export type { Context } from '@devvit/shared-types/client/client-context.js';
 export * from '@devvit/shared-types/PostData.js';
-
-import { registerListener } from './effects/web-view-mode.js';
-registerListener();

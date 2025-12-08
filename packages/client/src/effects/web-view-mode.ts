@@ -1,6 +1,5 @@
 import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
-import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { tokenParam } from '@devvit/shared-types/webbit.js';
 
@@ -18,8 +17,6 @@ export type WebViewMode = 'inline' | 'expanded';
  * @experimental
  */
 export type WebViewModeListener = (mode: WebViewMode) => void;
-
-const modeListeners = new Set<WebViewModeListener>();
 
 /**
  * Represents the current web view mode state for the application.
@@ -76,6 +73,9 @@ export function exitExpandedMode(event: MouseEvent): Promise<void> {
 }
 
 /**
+ * @deprecated This API is deprecated and will be removed in a future release.
+ * use window.addEventListener("focus", () => { }) to receive notifications
+ * when the web view mode changes back to inline.
  * Adds a listener that is called when the web view mode changes. Initial mode
  * is not reported. Web views in the process of destruction may not receive a
  * mode change event.
@@ -83,19 +83,16 @@ export function exitExpandedMode(event: MouseEvent): Promise<void> {
  * @param callback The callback to be called when the mode changes.
  * @experimental
  */
-export function addWebViewModeListener(callback: WebViewModeListener): void {
-  modeListeners.add(callback);
-}
+export function addWebViewModeListener(_: WebViewModeListener): void {}
 
 /**
+ * @deprecated This API is deprecated and will be removed in a future release.
  * Removes a listener that was previously added with `addWebViewModeListener`.
  *
  * @param callback The callback to be removed.
  * @experimental
  */
-export function removeWebViewModeListener(callback: WebViewModeListener): void {
-  modeListeners.delete(callback);
-}
+export function removeWebViewModeListener(_: WebViewModeListener): void {}
 
 async function emitModeEffect(
   mode: WebViewImmersiveMode,
@@ -124,28 +121,6 @@ async function emitModeEffect(
   await emitEffect({
     type,
     immersiveMode: { entryUrl, immersiveMode: mode },
-  });
-}
-
-/**
- * @internal
- * Handles incoming messages from the client, like when the user closes the immersive modal
- */
-export function registerListener(): void {
-  addEventListener('message', (event: MessageEvent<WebViewMessageEvent_MessageData>) => {
-    const { type, data } = event.data;
-
-    if (type !== 'devvit-message') {
-      return;
-    }
-    if (!data?.immersiveModeEvent) {
-      return;
-    }
-
-    devvit.webViewMode = data.immersiveModeEvent.immersiveMode;
-
-    const webViewModeString = webViewMode(data.immersiveModeEvent.immersiveMode);
-    modeListeners.forEach((listener) => listener(webViewModeString));
   });
 }
 
