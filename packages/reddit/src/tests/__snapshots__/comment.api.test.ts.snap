@@ -3,6 +3,28 @@
 exports[`Commment API > RedditClient:Comment > Comment matches JSON snapshot 1`] = `
 {
   "approved": false,
+  "authorFlair": {
+    "backgroundColor": "",
+    "cssClass": undefined,
+    "richtext": [
+      {
+        "elementType": "emoji",
+        "emojiRef": ":stonks:",
+        "text": undefined,
+        "url": "https://emoji.redditmedia.com/inqlseapworc1_t5_3acsi/stonks",
+      },
+      {
+        "elementType": "text",
+        "emojiRef": undefined,
+        "text": " 1 share",
+        "url": undefined,
+      },
+    ],
+    "templateId": undefined,
+    "text": ":stonks: 1 share",
+    "textColor": "dark",
+    "type": "richtext",
+  },
   "authorName": "my-user",
   "body": "body",
   "collapsedBecauseCrowdControl": false,
@@ -38,6 +60,28 @@ exports[`Commment API > RedditClient:Comment > Comment matches JSON snapshot 1`]
 exports[`Commment API > RedditClient:Comment > submitComment() should return a new comment when successful 1`] = `
 {
   "approved": false,
+  "authorFlair": {
+    "backgroundColor": "",
+    "cssClass": undefined,
+    "richtext": [
+      {
+        "elementType": "emoji",
+        "emojiRef": ":stonks:",
+        "text": undefined,
+        "url": "https://emoji.redditmedia.com/inqlseapworc1_t5_3acsi/stonks",
+      },
+      {
+        "elementType": "text",
+        "emojiRef": undefined,
+        "text": " 1 share",
+        "url": undefined,
+      },
+    ],
+    "templateId": undefined,
+    "text": ":stonks: 1 share",
+    "textColor": "dark",
+    "type": "richtext",
+  },
   "authorName": "my-user",
   "body": "body",
   "collapsedBecauseCrowdControl": false,
@@ -73,6 +117,28 @@ exports[`Commment API > RedditClient:Comment > submitComment() should return a n
 exports[`Commment API > RedditClient:Comment > submitComment(): can set runAs: USER when userActions is enabled 1`] = `
 {
   "approved": false,
+  "authorFlair": {
+    "backgroundColor": "",
+    "cssClass": undefined,
+    "richtext": [
+      {
+        "elementType": "emoji",
+        "emojiRef": ":stonks:",
+        "text": undefined,
+        "url": "https://emoji.redditmedia.com/inqlseapworc1_t5_3acsi/stonks",
+      },
+      {
+        "elementType": "text",
+        "emojiRef": undefined,
+        "text": " 1 share",
+        "url": undefined,
+      },
+    ],
+    "templateId": undefined,
+    "text": ":stonks: 1 share",
+    "textColor": "dark",
+    "type": "richtext",
+  },
   "authorName": "my-user",
   "body": "body",
   "collapsedBecauseCrowdControl": false,
