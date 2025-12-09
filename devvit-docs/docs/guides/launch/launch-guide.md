@@ -1,180 +1,87 @@
 # Launch Your App
 
-Once your app is ready, you can launch it to users and moderators across Reddit. There are a few things you need to do to get your app "launch ready". This guide will walk you through that process.
+Once your app is ready, you can launch it to users and moderators across Reddit. This guide outlines what “launch-ready” means and the steps you need to take to submit your app for review.
 
-Once you have created a polished app, you may also apply for **Reddit featuring**, which includes on-platform promotion and boosting of your app. Make sure to read this guide closely before filling out a [Reddit featuring request](https://forms.gle/pLEfhZFf6skc4Rto8).
+Polished apps may also apply for **Reddit featuring**, which includes on-platform promotion and distribution support. Make sure to read [this guide](https://developers.reddit.com/docs/guides/launch/feature-guide) before submitting your app.
 
-We've broken the Devvit App Launch guide into four phases:
+---
 
-- **Alpha**: Use this stage to validate your core concept and catch major issues early.
-- **Beta**: Test your game with real users on a public subreddit.
-- **General Availability (GA)**: Share your app with all of Reddit!
-- **Featured**: Work with the Reddit team to promote your app across the site.
+## When is an app ready to be launched?
 
-How you launch your app in each of these stages depends on the type of app you’re building: a game or a community app.
+Apps should be polished and stable before launch. Ensure your data schema is scalable and your UIs are clean and accessible, as **quality and performance directly impact organic distribution and adoption**.
 
-## Games
+Before submitting your app for review, be sure to:
 
-Select your launch stage for instructions and guidelines to maximize your game's development.
+- Test all functionality across mobile and web.
+- Test from multiple accounts (developer, moderator, regular user), since permissions differ.
+- Have a stable prototype with clear UX flows.
 
-<details>
-  <summary>Alpha</summary>
-  <div>
-    <div>
-   Share your app on r/Devvit to get technical feedback from other devs and Reddit admins:
+We also recommend getting feedback from the community:
 
-1.  Create a public subreddit for your game.
-2.  Create a game post in your public subreddit.
-3.  [Cross-post](https://support.reddithelp.com/hc/en-us/articles/4835584113684-What-is-Crossposting) your game to r/Devvit with the flair "Feedback Friday”.
+- **All apps:**
+  - [Cross-post](https://support.reddithelp.com/hc/en-us/articles/4835584113684-What-is-Crossposting) your post to r/Devvit using the **Feedback Friday** flair.
+  - Share your app in the **#sharing** channel in the Reddit Devs Discord.
+- **Games:**
+  - Cross-post gameplay posts to r/GamesOnReddit with the **Feedback** flair.
+- **Mod Apps:**
+  - Share your app in the **#mod-discussion** Discord channel for moderator-specific feedback.
 
-**Guidelines**
+If your app is a **game**, ensure the experience:
 
-To get the best feedback:
+- Works across platforms with responsive design.
+- Includes a custom launch or first screen.
+- Avoids inline scrolling (scrolling inside inline webviews is prohibited).
+- Has a dedicated, non-test subreddit (e.g., [r/Pixelary](https://www.reddit.com/r/Pixelary/)).
+- Is immediately understandable to new users.
 
-- Post only once for a meaningful update (maybe a 2+ week gaps between versions)
-- Respond to feedback within 24-48 hours.
-- Test other developers' apps, too, to build relationships with your fellow devs.
-</div>
-    <br/>
-  </div>
-</details>
+Launching your app signals to Reddit’s algorithmic feeds that it is ready for broader distribution. Engagement — clicks, dwell time, and voting — determines your organic reach.
 
-<details>
-  <summary>Beta</summary>
-  <div>
-    <div>
-  When you’re ready for broader player testing, launch your game on r/GamesOnReddit: 
-  
-  1. Go to your public subreddit for your game.
-  2. Create a game post in your public subreddit.
-  3. [Cross-post](https://support.reddithelp.com/hc/en-us/articles/4835584113684-What-is-Crossposting) a game post to r/GamesOnReddit with flair "Feedback”.
+---
 
-**Guidelines**
+## How to launch an app
 
-To get the best results, engage with players that give you feedback to start growing your community.
+Apps are submitted for review through the CLI. To launch your app:
 
-**Apps that have strong post engagement are great candidates for the next launch phase.**
+1. Add a user-friendly overview in your app’s `README.md`.
+2. Run `npx devvit upload` for the version you want to launch.
+3. Run `npx devvit publish`.
 
-</div>
-    <br/>
-  </div>
-</details>
+Once submitted, your app enters Reddit’s review queue. Our team evaluates your code, example posts, and app documentation.
 
-<details>
-  <summary>GA</summary>
-  <div>
-    <div>
-  When you're ready to publicly release your game:
-  
-  1. Upload the latest version of your app with `npx devvit upload`
-  2. Publish your app with `npx devvit publish`
-  
-  Publishing your app triggers a thorough app review. Make sure your app has a detailed README in accordance with our [guidelines](https://www.reddit.com/r/Devvit/comments/1gfvsfy/all_published_apps_must_have_readmes/).
+You will receive email confirmation when your app is approved. If we need more information, a team member may contact you via Modmail or Reddit chat.
 
-</div>
-    <br/>
-  </div>
-</details>
+Because you must run `npx devvit publish` for **every version** you want to launch, we recommend batching updates into weekly (or less frequent) releases.
 
-### Best Practices for GAing your game
+Review times vary. We aim to review most apps — especially version updates — within **1–2 business days**. New apps, apps with policy ambiguity, or apps using higher-risk features (e.g., payments, fetch) may require more time.  
+If you haven’t heard from us after a week, please reach out in Discord or via r/Devvit Modmail.
 
-In order to have a successful app launch, please ensure your game has the following required and suggested best practices integrated into your experience. Reddit will not feature games that do not have these best practices implemented.
+Ensuring your app complies with all [Devvit Rules](https://developers.reddit.com/docs/devvit_rules) will streamline review.
 
-#### Required
+**By default, published apps are unlisted**, meaning other communities cannot install them. This is ideal for games and community-specific tools.
 
-- A compelling first screen - you **must** have a custom [splash screen](../../capabilities/server/splash-screen.mdx).
-- Working across platforms - your game's viewport must be accessible and clean on both mobile and desktop platforms.
-- Self-explanatory - anyone should be able to click into your post and have the context needed to play or participate.
-- Responsive design - all screens should be visible within fullscreen, mobile, and desktop. Avoid unnecessary scrolls. Scrolling within inline webviews is prohibited.
+---
 
-#### Suggested
+## How to list your app for any community to install
 
-- A subscribe button - encourage re-engagement.
-- Leaderboards - a view into a user's community standing.
-- Community Flair - leverage [user flair](https://support.reddithelp.com/hc/en-us/articles/205242695-How-do-I-get-user-flair) to give users special distinction in the community (this can be done programmatically via the API).
-- User Generated Content - provide ways for users to contribute (think: custom post comments, drawings, level builders, etc).
+If your app is a general-purpose moderation tool, community utility, or otherwise broadly applicable, you can request to list it in the [App Directory](https://developers.reddit.com/apps). Listing makes your app installable by any moderator.
 
-### Organic distribution
+Publicly listed apps must include a detailed `README.md` with:
 
-A published app is automatically shared with a small number of redditors, and engagement metrics will determine if our feed algorithms start to organically pick up your posts.
+- A comprehensive app overview.
+- Installer-facing instructions.
+- Changelogs for major updates.
 
-Key engagement metrics for games include:
+To list your app:
 
-- Contribution generation - comments and posts created
-- Click through rate - how often users engage with your app
-- Dwell time - how long users spend in your app
-- Post score - upvotes vs downvotes ratio
+1. Run `npx devvit publish --listed`
+2. Once approved, it will appear in the Apps Directory for any community to install.
 
-Successful games will generate genuine conversation within each post, and create compelling content that engages redditors.
+We do not recommend listing apps built for a single subreddit, as this may confuse moderators and clutter the directory.
 
-### Featuring with Reddit
-
-Once your game has been published and approved, it may be featured by Reddit in one or more ways, such as:
-
-- Games directory
-- Featured promotional units
-- Reddit's Game Feed
-- Highlight in Reddit's Games sidebar
-
-If you would like to apply for featuring, please [use this form](https://forms.gle/pLEfhZFf6skc4Rto8). We will respond to requests within two business days.
-
-## Community apps
-
-Apps that are built to use within a community (think mod tools like Bot Bouncer or interactive post apps like Community Hub) also follow the alpha, beta, and GA launch path.
-
-<details>
-  <summary>Alpha</summary>
-  <div>
-    <div>
-   Share your app on r/Devvit to validate that your app solves real community problems:
-
-1.  Create a public subreddit for your game.
-2.  Create a game post in your public subreddit.
-3.  On a Friday, cross-post your game to r/Devvit with the flair "Feedback Friday”.
-
-You can also solicit feedback on the #mod-discussion Discord channel. Write a short description of your app that explains the problem your app solves, target community types, and how it fits into existing mod workflows. Include screenshots of the mode interface, and see what the community has to say.
-
-**Guidelines**
-
-To get the best feedback:
-
-- Post only once for a meaningful update (maybe a 2+ week gaps between versions).
-- Test your app with different permission levels (mod, approved user, regular user).
-- Actively seek feedback from mods in your target communities.
-</div>
-    <br/>
-  </div>
-</details>
-
-<details>
-  <summary>Beta</summary>
-  <div>
-    <div>
-  When you’re ready for broader testing, launch your game on a larger subreddit: 
-  
-  1. Upload the latest version of your app with `npx devvit upload`
-  2. Publish your app as unlisted with `npx devvit publish`
-  3. Once your app is approved, you can install it to a larger subreddit that you moderate for further testing. 
-</div>
-    <br/>
-  </div>
-</details>
-
-<details>
-  <summary>GA</summary>
-  <div>
-    <div>
-When you're ready to publicly release your app, you’ll need to add it to the Apps Directory:
-  
-  1. Run  `npx devvit publish --listed`
-  2. Once your app is approved, it will be publicly available in the Apps Directory for any mod to install.
-</div>
-    <br/>
-  </div>
-</details>
+---
 
 ## Resources
 
-- Got questions? Join our Discord or post in [r/Devvit](https://www.reddit.com/r/Devvit/).
-- Review the [rules](../../devvit_rules.md) before publishing.
-- Learn more about [how to earn](../../earn-money/payments/payments_overview.md) for apps you launch.
+- Questions? Join our Discord or post in [r/Devvit](https://www.reddit.com/r/Devvit/).
+- Review the [Devvit Rules](https://developers.reddit.com/docs/devvit_rules) before publishing.
+- Learn more about [how to earn](../../earn-money/payments/payments_overview.md) from your apps.

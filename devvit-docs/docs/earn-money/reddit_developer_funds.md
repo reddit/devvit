@@ -1,4 +1,4 @@
-# Reddit Developer Funds 2025
+# Reddit Developer Funds
 
 Reddit developer funds is a way for developers to earn money for the apps they build. Devs can earn up to $500,000 for their apps, or $167,000 per app.
 
@@ -13,7 +13,7 @@ Check your [eligibility from your settings page](https://developers.reddit.com/m
 
 ## How it works
 
-The Reddit Developer Funds 2025 program (the “Program”) will run from April 1, 2025 - Dec 31, 2025. The Program is focused on reach, and success will be measured by Daily Qualified Engagers and Qualified Installs defined as:
+The Reddit Developer Funds program (the “Program”) will run from April 1, 2025 - June 30, 2026. The Program is focused on reach, and success will be measured by Daily Qualified Engagers and Qualified Installs defined as:
 
 - A “Qualified Install” means that a subreddit has your app installed and that subreddit: 1) has a minimum of 1,000 members, and 2) is eligible for monetization under Reddit’s Earn Policy (e.g., that is Safe for Work).
 
@@ -36,11 +36,13 @@ Measurement and eligibility are further defined in our terms. Please reference o
 
 The Daily Qualified Engagers threshold(s) are determined on a rolling seven day average, which means that the average Daily Qualified Engagers for your app over the prior seven days exceeds a given threshold.
 
-| Tier     | Threshold              | Payout |
-| :------- | :--------------------- | :----- |
-| Installs | 250 qualified installs | $1000  |
+| Tier     | Threshold                | Payout | Cumulative Payout |
+| :------- | :----------------------- | :----- | :---------------- |
+| Installs | 50 qualified installs    | $500   | $500              |
+| Installs | 250 qualified installs   | $1,000 | $1,500            |
+| Installs | 1,000 qualified installs | $2,000 | $3,500            |
 
-The “Qualified Install” threshold is met when your app exceeds the threshold below and maintains that number of qualified installs for a consecutive 7-day period.
+The “Qualified Install” threshold(s) are met when your app exceeds the threshold(s) above and maintains that number of qualified installs for a consecutive 7-day period.
 
 ### Eligibility restrictions:
 
@@ -52,7 +54,7 @@ Apps are not eligible if they previously received a payout under Developer Funds
 - Apps can only qualify once for each reward tier.
 - Don’t use spam, bots, or other forms of view manipulation, which may result in your disqualification from the program
 - The community comes first. Apps should only be installed where relevant, useful, or enriching
-- Up to three apps per developer can qualify for the funds program.
+- Up to three apps per developer can qualify for the funds program. If you want to qualify for a 4th+ app, please fill out this [exemption form](https://forms.gle/KwMg4PCEenrqsv87A).
 - Apps should be unique, original, and created by you.
   - A significant portion of the code and app UI should be original and follow our [rules](../devvit_rules.md)
   - Forked versions of apps must be significantly different in concept and function

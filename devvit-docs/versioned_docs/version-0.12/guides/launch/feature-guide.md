@@ -14,6 +14,10 @@ Learn how your game can be featured across Reddit and reach thousands of players
 
 Whether you’re prototyping an early version of your first Reddit game or launching a polished experience to a wide audience, you have an opportunity to be featured. Our mission is to help developers grow by connecting their work with the Reddit users that will love it. Featuring selections are curated by our team and refreshed regularly to spotlight innovation, polished play, and player engagement.
 
+Note that our top featuring slots are reserved for games that are of professional quality, as well as games that see exceptional engagement as they grow (CTR, dwell times, positive user engagement, retention).
+
+Once your game is part of the program, it will be rotated in and out of featuring slots to support curitorial diversity.
+
 ---
 
 ## How to get featured
@@ -30,7 +34,7 @@ Games that see organic growth are also likely to be scouted by our team for feat
 
 Reddit features games and developers across multiple discovery surfaces to help players find new favorites:
 
-- **Games Feed.** The Games Feed showcases playable experiences directly within Reddit, with top positions reserved for standout titles.
+- **Games Feed.** The Games Feed showcases playable experiences directly within Reddit. When featured, games are rotated into a list of games that is algorythmically served to users visiting the feed.
 
 ![Featured games](../../assets/featured_games.png)
 
@@ -56,6 +60,8 @@ Reddit features games and developers across multiple discovery surfaces to help 
 | **Hero**        | Top-tier, standout games featured broadly across Reddit        | Games Feed highlight, featured in Community Drawer, Home Feed highlight                           | Developers with flagship-quality games          | Pro quality, high retention and engagement         | Millions to tens of millions of impressions |
 
 \*This is a rough estimate and does not reflect what any particular game will reach at this tier.
+
+Games can be promoted to our highest featuring tiers if they see exceptional engagement and retention at lower featuring levels. Our team looks at CTRs, day 1 and day 3 retention, dwell time, as well as qualitative user feedback. We hope to add more of these metrics to the developer analytics panel in the coming months.
 
 ---
 
