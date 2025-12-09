@@ -1361,6 +1361,10 @@ export async function getSubredditInfoById(
 
   if (!subredditInfo) throw new Error('subreddit info not found');
 
+  if (subredditInfo.type) {
+    subredditInfo.type = asSubredditType(subredditInfo.type);
+  }
+
   return subredditInfo;
 }
 
@@ -1389,6 +1393,10 @@ export async function getSubredditInfoByName(
   const subredditInfo = response.data?.subredditInfoByName;
 
   if (!subredditInfo) throw new Error('subreddit info not found');
+
+  if (subredditInfo.type) {
+    subredditInfo.type = asSubredditType(subredditInfo.type);
+  }
 
   return subredditInfo;
 }
@@ -1442,17 +1450,19 @@ export async function getSubredditStyles(
 }
 
 function asSubredditType(type?: string): SubredditType {
+  const normalizedType = type?.toLowerCase();
+
   if (
-    type === 'public' ||
-    type === 'private' ||
-    type === 'restricted' ||
-    type === 'employees_only' ||
-    type === 'gold_only' ||
-    type === 'gold_restricted' ||
-    type === 'archived' ||
-    type === 'user'
+    normalizedType === 'public' ||
+    normalizedType === 'private' ||
+    normalizedType === 'restricted' ||
+    normalizedType === 'employees_only' ||
+    normalizedType === 'gold_only' ||
+    normalizedType === 'gold_restricted' ||
+    normalizedType === 'archived' ||
+    normalizedType === 'user'
   ) {
-    return type;
+    return normalizedType;
   }
 
   throw new Error(`invalid subreddit type: ${type}`);
