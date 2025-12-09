@@ -1,4 +1,6 @@
 import {
+  type RedditObject_AuthorFlairRichText,
+  type RedditObject_LinkFlairRichText,
   type FlairCsvResult,
   type FlairObject,
   type Metadata,
@@ -345,6 +347,96 @@ export type GetUserFlairBySubredditResponse = {
   prev?: string;
 };
 
+/** This type is used for both the link and author flairs on Post and Comment objects. */
+export type CommonFlair = {
+  /**
+   * One of: "text", "richtext"
+   */
+  type?: string;
+  /**
+   * Flair template ID to use when rendering this flair
+   */
+  templateId?: string;
+  /**
+   * Plain text representation of the flair
+   */
+  text?: string;
+  /**
+   * RichText object representation of the flair
+   */
+  richtext: {
+    /**
+     * Enum of element types.  e.g. emoji or text
+     */
+    elementType?: string;
+    /**
+     * Text to show up in the flair, e.g. "Need Advice"
+     */
+    text?: string;
+    /**
+     * Emoji references, e.g. ":rainbow:"
+     */
+    emojiRef?: string;
+    /**
+     * url string, e.g. "https://reddit.com/"
+     */
+    url?: string;
+  }[];
+  /**
+   * Custom CSS classes from the subreddit's stylesheet to apply to the flair if rendered as HTML
+   */
+  cssClass?: string;
+  /**
+   * One of: "light", "dark"
+   */
+  textColor?: string;
+  /**
+   * Flair background color as a hex color string (# prefixed) or transparent
+   * @example "#FF4500"
+   */
+  backgroundColor?: string;
+};
+
+/** @internal */
+export type ProtosFlairData = {
+  flairBackgroundColor?: string;
+  flairCssClass?: string;
+  flairText?: string;
+  flairType?: string;
+  flairTemplateId?: string;
+  flairRichtext?: RedditObject_LinkFlairRichText[] | RedditObject_AuthorFlairRichText[];
+  flairTextColor?: string;
+}
+
+/** @internal */
+export function convertProtosFlairToCommonFlair(data: ProtosFlairData): CommonFlair | undefined {
+  if (
+    data.flairBackgroundColor ||
+    data.flairCssClass ||
+    data.flairText ||
+    data.flairType ||
+    data.flairTemplateId ||
+    data.flairRichtext ||
+    data.flairTextColor
+  ) {
+    return {
+      backgroundColor: data.flairBackgroundColor,
+      cssClass: data.flairCssClass,
+      text: data.flairText,
+      type: data.flairType,
+      templateId: data.flairTemplateId,
+      // Map flairRichtext[] into the objects with more user-friendly property names
+      richtext: (data.flairRichtext ?? []).map(({ e, t, a, u }) => ({
+        elementType: e,
+        text: t,
+        emojiRef: a,
+        url: u,
+      })),
+      textColor: data.flairTextColor,
+    };
+  }
+}
+
 /** @internal */
 export function convertUserFlairProtoToAPI(userFlair: UserFlairProto): UserFlair {
   return {
@@ -545,3 +637,4 @@ function asAllowableContent(allowableContent?: string): AllowableFlairContent {
 
   throw new Error(`Invalid allowable content: ${allowableContent}`);
 }
+
