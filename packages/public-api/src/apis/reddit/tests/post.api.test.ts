@@ -23,7 +23,21 @@ describe('Post API', () => {
     url: 'fake-url//',
     permalink: 'fake-permalink//',
     allAwardings: [],
-    authorFlairRichtext: [],
+    authorFlairBackgroundColor: "",
+    authorFlairRichtext: [
+      {
+          e: "emoji",
+          a: ":stonks:",
+          u: "https://emoji.redditmedia.com/inqlseapworc1_t5_3acsi/stonks"
+      },
+      {
+          e: "text",
+          t: " 1 share"
+      }
+    ],
+    authorFlairText: ":stonks: 1 share",
+    authorFlairTextColor: "dark",
+    authorFlairType: "richtext",
     linkFlairBackgroundColor: '#aaa',
     linkFlairTextColor: '#ccc',
     linkFlairCssClass: 'custom-css-class',
