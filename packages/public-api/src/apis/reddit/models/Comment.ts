@@ -19,6 +19,8 @@ import type { ListingFetchOptions, ListingFetchResponse, MoreObject } from './Li
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
+import type { CommonFlair } from './Flair.js';
+import { convertProtosFlairToCommonFlair } from './Flair.js';
 
 export type CommentSort =
   | 'confidence'
@@ -99,6 +101,7 @@ export class Comment {
   #userReportReasons: string[];
   #url: string;
   #ignoringReports: boolean;
+  #authorFlair?: CommonFlair;
 
   #metadata: Metadata | undefined;
 
@@ -142,6 +145,16 @@ export class Comment {
     // R2 API does not include a URL for a comment, just a permalink
     this.#url = new URL(data.permalink ?? '', 'https://www.reddit.com/').toString();
     this.#ignoringReports = data.ignoreReports ?? false;
+
+    this.#authorFlair = convertProtosFlairToCommonFlair({
+      flairBackgroundColor: data.authorFlairBackgroundColor,
+      flairCssClass: data.authorFlairCssClass,
+      flairText: data.authorFlairText,
+      flairType: data.authorFlairType,
+      flairTemplateId: data.authorFlairTemplateId,
+      flairRichtext: data.authorFlairRichtext,
+      flairTextColor: data.authorFlairTextColor
+    });
 
     this.#modReportReasons = ((data.modReports as unknown as [string, string]) ?? []).map(
       ([reason]) => reason
@@ -276,6 +289,10 @@ export class Comment {
     return this.#ignoringReports;
   }
 
+  get authorFlair(): CommonFlair | undefined {
+    return this.#authorFlair;
+  }
+
   toJSON(): Pick<
     Comment,
     | 'id'
@@ -302,6 +319,7 @@ export class Comment {
     | 'modReportReasons'
     | 'url'
     | 'ignoringReports'
+    | 'authorFlair'
   > {
     return {
       id: this.id,
@@ -328,6 +346,7 @@ export class Comment {
       userReportReasons: this.userReportReasons,
       url: this.url,
       ignoringReports: this.ignoringReports,
+      authorFlair: this.#authorFlair,
     };
   }
 
