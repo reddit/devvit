@@ -4,6 +4,28 @@ exports[`Post API > RedditClient > Post matches JSON snapshot 1`] = `
 {
   "approved": false,
   "archived": false,
+  "authorFlair": {
+    "backgroundColor": "",
+    "cssClass": undefined,
+    "richtext": [
+      {
+        "elementType": "emoji",
+        "emojiRef": ":stonks:",
+        "text": undefined,
+        "url": "https://emoji.redditmedia.com/inqlseapworc1_t5_3acsi/stonks",
+      },
+      {
+        "elementType": "text",
+        "emojiRef": undefined,
+        "text": " 1 share",
+        "url": undefined,
+      },
+    ],
+    "templateId": undefined,
+    "text": ":stonks: 1 share",
+    "textColor": "dark",
+    "type": "richtext",
+  },
   "authorId": undefined,
   "authorName": "my-user",
   "body": undefined,
