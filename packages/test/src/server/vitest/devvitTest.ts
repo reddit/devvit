@@ -1,9 +1,11 @@
 import '@devvit/shared-types/polyfill/fetch.polyfill.js';
 
 import { MediaMock } from '@devvit/media/test';
+import { RealtimeDefinition } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
 import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
 import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
 import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+import { RealtimeMock } from '@devvit/realtime/server/test';
 import { RedditPluginMock } from '@devvit/reddit/test';
 import { RedisMock } from '@devvit/redis/test';
 import { Context, runWithContext } from '@devvit/server';
@@ -74,6 +76,7 @@ export type DevvitFixtures = {
     redis: RedisMock;
     http: HTTPMock;
     reddit: RedditPluginMock;
+    realtime: RealtimeMock;
   };
 };
 
@@ -220,6 +223,7 @@ const setup = (
   const redisMock = new RedisMock();
   const httpMock = new HTTPMock();
   const redditMock = new RedditPluginMock();
+  const realtimeMock = new RealtimeMock();
 
   // Seed default context data so helpers like getCurrentUser/subreddit work.
   redditMock.addUser({ id: userId, name: username });
@@ -230,6 +234,7 @@ const setup = (
       [MediaServiceDefinition.fullName]: mediaMock,
       [RedisAPIDefinition.fullName]: redisMock,
       [HTTPDefinition.fullName]: httpMock,
+      [RealtimeDefinition.fullName]: realtimeMock.plugin,
       ...redditMock.getPluginRegistrations(),
     },
   });
@@ -251,6 +256,7 @@ const setup = (
       redis: redisMock,
       http: httpMock,
       reddit: redditMock,
+      realtime: realtimeMock,
     },
   };
 

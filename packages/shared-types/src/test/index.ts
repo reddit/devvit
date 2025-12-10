@@ -4,6 +4,10 @@ import type { Config } from '../Config.js';
 import { Header } from '../Header.js';
 import type { AppConfig } from '../schemas/config-file.v1.js';
 
+export type PluginMock<T> = {
+  plugin: T;
+};
+
 export const MOCK_HEADERS = {
   [Header.Subreddit]: 't5_testsub',
   [Header.SubredditName]: 'testsub',
