@@ -1,5 +1,5 @@
 import type { JsonObject } from '@devvit/shared-types/json.js';
-import { T2 } from '@devvit/shared-types/tid.js';
+import { isT2, T2 } from '@devvit/shared-types/tid.js';
 
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { authHeaders } from '../auth.js';
@@ -30,20 +30,17 @@ export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2>> {
     return Result.Err(fetchUserRes.error);
   }
 
-  let userId = fetchUserRes.value.id;
+  const userId = fetchUserRes.value.id;
   if (typeof userId !== 'string') {
     return Result.Err(`Failed to fetch user id as string. Got: ${fetchUserRes.value}`);
   }
   if (userId === '') {
     return Result.Err(`Failed to fetch user id - got an empty string somehow.`);
   }
-  if (!userId.startsWith('t2_')) {
-    userId = 't2_' + userId;
-  }
 
   let t2: T2;
   try {
-    t2 = T2(userId);
+    t2 = T2(isT2(userId) ? userId : `t2_${userId}`);
   } catch {
     return Result.Err(`Failed to convert user id to T2. Got: ${userId}`);
   }

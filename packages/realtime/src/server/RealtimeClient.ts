@@ -4,8 +4,6 @@ import type { JsonValue } from '@devvit/shared';
 import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
 
 export class RealtimeClient {
-  #pluginCache?: Realtime;
-
   /**
    * @example
    *
@@ -24,6 +22,6 @@ export class RealtimeClient {
   }
 
   get #plugin(): Realtime {
-    return (this.#pluginCache ??= getDevvitConfig().use(RealtimeDefinition));
+    return getDevvitConfig().use(RealtimeDefinition);
   }
 }

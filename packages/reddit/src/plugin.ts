@@ -45,14 +45,11 @@ export type RedditApiPluginClient = {
   Wiki: Wiki;
 };
 
-let redditApiPlugin: RedditApiPluginClient | undefined;
-let userActionsPlugin: UserActions | undefined;
-
 /**
  * @internal
  */
 export function getRedditApiPlugins(): RedditApiPluginClient {
-  return (redditApiPlugin ??= {
+  return {
     Flair: getDevvitConfig().use(FlairDefinition),
     GraphQL: getDevvitConfig().use(GraphQLDefinition),
     LinksAndComments: getDevvitConfig().use(LinksAndCommentsDefinition),
@@ -65,7 +62,7 @@ export function getRedditApiPlugins(): RedditApiPluginClient {
     Users: getDevvitConfig().use(UsersDefinition),
     Widgets: getDevvitConfig().use(WidgetsDefinition),
     Wiki: getDevvitConfig().use(WikiDefinition),
-  });
+  };
 }
 
 /**
@@ -77,5 +74,5 @@ export function getUserActionsPlugin(): UserActions {
       `UserActions plugin is not enabled. To use 'runAs: "USER"', set 'permissions.reddit.asUser: [ "PERMISSION_SCOPE_NAME" ]' in your devvit.json file.`
     );
   }
-  return (userActionsPlugin ??= getDevvitConfig().use(UserActionsDefinition)!);
+  return getDevvitConfig().use(UserActionsDefinition)!;
 }

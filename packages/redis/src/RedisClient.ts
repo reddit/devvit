@@ -372,7 +372,6 @@ export class TxClient implements TxClientLike {
 export class RedisClient implements RedisClientLike {
   readonly global: Omit<RedisClientLike, 'global'>;
   readonly scope: RedisKeyScope;
-  #pluginCache?: RedisAPI;
 
   constructor(scope: RedisKeyScope) {
     this.scope = scope;
@@ -815,7 +814,7 @@ export class RedisClient implements RedisClientLike {
   }
 
   get #plugin(): RedisAPI {
-    return (this.#pluginCache ??= getDevvitConfig().use(RedisAPIDefinition));
+    return getDevvitConfig().use(RedisAPIDefinition);
   }
 }
 

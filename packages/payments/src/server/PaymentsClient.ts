@@ -24,8 +24,6 @@ export type GetOrdersFilters = Prettify<
  * @experimental - This is not finalized yet, may not work, and may change.
  */
 export class PaymentsClient {
-  #pluginCache?: PaymentsService;
-
   /**
    * @param filters - Filters to apply to the products query.
    * @experimental - This is not finalized yet, may not work, and may change.
@@ -69,6 +67,6 @@ export class PaymentsClient {
   }
 
   get #plugin(): PaymentsService {
-    return (this.#pluginCache ??= getDevvitConfig().use(PaymentsServiceDefinition));
+    return getDevvitConfig().use(PaymentsServiceDefinition);
   }
 }

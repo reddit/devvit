@@ -1,5 +1,5 @@
 {
-  "name": "@devvit/reddit",
+  "name": "@devvit/test",
   "version": "0.12.5",
   "license": "BSD-3-Clause",
   "repository": {
@@ -8,12 +8,15 @@
   },
   "type": "module",
   "exports": {
-    ".": {
-      "browser": "./dist/serverImportInClientCodePanic.js",
-      "default": "./dist/index.js"
+    "./server": {
+      "browser": "./dist/server/serverImportInClientCodePanic.js",
+      "default": "./dist/server/index.js"
     },
-    "./package.json": "./package.json",
-    "./test": "./dist/test.js"
+    "./server/vitest": {
+      "browser": "./dist/server/serverImportInClientCodePanic.js",
+      "default": "./dist/server/vitest/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/**"
@@ -32,17 +35,19 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@devvit/media": "0.12.5",
     "@devvit/protos": "0.12.5",
-    "@devvit/public-api": "0.12.5",
-    "@devvit/shared": "0.12.5",
+    "@devvit/reddit": "0.12.5",
+    "@devvit/redis": "0.12.5",
+    "@devvit/server": "0.12.5",
     "@devvit/shared-types": "0.12.5",
-    "@devvit/splash": "0.12.5"
+    "ioredis": "5.7.0",
+    "redis-memory-server": "0.12.1"
   },
   "peerDependencies": {
-    "@devvit/server": "*"
+    "vitest": "*"
   },
   "devDependencies": {
-    "@devvit/server": "0.12.5",
     "@devvit/tsconfig": "0.12.5",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
