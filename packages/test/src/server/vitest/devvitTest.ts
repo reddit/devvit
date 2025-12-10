@@ -1,6 +1,7 @@
 import '@devvit/shared-types/polyfill/fetch.polyfill.js';
 
 import { MediaMock } from '@devvit/media/test';
+import { SchedulerDefinition } from '@devvit/protos';
 import { RealtimeDefinition } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
 import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
 import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
@@ -9,6 +10,7 @@ import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/
 import { RealtimeMock } from '@devvit/realtime/server/test';
 import { RedditPluginMock } from '@devvit/reddit/test';
 import { RedisMock } from '@devvit/redis/test';
+import { SchedulerMock } from '@devvit/scheduler/test';
 import { Context, runWithContext } from '@devvit/server';
 import { SettingsMock } from '@devvit/settings/test';
 import type { Config } from '@devvit/shared-types/Config.js';
@@ -80,6 +82,7 @@ export type DevvitFixtures = {
     reddit: RedditPluginMock;
     realtime: RealtimeMock;
     settings: SettingsMock;
+    scheduler: SchedulerMock;
   };
 };
 
@@ -228,6 +231,7 @@ const setup = (
   const redditMock = new RedditPluginMock();
   const realtimeMock = new RealtimeMock();
   const settingsMock = new SettingsMock(settings);
+  const schedulerMock = new SchedulerMock();
 
   // Seed default context data so helpers like getCurrentUser/subreddit work.
   redditMock.addUser({ id: userId, name: username });
@@ -240,6 +244,7 @@ const setup = (
       [HTTPDefinition.fullName]: httpMock,
       [RealtimeDefinition.fullName]: realtimeMock.plugin,
       [SettingsDefinition.fullName]: settingsMock.plugin,
+      [SchedulerDefinition.fullName]: schedulerMock.plugin,
       ...redditMock.getPluginRegistrations(),
     },
   });
@@ -263,6 +268,7 @@ const setup = (
       reddit: redditMock,
       realtime: realtimeMock,
       settings: settingsMock,
+      scheduler: schedulerMock,
     },
   };
 
