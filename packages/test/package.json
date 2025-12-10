@@ -41,6 +41,7 @@
     "@devvit/reddit": "0.12.5",
     "@devvit/redis": "0.12.5",
     "@devvit/server": "0.12.5",
+    "@devvit/settings": "0.12.5",
     "@devvit/shared-types": "0.12.5",
     "ioredis": "5.7.0",
     "redis-memory-server": "0.12.1"

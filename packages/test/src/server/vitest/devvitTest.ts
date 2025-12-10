@@ -5,10 +5,12 @@ import { RealtimeDefinition } from '@devvit/protos/types/devvit/events/v1alpha/r
 import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
 import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
 import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 import { RealtimeMock } from '@devvit/realtime/server/test';
 import { RedditPluginMock } from '@devvit/reddit/test';
 import { RedisMock } from '@devvit/redis/test';
 import { Context, runWithContext } from '@devvit/server';
+import { SettingsMock } from '@devvit/settings/test';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { AppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
@@ -77,6 +79,7 @@ export type DevvitFixtures = {
     http: HTTPMock;
     reddit: RedditPluginMock;
     realtime: RealtimeMock;
+    settings: SettingsMock;
   };
 };
 
@@ -224,6 +227,7 @@ const setup = (
   const httpMock = new HTTPMock();
   const redditMock = new RedditPluginMock();
   const realtimeMock = new RealtimeMock();
+  const settingsMock = new SettingsMock(settings);
 
   // Seed default context data so helpers like getCurrentUser/subreddit work.
   redditMock.addUser({ id: userId, name: username });
@@ -235,6 +239,7 @@ const setup = (
       [RedisAPIDefinition.fullName]: redisMock,
       [HTTPDefinition.fullName]: httpMock,
       [RealtimeDefinition.fullName]: realtimeMock.plugin,
+      [SettingsDefinition.fullName]: settingsMock.plugin,
       ...redditMock.getPluginRegistrations(),
     },
   });
@@ -257,6 +262,7 @@ const setup = (
       http: httpMock,
       reddit: redditMock,
       realtime: realtimeMock,
+      settings: settingsMock,
     },
   };
 
