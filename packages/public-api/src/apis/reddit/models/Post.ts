@@ -254,6 +254,9 @@ export type CrosspostOptions = CommonSubmitPostOptions & {
   postId: string;
 };
 
+/** @deprecated Use {@link CommonFlair}. */
+export type LinkFlair = CommonFlair
+
 /**
  * oEmbed is a format for allowing an embedded representation of a URL on third party sites.
  * The simple API allows a website to display embedded content (such as photos or videos)
