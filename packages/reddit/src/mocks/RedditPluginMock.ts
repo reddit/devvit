@@ -1,5 +1,4 @@
 import { NewModmailDefinition } from '@devvit/protos';
-import type { RedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { FlairDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/flair/flair_svc.js';
 import { GraphQLDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_svc.js';
 import { LinksAndCommentsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
@@ -7,14 +6,10 @@ import { ListingsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi
 import { ModerationDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/moderation/moderation_svc.js';
 import { ModNoteDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/modnote/modnote_svc.js';
 import { PrivateMessagesDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/privatemessages/privatemessages_svc.js';
-import type { SubredditAboutResponse_AboutData } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
 import { SubredditsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_svc.js';
 import { UsersDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/users/users_svc.js';
 import { WidgetsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/widgets/widgets_svc.js';
 import { WikiDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/wiki/wiki_svc.js';
-import type { User } from '@devvit/protos/types/devvit/reddit/user.js';
-import { T3, type T5 } from '@devvit/shared';
-import { T2 } from '@devvit/shared-types/tid.js';
 
 import { GraphQLMock } from './GraphQLMock.js';
 import { LinksAndCommentsMock } from './LinksAndCommentsMock.js';
@@ -96,44 +91,18 @@ export class RedditPluginMock {
   getPluginRegistrations() {
     return {
       [FlairDefinition.fullName]: this.flair,
-      [GraphQLDefinition.fullName]: this.graphQL,
-      [LinksAndCommentsDefinition.fullName]: this.linksAndComments,
+      [GraphQLDefinition.fullName]: this.graphQL.plugin,
+      [LinksAndCommentsDefinition.fullName]: this.linksAndComments.plugin,
       [ListingsDefinition.fullName]: this.listings,
       [ModerationDefinition.fullName]: this.moderation,
       [ModNoteDefinition.fullName]: this.modNote,
       [NewModmailDefinition.fullName]: this.newModmail,
       [PrivateMessagesDefinition.fullName]: this.privateMessages,
-      [SubredditsDefinition.fullName]: this.subreddits,
-      [UsersDefinition.fullName]: this.users,
+      [SubredditsDefinition.fullName]: this.subreddits.plugin,
+      [UsersDefinition.fullName]: this.users.plugin,
       [WidgetsDefinition.fullName]: this.widgets,
       [WikiDefinition.fullName]: this.wiki,
     };
-  }
-
-  /**
-   * Helper to seed the mock database with a User.
-   * This allows tests to set up state before calling `reddit.getUserByUsername`.
-   */
-  addUser(user: Omit<Partial<User>, 'id'> & { name: string; id: T2 }): User {
-    return this.users.addUser(user);
-  }
-
-  /**
-   * Helper to seed the mock database with a Post.
-   * This allows tests to set up state before calling `reddit.getPostById`.
-   */
-  addPost(post: Omit<Partial<RedditObject>, 'id'> & { id: T3; title: string }): RedditObject {
-    return this.linksAndComments.addPost(post);
-  }
-
-  /**
-   * Helper to seed the mock database with a Subreddit.
-   * This allows tests to set up state before calling `reddit.getSubredditByName`.
-   */
-  addSubreddit(
-    data: Partial<SubredditAboutResponse_AboutData> & { id: T5; displayName: string }
-  ): SubredditAboutResponse_AboutData {
-    return this.subreddits.addSubreddit(data);
   }
 
   private _createUnimplementedPluginService(pluginName: string) {

@@ -4,14 +4,23 @@ import {
   type MediaUploadResponse,
   type Metadata,
 } from '@devvit/protos';
+import type { PluginMock } from '@devvit/shared-types/test/index.js';
 
-export class MediaMock implements MediaService {
-  private _uploads: MediaUploadRequest[] = [];
+type MediaStore = {
+  uploads: MediaUploadRequest[];
+};
+
+export class MediaPluginMock implements MediaService {
+  private readonly _store: MediaStore;
+
+  constructor(store: MediaStore) {
+    this._store = store;
+  }
 
   async Upload(request: MediaUploadRequest, _metadata?: Metadata): Promise<MediaUploadResponse> {
-    this._uploads.push(request);
+    this._store.uploads.push(request);
 
-    const mediaId = `media-${this._uploads.length}`;
+    const mediaId = `media-${this._store.uploads.length}`;
 
     const extensionMap: Record<string, string> = {
       image: 'png',
@@ -28,12 +37,30 @@ export class MediaMock implements MediaService {
       mediaUrl,
     };
   }
+}
 
-  get uploads(): MediaUploadRequest[] {
-    return this._uploads;
+export class MediaMock implements PluginMock<MediaService> {
+  readonly plugin: MediaPluginMock;
+  private readonly _store: MediaStore;
+
+  constructor() {
+    this._store = {
+      uploads: [],
+    };
+    this.plugin = new MediaPluginMock(this._store);
   }
 
+  /**
+   * Returns the list of media upload requests that have been made.
+   */
+  get uploads(): MediaUploadRequest[] {
+    return this._store.uploads;
+  }
+
+  /**
+   * Clears all recorded uploads.
+   */
   clear(): void {
-    this._uploads = [];
+    this._store.uploads = [];
   }
 }

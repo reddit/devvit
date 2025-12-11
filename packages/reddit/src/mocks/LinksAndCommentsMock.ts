@@ -27,6 +27,7 @@ import type {
 } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import type { Comment } from '@devvit/protos/types/devvit/reddit/comment.js';
 import { type JsonObject, T3 } from '@devvit/shared';
+import type { PluginMock } from '@devvit/shared-types/test/index.js';
 
 const DEFAULT_REDDIT_OBJECT: Readonly<RedditObject> = {
   allAwardings: [],
@@ -225,9 +226,17 @@ function fakeId(): T3 {
   return `t3_${Math.random().toString(36).substring(7)}`;
 }
 
-export class LinksAndCommentsMock implements LinksAndComments {
-  private _posts = new Map<string, RedditObject>();
-  private _postData = new Map<string, Readonly<JsonObject>>();
+type LinksAndCommentsStore = {
+  posts: Map<string, RedditObject>;
+  postData: Map<string, Readonly<JsonObject>>;
+};
+
+export class LinksAndCommentsPluginMock implements LinksAndComments {
+  private readonly _store: LinksAndCommentsStore;
+
+  constructor(store: LinksAndCommentsStore) {
+    this._store = store;
+  }
 
   async Comment(_request: CommentRequest, _metadata?: Metadata): Promise<JsonWrappedComment> {
     throw new Error(
@@ -237,7 +246,7 @@ export class LinksAndCommentsMock implements LinksAndComments {
   }
 
   async Del(request: BasicIdRequest, _metadata?: Metadata): Promise<Empty> {
-    this._posts.delete(request.id);
+    this._store.posts.delete(request.id);
     return {};
   }
 
@@ -246,13 +255,13 @@ export class LinksAndCommentsMock implements LinksAndComments {
     _metadata?: Metadata
   ): Promise<JsonRedditObjects> {
     if (request.postData?.developerData) {
-      this._postData.set(request.thingId, request.postData.developerData);
+      this._store.postData.set(request.thingId, request.postData.developerData);
     }
     return { json: { errors: [], data: { things: [] } } };
   }
 
   async EditUserText(request: CommentRequest, _metadata?: Metadata): Promise<JsonWrappedComment> {
-    const post = this._posts.get(request.thingId);
+    const post = this._store.posts.get(request.thingId);
     if (!post) {
       throw new Error('Post not found');
     }
@@ -300,7 +309,7 @@ export class LinksAndCommentsMock implements LinksAndComments {
   async Info(request: InfoRequest, _metadata?: Metadata): Promise<Listing> {
     const children = [];
     for (const id of request.thingIds) {
-      const post = this._posts.get(id);
+      const post = this._store.posts.get(id);
       if (post) {
         children.push({
           kind: 't3',
@@ -432,7 +441,7 @@ export class LinksAndCommentsMock implements LinksAndComments {
       authorFullname: 't2_testuser',
     };
 
-    this._posts.set(id, post);
+    this._store.posts.set(id, post);
 
     return {
       json: {
@@ -465,10 +474,10 @@ export class LinksAndCommentsMock implements LinksAndComments {
       authorFullname: 't2_testuser',
     };
 
-    this._posts.set(id, post);
+    this._store.posts.set(id, post);
 
     if (request.postData?.developerData) {
-      this._postData.set(id, request.postData.developerData);
+      this._store.postData.set(id, request.postData.developerData);
     }
 
     return {
@@ -524,11 +533,31 @@ export class LinksAndCommentsMock implements LinksAndComments {
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }
+}
 
-  getPostData(postId: string): JsonObject | undefined {
-    return this._postData.get(postId);
+export class LinksAndCommentsMock implements PluginMock<LinksAndComments> {
+  readonly plugin: LinksAndCommentsPluginMock;
+  private readonly _store: LinksAndCommentsStore;
+
+  constructor() {
+    this._store = {
+      posts: new Map(),
+      postData: new Map(),
+    };
+    this.plugin = new LinksAndCommentsPluginMock(this._store);
   }
 
+  /**
+   * Retrieves developer data associated with a post.
+   */
+  getPostData(postId: string): JsonObject | undefined {
+    return this._store.postData.get(postId);
+  }
+
+  /**
+   * Seeds the mock database with a Post.
+   * This allows tests to set up state before calling `reddit.getPostById`.
+   */
   addPost(post: Omit<Partial<RedditObject>, 'id'> & { id: T3; title: string }): RedditObject {
     const fullId = post.id;
     const shortId = fullId.replace(/^t3_/, '');
@@ -548,7 +577,7 @@ export class LinksAndCommentsMock implements LinksAndComments {
       name: post.title,
     };
 
-    this._posts.set(fullId, newPost);
+    this._store.posts.set(fullId, newPost);
 
     return newPost;
   }

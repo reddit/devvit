@@ -35,11 +35,20 @@ import type {
   UsersSearchRequest,
 } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
 import type { T5 } from '@devvit/shared';
+import type { PluginMock } from '@devvit/shared-types/test/index.js';
 
 type SubredditDisplayName = string;
 
-export class SubredditMock implements Subreddits {
-  private _subreddits = new Map<SubredditDisplayName, SubredditAboutResponse_AboutData>();
+type SubredditStore = {
+  subreddits: Map<SubredditDisplayName, SubredditAboutResponse_AboutData>;
+};
+
+export class SubredditPluginMock implements Subreddits {
+  private readonly _store: SubredditStore;
+
+  constructor(store: SubredditStore) {
+    this._store = store;
+  }
 
   async AboutWhere(_request: AboutWhereRequest, _metadata?: Metadata): Promise<Listing> {
     throw new Error(
@@ -134,7 +143,7 @@ export class SubredditMock implements Subreddits {
     const subredditName = request.subreddit;
     let found: SubredditAboutResponse_AboutData | undefined;
 
-    for (const [name, data] of this._subreddits.entries()) {
+    for (const [name, data] of this._store.subreddits.entries()) {
       if (name.toLowerCase() === subredditName.toLowerCase()) {
         found = data;
         break;
@@ -291,7 +300,23 @@ export class SubredditMock implements Subreddits {
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }
+}
 
+export class SubredditMock implements PluginMock<Subreddits> {
+  readonly plugin: SubredditPluginMock;
+  private readonly _store: SubredditStore;
+
+  constructor() {
+    this._store = {
+      subreddits: new Map(),
+    };
+    this.plugin = new SubredditPluginMock(this._store);
+  }
+
+  /**
+   * Helper to seed the mock database with a Subreddit.
+   * This allows tests to set up state before calling `reddit.getSubredditByName`.
+   */
   addSubreddit(
     data: Partial<SubredditAboutResponse_AboutData> & { id: T5; displayName: string }
   ): SubredditAboutResponse_AboutData {
@@ -309,7 +334,7 @@ export class SubredditMock implements Subreddits {
       id: data.id.replace(/^t5_/, ''),
     } as SubredditAboutResponse_AboutData;
 
-    this._subreddits.set(data.displayName, subreddit);
+    this._store.subreddits.set(data.displayName, subreddit);
 
     return subreddit;
   }

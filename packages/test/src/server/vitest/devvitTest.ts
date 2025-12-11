@@ -24,6 +24,8 @@ import {
   MOCK_HEADERS as headersMock,
 } from '@devvit/shared-types/test/index.js';
 import type { T2, T5 } from '@devvit/shared-types/tid.js';
+import { Redis } from 'ioredis';
+import { RedisMemoryServer } from 'redis-memory-server';
 import type { TestAPI, TestFunction } from 'vitest';
 import { test as baseTest, vi } from 'vitest';
 
@@ -31,6 +33,11 @@ import { HTTPMock } from '../mocks/http/httpMock.js';
 import { installDevvitInterceptors, runWithTestContext, type TestContext } from './context.js';
 
 installDevvitInterceptors();
+
+const redisServer = new RedisMemoryServer();
+const host = await redisServer.getHost();
+const port = await redisServer.getPort();
+const sharedRedisConn = new Redis({ host, port });
 
 export type DevvitFixtures = {
   /**
@@ -229,7 +236,7 @@ const setup = (
     [Header.SubredditName]: subredditName,
   };
   const mediaMock = new MediaMock();
-  const redisMock = new RedisMock();
+  const redisMock = new RedisMock(sharedRedisConn);
   const httpMock = new HTTPMock();
   const redditMock = new RedditPluginMock();
   const realtimeMock = new RealtimeMock();
@@ -238,14 +245,18 @@ const setup = (
   const notificationsMock = new NotificationsMock();
 
   // Seed default context data so helpers like getCurrentUser/subreddit work.
-  redditMock.addUser({ id: userId, name: username });
-  redditMock.addSubreddit({ id: subredditId, displayName: subredditName, title: subredditName });
+  redditMock.users.addUser({ id: userId, name: username });
+  redditMock.subreddits.addSubreddit({
+    id: subredditId,
+    displayName: subredditName,
+    title: subredditName,
+  });
 
   const cfg = makeConfig({
     plugins: {
-      [MediaServiceDefinition.fullName]: mediaMock,
-      [RedisAPIDefinition.fullName]: redisMock,
-      [HTTPDefinition.fullName]: httpMock,
+      [MediaServiceDefinition.fullName]: mediaMock.plugin,
+      [RedisAPIDefinition.fullName]: redisMock.plugin,
+      [HTTPDefinition.fullName]: httpMock.plugin,
       [RealtimeDefinition.fullName]: realtimeMock.plugin,
       [SettingsDefinition.fullName]: settingsMock.plugin,
       [SchedulerDefinition.fullName]: schedulerMock.plugin,

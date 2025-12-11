@@ -3,6 +3,7 @@ import type {
   PersistedQueryRequest,
   QueryRequest,
 } from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_msg.js';
+import type { PluginMock } from '@devvit/shared-types/test/index.js';
 
 import type { LinksAndCommentsMock } from './LinksAndCommentsMock.js';
 
@@ -17,7 +18,7 @@ const methodMap: { readonly [method: string]: string } = {
   CreateShareUrl: 'createShareUrl',
 };
 
-export class GraphQLMock implements GraphQL {
+export class GraphQLPluginMock implements GraphQL {
   private readonly _linksAndCommentsMock: LinksAndCommentsMock;
 
   constructor(linksAndCommentsMock: LinksAndCommentsMock) {
@@ -63,5 +64,13 @@ export class GraphQLMock implements GraphQL {
       `Reddit API method GraphQL.Query is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
+  }
+}
+
+export class GraphQLMock implements PluginMock<GraphQL> {
+  readonly plugin: GraphQLPluginMock;
+
+  constructor(linksAndCommentsMock: LinksAndCommentsMock) {
+    this.plugin = new GraphQLPluginMock(linksAndCommentsMock);
   }
 }

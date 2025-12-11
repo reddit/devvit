@@ -13,7 +13,7 @@ const media = new MediaClient();
 beforeAll(() => {
   const config = makeConfig({
     plugins: {
-      [MediaServiceDefinition.fullName]: new MediaMock(),
+      [MediaServiceDefinition.fullName]: new MediaMock().plugin,
     },
   });
   installGlobalConfig(config);

@@ -52,14 +52,8 @@ import type {
   Int64Value,
   StringValue,
 } from '@devvit/protos/types/google/protobuf/wrappers.js';
+import type { PluginMock } from '@devvit/shared-types/test/index.js';
 import { Redis } from 'ioredis';
-import { RedisMemoryServer } from 'redis-memory-server';
-
-const redisServer = new RedisMemoryServer();
-const host = await redisServer.getHost();
-const port = await redisServer.getPort();
-
-const conn = new Redis({ host, port });
 
 type QueuedCommand = () => Promise<TransactionResponse>;
 
@@ -124,21 +118,20 @@ const pairsToMembers = (vals: string[]): ZMemberEntry[] => {
 const lexValsToMembers = (vals: string[]): ZMemberEntry[] =>
   vals.map((member) => ({ member, score: 0 }));
 
+type RedisStore = {
+  transactions: Map<string, TransactionState>;
+  conn: Redis;
+};
+
 /**
  * Mock implementation of the Redis API for testing purposes.
  * Uses an in-memory Redis server to simulate actual Redis behavior.
  */
-export class RedisMock implements RedisAPI {
-  private readonly _transactions = new Map<string, TransactionState>();
+export class RedisPluginMock implements RedisAPI {
+  private readonly _store: RedisStore;
 
-  constructor() {}
-
-  /**
-   * Clears the mock Redis state.
-   */
-  async clear(): Promise<void> {
-    this._transactions.clear();
-    await conn.flushall();
+  constructor(store: RedisStore) {
+    this._store = store;
   }
 
   private _makeKey(key: string, scope?: RedisKeyScope | undefined): string {
@@ -149,7 +142,7 @@ export class RedisMock implements RedisAPI {
   // Simple Key-Value operations
   async Get(request: KeyRequest, metadata?: Metadata): Promise<StringValue> {
     const operation = async (): Promise<StringValue> => {
-      const v = await conn.get(this._makeKey(request.key, request.scope));
+      const v = await this._store.conn.get(this._makeKey(request.key, request.scope));
       if (v == null) {
         if (shouldThrowNil(metadata)) throw new Error('redis: nil');
         return { value: '' } as StringValue;
@@ -160,7 +153,7 @@ export class RedisMock implements RedisAPI {
   }
 
   async GetBytes(request: KeyRequest, metadata?: Metadata): Promise<BytesValue> {
-    const v = await conn.getBuffer(this._makeKey(request.key, request.scope));
+    const v = await this._store.conn.getBuffer(this._makeKey(request.key, request.scope));
     if (v == null) {
       if (shouldThrowNil(metadata)) throw new Error('redis: nil');
       return { value: new Uint8Array() } as BytesValue;
@@ -185,7 +178,7 @@ export class RedisMock implements RedisAPI {
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const res = await (conn.set as any)(...args);
+      const res = await (this._store.conn.set as any)(...args);
       return { value: res ?? '' } as StringValue;
     };
 
@@ -193,13 +186,17 @@ export class RedisMock implements RedisAPI {
   }
 
   async Exists(request: KeysRequest): Promise<ExistsResponse> {
-    const count = await conn.exists(...request.keys.map((k) => this._makeKey(k, request.scope)));
+    const count = await this._store.conn.exists(
+      ...request.keys.map((k) => this._makeKey(k, request.scope))
+    );
     return { existingKeys: count } as ExistsResponse;
   }
 
   async Del(request: KeysRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const n = await conn.del(...request.keys.map((k) => this._makeKey(k, request.scope)));
+      const n = await this._store.conn.del(
+        ...request.keys.map((k) => this._makeKey(k, request.scope))
+      );
       return { value: n } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
@@ -207,14 +204,14 @@ export class RedisMock implements RedisAPI {
 
   async Type(request: KeyRequest): Promise<StringValue> {
     const operation = async (): Promise<StringValue> => {
-      const t = await conn.type(this._makeKey(request.key, request.scope));
+      const t = await this._store.conn.type(this._makeKey(request.key, request.scope));
       return { value: t } as StringValue;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ str: result.value }));
   }
 
   async Rename(request: RenameRequest): Promise<RenameResponse> {
-    const res = await conn.rename(
+    const res = await this._store.conn.rename(
       this._makeKey(request.key, request.scope),
       this._makeKey(request.newKey, request.scope)
     );
@@ -225,7 +222,7 @@ export class RedisMock implements RedisAPI {
   async IncrBy(request: IncrByRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
       const { key, value, scope } = request;
-      const v = await conn.incrby(this._makeKey(key, scope), value);
+      const v = await this._store.conn.incrby(this._makeKey(key, scope), value);
       return { value: Number(v) } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
@@ -236,7 +233,7 @@ export class RedisMock implements RedisAPI {
     const operation = async (): Promise<Int64Value> => {
       const map: Record<string, string> = {};
       for (const { field, value } of request.fv) map[field] = value;
-      const v = await conn.hset(this._makeKey(request.key, request.scope), map);
+      const v = await this._store.conn.hset(this._makeKey(request.key, request.scope), map);
       return { value: Number(v) } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
@@ -244,7 +241,10 @@ export class RedisMock implements RedisAPI {
 
   async HGet(request: HGetRequest, metadata?: Metadata): Promise<StringValue> {
     const operation = async (): Promise<StringValue> => {
-      const v = await conn.hget(this._makeKey(request.key, request.scope), request.field);
+      const v = await this._store.conn.hget(
+        this._makeKey(request.key, request.scope),
+        request.field
+      );
       if (v == null) {
         if (shouldThrowNil(metadata)) throw new Error('redis: nil');
         return { value: '' } as StringValue;
@@ -256,7 +256,10 @@ export class RedisMock implements RedisAPI {
 
   async HMGet(request: HMGetRequest): Promise<RedisValues> {
     const operation = async (): Promise<RedisValues> => {
-      const vals = await conn.hmget(this._makeKey(request.key, request.scope), ...request.fields);
+      const vals = await this._store.conn.hmget(
+        this._makeKey(request.key, request.scope),
+        ...request.fields
+      );
       return {
         values: vals.map((v) => (v === null ? '' : v)),
       } as unknown as RedisValues;
@@ -266,7 +269,7 @@ export class RedisMock implements RedisAPI {
 
   async HGetAll(request: KeyRequest): Promise<RedisFieldValues> {
     const operation = async (): Promise<RedisFieldValues> => {
-      const v = await conn.hgetall(this._makeKey(request.key, request.scope));
+      const v = await this._store.conn.hgetall(this._makeKey(request.key, request.scope));
       return { fieldValues: v } as RedisFieldValues;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => {
@@ -280,7 +283,10 @@ export class RedisMock implements RedisAPI {
 
   async HDel(request: HDelRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const n = await conn.hdel(this._makeKey(request.key, request.scope), ...request.fields);
+      const n = await this._store.conn.hdel(
+        this._makeKey(request.key, request.scope),
+        ...request.fields
+      );
       return { value: Number(n) } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
@@ -293,7 +299,7 @@ export class RedisMock implements RedisAPI {
       if (request.count) args.push('COUNT', String(request.count));
       // ioredis types don't support spread arguments well, so we cast the function to any
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const [cursor, elements] = await (conn.hscan as any)(
+      const [cursor, elements] = await (this._store.conn.hscan as any)(
         this._makeKey(request.key, request.scope),
         request.cursor,
         ...args
@@ -315,7 +321,7 @@ export class RedisMock implements RedisAPI {
 
   async HKeys(request: KeyRequest): Promise<KeysResponse> {
     const operation = async (): Promise<KeysResponse> => {
-      const keys = await conn.hkeys(this._makeKey(request.key, request.scope));
+      const keys = await this._store.conn.hkeys(this._makeKey(request.key, request.scope));
       return { keys } as KeysResponse;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({
@@ -325,7 +331,7 @@ export class RedisMock implements RedisAPI {
 
   async HIncrBy(request: HIncrByRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.hincrby(
+      const v = await this._store.conn.hincrby(
         this._makeKey(request.key, request.scope),
         request.field,
         request.value
@@ -337,7 +343,7 @@ export class RedisMock implements RedisAPI {
 
   async HLen(request: KeyRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.hlen(this._makeKey(request.key, request.scope));
+      const v = await this._store.conn.hlen(this._makeKey(request.key, request.scope));
       return { value: Number(v) } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
@@ -345,7 +351,7 @@ export class RedisMock implements RedisAPI {
 
   async HSetNX(request: HSetNXRequest): Promise<{ success: number }> {
     const operation = async (): Promise<{ success: number }> => {
-      const v = await conn.hsetnx(
+      const v = await this._store.conn.hsetnx(
         this._makeKey(request.key, request.scope),
         request.field,
         request.value
@@ -407,7 +413,7 @@ export class RedisMock implements RedisAPI {
   // String operations
   async GetRange(request: KeyRangeRequest): Promise<StringValue> {
     const operation = async (): Promise<StringValue> => {
-      const v = await conn.getrange(
+      const v = await this._store.conn.getrange(
         this._makeKey(request.key, request.scope),
         request.start,
         request.end
@@ -418,7 +424,7 @@ export class RedisMock implements RedisAPI {
   }
   async SetRange(request: SetRangeRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.setrange(
+      const v = await this._store.conn.setrange(
         this._makeKey(request.key, request.scope),
         request.offset,
         request.value
@@ -429,7 +435,7 @@ export class RedisMock implements RedisAPI {
   }
   async Strlen(request: KeyRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.strlen(this._makeKey(request.key, request.scope));
+      const v = await this._store.conn.strlen(this._makeKey(request.key, request.scope));
       return { value: Number(v) } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
@@ -439,7 +445,7 @@ export class RedisMock implements RedisAPI {
   async MGet(request: KeysRequest): Promise<RedisValues> {
     const operation = async (): Promise<RedisValues> => {
       const keys = request.keys.map((k) => this._makeKey(k, request.scope));
-      const vals = await conn.mget(...keys);
+      const vals = await this._store.conn.mget(...keys);
       return {
         values: vals.map((v) => (v === null ? '' : v)),
       } as unknown as RedisValues;
@@ -452,7 +458,7 @@ export class RedisMock implements RedisAPI {
       for (const { key, value } of request.kv) {
         flat.push(this._makeKey(key, request.scope), value);
       }
-      await conn.mset(...flat);
+      await this._store.conn.mset(...flat);
       return {} as Empty;
     };
     return this._queueOrRun(request.transactionId, operation, () => ({ str: 'OK' }), {} as Empty);
@@ -461,14 +467,14 @@ export class RedisMock implements RedisAPI {
   // Key expiration
   async Expire(request: ExpireRequest): Promise<Empty> {
     const operation = async (): Promise<Empty> => {
-      await conn.expire(this._makeKey(request.key, request.scope), request.seconds);
+      await this._store.conn.expire(this._makeKey(request.key, request.scope), request.seconds);
       return {} as Empty;
     };
     return this._queueOrRun(request.transactionId, operation, () => ({ str: 'OK' }), {} as Empty);
   }
   async ExpireTime(request: KeyRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.expiretime(this._makeKey(request.key, request.scope));
+      const v = await this._store.conn.expiretime(this._makeKey(request.key, request.scope));
       return { value: Number(v) } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
@@ -478,14 +484,14 @@ export class RedisMock implements RedisAPI {
   async ZAdd(request: ZAddRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
       const args = request.members.flatMap((m) => [m.score, m.member]);
-      const v = await conn.zadd(this._makeKey(request.key, request.scope), ...args);
+      const v = await this._store.conn.zadd(this._makeKey(request.key, request.scope), ...args);
       return { value: Number(v) } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
   }
   async ZCard(request: KeyRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.zcard(this._makeKey(request.key, request.scope));
+      const v = await this._store.conn.zcard(this._makeKey(request.key, request.scope));
       return { value: Number(v) } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
@@ -498,16 +504,16 @@ export class RedisMock implements RedisAPI {
 
       if (request.byScore) {
         const vals = request.rev
-          ? await conn.zrevrangebyscore(k, request.stop, request.start, 'WITHSCORES')
-          : await conn.zrangebyscore(k, request.start, request.stop, 'WITHSCORES');
+          ? await this._store.conn.zrevrangebyscore(k, request.stop, request.start, 'WITHSCORES')
+          : await this._store.conn.zrangebyscore(k, request.start, request.stop, 'WITHSCORES');
         const members = paginateMembers(pairsToMembers(vals), offsetVal, countVal);
         return { members } as ZMembers;
       }
 
       if (request.byLex) {
         const vals = request.rev
-          ? await conn.zrevrangebylex(k, request.start, request.stop)
-          : await conn.zrangebylex(k, request.start, request.stop);
+          ? await this._store.conn.zrevrangebylex(k, request.start, request.stop)
+          : await this._store.conn.zrangebylex(k, request.start, request.stop);
         const members = paginateMembers(lexValsToMembers(vals), offsetVal, countVal);
         return { members } as ZMembers;
       }
@@ -515,8 +521,8 @@ export class RedisMock implements RedisAPI {
       const startIndex = Number(request.start);
       const stopIndex = Number(request.stop);
       const vals = request.rev
-        ? await conn.zrevrange(k, startIndex, stopIndex, 'WITHSCORES')
-        : await conn.zrange(k, startIndex, stopIndex, 'WITHSCORES');
+        ? await this._store.conn.zrevrange(k, startIndex, stopIndex, 'WITHSCORES')
+        : await this._store.conn.zrange(k, startIndex, stopIndex, 'WITHSCORES');
       const members = paginateMembers(pairsToMembers(vals), offsetVal, countVal);
       return { members } as ZMembers;
     };
@@ -525,7 +531,7 @@ export class RedisMock implements RedisAPI {
   }
   async ZRem(request: ZRemRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.zrem(
+      const v = await this._store.conn.zrem(
         this._makeKey(request.key?.key ?? '', request.scope ?? request.key?.scope),
         ...request.members
       );
@@ -541,7 +547,7 @@ export class RedisMock implements RedisAPI {
   }
   async ZRemRangeByLex(request: ZRemRangeByLexRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.zremrangebylex(
+      const v = await this._store.conn.zremrangebylex(
         this._makeKey(request.key?.key ?? '', request.scope ?? request.key?.scope),
         request.min,
         request.max
@@ -558,7 +564,7 @@ export class RedisMock implements RedisAPI {
   }
   async ZRemRangeByRank(request: ZRemRangeByRankRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.zremrangebyrank(
+      const v = await this._store.conn.zremrangebyrank(
         this._makeKey(request.key?.key ?? '', request.scope ?? request.key?.scope),
         request.start,
         request.stop
@@ -575,7 +581,7 @@ export class RedisMock implements RedisAPI {
   }
   async ZRemRangeByScore(request: ZRemRangeByScoreRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.zremrangebyscore(
+      const v = await this._store.conn.zremrangebyscore(
         this._makeKey(request.key?.key ?? '', request.scope ?? request.key?.scope),
         request.min,
         request.max
@@ -597,7 +603,7 @@ export class RedisMock implements RedisAPI {
       if (request.count) args.push('COUNT', String(request.count));
       // ioredis types don't support spread arguments well, so we cast the function to any
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const [cursor, elements] = await (conn.zscan as any)(
+      const [cursor, elements] = await (this._store.conn.zscan as any)(
         this._makeKey(request.key, request.scope),
         request.cursor,
         ...args
@@ -621,7 +627,7 @@ export class RedisMock implements RedisAPI {
   }
   async ZScore(request: ZScoreRequest, metadata?: Metadata): Promise<DoubleValue> {
     const operation = async (): Promise<DoubleValue> => {
-      const v = await conn.zscore(
+      const v = await this._store.conn.zscore(
         this._makeKey(request.key?.key ?? '', request.scope ?? request.key?.scope),
         request.member
       );
@@ -639,7 +645,7 @@ export class RedisMock implements RedisAPI {
   }
   async ZRank(request: ZRankRequest, metadata?: Metadata): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await conn.zrank(
+      const v = await this._store.conn.zrank(
         this._makeKey(request.key?.key ?? '', request.scope ?? request.key?.scope),
         request.member
       );
@@ -657,7 +663,7 @@ export class RedisMock implements RedisAPI {
   }
   async ZIncrBy(request: ZIncrByRequest): Promise<DoubleValue> {
     const operation = async (): Promise<DoubleValue> => {
-      const v = await conn.zincrby(
+      const v = await this._store.conn.zincrby(
         this._makeKey(request.key, request.scope),
         request.value,
         request.member
@@ -690,7 +696,10 @@ export class RedisMock implements RedisAPI {
     }
     // TODO: Fix this once BitfieldRequest supports scope. Looks like a bug that it doesn't?
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = await (conn.bitfield as any)(this._makeKey(request.key, undefined), ...flat);
+    const res = await (this._store.conn.bitfield as any)(
+      this._makeKey(request.key, undefined),
+      ...flat
+    );
     return { results: res } as BitfieldResponse;
   }
 
@@ -702,12 +711,12 @@ export class RedisMock implements RedisAPI {
       watchedKeys: [...keys],
       closed: false,
     };
-    this._transactions.set(tx.id, tx);
+    this._store.transactions.set(tx.id, tx);
     return tx;
   }
 
   private _getTransaction(transactionId: TransactionId): TransactionState {
-    const tx = this._transactions.get(transactionId.id);
+    const tx = this._store.transactions.get(transactionId.id);
     if (!tx || tx.closed) {
       throw new Error(`Unknown or closed transaction ${transactionId.id}`);
     }
@@ -751,10 +760,31 @@ export class RedisMock implements RedisAPI {
   }
 
   private _closeTransaction(transactionId: TransactionId): void {
-    const tx = this._transactions.get(transactionId.id);
+    const tx = this._store.transactions.get(transactionId.id);
     if (tx) {
       tx.closed = true;
-      this._transactions.delete(transactionId.id);
+      this._store.transactions.delete(transactionId.id);
     }
+  }
+}
+
+export class RedisMock implements PluginMock<RedisAPI> {
+  readonly plugin: RedisPluginMock;
+  private readonly _store: RedisStore;
+
+  constructor(conn: Redis) {
+    this._store = {
+      transactions: new Map(),
+      conn: conn,
+    };
+    this.plugin = new RedisPluginMock(this._store);
+  }
+
+  /**
+   * Clears the mock Redis state.
+   */
+  async clear(): Promise<void> {
+    this._store.transactions.clear();
+    await this._store.conn.flushall();
   }
 }

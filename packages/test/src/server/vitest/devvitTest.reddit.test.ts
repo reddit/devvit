@@ -8,7 +8,7 @@ import { createDevvitTest } from './devvitTest.js';
 const test = createDevvitTest();
 
 test('can add and retrieve a user', async ({ mocks }) => {
-  mocks.reddit.addUser({
+  mocks.reddit.users.addUser({
     id: 't2_user',
     name: 'test_user',
     createdUtc: 100,
@@ -68,7 +68,7 @@ test('throws helpful error for unimplemented plugins', () => {
 });
 
 test('throws helpful error for unimplemented methods on an existing mock', async ({ mocks }) => {
-  mocks.reddit.addUser({
+  mocks.reddit.users.addUser({
     id: 't2_user',
     name: 'test_user',
   });
@@ -83,7 +83,7 @@ test('throws helpful error for unimplemented methods on an existing mock', async
 test('throws a helpful error for unimplemented methods on a returning object', async ({
   mocks,
 }) => {
-  mocks.reddit.addUser({
+  mocks.reddit.users.addUser({
     id: 't2_user',
     name: 'test_user',
   });
@@ -102,7 +102,7 @@ test('throws a helpful error for unimplemented methods on a returning object', a
 test('throws a helpful error for unimplemented listing on a returning object', async ({
   mocks,
 }) => {
-  mocks.reddit.addUser({
+  mocks.reddit.users.addUser({
     id: 't2_user',
     name: 'test_user',
   });
@@ -121,7 +121,7 @@ test('throws a helpful error for unimplemented listing on a returning object', a
 });
 
 test('can mock method on a returning object', async ({ mocks }) => {
-  mocks.reddit.addUser({
+  mocks.reddit.users.addUser({
     id: 't2_user',
     name: 'test_user',
   });
@@ -146,7 +146,7 @@ test('can mock method on a returning object', async ({ mocks }) => {
 });
 
 test('can mock method for all users', async ({ mocks }) => {
-  mocks.reddit.addUser({
+  mocks.reddit.users.addUser({
     id: 't2_user',
     name: 'test_user',
   });
@@ -208,7 +208,7 @@ test('can set, get, and update postData', async () => {
 });
 
 test('can add and retrieve a subreddit', async ({ mocks }) => {
-  mocks.reddit.addSubreddit({
+  mocks.reddit.subreddits.addSubreddit({
     id: 't5_test',
     displayName: 'other_sub',
     title: 'Other Subreddit',

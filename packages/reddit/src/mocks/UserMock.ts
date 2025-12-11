@@ -22,15 +22,24 @@ import type {
   UserWhereRequest,
 } from '@devvit/protos/types/devvit/plugin/redditapi/users/users_msg.js';
 import type { User } from '@devvit/protos/types/devvit/reddit/user.js';
+import type { PluginMock } from '@devvit/shared-types/test/index.js';
 import { isT2, T2 } from '@devvit/shared-types/tid.js';
 
 type Username = string;
 
-export class UserMock implements Users {
-  private _users = new Map<Username, User>();
+type UserStore = {
+  users: Map<Username, User>;
+};
+
+export class UserPluginMock implements Users {
+  private readonly _store: UserStore;
+
+  constructor(store: UserStore) {
+    this._store = store;
+  }
 
   async UserAbout(request: UserAboutRequest, _metadata?: Metadata): Promise<UserAboutResponse> {
-    const user = this._users.get(request.username);
+    const user = this._store.users.get(request.username);
     if (!user) {
       // Simulate 404
       throw new Error('HTTP 404 Not Found');
@@ -47,7 +56,7 @@ export class UserMock implements Users {
 
     for (const id of ids) {
       const targetId = T2(isT2(id) ? id : `t2_${id}`);
-      const user = Array.from(this._users.values()).find((u) => {
+      const user = Array.from(this._store.users.values()).find((u) => {
         if (!u.id) {
           return false;
         }
@@ -168,7 +177,23 @@ export class UserMock implements Users {
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }
+}
 
+export class UserMock implements PluginMock<Users> {
+  readonly plugin: UserPluginMock;
+  private readonly _store: UserStore;
+
+  constructor() {
+    this._store = {
+      users: new Map(),
+    };
+    this.plugin = new UserPluginMock(this._store);
+  }
+
+  /**
+   * Seeds the mock database with a User.
+   * This allows tests to set up state before calling `reddit.getUserByUsername`.
+   */
   addUser(data: Omit<Partial<User>, 'id'> & { name: string; id: T2 }): User {
     const user: User = {
       createdUtc: data.createdUtc ?? Math.floor(Date.now() / 1000),
@@ -193,7 +218,7 @@ export class UserMock implements Users {
       id: data.id.replace(/^t2_/, ''),
     };
 
-    this._users.set(data.name, user);
+    this._store.users.set(data.name, user);
 
     return user;
   }
