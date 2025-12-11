@@ -285,6 +285,9 @@ export type SubmitPostOptions =
 export type CrosspostOptions = CommonSubmitPostOptions &
   Required<SubredditOptions> & { postId: T3 };
 
+/** @deprecated Use {@link CommonFlair}. */
+export type LinkFlair = CommonFlair
+
 /**
  * oEmbed is a format for allowing an embedded representation of a URL on third party sites.
  * The simple API allows a website to display embedded content (such as photos or videos)
