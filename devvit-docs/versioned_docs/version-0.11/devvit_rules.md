@@ -12,9 +12,9 @@ Your app is subject to our app review and approval. Reddit may reject or remove 
 
 These Devvit Rules are intended to clarify how we review Devvit apps and streamline the process for you and Reddit. Our goal is to keep redditors safe and enable developers to build fun and useful apps for redditors. This means our Devvit Rules may evolve over time, which you should keep in mind when building or updating your app. Please [reach out](https://developers.reddit.com/docs/help) if you have any questions on these Devvit Rules. Any exceptions to these Devvit Rules or any other Reddit Terms & Policies must be approved in writing by Reddit.
 
-You can use Devvit and test your app without needing to submit it to Reddit’s App Review. However, to make your app visible in the [Reddit App Directory](https://developers.reddit.com/apps) and publicly available for other mods and admins to install, you’ll need prior app approval. Additionally, if you want to unlock premium features for your app (for example, [payments](./earn-money/payments/payments_overview), [fetching](./capabilities/server/http-fetch), or [using LLMs](#generative-aillm-rules)), you’ll also need prior app approval.
+You can use Devvit and test your app without needing to submit it to Reddit’s App Review. However, to make your app visible in the [Reddit App Directory](https://developers.reddit.com/apps) and publicly available for other mods and admins to install, you’ll need prior app approval. Additionally, if you want to unlock premium features for your app (for example, [payments](./payments/payments_overview), [fetching](./capabilities/http-fetch), or [using LLMs](#generative-aillm-rules)), you’ll also need prior app approval.
 
-You can start the Reddit app review process by [publishing your app](./guides/launch/launch-guide). Before starting a Reddit app review, we recommend:
+You can start the Reddit app review process by [publishing your app](./publishing). Before starting a Reddit app review, we recommend:
 
 - Thoroughly playtesting your app,
 - Carefully reviewing these Devvit Rules and other Reddit Terms & Policies, and
@@ -44,7 +44,7 @@ You and your app(s) must:
 - Provide discrete functionality and always try to make Reddit more enjoyable
 - Maintain functionality that communities rely on, communicate when you cannot, and make it easy to contact you for support
 - Be transparent and use clear naming and descriptions that accurately describe your app’s functionality, purpose, and data practices
-- Include your own terms of service and privacy policy if your app uses premium features (for example, [payments](./earn-money/payments/payments_overview), [fetching](./capabilities/server/http-fetch), or [using LLMs](#generative-aillm-rules)) or if requested by Reddit
+- Include your own terms of service and privacy policy if your app uses premium features (for example, [payments](./payments/payments_overview), [fetching](./capabilities/http-fetch.mdx), or [using LLMs](#generative-aillm-rules)) or if requested by Reddit
 - Provide accurate information about your relationship with Reddit or any other person or entity, including other developers (for example, by including them in your app description)
 - Test your app locally and in sandbox subreddits when applicable
 - Avoid enabling or allowing others to violate these Devvit Rules or other Reddit Terms & Policies
@@ -126,11 +126,11 @@ Your app must comply with all privacy and data protection requirements outlined 
 
 ### Be careful using external sites or services
 
-If your app uses [HTTP Fetch](./capabilities/server/http-fetch) or otherwise collects personal information about app users, we require you to have a terms of service and privacy policy and include a link to both in your app. Your terms of service and privacy policy must completely and accurately describe how you and your app collects, uses, shares, and stores data and why. (Please note that links to Reddit’s [User Agreement](https://redditinc.com/policies/user-agreement) and/or [Privacy Policy](https://www.reddit.com/policies/privacy-policy) will not be accepted.)
+If your app uses [HTTP Fetch](./capabilities/http-fetch) or otherwise collects personal information about app users, we require you to have a terms of service and privacy policy and include a link to both in your app. Your terms of service and privacy policy must completely and accurately describe how you and your app collects, uses, shares, and stores data and why. (Please note that links to Reddit’s [User Agreement](https://redditinc.com/policies/user-agreement) and/or [Privacy Policy](https://www.reddit.com/policies/privacy-policy) will not be accepted.)
 
 If your app links to any third-party site that may collect redditor personal data, you are solely responsible for verifying the legitimacy and security of the third-party site and should ensure that they are in compliance with all applicable laws. For example, you should ensure that a site collecting personal data provides a privacy policy that clearly discloses what data is collected, how the data is used, and how the data is shared.
 
-You’ll also need permission during app review to direct redditors outside of Reddit or otherwise collect personal information about them. To request HTTP Fetch functionality for a specific domain, please follow [these instructions](./capabilities/server/http-fetch).
+You’ll also need permission during app review to direct redditors outside of Reddit or otherwise collect personal information about them. To request HTTP Fetch functionality for a specific domain, please follow [these instructions](./capabilities/http-fetch).
 
 ## Content rules
 
@@ -160,7 +160,7 @@ Whether your app uses existing user content or otherwise allows users to create 
 
 - _Account Deletions_ – When a user account is deleted, the related user ID (t2\_\*) must be completely removed from your hosted datastores (e.g., Redis) and any external systems. You must also delete all references to the author-identifying information (including the author ID, name, profile URL, avatar image URL, user flair, etc.) from posts and comments created by that account. You may continue to keep posts and comments created by deleted accounts, provided that the posts and comments have not been explicitly deleted.
 
-- _Setting Up Auto-Deletion_ – To best comply with this policy, we recommend deleting any stored user data within 30 days. For any data you are storing in Redis, you can use the [expire function](./capabilities/server/redis#key-expiration) to ensure data gets deleted automatically.
+- _Setting Up Auto-Deletion_ – To best comply with this policy, we recommend deleting any stored user data within 30 days. For any data you are storing in Redis, you can use the [expire function](./capabilities/redis#key-expiration) to ensure data gets deleted automatically.
 
 - **Enabling Deletions of New User Content** – if your app allows users to create new user content, you must ensure that users have the ability to remove their own content when desired and comply with all legal requirements related to content removals. It is important to have safety guardrails in place if your app allows users to create new user content so that the content can be reported and removed by app users.
 

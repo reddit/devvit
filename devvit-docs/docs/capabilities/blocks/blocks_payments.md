@@ -64,7 +64,7 @@ Product prices are predefined and must be one of the following gold values:
 - 2500 gold ($50)
 
 :::note
-Actual payments will not be processed until your products are approved. While your app is under development, you can use sandbox payments to [simulate purchases](./payments_test#simulate-purchases).
+Actual payments will not be processed until your products are approved. While your app is under development, you can use sandbox payments to [simulate purchases](../../earn-money/payments/payments_test#simulate-purchases).
 :::
 
 ## Design guidelines
