@@ -1,5 +1,7 @@
 import '@devvit/shared-types/polyfill/fetch.polyfill.js';
 
+import { randomUUID } from 'node:crypto';
+
 import { MediaMock } from '@devvit/media/test';
 import { NotificationsMock } from '@devvit/notifications/test';
 import { SchedulerDefinition } from '@devvit/protos';
@@ -236,7 +238,7 @@ const setup = (
     [Header.SubredditName]: subredditName,
   };
   const mediaMock = new MediaMock();
-  const redisMock = new RedisMock(sharedRedisConn);
+  const redisMock = new RedisMock(sharedRedisConn, randomUUID());
   const httpMock = new HTTPMock();
   const redditMock = new RedditPluginMock();
   const realtimeMock = new RealtimeMock();

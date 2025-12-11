@@ -14,6 +14,7 @@ import {
   KeyRequest,
   KeysRequest,
   KeyValuesRequest,
+  RedisKeyScope,
   RenameRequest,
   SetRangeRequest,
   SetRequest,
@@ -813,6 +814,75 @@ describe('RedisMock', () => {
           SetRequest.create({ key: 'txn-error', value: 'boom', transactionId: txId })
         )
       ).rejects.toThrow(/multi/);
+    });
+  });
+
+  describe('Isolation and Prefixing', () => {
+    it('should clear all keys when no prefix is set', async () => {
+      const noPrefix = new RedisMock(conn); // No prefix
+      await noPrefix.plugin.Set(SetRequest.create({ key: 'key1', value: 'val1' }));
+      await noPrefix.plugin.Set(SetRequest.create({ key: 'key2', value: 'val2' }));
+
+      expect((await conn.keys('*')).length).toBeGreaterThan(0);
+
+      await noPrefix.clear();
+
+      expect((await conn.keys('*')).length).toBe(0);
+    });
+
+    it('should only clear prefixed keys when prefix is set', async () => {
+      // Create data with "test-A" prefix
+      const redisA = new RedisMock(conn, 'test-A');
+      await redisA.plugin.Set(SetRequest.create({ key: 'foo', value: 'bar' }));
+
+      // Create data with "test-B" prefix
+      const redisB = new RedisMock(conn, 'test-B');
+      await redisB.plugin.Set(SetRequest.create({ key: 'foo', value: 'baz' }));
+
+      // Both should exist in underlying redis
+      expect(await conn.get('test-A:foo')).toBe('bar');
+      expect(await conn.get('test-B:foo')).toBe('baz');
+
+      // Clear A
+      await redisA.clear();
+
+      // A should be gone, B should remain
+      expect(await conn.get('test-A:foo')).toBeNull();
+      expect(await conn.get('test-B:foo')).toBe('baz');
+    });
+
+    it('should apply prefix to both global and app-scoped keys', async () => {
+      const prefix = 'my-prefix';
+      const scopedRedis = new RedisMock(conn, prefix);
+
+      await scopedRedis.plugin.Set(SetRequest.create({ key: 'app-key', value: 'app-val' }));
+      await scopedRedis.plugin.Set(
+        SetRequest.create({
+          key: 'global-key',
+          value: 'global-val',
+          scope: RedisKeyScope.GLOBAL,
+        })
+      );
+
+      // Verify raw keys in Redis have the prefix
+      expect(await conn.get(`${prefix}:app-key`)).toBe('app-val');
+      expect(await conn.get(`${prefix}:global:global-key`)).toBe('global-val');
+    });
+
+    it('should add a colon delimiter if missing from prefix', async () => {
+      const redis = new RedisMock(conn, 'test-prefix');
+      await redis.plugin.Set(SetRequest.create({ key: 'key', value: 'val' }));
+
+      const rawValue = await conn.get('test-prefix:key');
+      expect(rawValue).toBe('val');
+    });
+
+    it('should not add a double colon if prefix ends with one', async () => {
+      const redis = new RedisMock(conn, 'test-prefix:');
+      await redis.plugin.Set(SetRequest.create({ key: 'key', value: 'val' }));
+
+      const rawValue = await conn.get('test-prefix:key');
+      expect(rawValue).toBe('val');
     });
   });
 });

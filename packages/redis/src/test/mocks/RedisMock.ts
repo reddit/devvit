@@ -121,6 +121,12 @@ const lexValsToMembers = (vals: string[]): ZMemberEntry[] =>
 type RedisStore = {
   transactions: Map<string, TransactionState>;
   conn: Redis;
+  /**
+   * Prefix to use for all keys.
+   * If provided, it will be used to scope all keys (including global ones).
+   * A colon delimiter (:) will be automatically appended if not present.
+   */
+  keyPrefix?: string;
 };
 
 /**
@@ -135,8 +141,13 @@ export class RedisPluginMock implements RedisAPI {
   }
 
   private _makeKey(key: string, scope?: RedisKeyScope | undefined): string {
-    if (scope === RedisKeyScope.GLOBAL) return `global:${key}`;
-    return key;
+    const scopedKey = scope === RedisKeyScope.GLOBAL ? `global:${key}` : key;
+    if (!this._store.keyPrefix) return scopedKey;
+
+    const prefix = this._store.keyPrefix.endsWith(':')
+      ? this._store.keyPrefix
+      : `${this._store.keyPrefix}:`;
+    return `${prefix}${scopedKey}`;
   }
 
   // Simple Key-Value operations
@@ -772,10 +783,17 @@ export class RedisMock implements PluginMock<RedisAPI> {
   readonly plugin: RedisPluginMock;
   private readonly _store: RedisStore;
 
-  constructor(conn: Redis) {
+  /**
+   * @param conn - The Redis connection to use.
+   * @param keyPrefix - Optional prefix to scope all keys. If provided, `clear()` will only delete
+   * keys starting with this prefix. This allows multiple test instances to share a single
+   * Redis connection without interference.
+   */
+  constructor(conn: Redis, keyPrefix: string = '') {
     this._store = {
       transactions: new Map(),
       conn: conn,
+      keyPrefix,
     };
     this.plugin = new RedisPluginMock(this._store);
   }
@@ -785,6 +803,22 @@ export class RedisMock implements PluginMock<RedisAPI> {
    */
   async clear(): Promise<void> {
     this._store.transactions.clear();
-    await this._store.conn.flushall();
+    if (this._store.keyPrefix) {
+      const prefix = this._store.keyPrefix.endsWith(':')
+        ? this._store.keyPrefix
+        : `${this._store.keyPrefix}:`;
+      const pattern = `${prefix}*`;
+      let cursor = '0';
+      do {
+        const result = await this._store.conn.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
+        cursor = result[0];
+        const keys = result[1];
+        if (keys.length > 0) {
+          await this._store.conn.del(...keys);
+        }
+      } while (cursor !== '0');
+    } else {
+      await this._store.conn.flushall();
+    }
   }
 }
