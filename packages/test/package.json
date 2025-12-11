@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@devvit/media": "0.12.5",
+    "@devvit/notifications": "0.12.5",
     "@devvit/protos": "0.12.5",
     "@devvit/realtime": "0.12.5",
     "@devvit/reddit": "0.12.5",
