@@ -21,6 +21,8 @@ The Reddit Developer Funds program (the “Program”) will run from April 1, 20
 
 Measurement and eligibility are further defined in our terms. Please reference our [terms](https://support.reddithelp.com/hc/en-us/articles/27958169342996) when evaluating your app performance.
 
+If your app has qualified for Developer Funds, you will recieve a notification within 15 days from the end of the qualifying month. Payouts are done net 45 from the end of the qualifying month.
+
 ## Awards
 
 | Tier              | Threshold                          | Payout  | Cumulative Payout |
