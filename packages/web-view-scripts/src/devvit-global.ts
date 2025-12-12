@@ -58,6 +58,7 @@ export const initDevvitGlobal = (
     appPermissionState: bridge?.appPermissionState,
     token: (bridge.signedRequestContext || bridge.webbitToken) as WebbitToken,
     webViewMode: bridge?.viewMode,
+    startTime: bridge?.startTime ?? undefined,
   };
 };
 

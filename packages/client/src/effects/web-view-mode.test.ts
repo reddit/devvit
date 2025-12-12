@@ -53,6 +53,7 @@ beforeEach(() => {
     share: undefined,
     token: noWebbitToken,
     webViewMode: undefined,
+    startTime: undefined,
   };
 });
 

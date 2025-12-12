@@ -22,6 +22,8 @@ export type DevvitGlobal = {
   token: WebbitToken;
   /** Current state of the web views immersive mode. */
   webViewMode: WebViewImmersiveMode | undefined;
+  /** Earliest moment the app started loading in UTC milliseconds. */
+  startTime: number | undefined;
 };
 
 /** `@devvit/web-view-scripts` version detail. */
