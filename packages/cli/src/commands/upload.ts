@@ -183,10 +183,10 @@ export default class Upload extends DevvitCommand {
 
     let appVersionNumber = flags.version;
 
-    if (! appVersionNumber) {
+    if (!appVersionNumber) {
       appVersionNumber = await this.#getNextVersionNumber(appInfo, flags.bump);
     }
-    
+
     this.#event.devplatform.app_version_number = appVersionNumber.toString();
     ux.action.start('Building');
     const bundles = await this.#bundleActors(username, appVersionNumber.toString());
