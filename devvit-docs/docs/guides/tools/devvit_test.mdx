@@ -1,0 +1,592 @@
+---
+id: devvit_test
+title: Testing Your App
+sidebar_label: Testing
+---
+
+# Testing with @devvit/test
+
+:::warning Experimental
+The `@devvit/test` package is currently experimental and subject to breaking changes. It is only available for Devvit Web apps.
+:::
+
+The `@devvit/test` package provides utilities to write unit and integration tests for your backend logic with [Vitest](https://vitest.dev/).
+
+## Capability Support
+
+Out of the box, the test harness mocks many of Devvit's capabilities for you. Here's what's supported:
+
+| Capability | Status | Notes |
+| :--- | :--- | :--- |
+| [Redis](#redis) | ✅ Supported | Per-test isolation; transactions supported |
+| [Scheduler](#scheduler) | ✅ Supported | Jobs are listed immediately; time does not advance |
+| [Settings](#settings) | ✅ Supported | Per-test isolation; configurable defaults |
+| [Realtime](#realtime) | ✅ Supported | In-memory recording of sent/received messages |
+| [Media](#media) | ✅ Supported | In-memory uploads with synthetic IDs/URLs |
+| [Notifications](#notifications) | ✅ Supported | |
+| [HTTP](#http) | ✅ Blocked by default | Network calls throw; mock `fetch` to allow |
+| [Reddit API](#reddit-api) | ⚠️ Partially Supported | Helpful errors for unimplemented methods |
+| Payments | ❌ Not Supported (yet) | |
+
+You can use these capabilities inside your tests exactly as you do in production code.
+
+## Getting Started
+
+The `@devvit/test` package provides a miniature Devvit backend on demand. Every time you call `test()`, the harness spins up a temporary, isolated test world in memory, including its own Redis, Reddit API, Scheduler, and other capabilities. This lets you write tests that verify your app's behavior in a production-like environment.
+
+With that in mind:
+
+- **Write tests like production code:** Call your services, save data to Redis, schedule jobs, and send realtime messages.
+- **Use mocks sparingly:** You might still need stubs for third-party HTTP calls or unsupported Reddit APIs, but they should be used sparingly. The provided mocks should handle most cases automatically.
+- **Isolation is built in:** Each test runs in its own world. You can reuse key names, IDs, or settings across tests without worrying about cleanup or one test affecting another. This also reduces the need for any life cycle hooks for tests like `beforeEach` and `afterEach`.
+
+First, make sure you have `vitest` and `@devvit/test` installed in your project.
+
+To get started, create a test instance using `createDevvitTest()`. This returns a Vitest `TestAPI` instance that contains app code fencing and fixtures for Devvit capabilities.
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { reddit } from '@devvit/reddit';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('my first devvit test', async ({ redis }) => {
+  await redis.set('my-key', 'hello world');
+  const value = await redis.get('my-key');
+  expect(value).toBe('hello world');
+});
+```
+
+### Fixtures and mocks
+
+Each test receives Devvit-specific fixtures as arguments to your test body:
+
+```typescript
+import { realtime } from '@devvit/web/server';
+
+test('an send realtime messages', async ({ mocks, userId, subredditName }) => {
+  await realtime.send('my-channel', { foo: 'bar' });
+
+  const messages = mocks.realtime.getSentMessagesForChannel('my-channel');
+  expect(messages.length).toBe(1);
+  expect(messages[0].channel).toBe('my-channel');
+  expect(messages[0].data?.msg).toEqual({ foo: 'bar' });
+});
+```
+
+Mocks expose convenience helpers for inspection/resetting and the raw plugin if you need to register it on a custom config.
+
+> Note: Plugins is the internal name that we call capabilities in the docs.
+
+Cleanup is automatic: Vitest spies are restored and Redis/mock state is cleared after every test.
+
+### Configuration
+
+You can customize the test environment by passing options to `createDevvitTest()`.
+
+```typescript
+const test = createDevvitTest({
+  username: 'mock_user',        // Default: 'testuser'
+  userId: 't2_mock_user',       // Default: 't2_testuser'
+  subredditName: 'mock_sub',    // Default: 'testsub'
+  subredditId: 't5_mock_sub',   // Default: 't5_testsub'
+  settings: {                   // Pre-configured app settings
+    'my-setting': 'value'
+  },
+  appConfig: { ... }            // Custom AppConfig (defaults to minimal config)
+});
+```
+
+## Integration Testing & Isolation
+
+The test harness is built for integration-style testing. Each test defined with `test()` runs in its own isolated world. State (including Redis and mocks) is reset for you between runs. There is no supported way to share state across tests. Vitest concurrency (`test.concurrent`) and parameterized tests (`test.each`) are fully supported.
+
+For example, if two tests write to the same Redis key, they won't interfere with each other:
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('should increment counter to 1', async ({ redis }) => {
+  await redis.incrBy('counter', 1);
+  const value = await redis.get('counter');
+  expect(value).toBe('1');
+});
+
+test('should also increment counter to 1', async ({ redis }) => {
+  await redis.incrBy('counter', 1);
+  const value = await redis.get('counter');
+  expect(value).toBe('1');
+});
+```
+
+### Staging Data For Your Tests
+
+When testing your app logic, it's best to use your own service layer methods to stage data rather than manually manipulating the mock storage. This ensures your tests cover your actual application flows and behavior more accurately.
+
+For instance, if you're testing a `deleteUser` function, create the user first using your `createUser` function:
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('can delete a user', async ({ redis }) => {
+  const userManager = new UserManager(redis); // Your app class
+  
+  // Stage data using your API
+  await userManager.createUser('bob', { age: 30 });
+
+  // Verify data was staged
+  const newUser = await userManager.getUser('bob');
+  expect(newUser).toEqual({ age: 30 });
+  
+  // Perform action
+  await userManager.deleteUser('bob');
+
+  // Verify data was deleted
+  const deletedUser = await userManager.getUser('bob');
+  expect(deletedUser).toBeNull();
+});
+```
+
+If you just need a quick smoke test, you *can* stage data directly via the same capabilities you use in production (e.g., `await redis.set('user:bob', JSON.stringify({ age: 30 }))`), but using your service APIs helps you cover more of your stack.
+
+## Capability Guides
+
+Each mocked capability exposes the same API surface you use in production. Unless noted otherwise, every `test()` gets a completely fresh, isolated world, so state never bleeds between tests.
+
+### Redis
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { redis } from '@devvit/redis';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('tracks counters per test', async () => {
+  await redis.incrBy('score', 1);
+  const score = await redis.get('score');
+  expect(score).toBe('1');
+});
+```
+
+#### Transactions
+
+Installation-scoped redis transactions work end-to-end in the harness. Use the
+same `watch`/`multi`/`exec` flow that production code does:
+
+```typescript
+test('commits redis transactions', async () => {
+  await redis.set('txn', '0');
+  const txn = await redis.watch('txn');
+  await txn.multi();
+  await txn.incrBy('txn', 4);
+  await txn.incrBy('txn', 1);
+  const results = await txn.exec();
+
+  expect(results).toStrictEqual([4, 5]);
+  expect(await redis.get('txn')).toBe('5');
+});
+```
+
+Global and scoped Redis data are cleared for you after every test run. Global Redis is scoped to the current test only—no manual clearing or cross-test sharing is needed. If you need to inspect mock state directly, use `mocks.redis`.
+
+### Scheduler
+
+**Limitations**
+
+- Scheduled jobs don't actually wait for `runAt` or cron triggers. Instead, use `scheduler.listJobs()` to verify they were scheduled.
+- Use the same API calls (`runJob`, `cancelJob`) you would in production.
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { scheduler } from '@devvit/scheduler';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('schedules and cancels jobs', async () => {
+  const jobId = await scheduler.runJob({
+    name: 'nightly-report',
+    runAt: new Date(Date.now() + 1_000),
+    data: { retry: false },
+  });
+
+  expect(jobId).toBeDefined();
+
+  await scheduler.cancelJob(jobId);
+  const jobs = await scheduler.listJobs();
+  expect(jobs).toHaveLength(0);
+});
+```
+
+### Settings
+
+**Limitations**
+
+- Settings are per-test. To use the same settings for all tests, configure defaults via `createDevvitTest({ settings: { ... } })`.
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { settings } from '@devvit/settings';
+import { expect } from 'vitest';
+
+const test = createDevvitTest({
+  settings: {
+    'feature-flag': true,
+    'api-key': 'secret-123',
+  },
+});
+
+test('reads configured settings', async () => {
+  const isEnabled = await settings.get<boolean>('feature-flag');
+  expect(isEnabled).toBe(true);
+  const apiKey = await settings.get<string>('api-key');
+  expect(apiKey).toBe('secret-123');
+});
+```
+
+You can also access `context.settings` from the fixtures if you prefer to work with the raw map.
+
+### Realtime
+
+**Limitations**
+
+- Messages are recorded in memory; no actual WebSocket connections are opened.
+- Use `mocks.realtime.getSentMessagesForChannel()` to inspect what was sent during a test.
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { realtime } from '@devvit/realtime/server';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('emits realtime events', async ({ mocks }) => {
+  await realtime.send('scores', { latest: 42 });
+
+  const messages = mocks.realtime.getSentMessagesForChannel('scores');
+  expect(messages).toHaveLength(1);
+  expect(messages[0].channel).toBe('scores');
+  expect(messages[0].data?.msg).toStrictEqual({ latest: 42 });
+});
+```
+
+### Media
+
+**Limitations**
+
+- Uploads don't hit the network. The mock simply records the payload and returns synthetic IDs/URLs.
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { media } from '@devvit/media';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('uploads media assets', async () => {
+  const response = await media.upload({
+    url: 'https://example.com/image.png',
+    type: 'image',
+  });
+
+  expect(response.mediaId).toBe('media-1');
+  expect(response.mediaUrl).toBe('https://i.redd.it/bogus-for-testing/media-1.png');
+});
+
+test('inspects uploads via mocks', async ({ mocks }) => {
+  await media.upload({ url: 'https://example.com/image.png', type: 'image' });
+
+  expect(mocks.media.uploads).toHaveLength(1);
+  expect(mocks.media.uploads[0].url).toBe('https://example.com/image.png');
+
+  mocks.media.clear();
+  expect(mocks.media.uploads).toHaveLength(0);
+});
+```
+
+### Notifications
+
+**Limitations**
+
+- Notifications are recorded in memory; no actual push notifications are sent.
+- Use `mocks.notifications` to inspect sent notifications and opted-in users.
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { notifications } from '@devvit/notifications';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('sends push notifications', async ({ mocks, userId }) => {
+  // Opt in the current user
+  await notifications.optInCurrentUser();
+
+  const isOptedIn = await notifications.isOptedIn(userId);
+  expect(isOptedIn).toBe(true);
+
+  // Send a notification
+  await notifications.enqueue({
+    title: 'Hello',
+    body: 'World',
+    recipients: [{ userId }],
+  });
+
+  // Verify notification was sent via mocks
+  const sent = mocks.notifications.getSentNotifications();
+  expect(sent).toHaveLength(1);
+  expect(sent[0].title).toBe('Hello');
+  expect(sent[0].recipients[0].userId).toBe(userId);
+});
+```
+
+### HTTP
+
+**Limitations**
+
+- HTTP requests are blocked by default in tests to prevent accidental network calls.
+- You must mock `fetch()` using Vitest's `vi.spyOn` to test code that makes HTTP requests.
+
+By default, any `fetch()` calls in your tests will throw an error. To test code that makes HTTP requests, mock `globalThis.fetch` using Vitest's `vi.spyOn`, similar to how you mock Reddit API methods.
+
+#### Default behavior
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('blocks HTTP by default', async () => {
+  await expect(fetch('https://noop.reddit.com')).rejects.toThrow(
+    'HTTP requests are not allowed in tests'
+  );
+});
+```
+
+#### Basic Mocking
+
+Use `vi.spyOn` to mock `fetch()` calls:
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { expect, vi } from 'vitest';
+
+const test = createDevvitTest();
+
+test('fetches Pokemon data', async () => {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: async () => ({
+      id: 25,
+      name: 'pikachu',
+      height: 4,
+      weight: 60,
+      types: [{ type: { name: 'electric' } }],
+    }),
+  } as Response);
+
+  const response = await fetch('https://pokeapi.co/api/v2/pokemon/pikachu');
+  const data = await response.json();
+
+  expect(response.status).toBe(200);
+  expect(data.name).toBe('pikachu');
+  expect(data.types[0].type.name).toBe('electric');
+});
+```
+
+#### Testing Error Cases
+
+You can also test error handling by making your mock return error responses:
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { expect, vi } from 'vitest';
+
+const test = createDevvitTest();
+
+test('handles API errors', async () => {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+    ok: false,
+    status: 500,
+    statusText: 'Internal Server Error',
+    text: async () => 'Internal Server Error',
+  } as Response);
+
+  const response = await fetch('https://pokeapi.co/api/v2/pokemon/pikachu');
+  expect(response.status).toBe(500);
+  expect(response.statusText).toBe('Internal Server Error');
+
+  const text = await response.text();
+  expect(text).toBe('Internal Server Error');
+});
+```
+
+#### Mocking POST Requests
+
+You can also mock POST requests and inspect the request body:
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { expect, vi } from 'vitest';
+
+const test = createDevvitTest();
+
+test('sends POST request with body', async () => {
+  vi.spyOn(globalThis, 'fetch').mockImplementation((url, options) => {
+    const body = options?.body as string;
+    const parsedBody = JSON.parse(body);
+
+    return Promise.resolve({
+      ok: true,
+      status: 201,
+      json: async () => ({ id: 123, ...parsedBody }),
+    } as Response);
+  });
+
+  const response = await fetch('https://pokeapi.co/api/v2/pokemon', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'pikachu', type: 'electric' }),
+  });
+
+  const data = await response.json();
+  expect(response.status).toBe(201);
+  expect(data.name).toBe('pikachu');
+  expect(data.type).toBe('electric');
+});
+```
+
+### Reddit API
+
+**Limitations**
+
+- Many core methods are mocked; unsupported methods throw helpful errors that reference this guide.
+- Returned models are real instances backed by the mocks, so you can spy on or override instance methods.
+
+The harness seeds a default user and subreddit based on your configuration. Use `mocks.reddit` to seed additional data or to inspect what the plugin saw.
+
+| Service | Support |
+| :--- | :--- |
+| Users | ⚠️ Partially Supported |
+| LinksAndComments | ⚠️ Partially Supported |
+| Subreddits | ⚠️ Partially Supported |
+| Flair | ❌ Not yet supported |
+| Listings | ❌ Not yet supported |
+| Moderation | ❌ Not yet supported |
+| ModNote | ❌ Not yet supported |
+| NewModmail | ❌ Not yet supported |
+| PrivateMessages | ❌ Not yet supported |
+| Widgets | ❌ Not yet supported |
+| Wiki | ❌ Not yet supported |
+
+*Note: `LinksAndComments` is more commonly referred to as `posts`.*
+
+#### Mocking Methods on Returned Objects
+
+Some methods exist on the objects returned by the API (like `user.getSocialLinks()`). Since these objects are real instances returned by the harness, you can spy on the specific instance to mock them.
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { reddit, type SocialLinkType } from '@devvit/reddit';
+import { expect, vi } from 'vitest';
+
+const test = createDevvitTest();
+
+test('mocks social links on a returned user', async ({ mocks }) => {
+  mocks.reddit.users.addUser({ id: 't2_user', name: 'test_user' });
+
+  const user = await reddit.getUserByUsername('test_user');
+  if (!user) throw new Error('User not found');
+
+  vi.spyOn(user, 'getSocialLinks').mockResolvedValue([
+    { id: '1', outboundUrl: 'https://example.com', type: 'REDDIT' as SocialLinkType, title: 'Example' },
+  ]);
+
+  await expect(user.getSocialLinks()).resolves.toStrictEqual([
+    { id: '1', outboundUrl: 'https://example.com', type: 'REDDIT', title: 'Example' },
+  ]);
+});
+```
+
+#### Seeding Supported Models
+
+For supported calls like `getUserByUsername`, use the provided `mocks.reddit` fixture to seed the backing store.
+
+```typescript
+import { createDevvitTest } from '@devvit/test/server/vitest';
+import { expect } from 'vitest';
+
+const test = createDevvitTest();
+
+test('can fetch a user', async ({ mocks }) => {
+  mocks.reddit.users.addUser({
+    id: 't2_12345',
+    name: 'testuser',
+    createdUtc: Date.now() / 1000,
+  });
+
+  const user = await reddit.getUserByUsername('testuser');
+  expect(user.id).toBe('t2_12345');
+});
+```
+
+You can also seed Posts for `getPostById`:
+
+```typescript
+import { reddit } from '@devvit/reddit';
+
+test('can fetch a post', async ({ mocks }) => {
+  mocks.reddit.linksAndComments.addPost({
+    id: 't3_123',
+    title: 'My Test Post',
+    subreddit: 'testsub',
+  });
+
+  const post = await reddit.getPostById('t3_123');
+  expect(post.title).toBe('My Test Post');
+});
+```
+
+
+## Multiple Test Instances
+
+Most of the time, you'll define a single `const test = createDevvitTest()` at the top of your spec file and use fixtures/settings to customize behavior. But if you need distinct contexts, such as different subreddits or users, you can spin up additional instances, even within the same file.
+
+```typescript
+// Development subreddit context
+const devTest = createDevvitTest({
+  subredditName: 'my_dev_sub',
+});
+
+// Production subreddit context
+const prodTest = createDevvitTest({
+  subredditName: 'my_prod_sub',
+});
+
+devTest('development logic', () => { /* ... */ });
+prodTest('production logic', () => { /* ... */ });
+```
+
+The reverse works too: you can create one instance and share it across every test in your application.
+
+## How the Harness Works
+
+To understand what makes this feel so close to production, check `createDevvitTest` in `packages/test/src/server/vitest/devvitTest.ts`. Every time you call `test()`, the helper:
+
+1. **Builds an isolated context:** Creates a fresh per-test context with default subreddit, user, and settings.
+2. **Builds a mocked config:** Uses `makeConfig` to install a global config, wiring up the same headers and request context that Devvit uses to run your backend.
+3. **Wraps your test function:** Ensures fixtures (`redis`, `scheduler`, `settings`, etc.) are ready and scoped to that test world before running your test.
+
+Each capability client you call is actually a proxy to a privileged plugin, which is the part of the platform that talks to Redis, Scheduler, Reddit, etc. The harness swaps those plugins for stateful mocks (exposed on `mocks.<capability>.plugin`), keeping commands in memory and isolated per test. This lets you exercise privileged operations, such as storing data or sending realtime events, without touching real infrastructure. Concurrency and parameterized tests are supported because the wrapper re-applies fixtures on every test call.
+
+Since the harness injects the same context headers as live requests, you can use capability clients exactly as you would in production, all while keeping your tests fast and isolated.
