@@ -57,6 +57,13 @@ export default class Upload extends DevvitCommand {
         VersionBumpType.Prerelease,
       ],
     })(),
+    version: Flags.custom<DevvitVersion>({
+      description: 'Explicit version number (e.g: 1.0.1)',
+      required: false,
+      multiple: false,
+      parse: async (version) => DevvitVersion.fromString(version),
+      exclusive: ['bump'],
+    })(),
     'employee-update': Flags.boolean({
       aliases: ['employeeUpdate'],
       description:
@@ -174,11 +181,13 @@ export default class Upload extends DevvitCommand {
       );
     }
 
-    // Now, create a new version.
-    const appVersionNumber = await this.#getNextVersionNumber(appInfo, flags.bump);
+    let appVersionNumber = flags.version;
 
+    if (! appVersionNumber) {
+      appVersionNumber = await this.#getNextVersionNumber(appInfo, flags.bump);
+    }
+    
     this.#event.devplatform.app_version_number = appVersionNumber.toString();
-
     ux.action.start('Building');
     const bundles = await this.#bundleActors(username, appVersionNumber.toString());
     ux.action.stop();
