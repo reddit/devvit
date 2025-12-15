@@ -1,6 +1,33 @@
 import type { Effect, EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
+import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 
 import type { Form, FormFieldGroup, SelectField, StringField } from './form-types.js';
+
+// Devvit mocks
+
+export const mockDevvit: Readonly<DevvitGlobal> = {
+  appPermissionState: undefined,
+  dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
+  entrypoints: {},
+  context: {
+    appName: 'appName',
+    appVersion: '1.0.0',
+    client: undefined,
+    postAuthorId: undefined,
+    postData: undefined,
+    postId: 't3_postId',
+    snoovatar: undefined,
+    subredditId: 't5_subredditId',
+    subredditName: 'subredditName',
+    userId: 't2_userId',
+    username: 'username',
+  },
+  share: undefined,
+  token: noWebbitToken,
+  webViewMode: undefined,
+  startTime: undefined,
+};
 
 // Thing mocks
 

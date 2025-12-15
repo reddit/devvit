@@ -4,9 +4,9 @@ import {
   Scope,
 } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
-import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
+import { mockDevvit } from './helpers/test-helpers.js';
 import { canRunAsUser } from './run-as-user.js';
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
@@ -23,28 +23,7 @@ function mockEmitEffect(consentStatus: ConsentStatus) {
 describe('canRunAsUser', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    globalThis.devvit = {
-      appPermissionState: undefined,
-      dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
-      entrypoints: {},
-      context: {
-        appName: 'appName',
-        appVersion: '1.0.0',
-        client: undefined,
-        postAuthorId: undefined,
-        postData: undefined,
-        postId: 't3_postId',
-        snoovatar: undefined,
-        subredditId: 't5_subredditId',
-        subredditName: 'subredditName',
-        userId: 't2_userId',
-        username: 'username',
-      },
-      share: undefined,
-      token: noWebbitToken,
-      webViewMode: undefined,
-      startTime: undefined,
-    };
+    globalThis.devvit = mockDevvit;
   });
 
   it('should return true if appPermissionState is not available', async () => {

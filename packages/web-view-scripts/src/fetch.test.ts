@@ -1,3 +1,5 @@
+import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
+import { type WebbitToken } from '@devvit/shared-types/webbit.js';
 import { test } from 'vitest';
 
 import { fetch, isSameSite } from './fetch.js';
@@ -7,6 +9,17 @@ const location: Readonly<Location> = {
 } as Location;
 
 describe('fetch()', () => {
+  const devvit: DevvitGlobal = {
+    context: {} as DevvitGlobal['context'],
+    dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
+    entrypoints: {},
+    share: undefined,
+    appPermissionState: undefined,
+    token: 'authToken' as WebbitToken,
+    webViewMode: undefined,
+    startTime: undefined,
+  };
+
   for (const { same, url } of [
     { same: false, url: 'https://example.com/api/example' },
     {
@@ -17,7 +30,7 @@ describe('fetch()', () => {
     test(same ? 'same-site' : 'cross-site', async () => {
       let req!: Request;
       await fetch(
-        'authToken',
+        devvit,
         ((arg: Request) => (req = arg)) as unknown as typeof globalThis.fetch,
         location,
         url
