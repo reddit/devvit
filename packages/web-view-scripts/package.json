@@ -43,11 +43,12 @@
     "@ampproject/filesize": "4.3.0",
     "@devvit/tsconfig": "0.12.6",
     "@types/jsdom": "21.1.7",
+    "@types/node": "20.14.12",
     "esbuild": "0.25.9",
     "eslint": "9.11.1",
     "jsdom": "24.1.0",
     "typescript": "5.8.3",
-    "vitest": "1.6.1"
+    "vitest": "4.0.15"
   },
   "publishConfig": {
     "directory": "dist"

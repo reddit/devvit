@@ -2,12 +2,10 @@
   "compilerOptions": {
     "target": "ES2021",
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": ["node", "vitest/globals"]
   },
   "extends": "@devvit/tsconfig/base.json",
   "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "src/__tests__/test-actors/bad-syntax/"
-  ]
+  "exclude": ["node_modules", "src/__tests__/test-actors/bad-syntax/"]
 }

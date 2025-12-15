@@ -2,7 +2,8 @@
   "compilerOptions": {
     "checkJs": true,
     "composite": true,
-    "lib": ["DOM"],
+    "lib": ["DOM", "ES2023"],
+    "types": ["node"],
     "noEmit": true,
     "outDir": "../dist"
   },

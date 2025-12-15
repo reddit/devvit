@@ -1,5 +1,8 @@
 {
   // Build all references.
   "files": [],
+  "compilerOptions": {
+    "lib": ["DOM", "ES2023"]
+  },
   "references": [{ "path": "./src" }, { "path": "./tools" }]
 }

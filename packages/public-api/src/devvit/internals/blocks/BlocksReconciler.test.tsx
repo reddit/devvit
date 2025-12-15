@@ -192,7 +192,7 @@ describe('BlocksReconciler', () => {
               actions: [
                 {
                   data: {},
-                  id: 'button.spy',
+                  id: 'button.Mock',
                   type: 0,
                 },
               ],

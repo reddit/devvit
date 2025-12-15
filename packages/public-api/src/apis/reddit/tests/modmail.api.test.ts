@@ -5,7 +5,7 @@ import type {
   Metadata,
   ModActionData,
 } from '@devvit/protos';
-import type { SpyInstance } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { describe, expect, test, vi } from 'vitest';
 
 import { Devvit } from '../../../devvit/Devvit.js';
@@ -143,7 +143,7 @@ describe('ModMail API', () => {
   });
 
   describe('getConversations()', () => {
-    let spyPlugin: SpyInstance;
+    let spyPlugin: MockInstance;
 
     beforeEach(() => {
       spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.NewModmail, 'GetConversations');
@@ -257,7 +257,7 @@ describe('ModMail API', () => {
   });
 
   describe('createConversation()', () => {
-    let spyPlugin: SpyInstance;
+    let spyPlugin: MockInstance;
 
     beforeEach(() => {
       spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.NewModmail, 'CreateConversation');

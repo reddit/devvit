@@ -5,7 +5,7 @@ import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
 
 import { initAnalytics } from './analytics.js';
 
-type EventListenerMock = Mock<[type: string, listener: (event: unknown) => void], void>;
+type EventListenerMock = Mock<(type: string, listener: (event: unknown) => void) => void>;
 
 const addEventListenerMock: EventListenerMock = vi.fn();
 const docAddEventListenerMock: EventListenerMock = vi.fn();

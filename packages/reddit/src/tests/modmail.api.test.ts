@@ -5,7 +5,7 @@ import type {
   ModActionData,
 } from '@devvit/protos';
 import { context } from '@devvit/server';
-import type { SpyInstance } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { describe, expect, test, vi } from 'vitest';
 
 import { RedditClient } from '../RedditClient.js';
@@ -148,7 +148,7 @@ describe('ModMail API', () => {
   });
 
   describe('getConversations()', () => {
-    let spyPlugin: SpyInstance;
+    let spyPlugin: MockInstance;
 
     beforeEach(() => {
       spyPlugin = redditApiPlugins.NewModmail.GetConversations;
@@ -270,7 +270,7 @@ describe('ModMail API', () => {
   });
 
   describe('createConversation()', () => {
-    let spyPlugin: SpyInstance;
+    let spyPlugin: MockInstance;
 
     beforeEach(() => {
       spyPlugin = redditApiPlugins.NewModmail.CreateConversation;

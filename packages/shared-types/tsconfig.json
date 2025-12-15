@@ -2,7 +2,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "lib": ["DOM", "ES2023"]
+    "lib": ["DOM", "ES2023"],
+    "types": ["node", "vitest/globals"]
   },
   "exclude": ["node_modules"],
   "extends": "@devvit/tsconfig/base.json",

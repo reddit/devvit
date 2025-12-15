@@ -35,6 +35,7 @@
     "@devvit/protos": "0.12.6",
     "@devvit/shared-types": "0.12.6",
     "@devvit/splash": "0.12.6",
+    "@types/node": "20.14.12",
     "esbuild": "0.25.9",
     "rxjs": "7.8.1",
     "tsv": "0.2.0",
@@ -52,7 +53,7 @@
     "@devvit/tsconfig": "0.12.6",
     "@types/tsv": "0.2.1",
     "eslint": "9.11.1",
-    "vitest": "1.6.1"
+    "vitest": "4.0.15"
   },
   "publishConfig": {
     "directory": "dist"

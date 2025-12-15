@@ -41,11 +41,12 @@
   "devDependencies": {
     "@devvit/server": "0.12.6",
     "@devvit/tsconfig": "0.12.6",
+    "@types/node": "20.14.12",
     "eslint": "9.11.1",
     "ioredis": "5.7.0",
     "redis-memory-server": "0.12.1",
     "typescript": "5.8.3",
-    "vitest": "1.6.1"
+    "vitest": "4.0.15"
   },
   "publishConfig": {
     "directory": "dist"
