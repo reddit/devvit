@@ -6,7 +6,7 @@ If you already have payments set up on a Blocks app, use the following steps to 
 
 Reference your `products.json` and declare endpoints.
 
-```tsx
+```tsx title="devvit.json"
 {
   "permissions": { "payments": true },
   "payments": {

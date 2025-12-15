@@ -1,4 +1,4 @@
-[**@devvit/public-api v0.12.5-dev**](../../README.md)
+[**@devvit/public-api v0.12.6-dev**](../../README.md)
 
 ---
 
@@ -2965,6 +2965,30 @@ To unsubscribe on behalf of a user, please contact Reddit.
 #### Returns
 
 `Promise`\<`void`\>
+
+---
+
+<a id="updatewidget"></a>
+
+### updateWidget()
+
+> **updateWidget**(`widgetData`): `Promise`\<[`Widget`](../../models/classes/Widget.md)\>
+
+Update a widget for a subreddit.
+
+#### Parameters
+
+##### widgetData
+
+[`UpdateWidgetData`](../../models/type-aliases/UpdateWidgetData.md)
+
+The data for the widget to update.
+
+#### Returns
+
+`Promise`\<[`Widget`](../../models/classes/Widget.md)\>
+
+- The updated Widget object.
 
 ---
 

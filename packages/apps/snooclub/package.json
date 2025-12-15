@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "snoo-club",
-  "version": "0.12.5",
+  "version": "0.12.6",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -15,11 +15,11 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/public-api": "0.12.5",
-    "@devvit/shared-types": "0.12.5"
+    "@devvit/public-api": "0.12.6",
+    "@devvit/shared-types": "0.12.6"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.5",
+    "@devvit/tsconfig": "0.12.6",
     "typescript": "5.8.3",
     "vitest": "1.6.1"
   }

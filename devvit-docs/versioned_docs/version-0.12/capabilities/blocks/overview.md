@@ -16,7 +16,7 @@ With the introduction of [0.12.2](../../changelog.md#devvit-0122-inline-mode-lau
 
 ## Examples
 
-- [r/WallStreetBets](https://www.reddit.com/r/wallstreetbets)
+### [r/WallStreetBets](https://www.reddit.com/r/wallstreetbets)
 
 Wall Street Bets's daily thread tracks stock performance and discussion on r/wallstreetbets. It's able to render in the feed quickly, and refresh automatically as new data is available.
 

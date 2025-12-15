@@ -335,7 +335,7 @@ The `devvit.json` configuration is validated against the JSON Schema at build ti
 
 ## Complete example
 
-```json
+```json title="devvit.json"
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
   "name": "my-awesome-app",

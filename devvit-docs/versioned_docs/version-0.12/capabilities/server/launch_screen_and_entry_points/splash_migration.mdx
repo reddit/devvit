@@ -39,7 +39,7 @@ await reddit.submitCustomPost({ title: 'Tennis Leaderboard', entry: 'leaderboard
 
 1. Update your `devvit.json` to define both preview and game entry points.
 
-```tsx
+```tsx title="devvit.json"
 {
   "post": {
     "dir": "dist/client",
@@ -72,28 +72,25 @@ Esbuild would probably be simpler and add fewer dependencies, but you can also u
 
 2. Create a `splash.html` file with a button to launch into the game.
 
-```tsx
-<!-- splash.html -->
-<!DOCTYPE html>
+```html title="splash.html"
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Game</title>
-  <script src="preview.js"></script>
-</head>
-<body>
-  <div class="preview-container">
-    <h1>My Game</h1>
-    <p>An exciting game</p>
-    <button id="play-button">Play Now</button>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Game</title>
+    <script src="preview.js"></script>
+  </head>
+  <body>
+    <div class="preview-container">
+      <h1>My Game</h1>
+      <p>An exciting game</p>
+      <button id="play-button">Play Now</button>
+    </div>
+  </body>
 </html>
 ```
 
-```tsx
-// preview.js
+```tsx title="preview.js"
 import { requestExpandedMode } from '@devvit/web/client';
 
 document.addEventListener('DOMContentLoaded', () => {

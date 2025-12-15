@@ -1,6 +1,6 @@
 {
   "name": "@devvit/media",
-  "version": "0.12.5",
+  "version": "0.12.6",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -32,15 +32,15 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.12.5"
+    "@devvit/protos": "0.12.6"
   },
   "peerDependencies": {
     "@devvit/server": "*"
   },
   "devDependencies": {
-    "@devvit/server": "0.12.5",
-    "@devvit/shared-types": "0.12.5",
-    "@devvit/tsconfig": "0.12.5",
+    "@devvit/server": "0.12.6",
+    "@devvit/shared-types": "0.12.6",
+    "@devvit/tsconfig": "0.12.6",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "1.6.1"

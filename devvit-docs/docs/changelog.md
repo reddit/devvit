@@ -9,6 +9,26 @@ To use the latest version of Devvit:
 
 **Please note**: you may see features available across Devvit packages that are not documented or noted in our changelog. These are experimental features that are not stable and are subject to change, or removal, from the platform. Please use caution when testing or implementing experimental features.
 
+## Devvit 0.12.6: End-of-the-Year Updates
+
+**Release Date: Dec 15, 2025**
+
+In the last release of 2025, we’ve made a slew of minor updates (they're still cool, though!).
+
+- **Added explicit version flag:** You can now specify an exact version number (e.g., `--version 1.2.3`) when publishing.
+- **Deprecated `webViewModeListener`:** Now you can use the `"focus"` event on the inline view to reliably detect when control returns from the expanded view.
+- **Fixed inconsistent casing:** The `Subreddit` type was previously printed in all lowercase for `getCurrentSubreddit()`, but in all uppercase for `getSubredditInfoByName()` and `getSubredditInfoById()`. This inconsistency has now been resolved.
+- **Clarified non-functional fields:** The Payments plugin does not currently support filtering, so specifying `start` or `end` has no effect. This will be supported in a later release.
+- **Added new User fields:** The `User` object now includes `displayName` and `about` to streamline user data experience.
+- **Bug fixes**
+  - Corrected post height for Devvit Web apps to prevent layout jumps on the initial web view render.
+  - Fixed an issue with the `reddit.reorderWidgets` method.
+  - Resolved an issue where fetching image widgets without a linked URL would throw an error.
+
+::: note
+**2025 is a wrap!** All of us on the Dev Platform team wish you and yours the absolute best holiday season, and we can’t wait to create with you in 2026!
+:::
+
 ## Devvit 0.12.5: Payments for Devvit Web
 
 **Release Date: Dec 1, 2025**
@@ -19,7 +39,7 @@ Devvit Web has reached full feature parity with blocks, and we strongly recommen
 
 To keep things clear (and friendlier to AI-assisted IDEs), we're moving all [blocks documentation](./capabilities/blocks/overview.md) into its own dedicated section.
 
-## Devvit 0.12.4:
+## Devvit 0.12.4: Ins and Outs
 
 **Release Date: Nov 24, 2025**
 
@@ -36,9 +56,9 @@ Devvit 0.12.4 is packed with payments (experimental) polish, and new tooling for
 
 - Improved accuracy of clicks measurement for App Directory Analytics
 - Bundle size improvements
-- Deprecated remaining splash screen APIs (`setSplash` and `SubmitCustomPostSplashOptions` fields) a
+- Deprecated remaining splash screen APIs (`setSplash` and `SubmitCustomPostSplashOptions` fields)
 
-## Devvit 0.12.3:
+## Devvit 0.12.3: Odds and Ends
 
 **Release Date: Nov 17, 2025**
 
@@ -58,7 +78,7 @@ This release focuses on Reddit data access and instrumenting WebView clients
 
 **Payments status**
 
-- `@devvit/payments` now taggged as `experimental`
+- `@devvit/payments` now tagged as `experimental`
 
 ## Devvit 0.12.2: Inline Mode, Launch Screens,Expanded App Experiences, and Developer Logs
 

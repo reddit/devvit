@@ -28,7 +28,7 @@ Make sure you’re on Devvit 0.11.3 or higher. See the [quickstart](https://deve
 
 You can reference an external `products.json` file, or define products directly. Endpoints are required for fulfillment and optional for refunds.
 
-```tsx
+```tsx title="devvit.json"
 {
   "payments": {
     "productsFile": "./products.json",
@@ -45,7 +45,7 @@ You can reference an external `products.json` file, or define products directly.
 
 Create endpoints to fulfill and optionally revoke purchases.
 
-```tsx
+```tsx title="server/index.ts"
 import type { PaymentHandlerResponse } from '@devvit/web/server';
 
 router.post('/internal/payments/fulfill', async (req, res) => {
@@ -65,7 +65,7 @@ export default router;
 
 On the server, use `payments.getProducts()` and `payments.getOrders()`. If the client needs product metadata, expose it via your own `/api/` endpoint.
 
-```tsx
+```tsx title="server/index.ts"
 // Example: expose products for client display
 import { payments } from '@devvit/web/server';
 
@@ -77,7 +77,7 @@ res.json(products);
 
 Use `purchase()` from `@devvit/web/client` with a product SKU (or array of SKUs).
 
-```tsx
+```tsx title="client/index.ts"
 import { purchase, OrderResultStatus } from '@devvit/web/client';
 
 export async function buy(sku: string) {
