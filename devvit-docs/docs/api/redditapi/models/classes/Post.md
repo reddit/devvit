@@ -48,6 +48,20 @@
 
 ---
 
+<a id="authorflair"></a>
+
+### authorFlair
+
+#### Get Signature
+
+> **get** **authorFlair**(): `undefined` \| [`CommonFlair`](../type-aliases/CommonFlair.md)
+
+##### Returns
+
+`undefined` \| [`CommonFlair`](../type-aliases/CommonFlair.md)
+
+---
+
 <a id="authorid"></a>
 
 ### authorId
@@ -180,11 +194,11 @@
 
 #### Get Signature
 
-> **get** **flair**(): `undefined` \| [`LinkFlair`](../type-aliases/LinkFlair.md)
+> **get** **flair**(): `undefined` \| [`CommonFlair`](../type-aliases/CommonFlair.md)
 
 ##### Returns
 
-`undefined` \| [`LinkFlair`](../type-aliases/LinkFlair.md)
+`undefined` \| [`CommonFlair`](../type-aliases/CommonFlair.md)
 
 ---
 
@@ -1144,11 +1158,11 @@ await post.setTextFallback(newTextFallback);
 
 ### toJSON()
 
-> **toJSON**(): `Pick`\<`Post`, `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"url"` \| `"createdAt"` \| `"nsfw"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"body"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"approved"` \| `"spam"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"archived"` \| `"edited"` \| `"locked"` \| `"quarantined"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
+> **toJSON**(): `Pick`\<`Post`, `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"url"` \| `"createdAt"` \| `"nsfw"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"body"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"approved"` \| `"spam"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"archived"` \| `"edited"` \| `"locked"` \| `"quarantined"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"authorFlair"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
 
 #### Returns
 
-`Pick`\<`Post`, `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"url"` \| `"createdAt"` \| `"nsfw"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"body"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"approved"` \| `"spam"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"archived"` \| `"edited"` \| `"locked"` \| `"quarantined"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
+`Pick`\<`Post`, `"spoiler"` \| `"subredditName"` \| `"flair"` \| `"id"` \| `"score"` \| `"title"` \| `"subredditId"` \| `"url"` \| `"createdAt"` \| `"nsfw"` \| `"permalink"` \| `"authorId"` \| `"authorName"` \| `"body"` \| `"bodyHtml"` \| `"thumbnail"` \| `"numberOfComments"` \| `"numberOfReports"` \| `"approved"` \| `"spam"` \| `"stickied"` \| `"removed"` \| `"removedBy"` \| `"removedByCategory"` \| `"archived"` \| `"edited"` \| `"locked"` \| `"quarantined"` \| `"hidden"` \| `"ignoringReports"` \| `"distinguishedBy"` \| `"authorFlair"` \| `"secureMedia"` \| `"userReportReasons"` \| `"modReportReasons"`\>
 
 ---
 

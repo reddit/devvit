@@ -1,9 +1,9 @@
 import {
-  type RedditObject_AuthorFlairRichText,
-  type RedditObject_LinkFlairRichText,
   type FlairCsvResult,
   type FlairObject,
   type Metadata,
+  type RedditObject_AuthorFlairRichText,
+  type RedditObject_LinkFlairRichText,
   type UserFlair as UserFlairProto,
 } from '@devvit/protos';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
@@ -406,17 +406,12 @@ export type ProtosFlairData = {
   flairTemplateId?: string;
   flairRichtext?: RedditObject_LinkFlairRichText[] | RedditObject_AuthorFlairRichText[];
   flairTextColor?: string;
-}
+};
 
 /** @internal */
 export function convertProtosFlairToCommonFlair(data: ProtosFlairData): CommonFlair | undefined {
   // Only one of these four has to be defined and non-empty for a valid flair to be set.
-  if (
-    data.flairText ||
-    data.flairCssClass ||
-    data.flairTemplateId ||
-    data.flairRichtext?.length
-  ) {
+  if (data.flairText || data.flairCssClass || data.flairTemplateId || data.flairRichtext?.length) {
     return {
       backgroundColor: data.flairBackgroundColor,
       cssClass: data.flairCssClass,
@@ -635,4 +630,3 @@ function asAllowableContent(allowableContent?: string): AllowableFlairContent {
 
   throw new Error(`Invalid allowable content: ${allowableContent}`);
 }
-

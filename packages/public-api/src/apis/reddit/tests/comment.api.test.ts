@@ -39,21 +39,21 @@ describe('Commment API', () => {
     treatmentTags: [],
     userReports: [],
     children: [],
-    authorFlairBackgroundColor: "",
+    authorFlairBackgroundColor: '',
     authorFlairRichtext: [
       {
-          e: "emoji",
-          a: ":stonks:",
-          u: "https://emoji.redditmedia.com/inqlseapworc1_t5_3acsi/stonks"
+        e: 'emoji',
+        a: ':stonks:',
+        u: 'https://emoji.redditmedia.com/inqlseapworc1_t5_3acsi/stonks',
       },
       {
-          e: "text",
-          t: " 1 share"
-      }
+        e: 'text',
+        t: ' 1 share',
+      },
     ],
-    authorFlairText: ":stonks: 1 share",
-    authorFlairTextColor: "dark",
-    authorFlairType: "richtext",
+    authorFlairText: ':stonks: 1 share',
+    authorFlairTextColor: 'dark',
+    authorFlairType: 'richtext',
     awarders: [],
   };
 

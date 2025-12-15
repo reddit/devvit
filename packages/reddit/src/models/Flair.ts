@@ -1,9 +1,9 @@
 import {
-  type RedditObject_AuthorFlairRichText,
-  type RedditObject_LinkFlairRichText,
   type FlairCsvResult,
   type FlairObject,
   type Metadata,
+  type RedditObject_AuthorFlairRichText,
+  type RedditObject_LinkFlairRichText,
   type UserFlair as UserFlairProto,
 } from '@devvit/protos';
 import { context } from '@devvit/server';
@@ -381,17 +381,12 @@ export type ProtosFlairData = {
   flairTemplateId?: string | undefined;
   flairRichtext?: RedditObject_LinkFlairRichText[] | RedditObject_AuthorFlairRichText[] | undefined;
   flairTextColor?: string | undefined;
-}
+};
 
 /** @internal */
 export function convertProtosFlairToCommonFlair(data: ProtosFlairData): CommonFlair | undefined {
   // Only one of these four has to be defined and non-empty for a valid flair to be set.
-  if (
-    data.flairText ||
-    data.flairCssClass ||
-    data.flairTemplateId ||
-    data.flairRichtext?.length
-  ) {
+  if (data.flairText || data.flairCssClass || data.flairTemplateId || data.flairRichtext?.length) {
     return {
       backgroundColor: data.flairBackgroundColor,
       cssClass: data.flairCssClass,

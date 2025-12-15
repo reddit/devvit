@@ -15,12 +15,12 @@ import { asT1ID, asT2ID, asT3ID, asT5ID, isCommentId, isT1ID } from '../../../ty
 import { RunAs } from '../common.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
+import type { CommonFlair } from './Flair.js';
+import { convertProtosFlairToCommonFlair } from './Flair.js';
 import type { ListingFetchOptions, ListingFetchResponse, MoreObject } from './Listing.js';
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
-import type { CommonFlair } from './Flair.js';
-import { convertProtosFlairToCommonFlair } from './Flair.js';
 
 export type CommentSort =
   | 'confidence'
@@ -153,7 +153,7 @@ export class Comment {
       flairType: data.authorFlairType,
       flairTemplateId: data.authorFlairTemplateId,
       flairRichtext: data.authorFlairRichtext,
-      flairTextColor: data.authorFlairTextColor
+      flairTextColor: data.authorFlairTextColor,
     });
 
     this.#modReportReasons = ((data.modReports as unknown as [string, string]) ?? []).map(

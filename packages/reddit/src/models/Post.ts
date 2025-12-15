@@ -32,12 +32,12 @@ import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext
 import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
+import type { CommonFlair } from './Flair.js';
+import { convertProtosFlairToCommonFlair } from './Flair.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
-import type { CommonFlair } from './Flair.js';
-import { convertProtosFlairToCommonFlair } from './Flair.js';
 
 export type GetPostsOptions = ListingFetchOptions & {
   subredditName?: string;
@@ -286,7 +286,7 @@ export type CrosspostOptions = CommonSubmitPostOptions &
   Required<SubredditOptions> & { postId: T3 };
 
 /** @deprecated Use {@link CommonFlair}. */
-export type LinkFlair = CommonFlair
+export type LinkFlair = CommonFlair;
 
 /**
  * oEmbed is a format for allowing an embedded representation of a URL on third party sites.
@@ -526,7 +526,7 @@ export class Post {
       flairType: data.linkFlairType,
       flairTemplateId: data.linkFlairTemplateId,
       flairRichtext: data.linkFlairRichtext,
-      flairTextColor: data.linkFlairTextColor
+      flairTextColor: data.linkFlairTextColor,
     });
 
     this.#authorFlair = convertProtosFlairToCommonFlair({
@@ -536,7 +536,7 @@ export class Post {
       flairType: data.authorFlairType,
       flairTemplateId: data.authorFlairTemplateId,
       flairRichtext: data.authorFlairRichtext,
-      flairTextColor: data.authorFlairTextColor
+      flairTextColor: data.authorFlairTextColor,
     });
 
     if (data.gallery) {
