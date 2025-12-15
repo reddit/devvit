@@ -9,9 +9,13 @@ export type MoreObject = {
 };
 
 export type ListingFetchOptions = {
+  /** The ID of the object to start at. */
   after?: string;
+  /** The ID of the object to end at. */
   before?: string;
+  /** The maximum number of objects to get. */
   limit?: number;
+  /** The number of objects to get per request. */
   pageSize?: number;
   more?: MoreObject;
 };

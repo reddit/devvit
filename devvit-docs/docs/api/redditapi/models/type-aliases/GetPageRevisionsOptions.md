@@ -4,51 +4,15 @@
 
 # Type Alias: GetPageRevisionsOptions
 
-> **GetPageRevisionsOptions** = `object`
+> **GetPageRevisionsOptions** = `Omit`\<[`ListingFetchOptions`](ListingFetchOptions.md), `"more"`\> & `object`
 
-## Properties
-
-<a id="after"></a>
-
-### after?
-
-> `optional` **after**: `string`
-
-The ID of the revision to start at.
-
----
-
-<a id="limit"></a>
-
-### limit?
-
-> `optional` **limit**: `number`
-
-The maximum number of revisions to get.
-
----
-
-<a id="page"></a>
+## Type declaration
 
 ### page?
 
 > `optional` **page**: `string`
 
 The name of the page to get revisions for.
-
----
-
-<a id="pagesize"></a>
-
-### pageSize?
-
-> `optional` **pageSize**: `number`
-
-The number of revisions to get per request.
-
----
-
-<a id="subredditname"></a>
 
 ### subredditName
 

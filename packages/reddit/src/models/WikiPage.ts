@@ -10,7 +10,7 @@ import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { getRedditApiPlugins } from '../plugin.js';
-import { Listing } from './Listing.js';
+import { Listing, type ListingFetchOptions } from './Listing.js';
 import { User } from './User.js';
 
 export type CreateWikiPageOptions = {
@@ -35,17 +35,11 @@ export type UpdateWikiPageOptions = {
   reason?: string | undefined;
 };
 
-export type GetPageRevisionsOptions = {
+export type GetPageRevisionsOptions = Omit<ListingFetchOptions, 'more'> & {
   /** The name of the subreddit the page is in. */
   subredditName: string;
   /** The name of the page to get revisions for. */
   page?: string;
-  /** The number of revisions to get per request. */
-  pageSize?: number;
-  /** The maximum number of revisions to get. */
-  limit?: number;
-  /** The ID of the revision to start at. */
-  after?: string;
 };
 
 export enum WikiPagePermissionLevel {
@@ -70,6 +64,15 @@ export type UpdatePageSettingsOptions = {
 
 /** The revision ID is a v4 UUID */
 export type WikiPageRevisionId = `${string}-${string}-${string}-${string}-${string}`;
+
+/**
+ * Listing endpoints expect the fullname of an object for the `before` and `after` parameters. Usually
+ * this is a `tX_` ID, but the fullname of a wiki page revision is its ID prefixed with `WikiPageRevision_`.
+ *
+ * Also, when fetching a listing of wiki page revisions, the `after` and `before` values returned
+ * by the API are already prefixed. However, the IDs in the revisions themselves are not prefixed.
+ */
+const WikiPageRevisionPrefix = 'WikiPageRevision_';
 
 export class WikiPage {
   #name: string;
@@ -267,9 +270,13 @@ export class WikiPage {
   /** @internal */
   static getPageRevisions(options: GetPageRevisionsOptions): Listing<WikiPageRevision> {
     const client = getRedditApiPlugins().Wiki;
+    const after = ensureWikiRevisionCursor(options.after);
+    const before = ensureWikiRevisionCursor(options.before);
+
     return new Listing({
       hasMore: true,
-      after: options.after,
+      after: after,
+      before: before,
       limit: options.limit,
       pageSize: options.pageSize,
       fetch: async (fetchOptions) => {
@@ -481,4 +488,16 @@ function wikiPageRevisionListingProtoToWikiPageRevision(listingProto: WikiPageRe
     before: listingProto.data.before,
     after: listingProto.data.after,
   };
+}
+
+/**
+ * When fetching a listing of wiki page revisions, the `after` and `before` values returned
+ * by the API are already prefixed. However, the IDs in the revisions themselves are not prefixed.
+ *
+ * This function ensures that developers can pass either the raw ID (from `WikiPageRevision.id`) or
+ * the prefixed ID (from `Listing.after` / `Listing.before`) to listing methods.
+ */
+function ensureWikiRevisionCursor(token: string | undefined): string | undefined {
+  if (!token) return undefined;
+  return token.startsWith(WikiPageRevisionPrefix) ? token : `${WikiPageRevisionPrefix}${token}`;
 }
