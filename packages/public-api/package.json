@@ -46,7 +46,8 @@
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
     "@devvit/tsconfig": "0.12.6",
-    "@reddit/faceplate-ui": "18.0.5",
+    "@reddit/faceplate-ui": "18.2.2",
+    "@reddit/rpl-styles": "1.0.2",
     "@types/clone-deep": "4.0.1",
     "chokidar-cli": "3.0.0",
     "esbuild": "0.25.9",
@@ -59,8 +60,8 @@
   },
   "filesize": {
     "dist/public-api.min.js": {
-      "gzip": "63 KB",
-      "none": "223 KB"
+      "gzip": "65 KB",
+      "none": "225 KB"
     }
   },
   "source": "./src/index.ts"

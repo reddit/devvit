@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const designSystem = require('@reddit/faceplate-ui/design-system/system.json');
+const designSystem = require('@reddit/rpl-styles/design-system/system.json');
 
 const OUTPUT = 'src/devvit/internals/semanticColors.ts';
 
@@ -76,7 +76,14 @@ async function writeColors() {
       const color = theme[name] ?? fallback[name];
 
       if (typeof color === 'string' || color instanceof String) {
-        finalColor = color.startsWith('#') ? color : RPLtoHex(color, globalColors, theme, fallback);
+        /**
+         * Highlight is a system color that we use directly.
+         * @see https://github.snooguts.net/reddit/reddit-service-shreddit/pull/28604/files/c4b868bd220a34cb961fa4f4b8dd44a5eef148ab#r1550356
+         */
+        finalColor =
+          color.startsWith('#') || color === 'Highlight'
+            ? color
+            : RPLtoHex(color, globalColors, theme, fallback);
       } else if ('opacity' in color && 'value' in color) {
         const preOpacityColor = color.value.startsWith('#')
           ? color.value
