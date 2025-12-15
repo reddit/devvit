@@ -385,14 +385,12 @@ export type ProtosFlairData = {
 
 /** @internal */
 export function convertProtosFlairToCommonFlair(data: ProtosFlairData): CommonFlair | undefined {
+  // Only one of these four has to be defined and non-empty for a valid flair to be set.
   if (
-    data.flairBackgroundColor ||
-    data.flairCssClass ||
     data.flairText ||
-    data.flairType ||
+    data.flairCssClass ||
     data.flairTemplateId ||
-    data.flairRichtext ||
-    data.flairTextColor
+    data.flairRichtext?.length
   ) {
     return {
       backgroundColor: data.flairBackgroundColor,
