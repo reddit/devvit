@@ -25,7 +25,7 @@ In the last release of 2025, we’ve made a slew of minor updates (they're still
   - Fixed an issue with the `reddit.reorderWidgets` method.
   - Resolved an issue where fetching image widgets without a linked URL would throw an error.
 
-::: note
+:::note
 **2025 is a wrap!** All of us on the Dev Platform team wish you and yours the absolute best holiday season, and we can’t wait to create with you in 2026!
 :::
 
