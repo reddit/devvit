@@ -34,6 +34,8 @@ import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
+import type { CommonFlair } from './Flair.js';
+import { convertProtosFlairToCommonFlair } from './Flair.js';
 
 export type GetPostsOptions = ListingFetchOptions & {
   subredditName?: string;
@@ -252,54 +254,8 @@ export type CrosspostOptions = CommonSubmitPostOptions & {
   postId: string;
 };
 
-export type LinkFlair = {
-  /**
-   * One of: "text", "richtext"
-   */
-  type?: string;
-  /**
-   * Flair template ID to use when rendering this flair
-   */
-  templateId?: string;
-  /**
-   * Plain text representation of the flair
-   */
-  text?: string;
-  /**
-   * RichText object representation of the flair
-   */
-  richtext: {
-    /**
-     * Enum of element types.  e.g. emoji or text
-     */
-    elementType?: string;
-    /**
-     * Text to show up in the flair, e.g. "Need Advice"
-     */
-    text?: string;
-    /**
-     * Emoji references, e.g. ":rainbow:"
-     */
-    emojiRef?: string;
-    /**
-     * url string, e.g. "https://reddit.com/"
-     */
-    url?: string;
-  }[];
-  /**
-   * Custom CSS classes from the subreddit's stylesheet to apply to the flair if rendered as HTML
-   */
-  cssClass?: string;
-  /**
-   * One of: "light", "dark"
-   */
-  textColor?: string;
-  /**
-   * Flair background color as a hex color string (# prefixed)
-   * @example "#FF4500"
-   */
-  backgroundColor?: string;
-};
+/** @deprecated Use {@link CommonFlair}. */
+export type LinkFlair = CommonFlair
 
 /**
  * oEmbed is a format for allowing an embedded representation of a URL on third party sites.
@@ -448,7 +404,8 @@ export class Post {
   #hidden: boolean;
   #ignoringReports: boolean;
   #distinguishedBy?: string;
-  #flair?: LinkFlair;
+  #flair?: CommonFlair;
+  #authorFlair?: CommonFlair;
   #secureMedia?: SecureMedia;
   #modReportReasons: string[];
   #userReportReasons: string[];
@@ -533,31 +490,25 @@ export class Post {
 
     this.#metadata = metadata;
 
-    if (
-      data.linkFlairBackgroundColor ||
-      data.linkFlairCssClass ||
-      data.linkFlairText ||
-      data.linkFlairType ||
-      data.linkFlairTemplateId ||
-      data.linkFlairRichtext ||
-      data.linkFlairTextColor
-    ) {
-      this.#flair = {
-        backgroundColor: data.linkFlairBackgroundColor,
-        cssClass: data.linkFlairCssClass,
-        text: data.linkFlairText,
-        type: data.linkFlairType,
-        templateId: data.linkFlairTemplateId,
-        // Map linkFlairRichtext[] into the objects with more user-friendly property names
-        richtext: (data.linkFlairRichtext ?? []).map(({ e, t, a, u }) => ({
-          elementType: e,
-          text: t,
-          emojiRef: a,
-          url: u,
-        })),
-        textColor: data.linkFlairTextColor,
-      };
-    }
+    this.#flair = convertProtosFlairToCommonFlair({
+      flairBackgroundColor: data.linkFlairBackgroundColor,
+      flairCssClass: data.linkFlairCssClass,
+      flairText: data.linkFlairText,
+      flairType: data.linkFlairType,
+      flairTemplateId: data.linkFlairTemplateId,
+      flairRichtext: data.linkFlairRichtext,
+      flairTextColor: data.linkFlairTextColor
+    });
+
+    this.#authorFlair = convertProtosFlairToCommonFlair({
+      flairBackgroundColor: data.authorFlairBackgroundColor,
+      flairCssClass: data.authorFlairCssClass,
+      flairText: data.authorFlairText,
+      flairType: data.authorFlairType,
+      flairTemplateId: data.authorFlairTemplateId,
+      flairRichtext: data.authorFlairRichtext,
+      flairTextColor: data.authorFlairTextColor
+    });
 
     if (data.gallery) {
       this.#gallery = data.gallery.map((item) => ({
@@ -724,8 +675,12 @@ export class Post {
     );
   }
 
-  get flair(): LinkFlair | undefined {
+  get flair(): CommonFlair | undefined {
     return this.#flair;
+  }
+
+  get authorFlair(): CommonFlair | undefined {
+    return this.#authorFlair;
   }
 
   get secureMedia(): SecureMedia | undefined {
@@ -780,6 +735,7 @@ export class Post {
     | 'ignoringReports'
     | 'distinguishedBy'
     | 'flair'
+    | 'authorFlair'
     | 'secureMedia'
     | 'userReportReasons'
     | 'modReportReasons'
@@ -816,6 +772,7 @@ export class Post {
       ignoringReports: this.ignoringReports,
       distinguishedBy: this.distinguishedBy,
       flair: this.flair,
+      authorFlair: this.authorFlair,
       secureMedia: this.secureMedia,
       modReportReasons: this.#modReportReasons,
       userReportReasons: this.#userReportReasons,

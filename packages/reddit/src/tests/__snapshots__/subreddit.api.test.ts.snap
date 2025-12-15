@@ -4,6 +4,7 @@ exports[`Subreddit API > RedditClient:Subreddit > getCommentsAndPostsByUser() 1`
 [
   {
     "approved": false,
+    "authorFlair": undefined,
     "authorName": "unusual_setup",
     "body": "This is a comment",
     "collapsedBecauseCrowdControl": false,
@@ -37,6 +38,7 @@ exports[`Subreddit API > RedditClient:Subreddit > getCommentsAndPostsByUser() 1`
   {
     "approved": false,
     "archived": false,
+    "authorFlair": undefined,
     "authorId": undefined,
     "authorName": "unusual_setup",
     "body": undefined,
@@ -44,15 +46,7 @@ exports[`Subreddit API > RedditClient:Subreddit > getCommentsAndPostsByUser() 1`
     "createdAt": +053973-10-22T00:00:00.000Z,
     "distinguishedBy": undefined,
     "edited": false,
-    "flair": {
-      "backgroundColor": undefined,
-      "cssClass": undefined,
-      "richtext": [],
-      "templateId": undefined,
-      "text": undefined,
-      "textColor": undefined,
-      "type": undefined,
-    },
+    "flair": undefined,
     "hidden": false,
     "id": "t3_abc123",
     "ignoringReports": false,
@@ -95,6 +89,7 @@ exports[`Subreddit API > Subreddit api model > getCommentsAndPostsByIds() 1`] = 
 [
   {
     "approved": false,
+    "authorFlair": undefined,
     "authorName": "unusual_setup",
     "body": "This is a comment",
     "collapsedBecauseCrowdControl": false,
@@ -128,6 +123,7 @@ exports[`Subreddit API > Subreddit api model > getCommentsAndPostsByIds() 1`] = 
   {
     "approved": false,
     "archived": false,
+    "authorFlair": undefined,
     "authorId": undefined,
     "authorName": "unusual_setup",
     "body": undefined,
@@ -135,15 +131,7 @@ exports[`Subreddit API > Subreddit api model > getCommentsAndPostsByIds() 1`] = 
     "createdAt": +053973-10-22T00:00:00.000Z,
     "distinguishedBy": undefined,
     "edited": false,
-    "flair": {
-      "backgroundColor": undefined,
-      "cssClass": undefined,
-      "richtext": [],
-      "templateId": undefined,
-      "text": undefined,
-      "textColor": undefined,
-      "type": undefined,
-    },
+    "flair": undefined,
     "hidden": false,
     "id": "t3_abc123",
     "ignoringReports": false,

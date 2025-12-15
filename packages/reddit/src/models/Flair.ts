@@ -1,4 +1,6 @@
 import {
+  type RedditObject_AuthorFlairRichText,
+  type RedditObject_LinkFlairRichText,
   type FlairCsvResult,
   type FlairObject,
   type Metadata,
@@ -319,6 +321,94 @@ export type GetUserFlairBySubredditResponse = {
    * in the next call to get the previous slice of data  */
   prev?: string | undefined;
 };
+
+/** This type is used for both the link and author flairs on Post and Comment objects. */
+export type CommonFlair = {
+  /**
+   * One of: "text", "richtext"
+   */
+  type?: string | undefined;
+  /**
+   * Flair template ID to use when rendering this flair
+   */
+  templateId?: string | undefined;
+  /**
+   * Plain text representation of the flair
+   */
+  text?: string | undefined;
+  /**
+   * RichText object representation of the flair
+   */
+  richtext: {
+    /**
+     * Enum of element types.  e.g. emoji or text
+     */
+    elementType?: string | undefined;
+    /**
+     * Text to show up in the flair, e.g. "Need Advice"
+     */
+    text?: string | undefined;
+    /**
+     * Emoji references, e.g. ":rainbow:"
+     */
+    emojiRef?: string | undefined;
+    /**
+     * url string, e.g. "https://reddit.com/"
+     */
+    url?: string | undefined;
+  }[];
+  /**
+   * Custom CSS classes from the subreddit's stylesheet to apply to the flair if rendered as HTML
+   */
+  cssClass?: string | undefined;
+  /**
+   * One of: "light", "dark"
+   */
+  textColor?: string | undefined;
+  /**
+   * Flair background color as a hex color string (# prefixed)
+   * @example "#FF4500"
+   */
+  backgroundColor?: string | undefined;
+};
+
+/** @internal */
+export type ProtosFlairData = {
+  flairBackgroundColor?: string | undefined;
+  flairCssClass?: string | undefined;
+  flairText?: string | undefined;
+  flairType?: string | undefined;
+  flairTemplateId?: string | undefined;
+  flairRichtext?: RedditObject_LinkFlairRichText[] | RedditObject_AuthorFlairRichText[] | undefined;
+  flairTextColor?: string | undefined;
+}
+
+/** @internal */
+export function convertProtosFlairToCommonFlair(data: ProtosFlairData): CommonFlair | undefined {
+  // Only one of these four has to be defined and non-empty for a valid flair to be set.
+  if (
+    data.flairText ||
+    data.flairCssClass ||
+    data.flairTemplateId ||
+    data.flairRichtext?.length
+  ) {
+    return {
+      backgroundColor: data.flairBackgroundColor,
+      cssClass: data.flairCssClass,
+      text: data.flairText,
+      type: data.flairType,
+      templateId: data.flairTemplateId,
+      // Map flairRichtext[] into the objects with more user-friendly property names
+      richtext: (data.flairRichtext ?? []).map(({ e, t, a, u }) => ({
+        elementType: e,
+        text: t,
+        emojiRef: a,
+        url: u,
+      })),
+      textColor: data.flairTextColor,
+    };
+  }
+}
 
 /** @internal */
 export function convertUserFlairProtoToAPI(userFlair: UserFlairProto): UserFlair {
