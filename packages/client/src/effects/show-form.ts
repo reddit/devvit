@@ -1,11 +1,11 @@
-import type { Form as FormProto } from '@devvit/protos';
 import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import type { Form as FormProto } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/form.js';
+import type { Form } from '@devvit/shared';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { assertValidFormFields } from './helpers/assert-valid-form-fields.js';
-import type { Form, FormToFormValues } from './helpers/form-types.js';
-import type { FormEffectResponse } from './helpers/form-types.js';
+import type { FormEffectResponse, FormToFormValues } from './helpers/form-types.js';
 import { getFormValues } from './helpers/get-form-values.js';
 import { transformFormFields } from './helpers/transform-form.js';
 

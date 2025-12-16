@@ -1,15 +1,15 @@
-import type { FormField as FormFieldProto, FormFieldType } from '@devvit/protos';
-
-import type {
-  BooleanField,
-  FormField,
-  FormFieldGroup,
-  ImageField,
-  NumberField,
-  ParagraphField,
-  SelectField,
-  StringField,
-} from './form-types.js';
+import type { FormField as FormFieldProto } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/field.js';
+import { FormFieldType } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/type.js';
+import {
+  type BooleanField,
+  type FormField,
+  type FormFieldGroup,
+  type ImageField,
+  type NumberField,
+  type ParagraphField,
+  type SelectField,
+  type StringField,
+} from '@devvit/shared';
 
 // This is a carbon copy of the transformFormFields function in the public-api package
 // We copy it here so that @devvit/client does not need to depend on public-api
@@ -40,7 +40,7 @@ export function transformFormFields(fields: readonly FormField[]): FormFieldProt
 function transformStringField(field: StringField): FormFieldProto {
   return {
     defaultValue: {
-      fieldType: 0 satisfies FormFieldType.STRING,
+      fieldType: FormFieldType.STRING,
       stringValue: field.defaultValue,
     },
     disabled: field.disabled,
@@ -50,7 +50,7 @@ function transformStringField(field: StringField): FormFieldProto {
       },
     },
     fieldId: field.name,
-    fieldType: 0 satisfies FormFieldType.STRING,
+    fieldType: FormFieldType.STRING,
     helpText: field.helpText,
     label: field.label,
     required: field.required,
@@ -62,7 +62,7 @@ function transformImageField(field: ImageField): FormFieldProto {
   return {
     disabled: field.disabled,
     fieldId: field.name,
-    fieldType: 7 satisfies FormFieldType.IMAGE,
+    fieldType: FormFieldType.IMAGE,
     helpText: field.helpText,
     label: field.label,
     required: field.required,
@@ -72,7 +72,7 @@ function transformImageField(field: ImageField): FormFieldProto {
 function transformParagraphField(field: ParagraphField): FormFieldProto {
   return {
     defaultValue: {
-      fieldType: 1 satisfies FormFieldType.PARAGRAPH,
+      fieldType: FormFieldType.PARAGRAPH,
       stringValue: field.defaultValue,
     },
     disabled: field.disabled,
@@ -83,7 +83,7 @@ function transformParagraphField(field: ParagraphField): FormFieldProto {
       },
     },
     fieldId: field.name,
-    fieldType: 1 satisfies FormFieldType.PARAGRAPH,
+    fieldType: FormFieldType.PARAGRAPH,
     helpText: field.helpText,
     label: field.label,
     required: field.required,
@@ -93,7 +93,7 @@ function transformParagraphField(field: ParagraphField): FormFieldProto {
 function transformNumberField(field: NumberField): FormFieldProto {
   return {
     defaultValue: {
-      fieldType: 2 satisfies FormFieldType.NUMBER,
+      fieldType: FormFieldType.NUMBER,
       numberValue: field.defaultValue,
     },
     disabled: field.disabled,
@@ -101,7 +101,7 @@ function transformNumberField(field: NumberField): FormFieldProto {
       numberConfig: {},
     },
     fieldId: field.name,
-    fieldType: 2 satisfies FormFieldType.NUMBER,
+    fieldType: FormFieldType.NUMBER,
     helpText: field.helpText,
     label: field.label,
     required: field.required,
@@ -111,7 +111,7 @@ function transformNumberField(field: NumberField): FormFieldProto {
 function transformSelectField(field: SelectField): FormFieldProto {
   return {
     defaultValue: {
-      fieldType: 5 satisfies FormFieldType.SELECTION,
+      fieldType: FormFieldType.SELECTION,
       selectionValue: {
         values: field.defaultValue ?? [],
       },
@@ -124,7 +124,7 @@ function transformSelectField(field: SelectField): FormFieldProto {
       },
     },
     fieldId: field.name,
-    fieldType: 5 satisfies FormFieldType.SELECTION,
+    fieldType: FormFieldType.SELECTION,
     helpText: field.helpText,
     label: field.label,
     required: field.required,
@@ -134,12 +134,12 @@ function transformSelectField(field: SelectField): FormFieldProto {
 function transformBooleanField(field: BooleanField): FormFieldProto {
   return {
     defaultValue: {
-      fieldType: 3 satisfies FormFieldType.BOOLEAN,
+      fieldType: FormFieldType.BOOLEAN,
       boolValue: field.defaultValue,
     },
     disabled: field.disabled,
     fieldId: field.name,
-    fieldType: 3 satisfies FormFieldType.BOOLEAN,
+    fieldType: FormFieldType.BOOLEAN,
     helpText: field.helpText,
     label: field.label,
   };
@@ -148,7 +148,7 @@ function transformBooleanField(field: BooleanField): FormFieldProto {
 function transformGroupField(field: FormFieldGroup): FormFieldProto {
   return {
     fieldId: '',
-    fieldType: 6 satisfies FormFieldType.GROUP,
+    fieldType: FormFieldType.GROUP,
     fieldConfig: {
       groupConfig: {
         fields: transformFormFields(field.fields),

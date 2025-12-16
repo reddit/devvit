@@ -1,8 +1,7 @@
-import type { Effect, EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import { type Effect, EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import type { Form, FormFieldGroup, SelectField, StringField } from '@devvit/shared';
 import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
 import { noWebbitToken } from '@devvit/shared-types/webbit.js';
-
-import type { Form, FormFieldGroup, SelectField, StringField } from './form-types.js';
 
 // Devvit mocks
 
@@ -294,5 +293,5 @@ export const expectedShowFormMessage = (form: Readonly<Form>): Effect => ({
       }),
     },
   },
-  type: 3 satisfies EffectType.EFFECT_SHOW_FORM,
+  type: EffectType.EFFECT_SHOW_FORM,
 });

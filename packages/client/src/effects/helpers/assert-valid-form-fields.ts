@@ -1,4 +1,4 @@
-import type { FormField, SettingScope } from './form-types.js';
+import type { FormField, SettingScope } from '@devvit/shared';
 
 /**
  * Make sure that the form fields have unique names.

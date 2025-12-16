@@ -1,16 +1,17 @@
-import type { FormField as FormFieldProto, FormFieldType } from '@devvit/protos';
+import type { FormField as FormFieldProto } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/field.js';
+import { FormFieldType } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/type.js';
+import {
+  type BooleanField,
+  type FormField,
+  type FormFieldGroup,
+  type ImageField,
+  type NumberField,
+  type ParagraphField,
+  type SelectField,
+  type StringField,
+} from '@devvit/shared';
 import { describe, expect, it } from 'vitest';
 
-import type {
-  BooleanField,
-  FormField,
-  FormFieldGroup,
-  ImageField,
-  NumberField,
-  ParagraphField,
-  SelectField,
-  StringField,
-} from './form-types.js';
 import { transformFormFields } from './transform-form.js';
 
 describe('transformFormFields', () => {
@@ -28,7 +29,7 @@ describe('transformFormFields', () => {
     };
     const expected: FormFieldProto = {
       defaultValue: {
-        fieldType: 0 satisfies FormFieldType.STRING,
+        fieldType: FormFieldType.STRING,
         stringValue: 'default',
       },
       disabled: false,
@@ -38,7 +39,7 @@ describe('transformFormFields', () => {
         },
       },
       fieldId: 'testString',
-      fieldType: 0 satisfies FormFieldType.STRING,
+      fieldType: FormFieldType.STRING,
       helpText: 'Some help',
       label: 'Test String',
       required: true,
@@ -59,7 +60,7 @@ describe('transformFormFields', () => {
     const expected: FormFieldProto = {
       disabled: true,
       fieldId: 'testImage',
-      fieldType: 7 satisfies FormFieldType.IMAGE,
+      fieldType: FormFieldType.IMAGE,
       helpText: 'Upload an image',
       label: 'Test Image',
       required: false,
@@ -82,7 +83,7 @@ describe('transformFormFields', () => {
     };
     const expected: FormFieldProto = {
       defaultValue: {
-        fieldType: 1 satisfies FormFieldType.PARAGRAPH,
+        fieldType: FormFieldType.PARAGRAPH,
         stringValue: 'Default text',
       },
       disabled: false,
@@ -93,7 +94,7 @@ describe('transformFormFields', () => {
         },
       },
       fieldId: 'testParagraph',
-      fieldType: 1 satisfies FormFieldType.PARAGRAPH,
+      fieldType: FormFieldType.PARAGRAPH,
       helpText: 'Some help',
       label: 'Test Paragraph',
       required: true,
@@ -114,7 +115,7 @@ describe('transformFormFields', () => {
     };
     const expected: FormFieldProto = {
       defaultValue: {
-        fieldType: 2 satisfies FormFieldType.NUMBER,
+        fieldType: FormFieldType.NUMBER,
         numberValue: 10,
       },
       disabled: true,
@@ -122,7 +123,7 @@ describe('transformFormFields', () => {
         numberConfig: {},
       },
       fieldId: 'testNumber',
-      fieldType: 2 satisfies FormFieldType.NUMBER,
+      fieldType: FormFieldType.NUMBER,
       helpText: 'Enter a number',
       label: 'Test Number',
       required: false,
@@ -148,7 +149,7 @@ describe('transformFormFields', () => {
     };
     const expected: FormFieldProto = {
       defaultValue: {
-        fieldType: 5 satisfies FormFieldType.SELECTION,
+        fieldType: FormFieldType.SELECTION,
         selectionValue: {
           values: ['1'],
         },
@@ -164,7 +165,7 @@ describe('transformFormFields', () => {
         },
       },
       fieldId: 'testSelect',
-      fieldType: 5 satisfies FormFieldType.SELECTION,
+      fieldType: FormFieldType.SELECTION,
       helpText: 'Select options',
       label: 'Test Select',
       required: true,
@@ -184,7 +185,7 @@ describe('transformFormFields', () => {
     };
     const expected: FormFieldProto = {
       defaultValue: {
-        fieldType: 5 satisfies FormFieldType.SELECTION,
+        fieldType: FormFieldType.SELECTION,
         selectionValue: {
           values: [], // Expect empty array for undefined default
         },
@@ -197,7 +198,7 @@ describe('transformFormFields', () => {
         },
       },
       fieldId: 'testSelectEmptyDefault',
-      fieldType: 5 satisfies FormFieldType.SELECTION,
+      fieldType: FormFieldType.SELECTION,
       helpText: undefined,
       label: 'Test Select',
       required: undefined,
@@ -216,12 +217,12 @@ describe('transformFormFields', () => {
     };
     const expected: FormFieldProto = {
       defaultValue: {
-        fieldType: 3 satisfies FormFieldType.BOOLEAN,
+        fieldType: FormFieldType.BOOLEAN,
         boolValue: true,
       },
       disabled: false,
       fieldId: 'testBoolean',
-      fieldType: 3 satisfies FormFieldType.BOOLEAN,
+      fieldType: FormFieldType.BOOLEAN,
       helpText: 'Toggle option',
       label: 'Test Boolean',
       // required, fieldConfig, isSecret are not applicable/defined for BooleanField
@@ -241,10 +242,10 @@ describe('transformFormFields', () => {
     };
     const expectedGroupedString: FormFieldProto = {
       fieldId: 'groupedString',
-      fieldType: 0 satisfies FormFieldType.STRING,
+      fieldType: FormFieldType.STRING,
       label: 'Grouped String',
       // Defaults for optional fields
-      defaultValue: { fieldType: 0 satisfies FormFieldType.STRING, stringValue: undefined },
+      defaultValue: { fieldType: FormFieldType.STRING, stringValue: undefined },
       disabled: undefined,
       fieldConfig: { stringConfig: { placeholder: undefined } },
       helpText: undefined,
@@ -253,10 +254,10 @@ describe('transformFormFields', () => {
     };
     const expectedGroupedNumber: FormFieldProto = {
       fieldId: 'groupedNumber',
-      fieldType: 2 satisfies FormFieldType.NUMBER,
+      fieldType: FormFieldType.NUMBER,
       label: 'Grouped Number',
       // Defaults for optional fields
-      defaultValue: { fieldType: 2 satisfies FormFieldType.NUMBER, numberValue: undefined },
+      defaultValue: { fieldType: FormFieldType.NUMBER, numberValue: undefined },
       disabled: undefined,
       fieldConfig: { numberConfig: {} },
       helpText: undefined,
@@ -264,7 +265,7 @@ describe('transformFormFields', () => {
     };
     const expected: FormFieldProto = {
       fieldId: '', // Group fieldId is empty
-      fieldType: 6 satisfies FormFieldType.GROUP,
+      fieldType: FormFieldType.GROUP,
       fieldConfig: {
         groupConfig: {
           fields: [expectedGroupedString, expectedGroupedNumber],
@@ -299,20 +300,20 @@ describe('transformFormFields', () => {
     ];
     const transformed = transformFormFields(fields);
     expect(transformed).toHaveLength(1);
-    expect(transformed[0].fieldType).toBe(6 satisfies FormFieldType.GROUP);
+    expect(transformed[0].fieldType).toBe(FormFieldType.GROUP);
     expect(transformed[0].label).toBe('Outer Group');
     expect(transformed[0].fieldConfig?.groupConfig?.fields).toHaveLength(2);
 
     const innerFields = transformed[0].fieldConfig?.groupConfig?.fields ?? [];
-    expect(innerFields[0].fieldType).toBe(0 satisfies FormFieldType.STRING);
+    expect(innerFields[0].fieldType).toBe(FormFieldType.STRING);
     expect(innerFields[0].fieldId).toBe('outerString');
 
-    expect(innerFields[1].fieldType).toBe(6 satisfies FormFieldType.GROUP);
+    expect(innerFields[1].fieldType).toBe(FormFieldType.GROUP);
     expect(innerFields[1].label).toBe('Inner Group');
     expect(innerFields[1].fieldConfig?.groupConfig?.fields).toHaveLength(1);
 
     const deepestFields = innerFields[1].fieldConfig?.groupConfig?.fields ?? [];
-    expect(deepestFields[0].fieldType).toBe(3 satisfies FormFieldType.BOOLEAN);
+    expect(deepestFields[0].fieldType).toBe(FormFieldType.BOOLEAN);
     expect(deepestFields[0].fieldId).toBe('innerBool');
   });
 

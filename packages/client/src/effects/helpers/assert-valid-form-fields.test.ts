@@ -1,7 +1,7 @@
+import type { FormField, SettingScope } from '@devvit/shared';
 import { describe, expect, it } from 'vitest';
 
 import { assertValidFormFields } from './assert-valid-form-fields.js';
-import type { FormField, SettingScope } from './form-types.js';
 
 describe('assertValidFormFields', () => {
   it('should not throw for valid fields', () => {
