@@ -1,5 +1,4 @@
-import type { Empty, JsonStatus, Listing, Metadata, Users } from '@devvit/protos';
-import type { BoolValue } from '@devvit/protos/community.js';
+import type { JsonStatus } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import type {
   BlockUserRequest,
   BlockUserResponse,
@@ -20,8 +19,15 @@ import type {
   UsernameAvailableRequest,
   UserTrophiesResponse,
   UserWhereRequest,
-} from '@devvit/protos/types/devvit/plugin/redditapi/users/users_msg.js';
-import type { User } from '@devvit/protos/types/devvit/reddit/user.js';
+} from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
+import type { User } from '@devvit/protos/json/devvit/reddit/user.js';
+import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
+import type { BoolValue } from '@devvit/protos/json/google/protobuf/wrappers.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Listing } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Users } from '@devvit/protos/types/devvit/plugin/redditapi/users/users_svc.js';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 import { isT2, T2 } from '@devvit/shared-types/tid.js';
 

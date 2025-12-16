@@ -1,11 +1,12 @@
+import type { JsonWrappedComment_WrappedComment } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import type { Comment as CommentProto } from '@devvit/protos/json/devvit/reddit/comment.js';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import type {
-  Comment as CommentProto,
-  JsonWrappedComment_WrappedComment,
-  Metadata,
   RedditObject,
   WrappedRedditObject,
-} from '@devvit/protos';
-import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+} from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';

@@ -1,4 +1,5 @@
-import type { QueryResponse } from '@devvit/protos';
+import type { QueryResponse } from '@devvit/protos/json/devvit/plugin/redditapi/graphql/graphql_msg.js';
+// eslint-disable-next-line no-restricted-imports
 import { Devvit } from '@devvit/public-api';
 import { context } from '@devvit/server';
 import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';

@@ -1,10 +1,10 @@
 import type {
-  Metadata,
   WikiPage as WikiPageProto,
   WikiPageRevision as WikiPageRevisionProto,
   WikiPageRevisionListing,
   WikiPageSettings_Data,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redditapi/wiki/wiki_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 

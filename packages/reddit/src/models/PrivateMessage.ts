@@ -1,4 +1,6 @@
-import type { Metadata, RedditObject } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { RedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';

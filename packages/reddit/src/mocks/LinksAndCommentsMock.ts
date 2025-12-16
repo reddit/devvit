@@ -1,10 +1,4 @@
-import type { Empty, LinksAndComments, Metadata } from '@devvit/protos';
-import {
-  type JsonRedditObjects,
-  type JsonStatus,
-  type Listing,
-  RedditObject,
-} from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+import { type JsonStatus } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import type {
   BasicIdRequest,
   CommentRequest,
@@ -22,10 +16,22 @@ import type {
   SetSubredditStickyRequest,
   SetSuggestedSortRequest,
   SubmitRequest,
-  SubmitResponse,
   VoteRequest,
-} from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
-import type { Comment } from '@devvit/protos/types/devvit/reddit/comment.js';
+} from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import type { Comment } from '@devvit/protos/json/devvit/reddit/comment.js';
+import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type {
+  JsonRedditObjects,
+  Listing,
+} from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import { type RedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import type { SubmitResponse } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import { type LinksAndComments } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { type JsonObject, T3 } from '@devvit/shared';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 

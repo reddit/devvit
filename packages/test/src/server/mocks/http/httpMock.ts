@@ -1,5 +1,8 @@
-import { type HTTP, type Metadata } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import type { FetchRequest, FetchResponse } from '@devvit/protos/types/devvit/plugin/http/http.js';
+// eslint-disable-next-line no-restricted-imports
+import type { HTTP } from '@devvit/protos/types/devvit/plugin/http/http.js';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 
 export class HTTPPluginMock implements HTTP {

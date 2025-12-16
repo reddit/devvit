@@ -1,14 +1,26 @@
-import { NewModmailDefinition } from '@devvit/protos';
+// eslint-disable-next-line no-restricted-imports
 import { FlairDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/flair/flair_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { GraphQLDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { LinksAndCommentsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { ListingsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/listings/listings_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { ModerationDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/moderation/moderation_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { ModNoteDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/modnote/modnote_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { NewModmailDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/newmodmail/newmodmail_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { PrivateMessagesDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/privatemessages/privatemessages_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { SubredditsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { UsersDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/users/users_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { WidgetsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/widgets/widgets_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { WikiDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/wiki/wiki_svc.js';
 
 import { GraphQLMock } from './GraphQLMock.js';

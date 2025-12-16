@@ -1,6 +1,7 @@
 import '@devvit/shared-types/shared/devvit-worker-global.js';
 
-import { MediaServiceDefinition } from '@devvit/protos';
+// eslint-disable-next-line no-restricted-imports
+import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
 import { Context, runWithContext } from '@devvit/server';
 import { installGlobalConfig, makeConfig, MOCK_HEADERS } from '@devvit/shared-types/test/index.js';
 import { beforeAll, expect, test } from 'vitest';

@@ -1,4 +1,4 @@
-import { type JsonWrappedComment } from '@devvit/protos';
+import type { JsonWrappedComment } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import { context } from '@devvit/server';
 import { describe, expect, test, vi } from 'vitest';
 

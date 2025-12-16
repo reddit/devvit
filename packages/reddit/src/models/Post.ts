@@ -1,14 +1,21 @@
-import type {
-  Listing as ListingProto,
-  Metadata,
-  RedditObject,
-  SubmitResponse,
-} from '@devvit/protos';
-import type { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos';
-import { Block, DevvitPostData, UIResponse } from '@devvit/protos';
+import { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import { SetCustomPostPreviewRequest_BodyType } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
-import { type SplashPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import {
+  type DevvitPostData,
+  type SplashPostData,
+} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { RedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Listing as ListingProto } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import { type SubmitResponse } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import { Block } from '@devvit/protos/types/devvit/ui/block_kit/v1beta/block.js';
+// eslint-disable-next-line no-restricted-imports
+import { UIResponse } from '@devvit/protos/types/devvit/ui/block_kit/v1beta/ui.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';

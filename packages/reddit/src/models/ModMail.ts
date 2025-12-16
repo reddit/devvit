@@ -1,9 +1,9 @@
 import {
   type ConversationData as ProtosConversationData,
   type MessageData as ProtosMessageData,
-  type Metadata,
   type ModActionData as ProtosModActionData,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redditapi/newmodmail/newmodmail_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import { type T1, T2, type T3, T5 } from '@devvit/shared-types/tid.js';
 

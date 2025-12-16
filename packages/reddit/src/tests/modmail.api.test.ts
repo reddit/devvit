@@ -3,7 +3,7 @@ import type {
   ConversationUserData,
   MessageData,
   ModActionData,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redditapi/newmodmail/newmodmail_msg.js';
 import { context } from '@devvit/server';
 import type { MockInstance } from 'vitest';
 import { describe, expect, test, vi } from 'vitest';

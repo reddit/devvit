@@ -1,3 +1,9 @@
+import type { SubredditAboutRulesResponse } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+import type {
+  CommunityListWidget_CommunityData as CommunityData,
+  GetWidgetsResponse_WidgetItem as WidgetItem,
+  GetWidgetsResponse_WidgetItem_PostFlairTemplate as PostFlairTemplateData,
+} from '@devvit/protos/json/devvit/plugin/redditapi/widgets/widgets_msg.js';
 import type {
   AddButtonWidgetRequest,
   AddCalendarWidgetRequest,
@@ -7,9 +13,6 @@ import type {
   AddPostFlairWidgetRequest,
   AddTextAreaWidgetRequest,
   CalendarWidgetConfiguration,
-  GetWidgetsResponse_WidgetItem_PostFlairTemplate as PostFlairTemplateData,
-  Metadata,
-  SubredditAboutRulesResponse,
   UpdateButtonWidgetRequest,
   UpdateCalendarWidgetRequest,
   UpdateCommunityListWidgetRequest,
@@ -20,11 +23,8 @@ import type {
   WidgetButton,
   WidgetImage,
   WidgetStyles,
-} from '@devvit/protos';
-import {
-  CommunityListWidget_CommunityData as CommunityData,
-  GetWidgetsResponse_WidgetItem as WidgetItem,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redditapi/widgets/widgets_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
@@ -301,7 +301,27 @@ export class ImageWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.AddImageWidget(options, getMetadata());
 
-    return new ImageWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new ImageWidget(
+      {
+        buttons: [],
+        data: response.data.map((data) => ({
+          children: [],
+          height: data.height,
+          linkUrl: data.linkUrl,
+          url: data.url,
+          width: data.width,
+        })),
+        kind: response.kind,
+        id: response.id,
+        imageData: [],
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 
   /** @internal */
@@ -309,7 +329,27 @@ export class ImageWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.UpdateImageWidget(options, getMetadata());
 
-    return new ImageWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new ImageWidget(
+      {
+        buttons: [],
+        data: response.data.map((data) => ({
+          children: [],
+          height: data.height,
+          linkUrl: data.linkUrl,
+          url: data.url,
+          width: data.width,
+        })),
+        kind: response.kind,
+        id: response.id,
+        imageData: [],
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 }
 
@@ -357,7 +397,24 @@ export class CalendarWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.AddCalendarWidget(options, getMetadata());
 
-    return new CalendarWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new CalendarWidget(
+      {
+        buttons: [],
+        configuration: response.configuration,
+        data: [],
+        googleCalendarId: response.googleCalendarId,
+        id: response.id,
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: [],
+        requiresSync: response.requiresSync,
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 
   /** @internal */
@@ -365,7 +422,24 @@ export class CalendarWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.UpdateCalendarWidget(options, getMetadata());
 
-    return new CalendarWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new CalendarWidget(
+      {
+        buttons: [],
+        configuration: response.configuration,
+        data: [],
+        googleCalendarId: response.googleCalendarId,
+        id: response.id,
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: [],
+        requiresSync: response.requiresSync,
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 }
 
@@ -404,7 +478,22 @@ export class TextAreaWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.AddTextAreaWidget(options, getMetadata());
 
-    return new TextAreaWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new TextAreaWidget(
+      {
+        buttons: [],
+        data: [],
+        id: response.id,
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+        text: response.text,
+      },
+      options.subreddit
+    );
   }
 
   /** @internal */
@@ -412,7 +501,22 @@ export class TextAreaWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.UpdateTextAreaWidget(options, getMetadata());
 
-    return new TextAreaWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new TextAreaWidget(
+      {
+        buttons: [],
+        data: [],
+        id: response.id,
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+        text: response.text,
+      },
+      options.subreddit
+    );
   }
 }
 
@@ -458,7 +562,22 @@ export class ButtonWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.AddButtonWidget(options, getMetadata());
 
-    return new ButtonWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new ButtonWidget(
+      {
+        buttons: response.buttons,
+        data: [],
+        description: response.description,
+        id: response.id,
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 
   /** @internal */
@@ -466,7 +585,22 @@ export class ButtonWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.UpdateButtonWidget(options, getMetadata());
 
-    return new ButtonWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new ButtonWidget(
+      {
+        buttons: response.buttons,
+        data: [],
+        description: response.description,
+        id: response.id,
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 }
 
@@ -477,9 +611,23 @@ export class CommunityListWidget extends Widget {
   constructor(widgetData: WidgetItem, subredditName: string) {
     super(widgetData, subredditName);
 
-    this.#communities = widgetData.data.map((communityData) =>
-      CommunityData.fromJSON(communityData)
-    );
+    this.#communities = widgetData.data.map((data) => ({
+      children: data.children,
+      communityIcon: data.communityIcon ?? '',
+      height: data.height,
+      iconUrl: data.iconUrl ?? '',
+      isNsfw: data.isNsfw ?? false,
+      isSubscribed: data.isSubscribed ?? false,
+      linkUrl: data.linkUrl,
+      name: data.name ?? '',
+      prefixedName: data.prefixedName ?? '',
+      primaryColor: '',
+      subscribers: data.subscribers ?? 0,
+      text: data.text,
+      type: data.type ?? '',
+      url: data.url,
+      width: data.width,
+    }));
 
     assertNonNull(widgetData.styles, 'Community list widget data is missing styles');
 
@@ -508,7 +656,32 @@ export class CommunityListWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.AddCommunityListWidget(options, getMetadata());
 
-    return new CommunityListWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new CommunityListWidget(
+      {
+        buttons: [],
+        kind: response.kind,
+        data: response.data.map((community) => ({
+          children: [],
+          communityIcon: community.communityIcon,
+          iconUrl: community.iconUrl,
+          isNsfw: community.isNsfw,
+          isSubscribed: community.isSubscribed,
+          name: community.name,
+          prefixedName: community.prefixedName,
+          primaryColor: community.primaryColor,
+          subscribers: community.subscribers,
+          type: community.type,
+        })),
+        id: response.id,
+        imageData: [],
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 
   /** @internal */
@@ -516,7 +689,21 @@ export class CommunityListWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.UpdateCommunityListWidget(options, getMetadata());
 
-    return new CommunityListWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new CommunityListWidget(
+      {
+        buttons: [],
+        data: response.data.map((data) => ({ text: data, children: [] })),
+        id: '',
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 }
 
@@ -569,7 +756,22 @@ export class PostFlairWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.AddPostFlairWidget(options, getMetadata());
 
-    return new PostFlairWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new PostFlairWidget(
+      {
+        buttons: [],
+        data: [],
+        display: response.display,
+        id: response.id,
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: response.order,
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 
   /** @internal */
@@ -577,7 +779,22 @@ export class PostFlairWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.UpdatePostFlairWidget(options, getMetadata());
 
-    return new PostFlairWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new PostFlairWidget(
+      {
+        buttons: [],
+        data: [],
+        display: response.display,
+        id: response.id,
+        imageData: [],
+        kind: response.kind,
+        mods: [],
+        order: response.order,
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+      },
+      options.subreddit
+    );
   }
 }
 
@@ -639,7 +856,25 @@ export class CustomWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.AddCustomWidget(options, getMetadata());
 
-    return new CustomWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new CustomWidget(
+      {
+        buttons: [],
+        css: response.css,
+        data: [],
+        height: response.height,
+        id: response.id,
+        imageData: response.imageData,
+        kind: response.kind,
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+        stylesheetUrl: '',
+        text: response.text,
+      },
+      options.subreddit
+    );
   }
 
   /** @internal */
@@ -647,7 +882,25 @@ export class CustomWidget extends Widget {
     const client = getRedditApiPlugins().Widgets;
     const response = await client.UpdateCustomWidget(options, getMetadata());
 
-    return new CustomWidget(WidgetItem.fromJSON(response), options.subreddit);
+    return new CustomWidget(
+      {
+        buttons: [],
+        css: response.css,
+        data: [],
+        height: response.height,
+        id: response.id,
+        imageData: response.imageData,
+        kind: response.kind,
+        mods: [],
+        order: [],
+        shortName: response.shortName,
+        styles: response.styles,
+        templates: {},
+        stylesheetUrl: '',
+        text: response.text,
+      },
+      options.subreddit
+    );
   }
 }
 

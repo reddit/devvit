@@ -1,8 +1,11 @@
-import type { GraphQL, Metadata, QueryResponse } from '@devvit/protos';
 import type {
   PersistedQueryRequest,
   QueryRequest,
-} from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_msg.js';
+  QueryResponse,
+} from '@devvit/protos/json/devvit/plugin/redditapi/graphql/graphql_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { GraphQL } from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_svc.js';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 
 import type { LinksAndCommentsMock } from './LinksAndCommentsMock.js';

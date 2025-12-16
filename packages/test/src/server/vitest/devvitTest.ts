@@ -4,12 +4,19 @@ import { randomUUID } from 'node:crypto';
 
 import { MediaMock } from '@devvit/media/test';
 import { NotificationsMock } from '@devvit/notifications/test';
-import { SchedulerDefinition } from '@devvit/protos';
+// eslint-disable-next-line no-restricted-imports
 import { RealtimeDefinition } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
+// eslint-disable-next-line no-restricted-imports
 import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
+// eslint-disable-next-line no-restricted-imports
 import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
+// eslint-disable-next-line no-restricted-imports
 import { NotificationsDefinition } from '@devvit/protos/types/devvit/plugin/notifications/notifications_svc.js';
+// eslint-disable-next-line no-restricted-imports
 import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+// eslint-disable-next-line no-restricted-imports
+import { SchedulerDefinition } from '@devvit/protos/types/devvit/plugin/scheduler/scheduler.js';
+// eslint-disable-next-line no-restricted-imports
 import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 import { RealtimeMock } from '@devvit/realtime/server/test';
 import { RedditPluginMock } from '@devvit/reddit/test';

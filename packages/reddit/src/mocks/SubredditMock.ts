@@ -1,5 +1,3 @@
-import type { JsonStatus, Listing, Metadata, Subreddits } from '@devvit/protos';
-import type { Empty, StringValue } from '@devvit/protos/community.js';
 import type {
   AboutWhereRequest,
   BasicSearchRequest,
@@ -9,8 +7,6 @@ import type {
   SearchRedditNamesResponse,
   SearchSubredditsResponse,
   SiteAdminRequest,
-  StickyRequest,
-  StickyResponse,
   SubmitTextResponse,
   SubredditAboutEditRequest,
   SubredditAboutEditResponse,
@@ -33,7 +29,22 @@ import type {
   UploadSrImgResponse,
   UserSearchResponse,
   UsersSearchRequest,
+} from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
+import type { StringValue } from '@devvit/protos/json/google/protobuf/wrappers.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type {
+  JsonStatus,
+  Listing,
+} from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import type {
+  StickyRequest,
+  StickyResponse,
 } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Subreddits } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_svc.js';
 import type { T5 } from '@devvit/shared';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 

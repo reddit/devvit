@@ -1,4 +1,5 @@
-import { MediaServiceDefinition } from '@devvit/protos';
+// eslint-disable-next-line no-restricted-imports
+import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
 import { makeConfig } from '@devvit/shared-types/test/index.js';
 import { describe, expect, it } from 'vitest';
 

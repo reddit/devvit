@@ -1,4 +1,4 @@
-import type { AboutLogResponse } from '@devvit/protos';
+import type { AboutLogResponse } from '@devvit/protos/json/devvit/plugin/redditapi/moderation/moderation_msg.js';
 import { context } from '@devvit/server';
 import type { T2, T5 } from '@devvit/shared';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';

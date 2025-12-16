@@ -1,6 +1,8 @@
-import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
+import type { JsonStatus } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
+import type { FlairCsvResult } from '@devvit/protos/json/devvit/plugin/redditapi/flair/flair_msg.js';
 import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context, getContextCache, setContextCache } from '@devvit/server';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { asTid, isT1, isT3, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';

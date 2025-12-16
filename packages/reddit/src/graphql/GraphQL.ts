@@ -1,4 +1,5 @@
-import type { Metadata, QueryResponse } from '@devvit/protos';
+import type { QueryResponse } from '@devvit/protos/json/devvit/plugin/redditapi/graphql/graphql_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import type { JsonObject } from '@devvit/shared';
 

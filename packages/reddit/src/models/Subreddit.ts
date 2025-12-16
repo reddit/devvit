@@ -1,10 +1,10 @@
-import type {
-  AboutLocationRequest,
-  Listing as ProtoListing,
-  Metadata,
-  SubredditAboutResponse_AboutData,
-  WrappedRedditObject,
-} from '@devvit/protos';
+import type { AboutLocationRequest } from '@devvit/protos/json/devvit/plugin/redditapi/moderation/moderation_msg.js';
+import type { SubredditAboutResponse_AboutData } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { WrappedRedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Listing as ProtoListing } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';

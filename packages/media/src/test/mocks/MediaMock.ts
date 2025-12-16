@@ -1,9 +1,10 @@
-import {
-  type MediaService,
-  type MediaUploadRequest,
-  type MediaUploadResponse,
-  type Metadata,
-} from '@devvit/protos';
+import type {
+  MediaUploadRequest,
+  MediaUploadResponse,
+} from '@devvit/protos/json/devvit/plugin/media/media.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { MediaService } from '@devvit/protos/types/devvit/plugin/media/media.js';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 
 type MediaStore = {

@@ -1,4 +1,6 @@
-import type { Listing as ListingProto, SubredditAboutResponse_AboutData } from '@devvit/protos';
+import type { SubredditAboutResponse_AboutData } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Listing } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { context } from '@devvit/server';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -45,7 +47,7 @@ describe('Subreddit API', () => {
   const username = 'unusual_setup';
   const subredditId = 't5_abc123';
 
-  const mockListingWithPostsAndComments: ListingProto = {
+  const mockListingWithPostsAndComments: Listing = {
     kind: 'Listing',
     data: {
       children: [

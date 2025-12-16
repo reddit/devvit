@@ -1,11 +1,11 @@
 import type {
   DeleteNotesRequest,
   GetNotesRequest,
-  Metadata,
   ModNoteObject,
   PostNotesRequest,
   PostRemovalNoteRequest,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redditapi/modnote/modnote_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';

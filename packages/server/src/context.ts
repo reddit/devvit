@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-import type { Metadata } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 
 import type { Context } from './server-context.js';
 

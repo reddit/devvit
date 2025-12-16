@@ -1,4 +1,4 @@
-import { Scope } from '@devvit/protos/types/reddit/devvit/app_permission/v1/app_permission.js';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { assertUserScope } from '../common.js';

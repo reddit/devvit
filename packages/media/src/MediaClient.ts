@@ -1,4 +1,6 @@
-import { type MediaService, MediaServiceDefinition, type Metadata } from '@devvit/protos';
+// eslint-disable-next-line no-restricted-imports
+import { type MediaService, MediaServiceDefinition } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
 
