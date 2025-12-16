@@ -1,8 +1,18 @@
-import type { HScanResponse, ZScanResponse } from '@devvit/protos';
-
 // TODO: This code is currently cloned into the Devvit Web world from `@devvit/public-api`. If
 //  you change this code, please make sure to update the other package as well. Eventually, that
 //  copy of the code will be deleted, when we move to a fully Devvit Web world.
+
+import type {
+  HScanResponse,
+  ZMember,
+  ZScanResponse,
+} from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
+
+export type {
+  HScanResponse,
+  ZMember,
+  ZScanResponse,
+} from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
 
 export type TxClientLike = {
   /**
@@ -1475,10 +1485,7 @@ export type SetOptions = {
   xx?: boolean;
   expiration?: Date;
 };
-export type ZMember = {
-  score: number;
-  member: string;
-};
+export { RedisKeyScope } from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
 
 export type ZRangeOptions = {
   /**
@@ -1506,12 +1513,12 @@ export type BitfieldCommand = BitfieldGet | BitfieldSet | BitfieldIncrBy | Bitfi
 /**
  * Represents a 'get' operation in a bitfield command
  */
-type BitfieldGet = [get: 'get', encoding: BitfieldEncoding, offset: BitfieldOffset];
+export type BitfieldGet = [get: 'get', encoding: BitfieldEncoding, offset: BitfieldOffset];
 
 /**
  * Represents a 'set' operation in a bitfield command
  */
-type BitfieldSet = [
+export type BitfieldSet = [
   set: 'set',
   encoding: BitfieldEncoding,
   offset: BitfieldOffset,
@@ -1524,7 +1531,7 @@ type BitfieldSet = [
 /**
  * Represents an 'incrBy' operation in a bitfield command
  */
-type BitfieldIncrBy = [
+export type BitfieldIncrBy = [
   incrBy: 'incrBy',
   encoding: BitfieldEncoding,
   offset: BitfieldOffset,
@@ -1537,7 +1544,7 @@ type BitfieldIncrBy = [
 /**
  * Represents an 'overflow' operation in a bitfield command
  */
-type BitfieldOverflow = [overflow: 'overflow', behavior: 'wrap' | 'sat' | 'fail'];
+export type BitfieldOverflow = [overflow: 'overflow', behavior: 'wrap' | 'sat' | 'fail'];
 
 /**
  * Encoding for operations in a bitfield command
@@ -1545,11 +1552,11 @@ type BitfieldOverflow = [overflow: 'overflow', behavior: 'wrap' | 'sat' | 'fail'
  * Prefix with 'i' to encode as signed integers (e.g. 'i6' is a 6-bit signed integer)
  * Up to 64 bits for signed integers, and up to 63 bits for unsigned integers
  */
-type BitfieldEncoding = `${'i' | 'u'}${number}`;
+export type BitfieldEncoding = `${'i' | 'u'}${number}`;
 
 /**
  * Offset to operate on for an operation in a bitfield command
  * If given a number without any prefix, it is used just as a zero based bit offset inside the string
  * if given a number prefixed with a # character, the specified offset is multiplied by the integer encoding's width
  */
-type BitfieldOffset = number | string | `#${number}`;
+export type BitfieldOffset = number | string | `#${number}`;

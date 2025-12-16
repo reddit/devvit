@@ -1,9 +1,11 @@
-import { type Metadata, type Realtime } from '@devvit/protos';
 import {
   type RealtimeEvent,
   type RealtimeRequest,
-} from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
-import { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
+} from '@devvit/protos/json/devvit/events/v1alpha/realtime.js';
+import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import { type Realtime } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 import { Observable, Subject } from 'rxjs';
 

@@ -1,5 +1,9 @@
-import { type Realtime, RealtimeDefinition } from '@devvit/protos';
-import type { RealtimeEvent } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
+import type { RealtimeEvent } from '@devvit/protos/json/devvit/events/v1alpha/realtime.js';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type Realtime,
+  RealtimeDefinition,
+} from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
 import { makeConfig } from '@devvit/shared-types/test/index.js';
 import { describe, expect, it } from 'vitest';
 

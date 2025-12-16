@@ -1,4 +1,8 @@
-import { type Realtime, RealtimeDefinition } from '@devvit/protos';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type Realtime,
+  RealtimeDefinition,
+} from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
 import { context } from '@devvit/server';
 import type { JsonValue } from '@devvit/shared';
 import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';

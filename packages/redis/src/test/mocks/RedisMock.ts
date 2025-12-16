@@ -19,8 +19,6 @@ import {
   type KeysRequest,
   type KeysResponse,
   type KeyValuesRequest,
-  type Metadata,
-  type RedisAPI,
   type RedisFieldValues,
   RedisKeyScope,
   type RedisValues,
@@ -44,14 +42,18 @@ import {
   type ZScanRequest,
   type ZScanResponse,
   type ZScoreRequest,
-} from '@devvit/protos';
-import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
+} from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
+import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
 import type {
-  BytesValue,
   DoubleValue,
   Int64Value,
   StringValue,
-} from '@devvit/protos/types/google/protobuf/wrappers.js';
+} from '@devvit/protos/json/google/protobuf/wrappers.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { RedisAPI } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+// eslint-disable-next-line no-restricted-imports
+import type { BytesValue } from '@devvit/protos/types/google/protobuf/wrappers.js';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 import { Redis } from 'ioredis';
 

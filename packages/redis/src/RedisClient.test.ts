@@ -1,4 +1,6 @@
-import { type RedisAPI, RedisKeyScope } from '@devvit/protos';
+import { RedisKeyScope } from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
+// eslint-disable-next-line no-restricted-imports
+import { type RedisAPI } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
 import { expect, test, vi } from 'vitest';
 
 import { RedisClient } from './RedisClient.js';

@@ -10,6 +10,7 @@ import {
   type ZScanResponse,
 } from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   type RedisAPI,
   RedisAPIDefinition,
@@ -24,9 +25,6 @@ import type {
   TxClientLike,
   ZRangeOptions,
 } from './types/redis.js';
-
-// Re-export this here, to prevent devs from needing to directly import from the protos package.
-export { RedisKeyScope } from '@devvit/protos';
 
 // TODO: This code is currently cloned into the Devvit Web world from `@devvit/public-api`. If
 //  you change this code, please make sure to update the other package as well. Eventually, that

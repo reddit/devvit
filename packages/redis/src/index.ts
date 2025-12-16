@@ -1,9 +1,8 @@
-import { RedisClient as RedisClientImpl, RedisKeyScope } from './RedisClient.js';
+import { RedisClient as RedisClientImpl } from './RedisClient.js';
 import { RedisCompressionProxy } from './redisCompression.js';
-import type { RedisClient } from './types/redis.js';
+import { type RedisClient, RedisKeyScope } from './types/redis.js';
 
-export { RedisKeyScope };
-export type * from './types/redis.js';
+export * from './types/redis.js';
 
 const redisClientImpl: RedisClientImpl = new RedisClientImpl(RedisKeyScope.INSTALLATION);
 export const redis: RedisClient = redisClientImpl;
