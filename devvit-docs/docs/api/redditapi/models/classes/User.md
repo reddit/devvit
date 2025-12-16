@@ -365,6 +365,22 @@ const userFlair = await user.getUserFlairBySubreddit(subredditName);
 
 ---
 
+<a id="getuserkarmafromcurrentsubreddit"></a>
+
+### getUserKarmaFromCurrentSubreddit()
+
+> **getUserKarmaFromCurrentSubreddit**(): `Promise`\<`GetUserKarmaForSubredditResponse`\>
+
+Returns the karma for this User in the current subreddit.
+
+#### Returns
+
+`Promise`\<`GetUserKarmaForSubredditResponse`\>
+
+The GetUserKarmaForSubredditResponse, containing the user's karma for comments and posts in the subreddit.
+
+---
+
 <a id="tojson"></a>
 
 ### toJSON()

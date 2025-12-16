@@ -5,6 +5,7 @@ import type {
   UserDataByAccountIdsResponse,
   UserDataByAccountIdsResponse_UserAccountData,
 } from '@devvit/protos';
+import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
@@ -474,6 +475,15 @@ export class User {
     }));
   }
 
+  /**
+   * Returns the karma for this User in the current subreddit.
+   *
+   * @returns The GetUserKarmaForSubredditResponse, containing the user's karma for comments and posts in the subreddit.
+   */
+  async getUserKarmaFromCurrentSubreddit(): Promise<GetUserKarmaForSubredditResponse> {
+    return await User.getUserKarmaFromCurrentSubreddit(this.username, this.#metadata);
+  }
+
   /** @internal */
   static async getById(id: T2ID, metadata: Metadata | undefined): Promise<User | undefined> {
     const username = await getUsernameById(id, metadata);
@@ -642,6 +652,22 @@ export class User {
 
         return listingProtosToPostsOrComments(response, metadata);
       },
+    });
+  }
+
+  /** @internal */
+  static async getUserKarmaFromCurrentSubreddit(
+    username: string,
+    metadata: Metadata | undefined
+  ): Promise<GetUserKarmaForSubredditResponse> {
+    assertNonNull(metadata);
+    const subredditId = metadata?.[Header.Subreddit]?.values[0];
+    if (!subredditId) {
+      throw new Error('Subreddit ID is missing from metadata');
+    }
+    return await Devvit.redditAPIPlugins.Users.GetUserKarmaForSubreddit({
+      username: username,
+      subredditId,
     });
   }
 }

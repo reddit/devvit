@@ -1979,6 +1979,30 @@ A Promise that resolves with an array of FlairTemplate objects.
 
 ---
 
+<a id="getuserkarmafromcurrentsubreddit"></a>
+
+### getUserKarmaFromCurrentSubreddit()
+
+> **getUserKarmaFromCurrentSubreddit**(`username`): `Promise`\<`GetUserKarmaForSubredditResponse`\>
+
+Returns the karma for a given user in the current subreddit.
+
+#### Parameters
+
+##### username
+
+`string`
+
+The username of the user to get the karma for. e.g. 'spez'
+
+#### Returns
+
+`Promise`\<`GetUserKarmaForSubredditResponse`\>
+
+The GetUserKarmaForSubredditResponse, containing the user's karma for posts and comments in the subreddit.
+
+---
+
 <a id="getvaultbyaddress"></a>
 
 ### getVaultByAddress()

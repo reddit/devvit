@@ -1,4 +1,5 @@
 import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
+import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import { Header } from '@devvit/shared-types/Header.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
@@ -684,6 +685,16 @@ export class RedditAPIClient {
    */
   getCommentsAndPostsByUser(options: GetUserOverviewOptions): Listing<Post | Comment> {
     return User.getOverview(options, this.#metadata);
+  }
+
+  /**
+   * Returns the karma for a given user in the current subreddit.
+   *
+   * @param username - The username of the user to get the karma for. e.g. 'spez'
+   * @returns The GetUserKarmaForSubredditResponse, containing the user's karma for posts and comments in the subreddit.
+   */
+  getUserKarmaFromCurrentSubreddit(username: string): Promise<GetUserKarmaForSubredditResponse> {
+    return User.getUserKarmaFromCurrentSubreddit(username, this.#metadata);
   }
 
   /**
