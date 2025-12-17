@@ -1,18 +1,7 @@
+import { KVStoreDefinition, type LinkedBundle, SchedulerDefinition } from '@devvit/protos/index.js';
+import { NutritionCategory } from '@devvit/protos/json/devvit/dev_portal/nutrition/nutrition.js';
+// eslint-disable-next-line no-restricted-imports
 import {
-  ContextActionDefinition,
-  CustomPostDefinition,
-  FlairDefinition,
-  GraphQLDefinition,
-  HTTPDefinition,
-  InstallationSettingsDefinition,
-  KVStoreDefinition,
-  LinksAndCommentsDefinition,
-  ListingsDefinition,
-  MediaServiceDefinition,
-  ModerationDefinition,
-  ModlogDefinition,
-  ModNoteDefinition,
-  NewModmailDefinition,
   OnAppInstallDefinition,
   OnAppUpgradeDefinition,
   OnCommentCreateDefinition,
@@ -28,27 +17,66 @@ import {
   OnPostReportDefinition,
   OnPostSubmitDefinition,
   OnPostUpdateDefinition,
-  PrivateMessagesDefinition,
-  RedisAPIDefinition,
-  SchedulerDefinition,
-  SchedulerHandlerDefinition,
-  SettingsDefinition,
-  SubredditsDefinition,
-  UIEventHandlerDefinition,
-  UserActionsDefinition,
-  UsersDefinition,
-  WidgetsDefinition,
-  WikiDefinition,
-} from '@devvit/protos';
-import { NutritionCategory } from '@devvit/protos/community.js';
-import type { LinkedBundle } from '@devvit/protos/index.js';
-import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
+} from '@devvit/protos/types/devvit/actor/automation/v1alpha/event_handlers.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   OnAccountDeleteDefinition,
   OnSubredditSubscribeDefinition,
 } from '@devvit/protos/types/devvit/actor/automation/v1alpha/event_handlers.js';
+// eslint-disable-next-line no-restricted-imports
+import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
+// eslint-disable-next-line no-restricted-imports
+import { ContextActionDefinition } from '@devvit/protos/types/devvit/actor/reddit/context_action.js';
+// eslint-disable-next-line no-restricted-imports
+import { SchedulerHandlerDefinition } from '@devvit/protos/types/devvit/actor/scheduler/handler.js';
+// eslint-disable-next-line no-restricted-imports
+import { InstallationSettingsDefinition } from '@devvit/protos/types/devvit/actor/settings/v1alpha/installation_settings.js';
+// eslint-disable-next-line no-restricted-imports
 import { AssetResolverDefinition } from '@devvit/protos/types/devvit/plugin/assetresolver/assetresolver.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+// eslint-disable-next-line no-restricted-imports
+import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
+// eslint-disable-next-line no-restricted-imports
+import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
+// eslint-disable-next-line no-restricted-imports
+import { ModlogDefinition } from '@devvit/protos/types/devvit/plugin/modlog/modlog.js';
+// eslint-disable-next-line no-restricted-imports
+import { PaymentsServiceDefinition } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
+// eslint-disable-next-line no-restricted-imports
+import { FlairDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/flair/flair_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { GraphQLDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { LinksAndCommentsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { ListingsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/listings/listings_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { ModerationDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/moderation/moderation_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { ModNoteDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/modnote/modnote_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { NewModmailDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/newmodmail/newmodmail_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { PrivateMessagesDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/privatemessages/privatemessages_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { SubredditsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { UsersDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/users/users_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { WidgetsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/widgets/widgets_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { WikiDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/wiki/wiki_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+// eslint-disable-next-line no-restricted-imports
+import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
+// eslint-disable-next-line no-restricted-imports
+import { UserActionsDefinition } from '@devvit/protos/types/devvit/plugin/useractions/useractions.js';
+// eslint-disable-next-line no-restricted-imports
+import { CustomPostDefinition } from '@devvit/protos/types/devvit/reddit/custom_post/v1alpha/custom_post.js';
+// eslint-disable-next-line no-restricted-imports
+import { UIEventHandlerDefinition } from '@devvit/protos/types/devvit/ui/events/v1alpha/handle_ui.js';
 
 /** Actor Plugins API as recorded in Prisma. */
 type AppActorTypes = readonly { readonly name: string }[];

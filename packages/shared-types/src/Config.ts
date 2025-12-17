@@ -1,5 +1,5 @@
+import type { DependencySpec, Permissions } from '@devvit/protos/json/devvit/runtime/bundle.js';
 import type { Definition } from '@devvit/protos/lib/Types.js';
-import type { DependencySpec, Permissions } from '@devvit/protos/types/devvit/runtime/bundle.js';
 
 import type { AssetMap } from './Assets.js';
 import type { Namespace } from './Namespace.js';

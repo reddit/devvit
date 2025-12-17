@@ -5,7 +5,7 @@
  * for where the runtime-worker bidirectional connection is established.
  */
 
-import type { Metadata } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 
 import type { AssetMap } from '../Assets.js';
 import type { Config } from '../Config.js';

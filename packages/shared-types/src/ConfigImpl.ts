@@ -1,10 +1,10 @@
-import { Definition } from '@devvit/protos/lib/Types.js';
-import {
+import type {
   ActorSpec,
   DependencySpec,
   PackageQuery,
   Permissions,
-} from '@devvit/protos/types/devvit/runtime/bundle.js';
+} from '@devvit/protos/json/devvit/runtime/bundle.js';
+import { Definition } from '@devvit/protos/lib/Types.js';
 
 import type { AssetMap } from './Assets.js';
 import type { Config } from './Config.js';

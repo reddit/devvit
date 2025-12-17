@@ -2,7 +2,7 @@
 // Do not use in @devvit/public-api. Protos not in externalized @devvit/protos
 // barrel.
 
-import type { AppVersionInfo } from '@devvit/protos/community.js';
+import type { AppVersionInfo } from '@devvit/protos/json/devvit/dev_portal/app_version/info/app_version_info.js';
 
 export enum VersionBumpType {
   Major = 'major',

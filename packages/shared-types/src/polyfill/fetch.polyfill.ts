@@ -1,5 +1,8 @@
-import type { HTTP as HTTPPlugin } from '@devvit/protos';
-import { HTTPDefinition } from '@devvit/protos';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type HTTP as HTTPPlugin,
+  HTTPDefinition,
+} from '@devvit/protos/types/devvit/plugin/http/http.js';
 
 import type {} from '../shared/devvit-worker-global.js';
 

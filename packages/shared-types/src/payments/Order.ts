@@ -1,5 +1,6 @@
-import { Order as OrderProto } from '@devvit/protos/payments.js';
-import { OrderStatus as OrderStatusProto } from '@devvit/protos/payments.js';
+import { OrderStatus as OrderStatusProto } from '@devvit/protos/json/devvit/payments/v1alpha/order.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Order as OrderProto } from '@devvit/protos/types/devvit/payments/v1alpha/order.js';
 
 import { purgeReservedDevvitKeysFromMetadata } from '../reservedDevvitMetadataKeys.js';
 import type { Product } from './Product.js';

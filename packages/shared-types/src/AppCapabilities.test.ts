@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-restricted-imports
 import type { LinkedBundle } from '@devvit/protos';
-import { NutritionCategory } from '@devvit/protos/community.js';
+import { NutritionCategory } from '@devvit/protos/json/devvit/dev_portal/nutrition/nutrition.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { expect, test } from 'vitest';
 

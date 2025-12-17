@@ -1,5 +1,5 @@
-import type { Product as ProductProto } from '@devvit/protos/payments.js';
-import { AccountingType as AccountingTypeProto } from '@devvit/protos/payments.js';
+import type { Product as ProductProto } from '@devvit/protos/json/devvit/payments/v1alpha/product.js';
+import { AccountingType as AccountingTypeProto } from '@devvit/protos/json/devvit/payments/v1alpha/product.js';
 import { v5 as uuidv5 } from 'uuid';
 
 import { assertNonNull } from '../NonNull.js';

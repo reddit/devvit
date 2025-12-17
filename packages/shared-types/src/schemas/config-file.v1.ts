@@ -5,7 +5,7 @@
 
 import { readFileSync } from 'node:fs';
 
-import { Scope, scopeFromJSON } from '@devvit/protos';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import jsonschema, { type Schema } from 'jsonschema/lib/index.js';
 
 import type { JsonObject, JsonValue } from '../json.js';
@@ -618,4 +618,8 @@ export function validate(config: Readonly<AppConfig>): void {
   }
 
   if (errs.length) throw Error(`${errs.join('; ')}.`);
+}
+
+function scopeFromJSON(scope: string): Scope {
+  return scope in Scope ? Scope[scope as keyof typeof Scope] : Scope.UNRECOGNIZED;
 }
