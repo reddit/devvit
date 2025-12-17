@@ -925,6 +925,7 @@ export class RedisClient implements RedisClientLike {
     const response = await this.storage.Bitfield({
       key,
       commands,
+      scope: this.scope,
     });
 
     return response.results;

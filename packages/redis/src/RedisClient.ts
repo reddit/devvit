@@ -802,6 +802,7 @@ export class RedisClient implements RedisClientLike {
     const response = await this.#plugin.Bitfield({
       key,
       commands,
+      scope: this.scope,
     });
 
     return response.results;
