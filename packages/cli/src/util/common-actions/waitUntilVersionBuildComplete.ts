@@ -7,9 +7,12 @@ import { sleep } from '../sleep.js';
 export async function waitUntilVersionBuildComplete(
   command: DevvitCommand,
   appVersionClient: AppVersionClient,
-  appVersionInfo: AppVersionInfo
+  appVersionInfo: AppVersionInfo,
+  verbose: boolean
 ): Promise<void> {
-  ux.action.start('App is building remotely');
+  if (verbose) {
+    ux.action.start('App is building remotely');
+  }
   for (let i = 0; i < 10 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
     // version is still building: wait and try again
     await sleep(3000);
@@ -25,7 +28,9 @@ export async function waitUntilVersionBuildComplete(
       command.log(`Your app's taking a while to build - sorry for the delay!`);
     }
   }
-  ux.action.stop();
+  if (verbose) {
+    ux.action.stop();
+  }
 
   if (appVersionInfo.buildStatus !== BuildStatus.READY) {
     throw new Error('Something went wrong: the previous version did not build successfully.');

@@ -85,9 +85,8 @@ export default class Upload extends DevvitCommand {
     }),
     verbose: Flags.boolean({
       char: 'v',
-      description: 'Include more details about discovered assets',
+      description: 'Enable verbose logging',
       default: false,
-      hidden: true,
     }),
   } as const;
 
@@ -155,7 +154,10 @@ export default class Upload extends DevvitCommand {
       }
     }
 
-    ux.action.start('Verifying app builds');
+    if (flags.verbose) {
+      ux.action.start('Verifying app builds');
+    }
+
     // Version is unknown until upload. Use a fake one for build verification.
     await this.#bundleActors(username, '0.0.0');
     ux.action.stop();
@@ -207,6 +209,10 @@ export default class Upload extends DevvitCommand {
       if (shouldCreatePlaytestSubreddit) {
         this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
       }
+      const shouldShowUploadingAction = !flags.verbose;
+      if (shouldShowUploadingAction) {
+        ux.action.start('Uploading');
+      }
       const latestVersion = await appVersionUploader.createVersion(
         {
           appId: appInfo.app.id,
@@ -217,12 +223,16 @@ export default class Upload extends DevvitCommand {
         bundles,
         !shouldCreatePlaytestSubreddit
       );
+      if (shouldShowUploadingAction) {
+        ux.action.stop();
+      }
 
       // Install the app to the default playtest subreddit, if it was created.
       if (shouldCreatePlaytestSubreddit) {
         const installationInfo = await this.#installOnDefaultPlaytestSubreddit(
           token,
-          latestVersion
+          latestVersion,
+          flags.verbose
         );
         if (installationInfo) {
           const devSubredditName = installationInfo.installation?.location?.name;
@@ -370,7 +380,8 @@ export default class Upload extends DevvitCommand {
   // For convenience, returns the name of the subreddit if the app is successfully installed.
   async #installOnDefaultPlaytestSubreddit(
     token: StoredToken,
-    appVersion: AppVersionInfo
+    appVersion: AppVersionInfo,
+    verbose: boolean
   ): Promise<FullInstallationInfo | undefined> {
     const appInfo = await getAppBySlug(this.#appClient, {
       slug: this.project.name,
@@ -398,7 +409,8 @@ export default class Upload extends DevvitCommand {
         this.#installationsClient,
         userT2Id,
         appVersion,
-        appInfo.app.defaultPlaytestSubredditId
+        appInfo.app.defaultPlaytestSubredditId,
+        verbose
       );
 
       ux.action.stop();

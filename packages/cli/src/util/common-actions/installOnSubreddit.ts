@@ -15,10 +15,11 @@ export async function installOnSubreddit(
   installationsClient: InstallationsClient,
   userT2Id: `t2_${string}`,
   appVersion: AppVersionInfo,
-  subreddit: string
+  subreddit: string,
+  verbose: boolean
 ): Promise<FullInstallationInfo> {
   // Wait for the app version to be built.
-  await waitUntilVersionBuildComplete(command, appVersionClient, appVersion);
+  await waitUntilVersionBuildComplete(command, appVersionClient, appVersion, verbose);
 
   return await installationsClient.Create({
     appVersionId: appVersion.id,
