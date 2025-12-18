@@ -149,6 +149,7 @@ const config: Config = {
     ],
     './plugins/copyDocsRaw.ts',
     './plugins/fixPrism.ts',
+    './plugins/customAssetPath.ts',
   ],
   themeConfig: {
     docs: {
