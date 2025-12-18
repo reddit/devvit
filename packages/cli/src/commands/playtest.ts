@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+
 import { updateBundleServer, updateBundleVersion } from '@devvit/build-pack/esbuild/ESBuildPack.js';
 import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
 import { type FullAppInfo, InstallationType, VersionVisibility } from '@devvit/protos/community.js';
@@ -14,8 +17,7 @@ import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js'
 import { Args, Flags, ux } from '@oclif/core';
 import chalk from 'chalk';
 import chokidar from 'chokidar';
-import { existsSync } from 'fs';
-import path from 'path';
+import { execaCommand } from 'execa';
 import type { Subscription } from 'rxjs';
 import { map } from 'rxjs';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
@@ -44,6 +46,14 @@ import { getAppBySlug } from '../util/getAppBySlug.js';
 import { isWebContainer } from '../util/platform-util.js';
 import { devvitClassicConfigFilename, devvitV1ConfigFilename } from '../util/project.js';
 import Logs from './logs.js';
+
+const CONFIG_RELOAD_STORM_WINDOW_MILLIS = 3_000;
+const MAX_CONFIG_RELOADS_PER_WINDOW = 2;
+
+type RunningDevScript = {
+  subprocess: ReturnType<typeof execaCommand>;
+  abortController: AbortController;
+};
 
 export default class Playtest extends DevvitCommand {
   static override description =
@@ -104,6 +114,63 @@ export default class Playtest extends DevvitCommand {
   #watchConfigFile?: chokidar.FSWatcher;
   #watchSrc?: Subscription;
   #server?: PlaytestServer;
+  #devScript?: RunningDevScript | undefined;
+  #configReloadWindowStartMs: number | undefined;
+  #configReloadCount: number = 0;
+
+  async #startDevScript(): Promise<void> {
+    const devCommand = this.project.appConfig?.scripts?.dev;
+    if (!devCommand) return;
+
+    const truncatedCommand = devCommand.length > 60 ? devCommand.substr(0, 60) + '…' : devCommand;
+    ux.action.start(`Starting dev command: "${truncatedCommand}"`);
+    try {
+      const abortController = new AbortController();
+      const subprocess = execaCommand(devCommand, {
+        cwd: this.project.root,
+        preferLocal: true,
+        shell: true,
+        stdout: 'inherit',
+        stderr: 'inherit',
+        cancelSignal: abortController.signal,
+        gracefulCancel: true,
+      });
+
+      this.#devScript = { subprocess, abortController };
+
+      await new Promise<void>((resolve, reject) => {
+        subprocess.once('spawn', () => resolve());
+        subprocess.once('error', (err) => reject(err));
+      });
+
+      subprocess.on('exit', (exitCode, signal) => {
+        if (exitCode != null && exitCode !== 0) {
+          this.warn(
+            `scripts.dev exited with ${exitCode ?? 'unknown'}${signal ? ` (${signal})` : ''}`
+          );
+        }
+      });
+
+      // Prevent unhandled promise rejections if `scripts.dev` exits non-zero while playtest continues.
+      void subprocess.catch(() => {});
+    } catch (err) {
+      ux.action.stop('Error');
+      this.error(`Failed to start scripts.dev: ${StringUtil.caughtToString(err, 'message')}`);
+    }
+    ux.action.stop('OK');
+  }
+
+  async #stopDevScript(): Promise<void> {
+    if (!this.#devScript) return;
+    const running = this.#devScript;
+    this.#devScript = undefined;
+    running.abortController.abort();
+    try {
+      await running.subprocess;
+    } catch {
+      // Ignore: expected when aborted / terminated.
+    }
+  }
 
   async #getExistingInstallInfo(
     appName: string,
@@ -142,6 +209,8 @@ export default class Playtest extends DevvitCommand {
     this.#bundler = new Bundler();
     this.project.flag.watchDebounceMillis = this.#flags?.['debounce'] as number | undefined;
     this.project.flag.subreddit = args.subreddit;
+
+    await this.#startDevScript();
 
     const token = await getAccessTokenAndLoginIfNeeded(
       isWebContainer() ? 'CopyPaste' : 'LocalSocket'
@@ -411,6 +480,15 @@ export default class Playtest extends DevvitCommand {
 
     if (!isFlaggedConfigFile && !isDefaultConfigFile && !isProductsFile) return;
 
+    if (this.#isConfigReloadStorm()) {
+      this.warn(
+        `Detected repeated config changes in a short period. ` +
+          `Auto-reloading playtest is temporarily disabled to avoid an infinite loop.\n` +
+          `If your scripts are rewriting ${devvitV1ConfigFilename}, stop them or restart playtest manually.`
+      );
+      return;
+    }
+
     ux.action.start(`Reloading config`);
     try {
       await this.init();
@@ -423,6 +501,19 @@ export default class Playtest extends DevvitCommand {
     await this.#destroyWatchers();
     await this.run();
   };
+
+  #isConfigReloadStorm(): boolean {
+    const now = Date.now();
+    const windowStart = this.#configReloadWindowStartMs;
+    if (windowStart == null || now - windowStart > CONFIG_RELOAD_STORM_WINDOW_MILLIS) {
+      this.#configReloadWindowStartMs = now;
+      this.#configReloadCount = 1;
+      return false;
+    }
+
+    this.#configReloadCount += 1;
+    return this.#configReloadCount > MAX_CONFIG_RELOADS_PER_WINDOW;
+  }
 
   #onWatch = debounce(
     (result: BundlerResult) => {
@@ -599,6 +690,7 @@ export default class Playtest extends DevvitCommand {
   async #destroyWatchers(): Promise<void> {
     process.removeListener('SIGINT', this.#onExit);
 
+    await this.#stopDevScript();
     this.#watchSrc?.unsubscribe();
     this.#appLogSub?.unsubscribe();
     await this.#bundler?.dispose();

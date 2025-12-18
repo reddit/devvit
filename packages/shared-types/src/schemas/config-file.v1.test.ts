@@ -172,6 +172,20 @@ describe('parseAppConfigJSON()', () => {
         },
       }
     `));
+
+  test('scripts', () => {
+    const scripts = {
+      dev: 'vite build --watch',
+      build: 'vite build',
+    };
+    const config = parseAppConfigJson(
+      { name: 'abc', server: {}, scripts } satisfies AppConfigJson,
+      false
+    );
+    expect(config.scripts).toStrictEqual(scripts);
+    expect(config.json.scripts).toStrictEqual(scripts);
+  });
+
   test('minimal', () =>
     expect(parseAppConfigJson({ name: 'abc', server: {} } satisfies AppConfigJson, false))
       .toMatchInlineSnapshot(`

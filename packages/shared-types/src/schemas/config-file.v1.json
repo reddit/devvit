@@ -631,29 +631,35 @@
     },
 
     "payments": {
-      "allOf": [{
-        "$ref": "https://developers.reddit.com/schema/products.json"
-      }, {
-        "required": ["endpoints"],
-        "oneOf": [{
-          "required": ["products"]
-        }, {
-          "required": ["productsFile"]
-        }],
-        "properties": {
-          "endpoints": {
-            "type": "object",
-            "description": "Internal endpoints for handling various payments-related actions",
-            "required": ["fulfillOrder"],
-            "additionalProperties": false,
-            "properties": {
-              "fulfillOrder": { "$ref": "#/$defs/InternalEndpoint" },
-              "refundOrder": { "$ref": "#/$defs/InternalEndpoint" }
+      "allOf": [
+        {
+          "$ref": "https://developers.reddit.com/schema/products.json"
+        },
+        {
+          "required": ["endpoints"],
+          "oneOf": [
+            {
+              "required": ["products"]
+            },
+            {
+              "required": ["productsFile"]
             }
-          },
-          "productsFile": { "$ref": "#/$defs/Path" }
+          ],
+          "properties": {
+            "endpoints": {
+              "type": "object",
+              "description": "Internal endpoints for handling various payments-related actions",
+              "required": ["fulfillOrder"],
+              "additionalProperties": false,
+              "properties": {
+                "fulfillOrder": { "$ref": "#/$defs/InternalEndpoint" },
+                "refundOrder": { "$ref": "#/$defs/InternalEndpoint" }
+              }
+            },
+            "productsFile": { "$ref": "#/$defs/Path" }
+          }
         }
-      }]
+      ]
     },
 
     "forms": {
@@ -676,6 +682,24 @@
           "minLength": 3,
           "maxLength": 21,
           "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+        }
+      }
+    },
+
+    "scripts": {
+      "type": "object",
+      "description": "[experimental] Optional build commands run by the Devvit CLI. These commands are executed relative to the devvit.json directory.",
+      "additionalProperties": false,
+      "properties": {
+        "dev": {
+          "type": "string",
+          "description": "[experimental] Command run by `devvit playtest` to build/watch your client/server artifacts.",
+          "examples": ["vite build --watch"]
+        },
+        "build": {
+          "type": "string",
+          "description": "[experimental] Command run by `devvit upload` to build your client/server artifacts.",
+          "examples": ["vite build"]
         }
       }
     },

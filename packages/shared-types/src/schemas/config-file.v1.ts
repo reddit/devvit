@@ -29,6 +29,7 @@ export type AppConfig = {
   triggers?: AppTriggersConfig;
   blocks?: AppBlocksConfig;
   dev?: AppDevConfig;
+  scripts?: AppScriptsConfig;
   menu?: AppMenuConfig;
   payments?: AppPaymentsConfig;
   scheduler?: AppSchedulerConfig;
@@ -122,6 +123,14 @@ export type AppMarketingAssetsConfig = {
 export type AppDevConfig = {
   subreddit?: string;
 };
+
+/** @experimental */
+export type AppScriptsConfig = {
+  /** @experimental */
+  dev?: string;
+  /** @experimental */
+  build?: string;
+};
 export type AppSchedulerConfig = {
   tasks: { [name: string]: AppSchedulerTaskConfig };
 };
@@ -202,6 +211,7 @@ export type AppConfigJson = {
   payments?: AppPaymentsConfigJson;
   forms?: AppFormsConfigJson;
   dev?: { subreddit?: string };
+  scripts?: AppScriptsConfig;
   scheduler?: AppSchedulerConfigJson;
   settings?: AppSettingsConfigJson;
   marketingAssets?: {
@@ -380,6 +390,9 @@ function AppConfig(json: Readonly<AppConfigJson>): AppConfig {
   if (json.dev) {
     partial.dev = {};
     if (json.dev.subreddit) partial.dev.subreddit = json.dev.subreddit;
+  }
+  if (json.scripts) {
+    partial.scripts = json.scripts;
   }
 
   const config = { ...partial, permissions: AppPermissionConfig(json.permissions, partial) };

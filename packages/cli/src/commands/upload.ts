@@ -18,6 +18,7 @@ import { DevvitVersion, VersionBumpType } from '@devvit/shared-types/Version.js'
 import { Flags, ux } from '@oclif/core';
 import type { CommandError } from '@oclif/core/lib/interfaces/index.js';
 import chalk from 'chalk';
+import { execaCommand, type StdoutStderrOption } from 'execa';
 
 import type { StoredToken } from '../lib/auth/StoredToken.js';
 import { REDDIT_DESKTOP } from '../lib/config.js';
@@ -105,10 +106,18 @@ export default class Upload extends DevvitCommand {
   };
   #eventSent = false;
 
+  protected override async init(): Promise<void> {
+    // Dynamic mode allows configs that reference build outputs that don't exist
+    // yet; upload will run scripts.build (if configured) before bundling.
+    await super.init('Dynamic');
+  }
+
   async run(): Promise<void> {
     const { flags } = await this.parse(Upload);
 
     await this.#checkDependencies(flags['just-do-it']);
+
+    await this.#runBuildScriptIfConfigured(Boolean(flags.verbose));
 
     const token = await getAccessTokenAndLoginIfNeeded(
       flags['copy-paste'] ? 'CopyPaste' : 'LocalSocket'
@@ -247,6 +256,31 @@ export default class Upload extends DevvitCommand {
     await this.#sendEventIfNotSent();
 
     process.exit(0);
+  }
+
+  async #runBuildScriptIfConfigured(streamOutput: boolean): Promise<void> {
+    const buildCommand = this.project.appConfig?.scripts?.build;
+    if (!buildCommand) return;
+
+    const truncatedCommand =
+      buildCommand.length > 60 ? buildCommand.substr(0, 60) + '…' : buildCommand;
+    ux.action.start(`Running build command: "${truncatedCommand}"`);
+    try {
+      const stdout: StdoutStderrOption = streamOutput ? ['pipe', 'inherit'] : 'pipe';
+      const stderr: StdoutStderrOption = streamOutput ? ['pipe', 'inherit'] : 'pipe';
+
+      await execaCommand(buildCommand, {
+        cwd: this.project.root,
+        preferLocal: true,
+        shell: true,
+        stdout,
+        stderr,
+      });
+    } catch (err) {
+      ux.action.stop('Error');
+      this.error(`scripts.build failed: ${StringUtil.caughtToString(err, 'message')}`);
+    }
+    ux.action.stop();
   }
 
   /**
