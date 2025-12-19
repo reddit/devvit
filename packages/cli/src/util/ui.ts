@@ -50,7 +50,7 @@ type BoxOptions = {
 const defaultBoxOptions: Required<BoxOptions> = {
   padding: { x: 1, y: 0 },
   style: 'SINGLE',
-  color: chalk.magenta,
+  color: chalk.white,
 };
 export function logInBox(
   message: string,

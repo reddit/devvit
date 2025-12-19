@@ -45,7 +45,6 @@ import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilV
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { isWebContainer } from '../util/platform-util.js';
 import { devvitClassicConfigFilename, devvitV1ConfigFilename } from '../util/project.js';
-import { logInBox } from '../util/ui.js';
 import Logs from './logs.js';
 
 const CONFIG_RELOAD_STORM_WINDOW_MILLIS = 3_000;
@@ -116,7 +115,6 @@ export default class Playtest extends DevvitCommand {
   #watchSrc?: Subscription;
   #server?: PlaytestServer;
   #devScript?: RunningDevScript | undefined;
-  #hasShownPlaytestReadyMessage: boolean = false;
   #configReloadWindowStartMs: number | undefined;
   #configReloadCount: number = 0;
 
@@ -124,10 +122,8 @@ export default class Playtest extends DevvitCommand {
     const devCommand = this.project.appConfig?.scripts?.dev;
     if (!devCommand) return;
 
-    if (this.#flags?.verbose) {
-      const truncatedCommand = devCommand.length > 60 ? devCommand.substr(0, 60) + '…' : devCommand;
-      ux.action.start(`Starting dev command: "${truncatedCommand}"`);
-    }
+    const truncatedCommand = devCommand.length > 60 ? devCommand.substr(0, 60) + '…' : devCommand;
+    ux.action.start(`Starting dev command: "${truncatedCommand}"`);
     try {
       const abortController = new AbortController();
       const subprocess = execaCommand(devCommand, {
@@ -180,9 +176,7 @@ export default class Playtest extends DevvitCommand {
     appName: string,
     subreddit: string
   ): Promise<FullInstallationInfo | undefined> {
-    if (this.#flags?.verbose) {
-      ux.action.start(`Checking for existing installation`);
-    }
+    ux.action.start(`Checking for existing installation`);
     try {
       const result = await this.#installationsClient.GetByAppNameAndInstallLocation({
         location: subreddit,
@@ -359,8 +353,7 @@ export default class Playtest extends DevvitCommand {
           this.#installationsClient,
           userT2Id,
           latestVersion,
-          this.#subreddit,
-          Boolean(this.#flags?.verbose)
+          this.#subreddit
         );
 
         ux.action.stop();
@@ -577,15 +570,12 @@ export default class Playtest extends DevvitCommand {
     // 1. bump playtest version:
     this.#version.bumpVersion(VersionBumpType.Prerelease);
 
-    ux.action.start('Updating');
-
     try {
       // 2. update bundle:
       updateBundleVersion(this.#lastBundles, this.#version.toString());
       try {
         updateBundleServer(this.#lastBundles, this.project.root, this.project.server);
       } catch (err) {
-        ux.action.stop('Error');
         this.error(err instanceof Error ? err.message : String(err), {
           exit: false,
         });
@@ -611,29 +601,20 @@ export default class Playtest extends DevvitCommand {
       if (this.#lastQueuedBundles) {
         // No need to go further if there's a newer playtest version is waiting
         this.#runQueuedBundlePlaytest(this.#lastQueuedBundles);
-        ux.action.stop();
         return;
       }
 
       // 5. confirm new version has finished building
-      await waitUntilVersionBuildComplete(
-        this,
-        this.#appVersionClient,
-        appVersionInfo,
-        Boolean(this.#flags?.verbose)
-      );
+      await waitUntilVersionBuildComplete(this, this.#appVersionClient, appVersionInfo);
 
       if (this.#lastQueuedBundles) {
         // No need to go further if there's a newer playtest version is waiting
         this.#runQueuedBundlePlaytest(this.#lastQueuedBundles);
-        ux.action.stop();
         return;
       }
 
       // 6. install playtest version to specified subreddit:
-      if (this.#flags?.verbose) {
-        ux.action.start(`Installing playtest version ${this.#version}`);
-      }
+      ux.action.start(`Installing playtest version ${this.#version}`);
       await this.#installationsClient.Upgrade({
         id: this.#installationInfo!.installation!.id,
         appVersionId: appVersionInfo.id,
@@ -641,34 +622,18 @@ export default class Playtest extends DevvitCommand {
 
       this.#server?.send({ appInstalled: {} });
 
-      const playtestUrlRaw = `${REDDIT_DESKTOP}/r/${this.#subreddit}/${
-        this.#flags?.connect ? `?playtest=${this.#appInfo!.app!.slug}` : ''
-      }`;
-      const playtestUrlLabel = chalk.cyan.underline(playtestUrlRaw);
-      ux.action.stop(`Success!`);
-
-      const versionText = this.#version.toString();
-      const versionLabel = chalk.cyan.bold(`v${versionText}`);
-
-      if (!this.#hasShownPlaytestReadyMessage) {
-        this.#hasShownPlaytestReadyMessage = true;
-        const message = [
-          `${chalk.green('✓')} ${chalk.bold('Playtest ready')}`,
-          `${chalk.dim('➜')} ${chalk.bold('URL')}: ${playtestUrlLabel}`,
-          `${chalk.dim('➜')} ${chalk.bold('Version')}: ${versionLabel}`,
-          `${chalk.dim('➜')} ${chalk.italic(
-            'Open the URL above and refresh to see your latest changes.'
-          )}`,
-        ].join('\n');
-        logInBox(message, { style: 'SINGLE' }, (line) => this.log(line));
-      } else {
-        this.log(`${chalk.green('✓')} ${versionLabel} ${chalk.dim('➜')} ${playtestUrlLabel}`);
-      }
+      const playtestUrl = chalk.bold.green(
+        `${REDDIT_DESKTOP}/r/${this.#subreddit}/${
+          this.#flags?.connect ? `?playtest=${this.#appInfo!.app!.slug}` : ''
+        }`
+      );
+      ux.action.stop(
+        `Success! Please visit your test subreddit and refresh to see your latest changes:\n${playtestUrl}\n`
+      );
     } catch (err) {
       ux.action.stop('Error'); // Stop any spinner if it's running
       this.log(chalk.red(`Something went wrong... ${StringUtil.caughtToString(err, 'message')}`));
     } finally {
-      ux.action.stop();
       this.#isOnWatchExecuting = false;
     }
 

@@ -75,11 +75,7 @@ export default class Logs extends DevvitCommand {
       char: 's',
       description: `when to start the logs from. example "15s", "2w1d" "30m"\n${supportedDurationFormats}`,
     }),
-    verbose: Flags.boolean({
-      char: 'v',
-      description: 'Enable verbose logging',
-      default: false,
-    }),
+    verbose: Flags.boolean({ default: false }),
   } as const;
 
   #appLogSub?: Subscription;

@@ -268,7 +268,7 @@ export default class Init extends DevvitCommand {
 
     const msg = welcomeInstructions.join('\n');
 
-    logInBox(msg, { style: 'SINGLE' });
+    logInBox(msg, { style: 'SINGLE', color: chalk.magenta });
   }
 
   /**

@@ -105,9 +105,7 @@ export class AssetUploader {
       }
       const iconAssetContents = await fsp.readFile(iconAssetFullPath);
       const iconAssetSize = Buffer.byteLength(iconAssetContents);
-      const iconAssetHash = createHash(ASSET_HASHING_ALGO)
-        .update(new Uint8Array(iconAssetContents))
-        .digest('hex');
+      const iconAssetHash = createHash(ASSET_HASHING_ALGO).update(iconAssetContents).digest('hex');
 
       this.assertAssetCanBeAnIcon(iconAssetContents);
 
@@ -167,7 +165,7 @@ export class AssetUploader {
     // - if the icon isn't a PNG
     // - if the icon is smaller than 1024x1024 pixels
 
-    const fileTypeResult = await fileTypeFromBuffer(new Uint8Array(data));
+    const fileTypeResult = await fileTypeFromBuffer(data);
     if (!fileTypeResult) {
       this.#cmd.error(`Icon asset is not a valid image.`);
     }
@@ -175,7 +173,7 @@ export class AssetUploader {
       this.#cmd.error(`Icon asset cannot be a GIF.`);
     }
 
-    const sizeResult = imageSize(new Uint8Array(data));
+    const sizeResult = imageSize(data);
     if (!sizeResult) {
       this.#cmd.error(`Icon asset is not a valid image.`);
     }
@@ -235,13 +233,9 @@ export class AssetUploader {
       }
     }
 
-    if (this.#verbose) {
-      ux.action.start(`Checking for new assets to upload`);
-    }
+    ux.action.start(`Checking for new assets to upload`);
     const assetMap = await this.#uploadNewAssets(assets);
-    if (this.#verbose) {
-      ux.action.stop(`Found ${assets.length} new asset${assets.length === 1 ? '' : 's'}.`);
-    }
+    ux.action.stop(`Found ${assets.length} new asset${assets.length === 1 ? '' : 's'}.`);
 
     return assetMap;
   }
@@ -252,14 +246,9 @@ export class AssetUploader {
       return {};
     }
 
-    if (this.#verbose) {
-      ux.action.start(`Checking for new WebView assets to upload`);
-    }
-
+    ux.action.start(`Checking for new WebView assets to upload`);
     const assetMap = await this.#uploadNewAssets(assets, true);
-    if (this.#verbose) {
-      ux.action.stop(`Found ${assets.length} new WebView asset${assets.length === 1 ? '' : 's'}.`);
-    }
+    ux.action.stop(`Found ${assets.length} new WebView asset${assets.length === 1 ? '' : 's'}.`);
     return assetMap;
   }
 
@@ -279,10 +268,10 @@ export class AssetUploader {
     });
 
     const webViewMsg = webViewAsset ? 'WebView ' : '';
+    ux.action.start(`Checking for new ${webViewMsg}assets`);
     const { newAssets, duplicateAssets, existingAssets } = await this.#mapAssets(assets, statuses);
+    ux.info(`Found ${assets.length} ${webViewMsg}assets (${newAssets.length} unique new assets)`);
     if (this.#verbose) {
-      ux.action.start(`Checking for new ${webViewMsg}assets`);
-      ux.info(`Found ${assets.length} ${webViewMsg}assets (${newAssets.length} unique new assets)`);
       ux.info('New assets:');
       newAssets.forEach((asset) => {
         ux.info(` · ${asset.filePath}`);
@@ -300,19 +289,12 @@ export class AssetUploader {
     const assetMap: AssetMap = existingAssets;
 
     if (newAssets.length === 0) {
-      if (this.#verbose) {
-        ux.action.stop(`None found!`);
-      }
+      ux.action.stop(`None found!`);
       return assetMap;
-    }
-    if (this.#verbose) {
-      ux.action.stop();
     }
 
     // Upload everything, giving back pairs of the assets & their upload response
-    if (this.#verbose) {
-      ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining`);
-    }
+    ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining`);
     let uploadResults: [MediaSignatureWithContents, UploadNewMediaResponse][] = [];
     try {
       // Do this in batches - we don't want to upload everything at once and
@@ -337,22 +319,15 @@ export class AssetUploader {
             })
           )),
         ];
-        if (this.#verbose) {
-          ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining`);
-        }
+        ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining`);
       }
     } catch (err) {
       const error = err as Error;
       const msg = `Failed to upload ${webViewMsg}assets. (${error.message})`;
-      if (this.#verbose) {
-        ux.action.stop(msg);
-      }
-
-      this.#cmd.log(msg);
-
+      ux.action.stop(msg);
       if (webViewAsset) {
-        ux.action.stop(msg);
         // don't fail on WebView uploads in case we just don't have the feature enabled
+        ux.action.stop(msg);
         return {};
       } else {
         // otherwise exit
@@ -360,9 +335,7 @@ export class AssetUploader {
       }
     }
 
-    if (this.#verbose) {
-      ux.action.stop(`New ${webViewMsg}assets uploaded.`);
-    }
+    ux.action.stop(`New ${webViewMsg}assets uploaded.`);
 
     return assets.reduce<{ [asset: string]: string }>((map, asset) => {
       const assetId =
@@ -468,7 +441,7 @@ export async function queryAssets(
       const size = Buffer.byteLength(file);
       const contents = new Uint8Array(file);
 
-      const hash = createHash(ASSET_HASHING_ALGO).update(new Uint8Array(file)).digest('hex');
+      const hash = createHash(ASSET_HASHING_ALGO).update(file).digest('hex');
       return {
         filePath: filename,
         size,
