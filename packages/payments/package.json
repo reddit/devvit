@@ -63,8 +63,8 @@
   },
   "filesize": {
     "dist/payments.min.js": {
-      "none": "250 KB",
-      "gzip": "64 KB"
+      "none": "290 KB",
+      "gzip": "80 KB"
     }
   },
   "source": "./src/index.ts"

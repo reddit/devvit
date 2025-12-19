@@ -85,15 +85,28 @@ describe('emit-effect', () => {
 
     const response = await messagePromise;
     expect(response).toStrictEqual<WebViewInternalEventMessage>({
+      consentStatus: undefined,
+      formCanceled: undefined,
       formSubmitted: {
+        formId: undefined,
         results: {
           field1: {
+            boolValue: undefined,
             fieldType: FormFieldType.STRING,
+            groupValue: undefined,
+            isSecret: undefined,
+            listValue: undefined,
+            numberValue: undefined,
+            selectionValue: undefined,
             stringValue: 'value1',
           },
         },
       },
       id: postedMessage.id,
+      immersiveModeEvent: undefined,
+      orderResult: undefined,
+      realtimeEvent: undefined,
+      updateRequestContext: undefined,
     });
   });
 
@@ -204,15 +217,28 @@ describe('emit-effect', () => {
     expect(response?.id).toBe(correctMessageData.id);
     expect(response?.formSubmitted).toEqual(correctMessageData.formSubmitted);
     expect(response).toStrictEqual<WebViewInternalEventMessage>({
+      consentStatus: undefined,
+      formCanceled: undefined,
       formSubmitted: {
+        formId: undefined,
         results: {
           field: {
+            boolValue: undefined,
             fieldType: FormFieldType.STRING,
+            groupValue: undefined,
+            isSecret: undefined,
+            listValue: undefined,
+            numberValue: undefined,
+            selectionValue: undefined,
             stringValue: 'correct',
           },
         },
       },
       id: correctMessageData.id,
+      immersiveModeEvent: undefined,
+      orderResult: undefined,
+      realtimeEvent: undefined,
+      updateRequestContext: undefined,
     });
   });
 
@@ -272,15 +298,28 @@ describe('emit-effect', () => {
 
     const response = await messagePromise;
     expect(response).toStrictEqual<WebViewInternalEventMessage>({
+      consentStatus: undefined,
+      formCanceled: undefined,
       formSubmitted: {
+        formId: undefined,
         results: {
           field: {
+            boolValue: undefined,
             fieldType: FormFieldType.STRING,
+            groupValue: undefined,
+            isSecret: undefined,
+            listValue: undefined,
+            numberValue: undefined,
+            selectionValue: undefined,
             stringValue: 'correct',
           },
         },
       },
       id: postedMessage.id,
+      immersiveModeEvent: undefined,
+      orderResult: undefined,
+      realtimeEvent: undefined,
+      updateRequestContext: undefined,
     });
   });
 
@@ -363,7 +402,13 @@ describe('emit-effect', () => {
       consentStatus: {
         consentStatus: ConsentStatus.GRANTED,
       },
+      formCanceled: undefined,
+      formSubmitted: undefined,
       id: messageData.id,
+      immersiveModeEvent: undefined,
+      orderResult: undefined,
+      realtimeEvent: undefined,
+      updateRequestContext: undefined,
     });
   });
 
