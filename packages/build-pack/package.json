@@ -1,6 +1,6 @@
 {
   "name": "@devvit/build-pack",
-  "version": "0.12.6",
+  "version": "0.12.7",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -31,10 +31,10 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/payments": "0.12.6",
-    "@devvit/protos": "0.12.6",
-    "@devvit/shared-types": "0.12.6",
-    "@devvit/splash": "0.12.6",
+    "@devvit/payments": "0.12.7",
+    "@devvit/protos": "0.12.7",
+    "@devvit/shared-types": "0.12.7",
+    "@devvit/splash": "0.12.7",
     "@types/node": "20.14.12",
     "esbuild": "0.25.9",
     "rxjs": "7.8.1",
@@ -46,11 +46,11 @@
     "@devvit/shared": "*"
   },
   "devDependencies": {
-    "@devvit/public-api": "0.12.6",
-    "@devvit/scheduler": "0.12.6",
-    "@devvit/server": "0.12.6",
-    "@devvit/shared": "0.12.6",
-    "@devvit/tsconfig": "0.12.6",
+    "@devvit/public-api": "0.12.7",
+    "@devvit/scheduler": "0.12.7",
+    "@devvit/server": "0.12.7",
+    "@devvit/shared": "0.12.7",
+    "@devvit/tsconfig": "0.12.7",
     "@types/tsv": "0.2.1",
     "eslint": "9.11.1",
     "vitest": "4.0.15"
