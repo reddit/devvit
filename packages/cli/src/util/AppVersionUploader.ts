@@ -84,7 +84,10 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
       devvitJson = JSON.stringify(appConfig);
     }
 
-    ux.action.start(`Uploading new version "${appInfo.appSemver.toString()}" to Reddit`);
+    const shouldShowUploadAction = this.#verbose;
+    if (shouldShowUploadAction) {
+      ux.action.start(`Uploading new version "${appInfo.appSemver.toString()}" to Reddit`);
+    }
     try {
       // Actually create the app version
       const appVersionInfo = await this.#appVersionClient.Create({
@@ -103,11 +106,15 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         },
         devvitJson,
       });
-      ux.action.stop();
+      if (shouldShowUploadAction) {
+        ux.action.stop();
+      }
 
       return appVersionInfo;
     } catch (error) {
-      ux.action.stop('Error');
+      if (shouldShowUploadAction) {
+        ux.action.stop('Error');
+      }
 
       return handleTwirpError(error, (message: string) => this.#cmd.error(message));
     }
