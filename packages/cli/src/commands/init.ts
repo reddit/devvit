@@ -320,8 +320,11 @@ export default class Init extends DevvitCommand {
     await sendEvent({
       ...this.#commonEventFields,
       action: 'paste',
-      app_name: appName,
-      app_template: appTemplate,
+      devplatform: {
+        ...this.#commonEventFields.devplatform,
+        app_name: appName,
+        app_template: appTemplate,
+      },
     });
   }
 
@@ -329,8 +332,11 @@ export default class Init extends DevvitCommand {
     await sendEvent({
       ...this.#commonEventFields,
       action: 'complete',
-      app_name: appName,
-      app_template: appTemplate,
+      devplatform: {
+        ...this.#commonEventFields.devplatform,
+        app_name: appName,
+        app_template: appTemplate,
+      },
     });
   }
 }
