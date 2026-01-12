@@ -1,6 +1,6 @@
 {
   "name": "@devvit/test",
-  "version": "0.12.7",
+  "version": "0.12.8",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -35,16 +35,16 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/media": "0.12.7",
-    "@devvit/notifications": "0.12.7",
-    "@devvit/protos": "0.12.7",
-    "@devvit/realtime": "0.12.7",
-    "@devvit/reddit": "0.12.7",
-    "@devvit/redis": "0.12.7",
-    "@devvit/scheduler": "0.12.7",
-    "@devvit/server": "0.12.7",
-    "@devvit/settings": "0.12.7",
-    "@devvit/shared-types": "0.12.7",
+    "@devvit/media": "0.12.8",
+    "@devvit/notifications": "0.12.8",
+    "@devvit/protos": "0.12.8",
+    "@devvit/realtime": "0.12.8",
+    "@devvit/reddit": "0.12.8",
+    "@devvit/redis": "0.12.8",
+    "@devvit/scheduler": "0.12.8",
+    "@devvit/server": "0.12.8",
+    "@devvit/settings": "0.12.8",
+    "@devvit/shared-types": "0.12.8",
     "ioredis": "5.7.0",
     "redis-memory-server": "0.12.1"
   },
@@ -52,7 +52,7 @@
     "vitest": "*"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.7",
+    "@devvit/tsconfig": "0.12.8",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "4.0.15"

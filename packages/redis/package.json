@@ -1,6 +1,6 @@
 {
   "name": "@devvit/redis",
-  "version": "0.12.7",
+  "version": "0.12.8",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -32,15 +32,15 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.12.7",
-    "@devvit/shared-types": "0.12.7"
+    "@devvit/protos": "0.12.8",
+    "@devvit/shared-types": "0.12.8"
   },
   "peerDependencies": {
     "@devvit/server": "*"
   },
   "devDependencies": {
-    "@devvit/server": "0.12.7",
-    "@devvit/tsconfig": "0.12.7",
+    "@devvit/server": "0.12.8",
+    "@devvit/tsconfig": "0.12.8",
     "@types/node": "20.14.12",
     "eslint": "9.11.1",
     "ioredis": "5.7.0",

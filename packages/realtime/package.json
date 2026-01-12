@@ -1,6 +1,6 @@
 {
   "name": "@devvit/realtime",
-  "version": "0.12.7",
+  "version": "0.12.8",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -39,9 +39,9 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.12.7",
-    "@devvit/shared": "0.12.7",
-    "@devvit/shared-types": "0.12.7",
+    "@devvit/protos": "0.12.8",
+    "@devvit/shared": "0.12.8",
+    "@devvit/shared-types": "0.12.8",
     "rxjs": "7.8.1"
   },
   "peerDependencies": {
@@ -49,9 +49,9 @@
     "@devvit/server": "*"
   },
   "devDependencies": {
-    "@devvit/client": "0.12.7",
-    "@devvit/server": "0.12.7",
-    "@devvit/tsconfig": "0.12.7",
+    "@devvit/client": "0.12.8",
+    "@devvit/server": "0.12.8",
+    "@devvit/tsconfig": "0.12.8",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "4.0.15"
