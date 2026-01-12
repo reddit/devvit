@@ -33,7 +33,6 @@
     "build:min": "esbuild --bundle --sourcemap=linked --target=es2020 --format=esm --metafile=dist/meta.min.json --outfile=dist/payments.min.js --external:@devvit/protos --minify src/index.ts",
     "clean": "rm -rf .turbo coverage dist",
     "clobber": "yarn clean && rm -rf node_modules",
-    "dev": "tsc -w",
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",
     "prepublishOnly": "publish-package-json",

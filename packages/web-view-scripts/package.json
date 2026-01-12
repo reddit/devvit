@@ -22,7 +22,6 @@
     "bundle": "tools/build.js",
     "clean": "rm -rf .turbo coverage dist",
     "clobber": "yarn clean && rm -rf node_modules",
-    "dev": "tsc -w",
     "dev:wvs": "yarn bundle --watch",
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",

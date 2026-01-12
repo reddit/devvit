@@ -20,7 +20,6 @@
     "build": "tsc && yarn postbuild:copy-schemas",
     "clean": "rm -rf .turbo coverage dist",
     "clobber": "yarn clean && rm -rf node_modules",
-    "dev": "tsc -w",
     "dev:build": "chokidar ./src --command 'yarn build && echo \"BUILD COMPLETE\"'",
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",

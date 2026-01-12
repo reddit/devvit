@@ -22,7 +22,6 @@
     "build:semantic-colors": "node scripts/make-semantic-colors.js",
     "clean": "rm -rf .turbo coverage dist src/devvit/internals/semanticColors.ts src/types/icons.ts || :",
     "clobber": "yarn clean && rm -rf node_modules",
-    "dev": "tsc -w",
     "dev:build": "chokidar ./src ../shared-types/dist --command 'yarn build' --ignore './src/types/icons.ts' --ignore './src/devvit/internals/semanticColors.ts'",
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",

@@ -21,7 +21,6 @@
     "clean:go": "make -C devvit-compute-go clean",
     "clean:nuke": "yarn cache clean --all && git clean -dffx -e .idea -e devvit.iml",
     "clobber": "npx --yes turbo run clobber --output-logs=new-only && rm -rf node_modules",
-    "dev": "turbo run dev --output-logs=new-only --parallel",
     "docs:build": "yarn workspace devvit-docs docs:build",
     "docs:gen-devvit-docs": "yarn workspace devvit-docs gen:devvit-docs",
     "docs:gen-private-docs": "yarn workspace devvit-docs gen:private-docs",

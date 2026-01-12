@@ -25,7 +25,6 @@
     "build": "tsc",
     "clean": "rm -rf .turbo coverage dist",
     "clobber": "yarn clean && rm -rf node_modules",
-    "dev": "tsc -w",
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",
     "prepublishOnly": "publish-package-json",
