@@ -1,6 +1,7 @@
 import type { Hook } from '@oclif/core';
 
 import { sendEvent } from '../../../util/metrics.js';
+import { shouldRedact } from '../../../util/redaction.js';
 
 // Yes, this is a global variable. It's not ideal, but it's the only way to
 // preserve the data from the `init` hook into the error handler.
@@ -19,13 +20,15 @@ export function getCurrentCommandEventData() {
 const hook: Hook<'init'> = async function (options) {
   const isValidCommand = options.id && options.config.commandIDs.includes(options.id);
 
-  // argv[0] is the path to node
-  // argv[1] is the path to the JS script that was run
-  // we only need indices 2+
-  const rawCommand = `devvit ${process.argv.slice(2).join(' ')}`;
+  // Do not capture init's argv. The init "code" can be passed via argv and is a one-time-use token.
+  // Also do not capture argv for `settings` commands because users may include secrets and we don't want
+  // to accidentally ingest them (especially on failures).
+  const argv = process.argv.slice(2);
+  const shouldRedactRawCommandLine = shouldRedact(argv);
+  const cliRawCommandLine = shouldRedactRawCommandLine ? '<redacted>' : `devvit ${argv.join(' ')}`;
 
   CURRENT_COMMAND_EVENT_DATA = {
-    cli_raw_command_line: rawCommand,
+    cli_raw_command_line: cliRawCommandLine,
     cli_is_valid_command: Boolean(isValidCommand),
     cli_command: isValidCommand ? options.id : undefined,
   };

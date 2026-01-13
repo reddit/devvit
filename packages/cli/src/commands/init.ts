@@ -80,8 +80,7 @@ export default class Init extends DevvitCommand {
     source: 'devplatform_cli',
     noun: 'init',
     devplatform: {
-      cli_raw_command_line:
-        'devvit ' + process.argv[2] + ' ' + redactCode(process.argv.slice(3)).join(' '),
+      cli_raw_command_line: 'devvit ' + process.argv.slice(2).join(' '),
       cli_is_valid_command: true,
       cli_command: 'init',
     } as Record<string, string | boolean | undefined>,
@@ -536,8 +535,4 @@ function syncDependenciesToCurrentCliVersion(deps: Record<string, string>): void
       }
     }
   }
-}
-
-function redactCode(args: string[]): string[] {
-  return args.map((arg) => (arg.toLowerCase().includes('--') ? arg : '<code redacted>'));
 }

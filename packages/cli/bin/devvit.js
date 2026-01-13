@@ -7,13 +7,16 @@ import { config as dotenvConfig } from 'dotenv';
 
 import { getCurrentCommandEventData } from '../dist/lib/hooks/init/fire-event.js';
 import { sendEvent } from '../dist/util/metrics.js';
+import { shouldRedact } from '../dist/util/redaction.js';
 
 dotenvConfig();
 
 run(undefined, import.meta.url)
   .then(() => flush())
   .catch(async (err) => {
-    const rawCommand = `devvit ${process.argv.slice(2).join(' ')}`;
+    const argv = process.argv.slice(2);
+    const shouldRedactRawCommandLine = shouldRedact(argv);
+    const rawCommand = shouldRedactRawCommandLine ? '<redacted>' : `devvit ${argv.join(' ')}`;
 
     const event = {
       source: 'devplatform_cli',
@@ -23,8 +26,12 @@ run(undefined, import.meta.url)
         ...(getCurrentCommandEventData() ?? {
           cli_raw_command_line: rawCommand,
         }),
-        cli_error_message: StringUtil.caughtToString(err, 'message'),
-        cli_error_stack: StringUtil.caughtToString(err, 'stack'),
+        cli_error_message: shouldRedactRawCommandLine
+          ? '<redacted>'
+          : StringUtil.caughtToString(err, 'message'),
+        cli_error_stack: shouldRedactRawCommandLine
+          ? '<redacted>'
+          : StringUtil.caughtToString(err, 'stack'),
       },
     };
     await sendEvent(event);
