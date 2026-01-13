@@ -18,5 +18,6 @@ export enum ProjectTemplateOverrides {
 
 export enum ProjectTemplateCategory {
   Web = 'web',
+  GameEngine = 'game-engine',
   Other = 'other',
 }
