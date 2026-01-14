@@ -200,7 +200,7 @@ export abstract class DevvitCommand extends Command {
     // Otherwise, we need to read appName or app version from the config
     // If the agrument has "@<version>" format
     if (appWithVersion.startsWith('@')) {
-      return { appName: this.project.name, version: appWithVersion };
+      return { appName: this.project.name, version: appWithVersion.slice(1) };
     }
 
     // Otherwise, default to the config and latest.
