@@ -4,6 +4,7 @@ import { Header } from '@devvit/shared-types/Header.js';
 import { AssetsClient } from '../../../../apis/AssetsClient/AssetsClient.js';
 import { KeyValueStorage } from '../../../../apis/key-value-storage/KeyValueStorage.js';
 import { MediaClient } from '../../../../apis/media/MediaClient.js';
+import { ModLogClient } from '../../../../apis/modLog/ModLogClient.js';
 import { RealtimeClient } from '../../../../apis/realtime/RealtimeClient.js';
 import { RedditAPIClient } from '../../../../apis/reddit/RedditAPIClient.js';
 import { RedisClient } from '../../../../apis/redis/RedisClient.js';
@@ -26,6 +27,7 @@ export class ContextBuilder {
     request: UIRequest,
     metadata: Metadata
   ): Devvit.Context {
+    const modLog = new ModLogClient(metadata);
     const kvStore = new KeyValueStorage(metadata);
     const redis = new RedisClient(metadata);
     const reddit = new RedditAPIClient(metadata);
@@ -37,6 +39,7 @@ export class ContextBuilder {
     const realtime = new RealtimeClient(metadata);
     const cache = makeCache(redis, renderContext._state);
     const apiClients: ContextAPIClients = {
+      modLog,
       kvStore,
       redis,
       reddit,

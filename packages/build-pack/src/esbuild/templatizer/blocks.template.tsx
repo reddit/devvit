@@ -84,6 +84,7 @@ function configurePermissions(permissions: Readonly<AppPermissionConfig>): void 
     // to-do: payments permissions.
     realtime: permissions.realtime,
     redditAPI: permissions.reddit.enable,
+    modLog: permissions.reddit.scope === 'moderator',
     userActions:
       permissions.reddit.asUser.length > 0 ? { scopes: permissions.reddit.asUser } : false,
     redis: permissions.redis,

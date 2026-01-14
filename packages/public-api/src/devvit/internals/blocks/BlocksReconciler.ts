@@ -14,6 +14,7 @@ import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { AssetsClient } from '../../../apis/AssetsClient/AssetsClient.js';
 import { makeAPIClients } from '../../../apis/makeAPIClients.js';
+import type { ModLogClient } from '../../../apis/modLog/ModLogClient.js';
 import type { RealtimeClient } from '../../../apis/realtime/RealtimeClient.js';
 import type { RedditAPIClient } from '../../../apis/reddit/RedditAPIClient.js';
 import { getEffectsFromUIClient } from '../../../apis/ui/helpers/getEffectsFromUIClient.js';
@@ -151,6 +152,7 @@ export class BlocksReconciler implements EffectEmitter {
   metadata: Metadata;
 
   // Common clients for props
+  modLog: ModLogClient;
   reddit: RedditAPIClient;
   kvStore: KVStore;
   cache: CacheHelper;
@@ -214,6 +216,7 @@ export class BlocksReconciler implements EffectEmitter {
       metadata,
     });
     this.cache = apiClients.cache;
+    this.modLog = apiClients.modLog;
     this.reddit = apiClients.reddit;
     this.kvStore = apiClients.kvStore;
     this.redis = apiClients.redis;
@@ -247,6 +250,7 @@ export class BlocksReconciler implements EffectEmitter {
     // skip typechecks for useForm which is templatized.
     const props: Omit<Devvit.Context, 'useForm'> = {
       ...getContextFromMetadata(this.metadata, this.state.__postData?.thingId),
+      modLog: this.modLog,
       reddit: this.reddit,
       cache: this.cache,
       kvStore: this.kvStore,

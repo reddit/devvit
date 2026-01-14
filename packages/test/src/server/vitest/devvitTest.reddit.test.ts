@@ -59,8 +59,8 @@ test('throws helpful error for unimplemented plugin methods', async () => {
   `);
 });
 
-test('throws helpful error for unimplemented plugins', async () => {
-  await expect(reddit.getWikiPage(context.subredditName, 'test_page')).rejects
+test('throws helpful error for unimplemented plugins', () => {
+  expect(reddit.getWikiPage(context.subredditName, 'test_page')).rejects
     .toThrowErrorMatchingInlineSnapshot(`
     [Error: Reddit API plugin Wiki is not implemented in the test harness.
     For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test]

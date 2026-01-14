@@ -96,6 +96,19 @@ export async function handleNukePost(props: NukePostProps, context: Devvit.Conte
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
 
+    if (shouldRemove) {
+      try {
+        await context.modLog.add({
+          action: 'removecomment',
+          target: props.postId,
+          details: 'comment-mop app',
+          description: `u/${user.username} used comment-mop to ${verbage} all comments of this post.`,
+        });
+      } catch (e: unknown) {
+        console.error(`Failed to add modlog for post: ${props.postId}.`, (e as Error).message);
+      }
+    }
+
     success = true;
     message = `Comments ${verbage}! Refresh the page to see the cleanup.`;
     const finishTime = Date.now();
@@ -159,6 +172,22 @@ export async function handleNuke(props: NukeProps, context: Devvit.Context) {
 
     const verbage =
       shouldLock && shouldRemove ? 'removed and locked' : shouldLock ? 'locked' : 'removed';
+
+    if (shouldRemove) {
+      try {
+        await context.modLog.add({
+          action: 'removecomment',
+          target: props.commentId,
+          details: 'comment-mop app',
+          description: `u/${user.username} used comment-mop to ${verbage} this comment and all child comments.`,
+        });
+      } catch (e: unknown) {
+        console.error(
+          `Failed to add modlog for comment: ${props.commentId}.`,
+          (e as Error).message
+        );
+      }
+    }
 
     success = true;
     message = `Comments ${verbage}! Refresh the page to see the cleanup.`;
