@@ -571,6 +571,43 @@ describe('Post API', () => {
           );
         });
       });
+
+      test('submitCustomPost(): throws error with decoded message when postData exceeds size limit', async () => {
+        const expectedErrMessage =
+          'rpc error: code = Unknown desc = custom post data size 2687 exceeds the limit of 2000 bytes';
+
+        // Error bytes captured from actual GQL error response
+        const errBytes = new Uint8Array([
+          10, 91, 114, 112, 99, 32, 101, 114, 114, 111, 114, 58, 32, 99, 111, 100, 101, 32, 61, 32,
+          85, 110, 107, 110, 111, 119, 110, 32, 100, 101, 115, 99, 32, 61, 32, 99, 117, 115, 116,
+          111, 109, 32, 112, 111, 115, 116, 32, 100, 97, 116, 97, 32, 115, 105, 122, 101, 32, 50,
+          54, 56, 55, 32, 101, 120, 99, 101, 101, 100, 115, 32, 116, 104, 101, 32, 108, 105, 109,
+          105, 116, 32, 111, 102, 32, 50, 48, 48, 48, 32, 98, 121, 116, 101, 115,
+        ]);
+
+        const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: {
+            data: { id: undefined },
+            errors: [
+              {
+                typeUrl: 'type.googleapis.com/google.protobuf.StringValue',
+                value: errBytes,
+              },
+            ],
+          },
+        }));
+
+        await runWithTestContext(async () => {
+          await expect(
+            reddit.submitCustomPost({
+              title: 'Test Post',
+              subredditName: 'askReddit',
+              splash: { appDisplayName: 'appDisplayName' },
+            })
+          ).rejects.toThrow(expectedErrMessage);
+        });
+      });
     });
 
     test('submitCustomPost() prefers entry to splash.entry', async () => {

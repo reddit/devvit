@@ -18,6 +18,7 @@ import { Block } from '@devvit/protos/types/devvit/ui/block_kit/v1beta/block.js'
 import { UIResponse } from '@devvit/protos/types/devvit/ui/block_kit/v1beta/ui.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
+import { decodeProtoErrors } from '@devvit/shared-types/helpers/protoErrorDecoder.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
@@ -1407,9 +1408,10 @@ export class Post {
         context.metadata
       ),
     ]);
-    if (rsp.json?.errors?.length)
-      // to-do: why is errors `Any[]`?
-      throw Error(`set post ${opts.postId} data failed: ${JSON.stringify(rsp.json.errors)}`);
+    if (rsp.json?.errors?.length) {
+      const errorMessages = decodeProtoErrors(rsp.json.errors);
+      throw Error(`set post ${opts.postId} data failed: ${errorMessages.join(', ')}`);
+    }
   }
 
   /** @internal */
@@ -1432,9 +1434,10 @@ export class Post {
       context.metadata
     );
 
-    if (rsp.json?.errors?.length)
-      // to-do: why is errors `Any[]`?
-      throw Error(`set post ${postId} text fallback failed: ${JSON.stringify(rsp.json.errors)}`);
+    if (rsp.json?.errors?.length) {
+      const errorMessages = decodeProtoErrors(rsp.json.errors);
+      throw Error(`set post ${postId} text fallback failed: ${errorMessages.join(', ')}`);
+    }
 
     return Post.getById(postId);
   }
@@ -1918,11 +1921,11 @@ function SplashPostData(
 }
 
 function postFromSubmitResponse(rsp: Readonly<SubmitResponse>): Promise<Post> {
-  if (!rsp.json?.data?.id || rsp.json.errors?.length)
-    throw Error(
-      // to-do: why is errors an `Any[]`?
-      `post ${rsp.json?.data?.id} submission failed: ${JSON.stringify(rsp.json?.errors)}`
-    );
+  if (!rsp.json?.data?.id || rsp.json.errors?.length) {
+    const errorMessages = rsp.json?.errors ? decodeProtoErrors(rsp.json.errors) : [];
+    const postIdText = rsp.json?.data?.id ? `post ${rsp.json.data.id}` : 'post';
+    throw Error(`${postIdText} submission failed: ${errorMessages.join(', ')}`);
+  }
 
   return Post.getById(`t3_${rsp.json.data.id}`);
 }

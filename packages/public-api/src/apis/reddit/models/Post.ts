@@ -13,6 +13,7 @@ import { Block, UIResponse } from '@devvit/protos';
 import type { DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { Header } from '@devvit/shared-types/Header.js';
+import { decodeProtoErrors } from '@devvit/shared-types/helpers/protoErrorDecoder.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
@@ -1212,7 +1213,9 @@ export class Post {
     }
 
     if (response.json?.errors?.length) {
-      throw new Error(`failed to submit post - errors: ${response.json?.errors.join(', ')}`);
+      const errorMessages = decodeProtoErrors(response.json.errors);
+      const postIdText = response.json?.data?.id ? ` ${response.json.data.id}` : '';
+      throw new Error(`failed to submit post${postIdText} - errors: ${errorMessages.join(', ')}`);
     } else if (!response.json?.data?.id) {
       throw new Error(`failed to submit post - no post ID returned but no error details found`);
     }
@@ -1246,7 +1249,8 @@ export class Post {
     );
 
     if (!response.json?.data?.id || response.json?.errors?.length) {
-      throw new Error('failed to crosspost post');
+      const errorMessages = response.json?.errors ? decodeProtoErrors(response.json.errors) : [];
+      throw new Error(`failed to crosspost post: ${errorMessages.join(', ')}`);
     }
 
     return Post.getById(`t3_${response.json.data.id}`, metadata);
@@ -1359,7 +1363,8 @@ export class Post {
       metadata
     );
     if (res.json?.errors?.length) {
-      throw new Error(`Failed to set post data, errors: ${res.json?.errors}`);
+      const errorMessages = decodeProtoErrors(res.json.errors);
+      throw new Error(`Failed to set post data, errors: ${errorMessages.join(', ')}`);
     }
   }
 
@@ -1411,11 +1416,10 @@ export class Post {
       metadata
     );
 
-    if (response.json?.errors?.length)
-      // to-do: why is errors `Any[]`?
-      throw Error(
-        `set post ${postId} text fallback failed: ${JSON.stringify(response.json.errors)}`
-      );
+    if (response.json?.errors?.length) {
+      const errorMessages = decodeProtoErrors(response.json.errors);
+      throw Error(`set post ${postId} text fallback failed: ${errorMessages.join(', ')}`);
+    }
 
     return Post.getById(postId, metadata);
   }
