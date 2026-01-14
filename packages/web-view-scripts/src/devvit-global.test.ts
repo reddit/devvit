@@ -24,7 +24,7 @@ describe('getBridgeContext()', () => {
         subredditId: 't5_subredditId',
         subredditName: 'subredditName',
         userId: 't2_userId',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.0.0',
         postId: 't3_postId',
       },
@@ -43,7 +43,7 @@ describe('getBridgeContext()', () => {
         subredditId: 't5_subredditId',
         subredditName: 'subredditName',
         userId: 't2_userId',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.0.0',
         postId: 't3_postId',
       },
@@ -65,7 +65,13 @@ describe('getBridgeContext()', () => {
 describe('contextFromRequestContext()', () => {
   test('creates context from request context', () => {
     const reqCtx: RequestContext = {
-      app: { id: 'app123', name: 'testApp', version: '1.0.0', status: 1 },
+      app: {
+        id: 'app123',
+        name: 'test-app-123',
+        version: '1.0.0',
+        status: 1,
+        slug: 'test-app-123',
+      },
       subreddit: { id: 't5_123', name: 'testSubreddit' },
       user: { id: 't2_456', name: 'testUser', snoovatar: 'https://avatar' },
       post: { id: 't3_789', author: 't2_400' },
@@ -77,7 +83,8 @@ describe('contextFromRequestContext()', () => {
 
     expect(result).toMatchInlineSnapshot(`
       {
-        "appName": "testApp",
+        "appName": "test-app-123",
+        "appSlug": "test-app-123",
         "appVersion": "1.0.0",
         "client": undefined,
         "postAuthorId": "t2_400",
@@ -96,7 +103,13 @@ describe('contextFromRequestContext()', () => {
 
   test('handles logged out user', () => {
     const reqCtx: RequestContext = {
-      app: { id: 'app123', name: 'testApp', version: '1.0.0', status: 1 },
+      app: {
+        id: 'app123',
+        name: 'test-app-123',
+        version: '1.0.0',
+        status: 1,
+        slug: 'test-app-123',
+      },
       subreddit: { id: 't5_123', name: 'testSubreddit' },
       post: { id: 't3_789', author: 't2_400' },
     };
@@ -116,7 +129,7 @@ describe('contextFromWebViewContext()', () => {
         subredditId: 't5_123',
         subredditName: 'testSubreddit',
         userId: 't2_456',
-        appName: 'testApp',
+        appName: 'test-app-123',
         appVersion: '1.0.0',
         postId: 't3_789',
       },
@@ -126,7 +139,8 @@ describe('contextFromWebViewContext()', () => {
 
     expect(result).toMatchInlineSnapshot(`
       {
-        "appName": "testApp",
+        "appName": "test-app-123",
+        "appSlug": "test-app-123",
         "appVersion": "1.0.0",
         "client": undefined,
         "postAuthorId": undefined,
@@ -149,7 +163,7 @@ describe('contextFromWebViewContext()', () => {
         subredditId: 't5_123',
         subredditName: 'testSubreddit',
         userId: '',
-        appName: 'testApp',
+        appName: 'test-app-123',
         appVersion: '1.0.0',
         postId: 't3_789',
       },
@@ -182,7 +196,7 @@ describe('initContext()', () => {
         subredditId: 't5_123',
         subredditName: 'subredditName',
         userId: 't2_123',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.2.3',
         postId: 't3_123',
       },
@@ -198,7 +212,8 @@ describe('initContext()', () => {
 
     expect(devvit.context).toMatchInlineSnapshot(`
       {
-        "appName": "appName",
+        "appName": "test-app-123",
+        "appSlug": "test-app-123",
         "appVersion": "1.2.3",
         "client": undefined,
         "postAuthorId": undefined,
@@ -234,7 +249,7 @@ describe('initContext()', () => {
         subredditId: 't5_123',
         subredditName: 'subredditName',
         userId: 't2_123',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.2.3',
         postId: 't3_123',
       },
@@ -250,7 +265,8 @@ describe('initContext()', () => {
 
     expect(devvit.context).toMatchInlineSnapshot(`
       {
-        "appName": "appName",
+        "appName": "test-app-123",
+        "appSlug": "test-app-123",
         "appVersion": "1.2.3",
         "client": undefined,
         "postAuthorId": undefined,
@@ -277,7 +293,7 @@ describe('initContext()', () => {
       webViewContext: {
         subredditId: 't5_123',
         subredditName: 'subredditName',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.2.3',
         postId: 't3_123',
         userId: '',
@@ -295,7 +311,7 @@ describe('initContext()', () => {
       devvitDebug: '',
       client: Client.SHREDDIT,
       signedRequestContext:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZ2aXQiOnsiYXBwIjp7ImlkIjoiYXBwMTIzIiwibmFtZSI6ImFwcE5hbWUiLCJ2ZXJzaW9uIjoiMS4yLjMiLCJzdGF0dXMiOjF9LCJzdWJyZWRkaXQiOnsiaWQiOiJ0NV8xMjMiLCJuYW1lIjoic3VicmVkZGl0TmFtZSJ9LCJ1c2VyIjp7ImlkIjoidDJfNDU2IiwibmFtZSI6InVzZXJuYW1lIiwic25vb3ZhdGFyIjoiaHR0cHM6Ly9pbWFnZSJ9LCJwb3N0Ijp7ImlkIjoidDNfNzg5IiwiYXV0aG9yIjoidDJfNDAwIn19LCJpc3MiOiJ0ZXN0In0.9UMPcIhkb4w5TzWW0Jqh7YyIKoWLsHYJCPpIE7oVMCA',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZ2aXQiOnsiYXBwIjp7ImlkIjoiYXBwMTIzIiwibmFtZSI6InRlc3QtYXBwLXNsdWciLCJ2ZXJzaW9uIjoiMS4yLjMiLCJzdGF0dXMiOjEsInNsdWciOiJ0ZXN0LWFwcC1zbHVnIn0sInN1YnJlZGRpdCI6eyJpZCI6InQ1XzEyMyIsIm5hbWUiOiJzdWJyZWRkaXROYW1lIn0sInVzZXIiOnsiaWQiOiJ0Ml80NTYiLCJuYW1lIjoidXNlcm5hbWUiLCJzbm9vdmF0YXIiOiJodHRwczovL2ltYWdlIn0sInBvc3QiOnsiaWQiOiJ0M183ODkiLCJhdXRob3IiOiJ0Ml80MDAifX0sImlzcyI6InRlc3QifQ.signature',
       webbitToken: noWebbitToken,
     };
 
@@ -303,7 +319,8 @@ describe('initContext()', () => {
 
     expect(devvit.context).toMatchInlineSnapshot(`
       {
-        "appName": "appName",
+        "appName": "test-app-slug",
+        "appSlug": "test-app-slug",
         "appVersion": "1.2.3",
         "client": undefined,
         "postAuthorId": "t2_400",
@@ -323,7 +340,7 @@ describe('initContext()', () => {
       devvitDebug: '',
       client: Client.SHREDDIT,
       signedRequestContext:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZ2aXQiOnsiYXBwIjp7ImlkIjoiYXBwMTIzIiwibmFtZSI6ImZyb21Kd3QiLCJ2ZXJzaW9uIjoiMi4wLjAiLCJzdGF0dXMiOjF9LCJzdWJyZWRkaXQiOnsiaWQiOiJ0NV8xMjMiLCJuYW1lIjoiZnJvbUp3dCJ9LCJ1c2VyIjp7ImlkIjoidDJfNDU2In0sInBvc3QiOnsiaWQiOiJ0M183ODkiLCJhdXRob3IiOiJ0Ml80MDAifX0sImlzcyI6InRlc3QifQ.qBNDaR4K3CmgPRMiNO3TyA_kZAjxrMN5uPU0WFYXfyI',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZ2aXQiOnsiYXBwIjp7ImlkIjoiYXBwMTIzIiwibmFtZSI6ImZyb21Kd3QiLCJ2ZXJzaW9uIjoiMi4wLjAiLCJzdGF0dXMiOjEsInNsdWciOiJmcm9tSnd0In0sInN1YnJlZGRpdCI6eyJpZCI6InQ1XzEyMyIsIm5hbWUiOiJmcm9tSnd0In0sInVzZXIiOnsiaWQiOiJ0Ml80NTYifSwicG9zdCI6eyJpZCI6InQzXzc4OSIsImF1dGhvciI6InQyXzQwMCJ9fSwiaXNzIjoidGVzdCJ9.signature',
       webViewContext: {
         subredditId: 't5_999',
         subredditName: 'fromContext',
@@ -340,6 +357,7 @@ describe('initContext()', () => {
     expect(devvit.context).toMatchInlineSnapshot(`
       {
         "appName": "fromJwt",
+        "appSlug": "fromJwt",
         "appVersion": "2.0.0",
         "client": undefined,
         "postAuthorId": "t2_400",
@@ -361,7 +379,7 @@ describe('initContext()', () => {
       webViewContext: {
         subredditId: 't5_123',
         subredditName: 'subredditName',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.0.0',
         postId: 't3_123',
         userId: 't2_123',
@@ -382,7 +400,7 @@ describe('initContext()', () => {
       webViewContext: {
         subredditId: 't5_123',
         subredditName: 'subredditName',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.0.0',
         postId: 't3_123',
         userId: 't2_123',
@@ -406,7 +424,7 @@ describe('initContext()', () => {
       webViewContext: {
         subredditId: 't5_123',
         subredditName: 'subredditName',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.0.0',
         postId: 't3_123',
         userId: 't2_123',
@@ -426,7 +444,7 @@ describe('initContext()', () => {
       webViewContext: {
         subredditId: 't5_123',
         subredditName: 'subredditName',
-        appName: 'appName',
+        appName: 'test-app-123',
         appVersion: '1.0.0',
         postId: 't3_123',
         userId: 't2_123',

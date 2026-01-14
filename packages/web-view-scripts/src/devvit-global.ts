@@ -73,6 +73,7 @@ export function contextFromRequestContext(
   if (!reqCtx.subreddit) throw Error('no RequestContext.subreddit');
   return {
     appName: reqCtx.app.name,
+    appSlug: reqCtx.app.slug,
     appVersion: reqCtx.app.version,
     client,
     postAuthorId: T2(reqCtx.post.author),
@@ -94,6 +95,7 @@ export function contextFromWebViewContext(
 ): Context {
   return {
     appName: webViewCtx.appName,
+    appSlug: webViewCtx.appName,
     appVersion: webViewCtx.appVersion,
     client,
     postData: postData?.developerData,

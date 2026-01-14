@@ -29,7 +29,7 @@ export function getContextFromMetadata(
 
   // devvit-app-user is only available in the remote runtime.
   const appAccountId = metadata[Header.AppUser]?.values[0];
-  const appName = metadata[Header.App]?.values[0];
+  const appSlug = metadata[Header.App]?.values[0];
   const appVersion = metadata[Header.Version]?.values[0];
   const snoovatar = metadata[Header.UserSnoovatarUrl]?.values[0];
   const username = metadata[Header.Username]?.values[0];
@@ -48,7 +48,8 @@ export function getContextFromMetadata(
     postId,
     postData,
     commentId,
-    appName,
+    appName: appSlug,
+    appSlug,
     appVersion,
     snoovatar,
     username,
@@ -57,7 +58,8 @@ export function getContextFromMetadata(
     toJSON() {
       return {
         appAccountId,
-        appName,
+        appName: appSlug,
+        appSlug,
         appVersion,
         subredditId,
         subredditName,

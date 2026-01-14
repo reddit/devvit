@@ -60,11 +60,16 @@ export type BaseContext = {
   userId?: string | undefined;
   /**
    * The ID of the current app's account
-   * @deprecated Use {@link BaseContext.appName} instead to get the app's username
+   * @deprecated Use {@link BaseContext.appSlug} instead to get the app's username
    */
   appAccountId: string;
-  /** The slug of the app that is running */
+  /**
+   * The slug of the app that is running
+   * @deprecated Use {@link BaseContext.appSlug} instead.
+   */
   appName: string;
+  /** The slug of the app that is running */
+  appSlug: string;
   /** The version of the app that is running */
   appVersion: string;
   /** The ID of the current comment */

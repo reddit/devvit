@@ -17,14 +17,15 @@ function baseContext(): BaseContext {
     subredditId: 't5_123',
     subredditName: 'test-subreddit',
     appVersion: '1.0.0',
-    appName: 'test-app',
+    appSlug: 'test-app-123',
+    appName: 'test-app-123',
     appAccountId: 't2_456',
     userId: 't2_123',
     postData: {},
   };
 
   const metadata = {
-    'devvit-app': { values: [ctx.appName] },
+    'devvit-app': { values: [ctx.appSlug] },
     'devvit-subreddit': { values: [ctx.subredditId] },
     'devvit-subreddit-name': { values: [ctx.subredditName] },
     'devvit-version': { values: [ctx.appVersion] },
@@ -99,7 +100,7 @@ describe('fetchDevvitWeb', () => {
       new URL('/api/test', 'http://webbit.local:3000/'),
       expect.objectContaining({
         headers: {
-          'devvit-app': 'test-app',
+          'devvit-app': 'test-app-123',
           'devvit-subreddit': 't5_123',
           'devvit-subreddit-name': 'test-subreddit',
           'devvit-version': '1.0.0',

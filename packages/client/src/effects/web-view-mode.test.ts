@@ -38,7 +38,8 @@ beforeEach(() => {
       splash: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',
     },
     context: {
-      appName: 'appName',
+      appName: 'test-app-123',
+      appSlug: 'test-app-123',
       appVersion: '1.0.0',
       client: undefined,
       postAuthorId: undefined,

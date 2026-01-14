@@ -9,8 +9,13 @@ export type BaseContext = {
   subredditName: string;
   /** The current user's ID, if logged in. */
   userId: T2 | undefined;
-  /** The slug of the app that is running. */
+  /**
+   * The slug of the app that is running.
+   * @deprecated Use {@link BaseContext.appSlug} instead.
+   */
   appName: string;
+  /** The slug of the app that is running. */
+  appSlug: string;
   /** The version of the app that is running. */
   appVersion: string;
   /** The ID of the current post, if applicable to the context. */
