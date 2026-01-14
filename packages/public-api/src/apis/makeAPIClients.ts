@@ -10,7 +10,6 @@ import type { ContextAPIClients } from '../index.js';
 import { AssetsClient } from './AssetsClient/AssetsClient.js';
 import { KeyValueStorage } from './key-value-storage/KeyValueStorage.js';
 import { MediaClient } from './media/MediaClient.js';
-import { ModLogClient } from './modLog/ModLogClient.js';
 import { RealtimeClient } from './realtime/RealtimeClient.js';
 import { RedditAPIClient } from './reddit/RedditAPIClient.js';
 import { RedisClient } from './redis/RedisClient.js';
@@ -31,7 +30,6 @@ export function makeAPIClients({
   hooks,
   reconciler,
 }: MakeAPIClientsOptions): ContextAPIClients {
-  const modLog = new ModLogClient(metadata);
   const kvStore = new KeyValueStorage(metadata);
   const redis = new RedisClient(metadata);
   const cache = makeCache(redis, reconciler ? reconciler.state : {});
@@ -48,7 +46,6 @@ export function makeAPIClients({
   const useChannel = hooks && reconciler ? makeUseChannelHook(reconciler) : undefined;
 
   return {
-    modLog,
     kvStore,
     redis,
     reddit,

@@ -66,7 +66,6 @@ type PluginType =
   | protos.Listings
   | protos.Moderation
   | protos.ModNote
-  | protos.Modlog
   | protos.NewModmail
   | protos.PrivateMessages
   | protos.RedisAPI
@@ -163,10 +162,6 @@ export class Devvit extends Actor {
 
     if (pluginIsEnabled(config.media)) {
       this.use(protos.MediaServiceDefinition);
-    }
-
-    if (pluginIsEnabled(config.modLog)) {
-      this.use(protos.ModlogDefinition);
     }
 
     if (pluginIsEnabled(config.redditAPI)) {
@@ -569,19 +564,6 @@ export class Devvit extends Actor {
       Widgets: this.#pluginClients[protos.WidgetsDefinition.fullName] as protos.Widgets,
       Wiki: this.#pluginClients[protos.WikiDefinition.fullName] as protos.Wiki,
     };
-  }
-
-  /** @internal */
-  static get modLogPlugin(): protos.Modlog {
-    const modLog = this.#pluginClients[protos.ModlogDefinition.fullName];
-
-    if (!modLog) {
-      throw new Error(
-        'ModLog is not enabled. You can enable it by passing `modLog: true` to `Devvit.configure`'
-      );
-    }
-
-    return modLog as protos.Modlog;
   }
 
   /** @internal */
