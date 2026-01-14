@@ -16,8 +16,6 @@ export type Configuration = {
   redis?: PluginSettings | boolean;
   /** Allows media uploads from apps */
   media?: PluginSettings | boolean;
-  /** Allows using ModLog API */
-  modLog?: PluginSettings | boolean;
   /** Allows your app to use the Realtime Plugin */
   realtime?: PluginSettings | boolean;
   /** Allows your app to call Reddit APIs on behalf of the User. Passing a boolean allows you to submit post/comments on behalf of the user. */

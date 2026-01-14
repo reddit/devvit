@@ -11,7 +11,6 @@ import {
   ListingsDefinition,
   MediaServiceDefinition,
   ModerationDefinition,
-  ModlogDefinition,
   ModNoteDefinition,
   NewModmailDefinition,
   OnAppInstallDefinition,
@@ -109,7 +108,6 @@ export function createDependencySpec(
       WidgetsDefinition,
       WikiDefinition
     );
-    if (config.permissions.reddit.scope === 'moderator') use(spec, ModlogDefinition);
     if (config.permissions.reddit.asUser.length > 0) {
       use(spec, UserActionsDefinition);
       permissions.asUserScopes.push(...config.permissions.reddit.asUser);

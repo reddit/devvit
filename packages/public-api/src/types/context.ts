@@ -3,7 +3,6 @@ import type { AppDebug } from '@devvit/shared-types/Header.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
 
 import type { AssetsClient } from '../apis/AssetsClient/AssetsClient.js';
-import type { ModLogClient } from '../apis/modLog/ModLogClient.js';
 import type { RealtimeClient } from '../apis/realtime/RealtimeClient.js';
 import type { RedditAPIClient } from '../apis/reddit/RedditAPIClient.js';
 import type { EffectEmitter } from '../devvit/internals/blocks/EffectEmitter.js';
@@ -90,8 +89,6 @@ export type BaseContext = {
 };
 
 export type ContextAPIClients = {
-  /** A client for the ModLog API */
-  modLog: ModLogClient;
   /** A client for the Key Value Store */
   kvStore: KVStore;
   /**

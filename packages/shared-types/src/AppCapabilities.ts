@@ -40,8 +40,6 @@ import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js'
 // eslint-disable-next-line no-restricted-imports
 import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
 // eslint-disable-next-line no-restricted-imports
-import { ModlogDefinition } from '@devvit/protos/types/devvit/plugin/modlog/modlog.js';
-// eslint-disable-next-line no-restricted-imports
 import { PaymentsServiceDefinition } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
 // eslint-disable-next-line no-restricted-imports
 import { FlairDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/flair/flair_svc.js';
@@ -219,9 +217,6 @@ function appCapabilityFromFullName(
 
     case HTTPDefinition.fullName:
       return [NutritionCategory.HTTP];
-
-    case ModlogDefinition.fullName:
-      return [NutritionCategory.MODLOG];
 
     case SchedulerHandlerDefinition.fullName:
     case SchedulerDefinition.fullName:
