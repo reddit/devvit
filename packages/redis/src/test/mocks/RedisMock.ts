@@ -244,10 +244,20 @@ export class RedisPluginMock implements RedisAPI {
   // Redis Hash operations
   async HSet(request: HSetRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const map: Record<string, string> = {};
-      for (const { field, value } of request.fv) map[field] = value;
-      const v = await this._store.conn.hset(this._makeKey(request.key, request.scope), map);
-      return { value: Number(v) } as Int64Value;
+      // Redis 3.x only supports `HSET key field value` (single pair).
+      // Redis 4+ supports variadic `HSET key f1 v1 f2 v2 ...`, which ioredis uses when given an object.
+      // To be compatible across versions (and OSes in redis-memory-server), issue one HSET per field and sum.
+      const map = new Map<string, string>();
+      for (const { field, value } of request.fv) map.set(field, value);
+
+      const key = this._makeKey(request.key, request.scope);
+      let addedFields = 0;
+      for (const [field, value] of map.entries()) {
+        const res = await this._store.conn.hset(key, field, value);
+        addedFields += Number(res);
+      }
+
+      return { value: addedFields } as Int64Value;
     };
     return this._queueOrRun(request.transactionId, operation, (result) => ({ num: result.value }));
   }
