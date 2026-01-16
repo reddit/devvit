@@ -298,7 +298,11 @@ export function mixinTableRowContext<T>(ctx: T, c: TableRow): TableCellContainer
 export function mixinTextContext<T>(ctx: T, c: unknown[] | Text[]): TextContainer<T> {
   return {
     text(opts: TextOptions): T {
-      c.push(makeText(opts));
+      const lines = opts.text.split(/\r?\n/);
+      for (const [index, line] of lines.entries()) {
+        if (line.length > 0) c.push(makeText({ ...opts, text: line }));
+        if (index < lines.length - 1) (c as unknown[]).push(makeLineBreak());
+      }
       return ctx;
     },
   };
