@@ -1,0 +1,49 @@
+{
+  "name": "@devvit/start",
+  "version": "0.12.8",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://developers.reddit.com/"
+  },
+  "type": "module",
+  "exports": {
+    "./vite": {
+      "types": "./dist/vite/index.d.ts",
+      "default": "./dist/vite/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf .turbo coverage dist",
+    "clobber": "yarn clean && rm -rf node_modules",
+    "lint": "redlint .",
+    "lint:fix": "yarn lint --fix",
+    "prepublishOnly": "publish-package-json",
+    "test": "yarn test:unit && yarn test:types && yarn lint",
+    "test:types": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:unit-with-coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@devvit/shared-types": "0.12.8",
+    "chalk": "4.1.2"
+  },
+  "peerDependencies": {
+    "vite": ">=6.0.0"
+  },
+  "devDependencies": {
+    "@devvit/tsconfig": "0.12.8",
+    "eslint": "9.11.1",
+    "typescript": "5.8.3",
+    "vite": "7.2.7",
+    "vitest": "4.0.15"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  }
+}
