@@ -685,6 +685,8 @@ export class RedditClient {
 
   /**
    * Returns the karma for a given user in the current subreddit.
+   * The user making the request must be a moderator of the subreddit to read another user's karma in the subreddit.
+   * An exception is if the specified user is the same as the user making the request.
    *
    * @param username - The username of the user to get the karma for. e.g. 'spez'
    * @returns The GetUserKarmaForSubredditResponse, containing the user's karma for posts and comments in the subreddit.
