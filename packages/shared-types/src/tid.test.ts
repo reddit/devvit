@@ -1,4 +1,4 @@
-import { isT1, isT2, isT3, isT4, isT5, isT6, T_PREFIX, T1, T2, T3, T4, T5 } from './tid.js';
+import { isT1, isT2, isT3, isT4, isT5, isT6, T_PREFIX, T1, T2, T3, T4, T5, T6 } from './tid.js';
 
 describe('Thing IDs', () => {
   it('never changes', () => {
@@ -57,5 +57,23 @@ describe('Thing IDs', () => {
           throw new Error(`Unexpected prefix: ${prefix}`);
       }
     }
+  });
+
+  test('type guards return false for undefined', () => {
+    expect(isT1(undefined)).toBe(false);
+    expect(isT2(undefined)).toBe(false);
+    expect(isT3(undefined)).toBe(false);
+    expect(isT4(undefined)).toBe(false);
+    expect(isT5(undefined)).toBe(false);
+    expect(isT6(undefined)).toBe(false);
+  });
+
+  test('factory functions throw for undefined', () => {
+    expect(() => T1(undefined)).toThrow();
+    expect(() => T2(undefined)).toThrow();
+    expect(() => T3(undefined)).toThrow();
+    expect(() => T4(undefined)).toThrow();
+    expect(() => T5(undefined)).toThrow();
+    expect(() => T6(undefined)).toThrow();
   });
 });
