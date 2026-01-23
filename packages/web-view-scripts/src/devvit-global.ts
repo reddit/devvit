@@ -62,6 +62,10 @@ export const initDevvitGlobal = (
   };
 };
 
+export function updateToken(token: WebbitToken): void {
+  globalThis.devvit.token = token;
+}
+
 /** @internal */
 export function contextFromRequestContext(
   reqCtx: Readonly<RequestContext>,

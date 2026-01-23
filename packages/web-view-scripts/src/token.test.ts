@@ -1,6 +1,9 @@
-import { describe, expect, test } from 'vitest';
+import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
+import * as emitEffectModule from '@devvit/shared-types/client/emit-effect.js';
+import type { WebbitToken } from '@devvit/shared-types/webbit.js';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { decodeToken } from './token.js';
+import { decodeToken, initToken, refreshToken } from './token.js';
 
 describe('decodeRequestContext()', () => {
   test('decodes valid JWT with devvit claim', () => {
@@ -39,5 +42,75 @@ describe('decodeRequestContext()', () => {
     expect(() => decodeToken('invalid.jwt.token')).toThrowErrorMatchingInlineSnapshot(
       `[Error: token decode failure]`
     );
+  });
+});
+
+describe('initToken()', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('sets up interval to call refreshToken every 6 seconds', () => {
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
+
+    initToken();
+
+    expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 60_000);
+  });
+});
+
+describe('refreshToken()', () => {
+  // Helper to create a JWT with a specific expiration time
+  function createJwtWithExp(expInSeconds: number): string {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const payload = btoa(JSON.stringify({ devvit: {}, exp: expInSeconds }));
+    const signature = 'fake-signature';
+    return `${header}.${payload}.${signature}`;
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    globalThis.devvit = {
+      context: {} as DevvitGlobal['context'],
+      dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
+      entrypoints: {},
+      share: undefined,
+      appPermissionState: undefined,
+      token: '' as WebbitToken,
+      webViewMode: undefined,
+      startTime: undefined,
+    };
+  });
+
+  test('does not refresh token if expiration is more than 5 minutes away', async () => {
+    const emitEffectSpy = vi.spyOn(emitEffectModule, 'emitEffect');
+    // Token expires in 10 minutes (600 seconds from now)
+    const futureExp = Math.floor(Date.now() / 1000) + 600;
+    globalThis.devvit.token = createJwtWithExp(futureExp) as WebbitToken;
+
+    await refreshToken();
+
+    expect(emitEffectSpy).not.toHaveBeenCalled();
+  });
+
+  test('refreshes token when expiration is within 5 minutes', async () => {
+    const newToken = 'new-token-from-server';
+    const emitEffectSpy = vi.spyOn(emitEffectModule, 'emitEffect').mockResolvedValue({
+      id: 'test-id',
+      updateRequestContext: { signedRequestContext: newToken },
+    });
+
+    // Token expires in 2 minutes (120 seconds from now)
+    const soonExp = Math.floor(Date.now() / 1000) + 120;
+    globalThis.devvit.token = createJwtWithExp(soonExp) as WebbitToken;
+
+    await refreshToken();
+
+    expect(emitEffectSpy).toHaveBeenCalled();
+    expect(globalThis.devvit.token).toBe(newToken);
   });
 });
