@@ -13,22 +13,28 @@ import type { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { ux } from '@oclif/core';
 import { default as glob } from 'tiny-glob';
 
-import { AssetUploader } from './AssetUploader.js';
+import { AssetUploader, type SyncAssetsResult } from './AssetUploader.js';
 import { createAppVersionClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
 import { decodeAsUtf8, decodeAsUtf16 } from './encodings.js';
+import { ExperimentalAssetUploader } from './ExperimentalAssetUploader.js';
 import { getPaymentsConfig, type JSONProduct, readProducts } from './payments/paymentsConfig.js';
 import { handleTwirpError } from './twirp-error-handler.js';
 
 export class AppVersionUploader {
   readonly #cmd: DevvitCommand;
   readonly #verbose: boolean;
+  readonly #experimentalDirectUpload: boolean;
 
   readonly #appVersionClient = createAppVersionClient();
 
-  constructor(cmd: DevvitCommand, { verbose }: { verbose: boolean }) {
+  constructor(
+    cmd: DevvitCommand,
+    { verbose, experimentalDirectUpload }: { verbose: boolean; experimentalDirectUpload: boolean }
+  ) {
     this.#cmd = cmd;
     this.#verbose = verbose;
+    this.#experimentalDirectUpload = experimentalDirectUpload;
   }
 
   async createVersion(
@@ -44,8 +50,18 @@ export class AppVersionUploader {
     const about = await this.#getReadmeContent();
 
     // Sync and upload assets
-    const assetUploader = new AssetUploader(this.#cmd, appInfo.appSlug, { verbose: this.#verbose });
-    const { assetMap, webViewAssetMap, iconAsset } = await assetUploader.syncAssets();
+    let syncAssetsResult: SyncAssetsResult;
+    if (this.#experimentalDirectUpload) {
+      const assetUploader = new ExperimentalAssetUploader(this.#cmd, appInfo.appSlug, {
+        verbose: this.#verbose,
+      });
+      syncAssetsResult = await assetUploader.syncAssets();
+    } else {
+      const assetUploader = new AssetUploader(this.#cmd, appInfo.appSlug, {
+        verbose: this.#verbose,
+      });
+      syncAssetsResult = await assetUploader.syncAssets();
+    }
 
     let products: JSONProduct[] | undefined;
 
@@ -64,8 +80,8 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
     await Promise.all(
       // Dump these in the assets fields of the bundles
       bundles.map(async (bundle) => {
-        bundle.assetIds = assetMap ?? {};
-        bundle.webviewAssetIds = webViewAssetMap ?? {};
+        bundle.assetIds = syncAssetsResult.assetMap ?? {};
+        bundle.webviewAssetIds = syncAssetsResult.webViewAssetMap ?? {};
 
         if (products) {
           this.#verifyThatDevvitPackagesVersionsMatch(bundle, [
@@ -102,7 +118,7 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         actorBundles: bundles,
         preventPlaytestSubredditCreation: preventSubredditCreation,
         marketingInfo: {
-          icon: iconAsset,
+          icon: syncAssetsResult.iconAsset,
         },
         devvitJson,
       });

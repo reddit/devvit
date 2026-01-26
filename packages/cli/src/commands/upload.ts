@@ -88,6 +88,11 @@ export default class Upload extends DevvitCommand {
       description: 'Enable verbose logging',
       default: false,
     }),
+    'experimental-direct-upload': Flags.boolean({
+      description: '[Experimental] Use direct upload method',
+      default: false,
+      hidden: true,
+    }),
   } as const;
 
   readonly #appClient = createAppClient();
@@ -204,7 +209,10 @@ export default class Upload extends DevvitCommand {
     ux.action.stop();
 
     try {
-      const appVersionUploader = new AppVersionUploader(this, { verbose: flags.verbose });
+      const appVersionUploader = new AppVersionUploader(this, {
+        verbose: flags.verbose,
+        experimentalDirectUpload: flags['experimental-direct-upload'],
+      });
 
       if (shouldCreatePlaytestSubreddit) {
         this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
