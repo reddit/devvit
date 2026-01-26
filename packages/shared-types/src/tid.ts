@@ -34,72 +34,72 @@ export type T6 = `${T_PREFIX.AWARD}${string}`;
 export type Tid = T1 | T2 | T3 | T4 | T5 | T6;
 
 // type guards
-export function isT1(id: string | undefined): id is T1 {
+export function isT1(id: string | null | undefined): id is T1 {
   return !!id?.startsWith(T_PREFIX.COMMENT);
 }
-export function isT2(id: string | undefined): id is T2 {
+export function isT2(id: string | null | undefined): id is T2 {
   return !!id?.startsWith(T_PREFIX.ACCOUNT);
 }
-export function isT3(id: string | undefined): id is T3 {
+export function isT3(id: string | null | undefined): id is T3 {
   return !!id?.startsWith(T_PREFIX.LINK);
 }
-export function isT4(id: string | undefined): id is T4 {
+export function isT4(id: string | null | undefined): id is T4 {
   return !!id?.startsWith(T_PREFIX.MESSAGE);
 }
-export function isT5(id: string | undefined): id is T5 {
+export function isT5(id: string | null | undefined): id is T5 {
   return !!id?.startsWith(T_PREFIX.SUBREDDIT);
 }
-export function isT6(id: string | undefined): id is T6 {
+export function isT6(id: string | null | undefined): id is T6 {
   return !!id?.startsWith(T_PREFIX.AWARD);
 }
 
 // assertion functions
-export function assertT1(id: string | undefined): asserts id is T1 {
+export function assertT1(id: string | null | undefined): asserts id is T1 {
   assert(isT1(id), `Expected comment id to start with ${T_PREFIX.COMMENT}, got ${id}`);
 }
-export function assertT2(id: string | undefined): asserts id is T2 {
+export function assertT2(id: string | null | undefined): asserts id is T2 {
   assert(isT2(id), `Expected account id to start with ${T_PREFIX.ACCOUNT}, got ${id}`);
 }
-export function assertT3(id: string | undefined): asserts id is T3 {
+export function assertT3(id: string | null | undefined): asserts id is T3 {
   assert(isT3(id), `Expected link id to start with ${T_PREFIX.LINK}, got ${id}`);
 }
-export function assertT4(id: string | undefined): asserts id is T4 {
+export function assertT4(id: string | null | undefined): asserts id is T4 {
   assert(isT4(id), `Expected message id to start with ${T_PREFIX.MESSAGE}, got ${id}`);
 }
-export function assertT5(id: string | undefined): asserts id is T5 {
+export function assertT5(id: string | null | undefined): asserts id is T5 {
   assert(isT5(id), `Expected subreddit id to start with ${T_PREFIX.SUBREDDIT}, got ${id}`);
 }
-export function assertT6(id: string | undefined): asserts id is T6 {
+export function assertT6(id: string | null | undefined): asserts id is T6 {
   assert(isT6(id), `Expected award id to start with ${T_PREFIX.AWARD}, got ${id}`);
 }
 
 // factory functions
-export function T1(id: string | undefined): T1 {
+export function T1(id: string | null | undefined): T1 {
   assertT1(id);
   return id;
 }
-export function T2(id: string | undefined): T2 {
+export function T2(id: string | null | undefined): T2 {
   assertT2(id);
   return id;
 }
-export function T3(id: string | undefined): T3 {
+export function T3(id: string | null | undefined): T3 {
   assertT3(id);
   return id;
 }
-export function T4(id: string | undefined): T4 {
+export function T4(id: string | null | undefined): T4 {
   assertT4(id);
   return id;
 }
-export function T5(id: string | undefined): T5 {
+export function T5(id: string | null | undefined): T5 {
   assertT5(id);
   return id;
 }
-export function T6(id: string | undefined): T6 {
+export function T6(id: string | null | undefined): T6 {
   assertT6(id);
   return id;
 }
 
-export function asTid<T extends Tid>(id: string | undefined): T {
+export function asTid<T extends Tid>(id: string | null | undefined): T {
   if (isT1(id)) {
     return T1(id) as T;
   }
