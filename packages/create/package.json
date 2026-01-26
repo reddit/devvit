@@ -1,6 +1,6 @@
 {
   "name": "create-devvit",
-  "version": "0.12.9",
+  "version": "0.12.10",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -31,10 +31,10 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/cli": "0.12.9"
+    "@devvit/cli": "0.12.10"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.9",
+    "@devvit/tsconfig": "0.12.10",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "4.0.15"

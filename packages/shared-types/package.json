@@ -1,6 +1,6 @@
 {
   "name": "@devvit/shared-types",
-  "version": "0.12.9",
+  "version": "0.12.10",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -32,12 +32,12 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.12.9",
+    "@devvit/protos": "0.12.10",
     "jsonschema": "1.4.1",
     "uuid": "9.0.0"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.9",
+    "@devvit/tsconfig": "0.12.10",
     "@types/node": "20.14.12",
     "@types/redis-mock": "0.17.1",
     "@types/uuid": "9.0.0",

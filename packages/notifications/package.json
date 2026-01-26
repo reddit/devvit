@@ -1,6 +1,6 @@
 {
   "name": "@devvit/notifications",
-  "version": "0.12.9",
+  "version": "0.12.10",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -31,15 +31,15 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.12.9",
-    "@devvit/shared-types": "0.12.9"
+    "@devvit/protos": "0.12.10",
+    "@devvit/shared-types": "0.12.10"
   },
   "peerDependencies": {
     "@devvit/server": "*"
   },
   "devDependencies": {
-    "@devvit/server": "0.12.9",
-    "@devvit/tsconfig": "0.12.9",
+    "@devvit/server": "0.12.10",
+    "@devvit/tsconfig": "0.12.10",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "4.0.15"
