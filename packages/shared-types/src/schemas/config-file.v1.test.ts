@@ -1266,6 +1266,33 @@ describe('parseAppConfigJSON()', () => {
       }
     `));
 
+  test('ban duplicate setting names in settings config', () =>
+    expect(() =>
+      parseAppConfigJson(
+        {
+          name: 'test-app',
+          server: {},
+          settings: {
+            global: {
+              'test-flag': {
+                type: 'string',
+                label: 'Duplicate name as in subreddit',
+              },
+            },
+            subreddit: {
+              'test-flag': {
+                type: 'string',
+                label: 'Duplicate name as above',
+              },
+            },
+          },
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: Duplicate setting name "test-flag" in global and subreddit scopes. Rename or remove one of them..]`
+    ));
+
   test('menu items', () =>
     expect(
       parseAppConfigJson(

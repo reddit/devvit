@@ -630,6 +630,16 @@ export function validate(config: Readonly<AppConfig>): void {
     }
   }
 
+  // DR-300: settings names must be unique across global and subreddit scopes
+  const globalSettingNames = new Set<string>(Object.keys(config.settings?.global ?? {}));
+  for (const subredditSettingName of Object.keys(config.settings?.subreddit ?? {})) {
+    if (globalSettingNames.has(subredditSettingName)) {
+      errs.push(
+        `Duplicate setting name "${subredditSettingName}" in global and subreddit scopes. Rename or remove one of them.`
+      );
+    }
+  }
+
   if (errs.length) throw Error(`${errs.join('; ')}.`);
 }
 
