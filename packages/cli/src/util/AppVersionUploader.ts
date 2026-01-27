@@ -43,6 +43,7 @@ export class AppVersionUploader {
       appSlug: string;
       appSemver: DevvitVersion;
       visibility: VersionVisibility;
+      appSourceBuffer?: ArrayBuffer;
     },
     bundles: Bundle[],
     preventSubredditCreation: boolean = false
@@ -121,9 +122,33 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
           icon: syncAssetsResult.iconAsset,
         },
         devvitJson,
+        ...(appInfo.appSourceBuffer ? { sourceSize: appInfo.appSourceBuffer.byteLength } : {}),
       });
       if (shouldShowUploadAction) {
         ux.action.stop();
+      }
+
+      // Upload source code if appInfo.appSourceBuffer is provided
+      if (appInfo.appSourceBuffer) {
+        if (!appVersionInfo.sourceUploadInfo?.uploadUrl) {
+          this.#cmd.error(
+            `Server did not return source upload info, so I can't upload the source. Contact a Devvit team member.`
+          );
+        }
+
+        ux.action.start('Uploading app source bundle...');
+        const resp = await fetch(appVersionInfo.sourceUploadInfo.uploadUrl, {
+          method: 'PUT',
+          body: appInfo.appSourceBuffer,
+          headers: appVersionInfo.sourceUploadInfo.requiredHeaders,
+        });
+        if (!resp.ok) {
+          const body = await resp.text();
+          this.#cmd.error(
+            `Failed to upload app source: ${resp.status} ${resp.statusText}:\n${body}\n\nDepending on what that error is, trying again may help. If the problem persists, contact a Devvit team member.`
+          );
+        }
+        ux.action.stop('Done');
       }
 
       return appVersionInfo;

@@ -23,7 +23,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc",
+    "build": "rm -rf dist oclif.manifest.json && tsc",
     "clean": "rm -rf .turbo coverage dist docs.json oclif.manifest.json",
     "clobber": "yarn clean && rm -rf node_modules",
     "install:dev": "./scripts/install.sh",
@@ -58,6 +58,7 @@
     "dotenv": "16.5.0",
     "execa": "9.6.1",
     "file-type": "18.2.1",
+    "ignore": "7.0.5",
     "image-size": "2.0.2",
     "inquirer": "9.1.4",
     "isomorphic-git": "1.33.1",

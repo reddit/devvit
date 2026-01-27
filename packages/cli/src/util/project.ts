@@ -224,6 +224,10 @@ export class Project {
     this.#config.json.payments.products = products;
     writeConfig(this.root, this.filename, this.#config);
   }
+
+  setEnvVariable(variableName: string, value: string): void {
+    createOrUpdateEnvFile(this.root, variableName, value);
+  }
 }
 
 /**
@@ -343,6 +347,34 @@ function updateEnvFileIfSettingExists(
     const updatedEnvContent = doEnvFileReplacement(envContent, variableName, value);
     writeFileSync(envFilePath, updatedEnvContent);
   }
+}
+
+function updateEnvFile(projectPath: string, variableName: string, value: string): void {
+  const envFilePath = path.join(projectPath, DEFAULT_DOTENV_PATH);
+  if (existsSync(envFilePath)) {
+    const envContent = readFileSync(envFilePath, 'utf8');
+    const updatedEnvContent = doEnvFileReplacement(envContent, variableName, value);
+    if (envContent !== updatedEnvContent) {
+      writeFileSync(envFilePath, updatedEnvContent);
+      return;
+    }
+    // Variable doesn't exist, so append it
+    let newLine = `${variableName}=${value}\n`;
+    if (!envContent.endsWith('\n') && envContent.length > 0) {
+      newLine = '\n' + newLine;
+    }
+    writeFileSync(envFilePath, envContent + newLine);
+  }
+}
+
+function createOrUpdateEnvFile(projectPath: string, variableName: string, value: string): void {
+  const envFilePath = path.join(projectPath, DEFAULT_DOTENV_PATH);
+  if (!existsSync(envFilePath)) {
+    // Make a blank
+    writeFileSync(envFilePath, '');
+  }
+  // Then just call the updater
+  updateEnvFile(projectPath, variableName, value);
 }
 
 export function doEnvFileReplacement(

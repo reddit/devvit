@@ -1818,6 +1818,56 @@ describe('parseAppConfigJSON()', () => {
         },
       }
     `));
+  test('sourceIgnores', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: {},
+          sourceIgnores: ['icon.png', 'another.txt'],
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "json": {
+          "name": "abc",
+          "server": {},
+          "sourceIgnores": [
+            "icon.png",
+            "another.txt",
+          ],
+        },
+        "name": "abc",
+        "permissions": {
+          "http": {
+            "domains": [],
+            "enable": false,
+          },
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": false,
+            "scope": "user",
+          },
+          "redis": false,
+          "settings": false,
+          "triggers": false,
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+        },
+        "sourceIgnores": [
+          "icon.png",
+          "another.txt",
+        ],
+      }
+    `));
 });
 
 describe('validate()', () => {

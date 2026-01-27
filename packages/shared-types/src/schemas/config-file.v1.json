@@ -792,6 +792,16 @@
           "description": "Path to the icon file relative to the project root. This should be a square PNG image, 1024x1024 pixels."
         }
       }
+    },
+
+    "sourceIgnores": {
+      "type": "array",
+      "description": "List of .gitignore-style patterns for source files and directories to ignore when packaging the source code for app review (i.e. as part of the `devvit publish` command). The contents of your root .gitignore file are applied first, then these rules, in the order listed. Patterns are relative to the project root. Note that some files/folders are always ignored, such as `node_modules/`, `.env`, and `.git/`.",
+      "items": {
+        "type": "string",
+        "description": "A .gitignore-style pattern to ignore.",
+        "examples": ["node_modules/", "dist/", "*.log"]
+      }
     }
   }
 }

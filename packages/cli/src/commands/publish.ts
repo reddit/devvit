@@ -66,10 +66,12 @@ export default class Publish extends DevvitCommand {
     public: Flags.boolean({
       description: 'Submit the app for review to be published publicly',
       required: false,
+      exclusive: ['withdraw'],
     }),
     withdraw: Flags.boolean({
       description: 'Withdraw the publish request (if it exists and is pending)',
       required: false,
+      exclusive: ['public'],
     }),
   } as const;
 
