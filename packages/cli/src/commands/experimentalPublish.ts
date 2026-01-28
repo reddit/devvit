@@ -613,11 +613,10 @@ export default class ExperimentalPublish extends DevvitCommand {
       return;
     }
 
-    this.log('In order to publish your app, you must upload a source code zip, to help us with');
-    this.log('the app review process. This zip will only be used by the Devvit team for review');
-    this.log('purposes, and will not be shared with any third parties. The CLI will create the');
-    this.log('source code zip from the contents of your current project directory, respecting');
-    this.log('your root .gitignore file.');
+    this.log('To publish your app, you need to upload a source code zip. This zip is only');
+    this.log('used by the Devvit team for the app review process and will not be shared with');
+    this.log('third parties. The CLI will automatically generate the zip from your current');
+    this.log('project directory and will respect your root .gitignore file.');
     this.log('');
     const { action } = await inquirer.prompt<{ action: 'stop' | 'continue' | 'neverAskAgain' }>({
       name: 'action',
@@ -625,15 +624,15 @@ export default class ExperimentalPublish extends DevvitCommand {
       type: 'list',
       choices: [
         {
-          name: 'Stop here - I want to do some cleanup first!',
+          name: 'Stop for now - I want to clean up my project first!',
           value: 'stop',
         },
         {
-          name: 'Continue with the source code upload this time, and ask again later',
+          name: 'Continue with the source code upload, and ask me every time.',
           value: 'continue',
         },
         {
-          name: 'Continue with the source code upload, and never ask again',
+          name: `Continue with the source code upload, and don't ask me again for this app.`,
           value: 'neverAskAgain',
         },
       ],
