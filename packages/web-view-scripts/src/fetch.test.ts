@@ -18,6 +18,7 @@ describe('fetch()', () => {
     token: 'authToken' as WebbitToken,
     webViewMode: undefined,
     startTime: undefined,
+    refreshToken: undefined,
   };
 
   for (const { same, url } of [

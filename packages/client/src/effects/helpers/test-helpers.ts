@@ -27,6 +27,7 @@ export const mockDevvit: Readonly<DevvitGlobal> = {
   token: noWebbitToken,
   webViewMode: undefined,
   startTime: undefined,
+  refreshToken: undefined,
 };
 
 // Thing mocks

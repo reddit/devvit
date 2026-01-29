@@ -3,7 +3,7 @@ import * as emitEffectModule from '@devvit/shared-types/client/emit-effect.js';
 import type { WebbitToken } from '@devvit/shared-types/webbit.js';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { decodeToken, initToken, refreshToken } from './token.js';
+import { decodeToken, initToken, refreshToken, requestTokenRefresh } from './token.js';
 
 describe('decodeRequestContext()', () => {
   test('decodes valid JWT with devvit claim', () => {
@@ -83,6 +83,7 @@ describe('refreshToken()', () => {
       token: '' as WebbitToken,
       webViewMode: undefined,
       startTime: undefined,
+      refreshToken: undefined,
     };
   });
 
@@ -111,6 +112,20 @@ describe('refreshToken()', () => {
     await refreshToken();
 
     expect(emitEffectSpy).toHaveBeenCalled();
+    expect(globalThis.devvit.token).toBe(newToken);
+  });
+
+  test('devvit.refreshToken calls requestTokenRefresh', async () => {
+    const newToken = 'refreshed.token.value';
+    vi.spyOn(emitEffectModule, 'emitEffect').mockResolvedValue({
+      id: 'test-id',
+      updateRequestContext: { signedRequestContext: newToken },
+    });
+
+    globalThis.devvit.refreshToken = requestTokenRefresh;
+
+    await globalThis.devvit.refreshToken();
+
     expect(globalThis.devvit.token).toBe(newToken);
   });
 });

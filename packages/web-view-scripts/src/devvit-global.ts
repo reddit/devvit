@@ -16,7 +16,7 @@ import { T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { type WebbitToken } from '@devvit/shared-types/webbit.js';
 
 import { queryClientVersion } from './client.js';
-import { decodeToken } from './token.js';
+import { decodeToken, requestTokenRefresh } from './token.js';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -59,6 +59,7 @@ export const initDevvitGlobal = (
     token: (bridge.signedRequestContext || bridge.webbitToken) as WebbitToken,
     webViewMode: bridge?.viewMode,
     startTime: bridge?.startTime ?? undefined,
+    refreshToken: requestTokenRefresh,
   };
 };
 

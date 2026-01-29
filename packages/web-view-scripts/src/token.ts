@@ -35,13 +35,16 @@ export async function refreshToken(): Promise<void> {
     return;
   }
 
-  // Refresh the token
+  await requestTokenRefresh();
+}
+
+export async function requestTokenRefresh(): Promise<void> {
   const response = await emitEffect({
     type: EffectType.EFFECT_UPDATE_REQUEST_CONTEXT,
     updateRequestContext: {},
   });
 
-  if (!response?.updateRequestContext) {
+  if (!response?.updateRequestContext?.signedRequestContext) {
     console.error('Failed to refresh token');
     return;
   }

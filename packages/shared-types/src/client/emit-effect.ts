@@ -18,6 +18,7 @@ const EFFECTS_WITH_RESPONSE: { readonly [fx in EffectType]?: true } = {
   [EffectType.EFFECT_SHOW_FORM]: true,
   [EffectType.EFFECT_CAN_RUN_AS_USER]: true,
   [EffectType.EFFECT_CREATE_ORDER]: true,
+  [EffectType.EFFECT_UPDATE_REQUEST_CONTEXT]: true,
 };
 
 /**

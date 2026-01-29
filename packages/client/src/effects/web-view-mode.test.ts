@@ -55,6 +55,7 @@ beforeEach(() => {
     token: noWebbitToken,
     webViewMode: undefined,
     startTime: undefined,
+    refreshToken: undefined,
   };
 });
 
