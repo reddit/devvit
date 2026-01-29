@@ -4,6 +4,10 @@ import {
   Client,
 } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
+import {
+  ConsentStatus,
+  Scope,
+} from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
 import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { describe, expect, test } from 'vitest';
@@ -455,6 +459,84 @@ describe('initContext()', () => {
     initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
 
     expect(devvit.token).toBe('webbitToken');
+  });
+
+  test('appPermissionState is suppressed on old Android versions', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.ANDROID,
+      nativeVersion: { yyyy: 2026, release: 5, attempt: 0, number: 2605000 },
+      webViewContext: {
+        subredditId: 't5_123',
+        subredditName: 'subredditName',
+        appName: 'test-app-123',
+        appVersion: '1.0.0',
+        postId: 't3_123',
+        userId: 't2_123',
+      },
+      webbitToken: noWebbitToken,
+      appPermissionState: {
+        consentStatus: ConsentStatus.GRANTED,
+        requestedScopes: [Scope.SUBMIT_POST],
+        grantedScopes: [Scope.SUBMIT_POST],
+      },
+    };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
+
+    expect(devvit.appPermissionState).toBeUndefined();
+  });
+
+  test('appPermissionState is preserved on new Android versions', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.ANDROID,
+      nativeVersion: { yyyy: 2026, release: 6, attempt: 0, number: 2606000 },
+      webViewContext: {
+        subredditId: 't5_123',
+        subredditName: 'subredditName',
+        appName: 'test-app-123',
+        appVersion: '1.0.0',
+        postId: 't3_123',
+        userId: 't2_123',
+      },
+      webbitToken: noWebbitToken,
+      appPermissionState: {
+        consentStatus: ConsentStatus.GRANTED,
+        requestedScopes: [Scope.SUBMIT_POST],
+        grantedScopes: [Scope.SUBMIT_POST],
+      },
+    };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
+
+    expect(devvit.appPermissionState).toBeDefined();
+  });
+
+  test('appPermissionState is preserved on iOS', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.IOS,
+      nativeVersion: { yyyy: 2025, release: 10, attempt: 0, number: 0 },
+      webViewContext: {
+        subredditId: 't5_123',
+        subredditName: 'subredditName',
+        appName: 'test-app-123',
+        appVersion: '1.0.0',
+        postId: 't3_123',
+        userId: 't2_123',
+      },
+      webbitToken: noWebbitToken,
+      appPermissionState: {
+        consentStatus: ConsentStatus.GRANTED,
+        requestedScopes: [Scope.SUBMIT_POST],
+        grantedScopes: [Scope.SUBMIT_POST],
+      },
+    };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
+
+    expect(devvit.appPermissionState).toBeDefined();
   });
 });
 

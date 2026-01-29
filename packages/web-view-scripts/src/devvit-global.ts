@@ -36,6 +36,18 @@ export const initDevvitGlobal = (
 
   const client = getClient(bridge);
 
+  let appPermissionState = bridge?.appPermissionState;
+  /**
+   * Android versions older than this do not support runAsUser correctly, so we
+   * suppress the permission state to allow the app to run as if the feature
+   * wasn't present (failing open).
+   *
+   * Supported after 2026.05.0 (2605000)
+   */
+  if (client?.name === 'ANDROID' && client.version.number <= 2605000) {
+    appPermissionState = undefined;
+  }
+
   const reqCtx = decodeToken(bridge.signedRequestContext);
 
   let context;
@@ -55,7 +67,7 @@ export const initDevvitGlobal = (
     },
     entrypoints: clientData?.appConfig?.entrypoints ?? {},
     share: bridge?.shareParam ? { userData: bridge?.shareParam.userData } : undefined,
-    appPermissionState: bridge?.appPermissionState,
+    appPermissionState,
     token: (bridge.signedRequestContext || bridge.webbitToken) as WebbitToken,
     webViewMode: bridge?.viewMode,
     startTime: bridge?.startTime ?? undefined,
