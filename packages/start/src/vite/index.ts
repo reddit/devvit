@@ -1,9 +1,7 @@
 /* eslint-disable implicitDependencies/no-implicit */
-import fs from 'node:fs';
 import { builtinModules } from 'node:module';
 import path from 'node:path';
 
-import type { AppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import chalk from 'chalk';
 import type {
   CustomPluginOptions,
@@ -18,6 +16,17 @@ import {
   type Plugin,
   type ViteBuilder,
 } from 'vite';
+
+import {
+  getClientInputs,
+  getServerEntry,
+  readDevvitConfig,
+  resolveClientRoot,
+  resolvePublicDir,
+  resolveRepoRoot,
+  shouldCheckClientForServerImports,
+  shouldSuppressWarning,
+} from './utils.js';
 
 /**
  * Options for configuring the Devvit plugin.
@@ -44,69 +53,28 @@ export type DevvitPluginOptions = {
 
 type BuildEnvironment = 'server' | 'client';
 
-const shouldSuppressWarning = (warning: RollupLog): boolean => {
-  return warning.code === 'EVAL' && (warning.id ?? '').includes('node_modules/@protobufjs/inquire');
+type ResolvedRoots = {
+  /** The root of the repo, where the devvit.json file is located. */
+  repoRoot: string;
+  /** The root of the client, where the client code is located. */
+  clientRoot: string;
+  /** The root of where Vite will build the project from */
+  root: string;
 };
 
-const shouldCheckClientForServerImports = (environmentName: string | undefined): boolean => {
-  // When Vite's Environment API is unavailable (or the hook is invoked without environment context),
-  // treat the build as "client" for safety. This prevents accidental bundling of server code into
-  // the browser output.
-  return environmentName === undefined || environmentName === 'client';
-};
+function resolveBuildRoots(
+  configRoot: string | undefined,
+  shouldBuildClient: boolean,
+  hasExplicitRoot: boolean
+): ResolvedRoots {
+  const repoRoot = resolveRepoRoot(configRoot);
+  const resolvedClientRoot = hasExplicitRoot ? repoRoot : resolveClientRoot(repoRoot);
 
-/**
- * Reads and parses the devvit.json configuration file.
- */
-function readDevvitConfig(projectRoot: string): AppConfig | null {
-  const configPath = path.resolve(projectRoot, 'devvit.json');
-  try {
-    const content = fs.readFileSync(configPath, 'utf-8');
-    return JSON.parse(content);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Extracts client entry points from devvit.json config.
- */
-function getClientInputsFromConfig(config: AppConfig): Record<string, string> | undefined {
-  if (!config?.post?.entrypoints) {
-    return undefined;
-  }
-
-  const inputs: Record<string, string> = {};
-
-  for (const [key, value] of Object.entries(config.post.entrypoints)) {
-    inputs[key] = value.entry;
-  }
-
-  return Object.keys(inputs).length > 0 ? inputs : undefined;
-}
-
-/**
- * Resolves the server entry point.
- *
- * Checks for src/api/index.ts first, then falls back to src/server/index.ts
- * for backwards compatibility.
- */
-function getServerEntry(projectRoot: string): string {
-  const apiEntry = path.resolve(projectRoot, 'src/api/index.ts');
-  if (fs.existsSync(apiEntry)) {
-    return apiEntry;
-  }
-
-  const serverEntry = path.resolve(projectRoot, 'src/server/index.ts');
-  if (fs.existsSync(serverEntry)) {
-    return serverEntry;
-  }
-
-  throw new Error(
-    `${chalk.red('✖')} ${chalk.bold('devvit plugin error')}\n\n` +
-      `Could not find server entry point.\n` +
-      `Expected ${chalk.cyan('src/api/index.ts')} or ${chalk.cyan('src/server/index.ts')}.\n`
-  );
+  return {
+    repoRoot,
+    clientRoot: shouldBuildClient ? resolvedClientRoot : repoRoot,
+    root: shouldBuildClient ? resolvedClientRoot : repoRoot,
+  };
 }
 
 /**
@@ -118,12 +86,20 @@ function getServerEntry(projectRoot: string): string {
  */
 export function devvit(opts: DevvitPluginOptions = {}): Plugin {
   let isWatchMode = false;
-  let projectRoot = process.cwd();
+  // Default roots keep early hooks safe before config() runs.
+  let repoRoot = process.cwd();
+  let clientRoot = process.cwd();
 
   const buildTimes = new Map<BuildEnvironment, number>();
+  const logVerbose = (...messages: string[]): void => {
+    if (!opts.verbose) return;
+    console.log(chalk.dim('[devvit]'), ...messages);
+  };
 
   const checkViolation = (id: string, importer?: string) => {
-    const restrictedPaths = ['src/server', 'src/api'].map((p) => path.resolve(projectRoot, p));
+    const restrictedPaths = ['src/server', 'src/api'].map((restrictedPath) =>
+      path.resolve(repoRoot, restrictedPath)
+    );
     const normalizedId = path.normalize(id);
 
     const violation = restrictedPaths.find((restrictedPath) => {
@@ -135,9 +111,9 @@ export function devvit(opts: DevvitPluginOptions = {}): Plugin {
     });
 
     if (violation) {
-      const relativeId = path.relative(projectRoot, id);
-      const relativeViolation = path.relative(projectRoot, violation);
-      const relativeImporter = importer ? path.relative(projectRoot, importer) : undefined;
+      const relativeId = path.relative(repoRoot, id);
+      const relativeViolation = path.relative(repoRoot, violation);
+      const relativeImporter = importer ? path.relative(repoRoot, importer) : undefined;
 
       let message =
         `\n${chalk.red.bold('Detected server code in the client!')}\n\n` +
@@ -172,24 +148,123 @@ export function devvit(opts: DevvitPluginOptions = {}): Plugin {
 
       // Check if watch mode is enabled
       isWatchMode = !!config.build?.watch;
+      logVerbose(`watch mode: ${isWatchMode ? 'enabled' : 'disabled'}`);
 
-      projectRoot = config.root ?? process.cwd();
-      const devvitConfig = readDevvitConfig(projectRoot);
+      // Resolve repo root and config paths early for consistent lookups.
+      const hasExplicitRoot = typeof config.root === 'string';
+      const initialRepoRoot = resolveRepoRoot(config.root);
+      repoRoot = initialRepoRoot;
+      const devvitConfig = readDevvitConfig(repoRoot);
+      logVerbose(`devvit.json: ${path.resolve(repoRoot, 'devvit.json')}`);
 
-      if (!devvitConfig) {
-        throw new Error(
-          `${chalk.red('✖')} ${chalk.bold('devvit plugin error')}\n\n` +
-            `Could not find ${chalk.cyan('devvit.json')}. It must be present in the root of your project.\n`
-        );
+      // Determine which environments should be enabled by config presence.
+      // NOTE: As more entrypoints (verticals?) are added, we will need to add
+      // them here
+      const hasClientEntrypoints = Object.keys(devvitConfig.post?.entrypoints ?? {}).length > 0;
+      const shouldBuildClient = hasClientEntrypoints;
+      const shouldBuildServer = devvitConfig.server !== undefined;
+
+      // Explain environment decisions to aid debugging.
+      logVerbose(`client build: ${shouldBuildClient ? 'enabled' : 'disabled'}`);
+      if (!devvitConfig.post) {
+        logVerbose('client build reason: devvit.json has no post config');
+      } else if (!hasClientEntrypoints) {
+        logVerbose('client build reason: devvit.json has no post entrypoints');
       }
 
-      const clientInputs = getClientInputsFromConfig(devvitConfig);
+      logVerbose(`server build: ${shouldBuildServer ? 'enabled' : 'disabled'}`);
+      if (!shouldBuildServer) {
+        logVerbose('server build reason: devvit.json has no server config');
+      }
 
-      if (!clientInputs) {
-        throw new Error(
-          `${chalk.red('✖')} ${chalk.bold('devvit plugin error')}\n\n` +
-            `Could not find entry points in ${chalk.cyan('devvit.json')}.\n`
-        );
+      /**
+       * This is a kludge to support src/client building outputs to
+       * /dist/client/entry.html instead of /dist/client/src/client/entry.html.
+       *
+       * Vite derives .html entrypoints relative to Vite's project root. Well,
+       * that works great in most cases, but in our case we have a TON of apps
+       * that rely on dist/client and inside of there entry.html being a direct
+       * descendant.
+       *
+       * Also, we want to keep that pattern for legibility in the templates of
+       * src/
+       *   client/
+       *     entry.html
+       *   server/
+       *     index.ts
+       *
+       * And support a devvit.json like this:
+       *   "post": {
+       *   "dir": "dist/client",
+       *   "entrypoints": {
+       *     "default": {
+       *       "inline": true,
+       *       "entry": "splash.html"
+       *     },
+       *     "game": {
+       *       "entry": "game.html"
+       *     }
+       *   }
+       * },
+       *
+       * So, what we've done to do this while utilizing Vite's environment API is
+       * to check if src/client exists and that the user hasn't explicitly set the root.
+       * When those are true, we set the client root to src/client which will
+       * cause Vite to build to dist/client/entry.html instead of dist/client/src/client/entry.html.
+       *
+       * The alternative is to run two builds in parallel within the plugin. We've tried it this way don't like it
+       * because:
+       * - There's more for us to manage
+       * - You need to coordinate multiple watchers
+       * - You lose shared pipelines, multi-env hooks, and a lot of the benefits of the environment API
+       * - If we ever decide to add HMR support, I think it'll be much harder to implement.
+       *
+       * Sources:
+       * - https://github.com/vitejs/vite/issues/15612
+       * - https://github.com/vitejs/vite/discussions/16358
+       * - https://github.com/vitejs/vite/pull/17394
+       *
+       *
+       * At the same time, our experimental template is flatted like this:
+       * src/
+       *   entry.html
+       *   server/
+       *     index.ts
+       *
+       * And the devvit.json looks like this:
+       *
+       *   "post": {
+       *   "dir": "dist/client",
+       *   "entrypoints": {
+       *     "default": {
+       *       "inline": true,
+       *       "entry": "src/splash.html"
+       *     },
+       *     "game": {
+       *       "entry": "src/game.html"
+       *     }
+       *   }
+       * },
+       *
+       * It doesn't help that we infer the entrypoints based on the expected build output, but that's
+       * where a lot of the magic happens!
+       */
+      // Resolve roots now that client enablement is known.
+      const {
+        repoRoot: resolvedRepoRoot,
+        clientRoot: resolvedClientRoot,
+        root: resolvedRoot,
+      } = resolveBuildRoots(config.root, shouldBuildClient, hasExplicitRoot);
+      repoRoot = resolvedRepoRoot;
+      clientRoot = resolvedClientRoot;
+      logVerbose(`explicit root: ${hasExplicitRoot ? 'yes' : 'no'}`);
+      logVerbose(`repo root: ${repoRoot}`);
+      logVerbose(`client root: ${clientRoot}`);
+      logVerbose(`root: ${resolvedRoot}`);
+
+      const clientInputs = getClientInputs(devvitConfig, repoRoot, clientRoot);
+      if (clientInputs) {
+        logVerbose(`client inputs: ${JSON.stringify(clientInputs)}`);
       }
 
       const baseBuildOptions: Partial<BuildOptions> = {
@@ -198,27 +273,123 @@ export function devvit(opts: DevvitPluginOptions = {}): Plugin {
         reportCompressedSize: false,
       };
 
-      // Resolve outDirs relative to project root
-      const clientOutDir = path.resolve(projectRoot, 'dist/client');
-      const serverOutDir = path.resolve(projectRoot, 'dist/server');
+      // Resolve outDirs relative to repo root
+      const clientOutDir = path.resolve(repoRoot, 'dist/client');
+      const serverOutDir = path.resolve(repoRoot, 'dist/server');
+      logVerbose(`config.publicDir: ${String(config.publicDir)}`);
+      // Only auto-resolve when unset; `false` explicitly disables publicDir.
+      const publicDir =
+        config.publicDir === undefined && shouldBuildClient
+          ? resolvePublicDir(repoRoot, clientRoot)
+          : undefined;
+      logVerbose(`client outDir: ${clientOutDir}`);
+      logVerbose(`server outDir: ${serverOutDir}`);
+      logVerbose(
+        `publicDir: ${
+          config.publicDir === undefined ? (publicDir ?? 'disabled') : 'using user config'
+        }`
+      );
+
+      const serverEntry = shouldBuildServer ? getServerEntry(repoRoot) : undefined;
+      logVerbose(`server entry: ${serverEntry ?? 'disabled'}`);
+
+      const environments: Record<string, EnvironmentOptions> = {};
+      if (shouldBuildClient && clientInputs) {
+        environments.client = mergeConfig<EnvironmentOptions, EnvironmentOptions>(
+          {
+            consumer: 'client',
+            build: {
+              ...baseBuildOptions,
+              outDir: clientOutDir,
+              rollupOptions: {
+                input: clientInputs,
+                onwarn(warning, warn) {
+                  if (shouldSuppressWarning(warning)) return;
+                  warn(warning);
+                },
+                output: {
+                  entryFileNames: '[name].js',
+                  chunkFileNames: '[name].js',
+                  assetFileNames: '[name][extname]',
+                  sourcemapFileNames: '[name].js.map',
+                },
+              },
+            },
+          },
+          opts.client ?? {}
+        );
+      }
+
+      if (shouldBuildServer && serverEntry) {
+        environments.server = mergeConfig<EnvironmentOptions, EnvironmentOptions>(
+          {
+            consumer: 'server',
+            resolve: {
+              // Bundle all dependencies so the output can run without node_modules.
+              noExternal: true,
+              // Don't force-externalize any npm deps.
+              external: [],
+              // But do treat Node built-ins as external.
+              builtins: [/^node:/, ...builtinModules],
+            },
+            build: {
+              ...baseBuildOptions,
+              ssr: serverEntry,
+              target: 'node22',
+              outDir: serverOutDir,
+              minify: true,
+              copyPublicDir: false,
+              rollupOptions: {
+                onwarn(warning: RollupLog, warn: LoggingFunction) {
+                  if (shouldSuppressWarning(warning)) return;
+                  warn(warning);
+                },
+                output: {
+                  format: 'cjs',
+                  entryFileNames: 'index.cjs',
+                  inlineDynamicImports: true,
+                },
+              },
+            },
+          },
+          opts.server ?? {}
+        );
+      }
 
       return {
         appType: 'custom',
-        root: projectRoot,
+        root: resolvedRoot,
+        envDir: repoRoot,
+        ...(publicDir !== undefined ? { publicDir } : {}),
         logLevel: opts.logLevel ?? 'warn',
         // Enable shared plugins (React, Tailwind, etc.) to run for both environments
         builder: {
           sharedPlugins: true,
           async buildApp(builder: ViteBuilder) {
-            const client = builder.environments.client;
-            const server = builder.environments.server;
             const start = Date.now();
 
             if (opts.verbose) {
               console.log(chalk.dim('Building...'));
             }
 
-            await Promise.all([builder.build(client), builder.build(server)]);
+            const buildPromises: Promise<unknown>[] = [];
+
+            for (const environmentName of Object.keys(environments)) {
+              const environment = builder.environments[environmentName];
+              if (!environment) {
+                logVerbose(`skipping ${environmentName} build (environment not found)`);
+                continue;
+              }
+              logVerbose(`building ${environmentName} environment`);
+              buildPromises.push(builder.build(environment));
+            }
+
+            if (buildPromises.length === 0) {
+              logVerbose('no environments enabled; skipping build');
+              return;
+            }
+
+            await Promise.all(buildPromises);
 
             console.log(
               chalk.green('✔') + ' Build complete ' + chalk.dim(`(${Date.now() - start}ms)`)
@@ -226,62 +397,7 @@ export function devvit(opts: DevvitPluginOptions = {}): Plugin {
           },
         },
         environments: {
-          client: mergeConfig<EnvironmentOptions, EnvironmentOptions>(
-            {
-              consumer: 'client',
-              build: {
-                ...baseBuildOptions,
-                outDir: clientOutDir,
-                rollupOptions: {
-                  input: clientInputs,
-                  onwarn(warning, warn) {
-                    if (shouldSuppressWarning(warning)) return;
-                    warn(warning);
-                  },
-                  output: {
-                    entryFileNames: '[name].js',
-                    chunkFileNames: '[name].js',
-                    assetFileNames: '[name][extname]',
-                    sourcemapFileNames: '[name].js.map',
-                  },
-                },
-              },
-            },
-            opts.client ?? {}
-          ),
-          server: mergeConfig<EnvironmentOptions, EnvironmentOptions>(
-            {
-              consumer: 'server',
-              resolve: {
-                // Bundle all dependencies so the output can run without node_modules.
-                noExternal: true,
-                // Don't force-externalize any npm deps.
-                external: [],
-                // But do treat Node built-ins as external.
-                builtins: [/^node:/, ...builtinModules],
-              },
-              build: {
-                ...baseBuildOptions,
-                ssr: getServerEntry(projectRoot),
-                target: 'node22',
-                outDir: serverOutDir,
-                minify: true,
-                copyPublicDir: false,
-                rollupOptions: {
-                  onwarn(warning: RollupLog, warn: LoggingFunction) {
-                    if (shouldSuppressWarning(warning)) return;
-                    warn(warning);
-                  },
-                  output: {
-                    format: 'cjs',
-                    entryFileNames: 'index.cjs',
-                    inlineDynamicImports: true,
-                  },
-                },
-              },
-            },
-            opts.server ?? {}
-          ),
+          ...environments,
         },
       };
     },

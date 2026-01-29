@@ -21,8 +21,12 @@ afterEach(() => {
 
 type DevvitResolvedConfig = {
   builder?: { buildApp?: (builder: ViteBuilder) => Promise<void> };
+  root?: string;
+  envDir?: string;
+  publicDir?: string | false;
   environments?: {
     client?: { build?: { rollupOptions?: { input?: Record<string, string> } } };
+    server?: { build?: { ssr?: string } };
   };
 };
 
@@ -43,6 +47,15 @@ type DevvitLoadContext = {
 
 function normalizePathForSnapshot(filePath: string, projectRoot: string): string {
   return filePath.replaceAll(projectRoot, '<root>').replaceAll('\\', '/');
+}
+
+function withMockedCwd<T>(projectRoot: string, runner: () => T): T {
+  const cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue(projectRoot);
+  try {
+    return runner();
+  } finally {
+    cwdSpy.mockRestore();
+  }
 }
 
 class PluginHarness {
@@ -202,14 +215,14 @@ describe('devvit Vite plugin', () => {
     const project = new TestProject();
 
     const callConfig = (): void => {
-      const config: UserConfig = { root: project.root };
+      const config: UserConfig = {};
       const env: ConfigEnv = { command: 'build', mode: 'production' };
       harness.runConfig(config, env);
     };
 
     let err: unknown;
     try {
-      callConfig();
+      withMockedCwd(project.root, callConfig);
     } catch (e) {
       err = e;
     }
@@ -217,7 +230,7 @@ describe('devvit Vite plugin', () => {
     expect((err as Error).message).toMatchInlineSnapshot(`
       "✖ devvit plugin error
 
-      Could not find devvit.json. It must be present in the root of your project.
+      Could not read devvit.json. Ensure it exists in the project root and contains valid JSON.
       "
     `);
 
@@ -238,9 +251,11 @@ describe('devvit Vite plugin', () => {
 
     project.write('src/server/index.ts', 'export const handler = async () => {}');
 
-    const config: UserConfig = { root: project.root };
-    const env: ConfigEnv = { command: 'build', mode: 'production' };
-    harness.runConfig(config, env);
+    withMockedCwd(project.root, () => {
+      const config: UserConfig = {};
+      const env: ConfigEnv = { command: 'build', mode: 'production' };
+      harness.runConfig(config, env);
+    });
 
     const importer = project.path('src/client/game.tsx');
     const source = 'src/server/secret.ts';
@@ -285,9 +300,11 @@ describe('devvit Vite plugin', () => {
 
     project.write('src/server/index.ts', 'export const handler = async () => {}');
 
-    const config: UserConfig = { root: project.root };
-    const env: ConfigEnv = { command: 'build', mode: 'production' };
-    harness.runConfig(config, env);
+    withMockedCwd(project.root, () => {
+      const config: UserConfig = {};
+      const env: ConfigEnv = { command: 'build', mode: 'production' };
+      harness.runConfig(config, env);
+    });
 
     const id = project.path('src/server/secret.ts');
 
@@ -309,17 +326,25 @@ describe('devvit Vite plugin', () => {
         entrypoints: {
           default: { entry: 'index.html' },
           splash: { entry: 'splash.html' },
+          legacy: { entry: 'src/client/legacy.html' },
         },
+      },
+      server: {
+        entry: 'src/server/index.ts',
+        dir: 'dist/server',
       },
     });
 
     project.write('src/client/index.html', '<!doctype html>');
     project.write('src/client/splash.html', '<!doctype html>');
+    project.write('src/client/legacy.html', '<!doctype html>');
     project.write('src/server/index.ts', 'export const handler = async () => {}');
 
-    const config: UserConfig = { root: project.root };
-    const env: ConfigEnv = { command: 'build', mode: 'production' };
-    const resolved = harness.runConfig(config, env) as DevvitResolvedConfig;
+    const resolved = withMockedCwd(project.root, () => {
+      const config: UserConfig = {};
+      const env: ConfigEnv = { command: 'build', mode: 'production' };
+      return harness.runConfig(config, env) as DevvitResolvedConfig;
+    });
 
     if (!('environments' in resolved) || !('builder' in resolved)) {
       throw new Error('Expected devvit plugin config hook to return a resolved config object.');
@@ -335,8 +360,9 @@ describe('devvit Vite plugin', () => {
       )
     ).toMatchInlineSnapshot(`
       {
-        "default": "index.html",
-        "splash": "splash.html",
+        "default": "<root>/src/client/index.html",
+        "legacy": "<root>/src/client/legacy.html",
+        "splash": "<root>/src/client/splash.html",
       }
     `);
 
@@ -360,6 +386,214 @@ describe('devvit Vite plugin', () => {
         "✔ Build complete (0ms)",
       ]
     `);
+
+    project.cleanup();
+  });
+
+  test('skips client environment when devvit.json has no post config', async () => {
+    const harness = new PluginHarness(devvit());
+    const project = new TestProject();
+
+    project.writeDevvitJson({
+      server: {
+        entry: 'src/server/index.ts',
+        dir: 'dist/server',
+      },
+    });
+
+    project.write('src/server/index.ts', 'export const handler = async () => {}');
+
+    const resolved = withMockedCwd(project.root, () => {
+      const config: UserConfig = {};
+      const env: ConfigEnv = { command: 'build', mode: 'production' };
+      return harness.runConfig(config, env) as DevvitResolvedConfig;
+    });
+
+    expect(resolved.environments?.client).toBeUndefined();
+    expect(resolved.environments?.server).toBeDefined();
+    expect(resolved.root).toBe(project.root);
+    expect(resolved.envDir).toBe(project.root);
+
+    const buildMock = vi.fn(async () => {});
+    const builder = {
+      environments: { server: { name: 'server' } },
+      build: buildMock,
+    } as unknown as ViteBuilder;
+
+    await resolved?.builder?.buildApp?.(builder);
+
+    expect(buildMock).toHaveBeenCalledTimes(1);
+    expect(buildMock).toHaveBeenCalledWith(builder.environments.server);
+
+    project.cleanup();
+  });
+
+  test('skips client environment when post entrypoints are missing', () => {
+    const harness = new PluginHarness(devvit());
+    const project = new TestProject();
+
+    project.writeDevvitJson({
+      post: {},
+      server: {
+        entry: 'src/server/index.ts',
+        dir: 'dist/server',
+      },
+    });
+
+    project.write('src/server/index.ts', 'export const handler = async () => {}');
+
+    const resolved = withMockedCwd(project.root, () => {
+      const config: UserConfig = {};
+      const env: ConfigEnv = { command: 'build', mode: 'production' };
+      return harness.runConfig(config, env) as DevvitResolvedConfig;
+    });
+
+    expect(resolved.environments?.client).toBeUndefined();
+    expect(resolved.environments?.server).toBeDefined();
+    expect(resolved.root).toBe(project.root);
+
+    project.cleanup();
+  });
+
+  test('skips server environment when devvit.json has no server config', async () => {
+    const harness = new PluginHarness(devvit());
+    const project = new TestProject();
+
+    project.writeDevvitJson({
+      post: {
+        entrypoints: {
+          default: { entry: 'index.html' },
+        },
+      },
+    });
+
+    project.write('src/client/index.html', '<!doctype html>');
+
+    const resolved = withMockedCwd(project.root, () => {
+      const config: UserConfig = {};
+      const env: ConfigEnv = { command: 'build', mode: 'production' };
+      return harness.runConfig(config, env) as DevvitResolvedConfig;
+    });
+
+    expect(resolved.environments?.client).toBeDefined();
+    expect(resolved.environments?.server).toBeUndefined();
+    expect(resolved.root).toBe(project.path('src/client'));
+
+    const buildMock = vi.fn(async () => {});
+    const builder = {
+      environments: { client: { name: 'client' } },
+      build: buildMock,
+    } as unknown as ViteBuilder;
+
+    await resolved?.builder?.buildApp?.(builder);
+
+    expect(buildMock).toHaveBeenCalledTimes(1);
+    expect(buildMock).toHaveBeenCalledWith(builder.environments.client);
+
+    project.cleanup();
+  });
+
+  test('supports repo-root client entries when src/client is missing', () => {
+    const harness = new PluginHarness(devvit());
+    const project = new TestProject();
+
+    project.writeDevvitJson({
+      post: {
+        entrypoints: {
+          default: { entry: 'src/splash.html' },
+          game: { entry: 'src/game.html' },
+        },
+      },
+    });
+
+    project.write('src/splash.html', '<!doctype html>');
+    project.write('src/game.html', '<!doctype html>');
+    project.write('src/server/index.ts', 'export const handler = async () => {}');
+
+    const resolved = withMockedCwd(project.root, () => {
+      const config: UserConfig = {};
+      const env: ConfigEnv = { command: 'build', mode: 'production' };
+      return harness.runConfig(config, env) as DevvitResolvedConfig;
+    });
+
+    const clientInputs = resolved.environments?.client?.build?.rollupOptions?.input ?? {};
+    const normalizedInputs = Object.fromEntries(
+      Object.entries(clientInputs).map(([key, value]) => [
+        key,
+        normalizePathForSnapshot(value, project.root),
+      ])
+    );
+
+    expect(normalizedInputs).toStrictEqual({
+      default: '<root>/src/splash.html',
+      game: '<root>/src/game.html',
+    });
+    expect(resolved.root).toBe(project.root);
+    expect(resolved.envDir).toBe(project.root);
+
+    project.cleanup();
+  });
+
+  test('respects explicit root without src/client inference', () => {
+    const harness = new PluginHarness(devvit());
+    const project = new TestProject();
+
+    project.writeDevvitJson({
+      post: {
+        entrypoints: {
+          default: { entry: 'src/client/index.html' },
+        },
+      },
+    });
+
+    project.write('src/client/index.html', '<!doctype html>');
+    project.write('src/server/index.ts', 'export const handler = async () => {}');
+
+    const config: UserConfig = { root: project.root };
+    const env: ConfigEnv = { command: 'build', mode: 'production' };
+    const resolved = harness.runConfig(config, env) as DevvitResolvedConfig;
+
+    const clientInputs = resolved.environments?.client?.build?.rollupOptions?.input ?? {};
+    expect(
+      Object.fromEntries(
+        Object.entries(clientInputs).map(([key, value]) => [
+          key,
+          normalizePathForSnapshot(value, project.root),
+        ])
+      )
+    ).toStrictEqual({ default: '<root>/src/client/index.html' });
+    expect(resolved.root).toBe(project.root);
+
+    project.cleanup();
+  });
+
+  test('skips publicDir auto-resolution when user disables it', () => {
+    const harness = new PluginHarness(devvit());
+    const project = new TestProject();
+
+    project.writeDevvitJson({
+      post: {
+        entrypoints: {
+          default: { entry: 'index.html' },
+        },
+      },
+    });
+
+    project.write('src/client/index.html', '<!doctype html>');
+    project.write('src/server/index.ts', 'export const handler = async () => {}');
+    project.write('public/snoo.png', 'png');
+    project.write('src/client/public/snoo.png', 'png');
+
+    let resolved: DevvitResolvedConfig | undefined;
+    expect(() => {
+      resolved = withMockedCwd(project.root, () => {
+        const config: UserConfig = { publicDir: false };
+        const env: ConfigEnv = { command: 'build', mode: 'production' };
+        return harness.runConfig(config, env) as DevvitResolvedConfig;
+      });
+    }).not.toThrow();
+
+    expect(resolved?.publicDir).toBeUndefined();
 
     project.cleanup();
   });
