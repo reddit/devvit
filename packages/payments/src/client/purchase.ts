@@ -1,6 +1,6 @@
 import type { OrderResultEvent } from '@devvit/protos/json/devvit/ui/effect_types/v1alpha/create_order.js';
 import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
-import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { emitEffectWithResponse } from '@devvit/shared-types/client/emit-effect.js';
 
 /**
  * Initiates a purchase for one or more products.
@@ -16,7 +16,7 @@ export async function purchase(
   const id = crypto.randomUUID();
   const skus = typeof skuOrSkus === 'string' ? [skuOrSkus] : skuOrSkus;
 
-  const resp = await emitEffect({
+  const resp = await emitEffectWithResponse({
     createOrder: {
       id,
       skus,

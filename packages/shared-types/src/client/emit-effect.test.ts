@@ -12,7 +12,12 @@ import type { FormFieldValue } from '@devvit/protos/json/devvit/ui/form_builder/
 import { ConsentStatus } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type Effect, emitEffect, webViewInternalMessageType } from './emit-effect.js';
+import {
+  type Effect,
+  emitEffect,
+  emitEffectWithResponse,
+  webViewInternalMessageType,
+} from './emit-effect.js';
 
 describe('emit-effect', () => {
   let originalParent: Window | null;
@@ -50,7 +55,7 @@ describe('emit-effect', () => {
       showForm,
     };
 
-    const messagePromise = emitEffect(effect);
+    const messagePromise = emitEffectWithResponse(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
@@ -130,7 +135,7 @@ describe('emit-effect', () => {
     };
 
     // Test effect with response
-    const promiseWithResponse = emitEffect(effectWithResponse);
+    const promiseWithResponse = emitEffectWithResponse(effectWithResponse);
     const messageWithId = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(messageWithId.id).toBeDefined();
     expect(typeof messageWithId.id).toBe('string');
@@ -169,7 +174,7 @@ describe('emit-effect', () => {
       },
     };
 
-    const messagePromise = emitEffect(effect);
+    const messagePromise = emitEffectWithResponse(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
@@ -255,7 +260,7 @@ describe('emit-effect', () => {
         },
       },
     };
-    const messagePromise = emitEffect(effect);
+    const messagePromise = emitEffectWithResponse(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
@@ -371,7 +376,7 @@ describe('emit-effect', () => {
       type: EffectType.EFFECT_CAN_RUN_AS_USER,
     };
 
-    const messagePromise = emitEffect(effect);
+    const messagePromise = emitEffectWithResponse(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
@@ -486,7 +491,7 @@ describe('emit-effect', () => {
       },
     };
 
-    emitEffect(canRunAsUserEffect);
+    emitEffectWithResponse(canRunAsUserEffect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
     const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];

@@ -1,4 +1,4 @@
-import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { tokenParam } from '@devvit/shared-types/webbit.js';
@@ -44,7 +44,7 @@ export const getWebViewMode = (): WebViewMode => webViewMode(devvit.webViewMode)
  * });
  * ```
  */
-export function requestExpandedMode(event: MouseEvent, entry: string): Promise<void> {
+export function requestExpandedMode(event: MouseEvent, entry: string): void {
   if (devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE)
     throw Error('web view is already expanded');
   return emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry);
@@ -66,7 +66,7 @@ export function requestExpandedMode(event: MouseEvent, entry: string): Promise<v
  * });
  * ```
  */
-export function exitExpandedMode(event: MouseEvent): Promise<void> {
+export function exitExpandedMode(event: MouseEvent): void {
   if (devvit.webViewMode === WebViewImmersiveMode.INLINE_MODE)
     throw Error('web view is already inlined');
   return emitModeEffect(WebViewImmersiveMode.INLINE_MODE, event, undefined);
@@ -94,11 +94,7 @@ export function addWebViewModeListener(_: WebViewModeListener): void {}
  */
 export function removeWebViewModeListener(_: WebViewModeListener): void {}
 
-async function emitModeEffect(
-  mode: WebViewImmersiveMode,
-  event: Event,
-  entry: string | undefined
-): Promise<void> {
+function emitModeEffect(mode: WebViewImmersiveMode, event: Event, entry: string | undefined): void {
   if (!event.isTrusted || event.type !== 'click') {
     console.error('Expanded mode effect ignored due to untrusted event');
     throw new Error('Untrusted event');
@@ -117,9 +113,8 @@ async function emitModeEffect(
     entryUrl = `${url}`;
   }
 
-  const type = 9 satisfies EffectType.EFFECT_WEB_VIEW;
-  await emitEffect({
-    type,
+  emitEffect({
+    type: EffectType.EFFECT_WEB_VIEW,
     immersiveMode: { entryUrl, immersiveMode: mode },
   });
 }

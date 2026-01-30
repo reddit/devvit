@@ -1,5 +1,5 @@
 import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
-import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { emitEffectWithResponse } from '@devvit/shared-types/client/emit-effect.js';
 import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,11 +7,11 @@ import { mockDevvit } from './helpers/test-helpers.js';
 import { updateRequestContext } from './update-request-context.js';
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
-  emitEffect: vi.fn(),
+  emitEffectWithResponse: vi.fn(),
 }));
 
 function mockEmitEffect(context: string) {
-  (emitEffect as unknown as Mock).mockResolvedValue({
+  (emitEffectWithResponse as unknown as Mock).mockResolvedValue({
     id: EffectType.EFFECT_UPDATE_REQUEST_CONTEXT,
     updateRequestContext: { signedRequestContext: context },
   });
@@ -37,7 +37,7 @@ describe('update request context', () => {
 
     await updateRequestContext();
 
-    expect(emitEffect).toHaveBeenCalledWith({
+    expect(emitEffectWithResponse).toHaveBeenCalledWith({
       updateRequestContext: {},
       type: EffectType.EFFECT_UPDATE_REQUEST_CONTEXT,
     });

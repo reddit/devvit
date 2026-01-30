@@ -88,7 +88,7 @@ describe('refreshToken()', () => {
   });
 
   test('does not refresh token if expiration is more than 5 minutes away', async () => {
-    const emitEffectSpy = vi.spyOn(emitEffectModule, 'emitEffect');
+    const emitEffectSpy = vi.spyOn(emitEffectModule, 'emitEffectWithResponse');
     // Token expires in 10 minutes (600 seconds from now)
     const futureExp = Math.floor(Date.now() / 1000) + 600;
     globalThis.devvit.token = createJwtWithExp(futureExp) as WebbitToken;
@@ -100,7 +100,7 @@ describe('refreshToken()', () => {
 
   test('refreshes token when expiration is within 5 minutes', async () => {
     const newToken = 'new-token-from-server';
-    const emitEffectSpy = vi.spyOn(emitEffectModule, 'emitEffect').mockResolvedValue({
+    const emitEffectSpy = vi.spyOn(emitEffectModule, 'emitEffectWithResponse').mockResolvedValue({
       id: 'test-id',
       updateRequestContext: { signedRequestContext: newToken },
     });
@@ -117,7 +117,7 @@ describe('refreshToken()', () => {
 
   test('devvit.refreshToken calls requestTokenRefresh', async () => {
     const newToken = 'refreshed.token.value';
-    vi.spyOn(emitEffectModule, 'emitEffect').mockResolvedValue({
+    vi.spyOn(emitEffectModule, 'emitEffectWithResponse').mockResolvedValue({
       id: 'test-id',
       updateRequestContext: { signedRequestContext: newToken },
     });

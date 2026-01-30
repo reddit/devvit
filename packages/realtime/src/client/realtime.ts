@@ -13,10 +13,6 @@ export type ConnectRealtimeOptions<Msg extends JsonValue> = {
 
 const connectionsByChannel = new Map<string, Connection>();
 
-/* TODO: Clean up this API. Now that realtime has been removed from the
- * EFFECTS_WITH_RESPONSE list, we probably don't need to await emitEffect.
- */
-
 /**
  * Connects to a realtime channel for receiving messages.
  *
@@ -48,9 +44,9 @@ const connectionsByChannel = new Map<string, Connection>();
  * })
  * ```
  */
-export const connectRealtime = async <Msg extends JsonValue>(
+export const connectRealtime = <Msg extends JsonValue>(
   opts: Readonly<ConnectRealtimeOptions<Msg>>
-): Promise<Connection> => {
+): Connection => {
   if (!opts.channel || /[^a-zA-Z0-9_]/.test(opts.channel))
     throw Error(
       `invalid channel name "${opts.channel}"; channels may only contain letters, numbers, and underscores`
@@ -64,12 +60,12 @@ export const connectRealtime = async <Msg extends JsonValue>(
   connectionsByChannel.set(opts.channel, connection);
   addEventListener('message', connection.onMessage);
 
-  await emitConnectionsEffect();
+  emitConnectionsEffect();
 
   return connection;
 };
 
-export async function disconnectRealtime(channel: string): Promise<void> {
+export function disconnectRealtime(channel: string): void {
   const connection = connectionsByChannel.get(channel);
   if (!connection) return;
 
@@ -78,7 +74,7 @@ export async function disconnectRealtime(channel: string): Promise<void> {
   if (connection.connected) connection.opts.onDisconnect?.(channel);
   connection.connected = false;
 
-  await emitConnectionsEffect();
+  emitConnectionsEffect();
 }
 
 /** True if the channel socket is connected. */
@@ -95,8 +91,8 @@ export const __clearConnections = (): void => {
 };
 
 /** Emits open connections which may cause subscribe / unsubscribe. */
-async function emitConnectionsEffect(): Promise<void> {
-  await emitEffect({
+function emitConnectionsEffect(): void {
+  emitEffect({
     realtime: { subscriptionIds: [...connectionsByChannel.keys()] },
     type: EffectType.EFFECT_REALTIME_SUB,
   });

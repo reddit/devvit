@@ -14,27 +14,41 @@ export const webViewInternalMessageType = 'devvit-internal';
 
 export type Effect = Omit<WebViewInternalMessage, 'id' | 'scope' | 'type'> & { type: EffectType };
 
-const EFFECTS_WITH_RESPONSE: { readonly [fx in EffectType]?: true } = {
-  [EffectType.EFFECT_SHOW_FORM]: true,
-  [EffectType.EFFECT_CAN_RUN_AS_USER]: true,
-  [EffectType.EFFECT_CREATE_ORDER]: true,
-  [EffectType.EFFECT_UPDATE_REQUEST_CONTEXT]: true,
+/**
+ * Emits an effect to the parent window returns immediately.
+ *
+ * @param effect - The effect to be emitted to the parent window
+ * @description
+ * This function handles effects that don't require a response.
+ */
+export const emitEffect = (effect: Readonly<Effect>): void => {
+  const message: WebViewInternalMessage = {
+    ...effect,
+    realtimeEffect: effect.realtime, // to-do: remove deprecated field.
+    scope: WebViewInternalMessageScope.CLIENT,
+    type: webViewInternalMessageType,
+  };
+
+  // For temporary backward compatibility, we set both `message.effect_type` above, and `effect` below
+  // Once mobile clients are updated to consume the strongly typed properties above, we can remove this block
+  // *Do not* add new effects here, use the strongly typed properties above
+  if (effect.showToast || effect.navigateToUrl) {
+    message.effect = effect;
+  }
+
+  parent.postMessage(message, '*');
 };
 
 /**
- * Emits an effect to the parent window and handles the response if required.
+ * Emits an effect to the parent window and returns a promise that resolves with the response message.
  *
  * @param effect - The effect to be emitted to the parent window
- * @returns A promise that resolves with the response message for effects that require
- *          a response, or resolves immediately with undefined for effects that don't
+ * @returns A promise that resolves with the response message
  *
  * @description
- * This function handles two types of effects:
- * 1. Effects that require a response: Creates a unique ID, sets up a message listener,
- *    and resolves the promise when a matching response is received
- * 2. Effects that don't require a response: Posts the message and resolves immediately
+ * This function handles effects that require a response.
  */
-export const emitEffect = (
+export const emitEffectWithResponse = (
   effect: Readonly<Effect>
 ): Promise<WebViewInternalEventMessage | undefined> => {
   return new Promise<WebViewInternalEventMessage | undefined>((resolve) => {
@@ -48,36 +62,24 @@ export const emitEffect = (
     // For temporary backward compatibility, we set both `message.effect_type` above, and `effect` below
     // Once mobile clients are updated to consume the strongly typed properties above, we can remove this block
     // *Do not* add new effects here, use the strongly typed properties above
-    if (
-      effect.showToast ||
-      effect.navigateToUrl ||
-      effect.showForm ||
-      effect.type === EffectType.EFFECT_CAN_RUN_AS_USER
-    ) {
+    if (effect.showForm || effect.type === EffectType.EFFECT_CAN_RUN_AS_USER) {
       message.effect = effect;
     }
 
-    // Only set message id and add a listener for effects which require a response
-    if (EFFECTS_WITH_RESPONSE[effect.type]) {
-      const id = crypto.randomUUID();
-      message.id = id;
+    const id = crypto.randomUUID();
+    message.id = id;
 
-      const handleEffect = (event: MessageEvent<WebViewMessageEvent_MessageData>): void => {
-        if (event.data?.type === 'devvit-message' && event.data?.data?.id === id) {
-          // to-do: drop fromJSON() when iOS is sending fully hydrated messages.
-          const serializedMessage = WebViewInternalEventMessage.fromJSON(event.data.data);
-          resolve(serializedMessage);
-          removeEventListener('message', handleEffect);
-        }
-      };
-      addEventListener('message', handleEffect);
+    const handleEffect = (event: MessageEvent<WebViewMessageEvent_MessageData>): void => {
+      if (event.data?.type === 'devvit-message' && event.data?.data?.id === id) {
+        // to-do: drop fromJSON() when iOS is sending fully hydrated messages.
+        const serializedMessage = WebViewInternalEventMessage.fromJSON(event.data.data);
+        resolve(serializedMessage);
+        removeEventListener('message', handleEffect);
+      }
+    };
+    addEventListener('message', handleEffect);
 
-      // Post message to the parent window, handled by client web view component
-      parent.postMessage(message, '*');
-    } else {
-      parent.postMessage(message, '*');
-      // Resolve immediately for effects that don't expect a response.
-      resolve(undefined);
-    }
+    // Post message to the parent window, handled by client web view component
+    parent.postMessage(message, '*');
   });
 };

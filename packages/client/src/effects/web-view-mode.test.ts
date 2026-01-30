@@ -89,25 +89,25 @@ describe('requestExpandedMode()', () => {
     } satisfies Effect);
   });
 
-  it('should throw an error when not called with an untrusted event or click event', async () => {
+  it('should throw an error when not called with an untrusted event or click event', () => {
     const event = { isTrusted: false, type: 'click' } as PointerEvent;
-    await expect(requestExpandedMode(event, 'default')).rejects.toThrow('Untrusted event');
+    expect(() => requestExpandedMode(event, 'default')).toThrow('Untrusted event');
 
     const trustedButWrongTypeEvent = { isTrusted: true, type: 'keydown' } as PointerEvent;
-    await expect(requestExpandedMode(trustedButWrongTypeEvent, 'default')).rejects.toThrow(
+    expect(() => requestExpandedMode(trustedButWrongTypeEvent, 'default')).toThrow(
       'Untrusted event'
     );
   });
 
-  test('typing supports `MouseEvent`s for React', async () => {
+  test('typing supports `MouseEvent`s for React', () => {
     const ev = { isTrusted: true, type: 'click' } as MouseEvent;
-    await requestExpandedMode(ev, 'default');
+    requestExpandedMode(ev, 'default');
   });
 
-  it('should throw an error when entrypoint does not exist in devvit.json', async () => {
+  it('should throw an error when entrypoint does not exist in devvit.json', () => {
     // to-do: tighten Event checking.
     const ev = { isTrusted: true, type: 'click' } as PointerEvent;
-    await expect(requestExpandedMode(ev, 'missing')).rejects.toThrowErrorMatchingInlineSnapshot(
+    expect(() => requestExpandedMode(ev, 'missing')).toThrowErrorMatchingInlineSnapshot(
       `[Error: no entrypoint named "missing"; all entrypoints must appear in \`devvit.json\` \`post.entrypoints\`]`
     );
   });

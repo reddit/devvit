@@ -111,22 +111,22 @@ describe('realtime', () => {
       expect(mockOnMessage).toHaveBeenCalledWith(testMessage);
     });
 
-    test('throws an error for an invalid channel', async () => {
+    test('throws an error for an invalid channel', () => {
       const mockOnMessage = vi.fn();
 
-      await expect(
+      expect(() =>
         connectRealtime({ channel: 'test-channel', onMessage: mockOnMessage })
-      ).rejects.toThrowErrorMatchingInlineSnapshot(
+      ).toThrowErrorMatchingInlineSnapshot(
         `[Error: invalid channel name "test-channel"; channels may only contain letters, numbers, and underscores]`
       );
     });
 
-    test('throws an error for an empty channel', async () => {
+    test('throws an error for an empty channel', () => {
       const mockOnMessage = vi.fn();
 
-      await expect(
+      expect(() =>
         connectRealtime({ channel: '', onMessage: mockOnMessage })
-      ).rejects.toThrowErrorMatchingInlineSnapshot(
+      ).toThrowErrorMatchingInlineSnapshot(
         `[Error: invalid channel name ""; channels may only contain letters, numbers, and underscores]`
       );
     });

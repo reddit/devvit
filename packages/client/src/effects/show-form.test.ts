@@ -1,6 +1,6 @@
 import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import type { WebViewInternalEventMessage } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
-import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { emitEffectWithResponse } from '@devvit/shared-types/client/emit-effect.js';
 import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -21,7 +21,7 @@ const mockWindow = {
 vi.stubGlobal('window', mockWindow);
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
-  emitEffect: vi.fn(),
+  emitEffectWithResponse: vi.fn(),
 }));
 
 describe('showForm', () => {
@@ -41,11 +41,11 @@ describe('showForm', () => {
       },
     };
 
-    (emitEffect as unknown as Mock).mockResolvedValueOnce(mockResponse);
+    (emitEffectWithResponse as unknown as Mock).mockResolvedValueOnce(mockResponse);
 
     const result = await showForm(basicFormDefinition);
 
-    expect(emitEffect).toHaveBeenCalledWith({
+    expect(emitEffectWithResponse).toHaveBeenCalledWith({
       showForm: {
         form: {
           id: expect.stringMatching(/^form\.\d+$/),
@@ -87,7 +87,7 @@ describe('showForm', () => {
   });
 
   it('should handle form cancellation', async () => {
-    (emitEffect as unknown as Mock).mockResolvedValueOnce(null);
+    (emitEffectWithResponse as unknown as Mock).mockResolvedValueOnce(null);
 
     const result = await showForm(basicFormDefinition);
 
@@ -118,11 +118,13 @@ describe('showForm', () => {
       },
     };
 
-    (emitEffect as unknown as Mock).mockResolvedValueOnce(mockResponse);
+    (emitEffectWithResponse as unknown as Mock).mockResolvedValueOnce(mockResponse);
 
     const result = await showForm(complexFormDefinition);
 
-    expect(emitEffect).toHaveBeenCalledWith(expectedShowFormMessage(complexFormDefinition));
+    expect(emitEffectWithResponse).toHaveBeenCalledWith(
+      expectedShowFormMessage(complexFormDefinition)
+    );
 
     expect(result).toStrictEqual({
       action: 'SUBMITTED',

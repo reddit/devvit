@@ -1,6 +1,6 @@
 import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { ConsentStatus } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { emitEffectWithResponse } from '@devvit/shared-types/client/emit-effect.js';
 
 /**
  * This method is used to check if the app has been granted all the requested scopes.
@@ -46,7 +46,7 @@ export const canRunAsUser = async (): Promise<boolean> => {
     }
   }
 
-  const response = await emitEffect({
+  const response = await emitEffectWithResponse({
     canRunAsUser: {
       postId: devvit.context.postId,
       appSlug: devvit.context.appName,

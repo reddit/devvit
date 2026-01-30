@@ -3,18 +3,18 @@ import {
   ConsentStatus,
   Scope,
 } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { emitEffectWithResponse } from '@devvit/shared-types/client/emit-effect.js';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { mockDevvit } from './helpers/test-helpers.js';
 import { canRunAsUser } from './run-as-user.js';
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
-  emitEffect: vi.fn(),
+  emitEffectWithResponse: vi.fn(),
 }));
 
 function mockEmitEffect(consentStatus: ConsentStatus) {
-  (emitEffect as unknown as Mock).mockResolvedValue({
+  (emitEffectWithResponse as unknown as Mock).mockResolvedValue({
     id: '1',
     consentStatus: { consentStatus },
   });
@@ -29,7 +29,7 @@ describe('canRunAsUser', () => {
   it('should return true if appPermissionState is not available', async () => {
     const result = await canRunAsUser();
     expect(result, 'result').toBe(true);
-    expect(emitEffect).not.toHaveBeenCalled();
+    expect(emitEffectWithResponse).not.toHaveBeenCalled();
   });
 
   it('should return false if consent has been revoked', async () => {
@@ -40,7 +40,7 @@ describe('canRunAsUser', () => {
     };
     const result = await canRunAsUser();
     expect(result, 'result').toBe(false);
-    expect(emitEffect).not.toHaveBeenCalled();
+    expect(emitEffectWithResponse).not.toHaveBeenCalled();
   });
 
   it('should return false if no scopes are requested', async () => {
@@ -51,7 +51,7 @@ describe('canRunAsUser', () => {
     };
     const result = await canRunAsUser();
     expect(result, 'result').toBe(false);
-    expect(emitEffect).not.toHaveBeenCalled();
+    expect(emitEffectWithResponse).not.toHaveBeenCalled();
   });
 
   it('should return true if consent is granted and all scopes are present', async () => {
@@ -62,7 +62,7 @@ describe('canRunAsUser', () => {
     };
     const result = await canRunAsUser();
     expect(result, 'result').toBe(true);
-    expect(emitEffect).not.toHaveBeenCalled();
+    expect(emitEffectWithResponse).not.toHaveBeenCalled();
   });
 
   it('should request consent if consent is granted but scopes are missing', async () => {
@@ -73,7 +73,7 @@ describe('canRunAsUser', () => {
     };
     mockEmitEffect(ConsentStatus.GRANTED);
     const result = await canRunAsUser();
-    expect(emitEffect).toHaveBeenCalledWith({
+    expect(emitEffectWithResponse).toHaveBeenCalledWith({
       type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
       canRunAsUser: {
         postId: globalThis.devvit.context.postId,
@@ -92,7 +92,7 @@ describe('canRunAsUser', () => {
     };
     mockEmitEffect(ConsentStatus.GRANTED);
     const result = await canRunAsUser();
-    expect(emitEffect).toHaveBeenCalledWith({
+    expect(emitEffectWithResponse).toHaveBeenCalledWith({
       type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
       canRunAsUser: {
         postId: globalThis.devvit.context.postId,

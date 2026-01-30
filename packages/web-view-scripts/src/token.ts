@@ -1,6 +1,6 @@
 import type { RequestContext } from '@devvit/protos/json/devvit/platform/v1/request_context.js';
 import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
-import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { emitEffectWithResponse } from '@devvit/shared-types/client/emit-effect.js';
 import type { WebbitToken } from '@devvit/shared-types/webbit.js';
 import { jwtDecode, type JwtPayload } from 'jwt-decode';
 
@@ -39,7 +39,7 @@ export async function refreshToken(): Promise<void> {
 }
 
 export async function requestTokenRefresh(): Promise<void> {
-  const response = await emitEffect({
+  const response = await emitEffectWithResponse({
     type: EffectType.EFFECT_UPDATE_REQUEST_CONTEXT,
     updateRequestContext: {},
   });
