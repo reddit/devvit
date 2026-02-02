@@ -135,9 +135,14 @@ export function getServerEntry(repoRoot: string): string {
     return serverEntry;
   }
 
+  const srcEntry = path.resolve(repoRoot, 'src/index.ts');
+  if (fs.existsSync(srcEntry)) {
+    return srcEntry;
+  }
+
   throw new Error(
     `${chalk.red('✖')} ${chalk.bold('devvit plugin error')}\n\n` +
       `Could not find server entry point.\n` +
-      `Expected ${chalk.cyan('src/api/index.ts')} or ${chalk.cyan('src/server/index.ts')}.\n`
+      `Expected ${chalk.cyan('src/api/index.ts')}, ${chalk.cyan('src/server/index.ts')}, or ${chalk.cyan('src/index.ts')}.\n`
   );
 }
