@@ -13,7 +13,7 @@ export async function waitUntilVersionBuildComplete(
   if (verbose) {
     ux.action.start('App is building remotely');
   }
-  for (let i = 0; i < 10 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
+  for (let i = 0; i < 20 && appVersionInfo.buildStatus === BuildStatus.BUILDING; i++) {
     // version is still building: wait and try again
     await sleep(3000);
     const info = await appVersionClient.Get({ id: appVersionInfo.id });
@@ -27,12 +27,25 @@ export async function waitUntilVersionBuildComplete(
     if (i === 5) {
       command.log(`Your app's taking a while to build - sorry for the delay!`);
     }
+    if (i === 10) {
+      command.log(`Still working on it... thanks for your patience!`);
+    }
+    if (i === 15) {
+      command.log(
+        `This is taking a lot longer than usual. If you had a lot of new assets, that might be why. Giving it a little more time...`
+      );
+    }
   }
   if (verbose) {
     ux.action.stop();
   }
 
   if (appVersionInfo.buildStatus !== BuildStatus.READY) {
+    if (appVersionInfo.buildStatus === BuildStatus.BUILDING) {
+      throw new Error(
+        `Something went wrong: The previous version did not finish building remotely in a timely manner. If you had a lot of new assets, wait a minute and then try again; if not, or if that doesn't help, please reach out to Devvit support.`
+      );
+    }
     throw new Error('Something went wrong: the previous version did not build successfully.');
   }
 }
