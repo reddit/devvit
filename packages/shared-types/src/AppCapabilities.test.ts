@@ -7,12 +7,10 @@ import { expect, test } from 'vitest';
 
 import {
   appCapabilitiesFromActor,
-  appCapabilitiesFromAppVersion,
   appCapabilitiesFromBundle,
   appCapabilitiesFromLinkedBundle,
 } from './AppCapabilities.js';
 
-const ASSET_RESOLVER_PLUGIN = 'devvit.plugin.assetresolver.AssetResolver';
 const MODMAIL_ACTOR = 'devvit.actor.automation.v1alpha.OnModMail';
 
 const ACTORS = [
@@ -56,43 +54,15 @@ const PLUGINS = [
   'devvit.plugin.redditapi.wiki.Wiki',
   'devvit.plugin.scheduler.Scheduler',
   'devvit.plugin.settings.v1alpha.Settings',
-  ASSET_RESOLVER_PLUGIN,
   'devvit.plugin.payments.v1alpha.PaymentsService',
 ];
 
-describe(appCapabilitiesFromAppVersion.name, () => {
-  test('an app with assets', async () => {
-    const version = {
-      actors: [{ types: [], plugins: [{ fullname: ASSET_RESOLVER_PLUGIN }] }],
-      assets: [{ webviewAsset: true }],
-    };
-
-    expect(appCapabilitiesFromAppVersion(version)).toStrictEqual([
-      NutritionCategory.ASSETS,
-      NutritionCategory.MODERATOR,
-      NutritionCategory.WEBVIEW,
-    ]);
-  });
-});
-
 describe(appCapabilitiesFromActor.name, () => {
-  test('an actor with assets', async () => {
-    expect(
-      appCapabilitiesFromActor({
-        actorPlugins: [{ fullname: ASSET_RESOLVER_PLUGIN }],
-        actorTypes: [],
-        hasAssets: true,
-        hasWebView: false,
-      })
-    ).toStrictEqual([NutritionCategory.ASSETS, NutritionCategory.MODERATOR]);
-  });
-
   test('an actor with webview', async () => {
     expect(
       appCapabilitiesFromActor({
         actorPlugins: [],
         actorTypes: [],
-        hasAssets: false,
         hasWebView: true,
       })
     ).toStrictEqual([NutritionCategory.MODERATOR, NutritionCategory.WEBVIEW]);
@@ -103,7 +73,6 @@ describe(appCapabilitiesFromActor.name, () => {
       appCapabilitiesFromActor({
         actorPlugins: PLUGINS.map((fullname) => ({ fullname })),
         actorTypes: ACTORS.map((name) => ({ name })),
-        hasAssets: false,
         hasWebView: false,
       })
     ).toStrictEqual([
@@ -139,24 +108,6 @@ describe(appCapabilitiesFromLinkedBundle.name, () => {
     version: '',
   };
 
-  test('a linked bundle with no provides and only an asset resolver with assets', async () => {
-    const bundle: LinkedBundle = {
-      ...baseLinkedBundle,
-      uses: [
-        {
-          ...baseLinkedBundle,
-          provides: [{ ...baseActorDefinition, fullName: ASSET_RESOLVER_PLUGIN }],
-        },
-      ],
-      assets: { 'foo.gif': 'f4e3cc03-667b-4ab5-9e99-0c030c5648af' },
-    };
-
-    expect(appCapabilitiesFromLinkedBundle(bundle)).toStrictEqual([
-      NutritionCategory.ASSETS,
-      NutritionCategory.MODERATOR,
-    ]);
-  });
-
   test('a linked bundle with no provides and only a webview asset resolver with assets', async () => {
     const bundle: LinkedBundle = {
       ...baseLinkedBundle,
@@ -189,34 +140,6 @@ describe(appCapabilitiesFromLinkedBundle.name, () => {
       NutritionCategory.HTTP,
       NutritionCategory.REDDIT_API,
       NutritionCategory.PAYMENTS,
-      NutritionCategory.MODERATOR,
-    ]);
-  });
-
-  test('a linked bundle with nested linked bundles', async () => {
-    const bundle: LinkedBundle = {
-      ...baseLinkedBundle,
-      uses: [
-        {
-          ...baseLinkedBundle,
-          provides: [
-            { ...baseActorDefinition, fullName: 'devvit.plugin.assetresolver.AssetResolver' },
-          ],
-          uses: [
-            {
-              ...baseLinkedBundle,
-              provides: [
-                { ...baseActorDefinition, fullName: 'devvit.plugin.assetresolver.AssetResolver' },
-              ],
-            },
-          ],
-        },
-      ],
-      assets: { 'foo.gif': 'f4e3cc03-667b-4ab5-9e99-0c030c5648af' },
-    };
-
-    expect(appCapabilitiesFromLinkedBundle(bundle)).toStrictEqual([
-      NutritionCategory.ASSETS,
       NutritionCategory.MODERATOR,
     ]);
   });
@@ -257,29 +180,6 @@ describe(appCapabilitiesFromBundle.name, () => {
       name: '',
       version: '',
     };
-
-  test('a bundle with no provides and only an asset resolver with assets', async () => {
-    const bundle: Bundle = {
-      ...baseBundle,
-      dependencies: {
-        ...baseDependencies,
-        uses: [
-          {
-            ...basePlugin,
-            typeName: ASSET_RESOLVER_PLUGIN,
-          },
-        ],
-      },
-
-      assetIds: { 'foo.gif': 'f4e3cc03-667b-4ab5-9e99-0c030c5648af' },
-      webviewAssetIds: {},
-    };
-
-    expect(appCapabilitiesFromBundle(bundle)).toStrictEqual([
-      NutritionCategory.ASSETS,
-      NutritionCategory.MODERATOR,
-    ]);
-  });
 
   test('a bundle with many provides and uses', async () => {
     const bundle: Bundle = {
