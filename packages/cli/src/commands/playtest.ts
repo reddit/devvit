@@ -80,10 +80,10 @@ export default class Playtest extends DevvitCommand {
       description: 'Debounce time in milliseconds for file changes',
       required: false,
     }),
-    'experimental-direct-upload': Flags.boolean({
-      description: '[Experimental] Use direct upload method',
+    // TODO: Remove completely next release cycle; see DR-231
+    'disable-direct-upload': Flags.boolean({
+      description: 'Disable direct web view asset uploading',
       default: false,
-      hidden: true,
     }),
   } as const;
 
@@ -278,7 +278,7 @@ export default class Playtest extends DevvitCommand {
       const firstVersion = new DevvitVersion(0, 0, 1);
       const appVersionCreator = new AppVersionUploader(this, {
         verbose: Boolean(this.#flags?.verbose),
-        experimentalDirectUpload: this.#flags?.['experimental-direct-upload'],
+        experimentalDirectUpload: !this.#flags?.['disable-direct-upload'],
       });
       const bundles = await this.#bundler.bundle(this.project, {
         name: ACTOR_SRC_PRIMARY_NAME,
@@ -324,7 +324,7 @@ export default class Playtest extends DevvitCommand {
 
       const appVersionCreator = new AppVersionUploader(this, {
         verbose: Boolean(this.#flags?.verbose),
-        experimentalDirectUpload: this.#flags?.['experimental-direct-upload'],
+        experimentalDirectUpload: !this.#flags?.['disable-direct-upload'],
       });
 
       const bundles = await this.#bundler.bundle(this.project, {
@@ -602,7 +602,7 @@ export default class Playtest extends DevvitCommand {
       // 3. create new playtest version:
       const appVersionCreator = new AppVersionUploader(this, {
         verbose: Boolean(this.#flags?.verbose),
-        experimentalDirectUpload: this.#flags?.['experimental-direct-upload'] ?? false,
+        experimentalDirectUpload: !this.#flags?.['disable-direct-upload'],
       });
 
       const appVersionInfo = await appVersionCreator.createVersion(

@@ -113,6 +113,11 @@ export default class Publish extends DevvitCommand {
       required: false,
       exclusive: ['public'],
     }),
+    // TODO: Remove completely next release cycle; see DR-231
+    'disable-direct-upload': Flags.boolean({
+      description: 'Disable direct web view asset uploading',
+      default: false,
+    }),
   } as const;
 
   readonly #appClient = createAppClient();
@@ -230,7 +235,7 @@ export default class Publish extends DevvitCommand {
     try {
       const appVersionUploader = new AppVersionUploader(this, {
         verbose: flags.verbose,
-        experimentalDirectUpload: false,
+        experimentalDirectUpload: !flags['disable-direct-upload'],
       });
 
       if (shouldCreatePlaytestSubreddit) {
