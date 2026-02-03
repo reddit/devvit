@@ -1,5 +1,7 @@
 import { WebViewInternalMessageScope } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
+import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
 import { webViewInternalMessageType } from '@devvit/shared-types/client/emit-effect.js';
+import type { WebbitToken } from '@devvit/shared-types/webbit.js';
 import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
 
@@ -10,6 +12,18 @@ type EventListenerMock = Mock<(type: string, listener: (event: unknown) => void)
 const addEventListenerMock: EventListenerMock = vi.fn();
 const docAddEventListenerMock: EventListenerMock = vi.fn();
 const postMessageMock: EventListenerMock = vi.fn();
+
+const createMockDevvit = (): DevvitGlobal => ({
+  context: {} as DevvitGlobal['context'],
+  dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
+  entrypoints: {},
+  share: undefined,
+  appPermissionState: undefined,
+  token: '' as WebbitToken,
+  webViewMode: undefined,
+  startTime: 1717171717171,
+  refreshToken: undefined,
+});
 
 beforeEach(() => {
   globalThis.addEventListener = addEventListenerMock as unknown as typeof addEventListener;
@@ -175,6 +189,199 @@ it('sends load analytics on window load', async () => {
     },
     '*'
   );
+});
+
+describe('performance monitoring', () => {
+  // Capture callbacks by entry type since multiple observers are created
+  const observerCallbacks: Record<string, (list: PerformanceObserverEntryList) => void> = {};
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Object.keys(observerCallbacks).forEach((key) => delete observerCallbacks[key]);
+
+    globalThis.devvit = createMockDevvit();
+
+    // Add window.addEventListener mock for performance monitoring
+    (globalThis as { window: Window }).window = {
+      getComputedStyle: () => {},
+      addEventListener: addEventListenerMock,
+    } as unknown as Window;
+
+    // Mock PerformanceObserver on globalThis - capture callbacks by entry type
+    (globalThis as unknown as { PerformanceObserver: unknown }).PerformanceObserver =
+      class MockPerformanceObserver {
+        #callback: (list: PerformanceObserverEntryList) => void;
+
+        constructor(callback: (list: PerformanceObserverEntryList) => void) {
+          this.#callback = callback;
+        }
+        observe(options: { entryTypes: string[] }) {
+          // Store callback by entry type for later triggering
+          options.entryTypes.forEach((type) => {
+            observerCallbacks[type] = this.#callback;
+          });
+        }
+        disconnect() {}
+        static supportedEntryTypes = ['paint', 'longtask'];
+      };
+
+    // Default mock for performance.getEntriesByType - needed because measureTti runs during init
+    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
+      if (type === 'navigation') {
+        return [
+          {
+            requestStart: 100,
+            responseStart: 200,
+            domInteractive: 300,
+            loadEventEnd: 400,
+          } as PerformanceNavigationTiming,
+        ];
+      }
+      return [];
+    });
+
+    initAnalytics();
+  });
+
+  it('captures ttfb metric', async () => {
+    // Stub performance.getEntriesByType for navigation timing
+    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
+      if (type === 'navigation') {
+        return [
+          {
+            requestStart: 100,
+            responseStart: 200,
+            domInteractive: 300,
+            loadEventEnd: 400,
+          } as PerformanceNavigationTiming,
+        ];
+      }
+      return [];
+    });
+
+    // Trigger ALL load handlers (initLoadedEvent and initPerformanceMonitoring both register load handlers)
+    const loadHandlers = addEventListenerMock.mock.calls
+      .filter((call) => call[0] === 'load')
+      .map((call) => call[1]);
+    loadHandlers.forEach((handler) => handler?.({}));
+
+    expect(postMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: WebViewInternalMessageScope.CLIENT,
+        type: webViewInternalMessageType,
+        telemetry: {
+          metrics: {
+            metrics: expect.arrayContaining([
+              {
+                spanName: 'web_view_time_to_first_byte',
+                timeStart: 1717171717171 + 100,
+                timeEnd: 1717171717171 + 200,
+              },
+            ]),
+          },
+        },
+      }),
+      '*'
+    );
+  });
+
+  it('captures fcp metric', async () => {
+    const paintEntry = {
+      name: 'first-contentful-paint',
+      startTime: 300,
+    } as PerformancePaintTiming;
+
+    // Stub performance.getEntriesByType for paint AND navigation entries
+    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
+      if (type === 'paint') {
+        return [paintEntry];
+      }
+      if (type === 'navigation') {
+        return [
+          {
+            requestStart: 100,
+            responseStart: 200,
+            domInteractive: 300,
+            loadEventEnd: 400,
+          } as PerformanceNavigationTiming,
+        ];
+      }
+      return [];
+    });
+
+    // Trigger the paint PerformanceObserver callback with mock FCP entry
+    observerCallbacks['paint']?.({
+      getEntries: () => [paintEntry],
+    } as PerformanceObserverEntryList);
+
+    // Trigger ALL load handlers to emit metrics
+    const loadHandlers = addEventListenerMock.mock.calls
+      .filter((call) => call[0] === 'load')
+      .map((call) => call[1]);
+    loadHandlers.forEach((handler) => handler?.({}));
+
+    expect(postMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: WebViewInternalMessageScope.CLIENT,
+        type: webViewInternalMessageType,
+        telemetry: {
+          metrics: {
+            metrics: expect.arrayContaining([
+              {
+                spanName: 'web_view_first_contentful_paint',
+                timeStart: 1717171717171,
+                timeEnd: 1717171717171 + 300,
+              },
+            ]),
+          },
+        },
+      }),
+      '*'
+    );
+  });
+
+  it('captures tti metric', async () => {
+    // Mock getEntriesByType for navigation
+    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
+      if (type === 'navigation') {
+        return [
+          {
+            requestStart: 100,
+            responseStart: 200,
+            domInteractive: 300,
+            loadEventEnd: 400,
+          } as PerformanceNavigationTiming,
+        ];
+      }
+      return [];
+    });
+
+    // Trigger ALL load handlers to emit metrics (TTI is captured during init since document.readyState !== 'loading')
+    const loadHandlers = addEventListenerMock.mock.calls
+      .filter((call) => call[0] === 'load')
+      .map((call) => call[1]);
+    loadHandlers.forEach((handler) => handler?.({}));
+
+    // TTI timeEnd = timeStart + domInteractive (domInteractive = 300)
+    expect(postMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: WebViewInternalMessageScope.CLIENT,
+        type: webViewInternalMessageType,
+        telemetry: {
+          metrics: {
+            metrics: expect.arrayContaining([
+              {
+                spanName: 'web_view_time_to_interactive',
+                timeStart: 1717171717171,
+                timeEnd: 1717171717171 + 300,
+              },
+            ]),
+          },
+        },
+      }),
+      '*'
+    );
+  });
 });
 
 const renderDom = (htmlFragment: string): HTMLElement => {
