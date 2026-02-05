@@ -81,8 +81,6 @@ function resolveBuildRoots(
  * Vite plugin for Devvit apps.
  *
  * Automatically builds your client and server together using the Vite Environment API.
- *
- * @experimental
  */
 export function devvit(opts: DevvitPluginOptions = {}): Plugin {
   let isWatchMode = false;

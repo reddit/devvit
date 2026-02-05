@@ -125,13 +125,11 @@ export type AppDevConfig = {
   subreddit?: string;
 };
 
-/** @experimental */
 export type AppScriptsConfig = {
-  /** @experimental */
   dev?: string;
-  /** @experimental */
   build?: string;
 };
+
 export type AppSchedulerConfig = {
   tasks: { [name: string]: AppSchedulerTaskConfig };
 };

@@ -313,8 +313,6 @@ const setup = (
  * test('mod action works', async ({ config, headers }) => {
  *   // ...
  * });
- *
- * @experimental
  */
 export const createDevvitTest = (config: DevvitTestConfig = {}): TestAPI<DevvitFixtures> => {
   return createWrappedTestApi(baseTest, () => setup(config)) as TestAPI<DevvitFixtures>;
