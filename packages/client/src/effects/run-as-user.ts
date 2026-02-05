@@ -6,9 +6,15 @@ import { emitEffectWithResponse } from '@devvit/shared-types/client/emit-effect.
  * This method is used to check if the app has been granted all the requested scopes.
  *
  * @experimental
+ * @param event The event that triggered the request, must be a trusted event.
  * @returns true if the app has been granted all the requested scopes, false otherwise.
  */
-export const canRunAsUser = async (): Promise<boolean> => {
+export const canRunAsUser = async (event: Event): Promise<boolean> => {
+  if (!event.isTrusted) {
+    console.error('CanRunAsUser effect ignored due to untrusted event');
+    throw new Error('Untrusted event');
+  }
+
   const appPermissionState = devvit.appPermissionState;
 
   if (!appPermissionState) {

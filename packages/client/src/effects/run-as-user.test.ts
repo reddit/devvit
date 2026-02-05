@@ -20,6 +20,10 @@ function mockEmitEffect(consentStatus: ConsentStatus) {
   });
 }
 
+const mockEvent = {
+  isTrusted: true,
+} as unknown as Event;
+
 describe('canRunAsUser', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -27,7 +31,7 @@ describe('canRunAsUser', () => {
   });
 
   it('should return true if appPermissionState is not available', async () => {
-    const result = await canRunAsUser();
+    const result = await canRunAsUser(mockEvent);
     expect(result, 'result').toBe(true);
     expect(emitEffectWithResponse).not.toHaveBeenCalled();
   });
@@ -38,7 +42,7 @@ describe('canRunAsUser', () => {
       requestedScopes: [],
       grantedScopes: [],
     };
-    const result = await canRunAsUser();
+    const result = await canRunAsUser(mockEvent);
     expect(result, 'result').toBe(false);
     expect(emitEffectWithResponse).not.toHaveBeenCalled();
   });
@@ -49,7 +53,7 @@ describe('canRunAsUser', () => {
       requestedScopes: [],
       grantedScopes: [],
     };
-    const result = await canRunAsUser();
+    const result = await canRunAsUser(mockEvent);
     expect(result, 'result').toBe(false);
     expect(emitEffectWithResponse).not.toHaveBeenCalled();
   });
@@ -60,8 +64,19 @@ describe('canRunAsUser', () => {
       requestedScopes: [Scope.SUBMIT_COMMENT, Scope.SUBMIT_POST],
       grantedScopes: [Scope.SUBMIT_COMMENT, Scope.SUBMIT_POST],
     };
-    const result = await canRunAsUser();
+    const result = await canRunAsUser(mockEvent);
     expect(result, 'result').toBe(true);
+    expect(emitEffectWithResponse).not.toHaveBeenCalled();
+  });
+
+  it('should throw if event is not trusted even if consent is already granted', async () => {
+    globalThis.devvit.appPermissionState = {
+      consentStatus: ConsentStatus.GRANTED,
+      requestedScopes: [Scope.SUBMIT_COMMENT],
+      grantedScopes: [Scope.SUBMIT_COMMENT],
+    };
+    const untrustedEvent = { isTrusted: false } as unknown as Event;
+    await expect(canRunAsUser(untrustedEvent)).rejects.toThrow('Untrusted event');
     expect(emitEffectWithResponse).not.toHaveBeenCalled();
   });
 
@@ -72,7 +87,7 @@ describe('canRunAsUser', () => {
       grantedScopes: [Scope.SUBMIT_COMMENT, Scope.SUBMIT_POST],
     };
     mockEmitEffect(ConsentStatus.GRANTED);
-    const result = await canRunAsUser();
+    const result = await canRunAsUser(mockEvent);
     expect(emitEffectWithResponse).toHaveBeenCalledWith({
       type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
       canRunAsUser: {
@@ -91,7 +106,7 @@ describe('canRunAsUser', () => {
       grantedScopes: [],
     };
     mockEmitEffect(ConsentStatus.GRANTED);
-    const result = await canRunAsUser();
+    const result = await canRunAsUser(mockEvent);
     expect(emitEffectWithResponse).toHaveBeenCalledWith({
       type: 11 satisfies EffectType.EFFECT_CAN_RUN_AS_USER,
       canRunAsUser: {
@@ -110,7 +125,7 @@ describe('canRunAsUser', () => {
       grantedScopes: [],
     };
     mockEmitEffect(ConsentStatus.REVOKED);
-    const result = await canRunAsUser();
+    const result = await canRunAsUser(mockEvent);
     expect(result, 'result').toBe(false);
   });
 });
