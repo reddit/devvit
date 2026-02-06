@@ -1166,7 +1166,7 @@ export class RedditAPIClient {
 
   /**
    * Sends a private message to a user on behalf of a subreddit.
-   *
+   * @deprecated No longer working as expected. Use {@link modMail.createConversation} with `isAuthorHidden: true` instead
    * @param options - The options for sending the message as a subreddit.
    * @returns A Promise that resolves if the private message was successfully sent.
    */
