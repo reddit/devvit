@@ -5,16 +5,8 @@ export type ProjectTemplateInfo = {
   url: string;
   /** Optional field to hide the template from all listings */
   hidden?: boolean;
-  overrides?: {
-    [key in ProjectTemplateOverrides]?: Partial<Omit<ProjectTemplateInfo, 'overrides'>>;
-  };
   category?: ProjectTemplateCategory;
 };
-
-export enum ProjectTemplateOverrides {
-  CLI = 'cli',
-  New = 'new',
-}
 
 export enum ProjectTemplateCategory {
   Web = 'web',
