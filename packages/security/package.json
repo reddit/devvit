@@ -1,6 +1,6 @@
 {
   "name": "@devvit/security",
-  "version": "0.12.11",
+  "version": "0.12.12",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -30,11 +30,11 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/public-api": "0.12.11",
-    "@devvit/shared-types": "0.12.11"
+    "@devvit/public-api": "0.12.12",
+    "@devvit/shared-types": "0.12.12"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.11",
+    "@devvit/tsconfig": "0.12.12",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "4.0.15"

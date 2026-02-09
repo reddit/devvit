@@ -1,11 +1,11 @@
 {
   "private": true,
   "name": "comment-nuke",
-  "version": "0.12.11",
+  "version": "0.12.12",
   "license": "BSD-3-Clause",
   "type": "module",
   "dependencies": {
-    "@devvit/public-api": "0.12.11"
+    "@devvit/public-api": "0.12.12"
   },
   "devDependencies": {
     "typescript": "5.8.3"
