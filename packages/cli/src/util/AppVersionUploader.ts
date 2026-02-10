@@ -13,28 +13,22 @@ import type { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { ux } from '@oclif/core';
 import { default as glob } from 'tiny-glob';
 
-import { AssetUploader, type SyncAssetsResult } from './AssetUploader.js';
+import { AssetUploader } from './AssetUploader.js';
 import { createAppVersionClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
 import { decodeAsUtf8, decodeAsUtf16 } from './encodings.js';
-import { ExperimentalAssetUploader } from './ExperimentalAssetUploader.js';
 import { getPaymentsConfig, type JSONProduct, readProducts } from './payments/paymentsConfig.js';
 import { handleTwirpError } from './twirp-error-handler.js';
 
 export class AppVersionUploader {
   readonly #cmd: DevvitCommand;
   readonly #verbose: boolean;
-  readonly #experimentalDirectUpload: boolean;
 
   readonly #appVersionClient = createAppVersionClient();
 
-  constructor(
-    cmd: DevvitCommand,
-    { verbose, experimentalDirectUpload }: { verbose: boolean; experimentalDirectUpload: boolean }
-  ) {
+  constructor(cmd: DevvitCommand, { verbose }: { verbose: boolean }) {
     this.#cmd = cmd;
     this.#verbose = verbose;
-    this.#experimentalDirectUpload = experimentalDirectUpload;
   }
 
   async createVersion(
@@ -51,18 +45,10 @@ export class AppVersionUploader {
     const about = await this.#getReadmeContent();
 
     // Sync and upload assets
-    let syncAssetsResult: SyncAssetsResult;
-    if (this.#experimentalDirectUpload) {
-      const assetUploader = new ExperimentalAssetUploader(this.#cmd, appInfo.appSlug, {
-        verbose: this.#verbose,
-      });
-      syncAssetsResult = await assetUploader.syncAssets();
-    } else {
-      const assetUploader = new AssetUploader(this.#cmd, appInfo.appSlug, {
-        verbose: this.#verbose,
-      });
-      syncAssetsResult = await assetUploader.syncAssets();
-    }
+    const assetUploader = new AssetUploader(this.#cmd, appInfo.appSlug, {
+      verbose: this.#verbose,
+    });
+    const syncAssetsResult = await assetUploader.syncAssets();
 
     let products: JSONProduct[] | undefined;
 

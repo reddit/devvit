@@ -20,32 +20,44 @@ import {
   ASSET_UPLOAD_BATCH_SIZE,
   ICON_FILE_PATH,
 } from '@devvit/shared-types/constants.js';
+import { mapAsyncWithMaxConcurrency } from '@devvit/shared-types/mapAsyncWithMaxConcurrency.js';
 import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { ux } from '@oclif/core';
 import { createHash } from 'crypto';
 import { fileTypeFromBuffer } from 'file-type';
 import { imageSize } from 'image-size';
 import { JSDOM } from 'jsdom';
+import { lookup } from 'mime-types';
 import { default as tinyglob } from 'tiny-glob';
 
 import { createAppClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
 import { dirExists } from './files.js';
+import { retryAsync } from './retryAsync.js';
 
 export const DEVVIT_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
+const DEFAULT_PARALLEL_UPLOADS = 7;
+
+let PARALLEL_UPLOADS = parseInt(process.env['DEVVIT_PARALLEL_UPLOADS'] || '0');
+if (isNaN(PARALLEL_UPLOADS) || PARALLEL_UPLOADS < 1) {
+  PARALLEL_UPLOADS = DEFAULT_PARALLEL_UPLOADS;
+}
 
 type MediaSignatureWithContents = MediaSignature & {
   contents: Uint8Array;
 };
 
-export type SyncAssetsResult = {
+type MediaSignatureWithContentsAndUploadInfo = MediaSignatureWithContents & {
+  uploadUrl: string;
+  uploadHeaders: { [key: string]: string };
+};
+
+type SyncAssetsResult = {
   assetMap: AssetMap | undefined;
   webViewAssetMap: AssetMap | undefined;
   iconAsset: string | undefined;
 };
 
-// TODO: Delete this, or ExperimentalAssetUploader, once we've tested that fully and are either
-//  happy with it or give up on it.
 export class AssetUploader {
   readonly #cmd: DevvitCommand;
   readonly #verbose: boolean;
@@ -60,7 +72,9 @@ export class AssetUploader {
     this.#cmd = cmd;
     this.#verbose = verbose;
     this.#appSlug = appSlug;
-    if (this.#skipWebViewScriptInjection) console.info('Skipping web view script injection.');
+    if (this.#skipWebViewScriptInjection) {
+      this.#cmd.log('Skipping web view script injection.');
+    }
   }
 
   /**
@@ -149,10 +163,13 @@ export class AssetUploader {
       );
     }
 
-    // regular assets go to Media Service
-    const assetMap = await this.#processRegularAssets(regularAssets);
-    // webroot assets go to WebView storage
-    const webViewAssetMap = await this.#processWebViewAssets(webViewAssets);
+    // We can parallelize this now, since regular vs webview assets go to different places
+    const [assetMap, webViewAssetMap] = await Promise.all([
+      // regular assets go to Media Service
+      this.#processRegularAssets(regularAssets),
+      // webroot assets go to WebView storage
+      this.#processWebViewAssets(webViewAssets),
+    ]);
 
     const retval: SyncAssetsResult = { assetMap, webViewAssetMap, iconAsset: undefined };
     if (iconAssetDetails) {
@@ -244,7 +261,7 @@ export class AssetUploader {
     if (this.#verbose) {
       ux.action.start(`Checking for new assets to upload`);
     }
-    const assetMap = await this.#uploadNewAssets(assets);
+    const assetMap = await this.#uploadNewMediaAssets(assets);
     if (this.#verbose) {
       ux.action.stop(`Found ${assets.length} new asset${assets.length === 1 ? '' : 's'}.`);
     }
@@ -262,17 +279,14 @@ export class AssetUploader {
       ux.action.start(`Checking for new WebView assets to upload`);
     }
 
-    const assetMap = await this.#uploadNewAssets(assets, true);
+    const assetMap = await this.#uploadNewWebViewAssets(assets);
     if (this.#verbose) {
       ux.action.stop(`Found ${assets.length} new WebView asset${assets.length === 1 ? '' : 's'}.`);
     }
     return assetMap;
   }
 
-  async #uploadNewAssets(
-    assets: MediaSignatureWithContents[],
-    webViewAsset: boolean = false
-  ): Promise<AssetMap> {
+  async #uploadNewMediaAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
     const { statuses } = await this.#appClient.CheckIfMediaExists({
       id: undefined,
       slug: this.#appSlug,
@@ -280,15 +294,14 @@ export class AssetUploader {
         size: a.size,
         hash: a.hash,
         filePath: a.filePath,
-        isWebviewAsset: webViewAsset,
+        isWebviewAsset: false,
       })),
     });
 
-    const webViewMsg = webViewAsset ? 'WebView ' : '';
     const { newAssets, duplicateAssets, existingAssets } = await this.#mapAssets(assets, statuses);
     if (this.#verbose) {
-      ux.action.start(`Checking for new ${webViewMsg}assets`);
-      ux.info(`Found ${assets.length} ${webViewMsg}assets (${newAssets.length} unique new assets)`);
+      ux.action.start(`Checking for new assets`);
+      ux.info(`Found ${assets.length} assets (${newAssets.length} unique new assets)`);
       ux.info('New assets:');
       newAssets.forEach((asset) => {
         ux.info(` · ${asset.filePath}`);
@@ -317,7 +330,7 @@ export class AssetUploader {
 
     // Upload everything, giving back pairs of the assets & their upload response
     if (this.#verbose) {
-      ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining`);
+      ux.action.start(`Uploading new assets, ${newAssets.length} remaining`);
     }
     let uploadResults: [MediaSignatureWithContents, UploadNewMediaResponse][] = [];
     try {
@@ -336,7 +349,7 @@ export class AssetUploader {
                   size: f.size,
                   hash: f.hash,
                   contents: f.contents,
-                  webviewAsset: webViewAsset,
+                  webviewAsset: false,
                   filePath: f.filePath,
                 }),
               ] as [MediaSignatureWithContents, UploadNewMediaResponse];
@@ -344,30 +357,22 @@ export class AssetUploader {
           )),
         ];
         if (this.#verbose) {
-          ux.action.start(`Uploading new ${webViewMsg}assets, ${newAssets.length} remaining`);
+          ux.action.start(`Uploading new assets, ${newAssets.length} remaining`);
         }
       }
     } catch (err) {
       const error = err as Error;
-      const msg = `Failed to upload ${webViewMsg}assets. (${error.message})`;
+      const msg = `Failed to upload assets. (${error.message})`;
       if (this.#verbose) {
         ux.action.stop(msg);
       }
 
       this.#cmd.log(msg);
-
-      if (webViewAsset) {
-        ux.action.stop(msg);
-        // don't fail on WebView uploads in case we just don't have the feature enabled
-        return {};
-      } else {
-        // otherwise exit
-        ux.error(msg, { exit: 1 });
-      }
+      ux.error(msg, { exit: 1 });
     }
 
     if (this.#verbose) {
-      ux.action.stop(`New ${webViewMsg}assets uploaded.`);
+      ux.action.stop(`New assets uploaded.`);
     }
 
     return assets.reduce<{ [asset: string]: string }>((map, asset) => {
@@ -383,6 +388,115 @@ export class AssetUploader {
     }, assetMap);
   }
 
+  async #uploadNewWebViewAssets(assets: MediaSignatureWithContents[]): Promise<AssetMap> {
+    const { statuses } = await this.#appClient.CheckIfMediaExists({
+      id: undefined,
+      slug: this.#appSlug,
+      signatures: await Promise.all(
+        assets.map(
+          retryAsync(async (a) => {
+            const fileType = await fileTypeFromBuffer(a.contents);
+            return {
+              size: a.size,
+              hash: a.hash,
+              filePath: a.filePath,
+              isWebviewAsset: true,
+              mimeType: fileType?.mime ?? (lookup(a.filePath) || 'application/octet-stream'),
+            };
+          })
+        )
+      ),
+    });
+
+    const { newAssets, duplicateAssets, existingAssets } = await this.#mapAssets(
+      assets,
+      statuses,
+      true
+    );
+    if (this.#verbose) {
+      ux.action.start(`Checking for new WebView assets`);
+      ux.info(`Found ${assets.length} WebView assets (${newAssets.length} unique new assets)`);
+      ux.info('New assets:');
+      newAssets.forEach((asset) => {
+        ux.info(` · ${asset.filePath}`);
+      });
+      ux.info('Duplicates of another asset already listed as new:');
+      duplicateAssets.forEach((asset) => {
+        ux.info(` · ${asset.filePath}`);
+      });
+      ux.info('Existing assets:');
+      Object.entries(existingAssets).forEach(([path, id]) => {
+        ux.info(` · ${path} (id: ${id})`);
+      });
+    }
+
+    const assetMap: AssetMap = existingAssets;
+
+    if (newAssets.length === 0) {
+      if (this.#verbose) {
+        ux.action.stop(`None found!`);
+      }
+      return assetMap;
+    }
+    if (this.#verbose) {
+      ux.action.stop();
+    }
+
+    // Upload everything, giving back pairs of the assets & their upload response
+    let assetsRemaining = newAssets.length;
+    let sizeRemaining = newAssets.reduce((sum, a) => sum + a.size, 0);
+    const updateUploadMsg = (sizeUploaded: number) => {
+      sizeRemaining -= sizeUploaded;
+      assetsRemaining -= 1;
+      ux.action.start(
+        `Uploading new WebView assets, ${assetsRemaining} remaining (${prettyPrintSize(sizeRemaining)})`
+      );
+    };
+    ux.action.start(
+      `Uploading new WebView assets, ${assetsRemaining} remaining (${prettyPrintSize(sizeRemaining)})`
+    );
+
+    await mapAsyncWithMaxConcurrency(
+      newAssets,
+      async (newAsset) => {
+        try {
+          const resp = await fetch(newAsset.uploadUrl, {
+            method: 'PUT',
+            body: newAsset.contents,
+            headers: newAsset.uploadHeaders,
+          });
+          if (!resp.ok) {
+            const body = await resp.text();
+            const msg = `Failed to upload WebView asset ${newAsset.filePath} - HTTP ${resp.status}:\n${body}`;
+            ux.action.stop(msg);
+
+            this.#cmd.error(msg);
+          }
+        } catch (e) {
+          const error = e as Error;
+          let errorMessage = error?.message;
+          if (errorMessage === 'fetch failed') {
+            // This is the most common, and least helpful error message. And it usually has a useful
+            // cause, so go get that instead.
+            errorMessage = (error.cause as Error)?.message || error.message;
+          }
+          const msg = `Failed to upload WebView asset ${newAsset.filePath}: ${errorMessage}`;
+          this.#cmd.error(msg);
+        }
+
+        const uploadUrl = new URL(newAsset.uploadUrl);
+        assetMap[newAsset.filePath] = uploadUrl.origin + uploadUrl.pathname;
+        updateUploadMsg(newAsset.size);
+      },
+      PARALLEL_UPLOADS
+    );
+
+    ux.action.stop(`${newAssets.length} new WebView assets uploaded.`);
+    ux.action.start(`Finishing upload`);
+
+    return assetMap;
+  }
+
   /**
    * Map assets into groups based on their server status:
    * - new assets
@@ -391,15 +505,34 @@ export class AssetUploader {
    */
   async #mapAssets(
     assets: MediaSignatureWithContents[],
-    statuses: MediaSignatureStatus[]
+    statuses: MediaSignatureStatus[],
+    areWebviewAssets?: false
   ): Promise<{
     newAssets: MediaSignatureWithContents[];
+    duplicateAssets: MediaSignatureWithContents[];
+    existingAssets: AssetMap;
+  }>;
+  async #mapAssets(
+    assets: MediaSignatureWithContents[],
+    statuses: MediaSignatureStatus[],
+    areWebviewAssets: true
+  ): Promise<{
+    newAssets: MediaSignatureWithContentsAndUploadInfo[];
+    duplicateAssets: MediaSignatureWithContents[];
+    existingAssets: AssetMap;
+  }>;
+  async #mapAssets(
+    assets: MediaSignatureWithContents[],
+    statuses: MediaSignatureStatus[],
+    areWebviewAssets: boolean = false
+  ): Promise<{
+    newAssets: (MediaSignatureWithContents | MediaSignatureWithContentsAndUploadInfo)[];
     duplicateAssets: MediaSignatureWithContents[];
     existingAssets: AssetMap;
   }> {
     const assetsByFilePath = Object.fromEntries(assets.map((a) => [a.filePath, a]));
 
-    const newAssets: MediaSignatureWithContents[] = [];
+    const newAssets: (MediaSignatureWithContents | MediaSignatureWithContentsAndUploadInfo)[] = [];
     const duplicateAssets: MediaSignatureWithContents[] = [];
     const existingAssets: AssetMap = {};
     statuses.forEach((status) => {
@@ -415,14 +548,27 @@ export class AssetUploader {
         if (newAssets.find((a) => a.hash === asset.hash && a.size === asset.size)) {
           duplicateAssets.push(asset);
         } else {
-          newAssets.push(asset);
+          if (!areWebviewAssets) {
+            newAssets.push(asset);
+            return;
+          }
+          if (!status.uploadUrl) {
+            throw new Error(
+              `Backend didn't return an upload URL for new webview asset ${status.filePath} - this shouldn't happen, contact us!`
+            );
+          }
+          newAssets.push({
+            ...asset,
+            uploadUrl: status.uploadUrl,
+            uploadHeaders: status.uploadHeaders,
+          });
         }
       } else {
         if (status.existingMediaId) {
           existingAssets[asset.filePath] = status.existingMediaId;
         } else {
           throw new Error(
-            `Backend doesn't have an ID for ${status.filePath} but says it isn't new..?`
+            `Backend doesn't have an ID for ${status.filePath} but says it isn't new..? This shouldn't happen, contact the Devvit team!`
           );
         }
       }
