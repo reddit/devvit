@@ -68,7 +68,7 @@ export default class Publish extends DevvitCommand {
 
   static override flags = {
     bump: Flags.custom<VersionBumpType>({
-      description: 'Type of version bump (major|minor|patch|prerelease). Minor by default.',
+      description: 'Type of version bump (major|minor|patch). Patch by default.',
       required: false,
       options: [
         VersionBumpType.Major,
@@ -79,7 +79,8 @@ export default class Publish extends DevvitCommand {
       exclusive: ['version'],
     })(),
     version: Flags.custom<DevvitVersion>({
-      description: 'Explicit version number (e.g: 1.0.1)',
+      description:
+        'Explicit version number (e.g: 1.0.1). Note that prerelease versions are not allowed to be published.',
       required: false,
       multiple: false,
       parse: async (version) => {
@@ -526,7 +527,7 @@ export default class Publish extends DevvitCommand {
     if (bump) {
       appVersion.bumpVersion(bump);
     } else {
-      appVersion.bumpVersion(VersionBumpType.Minor);
+      appVersion.bumpVersion(VersionBumpType.Patch);
       this.log('Automatically bumped app version to:', appVersion.toString());
     }
 
