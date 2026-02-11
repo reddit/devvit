@@ -34,6 +34,7 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@devvit/analytics": "0.12.12",
     "@devvit/media": "0.12.12",
     "@devvit/notifications": "0.12.12",
     "@devvit/protos": "0.12.12",

@@ -2,6 +2,7 @@ import '@devvit/shared-types/polyfill/fetch.polyfill.js';
 
 import { randomUUID } from 'node:crypto';
 
+import { TelemetryMock } from '@devvit/analytics/server/reddit/test';
 import { MediaMock } from '@devvit/media/test';
 import { NotificationsMock } from '@devvit/notifications/test';
 // eslint-disable-next-line no-restricted-imports
@@ -18,6 +19,8 @@ import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/red
 import { SchedulerDefinition } from '@devvit/protos/types/devvit/plugin/scheduler/scheduler.js';
 // eslint-disable-next-line no-restricted-imports
 import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
+// eslint-disable-next-line no-restricted-imports
+import { TelemetryPluginDefinition } from '@devvit/protos/types/devvit/plugin/telemetry/telemetry.js';
 import { RealtimeMock } from '@devvit/realtime/server/test';
 import { RedditPluginMock } from '@devvit/reddit/test';
 import { RedisMock } from '@devvit/redis/test';
@@ -102,6 +105,7 @@ export type DevvitFixtures = {
     settings: SettingsMock;
     scheduler: SchedulerMock;
     notifications: NotificationsMock;
+    telemetry: TelemetryMock;
   };
 };
 
@@ -252,6 +256,7 @@ const setup = (
   const settingsMock = new SettingsMock(settings);
   const schedulerMock = new SchedulerMock();
   const notificationsMock = new NotificationsMock();
+  const telemetryMock = new TelemetryMock();
 
   // Seed default context data so helpers like getCurrentUser/subreddit work.
   redditMock.users.addUser({ id: userId, name: username });
@@ -270,6 +275,7 @@ const setup = (
       [SettingsDefinition.fullName]: settingsMock.plugin,
       [SchedulerDefinition.fullName]: schedulerMock.plugin,
       [NotificationsDefinition.fullName]: notificationsMock.plugin,
+      [TelemetryPluginDefinition.fullName]: telemetryMock.plugin,
       ...redditMock.getPluginRegistrations(),
     },
   });
@@ -295,6 +301,7 @@ const setup = (
       settings: settingsMock,
       scheduler: schedulerMock,
       notifications: notificationsMock,
+      telemetry: telemetryMock,
     },
   };
 
