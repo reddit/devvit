@@ -240,16 +240,16 @@ describe('NotificationsMock', () => {
 
   it('should handle badges', async () => {
     const mock = new NotificationsMock();
-    await mock.plugin.ShowGamesDrawerBadge({ post: 't3_post' });
+    await mock.plugin.ShowGameBadge({ post: 't3_post' });
     expect(mock.getActiveBadge()?.post).toBe('t3_post');
 
-    const status = await mock.plugin.GetGamesDrawerBadgeStatus({});
+    const status = await mock.plugin.GetGameBadgeStatus({});
     expect(status.hasActiveBadge).toBe(true);
 
-    await mock.plugin.DismissGamesDrawerBadge({});
+    await mock.plugin.DismissGameBadge({});
     expect(mock.getActiveBadge()).toBeUndefined();
 
-    const status2 = await mock.plugin.GetGamesDrawerBadgeStatus({});
+    const status2 = await mock.plugin.GetGameBadgeStatus({});
     expect(status2.hasActiveBadge).toBe(false);
   });
 

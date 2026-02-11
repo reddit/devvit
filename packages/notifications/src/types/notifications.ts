@@ -51,7 +51,7 @@ export type ListOptedInUsersResponse = {
   next?: string | undefined;
 };
 
-export type ShowGamesDrawerBadgeRequest = {
+export type ShowGameBadgeRequest = {
   /** The fullname of a post (e.g., "t3_abc123") */
   post: T3;
   /** The expiration time of the badge */

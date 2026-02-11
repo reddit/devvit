@@ -1,11 +1,11 @@
 import { type Metadata } from '@devvit/protos';
 import {
-  type DismissGamesDrawerBadgeRequest,
-  type DismissGamesDrawerBadgeResponse,
-  type GetGamesDrawerBadgeStatusRequest,
-  type GetGamesDrawerBadgeStatusResponse,
-  type ShowGamesDrawerBadgeRequest,
-  type ShowGamesDrawerBadgeResponse,
+  type DismissGameBadgeRequest,
+  type DismissGameBadgeResponse,
+  type GetGameBadgeStatusRequest,
+  type GetGameBadgeStatusResponse,
+  type ShowGameBadgeRequest,
+  type ShowGameBadgeResponse,
 } from '@devvit/protos/types/devvit/plugin/notifications/gamesdrawerbadge_msg.js';
 import type { Notifications } from '@devvit/protos/types/devvit/plugin/notifications/notifications_svc.js';
 import {
@@ -180,28 +180,28 @@ export class NotificationsPluginMock implements Notifications {
     };
   }
 
-  async ShowGamesDrawerBadge(
-    request: ShowGamesDrawerBadgeRequest,
+  async ShowGameBadge(
+    request: ShowGameBadgeRequest,
     _metadata?: Metadata
-  ): Promise<ShowGamesDrawerBadgeResponse> {
+  ): Promise<ShowGameBadgeResponse> {
     this._store.badge = {
       post: T3(request.post),
     };
     return { success: true };
   }
 
-  async DismissGamesDrawerBadge(
-    _request: DismissGamesDrawerBadgeRequest,
+  async DismissGameBadge(
+    _request: DismissGameBadgeRequest,
     _metadata?: Metadata
-  ): Promise<DismissGamesDrawerBadgeResponse> {
+  ): Promise<DismissGameBadgeResponse> {
     this._store.badge = undefined;
     return { success: true };
   }
 
-  async GetGamesDrawerBadgeStatus(
-    _request: GetGamesDrawerBadgeStatusRequest,
+  async GetGameBadgeStatus(
+    _request: GetGameBadgeStatusRequest,
     _metadata?: Metadata
-  ): Promise<GetGamesDrawerBadgeStatusResponse> {
+  ): Promise<GetGameBadgeStatusResponse> {
     const badge = this._store.badge;
     if (badge) {
       return {

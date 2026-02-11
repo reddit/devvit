@@ -15,7 +15,7 @@ import type {
   ListOptedInUsersResponse,
   OptInCurrentUserResponse,
   OptOutCurrentUserResponse,
-  ShowGamesDrawerBadgeRequest,
+  ShowGameBadgeRequest,
 } from './types/notifications.js';
 
 export class NotificationsClient {
@@ -123,33 +123,33 @@ export class NotificationsClient {
   }
 
   /**
-   * Request to show a badge in the games drawer for a given app, linking to a given post
+   * Request to show a badge for a given app, linking to a given post
    * @param options Request containing post id and expiration, as duration or expiration time. If no expiration time is set, default to 24 hours from now.
    * @returns Response indicating success or failure
    */
-  async requestShowGamesDrawerBadge(
-    options: ShowGamesDrawerBadgeRequest
+  async requestShowGameBadge(
+    options: ShowGameBadgeRequest
   ): Promise<{ success: boolean; message?: string | undefined }> {
-    return await this.#plugin.ShowGamesDrawerBadge(options, this.#metadata);
+    return await this.#plugin.ShowGameBadge(options, this.#metadata);
   }
 
   /**
-   * Dismiss all active games drawer badges
+   * Dismiss all active game badges
    * @returns Response indicating success or failure
    */
-  async dismissGamesDrawerBadge(): Promise<{ success: boolean }> {
-    return await this.#plugin.DismissGamesDrawerBadge({}, this.#metadata);
+  async dismissGameBadge(): Promise<{ success: boolean }> {
+    return await this.#plugin.DismissGameBadge({}, this.#metadata);
   }
 
   /**
-   * Get the status of active games drawer badges for an app
-   * @returns Response indicating the present of an active badge and the expiration time if present
+   * Get the status of active game badges for an app
+   * @returns Response indicating the presence of an active badge and the expiration time if present
    */
-  async getGamesDrawerBadgeStatus(): Promise<{
+  async getGameBadgeStatus(): Promise<{
     hasActiveBadge: boolean;
     expiresAt?: Date | undefined;
   }> {
-    return await this.#plugin.GetGamesDrawerBadgeStatus({}, this.#metadata);
+    return await this.#plugin.GetGameBadgeStatus({}, this.#metadata);
   }
 
   get #metadata(): Metadata {
