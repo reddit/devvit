@@ -9,6 +9,7 @@ export const Header = Object.freeze({
   AppDependencies: 'devvit-app-dependencies',
   AppUser: 'devvit-app-user',
   AppViewerAuthToken: 'devvit-app-viewer-authorization',
+  BlobStorageCredentials: 'devvit-blob-storage-credentials',
   Canary: 'devvit-canary',
   Context: 'devvit-context',
   Debug: 'devvit-debug',
