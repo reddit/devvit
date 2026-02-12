@@ -42,10 +42,15 @@ export const initDevvitGlobal = (
    * suppress the permission state to allow the app to run as if the feature
    * wasn't present (failing open).
    *
-   * Supported after 2026.05.0 (2605000)
+   * Supported after 2026.05.x
    */
-  if (client?.name === 'ANDROID' && client.version.number <= 2605000) {
-    appPermissionState = undefined;
+  if (client?.name === 'ANDROID') {
+    if (
+      client.version.yyyy < 2026 ||
+      (client.version.yyyy === 2026 && client.version.release <= 5)
+    ) {
+      appPermissionState = undefined;
+    }
   }
 
   const reqCtx = decodeToken(bridge.signedRequestContext);
