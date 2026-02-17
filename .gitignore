@@ -45,6 +45,7 @@ client-manifest.json
 # Go workspace
 go.work.sum
 vendor/
+.gocache/
 
 vitest.config.js.timestamp-*.mjs
 
