@@ -77,7 +77,12 @@ describe('contextFromRequestContext()', () => {
         slug: 'test-app-123',
       },
       subreddit: { id: 't5_123', name: 'testSubreddit' },
-      user: { id: 't2_456', name: 'testUser', snoovatar: 'https://avatar' },
+      user: {
+        id: 't2_456',
+        name: 'testUser',
+        snoovatar: 'https://avatar',
+        sessionId: '',
+      },
       post: { id: 't3_789', author: 't2_400' },
     };
 
