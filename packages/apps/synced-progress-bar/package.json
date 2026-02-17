@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "progress-bar-rt",
-  "version": "0.12.12",
+  "version": "0.12.13",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -15,10 +15,10 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/public-api": "0.12.12"
+    "@devvit/public-api": "0.12.13"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.12.12",
+    "@devvit/tsconfig": "0.12.13",
     "typescript": "5.8.3",
     "vitest": "4.0.15"
   }

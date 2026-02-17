@@ -1,6 +1,6 @@
 {
   "name": "@devvit/client",
-  "version": "0.12.12",
+  "version": "0.12.13",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -32,13 +32,13 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.12.12",
-    "@devvit/shared": "0.12.12",
-    "@devvit/shared-types": "0.12.12"
+    "@devvit/protos": "0.12.13",
+    "@devvit/shared": "0.12.13",
+    "@devvit/shared-types": "0.12.13"
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
-    "@devvit/tsconfig": "0.12.12",
+    "@devvit/tsconfig": "0.12.13",
     "esbuild": "0.25.9",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
