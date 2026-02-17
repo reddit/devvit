@@ -49,6 +49,8 @@ export const redditApiPlugins = {
     Unsave: vi.fn(),
     Unspoiler: vi.fn(),
     Vote: vi.fn(),
+    SetCustomPostStyles: vi.fn(),
+    GetCustomPostStyles: vi.fn(),
   },
   Listings: {
     Best: vi.fn(),

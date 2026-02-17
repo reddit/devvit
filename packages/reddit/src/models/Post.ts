@@ -1,5 +1,8 @@
 import { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
-import { SetCustomPostPreviewRequest_BodyType } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import {
+  type CustomPostStylesInput,
+  SetCustomPostPreviewRequest_BodyType,
+} from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import {
   type DevvitPostData,
   type SplashPostData,
@@ -7,15 +10,21 @@ import {
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 // eslint-disable-next-line no-restricted-imports
-import type { RedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
-// eslint-disable-next-line no-restricted-imports
-import type { Listing as ListingProto } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
+import type {
+  Listing as ListingProto,
+  RedditObject,
+} from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 // eslint-disable-next-line no-restricted-imports
 import { type SubmitResponse } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 // eslint-disable-next-line no-restricted-imports
 import { Block } from '@devvit/protos/types/devvit/ui/block_kit/v1beta/block.js';
 // eslint-disable-next-line no-restricted-imports
 import { UIResponse } from '@devvit/protos/types/devvit/ui/block_kit/v1beta/ui.js';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type CustomPostStyles,
+  EntrypointHeight,
+} from '@devvit/protos/types/reddit/devvit/post/v1/post.js';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
 import { decodeProtoErrors } from '@devvit/shared-types/helpers/protoErrorDecoder.js';
@@ -267,6 +276,10 @@ export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
    *             inline entrypoint. Splash support will be removed soon.
    */
   splash?: SubmitCustomPostSplashOptions;
+  /**
+   * Styles associated with the custom post, such as height or background color.
+   */
+  styles?: CustomPostStylesInput;
 };
 
 export type CommonSubmitPostOptions = {
@@ -1168,6 +1181,24 @@ export class Post {
     return getThumbnailV2({ id: this.id });
   }
 
+  /**
+   * Set the custom styles for a custom post.
+   * @experimental
+   * @param styles The styles to set for the post. If a value isn't specified, its previous value
+   *   will be preserved. If `undefined` is passed, all custom styles will be removed.
+   */
+  async setCustomPostStyles(styles: CustomPostStylesInput | undefined): Promise<void> {
+    return Post.setDevvitCustomPostStyles(this.#id, styles);
+  }
+
+  /**
+   * Get the custom styles for a custom post.
+   * @experimental
+   */
+  async getCustomPostStyles(): Promise<CustomPostStyles> {
+    return Post.getDevvitCustomPostStyles(this.#id);
+  }
+
   // TODO: flair methods
 
   /** @internal */
@@ -1285,6 +1316,14 @@ export class Post {
         userGeneratedContent,
         runAs: runAsType,
         postData: { developerData: opts.postData, splash },
+        customPostStyles: opts.styles
+          ? {
+              backgroundColor: opts.styles.backgroundColor ?? '',
+              backgroundColorDark: opts.styles.backgroundColorDark ?? '',
+              height: opts.styles.height ?? EntrypointHeight.HEIGHT_UNSPECIFIED,
+              heightPixels: -1, // Not settable directly
+            }
+          : undefined,
       },
       context.metadata
     );
@@ -1395,6 +1434,24 @@ export class Post {
     }
 
     return JSON.parse(devvitPostData) as DevvitPostData;
+  }
+
+  /** @internal */
+  static async setDevvitCustomPostStyles(
+    postId: T3,
+    styles: CustomPostStylesInput | undefined
+  ): Promise<void> {
+    const client = getRedditApiPlugins().LinksAndComments;
+    await client.SetCustomPostStyles({
+      postId,
+      customPostStyles: styles,
+    });
+  }
+
+  /** @internal */
+  static async getDevvitCustomPostStyles(postId: T3): Promise<CustomPostStyles> {
+    const client = getRedditApiPlugins().LinksAndComments;
+    return await client.GetCustomPostStyles({ postId });
   }
 
   /** @internal */

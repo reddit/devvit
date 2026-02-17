@@ -20,6 +20,7 @@ import type {
 } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import type { Comment } from '@devvit/protos/json/devvit/reddit/comment.js';
 import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
+import type { CustomPostStyles } from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 // eslint-disable-next-line no-restricted-imports
 import type {
@@ -29,7 +30,11 @@ import type {
 // eslint-disable-next-line no-restricted-imports
 import { type RedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 // eslint-disable-next-line no-restricted-imports
-import type { SubmitResponse } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import type {
+  GetCustomPostStylesRequest,
+  SetCustomPostStylesRequest,
+  SubmitResponse,
+} from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 // eslint-disable-next-line no-restricted-imports
 import { type LinksAndComments } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { type JsonObject, T3 } from '@devvit/shared';
@@ -536,6 +541,23 @@ export class LinksAndCommentsPluginMock implements LinksAndComments {
   async Vote(_request: VoteRequest, _metadata?: Metadata): Promise<Empty> {
     throw new Error(
       `Reddit API method LinksAndComments.Vote is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  SetCustomPostStyles(_request: SetCustomPostStylesRequest, _metadata?: Metadata): Promise<Empty> {
+    throw new Error(
+      `Reddit API method LinksAndComments.SetCustomPostStyles is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  GetCustomPostStyles(
+    _request: GetCustomPostStylesRequest,
+    _metadata?: Metadata
+  ): Promise<CustomPostStyles> {
+    throw new Error(
+      `Reddit API method LinksAndComments.GetCustomPostStyles is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }
