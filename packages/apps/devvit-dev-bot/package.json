@@ -4,10 +4,29 @@
   "version": "0.12.13",
   "license": "BSD-3-Clause",
   "type": "module",
+  "scripts": {
+    "build": "npm run build:server",
+    "build:server": "cd src/server && vite build",
+    "deploy": "npm run build && devvit upload",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"SERVER,DEVVIT\" -c \"green,magenta\" \"npm run dev:server\" \"npm run dev:devvit\"",
+    "dev:devvit": "dotenv -e .env -- devvit playtest",
+    "dev:server": "cd src/server && vite build --watch",
+    "launch": "npm run build && npm run deploy && devvit publish",
+    "login": "devvit login",
+    "type-check": "tsc --build"
+  },
   "dependencies": {
-    "@devvit/public-api": "0.12.13"
+    "@devvit/public-api": "0.12.13",
+    "@devvit/web": "0.12.13",
+    "@types/express-serve-static-core": "5.1.0",
+    "devvit": "0.12.14-dev",
+    "express": "5.1.0"
   },
   "devDependencies": {
-    "typescript": "5.8.3"
+    "@types/express": "5.0.1",
+    "concurrently": "7.5.0",
+    "dotenv-cli": "8.0.0",
+    "typescript": "5.8.3",
+    "vite": "7.2.7"
   }
 }
