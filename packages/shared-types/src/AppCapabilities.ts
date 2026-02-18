@@ -32,6 +32,8 @@ import { SchedulerHandlerDefinition } from '@devvit/protos/types/devvit/actor/sc
 // eslint-disable-next-line no-restricted-imports
 import { InstallationSettingsDefinition } from '@devvit/protos/types/devvit/actor/settings/v1alpha/installation_settings.js';
 // eslint-disable-next-line no-restricted-imports
+import { BlobServiceDefinition } from '@devvit/protos/types/devvit/plugin/blob/v1alpha/blob.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 // eslint-disable-next-line no-restricted-imports
 import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
@@ -189,6 +191,7 @@ function appCapabilityFromFullName(fullName: string): (NutritionCategory | undef
     case UIEventHandlerDefinition.fullName:
       return [NutritionCategory.UI];
 
+    case BlobServiceDefinition.fullName:
     case InstallationSettingsDefinition.fullName:
     case SettingsDefinition.fullName:
     case KVStoreDefinition.fullName:

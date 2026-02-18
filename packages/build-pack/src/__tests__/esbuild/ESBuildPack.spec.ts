@@ -135,6 +135,7 @@ describe('ES Build Pack', () => {
             schema: 'v1',
             permissions: {
               http: { enable: false, domains: [] },
+              blob: false,
               media: false,
               menu: true,
               payments: false,
@@ -186,6 +187,7 @@ describe('ES Build Pack', () => {
             schema: 'v1',
             permissions: {
               http: { enable: false, domains: [] },
+              blob: false,
               media: false,
               menu: true,
               payments: false,
@@ -232,6 +234,7 @@ describe('ES Build Pack', () => {
             schema: 'v1',
             permissions: {
               http: { enable: false, domains: [] },
+              blob: false,
               media: false,
               menu: false,
               payments: false,

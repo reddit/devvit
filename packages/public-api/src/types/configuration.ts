@@ -31,4 +31,6 @@ export type Configuration = {
    * @internal
    */
   payments?: boolean;
+  /** Allows your app to use the Blob Plugin */
+  blob?: PluginSettings | boolean;
 };

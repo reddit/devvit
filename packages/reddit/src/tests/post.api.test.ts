@@ -131,6 +131,7 @@ describe('Post API', () => {
       schema: 'v1',
       name: '',
       permissions: {
+        blob: false,
         http: {
           enable: false,
           domains: [],

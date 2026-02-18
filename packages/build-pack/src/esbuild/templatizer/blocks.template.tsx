@@ -80,6 +80,7 @@ function configurePermissions(permissions: Readonly<AppPermissionConfig>): void 
       enabled: permissions.http.enable,
       domains: permissions.http.domains,
     },
+    blob: permissions.blob,
     media: permissions.media,
     // to-do: payments permissions.
     realtime: permissions.realtime,

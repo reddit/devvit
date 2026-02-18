@@ -26,6 +26,7 @@ describe('parseAppConfig()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -60,6 +61,7 @@ describe('parseAppConfig()', () => {
         },
         "name": "<% name %>",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -137,6 +139,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -196,6 +199,7 @@ describe('parseAppConfigJSON()', () => {
           },
           "name": "abc",
           "permissions": {
+            "blob": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -223,44 +227,45 @@ describe('parseAppConfigJSON()', () => {
   test('default post', () => {
     const config = parseAppConfigJson({ name: 'abc', post: {} } satisfies AppConfigJson, false);
     expect(config).toMatchInlineSnapshot(`
-        {
-          "json": {
-            "name": "abc",
-            "post": {},
-          },
+      {
+        "json": {
           "name": "abc",
-          "permissions": {
-            "http": {
-              "domains": [],
-              "enable": false,
-            },
-            "media": false,
-            "menu": false,
-            "payments": false,
-            "realtime": false,
-            "reddit": {
-              "asUser": [],
-              "enable": true,
-              "scope": "user",
-            },
-            "redis": true,
-            "settings": false,
-            "triggers": false,
+          "post": {},
+        },
+        "name": "abc",
+        "permissions": {
+          "blob": false,
+          "http": {
+            "domains": [],
+            "enable": false,
           },
-          "post": {
-            "dir": "public",
-            "entrypoints": {
-              "default": {
-                "entry": "index.html",
-                "height": "tall",
-                "inline": false,
-                "name": "default",
-              },
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": true,
+            "scope": "user",
+          },
+          "redis": true,
+          "settings": false,
+          "triggers": false,
+        },
+        "post": {
+          "dir": "public",
+          "entrypoints": {
+            "default": {
+              "entry": "index.html",
+              "height": "tall",
+              "inline": false,
+              "name": "default",
             },
           },
-          "schema": "v1",
-        }
-      `);
+        },
+        "schema": "v1",
+      }
+    `);
     {
       const l = parseAppConfigJson(
         {
@@ -305,6 +310,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -359,6 +365,7 @@ describe('parseAppConfigJSON()', () => {
           },
           "name": "abc",
           "permissions": {
+            "blob": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -394,6 +401,7 @@ describe('parseAppConfigJSON()', () => {
           },
           "name": "abc",
           "permissions": {
+            "blob": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -430,6 +438,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -482,6 +491,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -532,6 +542,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -586,6 +597,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -637,6 +649,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -703,6 +716,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -763,6 +777,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -808,6 +823,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -855,6 +871,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -904,6 +921,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [
               "example.com",
@@ -950,6 +968,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1008,6 +1027,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1173,6 +1193,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "test-app",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1366,6 +1387,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1453,6 +1475,7 @@ describe('parseAppConfigJSON()', () => {
           ],
         },
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1519,6 +1542,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1600,6 +1624,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1676,6 +1701,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1744,6 +1770,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1794,6 +1821,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1840,6 +1868,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "name": "abc",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2008,6 +2037,7 @@ describe('validate()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2080,6 +2110,7 @@ describe('validate()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2151,6 +2182,7 @@ describe('validate()', () => {
         },
         "name": "name",
         "permissions": {
+          "blob": false,
           "http": {
             "domains": [],
             "enable": false,

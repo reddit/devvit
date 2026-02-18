@@ -6,6 +6,7 @@ import { createDependencySpec } from './dependency-spec-util.js';
 
 const allPermissions: Readonly<AppPermissionConfig> = {
   http: { enable: true, domains: ['example.com'] },
+  blob: true,
   media: true,
   menu: true,
   payments: true,
@@ -17,6 +18,7 @@ const allPermissions: Readonly<AppPermissionConfig> = {
 };
 const noPermissions: Readonly<AppPermissionConfig> = {
   http: { enable: false, domains: [] },
+  blob: false,
   media: false,
   menu: false,
   payments: false,
@@ -28,6 +30,7 @@ const noPermissions: Readonly<AppPermissionConfig> = {
 };
 const asUserPermissions: Readonly<AppPermissionConfig> = {
   http: { enable: false, domains: [] },
+  blob: false,
   media: false,
   menu: false,
   payments: false,
@@ -39,6 +42,7 @@ const asUserPermissions: Readonly<AppPermissionConfig> = {
 };
 const redditPermissionsWithoutAsUser: Readonly<AppPermissionConfig> = {
   http: { enable: false, domains: [] },
+  blob: false,
   media: false,
   menu: false,
   payments: false,
@@ -274,6 +278,10 @@ test('permissions', () =>
         {
           "name": "default",
           "typeName": "devvit.plugin.useractions.UserActions",
+        },
+        {
+          "name": "default",
+          "typeName": "devvit.plugin.blob.v1alpha.BlobService",
         },
         {
           "name": "default",
@@ -1720,6 +1728,10 @@ test('everything', () =>
         {
           "name": "default",
           "typeName": "devvit.plugin.useractions.UserActions",
+        },
+        {
+          "name": "default",
+          "typeName": "devvit.plugin.blob.v1alpha.BlobService",
         },
         {
           "name": "default",

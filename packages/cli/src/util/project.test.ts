@@ -18,6 +18,7 @@ import {
 
 const noPermissions: AppPermissionConfig = {
   http: { enable: false, domains: [] },
+  blob: false,
   media: false,
   menu: false,
   payments: false,
@@ -207,11 +208,13 @@ describe('isAppConfig()', () => {
       schema: 'v1',
       name: 'name',
       permissions: {
+        blob: false,
         http: {
           enable: false,
           domains: [],
         },
         media: false,
+        menu: false,
         payments: false,
         realtime: false,
         redis: false,
@@ -220,6 +223,8 @@ describe('isAppConfig()', () => {
           scope: 'user',
           asUser: [],
         },
+        settings: false,
+        triggers: false,
       },
     };
     expect(isAppConfig(config)).toBe(true);

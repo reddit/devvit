@@ -386,6 +386,11 @@
           "description": "Enables the realtime plugin (client and server messaging).",
           "default": false
         },
+        "blob": {
+          "type": "boolean",
+          "description": "Enables the blob storage plugin (S3), which is not yet publicly available.",
+          "default": false
+        },
         "redis": {
           "type": "boolean",
           "description": "Enables the Redis plugin (storage).",

@@ -43,6 +43,7 @@ export type AppConfig = {
 export type AppBlocksConfig = { entry: string };
 /** Describes plugin usage. */
 export type AppPermissionConfig = {
+  blob: boolean;
   http: { enable: boolean; domains: string[] };
   media: boolean;
   menu: boolean;
@@ -239,6 +240,7 @@ export type AppPaymentsConfigJson = {
   };
 } & ({ products: Product[] } | { productsFile: string });
 export type AppPermissionConfigJson = {
+  blob?: boolean;
   http?: { enable?: boolean; domains?: string[] };
   media?: boolean;
   payments?: boolean;
@@ -440,6 +442,7 @@ function AppPermissionConfig(
         permissions?.http?.domains ??
         schema.properties.permissions.properties.http.properties.domains.default,
     },
+    blob: permissions?.blob ?? schema.properties.permissions.properties.blob.default,
     media: permissions?.media ?? schema.properties.permissions.properties.media.default,
     menu: !!partial.menu,
     payments:

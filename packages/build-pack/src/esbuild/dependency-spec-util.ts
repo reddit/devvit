@@ -48,6 +48,7 @@ import {
 import type { ActorSpec, DependencySpec } from '@devvit/protos/community.js';
 import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
 import { WebbitServerDefinition } from '@devvit/protos/types/devvit/actor/webbit/webbit.js';
+import { BlobServiceDefinition } from '@devvit/protos/types/devvit/plugin/blob/v1alpha/blob.js';
 import { normalizeDomains } from '@devvit/shared-types/fetch-domains.js';
 import { PLUGIN_NAME, resolveActorHostname } from '@devvit/shared-types/HostnameUtil.js';
 import type { Namespace } from '@devvit/shared-types/Namespace.js';
@@ -113,6 +114,8 @@ export function createDependencySpec(
       permissions.asUserScopes.push(...config.permissions.reddit.asUser);
     }
   }
+
+  if (config.permissions.blob) use(spec, BlobServiceDefinition);
 
   if (config.permissions.redis) use(spec, RedisAPIDefinition);
 

@@ -30,6 +30,7 @@ export const getDefaultAppConfig = (): AppConfig => {
     schema: 'v1',
     name: 'test-app',
     permissions: {
+      blob: true,
       http: { enable: true, domains: [] },
       media: true,
       menu: true,
