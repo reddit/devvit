@@ -111,7 +111,7 @@ describe('emit-effect', () => {
       immersiveModeEvent: undefined,
       orderResult: undefined,
       realtimeEvent: undefined,
-      screenshot: undefined,
+      screenshotRequest: undefined,
       updateRequestContext: undefined,
     });
   });
@@ -244,7 +244,7 @@ describe('emit-effect', () => {
       immersiveModeEvent: undefined,
       orderResult: undefined,
       realtimeEvent: undefined,
-      screenshot: undefined,
+      screenshotRequest: undefined,
       updateRequestContext: undefined,
     });
   });
@@ -326,7 +326,7 @@ describe('emit-effect', () => {
       immersiveModeEvent: undefined,
       orderResult: undefined,
       realtimeEvent: undefined,
-      screenshot: undefined,
+      screenshotRequest: undefined,
       updateRequestContext: undefined,
     });
   });
@@ -416,7 +416,7 @@ describe('emit-effect', () => {
       immersiveModeEvent: undefined,
       orderResult: undefined,
       realtimeEvent: undefined,
-      screenshot: undefined,
+      screenshotRequest: undefined,
       updateRequestContext: undefined,
     });
   });
