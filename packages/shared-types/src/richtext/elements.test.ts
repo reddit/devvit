@@ -47,27 +47,30 @@ import type {
 } from './options.js';
 import type { FormatRange, TextNode } from './types.js';
 
+const testMediaUrl = 'https://example.com/media.gif';
+const testImageUrl = 'https://example.com/image.png';
+
 describe('makeAnimatedImage()', () => {
   const testCases: { name: string; opts: ImageOptions; expected: unknown }[] = [
     {
-      name: 'with mediaId only',
-      opts: { mediaId: 'gif123' },
-      expected: { e: 'gif', id: 'gif123' },
+      name: 'with mediaUrl only',
+      opts: { mediaUrl: testMediaUrl },
+      expected: { e: 'gif', mediaUrl: testMediaUrl },
     },
     {
       name: 'with caption',
-      opts: { mediaId: 'gif123', caption: 'Funny cat' },
-      expected: { e: 'gif', id: 'gif123', c: 'Funny cat' },
+      opts: { mediaUrl: testMediaUrl, caption: 'Funny cat' },
+      expected: { e: 'gif', mediaUrl: testMediaUrl, c: 'Funny cat' },
     },
     {
       name: 'with blur',
-      opts: { mediaId: 'gif123', blur: 'nsfw' },
-      expected: { e: 'gif', id: 'gif123', o: 'nsfw' },
+      opts: { mediaUrl: testMediaUrl, blur: 'nsfw' },
+      expected: { e: 'gif', mediaUrl: testMediaUrl, o: 'nsfw' },
     },
     {
       name: 'with all options',
-      opts: { mediaId: 'gif123', caption: 'Funny cat', blur: 'spoiler' },
-      expected: { e: 'gif', id: 'gif123', c: 'Funny cat', o: 'spoiler' },
+      opts: { mediaUrl: testMediaUrl, caption: 'Funny cat', blur: 'spoiler' },
+      expected: { e: 'gif', mediaUrl: testMediaUrl, c: 'Funny cat', o: 'spoiler' },
     },
   ];
 
@@ -282,24 +285,24 @@ describe('makeHorizontalRule()', () => {
 describe('makeImage()', () => {
   const testCases: { name: string; opts: ImageOptions; expected: unknown }[] = [
     {
-      name: 'with mediaId only',
-      opts: { mediaId: 'img123' },
-      expected: { e: 'img', id: 'img123' },
+      name: 'with mediaUrl only',
+      opts: { mediaUrl: testImageUrl },
+      expected: { e: 'img', mediaUrl: testImageUrl },
     },
     {
       name: 'with caption',
-      opts: { mediaId: 'img123', caption: 'A photo' },
-      expected: { e: 'img', id: 'img123', c: 'A photo' },
+      opts: { mediaUrl: testImageUrl, caption: 'A photo' },
+      expected: { e: 'img', mediaUrl: testImageUrl, c: 'A photo' },
     },
     {
       name: 'with blur',
-      opts: { mediaId: 'img123', blur: 'nsfw' },
-      expected: { e: 'img', id: 'img123', o: 'nsfw' },
+      opts: { mediaUrl: testImageUrl, blur: 'nsfw' },
+      expected: { e: 'img', mediaUrl: testImageUrl, o: 'nsfw' },
     },
     {
       name: 'with all options',
-      opts: { mediaId: 'img123', caption: 'A photo', blur: 'spoiler' },
-      expected: { e: 'img', id: 'img123', c: 'A photo', o: 'spoiler' },
+      opts: { mediaUrl: testImageUrl, caption: 'A photo', blur: 'spoiler' },
+      expected: { e: 'img', mediaUrl: testImageUrl, c: 'A photo', o: 'spoiler' },
     },
   ];
 
@@ -451,8 +454,8 @@ describe('makeParagraph()', () => {
     },
     {
       name: 'with image',
-      callback: (ctx) => ctx.image({ mediaId: 'img123' }),
-      expected: { e: 'par', c: [{ e: 'img', id: 'img123' }] },
+      callback: (ctx) => ctx.image({ mediaUrl: testImageUrl }),
+      expected: { e: 'par', c: [{ e: 'img', mediaUrl: testImageUrl }] },
     },
   ];
 
@@ -603,8 +606,8 @@ describe('makeTableCell()', () => {
     },
     {
       name: 'cell with image',
-      callback: (cell) => cell.image({ mediaId: 'img123' }),
-      expected: { c: [{ e: 'img', id: 'img123' }] },
+      callback: (cell) => cell.image({ mediaUrl: testImageUrl }),
+      expected: { c: [{ e: 'img', mediaUrl: testImageUrl }] },
     },
     {
       name: 'cell with multiple elements',
@@ -773,48 +776,51 @@ describe('makeUserMention()', () => {
     });
 });
 
+const testVideoUrl = 'https://example.com/video.mp4';
+const testThumbUrl = 'https://example.com/thumb.png';
+
 describe('makeVideo()', () => {
   const testCases: { name: string; opts: VideoOptions; expected: unknown }[] = [
     {
-      name: 'with mediaId only',
-      opts: { mediaId: 'vid123' },
-      expected: { e: 'video', id: 'vid123' },
+      name: 'with mediaUrl only',
+      opts: { mediaUrl: testVideoUrl },
+      expected: { e: 'video', mediaUrl: testVideoUrl },
     },
     {
       name: 'with caption',
-      opts: { mediaId: 'vid123', caption: 'Cool video' },
-      expected: { e: 'video', id: 'vid123', c: 'Cool video' },
+      opts: { mediaUrl: testVideoUrl, caption: 'Cool video' },
+      expected: { e: 'video', mediaUrl: testVideoUrl, c: 'Cool video' },
     },
     {
       name: 'with blur',
-      opts: { mediaId: 'vid123', blur: 'nsfw' },
-      expected: { e: 'video', id: 'vid123', o: 'nsfw' },
+      opts: { mediaUrl: testVideoUrl, blur: 'nsfw' },
+      expected: { e: 'video', mediaUrl: testVideoUrl, o: 'nsfw' },
     },
     {
       name: 'with thumbnail',
-      opts: { mediaId: 'vid123', thumbnail: { e: 'img', id: 'thumb123' } },
-      expected: { e: 'video', id: 'vid123', p: { e: 'img', id: 'thumb123' } },
+      opts: { mediaUrl: testVideoUrl, thumbnail: { e: 'img', mediaUrl: testThumbUrl } },
+      expected: { e: 'video', mediaUrl: testVideoUrl, p: { e: 'img', mediaUrl: testThumbUrl } },
     },
     {
       name: 'with convertToGif',
-      opts: { mediaId: 'vid123', convertToGif: true },
-      expected: { e: 'video', id: 'vid123', gifify: true },
+      opts: { mediaUrl: testVideoUrl, convertToGif: true },
+      expected: { e: 'video', mediaUrl: testVideoUrl, gifify: true },
     },
     {
       name: 'with all options',
       opts: {
-        mediaId: 'vid123',
+        mediaUrl: testVideoUrl,
         caption: 'Cool video',
         blur: 'spoiler',
-        thumbnail: { e: 'img', id: 'thumb123' },
+        thumbnail: { e: 'img', mediaUrl: testThumbUrl },
         convertToGif: true,
       },
       expected: {
         e: 'video',
-        id: 'vid123',
+        mediaUrl: testVideoUrl,
         c: 'Cool video',
         o: 'spoiler',
-        p: { e: 'img', id: 'thumb123' },
+        p: { e: 'img', mediaUrl: testThumbUrl },
         gifify: true,
       },
     },

@@ -312,7 +312,9 @@ export const IMAGE_ELEMENT = 'img';
 
 export type Image = {
   e: typeof IMAGE_ELEMENT;
-  id: MediaAssetId;
+  /** URL of the media when building; backend may replace with id in processed JSON */
+  mediaUrl?: string;
+  id?: MediaAssetId;
   c?: string; // caption, completely optional
   o?: ObfuscationReason;
 };
@@ -326,7 +328,9 @@ export const ANIMATED_IMAGE_ELEMENT = 'gif';
 
 export type AnimatedImage = {
   e: typeof ANIMATED_IMAGE_ELEMENT;
-  id: MediaAssetId;
+  /** URL of the media when building; backend may replace with id in processed JSON */
+  mediaUrl?: string;
+  id?: MediaAssetId;
   c?: string; // caption, completly optional
   o?: ObfuscationReason;
 };
@@ -339,7 +343,9 @@ export const VIDEO_ELEMENT = 'video';
 
 export type Video = {
   e: typeof VIDEO_ELEMENT;
-  id: MediaAssetId;
+  /** URL of the media when building; backend may replace with id in processed JSON */
+  mediaUrl?: string;
+  id?: MediaAssetId;
   c?: string; // c = 'caption'
   o?: ObfuscationReason;
   p?: Image; // p = 'poster', the poster image for the video

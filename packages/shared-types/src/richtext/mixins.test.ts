@@ -136,14 +136,14 @@ describe('mixinImageContext()', () => {
     const content: unknown[] = [];
     const container = mixinImageContext(context, content);
 
-    const imageResult = container.image({ mediaId: 'image-1' });
-    const animatedResult = container.animatedImage({ mediaId: 'gif-1' });
+    const imageResult = container.image({ mediaUrl: 'https://example.com/image-1.png' });
+    const animatedResult = container.animatedImage({ mediaUrl: 'https://example.com/gif-1.gif' });
 
     expect(imageResult).toBe(context);
     expect(animatedResult).toBe(context);
     expect(content).toStrictEqual([
-      { e: 'img', id: 'image-1' },
-      { e: 'gif', id: 'gif-1' },
+      { e: 'img', mediaUrl: 'https://example.com/image-1.png' },
+      { e: 'gif', mediaUrl: 'https://example.com/gif-1.gif' },
     ]);
   });
 });
@@ -380,9 +380,9 @@ describe('mixinVideoContext()', () => {
     const content: unknown[] = [];
     const container = mixinVideoContext(context, content);
 
-    const result = container.video({ mediaId: 'video-1' });
+    const result = container.video({ mediaUrl: 'https://example.com/video-1.mp4' });
 
     expect(result).toBe(context);
-    expect(content).toStrictEqual([{ e: 'video', id: 'video-1' }]);
+    expect(content).toStrictEqual([{ e: 'video', mediaUrl: 'https://example.com/video-1.mp4' }]);
   });
 });

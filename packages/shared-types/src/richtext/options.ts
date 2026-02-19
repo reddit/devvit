@@ -74,8 +74,8 @@ export type ListOptions = {
 };
 
 export type MediaOptions = {
-  /** Reddit media ID provided after uploading media */
-  mediaId: string;
+  /** URL of the media */
+  mediaUrl: string;
   /** Media description */
   caption?: string;
   /**

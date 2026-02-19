@@ -119,9 +119,12 @@ import {
  * @returns AnimatedImage
  */
 export function makeAnimatedImage(opts: ImageOptions): AnimatedImage {
+  if (!opts.mediaUrl) {
+    throw new Error('mediaUrl is required for animated image');
+  }
   return {
     e: ANIMATED_IMAGE_ELEMENT,
-    id: opts.mediaId,
+    mediaUrl: opts.mediaUrl,
     ...(opts.caption && { c: opts.caption }),
     ...(opts.blur && { o: opts.blur }),
   };
@@ -229,9 +232,12 @@ export function makeHorizontalRule(): HorizontalRule {
 }
 
 export function makeImage(opts: ImageOptions): Image {
+  if (!opts.mediaUrl) {
+    throw new Error('mediaUrl is required for image');
+  }
   return {
     e: IMAGE_ELEMENT,
-    id: opts.mediaId,
+    mediaUrl: opts.mediaUrl,
     ...(opts.caption && { c: opts.caption }),
     ...(opts.blur && { o: opts.blur }),
   };
@@ -419,9 +425,12 @@ export function makeUserMention(opts: UserMentionOptions): UserMention {
 }
 
 export function makeVideo(opts: VideoOptions): Video {
+  if (!opts.mediaUrl) {
+    throw new Error('mediaUrl is required for video');
+  }
   return {
     e: VIDEO_ELEMENT,
-    id: opts.mediaId,
+    mediaUrl: opts.mediaUrl,
     ...(opts.caption && { c: opts.caption }),
     ...(opts.blur && { o: opts.blur }),
     ...(opts.thumbnail && { p: opts.thumbnail }),

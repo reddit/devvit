@@ -8,12 +8,14 @@ describe('build()', () => {
     expect(result).toStrictEqual({ document: [] });
   });
 
+  const testImageUrl = 'https://example.com/test-media.png';
+
   test('builds a paragraph with text containing trailing newlines and an image', () => {
     const builder = new RichTextBuilder();
     builder.paragraph((paragraph) => {
       paragraph.text({ text: 'hello world 12345678' + '\n\n' });
     });
-    builder.image({ mediaId: 'test-media-id' });
+    builder.image({ mediaUrl: testImageUrl });
 
     const result = JSON.parse(builder.build());
 
@@ -25,7 +27,7 @@ describe('build()', () => {
         },
         {
           e: 'img',
-          id: 'test-media-id',
+          mediaUrl: testImageUrl,
         },
       ],
     });
@@ -36,7 +38,7 @@ describe('build()', () => {
     builder.paragraph((paragraph) => {
       paragraph.text({ text: 'abc' + '\n\n' + 'def' });
     });
-    builder.image({ mediaId: 'test-media-id' });
+    builder.image({ mediaUrl: testImageUrl });
 
     const result = JSON.parse(builder.build());
 
@@ -48,7 +50,7 @@ describe('build()', () => {
         },
         {
           e: 'img',
-          id: 'test-media-id',
+          mediaUrl: testImageUrl,
         },
       ],
     });
@@ -196,40 +198,42 @@ describe('paragraph()', () => {
 });
 
 describe('image()', () => {
-  test('creates an image element with mediaId', () => {
+  const testImageUrl = 'https://example.com/abc123.png';
+
+  test('creates an image element with mediaUrl', () => {
     const builder = new RichTextBuilder();
-    builder.image({ mediaId: 'abc123' });
+    builder.image({ mediaUrl: testImageUrl });
 
     const result = JSON.parse(builder.build());
 
     expect(result.document[0]).toStrictEqual({
       e: 'img',
-      id: 'abc123',
+      mediaUrl: testImageUrl,
     });
   });
 
   test('includes caption when provided', () => {
     const builder = new RichTextBuilder();
-    builder.image({ mediaId: 'abc123', caption: 'A lovely cat' });
+    builder.image({ mediaUrl: testImageUrl, caption: 'A lovely cat' });
 
     const result = JSON.parse(builder.build());
 
     expect(result.document[0]).toStrictEqual({
       e: 'img',
-      id: 'abc123',
+      mediaUrl: testImageUrl,
       c: 'A lovely cat',
     });
   });
 
   test('includes blur reason when provided', () => {
     const builder = new RichTextBuilder();
-    builder.image({ mediaId: 'abc123', blur: 'nsfw' });
+    builder.image({ mediaUrl: testImageUrl, blur: 'nsfw' });
 
     const result = JSON.parse(builder.build());
 
     expect(result.document[0]).toStrictEqual({
       e: 'img',
-      id: 'abc123',
+      mediaUrl: testImageUrl,
       o: 'nsfw',
     });
   });

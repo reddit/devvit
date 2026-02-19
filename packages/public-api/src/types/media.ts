@@ -20,15 +20,9 @@ export type MediaPlugin = {
    *    url: "https://media2.giphy.com/media/xTiN0CNHgoRf1Ha7CM/giphy.gif",
    *    type: "gif"
    *  });
-   *  await context.reddit.submitPost(
-   *     {
-   *       subredditName: subreddit.name,
-   *       title: 'Hello World with Media',
-   *       richtext: new RichTextBuilder()
-   *            .image({mediaId: response.mediaId})
-   *            .codeBlock({}, (cb) => cb.rawText('This post was created from a Devvit App'))
-   *     }
-   *   );
+   *  res.json({
+   *    imageUrl: response.mediaUrl // This reddit hosted URL can be displayed by your client
+   *  });
    * ```
    */
   upload(opts: UploadMediaOptions): Promise<MediaAsset>;
