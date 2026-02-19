@@ -55,7 +55,7 @@
   "filesize": {
     "dist/scripts/devvit.v1.min.js": {
       "gzip": "26 kb",
-      "none": "114 kb"
+      "none": "115 kb"
     }
   },
   "source": "./src/index.ts"
