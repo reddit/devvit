@@ -1925,6 +1925,31 @@ describe('validate()', () => {
       `[Error: \`config.menu.items\` requires \`config.permissions.redis\` to be enabled.]`
     ));
 
+  test('menu item postFilter currentApp cannot be used for subreddit location', () =>
+    expect(() =>
+      parseAppConfigJson(
+        {
+          name: 'name',
+          permissions: { redis: true },
+          menu: {
+            items: [
+              {
+                label: 'label',
+                forUserType: 'moderator',
+                location: 'subreddit',
+                endpoint: '/internal/endpoint',
+                postFilter: 'currentApp',
+              },
+            ],
+          },
+          server: {},
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: \`config.menu.items\` cannot use \`postFilter: "currentApp"\` when \`location\` includes \`"subreddit"\`.]`
+    ));
+
   test('select setting with invalid default value', () =>
     expect(() =>
       parseAppConfigJson(

@@ -607,6 +607,13 @@ export function validate(config: Readonly<AppConfig>): void {
 
   if (config.menu?.items?.length && !config.permissions.redis)
     errs.push('`config.menu.items` requires `config.permissions.redis` to be enabled');
+  for (const item of config.menu?.items ?? []) {
+    if (item.postFilter === 'currentApp' && item.location.includes('subreddit')) {
+      errs.push(
+        '`config.menu.items` cannot use `postFilter: "currentApp"` when `location` includes `"subreddit"`'
+      );
+    }
+  }
 
   // If there are any select settings, their default values must be in the options,
   // and if it's not a multi-select, the default value must be a single string.
