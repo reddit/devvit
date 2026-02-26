@@ -41,6 +41,8 @@
   "types": "dist/index.d.ts",
   "dependencies": {
     "@devvit/build-pack": "0.12.13",
+    "@devvit/builders": "0.12.13",
+    "@devvit/linkers": "0.12.13",
     "@devvit/protos": "0.12.13",
     "@devvit/public-api": "0.12.13",
     "@devvit/shared-types": "0.12.13",
