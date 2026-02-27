@@ -464,8 +464,7 @@ export class Devvit extends Actor {
       for (const eventType of triggerDefinition.events) {
         this.addTrigger({
           event: eventType,
-          onEvent: (event: OnTriggerRequest, context: TriggerContext) =>
-            (triggerDefinition.onEvent as TriggerOnEventHandler<OnTriggerRequest>)(event, context),
+          onEvent: triggerDefinition.onEvent,
         } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
       }
       return this;
