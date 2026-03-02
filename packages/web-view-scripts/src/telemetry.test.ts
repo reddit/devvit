@@ -5,7 +5,7 @@ import type { WebbitToken } from '@devvit/shared-types/webbit.js';
 import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
 
-import { initAnalytics } from './analytics.js';
+import { initTelemetry } from './telemetry.js';
 
 type EventListenerMock = Mock<(type: string, listener: (event: unknown) => void) => void>;
 
@@ -47,14 +47,14 @@ afterEach(() => {
 const constructClickEvent = (overrides: Partial<MouseEvent>) => {
   return { isTrusted: true, ...overrides };
 };
-describe('analytics', () => {
+describe('telemetry', () => {
   const deadClick = { target: renderDom(`<div>div</div>`), isTrusted: true };
 
   beforeEach(() => {
-    initAnalytics();
+    initTelemetry();
   });
 
-  it('sends click analytics on click', async () => {
+  it('sends click telemetry on click', async () => {
     const onClick = getGlobalClickListener();
     onClick(deadClick);
 
@@ -159,8 +159,8 @@ describe('analytics', () => {
   });
 });
 
-it('sends load analytics on window load', async () => {
-  initAnalytics();
+it('sends load telemetry on window load', async () => {
+  initTelemetry();
 
   const onLoad = addEventListenerMock.mock.calls.find((call) => call[0] === 'load')?.[1];
 
@@ -240,7 +240,7 @@ describe('performance monitoring', () => {
       return [];
     });
 
-    initAnalytics();
+    initTelemetry();
   });
 
   it('captures ttfb metric', async () => {

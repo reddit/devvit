@@ -12,12 +12,12 @@ let telemetryMetrics: WebViewTelemetryMetric[];
 let startTime: number | undefined;
 
 /**
- * initAnalytics is added to all Devvit apps which use web views.
+ * `initTelemetry()` is added to all Devvit apps which use web views.
  *
  * This sends interaction events to the parent window via postMessage.
  * These metrics are used to inform app performance and feed ranking.
  */
-export function initAnalytics(): void {
+export function initTelemetry(): void {
   initPerformanceMonitoring();
   initLoadedEvent();
   initClickEvent();
@@ -35,8 +35,6 @@ function initLoadedEvent(): void {
       duration,
     };
 
-    // to-do: support devvit.debug.
-    // if (devvit.debug.analytics) console.debug(`[analytics] loaded in ${duration} ms`);
     void emitEffect({
       type: EffectType.EFFECT_TELEMETRY,
       telemetry: { event: loaded.event, loaded },
