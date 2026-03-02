@@ -220,6 +220,8 @@ export class Devvit extends Actor {
   }
 
   /**
+   * @deprecated Blocks is deprecated. Use {@link https://developers.reddit.com/docs/capabilities/devvit-web/devvit_web_overview|Devvit Web} instead
+   *
    * Add a custom post type for your app.
    * @param customPostType - The custom post type to add.
    * @param customPostType.name - The name of the custom post type.
