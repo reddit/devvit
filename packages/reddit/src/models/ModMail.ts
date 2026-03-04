@@ -1189,7 +1189,7 @@ async function createModmailConversation(params: {
   const response = await GraphQL.query(operationName, persistedQueryHash, {
     subject: params.subject,
     bodyMarkdown: params.bodyMarkdown,
-    subredditId: params.subredditId,
+    subredditId: T5(params.subredditId),
     authorId: appUserId,
     isInternal: params.isInternal,
     participantType: params.participantType,
@@ -1199,7 +1199,7 @@ async function createModmailConversation(params: {
   if (response.data?.createModmailConversationV2?.ok) {
     return response.data?.createModmailConversationV2?.conversationId;
   }
-  throw new Error(
-    'modmail conversation creation failed; ${response.data?.createModmailConversationV2?.errors[0].message}'
-  );
+  const errorMessage =
+    response.data?.createModmailConversationV2?.errors?.[0]?.message ?? 'unknown error';
+  throw new Error(`modmail conversation creation failed; ${errorMessage}`);
 }

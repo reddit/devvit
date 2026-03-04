@@ -1187,7 +1187,7 @@ async function createModmailConversation(
   if (response.data?.createModmailConversationV2?.ok) {
     return response.data?.createModmailConversationV2?.conversationId;
   }
-  throw new Error(
-    'modmail conversation creation failed; ${response.data?.createModmailConversationV2?.errors[0].message}'
-  );
+  const errorMessage =
+    response.data?.createModmailConversationV2?.errors?.[0]?.message ?? 'unknown error';
+  throw new Error(`modmail conversation creation failed; ${errorMessage}`);
 }
