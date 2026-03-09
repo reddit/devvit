@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "devvit-dev-bot",
-  "version": "0.12.13",
+  "version": "0.12.14",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {
@@ -16,10 +16,10 @@
     "type-check": "tsc --build"
   },
   "dependencies": {
-    "@devvit/public-api": "0.12.13",
-    "@devvit/web": "0.12.13",
+    "@devvit/public-api": "0.12.14",
+    "@devvit/web": "0.12.14",
     "@types/express-serve-static-core": "5.1.0",
-    "devvit": "0.12.14-dev",
+    "devvit": "0.12.15-dev",
     "express": "5.1.0"
   },
   "devDependencies": {
