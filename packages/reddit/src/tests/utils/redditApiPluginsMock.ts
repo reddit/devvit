@@ -97,6 +97,7 @@ export const redditApiPlugins = {
     BulkReadConversations: vi.fn(),
     GetConversations: vi.fn(),
     CreateConversation: vi.fn(),
+    CreateModmailConversation: vi.fn(),
     GetConversation: vi.fn(),
     CreateConversationMessage: vi.fn(),
     ApproveConversation: vi.fn(),

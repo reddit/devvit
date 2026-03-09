@@ -7,7 +7,6 @@ import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import { type T1, T2, type T3, T5 } from '@devvit/shared-types/tid.js';
 
-import { GraphQL } from '../graphql/GraphQL.js';
 import { getRedditApiPlugins } from '../plugin.js';
 import { User } from './User.js';
 
@@ -1182,11 +1181,7 @@ async function createModmailConversation(params: {
     throw new Error('App user not found; did the app get banned?');
   }
 
-  const operationName = 'CreateModmailConversation';
-  const persistedQueryHash = '5f9ae20b0c7bdffcafb80241728a72e67cd4239bc09f67284b79d4aa706ee0e5';
-  // Legacy GQL query. Do not copy this pattern.
-  // eslint-disable-next-line no-restricted-properties
-  const response = await GraphQL.query(operationName, persistedQueryHash, {
+  const response = await getRedditApiPlugins().NewModmail.CreateModmailConversation({
     subject: params.subject,
     bodyMarkdown: params.bodyMarkdown,
     subredditId: T5(params.subredditId),
@@ -1196,10 +1191,5 @@ async function createModmailConversation(params: {
     conversationType: params.conversationType,
   });
 
-  if (response.data?.createModmailConversationV2?.ok) {
-    return response.data?.createModmailConversationV2?.conversationId;
-  }
-  const errorMessage =
-    response.data?.createModmailConversationV2?.errors?.[0]?.message ?? 'unknown error';
-  throw new Error(`modmail conversation creation failed; ${errorMessage}`);
+  return (response as { conversationId?: string }).conversationId ?? '';
 }
