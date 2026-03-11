@@ -6,6 +6,7 @@ import {
   type WebViewClientData,
   type WebViewContext,
 } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import type { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
 import type { Context } from '@devvit/shared-types/client/client-context.js';
 import type {
   DevvitGlobal,
@@ -79,6 +80,10 @@ export const initDevvitGlobal = (
     refreshToken: requestTokenRefresh,
   };
 };
+
+export function updateMode(mode: WebViewImmersiveMode): void {
+  devvit.webViewMode = mode;
+}
 
 export function updateToken(token: WebbitToken): void {
   globalThis.devvit.token = token;

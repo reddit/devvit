@@ -1,5 +1,6 @@
 import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
+import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { tokenParam } from '@devvit/shared-types/webbit.js';
 
@@ -18,12 +19,16 @@ export type WebViewMode = 'inline' | 'expanded';
  */
 export type WebViewModeListener = (mode: WebViewMode) => void;
 
+const modeListeners: Set<WebViewModeListener> = new Set();
+
 /**
  * Represents the current web view mode state for the application.
  *
  * @experimental
  */
-export const getWebViewMode = (): WebViewMode => webViewMode(devvit.webViewMode);
+export function getWebViewMode(): WebViewMode {
+  return webViewMode(devvit.webViewMode);
+}
 
 /**
  * Requests expanded mode for the web view.
@@ -83,7 +88,9 @@ export function exitExpandedMode(event: MouseEvent): void {
  * @param callback The callback to be called when the mode changes.
  * @experimental
  */
-export function addWebViewModeListener(_: WebViewModeListener): void {}
+export function addWebViewModeListener(callback: WebViewModeListener): void {
+  modeListeners.add(callback);
+}
 
 /**
  * @deprecated This API is deprecated and will be removed in a future release.
@@ -92,7 +99,9 @@ export function addWebViewModeListener(_: WebViewModeListener): void {}
  * @param callback The callback to be removed.
  * @experimental
  */
-export function removeWebViewModeListener(_: WebViewModeListener): void {}
+export function removeWebViewModeListener(callback: WebViewModeListener): void {
+  modeListeners.delete(callback);
+}
 
 function emitModeEffect(mode: WebViewImmersiveMode, event: Event, entry: string | undefined): void {
   if (!event.isTrusted || event.type !== 'click') {
@@ -117,6 +126,20 @@ function emitModeEffect(mode: WebViewImmersiveMode, event: Event, entry: string 
     type: EffectType.EFFECT_WEB_VIEW,
     immersiveMode: { entryUrl, immersiveMode: mode },
   });
+}
+
+/** @internal */
+export function initWebViewMode(): void {
+  addEventListener('message', onWebViewMessage);
+}
+
+/** @internal */
+export function onWebViewMessage(ev: MessageEvent<WebViewMessageEvent_MessageData>): void {
+  if (ev.data?.type !== 'devvit-message') return;
+  if (!ev.data?.data?.immersiveModeEvent) return;
+
+  const mode = getWebViewMode();
+  for (const listener of modeListeners) listener(mode);
 }
 
 function webViewMode(mode: WebViewImmersiveMode | undefined): WebViewMode {

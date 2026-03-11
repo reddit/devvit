@@ -7,7 +7,14 @@ import { type Effect, emitEffect } from '@devvit/shared-types/client/emit-effect
 import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { describe, expect, it, vi } from 'vitest';
 
-import { exitExpandedMode, getWebViewMode, requestExpandedMode } from './web-view-mode.js';
+import {
+  addWebViewModeListener,
+  exitExpandedMode,
+  getWebViewMode,
+  initWebViewMode,
+  removeWebViewModeListener,
+  requestExpandedMode,
+} from './web-view-mode.js';
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(() => Promise.resolve(undefined)),
@@ -129,6 +136,55 @@ describe('requestExpandedMode()', () => {
     // transition back to inline
     sendEvent(WebViewImmersiveMode.INLINE_MODE);
     expect(getWebViewMode()).toBe('inline');
+  });
+});
+
+describe('message listener', () => {
+  beforeAll(() => {
+    initWebViewMode();
+  });
+
+  describe('addWebViewModeListener()', () => {
+    it('is called with "expanded" on immersive mode event', () => {
+      const listener = vi.fn();
+      addWebViewModeListener(listener);
+      globalThis.devvit.webViewMode = WebViewImmersiveMode.IMMERSIVE_MODE;
+      sendEvent(WebViewImmersiveMode.IMMERSIVE_MODE);
+      expect(listener).toHaveBeenCalledOnce();
+      expect(listener).toHaveBeenCalledWith('expanded');
+      removeWebViewModeListener(listener);
+    });
+
+    it('is called with "inline" on inline mode event', () => {
+      const listener = vi.fn();
+      addWebViewModeListener(listener);
+      sendEvent(WebViewImmersiveMode.INLINE_MODE);
+      expect(listener).toHaveBeenCalledWith('inline');
+      removeWebViewModeListener(listener);
+    });
+
+    it('calls all registered listeners', () => {
+      const listenerA = vi.fn();
+      const listenerB = vi.fn();
+      addWebViewModeListener(listenerA);
+      addWebViewModeListener(listenerB);
+      globalThis.devvit.webViewMode = WebViewImmersiveMode.IMMERSIVE_MODE;
+      sendEvent(WebViewImmersiveMode.IMMERSIVE_MODE);
+      expect(listenerA).toHaveBeenCalledWith('expanded');
+      expect(listenerB).toHaveBeenCalledWith('expanded');
+      removeWebViewModeListener(listenerA);
+      removeWebViewModeListener(listenerB);
+    });
+  });
+
+  describe('removeWebViewModeListener()', () => {
+    it('prevents listener from being called after removal', () => {
+      const listener = vi.fn();
+      addWebViewModeListener(listener);
+      removeWebViewModeListener(listener);
+      sendEvent(WebViewImmersiveMode.IMMERSIVE_MODE);
+      expect(listener).not.toHaveBeenCalled();
+    });
   });
 });
 
