@@ -4,6 +4,10 @@ import type {
   BasicSubredditRequest,
   BasicWhereRequest,
   DeleteSrImgRequest,
+  GetHighlightedPostsRequest,
+  GetHighlightedPostsResponse,
+  ReorderHighlightedPostsRequest,
+  ReorderHighlightedPostsResponse,
   SearchRedditNamesResponse,
   SearchSubredditsResponse,
   SiteAdminRequest,
@@ -92,6 +96,26 @@ export class SubredditPluginMock implements Subreddits {
   async DeleteSrImg(_request: DeleteSrImgRequest, _metadata?: Metadata): Promise<JsonStatus> {
     throw new Error(
       `Reddit API method Subreddits.DeleteSrImg is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async GetHighlightedPosts(
+    _request: GetHighlightedPostsRequest,
+    _metadata?: Metadata
+  ): Promise<GetHighlightedPostsResponse> {
+    throw new Error(
+      `Reddit API method Subreddits.GetHighlightedPosts is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async ReorderHighlightedPosts(
+    _request: ReorderHighlightedPostsRequest,
+    _metadata?: Metadata
+  ): Promise<ReorderHighlightedPostsResponse> {
+    throw new Error(
+      `Reddit API method Subreddits.ReorderHighlightedPosts is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }

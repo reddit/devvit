@@ -1,12 +1,18 @@
 import { type JsonStatus } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import type {
+  AddPostToHighlightsRequest,
+  AddPostToHighlightsResponse,
   BasicIdRequest,
   CommentRequest,
   EditCustomPostRequest,
   FollowPostRequest,
+  GetIsPostHighlightedRequest,
+  GetIsPostHighlightedResponse,
   InfoRequest,
   JsonWrappedComment,
   MoreChildrenRequest,
+  RemovePostFromHighlightsRequest,
+  RemovePostFromHighlightsResponse,
   ReportAwardRequest,
   ReportRequest,
   SaveRequest,
@@ -310,6 +316,26 @@ export class LinksAndCommentsPluginMock implements LinksAndComments {
     );
   }
 
+  async GetIsPostHighlighted(
+    _request: GetIsPostHighlightedRequest,
+    _metadata?: Metadata
+  ): Promise<GetIsPostHighlightedResponse> {
+    throw new Error(
+      `Reddit API method LinksAndComments.GetIsPostHighlighted is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async AddPostToHighlights(
+    _request: AddPostToHighlightsRequest,
+    _metadata?: Metadata
+  ): Promise<AddPostToHighlightsResponse> {
+    throw new Error(
+      `Reddit API method LinksAndComments.AddPostToHighlights is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
   async Hide(_request: BasicIdRequest, _metadata?: Metadata): Promise<Empty> {
     throw new Error(
       `Reddit API method LinksAndComments.Hide is not implemented in the test harness.\n` +
@@ -534,6 +560,16 @@ export class LinksAndCommentsPluginMock implements LinksAndComments {
   async Unspoiler(_request: BasicIdRequest, _metadata?: Metadata): Promise<Empty> {
     throw new Error(
       `Reddit API method LinksAndComments.Unspoiler is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async RemovePostFromHighlights(
+    _request: RemovePostFromHighlightsRequest,
+    _metadata?: Metadata
+  ): Promise<RemovePostFromHighlightsResponse> {
+    throw new Error(
+      `Reddit API method LinksAndComments.RemovePostFromHighlights is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }
