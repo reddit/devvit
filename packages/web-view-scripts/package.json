@@ -36,6 +36,7 @@
     "@devvit/protos": "0.12.14",
     "@devvit/shared": "0.12.14",
     "@devvit/shared-types": "0.12.14",
+    "html-to-image": "1.11.13",
     "jwt-decode": "4.0.0"
   },
   "devDependencies": {
@@ -55,7 +56,11 @@
   "filesize": {
     "dist/scripts/devvit.v1.min.js": {
       "gzip": "26 kb",
-      "none": "115 kb"
+      "none": "116 kb"
+    },
+    "dist/scripts/screenshot.v1.min.js": {
+      "gzip": "28 kb",
+      "none": "121 kb"
     }
   },
   "source": "./src/index.ts"

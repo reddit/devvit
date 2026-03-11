@@ -21,15 +21,17 @@ import {
 
 describe('emit-effect', () => {
   let originalParent: Window | null;
-  let mockParent: Window;
+  let mockParent: Pick<Window, 'postMessage'>;
+  let mockPostMessage: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     originalParent = parent;
+    mockPostMessage = vi.fn();
     mockParent = {
-      postMessage: vi.fn(),
-    } as unknown as Window;
+      postMessage: mockPostMessage as unknown as Window['postMessage'],
+    };
     Object.defineProperty(window, 'parent', {
-      value: mockParent,
+      value: mockParent as unknown as Window,
       writable: true,
     });
   });
@@ -58,16 +60,16 @@ describe('emit-effect', () => {
     const messagePromise = emitEffectWithResponse(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
-    const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const postedMessage = mockPostMessage.mock.calls[0][0];
     expect(postedMessage).toStrictEqual({
-      realtimeEffect: undefined,
       scope: WebViewInternalMessageScope.CLIENT,
       type: webViewInternalMessageType,
       effect,
       showForm,
       id: expect.any(String),
+      realtimeEffect: undefined,
     });
-    expect((mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][1]).toBe('*');
+    expect(mockPostMessage.mock.calls[0][1]).toBe('*');
 
     // Create mock response
     const messageData: WebViewInternalEventMessage = {
@@ -136,7 +138,7 @@ describe('emit-effect', () => {
 
     // Test effect with response
     const promiseWithResponse = emitEffectWithResponse(effectWithResponse);
-    const messageWithId = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const messageWithId = mockPostMessage.mock.calls[0][0];
     expect(messageWithId.id).toBeDefined();
     expect(typeof messageWithId.id).toBe('string');
     expect(messageWithId.effect).toStrictEqual(effectWithResponse);
@@ -154,7 +156,7 @@ describe('emit-effect', () => {
 
     // Test effect without response
     const promiseWithoutResponse = emitEffect(effectWithoutResponse);
-    const messageWithoutId = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[1][0];
+    const messageWithoutId = mockPostMessage.mock.calls[1][0];
     expect(messageWithoutId.id).toBeUndefined();
     expect(messageWithoutId.effect).toStrictEqual(effectWithoutResponse);
 
@@ -177,7 +179,7 @@ describe('emit-effect', () => {
     const messagePromise = emitEffectWithResponse(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
-    const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const postedMessage = mockPostMessage.mock.calls[0][0];
 
     // First dispatch a message with wrong ID - should be ignored
     const wrongMessage = {
@@ -263,7 +265,7 @@ describe('emit-effect', () => {
     const messagePromise = emitEffectWithResponse(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
-    const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const postedMessage = mockPostMessage.mock.calls[0][0];
 
     // First dispatch a non-devvit message - should be ignored
     dispatchEvent(
@@ -336,7 +338,7 @@ describe('emit-effect', () => {
     const messagePromise = emitEffect(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
-    const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const postedMessage = mockPostMessage.mock.calls[0][0];
 
     const handleMessageSpy = vi.fn();
     addEventListener('message', handleMessageSpy);
@@ -379,7 +381,7 @@ describe('emit-effect', () => {
     const messagePromise = emitEffectWithResponse(effect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
-    const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const postedMessage = mockPostMessage.mock.calls[0][0];
     expect(postedMessage).toStrictEqual({
       scope: WebViewInternalMessageScope.CLIENT,
       type: webViewInternalMessageType,
@@ -387,7 +389,7 @@ describe('emit-effect', () => {
       id: expect.any(String),
       realtimeEffect: undefined,
     });
-    expect((mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][1]).toBe('*');
+    expect(mockPostMessage.mock.calls[0][1]).toBe('*');
 
     const messageData: WebViewInternalEventMessage = {
       id: postedMessage.id,
@@ -432,7 +434,7 @@ describe('emit-effect', () => {
     emitEffect(navigateEffect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
-    const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const postedMessage = mockPostMessage.mock.calls[0][0];
     expect(postedMessage).toMatchInlineSnapshot(`
       {
         "effect": {
@@ -441,6 +443,7 @@ describe('emit-effect', () => {
           },
           "type": 5,
         },
+        "id": undefined,
         "navigateToUrl": {
           "url": "https://www.reddit.com/r/test",
         },
@@ -462,9 +465,10 @@ describe('emit-effect', () => {
     emitEffect(realtimeEffect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
-    const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const postedMessage = mockPostMessage.mock.calls[0][0];
     expect(postedMessage).toMatchInlineSnapshot(`
       {
+        "id": undefined,
         "realtime": {
           "subscriptionIds": [
             "channel1",
@@ -494,7 +498,7 @@ describe('emit-effect', () => {
     emitEffectWithResponse(canRunAsUserEffect);
 
     expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
-    const postedMessage = (mockParent.postMessage as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const postedMessage = mockPostMessage.mock.calls[0][0];
     expect(postedMessage).toStrictEqual<WebViewInternalMessage>({
       canRunAsUser: {
         postId: 't3_post123',
@@ -510,5 +514,44 @@ describe('emit-effect', () => {
       scope: 0,
       type: webViewInternalMessageType,
     });
+  });
+
+  it('should post effect response with request id on envelope and screenshot payload', () => {
+    const requestId = 'req-screenshot-abc';
+    const dataUrl = 'data:image/png;base64,abc123';
+
+    emitEffect({ type: EffectType.EFFECT_SCREENSHOT_RESPONSE, screenshot: { dataUrl } }, requestId);
+
+    expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
+    const postedMessage = mockPostMessage.mock.calls[0][0];
+    expect(postedMessage).toStrictEqual({
+      id: requestId,
+      realtimeEffect: undefined,
+      scope: WebViewInternalMessageScope.CLIENT,
+      type: webViewInternalMessageType,
+      screenshot: { dataUrl },
+    });
+    expect(mockPostMessage.mock.calls[0][1]).toBe('*');
+  });
+
+  it('should post effect response with screenshot error on failure', () => {
+    const requestId = 'req-screenshot-xyz';
+    const errorMessage = 'Target element has no content to capture';
+
+    emitEffect(
+      { type: EffectType.EFFECT_SCREENSHOT_RESPONSE, screenshot: { error: errorMessage } },
+      requestId
+    );
+
+    expect(mockParent.postMessage).toHaveBeenCalledTimes(1);
+    const postedMessage = mockPostMessage.mock.calls[0][0];
+    expect(postedMessage).toStrictEqual({
+      id: requestId,
+      realtimeEffect: undefined,
+      scope: WebViewInternalMessageScope.CLIENT,
+      type: webViewInternalMessageType,
+      screenshot: { error: errorMessage },
+    });
+    expect(mockPostMessage.mock.calls[0][1]).toBe('*');
   });
 });

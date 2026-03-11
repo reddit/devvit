@@ -18,13 +18,16 @@ export type Effect = Omit<WebViewInternalMessage, 'id' | 'scope' | 'type'> & { t
  * Emits an effect to the parent window returns immediately.
  *
  * @param effect - The effect to be emitted to the parent window
+ * @param requestId - Optional request id used to correlate request/response messages
  * @description
- * This function handles effects that don't require a response.
+ * This function handles effects that don't require a response, and can also
+ * set a request id when replying to client-originated requests.
  */
-export const emitEffect = (effect: Readonly<Effect>): void => {
+export const emitEffect = (effect: Readonly<Effect>, requestId?: string): void => {
   const message: WebViewInternalMessage = {
     ...effect,
     realtimeEffect: effect.realtime, // to-do: remove deprecated field.
+    id: requestId,
     scope: WebViewInternalMessageScope.CLIENT,
     type: webViewInternalMessageType,
   };

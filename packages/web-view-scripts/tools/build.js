@@ -19,7 +19,7 @@ import packageJSON from '../package.json' with { type: 'json' };
 };
 
 /** @type {esbuild.BuildOptions} */
-const opts = {
+const baseOpts = {
   banner: watch
     ? {
         js: "new EventSource('/esbuild').addEventListener('change', () => location.reload());",
@@ -27,21 +27,42 @@ const opts = {
     : {},
   bundle: true,
   define: { 'globalThis.webViewScriptsVersion': JSON.stringify(webViewScripts) },
-  entryPoints: ['src/devvit.v1.ts'],
-  format: 'iife',
   logLevel: 'info', // Print the port and build demarcations.
   metafile: true,
   minify,
-  outfile: 'dist/scripts/devvit.v1.min.js',
+  entryNames: '[name].min',
+  outdir: 'dist/scripts',
   sourcemap: 'linked',
   target: 'es2020', // https://esbuild.github.io/content-types/#tsconfig-json
   write: !watch,
 };
 
+/** @type {esbuild.BuildOptions} */
+const devvitOpts = {
+  ...baseOpts,
+  external: ['./screenshot.v1.min.js'],
+  entryPoints: ['src/devvit.v1.ts'],
+  format: 'iife',
+};
+
+/** @type {esbuild.BuildOptions} */
+const screenshotOpts = {
+  ...baseOpts,
+  entryPoints: ['src/screenshot.v1.ts'],
+  format: 'esm',
+};
+
 if (watch) {
-  const ctx = await esbuild.context(opts);
-  await Promise.all([ctx.watch(), ctx.serve({ port: 1234, servedir: '.' })]);
+  const devvitCtx = await esbuild.context(devvitOpts);
+  const screenshotCtx = await esbuild.context(screenshotOpts);
+  await Promise.all([
+    devvitCtx.watch(),
+    screenshotCtx.watch(),
+    devvitCtx.serve({ port: 1234, servedir: '.' }),
+  ]);
 } else {
-  const build = await esbuild.build(opts);
-  fs.writeFileSync('dist/meta.json', JSON.stringify(build.metafile));
+  const devvitResult = await esbuild.build(devvitOpts);
+  const screenshotResult = await esbuild.build(screenshotOpts);
+  fs.writeFileSync('dist/devvit.v1.meta.json', JSON.stringify(devvitResult.metafile));
+  fs.writeFileSync('dist/screenshot.v1.meta.json', JSON.stringify(screenshotResult.metafile));
 }
