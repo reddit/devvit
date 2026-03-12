@@ -1,8 +1,5 @@
 import { debounce } from './debounce.js';
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { sleep } from './sleep.js';
 
 let called = 0;
 const cb = debounce(() => {
