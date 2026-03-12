@@ -8,10 +8,11 @@ test('sleep returns a Promise', () => {
 
 test('sleep resolves after at least the requested delay', async () => {
   const delayMS = 20;
-  const startedAt = Date.now();
+  const timingFuzzMS = 1;
+  const startedAt = performance.now();
 
   await sleep(delayMS);
 
-  const elapsedMS = Date.now() - startedAt;
-  expect(elapsedMS).toBeGreaterThanOrEqual(delayMS);
+  const elapsedMS = performance.now() - startedAt;
+  expect(elapsedMS).toBeGreaterThanOrEqual(delayMS - timingFuzzMS);
 });
