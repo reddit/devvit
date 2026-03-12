@@ -1321,7 +1321,7 @@ export class Post {
               backgroundColor: opts.styles.backgroundColor ?? '',
               backgroundColorDark: opts.styles.backgroundColorDark ?? '',
               height: opts.styles.height ?? EntrypointHeight.HEIGHT_UNSPECIFIED,
-              shareImageUrl: /* TODO: opts.styles.shareImageUrl ?? */ '',
+              shareImageUrl: opts.styles.shareImageUrl ?? '',
               heightPixels: -1, // Not settable directly
             }
           : undefined,
