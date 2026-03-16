@@ -5,13 +5,16 @@ import type {
   UserDataByAccountIdsResponse,
   UserDataByAccountIdsResponse_UserAccountData,
 } from '@devvit/protos';
-import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
+import type {
+  GetUserKarmaForSubredditResponse,
+  UserTrophiesResponse,
+} from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
-import type { T2ID } from '../../../types/tid.js';
-import { asT2ID, isT2ID } from '../../../types/tid.js';
+import type { T2ID, T6ID } from '../../../types/tid.js';
+import { asT2ID, asT6ID, isT2ID, isT6ID } from '../../../types/tid.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { formatModeratorPermissions, validModPermissions } from '../helpers/permissions.js';
@@ -171,6 +174,28 @@ export type UserSocialLink = {
  * @internal
  */
 type UserSocialLinkResponse = Omit<UserSocialLink, 'handle'> & { handle: string | null };
+
+/**
+ * A trophy displayed on a user's profile.
+ */
+export type Trophy = {
+  /** Trophy ID. */
+  id: T6ID | undefined;
+  /** Display name of the trophy. */
+  name: string | undefined;
+  /** Description. */
+  description: string | undefined;
+  /** URL of the trophy icon. Currently 70x70. */
+  iconUrl: string | undefined;
+  /** URL of the small icon. Currently 40x40. */
+  iconSmallUrl: string | undefined;
+  /** When the trophy was granted (Unix timestamp). */
+  grantedAt: number | undefined;
+  /** Award ID. */
+  awardId: T6ID | undefined;
+  /** URL to redirect to when the trophy is clicked. */
+  url: string | undefined;
+};
 
 /**
  * A class representing a user.
@@ -486,6 +511,15 @@ export class User {
     return await User.getUserKarmaFromCurrentSubreddit(this.username, this.#metadata);
   }
 
+  /**
+   * Get the trophies displayed on this user's profile.
+   *
+   * @returns A Promise that resolves to an array of Trophy objects.
+   */
+  async getTrophies(): Promise<Trophy[]> {
+    return User.getTrophies(this.username, this.#metadata);
+  }
+
   /** @internal */
   static async getById(id: T2ID, metadata: Metadata | undefined): Promise<User | undefined> {
     const username = await getUsernameById(id, metadata);
@@ -672,6 +706,12 @@ export class User {
       subredditId,
     });
   }
+
+  /** @internal */
+  static async getTrophies(username: string, metadata: Metadata | undefined): Promise<Trophy[]> {
+    const response = await Devvit.redditAPIPlugins.Users.UserTrophies({ username }, metadata);
+    return userTrophiesResponseToTrophies(response);
+  }
 }
 
 function listingProtosToPostsOrComments(
@@ -770,6 +810,38 @@ async function listingProtosToUsers(
     before: listingProto.data.before,
     after: listingProto.data.after,
   };
+}
+
+/** @internal */
+function userTrophiesResponseToTrophies(response: UserTrophiesResponse): Trophy[] {
+  if (!response.data?.trophies) {
+    return [];
+  }
+
+  return response.data.trophies.map((t) => {
+    if (!t.data) {
+      return {} as Trophy;
+    }
+
+    const trophy: Trophy = {
+      id:
+        t.data.id != null && t.data.id !== ''
+          ? asT6ID(isT6ID(t.data.id) ? t.data.id : `t6_${t.data.id}`)
+          : undefined,
+      name: t.data.name,
+      description: t.data.description,
+      iconUrl: t.data.icon70,
+      iconSmallUrl: t.data.icon40,
+      grantedAt: t.data.grantedAt,
+      awardId:
+        t.data.awardId != null && t.data.awardId !== ''
+          ? asT6ID(isT6ID(t.data.awardId) ? t.data.awardId : `t6_${t.data.awardId}`)
+          : undefined,
+      url: t.data.url,
+    };
+
+    return trophy;
+  });
 }
 
 /** @internal */

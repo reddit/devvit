@@ -28,7 +28,7 @@ export type T3 = `${T_PREFIX.LINK}${string}`;
 export type T4 = `${T_PREFIX.MESSAGE}${string}`;
 /** Subreddit thing ID. */
 export type T5 = `${T_PREFIX.SUBREDDIT}${string}`;
-/** Award thing ID. */
+/** Trophy/Award thing ID. */
 export type T6 = `${T_PREFIX.AWARD}${string}`;
 
 export type Tid = T1 | T2 | T3 | T4 | T5 | T6;

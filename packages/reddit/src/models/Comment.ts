@@ -446,6 +446,35 @@ export class Comment {
   }
 
   /**
+   * Snooze subsequent reports with the given reason from the same users for the next 7 days.
+   * Only works for free-form reports.
+   *
+   * @param reason - The report reason to snooze.
+   */
+  async snoozeReports(reason: string): Promise<void> {
+    await Comment.snoozeReports(this.id, reason);
+  }
+
+  /**
+   * Unsnooze reports with the given reason.
+   * Only works for free-form reports.
+   *
+   * @param reason - The report reason to unsnooze.
+   */
+  async unsnoozeReports(reason: string): Promise<void> {
+    await Comment.unsnoozeReports(this.id, reason);
+  }
+
+  /**
+   * Marks that this comment should not be collapsed by the crowd control system.
+   * It can still be collapsed for other reasons.
+   */
+  async showComment(): Promise<void> {
+    await Comment.showComment(this.id);
+    this.#removed = false;
+  }
+
+  /**
    * Add a mod note for why the comment was removed
    *
    * @param options.reasonId id of a Removal Reason - you can leave this as an empty string if you don't have one
@@ -722,6 +751,44 @@ export class Comment {
     const client = getRedditApiPlugins().Moderation;
 
     await client.UnignoreReports(
+      {
+        id,
+      },
+      this.#metadata
+    );
+  }
+
+  /** @internal */
+  static async snoozeReports(id: T1, reason: string): Promise<void> {
+    const client = getRedditApiPlugins().Moderation;
+
+    await client.SnoozeReports(
+      {
+        id,
+        reason,
+      },
+      this.#metadata
+    );
+  }
+
+  /** @internal */
+  static async unsnoozeReports(id: T1, reason: string): Promise<void> {
+    const client = getRedditApiPlugins().Moderation;
+
+    await client.UnsnoozeReports(
+      {
+        id,
+        reason,
+      },
+      this.#metadata
+    );
+  }
+
+  /** @internal */
+  static async showComment(id: T1): Promise<void> {
+    const client = getRedditApiPlugins().Moderation;
+
+    await client.ShowComment(
       {
         id,
       },

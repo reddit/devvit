@@ -23,8 +23,10 @@ import type {
   CrosspostOptions,
   DeleteNotesOptions,
   EditFlairTemplateOptions,
+  GetBestPostsOptions,
   GetCommentsByUserOptions,
   GetCommentsOptions,
+  GetDuplicatesOptions,
   GetHotPostsOptions,
   GetModerationLogOptions,
   GetModNotesOptions,
@@ -606,6 +608,49 @@ export class RedditClient {
    */
   getTopPosts(options: GetPostsOptionsWithTimeframe): Listing<Post> {
     return Post.getTopPosts(options);
+  }
+
+  /**
+   * Get a list of best posts from the front page.
+   * This method will get the front page for the app account by default.
+   * To get the front page for a user, please contact Reddit.
+   *
+   * @param options - Options for the request
+   * @param options.limit - The maximum number of posts to return. e.g. 1000
+   * @param options.pageSize - The number of posts to return per request. e.g. 100
+   * @returns A Listing of Post objects.
+   * @example
+   * ```ts
+   * const posts = await reddit.getBestPosts({
+   *   limit: 1000,
+   *   pageSize: 100
+   * }).all();
+   * ```
+   */
+  getBestPosts(options: GetBestPostsOptions): Listing<Post> {
+    return Post.getBestPosts(options);
+  }
+
+  /**
+   * Get posts that shared the same link as the given post.
+   *
+   * @param options - Options for the request. Post ID is required, eveything else is optional.
+   * @param options.postId - (required) The ID of the post to get duplicates for. e.g. 't3_1qjpg'.
+   * @param options.sort - Sort duplicates by new or number of comments.
+   * @param options.subredditName - Limit the search to the given subreddit.
+   * @param options.crosspostsOnly - Only return duplicates that are crossposting this post.
+   * @returns A Listing of Post objects.
+   * @example
+   * ```ts
+   * const duplicates = await reddit.getDuplicatesForPost({
+   *   postId: 't3_abc123',
+   *   sort: 'num_comments',
+   *   limit: 100
+   * }).all();
+   * ```
+   */
+  getDuplicatesForPost(options: GetDuplicatesOptions): Listing<Post> {
+    return Post.getDuplicates(options);
   }
 
   /**

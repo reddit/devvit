@@ -56,8 +56,43 @@ import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
 
+/**
+ * Crowd control level for posts. Determines which comments should be collapsed due to crowd control.
+ * OFF: Anyone with a Reddit account can comment freely.
+ * LENIENT: Collapse comments from people who have negative karma in your community.
+ * MEDIUM: Collapse comments from new Reddit users and people with negative karma in your community.
+ * STRICT: Collapse comments from people who haven’t joined your community, new Reddit users, and people with negative karma in your community
+ */
+export type CrowdControlLevel = 'OFF' | 'LENIENT' | 'MEDIUM' | 'STRICT';
+
+const CROWD_CONTROL_LEVEL_TO_PROTO: Readonly<Record<CrowdControlLevel, number>> = Object.freeze({
+  OFF: 0,
+  LENIENT: 1,
+  MEDIUM: 2,
+  STRICT: 3,
+});
+
+function crowdControlLevelToProto(level: CrowdControlLevel): number {
+  return CROWD_CONTROL_LEVEL_TO_PROTO[level];
+}
+
 export type GetPostsOptions = ListingFetchOptions & {
   subredditName?: string;
+};
+
+export type GetBestPostsOptions = ListingFetchOptions;
+
+export type GetDuplicatesOptions = ListingFetchOptions & {
+  /** Post ID with t3_ prefix (e.g. `t3_abc123`). The prefix is stripped internally. */
+  postId: T3;
+  /** One of: "num_comments", "new" */
+  sort?: 'num_comments' | 'new';
+  /** Limit search to the given subreddit name. The r/ prefix is optional. */
+  subredditName?: string;
+  /** Only return duplicates that are crossposting this post. */
+  crosspostsOnly?: boolean;
+  /** Adding the string "all" will show all results regardless of user preferences. */
+  show?: string;
 };
 
 export type GetPostsOptionsWithTimeframe = GetPostsOptions & {
@@ -722,6 +757,10 @@ export class Post {
     });
   }
 
+  getDuplicates(opts: Omit<GetDuplicatesOptions, 'postId'> = {}): Listing<Post> {
+    return Post.getDuplicates({ ...opts, postId: this.id });
+  }
+
   get flair(): CommonFlair | undefined {
     return this.#flair;
   }
@@ -1142,6 +1181,36 @@ export class Post {
   async unignoreReports(): Promise<void> {
     await Post.unignoreReports(this.id);
     this.#ignoringReports = false;
+  }
+
+  /**
+   * Snooze subsequent reports with the given reason from the same users for the next 7 days.
+   * Only works for free-form reports.
+   *
+   *
+   * @param reason - The report reason to snooze.
+   */
+  async snoozeReports(reason: string): Promise<void> {
+    await Post.snoozeReports(this.id, reason);
+  }
+
+  /**
+   * Unsnooze reports with the given reason.
+   * Only works for free-form reports.
+   *
+   * @param reason - The report reason to unsnooze.
+   */
+  async unsnoozeReports(reason: string): Promise<void> {
+    await Post.unsnoozeReports(this.id, reason);
+  }
+
+  /**
+   * Updates the crowd control level of the post to hide comments accordingly.
+   *
+   * @param level - The crowd control level to set. See {@link CrowdControlLevel} for more information.
+   */
+  async updateCrowdControlLevel(level: CrowdControlLevel): Promise<void> {
+    await Post.updateCrowdControlLevel(this.id, level);
   }
 
   async getAuthor(): Promise<User | undefined> {
@@ -1744,6 +1813,45 @@ export class Post {
   }
 
   /** @internal */
+  static async snoozeReports(id: T3, reason: string): Promise<void> {
+    const client = getRedditApiPlugins().Moderation;
+
+    await client.SnoozeReports(
+      {
+        id,
+        reason,
+      },
+      context.metadata
+    );
+  }
+
+  /** @internal */
+  static async unsnoozeReports(id: T3, reason: string): Promise<void> {
+    const client = getRedditApiPlugins().Moderation;
+
+    await client.UnsnoozeReports(
+      {
+        id,
+        reason,
+      },
+      context.metadata
+    );
+  }
+
+  /** @internal */
+  static async updateCrowdControlLevel(id: T3, level: CrowdControlLevel): Promise<void> {
+    const client = getRedditApiPlugins().Moderation;
+
+    await client.UpdateCrowdControlLevel(
+      {
+        id,
+        level: crowdControlLevelToProto(level),
+      },
+      context.metadata
+    );
+  }
+
+  /** @internal */
   static getControversialPosts(opts: Readonly<GetPostsOptionsWithTimeframe>): Listing<Post> {
     return this.getSortedPosts({ ...opts, sort: 'controversial' });
   }
@@ -1776,6 +1884,66 @@ export class Post {
         );
 
         return listingProtosToPosts(response);
+      },
+    });
+  }
+
+  /** @internal */
+  static getBestPosts(opts: Readonly<GetBestPostsOptions>): Listing<Post> {
+    const client = getRedditApiPlugins().Listings;
+
+    return new Listing({
+      hasMore: true,
+      before: opts.before,
+      after: opts.after,
+      pageSize: opts.pageSize,
+      limit: opts.limit,
+      fetch: async (fetchOpts: ListingFetchOptions) => {
+        const response = await client.Best(
+          {
+            show: 'all',
+            ...fetchOpts,
+          },
+          context.metadata
+        );
+
+        return listingProtosToPosts(response);
+      },
+    });
+  }
+
+  /** @internal */
+  static getDuplicates(opts: Readonly<GetDuplicatesOptions>): Listing<Post> {
+    const article = opts.postId.slice(3);
+    const client = getRedditApiPlugins().Listings;
+
+    return new Listing({
+      hasMore: true,
+      before: opts.before,
+      after: opts.after,
+      pageSize: opts.pageSize,
+      limit: opts.limit,
+      fetch: async (fetchOpts: ListingFetchOptions) => {
+        const response = await client.Duplicates(
+          {
+            article,
+            sort: opts.sort,
+            sr: opts.subredditName,
+            crosspostsOnly: opts.crosspostsOnly,
+            show: opts.show,
+            ...fetchOpts,
+          },
+          context.metadata
+        );
+
+        // We access the second listing because client.Duplicates returns a ListingResponse
+        // with a listings array of length 2. The first listing contains only the original post,
+        // while the second listing contains the duplicates.
+        const duplicatesListing = response.listings?.[1];
+        if (!duplicatesListing?.data?.children) {
+          throw new Error('Duplicates response is missing children');
+        }
+        return listingProtosToPosts(duplicatesListing);
       },
     });
   }

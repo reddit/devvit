@@ -2,6 +2,7 @@ import type {
   GetUserKarmaForSubredditResponse,
   UserDataByAccountIdsResponse,
   UserDataByAccountIdsResponse_UserAccountData,
+  UserTrophiesResponse,
 } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import type { User as UserProto } from '@devvit/protos/json/devvit/reddit/user.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
@@ -9,7 +10,7 @@ import type { Metadata } from '@devvit/protos/lib/Types.js';
 import type { Listing as ListingProto } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import { isT2, T2 } from '@devvit/shared-types/tid.js';
+import { isT2, isT6, T2, T6 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
@@ -150,6 +151,63 @@ export type UserSocialLink = {
  * @internal
  */
 type UserSocialLinkResponse = Omit<UserSocialLink, 'handle'> & { handle: string | null };
+
+/**
+ * A trophy displayed on a user's profile.
+ * All fields are optional; the API may return null or omit any of them.
+ */
+export type Trophy = {
+  /** Trophy ID. */
+  id: T6 | undefined;
+  /** Display name of the trophy. */
+  name: string | undefined;
+  /** Description. */
+  description: string | undefined;
+  /** URL of the trophy icon. Currently 70x70. */
+  iconUrl: string | undefined;
+  /** URL of the small icon. Currently 40x40. */
+  iconSmallUrl: string | undefined;
+  /** When the trophy was granted (Unix timestamp). */
+  grantedAt: number | undefined;
+  /** Award ID. */
+  awardId: T6 | undefined;
+  /** URL to redirect to when the trophy is clicked. */
+  url: string | undefined;
+};
+
+/**
+ * @internal
+ */
+function userTrophiesResponseToTrophies(response: UserTrophiesResponse): Trophy[] {
+  if (!response.data?.trophies) {
+    return [];
+  }
+
+  return response.data.trophies.map((t) => {
+    if (!t.data) {
+      return {} as Trophy;
+    }
+
+    const trophy: Trophy = {
+      id:
+        t.data.id != null && t.data.id !== ''
+          ? T6(isT6(t.data.id) ? t.data.id : `t6_${t.data.id}`)
+          : undefined,
+      name: t.data.name,
+      description: t.data.description,
+      iconUrl: t.data.icon70,
+      iconSmallUrl: t.data.icon40,
+      grantedAt: t.data.grantedAt,
+      awardId:
+        t.data.awardId != null && t.data.awardId !== ''
+          ? T6(isT6(t.data.awardId) ? t.data.awardId : `t6_${t.data.awardId}`)
+          : undefined,
+      url: t.data.url,
+    };
+
+    return trophy;
+  });
+}
 
 /**
  * A class representing a user.
@@ -444,6 +502,15 @@ export class User {
     });
   }
 
+  /**
+   * Get the trophies displayed on this user's profile.
+   *
+   * @returns A Promise that resolves to an array of Trophy objects.
+   */
+  async getTrophies(): Promise<Trophy[]> {
+    return User.getTrophies(this.username);
+  }
+
   /** @internal */
   static async getById(id: T2): Promise<User | undefined> {
     const username = await getUsernameById(id);
@@ -601,6 +668,12 @@ export class User {
       username: username,
       subredditId: context.subredditId,
     });
+  }
+
+  /**@internal */
+  static async getTrophies(username: string): Promise<Trophy[]> {
+    const response = await getRedditApiPlugins().Users.UserTrophies({ username }, context.metadata);
+    return userTrophiesResponseToTrophies(response);
   }
 
   static get #metadata(): Metadata {

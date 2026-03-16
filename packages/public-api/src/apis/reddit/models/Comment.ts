@@ -477,6 +477,35 @@ export class Comment {
   }
 
   /**
+   * Snooze subsequent reports with the given reason from the same users for the next 7 days.
+   * Only works for free-form reports.
+   *
+   * @param reason - The report reason to snooze.
+   */
+  async snoozeReports(reason: string): Promise<void> {
+    await Comment.snoozeReports(this.id, reason, this.#metadata);
+  }
+
+  /**
+   * Unsnooze reports with the given reason.
+   * Only works for free-form reports.
+   *
+   * @param reason - The report reason to unsnooze.
+   */
+  async unsnoozeReports(reason: string): Promise<void> {
+    await Comment.unsnoozeReports(this.id, reason, this.#metadata);
+  }
+
+  /**
+   * Marks that this comment should not be collapsed by the crowd control system.
+   * It can still be collapsed for other reasons.
+   */
+  async showComment(): Promise<void> {
+    await Comment.showComment(this.id, this.#metadata);
+    this.#removed = false;
+  }
+
+  /**
    * Add a mod note for why the comment was removed
    *
    * @param options.reasonId id of a Removal Reason - you can leave this as an empty string if you don't have one
@@ -779,6 +808,52 @@ export class Comment {
     const client = Devvit.redditAPIPlugins.Moderation;
 
     await client.UnignoreReports(
+      {
+        id,
+      },
+      metadata
+    );
+  }
+
+  /** @internal */
+  static async snoozeReports(
+    id: T1ID,
+    reason: string,
+    metadata: Metadata | undefined
+  ): Promise<void> {
+    const client = Devvit.redditAPIPlugins.Moderation;
+
+    await client.SnoozeReports(
+      {
+        id,
+        reason,
+      },
+      metadata
+    );
+  }
+
+  /** @internal */
+  static async unsnoozeReports(
+    id: T1ID,
+    reason: string,
+    metadata: Metadata | undefined
+  ): Promise<void> {
+    const client = Devvit.redditAPIPlugins.Moderation;
+
+    await client.UnsnoozeReports(
+      {
+        id,
+        reason,
+      },
+      metadata
+    );
+  }
+
+  /** @internal */
+  static async showComment(id: T1ID, metadata: Metadata | undefined): Promise<void> {
+    const client = Devvit.redditAPIPlugins.Moderation;
+
+    await client.ShowComment(
       {
         id,
       },
