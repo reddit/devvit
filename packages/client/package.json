@@ -34,12 +34,12 @@
   "dependencies": {
     "@devvit/protos": "0.12.14",
     "@devvit/shared": "0.12.14",
-    "@devvit/shared-types": "0.12.14"
+    "@devvit/shared-types": "0.12.14",
+    "@devvit/web-view-scripts": "0.12.14"
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
     "@devvit/tsconfig": "0.12.14",
-    "@devvit/web-view-scripts": "0.12.14",
     "esbuild": "0.25.9",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
