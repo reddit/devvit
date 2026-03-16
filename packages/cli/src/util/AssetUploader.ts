@@ -21,7 +21,10 @@ import {
   ICON_FILE_PATH,
 } from '@devvit/shared-types/constants.js';
 import { mapAsyncWithMaxConcurrency } from '@devvit/shared-types/mapAsyncWithMaxConcurrency.js';
-import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
+import {
+  clientVersionQueryParam,
+  devvitScriptUrl,
+} from '@devvit/shared-types/web-view-scripts-constants.js';
 import { ux } from '@oclif/core';
 import { createHash } from 'crypto';
 import { fileTypeFromBuffer } from 'file-type';
@@ -35,7 +38,6 @@ import type { DevvitCommand } from './commands/DevvitCommand.js';
 import { dirExists } from './files.js';
 import { retryAsync } from './retryAsync.js';
 
-export const DEVVIT_JS_URL = 'https://webview.devvit.net/scripts/devvit.v1.min.js';
 const DEFAULT_PARALLEL_UPLOADS = 7;
 
 let PARALLEL_UPLOADS = parseInt(process.env['DEVVIT_PARALLEL_UPLOADS'] || '0');
@@ -659,7 +661,7 @@ export function transformHTML(str: string, clientVersionNum: string | undefined)
   const clientVersionQueryArg = clientVersionNum
     ? `${clientVersionQueryParam}=${clientVersionNum}`
     : '';
-  const scriptTag = `<script src="${DEVVIT_JS_URL}?${clientVersionQueryArg}"></script>`;
+  const scriptTag = `<script src="${devvitScriptUrl}?${clientVersionQueryArg}"></script>`;
 
   // if no head tag, create one after the html tag
   const headTag = document.querySelector('head');

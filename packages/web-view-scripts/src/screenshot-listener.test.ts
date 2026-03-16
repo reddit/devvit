@@ -1,6 +1,7 @@
+import { devvitScriptUrl } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { initScreenshotRequestListener } from './screenshot-listener.js';
+import { getScreenshotModuleUrl, initScreenshotRequestListener } from './screenshot-listener.js';
 
 function registerListener(): (event: MessageEvent) => void {
   let listener: ((event: MessageEvent) => void) | undefined;
@@ -12,7 +13,7 @@ function registerListener(): (event: MessageEvent) => void {
       listener = callback as (event: MessageEvent) => void;
     }
   }) as typeof globalThis.addEventListener;
-  initScreenshotRequestListener();
+  initScreenshotRequestListener(devvitScriptUrl);
   expect(listener).toBeDefined();
   return listener as (event: MessageEvent) => void;
 }
@@ -32,7 +33,7 @@ describe('screenshot-listener', () => {
     const addEventListenerMock: Mock = vi.fn();
     globalThis.addEventListener = addEventListenerMock as typeof globalThis.addEventListener;
 
-    initScreenshotRequestListener();
+    initScreenshotRequestListener(devvitScriptUrl);
 
     expect(addEventListenerMock).toHaveBeenCalledTimes(1);
     expect(addEventListenerMock.mock.calls[0][0]).toBe('message');
@@ -59,5 +60,25 @@ describe('screenshot-listener', () => {
       },
     } as MessageEvent);
     expect(console.warn).not.toHaveBeenCalled();
+  });
+
+  it('resolves screenshot module URL from devvit script src', () => {
+    expect(
+      getScreenshotModuleUrl(
+        'https://webview.devvit.net/scripts/devvit.v1.min.js?clientVersion=1.2.3'
+      )
+    ).toBe('https://webview.devvit.net/scripts/screenshot.v1.min.js');
+  });
+
+  it('falls back to default screenshot module URL without devvit script', () => {
+    expect(getScreenshotModuleUrl(undefined)).toBe(
+      'https://webview.devvit.net/scripts/screenshot.v1.min.js'
+    );
+  });
+
+  it('falls back to default screenshot module URL for non-devvit script src', () => {
+    expect(getScreenshotModuleUrl('https://example.com/assets/main.js')).toBe(
+      'https://webview.devvit.net/scripts/screenshot.v1.min.js'
+    );
   });
 });

@@ -16,3 +16,12 @@ export function queryClientVersion(document: {
       new URL(document.currentScript.src).searchParams.get(clientVersionQueryParam) ?? undefined
     );
 }
+
+/** Queries the current script `src` from the active document. */
+export function queryCurrentScriptSrc(document: {
+  readonly currentScript: { readonly src: string } | SVGScriptElement | null;
+}): string | undefined {
+  if (document.currentScript && 'src' in document.currentScript) {
+    return document.currentScript.src;
+  }
+}

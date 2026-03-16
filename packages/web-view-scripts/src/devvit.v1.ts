@@ -1,3 +1,4 @@
+import { queryCurrentScriptSrc } from './client.js';
 import { initDevvitGlobal } from './devvit-global.js';
 import { initFetch } from './fetch.js';
 import { initScreenshotRequestListener } from './screenshot-listener.js';
@@ -8,6 +9,6 @@ import { initWebViewMode } from './web-view-mode.js';
 initDevvitGlobal(document, location, window);
 initTelemetry();
 initFetch();
-initScreenshotRequestListener();
+initScreenshotRequestListener(queryCurrentScriptSrc(document) ?? '');
 initToken();
 initWebViewMode();

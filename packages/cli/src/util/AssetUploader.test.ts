@@ -2,11 +2,14 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { clientVersionQueryParam } from '@devvit/shared-types/web-view-scripts-constants.js';
+import {
+  clientVersionQueryParam,
+  devvitScriptUrl,
+} from '@devvit/shared-types/web-view-scripts-constants.js';
 import { JSDOM } from 'jsdom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { AssetUploader, DEVVIT_JS_URL, queryAssets, transformHTML } from './AssetUploader.js';
+import { AssetUploader, queryAssets, transformHTML } from './AssetUploader.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
 
 describe('HTML Transformation', () => {
@@ -78,7 +81,7 @@ describe('HTML Transformation', () => {
 
       // Verify script tag exists
       const script = document.querySelector(
-        `script[src="${DEVVIT_JS_URL}?${clientVersionQueryParam}=1.2.3"]`
+        `script[src="${devvitScriptUrl}?${clientVersionQueryParam}=1.2.3"]`
       );
       assertScriptExpectations(script);
     });
@@ -93,7 +96,7 @@ describe('HTML Transformation', () => {
 
       // Verify script tag exists
       const script = document.querySelector(
-        `script[src="${DEVVIT_JS_URL}?${clientVersionQueryParam}=1.2.3"]`
+        `script[src="${devvitScriptUrl}?${clientVersionQueryParam}=1.2.3"]`
       );
       assertScriptExpectations(script);
     });
@@ -197,7 +200,7 @@ describe('queryAssets()', () => {
     // Verify that the HTML was transformed.
     const transformedContent = new TextDecoder('utf-8').decode(assets[0].contents);
     expect(transformedContent).toContain(
-      `<script src="${DEVVIT_JS_URL}?${clientVersionQueryParam}=1.2.3"></script>`
+      `<script src="${devvitScriptUrl}?${clientVersionQueryParam}=1.2.3"></script>`
     );
     expect(transformedContent).toContain('<title>Test Page</title>');
     expect(transformedContent).toContain('<h1>Hello World</h1>');
@@ -213,7 +216,7 @@ describe('queryAssets()', () => {
 
     // Verify that the HTML was NOT transformed.
     const untransformedContent = new TextDecoder('utf-8').decode(assets[0].contents);
-    expect(untransformedContent).not.toContain(DEVVIT_JS_URL);
+    expect(untransformedContent).not.toContain(devvitScriptUrl);
     expect(untransformedContent).toContain('<title>Test Page</title>');
     expect(untransformedContent).toContain('<h1>Hello World</h1>');
   });
@@ -221,7 +224,7 @@ describe('queryAssets()', () => {
 
 function selectScript(document: Document): Element | null {
   return document.querySelector(
-    `head script[src="${DEVVIT_JS_URL}?${clientVersionQueryParam}=1.2.3"]`
+    `head script[src="${devvitScriptUrl}?${clientVersionQueryParam}=1.2.3"]`
   );
 }
 

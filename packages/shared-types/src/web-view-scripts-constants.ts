@@ -11,3 +11,12 @@
  * expectations of the `@devvit/client` version.
  */
 export const clientVersionQueryParam: string = 'clientVersion';
+
+/** Bootstrap WebView script file name. */
+export const devvitScriptFileName: string = 'devvit.v1.min.js';
+
+/** Screenshot capture WebView script file name. */
+export const screenshotScriptFileName: string = 'screenshot.v1.min.js';
+
+/** CDN URL for the WebView bootstrap script. */
+export const devvitScriptUrl: string = `https://webview.devvit.net/scripts/${devvitScriptFileName}`;
