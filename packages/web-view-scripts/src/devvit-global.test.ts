@@ -18,6 +18,7 @@ import {
   getBridgeContext,
   getClient,
   initDevvitGlobal,
+  updateConsentStatus,
 } from './devvit-global.js';
 
 describe('getBridgeContext()', () => {
@@ -630,5 +631,32 @@ describe('getClient()', () => {
     };
     const result = getClient(bridge);
     expect(result).toBeUndefined();
+  });
+});
+
+describe('updateConsentStatus()', () => {
+  beforeEach(() => {
+    globalThis.devvit = {
+      appPermissionState: {
+        consentStatus: ConsentStatus.CONSENT_STATUS_UNKNOWN,
+        requestedScopes: [],
+        grantedScopes: [],
+      },
+    } as unknown as DevvitGlobal;
+  });
+
+  afterEach(() => {
+    delete (globalThis as { devvit?: DevvitGlobal }).devvit;
+  });
+
+  test('updates consentStatus when appPermissionState exists', () => {
+    updateConsentStatus(ConsentStatus.GRANTED);
+    expect(globalThis.devvit.appPermissionState?.consentStatus).toBe(ConsentStatus.GRANTED);
+  });
+
+  test('does nothing when appPermissionState is missing', () => {
+    (globalThis as { devvit: DevvitGlobal }).devvit.appPermissionState = undefined;
+    updateConsentStatus(ConsentStatus.REVOKED);
+    expect(globalThis.devvit.appPermissionState).toBeUndefined();
   });
 });

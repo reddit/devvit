@@ -96,6 +96,7 @@ describe('canRunAsUser', () => {
         subredditId: globalThis.devvit.context.subredditId,
       },
     });
+    expect(globalThis.devvit.appPermissionState?.consentStatus).toBe(ConsentStatus.GRANTED);
     expect(result, 'result').toBe(true);
   });
 
@@ -115,6 +116,7 @@ describe('canRunAsUser', () => {
         subredditId: globalThis.devvit.context.subredditId,
       },
     });
+    expect(globalThis.devvit.appPermissionState?.consentStatus).toBe(ConsentStatus.GRANTED);
     expect(result, 'result').toBe(true);
   });
 
@@ -126,6 +128,7 @@ describe('canRunAsUser', () => {
     };
     mockEmitEffect(ConsentStatus.REVOKED);
     const result = await canRunAsUser(mockEvent);
+    expect(globalThis.devvit.appPermissionState?.consentStatus).toBe(ConsentStatus.REVOKED);
     expect(result, 'result').toBe(false);
   });
 });
