@@ -61,7 +61,7 @@ export default class Icons extends DevvitCommand {
     });
     return await Promise.all(
       assets.map(async (asset) => {
-        const name = path.relative(assetsPath, asset);
+        const name = path.relative(assetsPath, asset).replaceAll(path.sep, '/');
         const contents = await fsp.readFile(asset, 'utf-8');
         return { name, contents: stripXmlPreamble(contents) };
       })
