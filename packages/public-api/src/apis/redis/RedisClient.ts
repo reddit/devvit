@@ -354,6 +354,18 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
+  async hsetnx(key: string, field: string, value: string): Promise<TxClientLike> {
+    return this.hSetNX(key, field, value);
+  }
+
+  async hSetNX(key: string, field: string, value: string): Promise<TxClientLike> {
+    await this.#storage.HSetNX(
+      { key, field, value, transactionId: this.#transactionId },
+      this.#metadata
+    );
+    return this;
+  }
+
   async hincrby(key: string, field: string, value: number): Promise<TxClientLike> {
     return this.hIncrBy(key, field, value);
   }
