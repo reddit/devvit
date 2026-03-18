@@ -58,7 +58,9 @@ export default class Icons extends DevvitCommand {
       assets.map(async (asset) => {
         const name = path.relative(assetsPath, asset);
         const contents = await fsp.readFile(asset, 'utf-8');
-        return { name, contents };
+        // Strip XML preamble (<?xml?>, <!DOCTYPE>, comments) before <svg> tag.
+        const stripped = contents.replace(/^[\s\S]*?(<svg)/i, '$1');
+        return { name, contents: stripped };
       })
     );
   }
