@@ -8,6 +8,10 @@ import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 
 let telemetryMetrics: WebViewTelemetryMetric[];
 
+type WebViewTelemetryClickPayload = WebViewTelemetryClickEffect & {
+  elemTrackId?: string | undefined;
+};
+
 /** startTime (UTC milliseconds) is provided by the client within the bridge context, to be used for all metrics */
 let startTime: number | undefined;
 
@@ -49,9 +53,11 @@ function initClickEvent(): void {
   document.addEventListener(
     'click',
     (event) => {
-      const click: WebViewTelemetryClickEffect = {
+      const { definition, elemTrackId } = analyzeClickTarget(event.target, event.isTrusted);
+      const click: WebViewTelemetryClickPayload = {
         event: 'click',
-        definition: isStrictClick(event) ? 'strict' : 'default',
+        definition,
+        elemTrackId,
       };
       void emitEffect({
         type: EffectType.EFFECT_TELEMETRY,
@@ -65,39 +71,66 @@ function initClickEvent(): void {
   );
 }
 
-function isStrictClick(event: MouseEvent): boolean {
-  if (!event.isTrusted) {
-    return false;
+function analyzeClickTarget(
+  eventTarget: EventTarget | null,
+  isTrusted: boolean
+): Pick<WebViewTelemetryClickPayload, 'definition' | 'elemTrackId'> {
+  const targetElement = getTargetElement(eventTarget);
+  if (!targetElement) {
+    return { definition: 'default', elemTrackId: undefined };
   }
 
-  const eventTarget = event.target as HTMLElement;
-
-  const computedStyles = globalThis.window.getComputedStyle(eventTarget);
-  if (computedStyles?.getPropertyValue('cursor') === 'pointer') {
-    return true;
+  let definition: WebViewTelemetryClickEffect['definition'] = 'default';
+  if (isTrusted) {
+    const computedStyles = globalThis.window.getComputedStyle(targetElement);
+    if (computedStyles?.getPropertyValue('cursor') === 'pointer') {
+      definition = 'strict';
+    }
   }
 
-  return elementOrParentIsInteractive(eventTarget);
-}
+  let elemTrackId: string | undefined;
+  let currentElement: Element | null = targetElement;
 
-function elementOrParentIsInteractive(element: HTMLElement): boolean {
-  const STRICT_CLICK_TAGNAMES = ['A', 'BUTTON', 'CANVAS', 'INPUT', 'SELECT', 'TEXTAREA', 'LABEL'];
-
-  let currentElement: HTMLElement | null = element;
-
-  while (currentElement && currentElement.tagName !== 'BODY') {
-    if (STRICT_CLICK_TAGNAMES.includes(currentElement.tagName)) {
-      return true;
+  while (currentElement) {
+    if (elemTrackId === undefined) {
+      const dataTrackId = currentElement.getAttribute('data-track-id');
+      if (dataTrackId) {
+        elemTrackId = dataTrackId;
+      } else if (currentElement.id) {
+        elemTrackId = currentElement.id;
+      }
     }
 
-    if (['true', 'plaintext-only'].includes(currentElement.getAttribute('contenteditable') ?? '')) {
-      return true;
+    if (isTrusted && definition === 'default' && elementIsStrictClickTarget(currentElement)) {
+      definition = 'strict';
+    }
+
+    if (elemTrackId !== undefined && (!isTrusted || definition === 'strict')) {
+      break;
     }
 
     currentElement = currentElement.parentElement;
   }
 
-  return false;
+  return { definition, elemTrackId };
+}
+
+function getTargetElement(eventTarget: EventTarget | null): Element | undefined {
+  if (!eventTarget || typeof eventTarget !== 'object' || !('nodeType' in eventTarget)) {
+    return undefined;
+  }
+
+  const node = eventTarget as Node;
+  return node.nodeType === 1 ? (node as Element) : (node.parentElement ?? undefined);
+}
+
+function elementIsStrictClickTarget(element: Element): boolean {
+  const STRICT_CLICK_TAGNAMES = ['A', 'BUTTON', 'CANVAS', 'INPUT', 'SELECT', 'TEXTAREA', 'LABEL'];
+
+  return (
+    STRICT_CLICK_TAGNAMES.includes(element.tagName) ||
+    ['true', 'plaintext-only'].includes(element.getAttribute('contenteditable') ?? '')
+  );
 }
 
 function measureTtfb(): WebViewTelemetryMetric | undefined {

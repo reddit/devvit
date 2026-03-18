@@ -109,13 +109,12 @@ describe('telemetry', () => {
     it('adds the strict flag if click target has cursor:pointer', () => {
       const onClick = getGlobalClickListener();
       const page = new JSDOM(
-        `<style>div{cursor: pointer}</style><div id="target">div cursor pointer</div>`
+        `<style>div.clickable{cursor: pointer}</style><div class="clickable">div cursor pointer</div>`
       );
       const window = page.window as unknown as Window;
-      // Dirty casting magic to avoid TS errors
       (globalThis as { window: Window }).window = window;
 
-      const divWithCursorPointer = window.document.getElementById('target');
+      const divWithCursorPointer = window.document.querySelector('.clickable');
 
       onClick(constructClickEvent({ target: divWithCursorPointer }));
       expect(postMessageMock).toHaveBeenCalledWith(...clickPostMessageWithDefinition('strict'));
@@ -126,10 +125,10 @@ describe('telemetry', () => {
       const buttonWithChildren = renderDom(`<button class="toplevel-btn">
           <img alt="snoo"/>
           <div class="useless-wrapper">
-            <span id="target">Click Me!</span>
+            <span class="target">Click Me!</span>
           </div>
         </button>`);
-      const targetSpan = buttonWithChildren.querySelector('#target');
+      const targetSpan = buttonWithChildren.querySelector('.target');
 
       onClick(constructClickEvent({ target: targetSpan }));
       expect(postMessageMock).toHaveBeenCalledWith(...clickPostMessageWithDefinition('strict'));
@@ -140,10 +139,10 @@ describe('telemetry', () => {
       const buttonWithChildren = renderDom(`<div contenteditable="true">
           <img alt="snoo"/>
           <div class="useless-wrapper">
-            <span id="target">Click Me!</span>
+            <span class="target">Click Me!</span>
           </div>
         </div>`);
-      const targetSpan = buttonWithChildren.querySelector('#target');
+      const targetSpan = buttonWithChildren.querySelector('.target');
 
       onClick(constructClickEvent({ target: targetSpan }));
       expect(postMessageMock).toHaveBeenCalledWith(...clickPostMessageWithDefinition('strict'));
@@ -155,6 +154,119 @@ describe('telemetry', () => {
 
       onClick(constructClickEvent({ target: button, isTrusted: false }));
       expect(postMessageMock).toHaveBeenCalledWith(...clickPostMessageWithDefinition('default'));
+    });
+  });
+
+  describe('elemTrackId', () => {
+    it('uses data-track-id from the clicked element', () => {
+      const onClick = getGlobalClickListener();
+      const el = renderDom('<div data-track-id="cta-buy">Buy</div>');
+
+      onClick(constructClickEvent({ target: el }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'cta-buy')
+      );
+    });
+
+    it('uses id when data-track-id is absent', () => {
+      const onClick = getGlobalClickListener();
+      const el = renderDom('<div id="hero-banner">Banner</div>');
+
+      onClick(constructClickEvent({ target: el }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'hero-banner')
+      );
+    });
+
+    it('prefers data-track-id over id on the same element', () => {
+      const onClick = getGlobalClickListener();
+      const el = renderDom('<div id="fallback" data-track-id="preferred">Text</div>');
+
+      onClick(constructClickEvent({ target: el }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'preferred')
+      );
+    });
+
+    it('traverses up to find data-track-id on an ancestor', () => {
+      const onClick = getGlobalClickListener();
+      const wrapper = renderDom('<div data-track-id="card"><span class="child">Click</span></div>');
+      const target = wrapper.querySelector('.child');
+
+      onClick(constructClickEvent({ target }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'card')
+      );
+    });
+
+    it('traverses up to find id on an ancestor', () => {
+      const onClick = getGlobalClickListener();
+      const wrapper = renderDom('<div id="sidebar"><span>Click</span></div>');
+      const target = wrapper.querySelector('span');
+
+      onClick(constructClickEvent({ target }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'sidebar')
+      );
+    });
+
+    it('handles svg element targets', () => {
+      const onClick = getGlobalClickListener();
+      const page = new JSDOM('<svg data-track-id="icon"><circle /></svg>');
+      const target = page.window.document.querySelector('circle');
+
+      onClick(constructClickEvent({ target }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'icon')
+      );
+    });
+
+    it('uses the parent element for text node targets', () => {
+      const onClick = getGlobalClickListener();
+      const wrapper = renderDom('<div id="copy"><span>Click</span></div>');
+      const target = wrapper.querySelector('span')?.firstChild ?? null;
+
+      onClick(constructClickEvent({ target }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'copy')
+      );
+    });
+
+    it('picks closest ancestor data-track-id over farther ancestor id', () => {
+      const onClick = getGlobalClickListener();
+      const wrapper = renderDom(
+        '<div id="outer"><div data-track-id="inner"><span>Click</span></div></div>'
+      );
+      const target = wrapper.querySelector('span');
+
+      onClick(constructClickEvent({ target }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'inner')
+      );
+    });
+
+    it('treats empty data-track-id as unset', () => {
+      const onClick = getGlobalClickListener();
+      const wrapper = renderDom(
+        '<div id="outer"><div data-track-id=""><span>Click</span></div></div>'
+      );
+      const target = wrapper.querySelector('span');
+
+      onClick(constructClickEvent({ target }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', 'outer')
+      );
+    });
+
+    it('is undefined when no data-track-id or id exists in the tree', () => {
+      const onClick = getGlobalClickListener();
+      const el = renderDom('<div><span>Click</span></div>');
+      const target = el.querySelector('span');
+
+      onClick(constructClickEvent({ target }));
+      expect(postMessageMock).toHaveBeenLastCalledWith(
+        ...clickPostMessageWithDefinition('default', undefined)
+      );
     });
   });
 });
@@ -385,23 +497,25 @@ describe('performance monitoring', () => {
 });
 
 const renderDom = (htmlFragment: string): HTMLElement => {
-  return new JSDOM(`<div id="wrapper">${htmlFragment}</div>`).window.document.getElementById(
-    'wrapper'
-  )!.childNodes[0]! as HTMLElement;
+  const doc = new JSDOM(`<div class="wrapper">${htmlFragment}</div>`).window.document;
+  return doc.querySelector('.wrapper')!.childNodes[0]! as HTMLElement;
 };
 
 const getGlobalClickListener = () => {
   return docAddEventListenerMock.mock.calls.find((call) => call[0] === 'click')?.[1]!;
 };
 
-const clickPostMessageWithDefinition = (definition: string): [unknown, string] => {
+const clickPostMessageWithDefinition = (
+  definition: string,
+  elemTrackId?: string
+): [unknown, string] => {
   return [
     {
       scope: WebViewInternalMessageScope.CLIENT,
       type: webViewInternalMessageType,
-      analytics: { event: 'click', definition },
+      analytics: { event: 'click', definition, elemTrackId },
       realtimeEffect: undefined,
-      telemetry: { event: 'click', click: { event: 'click', definition } },
+      telemetry: { event: 'click', click: { event: 'click', definition, elemTrackId } },
     },
     '*',
   ];
