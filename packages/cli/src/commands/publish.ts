@@ -610,10 +610,10 @@ export default class Publish extends DevvitCommand {
       return;
     }
 
-    this.log('To publish your app, you need to upload a source code zip. This zip is only');
-    this.log('used by the Devvit team for the app review process and will not be shared with');
-    this.log('third parties. The CLI will automatically generate the zip from your current');
-    this.log('project directory and will respect your root .gitignore file.');
+    this.log('To publish your app, you need to upload a source code zip. This zip is used');
+    this.log('by the Devvit team in accordance with our Developer Terms. The CLI will');
+    this.log('automatically generate the zip from your current project directory and');
+    this.log('will respect your root .gitignore file.');
     this.log('');
     const { action } = await inquirer.prompt<{ action: 'stop' | 'continue' | 'neverAskAgain' }>({
       name: 'action',
