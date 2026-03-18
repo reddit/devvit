@@ -34,6 +34,8 @@ import type {
   SubmitSelfPostOptions,
 } from './Post.js';
 import { Post } from './Post.js';
+import type { CreateRuleOptions } from './Rule.js';
+import { Rule } from './Rule.js';
 import type {
   BanUserOptions,
   BanWikiContributorOptions,
@@ -1288,6 +1290,28 @@ export class Subreddit {
     );
 
     return result.order.map((id) => ({ ...result.data[id] }));
+  }
+
+  getRules(): Promise<Rule[]> {
+    return Rule.getRules(this.#name, this.#metadata);
+  }
+
+  /**
+   * Create a new subreddit rule.
+   *
+   * @param options - Options for creating a new subreddit rule.
+   * @param options.shortName - Name for the rule. The rule name must be unique within this subreddit.
+   * @param options.description - Full description of the rule. This appears on your subreddit's sidebar.
+   * @param options.kind - Which Reddit objects this rule applies to. One of "all", "link", "comment".
+   * @param options.violationReason - Text to show users when reporting content due to this rule. It appears in the report submission form.
+   *     If empty, it will default to the shortName.
+   */
+  createRule(options: Readonly<CreateRuleOptions>): Promise<void> {
+    return Rule.createRule(this.#name, options, this.#metadata);
+  }
+
+  reorderRules(rules: Rule[]): Promise<void> {
+    return Rule.reorderRules(this.#name, rules, this.#metadata);
   }
 
   /** @internal */

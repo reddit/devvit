@@ -1,13 +1,16 @@
 import type {
   AboutWhereRequest,
+  AddSubredditRuleRequest,
   BasicSearchRequest,
   BasicSubredditRequest,
   BasicWhereRequest,
   DeleteSrImgRequest,
   GetHighlightedPostsRequest,
   GetHighlightedPostsResponse,
+  RemoveSubredditRuleRequest,
   ReorderHighlightedPostsRequest,
   ReorderHighlightedPostsResponse,
+  ReorderSubredditRulesRequest,
   SearchRedditNamesResponse,
   SearchSubredditsResponse,
   SiteAdminRequest,
@@ -29,6 +32,7 @@ import type {
   SubredditsSearchResponse,
   SubredditStylesheetRequest,
   SubscribeRequest,
+  UpdateSubredditRuleRequest,
   UploadSrImgRequest,
   UploadSrImgResponse,
   UserSearchResponse,
@@ -202,6 +206,13 @@ export class SubredditPluginMock implements Subreddits {
     );
   }
 
+  async AddSubredditRule(_request: AddSubredditRuleRequest, _metadata?: Metadata): Promise<Empty> {
+    throw new Error(
+      `Reddit API method Subreddits.AddSubredditRule is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
   async SubredditAboutRules(
     _request: BasicSubredditRequest,
     _metadata?: Metadata
@@ -248,6 +259,36 @@ export class SubredditPluginMock implements Subreddits {
   ): Promise<SubredditGetRemovalReasonsResponse> {
     throw new Error(
       `Reddit API method Subreddits.SubredditGetRemovalReasons is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async RemoveSubredditRule(
+    _request: RemoveSubredditRuleRequest,
+    _metadata?: Metadata
+  ): Promise<Empty> {
+    throw new Error(
+      `Reddit API method Subreddits.RemoveSubredditRule is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async ReorderSubredditRules(
+    _request: ReorderSubredditRulesRequest,
+    _metadata?: Metadata
+  ): Promise<Empty> {
+    throw new Error(
+      `Reddit API method Subreddits.ReorderSubredditRules is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async UpdateSubredditRule(
+    _request: UpdateSubredditRuleRequest,
+    _metadata?: Metadata
+  ): Promise<Empty> {
+    throw new Error(
+      `Reddit API method Subreddits.UpdateSubredditRule is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }

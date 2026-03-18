@@ -185,6 +185,57 @@ describe('Subreddit API', () => {
       });
     });
 
+    test('getRules()', async () => {
+      const subreddit = createTestSub({ name: 'askReddit' });
+      const spyPlugin = redditApiPlugins.Subreddits.SubredditAboutRules;
+      spyPlugin.mockImplementationOnce(async () => ({
+        rules: [
+          {
+            shortName: 'No spam',
+            description: 'No spammy posts',
+            kind: 'link',
+            violationReason: 'Spam',
+            priority: 0,
+            createdUtc: 1773419801,
+            descriptionHtml: '<p>No spammy posts</p>',
+          },
+        ],
+      }));
+
+      await runWithTestContext(async () => {
+        const rules = await subreddit.getRules();
+
+        expect(spyPlugin).toHaveBeenCalledWith({ subreddit: 'askReddit' }, context.metadata);
+        expect(rules).toHaveLength(1);
+        expect(rules[0].shortName).toBe('No spam');
+      });
+    });
+
+    test('createRule()', async () => {
+      const subreddit = createTestSub({ name: 'askReddit' });
+      const spyPlugin = redditApiPlugins.Subreddits.AddSubredditRule;
+      spyPlugin.mockImplementationOnce(async () => ({}));
+
+      await runWithTestContext(async () => {
+        await subreddit.createRule({
+          description: 'No spammy posts',
+          kind: 'link',
+          shortName: 'No spam',
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            r: 'askReddit',
+            description: 'No spammy posts',
+            kind: 'link',
+            shortName: 'No spam',
+            violationReason: '',
+          },
+          context.metadata
+        );
+      });
+    });
+
     test('subscribe()', async () => {
       const subreddit = new Subreddit({
         id: subredditId,

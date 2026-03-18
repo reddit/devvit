@@ -19,6 +19,7 @@ import type {
   CommentSubmissionOptions,
   CreateFlairTemplateOptions,
   CreateModNoteOptions,
+  CreateRuleOptions,
   CreateWikiPageOptions,
   CrosspostOptions,
   DeleteNotesOptions,
@@ -79,6 +80,7 @@ import {
   ModNote,
   Post,
   PrivateMessage,
+  Rule,
   Subreddit,
   User,
   Widget,
@@ -283,6 +285,40 @@ export class RedditClient {
    */
   getSubredditRemovalReasons(subredditName: string): Promise<RemovalReason[]> {
     return Subreddit.getRemovalReasons(subredditName);
+  }
+
+  /**
+   * Get the rules for a subreddit.
+   *
+   * @param subredditName - The name of the subreddit to get the rules for.
+   * @returns An array of Rule objects.
+   */
+  getRules(subredditName: string): Promise<Rule[]> {
+    return Rule.getRules(subredditName);
+  }
+
+  /**
+   * Create a new rule in a subreddit.
+   *
+   * @param subredditName - The name of the subreddit to add the rule to.
+   * @param options.shortName - Name for the rule. The rule name must be unique within this subreddit.
+   * @param options.description - Full description of the rule. This appears on your subreddit's sidebar.
+   * @param options.kind - Which Reddit objects this rule applies to. One of "all", "link", "comment".
+   * @param options.violationReason - Text to show users when reporting content due to this rule. It appears in the report submission form.
+   *     If empty, it will default to the shortName.
+   */
+  createRule(subredditName: string, options: CreateRuleOptions): Promise<void> {
+    return Rule.createRule(subredditName, options);
+  }
+
+  /**
+   * Reorder the rules in a subreddit.
+   *
+   * @param subredditName - The name of the subreddit to reorder the rules for.
+   * @param rules - Array of Rule objects in the desired order (order is determined by array position).
+   */
+  reorderRules(subredditName: string, rules: Rule[]): Promise<void> {
+    return Rule.reorderRules(subredditName, rules);
   }
 
   /**
