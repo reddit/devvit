@@ -106,7 +106,9 @@ export type GetSubscribedSubredditsForCurrentUserOptions = {
 };
 
 /**
- * An individual Removal Reason object.
+ * Plain data for a subreddit removal reason. Use {@link Subreddit.updateRemovalReason},
+ * {@link Subreddit.deleteRemovalReason}, or the matching {@link RedditClient} methods to change or
+ * remove it.
  */
 export type RemovalReason = {
   /**
@@ -1198,6 +1200,41 @@ export class Subreddit {
     });
   }
 
+  /**
+   * Get the list of this subreddit's removal reasons (ordered).
+   */
+  getRemovalReasons(): Promise<RemovalReason[]> {
+    return Subreddit.getRemovalReasons(this.name);
+  }
+
+  /**
+   * Add a removal reason to this subreddit.
+   *
+   * @param options.title The title of the removal reason.
+   * @param options.message The message associated with the removal reason.
+   * @returns The new removal reason ID.
+   */
+  addRemovalReason(options: { title: string; message: string }): Promise<string> {
+    return Subreddit.addRemovalReason(this.name, options.title, options.message);
+  }
+
+  /**
+   * Update a removal reason's title and message in this subreddit.
+   */
+  updateRemovalReason(
+    reasonId: string,
+    options: { title: string; message: string }
+  ): Promise<void> {
+    return Subreddit.updateRemovalReason(this.name, reasonId, options);
+  }
+
+  /**
+   * Delete a removal reason from this subreddit.
+   */
+  deleteRemovalReason(reasonId: string): Promise<void> {
+    return Subreddit.deleteRemovalReason(this.name, reasonId);
+  }
+
   /** @internal */
   static async addRemovalReason(
     subredditName: string,
@@ -1205,12 +1242,13 @@ export class Subreddit {
     message: string
   ): Promise<string> {
     const client = getRedditApiPlugins().Subreddits;
+    const subreddit = normalizeSubredditName(subredditName);
 
     const response = await client.SubredditAddRemovalReason(
       {
         title,
         message,
-        subreddit: subredditName,
+        subreddit,
       },
       this.#metadata
     );
@@ -1221,15 +1259,57 @@ export class Subreddit {
   /** @internal */
   static async getRemovalReasons(subredditName: string): Promise<RemovalReason[]> {
     const client = getRedditApiPlugins().Subreddits;
+    const subreddit = normalizeSubredditName(subredditName);
 
     const result = await client.SubredditGetRemovalReasons(
       {
-        subreddit: subredditName,
+        subreddit,
       },
       this.#metadata
     );
 
-    return result.order.map((id) => ({ ...result.data[id] }));
+    return result.order.map((id) => {
+      const data = result.data[id];
+      return {
+        id: data.id,
+        title: data.title,
+        message: data.message,
+      };
+    });
+  }
+
+  /** @internal */
+  static async updateRemovalReason(
+    subredditName: string,
+    reasonId: string,
+    options: { title: string; message: string }
+  ): Promise<void> {
+    const client = getRedditApiPlugins().Subreddits;
+    const subreddit = normalizeSubredditName(subredditName);
+
+    await client.SubredditUpdateRemovalReason(
+      {
+        subreddit,
+        reasonId,
+        title: options.title,
+        message: options.message,
+      },
+      this.#metadata
+    );
+  }
+
+  /** @internal */
+  static async deleteRemovalReason(subredditName: string, reasonId: string): Promise<void> {
+    const client = getRedditApiPlugins().Subreddits;
+    const subreddit = normalizeSubredditName(subredditName);
+
+    await client.SubredditDeleteRemovalReason(
+      {
+        subreddit,
+        reasonId,
+      },
+      this.#metadata
+    );
   }
 
   getRules(): Promise<Rule[]> {
@@ -1465,4 +1545,9 @@ export async function getSubredditNameById(id: T5): Promise<string | undefined> 
 
   const response = await client.Info({ thingIds: [id], subreddits: [] }, context.metadata);
   return response.data?.children[0]?.data?.displayName;
+}
+
+/** Strips optional r/ prefix so the API receives the name without it. */
+function normalizeSubredditName(name: string): string {
+  return name.startsWith('r/') ? name.slice(2) : name;
 }

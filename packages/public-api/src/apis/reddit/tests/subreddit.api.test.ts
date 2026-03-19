@@ -142,8 +142,10 @@ describe('Subreddit API', () => {
       const result = await api.reddit.getSubredditRemovalReasons('askReddit');
 
       expect(spyPlugin).toHaveBeenCalledWith({ subreddit: 'askReddit' }, api.metadata);
-
-      expect(result).toMatchSnapshot();
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe(removalReasonId);
+      expect(result[0].title).toBe('Spam');
+      expect(result[0].message).toBe('This is spam!');
     });
 
     test('addSubredditRemovalReason()', async () => {
@@ -169,6 +171,105 @@ describe('Subreddit API', () => {
       );
 
       expect(result).toEqual('uuid-abc');
+    });
+
+    test('updateSubredditRemovalReason()', async () => {
+      const spyPlugin = vi.spyOn(
+        Devvit.redditAPIPlugins.Subreddits,
+        'SubredditUpdateRemovalReason'
+      );
+      spyPlugin.mockImplementationOnce(async () => ({}));
+
+      await api.reddit.updateSubredditRemovalReason('askReddit', 'uuid-abc', {
+        title: 'Spam',
+        message: 'This post was removed for spam.',
+      });
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        {
+          subreddit: 'askReddit',
+          reasonId: 'uuid-abc',
+          title: 'Spam',
+          message: 'This post was removed for spam.',
+        },
+        api.metadata
+      );
+    });
+
+    test('deleteSubredditRemovalReason()', async () => {
+      const spyPlugin = vi.spyOn(
+        Devvit.redditAPIPlugins.Subreddits,
+        'SubredditDeleteRemovalReason'
+      );
+      spyPlugin.mockImplementationOnce(async () => ({}));
+
+      await api.reddit.deleteSubredditRemovalReason('askReddit', 'uuid-abc');
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        {
+          subreddit: 'askReddit',
+          reasonId: 'uuid-abc',
+        },
+        api.metadata
+      );
+    });
+
+    test('removal reason methods accept subredditName with optional r/ prefix', async () => {
+      const getSpy = vi.spyOn(Devvit.redditAPIPlugins.Subreddits, 'SubredditGetRemovalReasons');
+      getSpy.mockImplementationOnce(async () => ({ data: {}, order: [] }));
+
+      await api.reddit.getSubredditRemovalReasons('r/askReddit');
+
+      expect(getSpy).toHaveBeenCalledWith({ subreddit: 'askReddit' }, api.metadata);
+    });
+
+    test('Subreddit updateRemovalReason() and deleteRemovalReason()', async () => {
+      const subreddit = createTestSub({ displayName: 'askReddit' }, api.metadata);
+      const getSpy = vi.spyOn(Devvit.redditAPIPlugins.Subreddits, 'SubredditGetRemovalReasons');
+      const updateSpy = vi.spyOn(
+        Devvit.redditAPIPlugins.Subreddits,
+        'SubredditUpdateRemovalReason'
+      );
+      const deleteSpy = vi.spyOn(
+        Devvit.redditAPIPlugins.Subreddits,
+        'SubredditDeleteRemovalReason'
+      );
+      const removalReasonId = 'uuid-abc';
+      getSpy.mockImplementationOnce(async () => ({
+        data: {
+          [removalReasonId]: {
+            id: removalReasonId,
+            title: 'Spam',
+            message: 'Original',
+          },
+        },
+        order: [removalReasonId],
+      }));
+      updateSpy.mockImplementationOnce(async () => ({}));
+      deleteSpy.mockImplementationOnce(async () => ({}));
+
+      const reasons = await subreddit.getRemovalReasons();
+      const reason = reasons[0];
+
+      await subreddit.updateRemovalReason(reason.id, {
+        title: 'Spam',
+        message: 'Updated message.',
+      });
+      expect(updateSpy).toHaveBeenCalledWith(
+        {
+          subreddit: 'askReddit',
+          reasonId: removalReasonId,
+          title: 'Spam',
+          message: 'Updated message.',
+        },
+        api.metadata
+      );
+
+      await subreddit.deleteRemovalReason(reason.id);
+      expect(deleteSpy).toHaveBeenCalledWith(
+        { subreddit: 'askReddit', reasonId: removalReasonId },
+        api.metadata
+      );
     });
 
     test('subscribe()', async () => {
@@ -247,6 +348,47 @@ describe('Subreddit API', () => {
   });
 
   describe('Subreddit api model', () => {
+    test('getRemovalReasons()', async () => {
+      const subreddit = createTestSub({ displayName: 'askReddit' }, api.metadata);
+      const removalReasonId = 'uuid-abc';
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Subreddits, 'SubredditGetRemovalReasons');
+      spyPlugin.mockImplementationOnce(async () => ({
+        data: {
+          [removalReasonId]: {
+            id: removalReasonId,
+            title: 'Spam',
+            message: 'This is spam!',
+          },
+        },
+        order: [removalReasonId],
+      }));
+
+      const result = await subreddit.getRemovalReasons();
+
+      expect(spyPlugin).toHaveBeenCalledWith({ subreddit: 'askReddit' }, api.metadata);
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe(removalReasonId);
+      expect(result[0].title).toBe('Spam');
+      expect(result[0].message).toBe('This is spam!');
+    });
+
+    test('addRemovalReason()', async () => {
+      const subreddit = createTestSub({ displayName: 'askReddit' }, api.metadata);
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Subreddits, 'SubredditAddRemovalReason');
+      spyPlugin.mockImplementationOnce(async () => ({ id: 'uuid-xyz' }));
+
+      const id = await subreddit.addRemovalReason({
+        title: 'Spam',
+        message: 'This is spam!',
+      });
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        { subreddit: 'askReddit', title: 'Spam', message: 'This is spam!' },
+        api.metadata
+      );
+      expect(id).toBe('uuid-xyz');
+    });
+
     test('getCommentsAndPostsByIds()', async () => {
       const subreddit = new Subreddit(
         {

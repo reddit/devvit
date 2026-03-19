@@ -75,16 +75,6 @@ exports[`Subreddit API > RedditClient:Subreddit > getCommentsAndPostsByUser() 1`
 ]
 `;
 
-exports[`Subreddit API > RedditClient:Subreddit > getSubredditRemovalReasons() 1`] = `
-[
-  {
-    "id": "uuid-abc",
-    "message": "This is spam!",
-    "title": "Spam",
-  },
-]
-`;
-
 exports[`Subreddit API > Subreddit api model > getCommentsAndPostsByIds() 1`] = `
 [
   {

@@ -25,12 +25,16 @@ import type {
   SubredditAddRemovalReasonResponse,
   SubredditAutocompleteRequest,
   SubredditAutocompleteResponse,
+  SubredditDeleteRemovalReasonRequest,
+  SubredditDeleteRemovalReasonResponse,
   SubredditGetRemovalReasonsRequest,
   SubredditGetRemovalReasonsResponse,
   SubredditPostRequirementsResponse,
   SubredditsSearchRequest,
   SubredditsSearchResponse,
   SubredditStylesheetRequest,
+  SubredditUpdateRemovalReasonRequest,
+  SubredditUpdateRemovalReasonResponse,
   SubscribeRequest,
   UpdateSubredditRuleRequest,
   UploadSrImgRequest,
@@ -259,6 +263,26 @@ export class SubredditPluginMock implements Subreddits {
   ): Promise<SubredditGetRemovalReasonsResponse> {
     throw new Error(
       `Reddit API method Subreddits.SubredditGetRemovalReasons is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async SubredditUpdateRemovalReason(
+    _request: SubredditUpdateRemovalReasonRequest,
+    _metadata?: Metadata
+  ): Promise<SubredditUpdateRemovalReasonResponse> {
+    throw new Error(
+      `Reddit API method Subreddits.SubredditUpdateRemovalReason is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  async SubredditDeleteRemovalReason(
+    _request: SubredditDeleteRemovalReasonRequest,
+    _metadata?: Metadata
+  ): Promise<SubredditDeleteRemovalReasonResponse> {
+    throw new Error(
+      `Reddit API method Subreddits.SubredditDeleteRemovalReason is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }

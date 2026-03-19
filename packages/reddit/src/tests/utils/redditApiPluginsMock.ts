@@ -166,6 +166,8 @@ export const redditApiPlugins = {
     ReorderSubredditRules: vi.fn(),
     SubredditAddRemovalReason: vi.fn(),
     SubredditGetRemovalReasons: vi.fn(),
+    SubredditUpdateRemovalReason: vi.fn(),
+    SubredditDeleteRemovalReason: vi.fn(),
   },
   Users: {
     BlockUser: vi.fn(),

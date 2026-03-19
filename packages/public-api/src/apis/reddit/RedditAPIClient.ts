@@ -210,9 +210,9 @@ export class RedditAPIClient {
   }
 
   /**
-   * Add a removal reason to a subreddit
+   * Add a removal reason to a subreddit.
    *
-   * @param subredditName Name of the subreddit being removed.
+   * @param subredditName Name of the subreddit (e.g. `askReddit` or `r/askReddit`).
    * @param options Options.
    * @param options.title The title of the removal reason.
    * @param options.message The message associated with the removal reason.
@@ -243,22 +243,50 @@ export class RedditAPIClient {
   }
 
   /**
-   * Get the list of subreddit's removal reasons (ordered)
+   * Get the list of subreddit's removal reasons (ordered).
    *
-   * @param subredditName
+   * @param subredditName Name of the subreddit (e.g. `askReddit` or `r/askReddit`).
    * @example
    * ```ts
    * const reasons = await reddit.getSubredditRemovalReasons('askReddit');
-   *
-   * for (let reason of reasons) {
-   *   console.log(reason.id, reason.message, reason.title)
+   * const sub = await reddit.getSubredditByName('askReddit');
+   * for (const reason of reasons) {
+   *   console.log(reason.id, reason.message, reason.title);
+   *   await sub.updateRemovalReason(reason.id, { title: 'Spam', message: 'Updated.' });
+   *   await sub.deleteRemovalReason(reason.id);
    * }
    * ```
    *
-   * @returns Ordered array of Removal Reasons
+   * @returns Ordered array of plain removal reason objects.
    */
   getSubredditRemovalReasons(subredditName: string): Promise<RemovalReason[]> {
     return Subreddit.getRemovalReasons(subredditName, this.#metadata);
+  }
+
+  /**
+   * Update an existing removal reason in a subreddit.
+   *
+   * @param subredditName Name of the subreddit (e.g. `askReddit` or `r/askReddit`).
+   * @param reasonId ID of the removal reason (from get or add).
+   * @param options.title The title of the removal reason.
+   * @param options.message The message associated with the removal reason.
+   */
+  updateSubredditRemovalReason(
+    subredditName: string,
+    reasonId: string,
+    options: { title: string; message: string }
+  ): Promise<void> {
+    return Subreddit.updateRemovalReason(subredditName, reasonId, options, this.#metadata);
+  }
+
+  /**
+   * Delete a removal reason from a subreddit.
+   *
+   * @param subredditName Name of the subreddit (e.g. `askReddit` or `r/askReddit`).
+   * @param reasonId ID of the removal reason (from get or add).
+   */
+  deleteSubredditRemovalReason(subredditName: string, reasonId: string): Promise<void> {
+    return Subreddit.deleteRemovalReason(subredditName, reasonId, this.#metadata);
   }
 
   /**
