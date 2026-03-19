@@ -345,6 +345,33 @@ describe('Subreddit API', () => {
         api.metadata
       );
     });
+
+    test('updateSettings()', async () => {
+      const subreddit = createTestSub(
+        {
+          displayName: 'askReddit',
+          title: 'Ask Reddit',
+          id: '2qjpg',
+        },
+        api.metadata
+      );
+
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Subreddits, 'SiteAdmin');
+      spyPlugin.mockImplementationOnce(async () => ({}));
+
+      await subreddit.updateSettings({ restrictPosting: true });
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sr: 't5_2qjpg',
+          name: 'askReddit',
+          title: 'Ask Reddit',
+          type: 'public',
+          restrictPosting: true,
+        }),
+        api.metadata
+      );
+    });
   });
 
   describe('Subreddit api model', () => {

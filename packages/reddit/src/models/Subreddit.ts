@@ -1,5 +1,8 @@
 import type { AboutLocationRequest } from '@devvit/protos/json/devvit/plugin/redditapi/moderation/moderation_msg.js';
-import type { SubredditAboutResponse_AboutData } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+import type {
+  SiteAdminRequest,
+  SubredditAboutResponse_AboutData,
+} from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 // eslint-disable-next-line no-restricted-imports
 import type { WrappedRedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
@@ -278,6 +281,19 @@ export type SubredditSettings = {
    * HTTP URL to the subreddit
    */
   url: string;
+};
+
+/**
+ * Optional overrides for subreddit settings. Only provided fields are applied;
+ * the rest remain unchanged when calling {@link Subreddit.updateSettings}.
+ */
+export type SubredditSettingsOptions = Partial<SubredditSettings> & {
+  /** Subreddit type (e.g. public, private, restricted). */
+  type?: SubredditType;
+  /** Subreddit title. */
+  title?: string;
+  /** Subreddit description (raw markdown). Appears in the sidebar of the subreddit. */
+  description?: string;
 };
 
 export type SubredditLeaderboardSummaryRow = {
@@ -565,7 +581,7 @@ export class Subreddit {
   }
 
   /**
-   * The description of the subreddit.
+   * The description of the subreddit. Appears in the sidebar of the subreddit.
    */
   get description(): string | undefined {
     return this.#description;
@@ -679,6 +695,48 @@ export class Subreddit {
       numberOfActiveUsers: this.numberOfActiveUsers,
       settings: this.settings,
     };
+  }
+
+  /**
+   * Updates subreddit settings via the SiteAdmin API. Current settings are used as the base;
+   * only fields specified in `options` are changed. In order to reset a field to its default value,
+   * pass the default value as the option value.
+   *
+   * @param options - Optional settings to apply. Omitted fields are left unchanged.
+   * @example
+   * ```ts
+   * const subreddit = await reddit.getSubredditByName('mysubreddit');
+   * await subreddit.setSettings({ restrictPosting: true, allowImages: false });
+   * await subreddit.setSettings({ type: 'restricted', title: 'New Title', description: 'Sidebar text' });
+   * ```
+   */
+  async updateSettings(options: SubredditSettingsOptions): Promise<void> {
+    const { type, title, description, ...settingsOptions } = options;
+
+    const merged: SubredditSettings = {
+      ...this.settings,
+      ...settingsOptions,
+      userFlairs: { ...this.settings.userFlairs, ...settingsOptions.userFlairs },
+      postFlairs: { ...this.settings.postFlairs, ...settingsOptions.postFlairs },
+    };
+
+    const request = subredditSettingsToSiteAdminRequest(
+      this.#id,
+      this.#name,
+      type ?? this.#type,
+      title ?? this.#title,
+      description ?? this.#description,
+      this.#nsfw,
+      merged
+    );
+
+    const client = getRedditApiPlugins().Subreddits;
+    await client.SiteAdmin(request, context.metadata);
+
+    this.#settings = merged;
+    this.#type = type ?? this.#type;
+    this.#title = title ?? this.#title;
+    this.#description = description ?? this.#description;
   }
 
   async submitPost(opts: Readonly<SubmitPostOptions>): Promise<Post> {
@@ -1497,6 +1555,94 @@ function asCommentMediaTypes(type: string): CommentMediaTypes {
   }
 
   throw new Error(`invalid comment media type: ${type}`);
+}
+
+/**
+ * Builds a SiteAdmin request from subreddit identity and merged settings.
+ * All SiteAdminRequest fields are set; values come from settings or defaults.
+ */
+function subredditSettingsToSiteAdminRequest(
+  id: T5,
+  name: string,
+  subredditType: SubredditType,
+  title: string | undefined,
+  description: string | undefined,
+  over18: boolean,
+  settings: SubredditSettings
+): SiteAdminRequest {
+  assertNonNull(title, 'title is required');
+
+  return {
+    sr: id,
+    title: title,
+    type: subredditType,
+    linkType: settings.allowedPostType,
+    name,
+    description: description ?? '',
+    publicDescription: description ?? '',
+    over18,
+    acceptFollowers: settings.acceptFollowers,
+    allOriginalContent: settings.allOriginalContent,
+    allowChatPostCreation: settings.allowChatPostCreation,
+    allowDiscovery: settings.allowDiscovery,
+    allowGalleries: settings.allowGalleries,
+    allowImages: settings.allowImages,
+    allowPolls: settings.allowPolls,
+    allowPostCrossposts: settings.crosspostable,
+    allowPredictionContributors: settings.allowPredictionContributors,
+    allowPredictions: settings.allowPredictions,
+    allowPredictionsTournament: settings.allowPredictionsTournament,
+    allowTalks: settings.allowTalks,
+    allowVideos: settings.allowVideos,
+    headerTitle: settings.headerTitle ?? '',
+    keyColor: settings.keyColor ?? '',
+    originalContentTagEnabled: settings.originalContentTagEnabled,
+    restrictCommenting: settings.restrictCommenting,
+    restrictPosting: settings.restrictPosting,
+    shouldArchivePosts: settings.shouldArchivePosts,
+    spoilersEnabled: settings.spoilersEnabled,
+
+    // The reddit API expects all the fields in the request to be set, even if they are not used.
+    // We don't expose the fields below yet, but we still need to set them to satisfy the typing.
+    adminOverrideSpamComments: false,
+    adminOverrideSpamLinks: false,
+    adminOverrideSpamSelfposts: false,
+    allowTop: false,
+    banEvasionThreshold: 0,
+    collapseDeletedComments: false,
+    commentScoreHideMins: 0,
+    crowdControlFilter: false,
+    crowdControlLevel: 0,
+    crowdControlMode: false,
+    crowdControlPostLevel: 0,
+    disableContributorRequests: false,
+    excludeBannedModqueue: false,
+    freeFormReports: false,
+    gRecaptchaResponse: '',
+    hatefulContentThresholdAbuse: 0,
+    newPinnedPostPnsEnabled: false,
+    hatefulContentThresholdIdentity: 0,
+    predictionLeaderboardEntryType: 0,
+    showMedia: false,
+    showMediaPreview: false,
+    spamComments: '',
+    spamLinks: '',
+    spamSelfposts: '',
+    submitLinkLabel: '',
+    submitText: '',
+    submitTextLabel: '',
+    suggestedCommentSort: '',
+    toxicityThresholdChatLevel: 0,
+    userFlairPnsEnabled: false,
+    welcomeMessageEnabled: false,
+    welcomeMessageText: '',
+    wikiEditAge: 0,
+    wikiEditKarma: 0,
+    wikimode: '',
+    crowdControlChatLevel: 0,
+    hideAds: false,
+    modmailHarassmentFilterEnabled: false,
+  };
 }
 
 function parseListing(listing: ProtoListing): ListingFetchResponse<Post | Comment> {

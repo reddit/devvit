@@ -2,6 +2,7 @@ import type {
   AboutLocationRequest,
   Listing as ProtoListing,
   Metadata,
+  SiteAdminRequest,
   SubredditAboutResponse_AboutData,
   WrappedRedditObject,
 } from '@devvit/protos';
@@ -271,6 +272,19 @@ export type SubredditSettings = {
    * HTTP URL to the subreddit
    */
   url: string;
+};
+
+/**
+ * Optional overrides for subreddit settings. Only provided fields are applied;
+ * the rest remain unchanged when calling {@link Subreddit.updateSettings}.
+ */
+export type SubredditSettingsOptions = Partial<SubredditSettings> & {
+  /** Subreddit type (e.g. public, private, restricted). */
+  type?: SubredditType;
+  /** Subreddit title. */
+  title?: string;
+  /** Subreddit description (raw markdown). Appears in the sidebar of the subreddit. */
+  description?: string;
 };
 
 export type SubredditLeaderboardSummaryRow = {
@@ -677,6 +691,48 @@ export class Subreddit {
       numberOfActiveUsers: this.numberOfActiveUsers,
       settings: this.settings,
     };
+  }
+
+  /**
+   * Updates subreddit settings via the SiteAdmin API. Current settings are used as the base;
+   * only provided options are applied. In order to reset a field to its default value,
+   * pass the default value as the option value.
+   *
+   * @param options - Optional settings to apply. Omitted fields are left unchanged.
+   * @example
+   * ```ts
+   * const subreddit = await reddit.getSubredditByName('mysubreddit');
+   * await subreddit.updateSettings({ restrictPosting: true, allowImages: false });
+   * await subreddit.updateSettings({ type: 'restricted', title: 'New Title', description: 'Sidebar text' });
+   * ```
+   */
+  async updateSettings(options: SubredditSettingsOptions): Promise<void> {
+    const { type, title, description, ...settingsOptions } = options;
+
+    const merged: SubredditSettings = {
+      ...this.settings,
+      ...settingsOptions,
+      userFlairs: { ...this.settings.userFlairs, ...settingsOptions.userFlairs },
+      postFlairs: { ...this.settings.postFlairs, ...settingsOptions.postFlairs },
+    };
+
+    const request = subredditSettingsToSiteAdminRequest(
+      this.#id,
+      this.#name,
+      type ?? this.#type,
+      title ?? this.#title,
+      description ?? this.#description,
+      this.#nsfw,
+      merged
+    );
+
+    const client = Devvit.redditAPIPlugins.Subreddits;
+    await client.SiteAdmin(request, this.#metadata);
+
+    this.#settings = merged;
+    this.#type = type ?? this.#type;
+    this.#title = title ?? this.#title;
+    this.#description = description ?? this.#description;
   }
 
   async submitPost(options: SubmitLinkOptions | SubmitSelfPostOptions): Promise<Post> {
@@ -1556,6 +1612,94 @@ export async function getSubredditStyles(
   if (!styles) throw new Error('subreddit styles not found');
 
   return styles;
+}
+
+/**
+ * Builds a SiteAdmin request from subreddit identity and merged settings.
+ * All SiteAdminRequest fields are set; values come from settings or defaults.
+ */
+function subredditSettingsToSiteAdminRequest(
+  id: T5ID,
+  name: string,
+  subredditType: SubredditType,
+  title: string | undefined,
+  description: string | undefined,
+  over18: boolean,
+  settings: SubredditSettings
+): SiteAdminRequest {
+  assertNonNull(title, 'title is required');
+
+  return {
+    sr: id,
+    title,
+    type: subredditType,
+    linkType: settings.allowedPostType,
+    name,
+    description: description ?? '',
+    publicDescription: description ?? '',
+    over18,
+    acceptFollowers: settings.acceptFollowers,
+    allOriginalContent: settings.allOriginalContent,
+    allowChatPostCreation: settings.allowChatPostCreation,
+    allowDiscovery: settings.allowDiscovery,
+    allowGalleries: settings.allowGalleries,
+    allowImages: settings.allowImages,
+    allowPolls: settings.allowPolls,
+    allowPostCrossposts: settings.crosspostable,
+    allowPredictionContributors: settings.allowPredictionContributors,
+    allowPredictions: settings.allowPredictions,
+    allowPredictionsTournament: settings.allowPredictionsTournament,
+    allowTalks: settings.allowTalks,
+    allowVideos: settings.allowVideos,
+    headerTitle: settings.headerTitle ?? '',
+    keyColor: settings.keyColor ?? '',
+    originalContentTagEnabled: settings.originalContentTagEnabled,
+    restrictCommenting: settings.restrictCommenting,
+    restrictPosting: settings.restrictPosting,
+    shouldArchivePosts: settings.shouldArchivePosts,
+    spoilersEnabled: settings.spoilersEnabled,
+
+    // The reddit API expects all the fields in the request to be set, even if they are not used.
+    // We don't expose the fields below yet, but we still need to set them to satisfy the typing.
+    adminOverrideSpamComments: false,
+    adminOverrideSpamLinks: false,
+    adminOverrideSpamSelfposts: false,
+    allowTop: false,
+    banEvasionThreshold: 0,
+    collapseDeletedComments: false,
+    commentScoreHideMins: 0,
+    crowdControlFilter: false,
+    crowdControlLevel: 0,
+    crowdControlMode: false,
+    crowdControlPostLevel: 0,
+    disableContributorRequests: false,
+    excludeBannedModqueue: false,
+    freeFormReports: false,
+    gRecaptchaResponse: '',
+    hatefulContentThresholdAbuse: 0,
+    newPinnedPostPnsEnabled: false,
+    hatefulContentThresholdIdentity: 0,
+    predictionLeaderboardEntryType: 0,
+    showMedia: false,
+    showMediaPreview: false,
+    spamComments: '',
+    spamLinks: '',
+    spamSelfposts: '',
+    submitLinkLabel: '',
+    submitText: '',
+    submitTextLabel: '',
+    suggestedCommentSort: '',
+    toxicityThresholdChatLevel: 0,
+    userFlairPnsEnabled: false,
+    welcomeMessageEnabled: false,
+    welcomeMessageText: '',
+    wikiEditAge: 0,
+    wikiEditKarma: 0,
+    wikimode: '',
+    crowdControlChatLevel: 0,
+    hideAds: false,
+    modmailHarassmentFilterEnabled: false,
+  };
 }
 
 function asSubredditType(type?: string): SubredditType {

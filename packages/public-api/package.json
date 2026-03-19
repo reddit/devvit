@@ -61,7 +61,7 @@
   "filesize": {
     "dist/public-api.min.js": {
       "gzip": "66 KB",
-      "none": "232 KB"
+      "none": "234 KB"
     }
   },
   "source": "./src/index.ts"
