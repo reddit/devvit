@@ -403,6 +403,26 @@ export type GalleryMedia = {
   width: number;
 };
 
+/** Poll option on a poll post. */
+export type PollOption = {
+  /** ID of the poll option. */
+  id: string;
+  /** The text of the poll option. */
+  text: string;
+  /** The number of votes this poll option has received. */
+  voteCount: number;
+};
+
+/** Aggregated poll data for a poll post. */
+export type PollData = {
+  /** Options in the poll. */
+  options: PollOption[];
+  /** Total number of votes cast in the poll. Aggregated across all PollOption objects. */
+  totalVoteCount: number;
+  /** Time the poll voting closes, in Unix milliseconds. */
+  votingEndTimestamp: number;
+};
+
 export class Post {
   #id: T3ID;
   #authorId?: T2ID;
@@ -446,6 +466,7 @@ export class Post {
   #modReportReasons: string[];
   #userReportReasons: string[];
   #gallery: GalleryMedia[];
+  #pollData: PollData | undefined;
 
   #metadata: Metadata | undefined;
 
@@ -555,6 +576,19 @@ export class Post {
       }));
     } else {
       this.#gallery = [];
+    }
+
+    if (data.pollData) {
+      const raw = data.pollData;
+      this.#pollData = {
+        options: (raw.options ?? []).map((opt) => ({
+          id: opt.id,
+          text: opt.text,
+          voteCount: opt.voteCount,
+        })),
+        totalVoteCount: raw.totalVoteCount,
+        votingEndTimestamp: raw.votingEndTimestamp,
+      };
     }
   }
 
@@ -736,6 +770,13 @@ export class Post {
    */
   get gallery(): GalleryMedia[] {
     return this.#gallery;
+  }
+
+  /**
+   * Poll data for the post, if the post is a poll. Undefined otherwise.
+   */
+  get pollData(): PollData | undefined {
+    return this.#pollData;
   }
 
   toJSON(): Pick<
@@ -1162,6 +1203,17 @@ export class Post {
     return getThumbnailV2({ id: this.id }, this.#metadata);
   }
 
+  /**
+   * Get the poll option the authenticated user selected for this post.
+   * Returns undefined if the post is not a poll or the user has not voted.
+   *
+   * This method will get the poll option for the app account by default.
+   * To get the poll option for a user, please contact Reddit.
+   */
+  async getCurrentUserPollOption(): Promise<PollOption | undefined> {
+    return Post.getUserPollOption(this.#id, this.#metadata);
+  }
+
   // TODO: flair methods
 
   /** @internal */
@@ -1189,6 +1241,22 @@ export class Post {
     }
 
     return new Post(postData.data, metadata);
+  }
+
+  /** @internal */
+  static async getUserPollOption(
+    postId: T3ID,
+    metadata: Metadata | undefined
+  ): Promise<PollOption | undefined> {
+    const client = Devvit.redditAPIPlugins.LinksAndComments;
+    const rsp = await client.GetUserPollOption({ postId }, metadata);
+    const opt = rsp.pollOption;
+    if (!opt) return undefined;
+    return {
+      id: opt.id,
+      text: opt.text,
+      voteCount: opt.voteCount,
+    };
   }
 
   /** @internal */

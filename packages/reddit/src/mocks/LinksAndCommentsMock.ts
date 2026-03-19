@@ -38,6 +38,8 @@ import { type RedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/
 // eslint-disable-next-line no-restricted-imports
 import type {
   GetCustomPostStylesRequest,
+  GetUserPollOptionRequest,
+  GetUserPollOptionResponse,
   SetCustomPostStylesRequest,
   SubmitResponse,
 } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
@@ -594,6 +596,16 @@ export class LinksAndCommentsPluginMock implements LinksAndComments {
   ): Promise<CustomPostStyles> {
     throw new Error(
       `Reddit API method LinksAndComments.GetCustomPostStyles is not implemented in the test harness.\n` +
+        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
+    );
+  }
+
+  GetUserPollOption(
+    _request: GetUserPollOptionRequest,
+    _metadata?: Metadata
+  ): Promise<GetUserPollOptionResponse> {
+    throw new Error(
+      `Reddit API method LinksAndComments.GetUserPollOption is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }
