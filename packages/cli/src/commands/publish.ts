@@ -62,8 +62,6 @@ const appCapabilityToReviewRequirementMessage: Record<
 };
 
 export default class Publish extends DevvitCommand {
-  static override hidden = true;
-
   static override description = `Creates a new app version, uploads it along with your source for review, and then files a publish request for you app.`;
 
   static override flags = {
