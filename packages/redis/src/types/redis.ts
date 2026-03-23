@@ -573,7 +573,7 @@ export type TxClientLike = {
    *  console.log("Number of fields added: " + numFieldsAdded);
    * }
    * ```
-  */
+   */
   hSet(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike>;
   hSetNX(key: string, field: string, value: string): Promise<TxClientLike>;
   /**
