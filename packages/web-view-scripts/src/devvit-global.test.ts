@@ -334,7 +334,7 @@ describe('initContext()', () => {
       devvitDebug: '',
       client: Client.SHREDDIT,
       signedRequestContext:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZ2aXQiOnsiYXBwIjp7ImlkIjoiYXBwMTIzIiwibmFtZSI6InRlc3QtYXBwLXNsdWciLCJ2ZXJzaW9uIjoiMS4yLjMiLCJzdGF0dXMiOjEsInNsdWciOiJ0ZXN0LWFwcC1zbHVnIn0sInN1YnJlZGRpdCI6eyJpZCI6InQ1XzEyMyIsIm5hbWUiOiJzdWJyZWRkaXROYW1lIn0sInVzZXIiOnsiaWQiOiJ0Ml80NTYiLCJuYW1lIjoidXNlcm5hbWUiLCJzbm9vdmF0YXIiOiJodHRwczovL2ltYWdlIn0sInBvc3QiOnsiaWQiOiJ0M183ODkiLCJhdXRob3IiOiJ0Ml80MDAifX0sImlzcyI6InRlc3QifQ.signature',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkZXZ2aXQiOnsiYXBwIjp7ImlkIjoiYXBwMTIzIiwibmFtZSI6InRlc3QtYXBwLXNsdWciLCJ2ZXJzaW9uIjoiMS4yLjMiLCJzdGF0dXMiOjEsInNsdWciOiJ0ZXN0LWFwcC1zbHVnIn0sInN1YnJlZGRpdCI6eyJpZCI6InQ1XzEyMyIsIm5hbWUiOiJzdWJyZWRkaXROYW1lIn0sInVzZXIiOnsiaWQiOiJ0Ml80NTYiLCJuYW1lIjoidXNlcm5hbWUiLCJzbm9vdmF0YXIiOiJodHRwczovL2ltYWdlIiwiZGV2dml0X2xvaWQiOiJsb2lkLWZyb20tand0LXNuYWtlIn0sInBvc3QiOnsiaWQiOiJ0M183ODkiLCJhdXRob3IiOiJ0Ml80MDAifX0sImlzcyI6InRlc3QifQ.signature',
       webbitToken: noWebbitToken,
     };
 
@@ -346,7 +346,7 @@ describe('initContext()', () => {
         "appSlug": "test-app-slug",
         "appVersion": "1.2.3",
         "client": undefined,
-        "loid": undefined,
+        "loid": "loid-from-jwt-snake",
         "postAuthorId": "t2_400",
         "postData": undefined,
         "postId": "t3_789",

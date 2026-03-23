@@ -109,7 +109,8 @@ export function contextFromRequestContext(
     appSlug: reqCtx.app.slug,
     appVersion: reqCtx.app.version,
     client,
-    loid: reqCtx.user?.devvitLoid,
+    loid:
+      reqCtx.user?.devvitLoid ?? (reqCtx.user as { devvit_loid?: string } | undefined)?.devvit_loid,
     postAuthorId: T2(reqCtx.post.author),
     postData: postData?.developerData,
     postId: T3(reqCtx.post.id),
