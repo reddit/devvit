@@ -9,6 +9,11 @@ import { dirExists } from '../../util/files.js';
 
 type SvgAsset = { name: string; contents: string };
 
+/** Strip XML preamble (<?xml?>, <!DOCTYPE>, comments) before the <svg> tag. */
+export function stripXmlPreamble(contents: string): string {
+  return contents.replace(/^[\s\S]*?(<svg)/i, '$1');
+}
+
 // TODO: When Blocks support is fully removed, this command can be removed as well, since icons will
 //  be loaded directly in the webview once we're fully in a Devvit Web world.
 export default class Icons extends DevvitCommand {
@@ -58,7 +63,7 @@ export default class Icons extends DevvitCommand {
       assets.map(async (asset) => {
         const name = path.relative(assetsPath, asset);
         const contents = await fsp.readFile(asset, 'utf-8');
-        return { name, contents };
+        return { name, contents: stripXmlPreamble(contents) };
       })
     );
   }
