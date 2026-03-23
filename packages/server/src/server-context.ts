@@ -26,6 +26,7 @@ export let Context = (headers: Readonly<Headers>): Context => {
     subredditName: publicApiContext.subredditName!, // This is guaranteed to be defined
     snoovatar: publicApiContext.snoovatar,
     username: publicApiContext.username,
+    loid: publicApiContext.loid,
   };
 };
 

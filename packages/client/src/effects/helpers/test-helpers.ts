@@ -14,6 +14,7 @@ export const mockDevvit: Readonly<DevvitGlobal> = {
     appSlug: 'test-app-123',
     appVersion: '1.0.0',
     client: undefined,
+    loid: undefined,
     postAuthorId: undefined,
     postData: undefined,
     postId: 't3_postId',

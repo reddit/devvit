@@ -85,6 +85,12 @@ export type BaseContext = {
    * @experimental
    */
   username?: string | undefined;
+  /**
+   * LOID (logged-out ID) is a token assigned on first visit and persists across sessions, account creation, and sign-in.
+   * Logged-in users retain a LOID for attribution, analytics, and cross-session tracking.
+   * @experimental
+   */
+  loid?: string | undefined;
   /** Returns a JSON representation of the context */
   toJSON(): Omit<BaseContext, 'toJSON'>;
   /** More useful things, but probably not for the average developer */

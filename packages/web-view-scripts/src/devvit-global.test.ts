@@ -83,6 +83,7 @@ describe('contextFromRequestContext()', () => {
         name: 'testUser',
         snoovatar: 'https://avatar',
         sessionId: '',
+        devvitLoid: 'NAntSOVzPGlf5ge0Z0UbDAz-5-r22CdusQb4f9Rfaws',
       },
       post: { id: 't3_789', author: 't2_400' },
     };
@@ -97,6 +98,7 @@ describe('contextFromRequestContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.0.0",
         "client": undefined,
+        "loid": "NAntSOVzPGlf5ge0Z0UbDAz-5-r22CdusQb4f9Rfaws",
         "postAuthorId": "t2_400",
         "postData": {
           "score": 42,
@@ -122,13 +124,21 @@ describe('contextFromRequestContext()', () => {
       },
       subreddit: { id: 't5_123', name: 'testSubreddit' },
       post: { id: 't3_789', author: 't2_400' },
+      user: {
+        id: '',
+        name: '',
+        snoovatar: '',
+        sessionId: '',
+        devvitLoid: 'NAntSOVzPGlf5ge0Z0UbDAz-5-r22CdusQb4f9Rfaws',
+      },
     };
 
     const result = contextFromRequestContext(reqCtx, undefined, undefined);
 
     expect(result.userId).toBeUndefined();
-    expect(result.username).toBeUndefined();
-    expect(result.snoovatar).toBeUndefined();
+    expect(result.username).toBe('');
+    expect(result.snoovatar).toBe('');
+    expect(result.loid).toBe('NAntSOVzPGlf5ge0Z0UbDAz-5-r22CdusQb4f9Rfaws');
   });
 });
 
@@ -153,6 +163,7 @@ describe('contextFromWebViewContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.0.0",
         "client": undefined,
+        "loid": undefined,
         "postAuthorId": undefined,
         "postData": {
           "score": 42,
@@ -226,6 +237,7 @@ describe('initContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.2.3",
         "client": undefined,
+        "loid": undefined,
         "postAuthorId": undefined,
         "postData": {
           "leaderboard": {
@@ -279,6 +291,7 @@ describe('initContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.2.3",
         "client": undefined,
+        "loid": undefined,
         "postAuthorId": undefined,
         "postData": {
           "leaderboard": {
@@ -333,6 +346,7 @@ describe('initContext()', () => {
         "appSlug": "test-app-slug",
         "appVersion": "1.2.3",
         "client": undefined,
+        "loid": undefined,
         "postAuthorId": "t2_400",
         "postData": undefined,
         "postId": "t3_789",
@@ -370,6 +384,7 @@ describe('initContext()', () => {
         "appSlug": "fromJwt",
         "appVersion": "2.0.0",
         "client": undefined,
+        "loid": undefined,
         "postAuthorId": "t2_400",
         "postData": undefined,
         "postId": "t3_789",

@@ -1,11 +1,19 @@
 import type { DevvitPostData, Metadata } from '@devvit/protos';
+import type { RequestContext } from '@devvit/protos/json/devvit/platform/v1/request_context.js';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { PostData } from '@devvit/shared-types/PostData.js';
+import { jwtDecode, type JwtPayload } from 'jwt-decode';
 
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
 import pkg from '../../version.json' with { type: 'json' };
+
+/**
+ * Claims payload extracted from a Devvit JWT.
+ * This represents a JSON Web Token (JWT) that holds the `devvit` platform request context
+ */
+type ContextClaims = JwtPayload & { devvit: RequestContext };
 
 export function getContextFromMetadata(
   metadata: Metadata,
@@ -37,6 +45,15 @@ export function getContextFromMetadata(
   const userId = metadata[Header.User]?.values[0];
   const debug = parseDebug(metadata);
 
+  let loid: string | undefined;
+  try {
+    // TODO - Use the RequestContext to extract other metadata like postData, userId, username, etc.
+    const signedRequestContext = decodeSignedRequestContext(metadata[Header.Context]?.values[0]);
+    loid = signedRequestContext?.user?.devvitLoid;
+  } catch {
+    loid = undefined;
+  }
+
   return {
     get appAccountId() {
       assertNonNull<string | undefined>(appAccountId, 'appAccountId is missing from Context');
@@ -53,6 +70,7 @@ export function getContextFromMetadata(
     appVersion,
     snoovatar,
     username,
+    loid,
     debug,
     metadata,
     toJSON() {
@@ -69,6 +87,7 @@ export function getContextFromMetadata(
         commentId,
         snoovatar,
         username,
+        loid,
         debug,
         metadata,
       };
@@ -122,4 +141,16 @@ export function parseDebug(meta: Readonly<Metadata>): ContextDebugInfo {
     );
 
   return { ...debug, metadata: meta };
+}
+
+/**
+ * Decodes the signed request-context JWT.
+ */
+function decodeSignedRequestContext(token: string | undefined): RequestContext | undefined {
+  if (!token) return;
+  try {
+    return jwtDecode<ContextClaims>(token)?.devvit;
+  } catch (err) {
+    throw Error('token decode failure', { cause: err });
+  }
 }

@@ -40,6 +40,7 @@
     "@devvit/shared-types": "0.12.16",
     "base64-js": "1.5.1",
     "clone-deep": "4.0.1",
+    "jwt-decode": "4.0.0",
     "moderndash": "4.0.0"
   },
   "devDependencies": {
@@ -60,8 +61,8 @@
   },
   "filesize": {
     "dist/public-api.min.js": {
-      "gzip": "66 KB",
-      "none": "234 KB"
+      "gzip": "67 KB",
+      "none": "235 KB"
     }
   },
   "source": "./src/index.ts"

@@ -18,6 +18,12 @@ export type BaseContext = {
   appSlug: string;
   /** The version of the app that is running. */
   appVersion: string;
+  /**
+   * LOID (logged-out ID) is a token assigned on first visit and persists across sessions, account creation, and sign-in.
+   * Logged-in users retain a LOID for attribution, analytics, and cross-session tracking.
+   * @experimental
+   */
+  loid: string | undefined;
   /** The ID of the current post, if applicable to the context. */
   postId: T3 | undefined;
   /**
