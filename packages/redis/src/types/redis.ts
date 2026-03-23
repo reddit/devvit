@@ -573,8 +573,9 @@ export type TxClientLike = {
    *  console.log("Number of fields added: " + numFieldsAdded);
    * }
    * ```
-   */
+  */
   hSet(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike>;
+  hSetNX(key: string, field: string, value: string): Promise<TxClientLike>;
   /**
    * Returns the value associated with field in the hash stored at key.
    * https://redis.io/commands/hget
