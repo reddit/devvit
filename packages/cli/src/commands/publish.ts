@@ -654,6 +654,7 @@ export default class Publish extends DevvitCommand {
       const pendingPRs = await this.#appPRClient.FindMany({
         appName: this.project.name,
         statuses: [AppPublishRequestStatus.PENDING],
+        pendingStates: [],
         sort: {
           field: 'createdAt',
           asc: false,
