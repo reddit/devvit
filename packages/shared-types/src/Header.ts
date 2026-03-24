@@ -13,6 +13,7 @@ export const Header = Object.freeze({
   Canary: 'devvit-canary',
   Context: 'devvit-context',
   Debug: 'devvit-debug',
+  FeaturedGames: 'devvit-featured-games',
   GQLHost: 'devvit-gql-host',
   Installation: 'devvit-installation',
   ModPermissions: 'devvit-mod-permissions',
