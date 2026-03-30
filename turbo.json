@@ -21,6 +21,10 @@
     "lint": {
       "outputs": []
     },
+    "lint:fix": {
+      "cache": false,
+      "outputs": []
+    },
     "test": {
       "outputs": []
     },

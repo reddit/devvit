@@ -3,6 +3,10 @@ server/static/
 server/bin/
 *.template.ts
 
+# Generated and formatted by Go.
+/docs/spec/headers.md
+/AGENTS.md
+
 node_modules/
 
 /packages/build-pack/src/__tests__/test-actors/bad-syntax/main.ts

@@ -47,8 +47,8 @@ All options are optional. The plugin works out of the box with sensible defaults
 
 ```ts
 devvit({
-  logLevel: 'warn',     // Vite log level: 'info' | 'warn' | 'error' | 'silent' (default: 'warn')
-  client: {},           // Vite EnvironmentOptions (merged into the client environment)
-  server: {}            // Vite EnvironmentOptions (merged into the server environment)
-})
+  logLevel: 'warn', // Vite log level: 'info' | 'warn' | 'error' | 'silent' (default: 'warn')
+  client: {}, // Vite EnvironmentOptions (merged into the client environment)
+  server: {}, // Vite EnvironmentOptions (merged into the server environment)
+});
 ```
