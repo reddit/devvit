@@ -46,7 +46,7 @@ exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 512x
 exports[`assertAssetCanBeAnIcon > should match the snapshot for image file: 1024x1024.gif > 1024x1024.gif-err 1`] = `
 [
   [
-    "Icon asset cannot be a GIF.",
+    "Icon asset must be a PNG or JPEG.",
   ],
 ]
 `;

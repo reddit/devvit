@@ -23,6 +23,12 @@ export const MAX_ASSET_FOLDER_SIZE_BYTES = GIGABYTE;
 export const MAX_ASSET_GIF_SIZE = 40 * MEGABYTE;
 export const MAX_ASSET_NON_GIF_SIZE = 20 * MEGABYTE;
 
+/**
+ * Max file size for `marketingAssets.icon` in devvit.json.
+ * This is limited by the maximum size of reddit profile pictures, which is 500 KB.
+ */
+export const MAX_DEVVIT_JSON_ICON_SIZE_BYTES = 500 * KILOBYTE;
+
 export function prettyPrintSize(bytes: number): string {
   const sizeNames = ['B', 'KB', 'MB', 'GB', 'TB'];
 

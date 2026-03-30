@@ -127,7 +127,7 @@ export class AssetUploader {
         .update(new Uint8Array(iconAssetContents))
         .digest('hex');
 
-      this.assertAssetCanBeAnIcon(iconAssetContents);
+      await this.assertAssetCanBeAnIcon(iconAssetContents);
 
       iconAssetDetails = {
         filePath: ICON_FILE_PATH, // Use a placeholder path for the icon asset
@@ -183,7 +183,7 @@ export class AssetUploader {
 
   async assertAssetCanBeAnIcon(data: Buffer): Promise<void> {
     // Verify the icon. It *must*:
-    // - NOT be a GIF
+    // - be a PNG or JPEG (so it's also supported as a reddit profile picture)
     // - be square in shape
     // - be at least 256x256 pixels
     // - be at most 1024x1024 pixels
@@ -196,8 +196,8 @@ export class AssetUploader {
     if (!fileTypeResult) {
       this.#cmd.error(`Icon asset is not a valid image.`);
     }
-    if (fileTypeResult.mime === 'image/gif') {
-      this.#cmd.error(`Icon asset cannot be a GIF.`);
+    if (fileTypeResult.mime !== 'image/png' && fileTypeResult.mime !== 'image/jpeg') {
+      this.#cmd.error(`Icon asset must be a PNG or JPEG.`);
     }
 
     const sizeResult = imageSize(new Uint8Array(data));

@@ -794,7 +794,7 @@
       "properties": {
         "icon": {
           "type": "string",
-          "description": "Path to the icon file relative to the project root. This should be a square PNG image, 1024x1024 pixels."
+          "description": "Path to the icon file relative to the project root. This should be a square PNG image, 1024x1024 pixels, at most 500 KB."
         }
       }
     },
