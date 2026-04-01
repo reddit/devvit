@@ -86,7 +86,7 @@ type AboutSubredditHelperOptions<T extends AboutSubredditTypes> = Prettify<
   } & AboutLocationRequest
 >;
 
-export type CommentMediaTypes = 'giphy' | 'static' | 'animated' | 'expression';
+export type CommentMediaTypes = 'giphy' | 'static' | 'animated' | 'expression' | 'video';
 
 export type FlairSettings = {
   enabled: boolean;
@@ -1550,7 +1550,13 @@ function asAllowedPostType(type?: string): 'any' | 'link' | 'self' {
 }
 
 function asCommentMediaTypes(type: string): CommentMediaTypes {
-  if (type === 'animated' || type === 'giphy' || type === 'static' || type === 'expression') {
+  if (
+    type === 'animated' ||
+    type === 'giphy' ||
+    type === 'static' ||
+    type === 'expression' ||
+    type === 'video'
+  ) {
     return type;
   }
 
