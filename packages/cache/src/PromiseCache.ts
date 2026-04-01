@@ -1,4 +1,5 @@
 import type { RedisClient } from '@devvit/redis';
+import { context } from '@devvit/server';
 import type { JsonValue } from '@devvit/shared-types/json.js';
 
 export type CacheEntry = {
@@ -168,7 +169,8 @@ export class PromiseCache {
    * clientRetryDelay, let's not retry again.  We also have a probability of retrying, so we don't retry every time.
    */
   #localCachedAnswer<T extends JsonValue>(key: string): T | undefined {
-    const val = this.#localCache[key];
+    const localKey = this.#localKey(key);
+    const val = this.#localCache[localKey];
     if (val) {
       const now = this.#clock.now().getTime();
       const hasRetryableError =
@@ -179,7 +181,7 @@ export class PromiseCache {
         val.errorTime + clientRetryDelay < now;
       const expired = val?.expires && val.expires < now && val.checkedAt + clientRetryDelay < now;
       if (expired || hasRetryableError) {
-        delete this.#localCache[key];
+        delete this.#localCache[localKey];
         return undefined;
       } else {
         return _unwrap(val);
@@ -274,6 +276,7 @@ export class PromiseCache {
     closure: () => Promise<T>,
     ttlMs: number
   ): Promise<CacheEntry> {
+    const localKey = this.#localKey(key);
     const expires = this.#clock.now().getTime() + ttlMs;
     entry = entry ?? {
       value: null,
@@ -295,7 +298,7 @@ export class PromiseCache {
       entry.errorCount++;
     }
 
-    this.#localCache[key] = entry;
+    this.#localCache[localKey] = entry;
 
     await this.#redis.set(_namespaced(key), JSON.stringify(entry), {
       expiration: new Date(expires + allowStaleFor),
@@ -333,12 +336,17 @@ export class PromiseCache {
     }
   }
 
+  #localKey(key: string): string {
+    return `${context.subredditId}:${key}`;
+  }
+
   async #redisEntry(key: string): Promise<CacheEntry | undefined> {
+    const localKey = this.#localKey(key);
     const val = await this.#redis.get(_namespaced(key));
     if (val) {
       const entry = JSON.parse(val) as CacheEntry;
       entry.checkedAt = this.#clock.now().getTime();
-      this.#localCache[key] = entry;
+      this.#localCache[localKey] = entry;
       return entry;
     }
     return undefined;

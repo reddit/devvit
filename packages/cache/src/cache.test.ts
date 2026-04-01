@@ -1,5 +1,7 @@
 /* eslint-disable sonarjs/no-identical-functions */
 import type { RedisClient, SetOptions } from '@devvit/redis';
+import { Context, runWithContext } from '@devvit/server';
+import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 
 import type { CacheHelper } from './cache.js';
@@ -116,8 +118,10 @@ describe('cache works functionality', () => {
     const vals = {};
     const cache = mockedCache(clock, random, stats, vals);
 
-    const val = cache(async () => 'hello', { ttl: 5, key: 'test' });
-    expect(await val).toBe('hello');
+    await runWithTestContext(async () => {
+      const val = cache(async () => 'hello', { ttl: 5, key: 'test' });
+      expect(await val).toBe('hello');
+    });
   });
 
   test('expires', async () => {
@@ -130,11 +134,13 @@ describe('cache works functionality', () => {
     const get = async (): Promise<number> =>
       cache(async () => clock.now().getTime(), { ttl: 5, key: 'test' });
 
-    const orig = await get();
-    clock.advance(500);
-    expect(await get()).toBe(orig);
-    clock.advance(5000);
-    expect(await get()).not.toBe(orig);
+    await runWithTestContext(async () => {
+      const orig = await get();
+      clock.advance(500);
+      expect(await get()).toBe(orig);
+      clock.advance(5000);
+      expect(await get()).not.toBe(orig);
+    });
   });
 
   test('sets ttl to 5s if the developer gives less (or not a number)', async () => {
@@ -147,10 +153,12 @@ describe('cache works functionality', () => {
     const get = async (): Promise<number> =>
       cache(async () => clock.now().getTime(), { ttl: 5, key: 'test' });
 
-    // Since we set the default to be 5s instead of the given 1s we expect the original here instead of a new object.
-    const orig = await get();
-    clock.advance(2_000);
-    expect(await get()).toBe(orig);
+    await runWithTestContext(async () => {
+      // Since we set the default to be 5s instead of the given 1s we expect the original here instead of a new object.
+      const orig = await get();
+      clock.advance(2_000);
+      expect(await get()).toBe(orig);
+    });
   });
 
   test('writes through to local cache', async () => {
@@ -165,11 +173,13 @@ describe('cache works functionality', () => {
     const get = async (): Promise<number> =>
       cache(async () => clock.now().getTime(), { ttl: 5, key: 'test' });
 
-    const orig = await get();
-    clock.advance(500);
-    expect(await get()).toBe(orig);
-    expect(await get()).toBe(orig);
-    expect(stats.gets).toBe(1); // because we hit the local cache not redis
+    await runWithTestContext(async () => {
+      const orig = await get();
+      clock.advance(500);
+      expect(await get()).toBe(orig);
+      expect(await get()).toBe(orig);
+      expect(stats.gets).toBe(1); // because we hit the local cache not redis
+    });
   });
 
   test('writes through to local cache with two instances', async () => {
@@ -189,14 +199,16 @@ describe('cache works functionality', () => {
     const get2 = async (): Promise<number> =>
       cache2(async () => clock.now().getTime(), { ttl: 5, key: 'test' });
 
-    const orig = await get1();
-    clock.advance(500);
-    expect(await get1()).toBe(orig);
-    expect(await get1()).toBe(orig);
-    expect(stats1.gets).toBe(1); // because we hit the local cache not redis
-    expect(await get2()).toBe(orig);
-    expect(await get2()).toBe(orig);
-    expect(stats2.gets).toBe(1); // because we hit the local cache not redis
+    await runWithTestContext(async () => {
+      const orig = await get1();
+      clock.advance(500);
+      expect(await get1()).toBe(orig);
+      expect(await get1()).toBe(orig);
+      expect(stats1.gets).toBe(1); // because we hit the local cache not redis
+      expect(await get2()).toBe(orig);
+      expect(await get2()).toBe(orig);
+      expect(stats2.gets).toBe(1); // because we hit the local cache not redis
+    });
   });
 
   test('simultaneous', async () => {
@@ -216,10 +228,12 @@ describe('cache works functionality', () => {
         { ttl: 5, key: 'test' }
       );
 
-    const a = get();
-    const b = get();
-    expect(await a).toBe(await b);
-    expect(i).toBe(1);
+    await runWithTestContext(async () => {
+      const a = get();
+      const b = get();
+      expect(await a).toBe(await b);
+      expect(i).toBe(1);
+    });
   });
 
   test('optimistic refresh', async () => {
@@ -233,40 +247,43 @@ describe('cache works functionality', () => {
     let inner = 'initial';
 
     const get = async (): Promise<string> => cache(async () => inner, { ttl: 5, key: 'test' });
-    const initial = await get();
-    expect(initial).toBe('initial');
 
-    inner = 'changed';
-    clock.advance(3500); // Advance 3.5s
-    expect(await get()).toBe('initial'); // Should still be the initial value
+    await runWithTestContext(async () => {
+      const initial = await get();
+      expect(initial).toBe('initial');
 
-    const limit = 10000; // 1% should happen in 10000 tries
-    let i;
-    // See if the refresh happens
-    for (i = 0; i < limit; i++) {
-      random.next = Math.random();
-      await get();
-    }
-    // It should not, because we have a value in the local cache, and only redis is refreshed optimistically
-    expect(await get()).toBe('initial');
+      inner = 'changed';
+      clock.advance(3500); // Advance 3.5s
+      expect(await get()).toBe('initial'); // Should still be the initial value
 
-    // Clear the local cache and try again
-    for (const key in localCache) {
-      delete localCache[key];
-    }
+      const limit = 10000; // 1% should happen in 10000 tries
+      let i;
+      // See if the refresh happens
+      for (i = 0; i < limit; i++) {
+        random.next = Math.random();
+        await get();
+      }
+      // It should not, because we have a value in the local cache, and only redis is refreshed optimistically
+      expect(await get()).toBe('initial');
 
-    // Now we should probabilistically update redis since the local cache is empty and the value is about to expire
-    // The TTL is 5s, we are 3.5s in, with 1.5s left, so:
-    // rampProbability = #calculateRamp(5s) = 0.01 since there are 1.5s left
-    random.next = 0.5; // Greater than 0.01, so we should NOT refresh redis
-    expect(await get()).toBe('initial');
+      // Clear the local cache and try again
+      for (const key in localCache) {
+        delete localCache[key];
+      }
 
-    // Clear the local cache (otherwise we don't hit redis and attempt to refresh it) and try again
-    for (const key in localCache) {
-      delete localCache[key];
-    }
-    random.next = 0.001; // Less than 0.01, so we should refresh redis
-    expect(await get()).toBe('changed');
+      // Now we should probabilistically update redis since the local cache is empty and the value is about to expire
+      // The TTL is 5s, we are 3.5s in, with 1.5s left, so:
+      // rampProbability = #calculateRamp(5s) = 0.01 since there are 1.5s left
+      random.next = 0.5; // Greater than 0.01, so we should NOT refresh redis
+      expect(await get()).toBe('initial');
+
+      // Clear the local cache (otherwise we don't hit redis and attempt to refresh it) and try again
+      for (const key in localCache) {
+        delete localCache[key];
+      }
+      random.next = 0.001; // Less than 0.01, so we should refresh redis
+      expect(await get()).toBe('changed');
+    });
   });
 
   test('retries on failures', async () => {
@@ -298,30 +315,32 @@ describe('cache works functionality', () => {
       }
     };
 
-    expect(await getSafe()).toBeUndefined();
-    let entry: CacheEntry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.error).toBe('foo');
-    expect(entry.errorCount).toBe(1);
+    await runWithTestContext(async () => {
+      expect(await getSafe()).toBeUndefined();
+      let entry: CacheEntry = JSON.parse(vals[nameSpacedKey][0]);
+      expect(entry.error).toBe('foo');
+      expect(entry.errorCount).toBe(1);
 
-    const limit = 1000;
+      const limit = 1000;
 
-    shouldFail = false;
-    let i;
-    for (i = 0; i < limit; i++) {
-      clock.advance(clientRetryDelay + 1);
-      expect(i).toBeLessThan(limit - 1);
-      const n = await getSafe();
-      if (n !== undefined) {
-        break;
+      shouldFail = false;
+      let i;
+      for (i = 0; i < limit; i++) {
+        clock.advance(clientRetryDelay + 1);
+        expect(i).toBeLessThan(limit - 1);
+        const n = await getSafe();
+        if (n !== undefined) {
+          break;
+        }
+        entry = JSON.parse(vals[nameSpacedKey][0]);
+        // only retrying some of the time
+        expect(entry.errorCount).toBe(1);
       }
       entry = JSON.parse(vals[nameSpacedKey][0]);
-      // only retrying some of the time
-      expect(entry.errorCount).toBe(1);
-    }
-    entry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.errorCount).toBe(0);
-    expect(entry.error).toBeNull();
-    expect(entry.value).toBeGreaterThan(0);
+      expect(entry.errorCount).toBe(0);
+      expect(entry.error).toBeNull();
+      expect(entry.value).toBeGreaterThan(0);
+    });
   });
 
   test('retries on failures doesnt retry more than limit', async () => {
@@ -353,39 +372,41 @@ describe('cache works functionality', () => {
       }
     };
 
-    expect(await getSafe()).toBeUndefined();
-    let entry: CacheEntry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.error).toBe('foo');
-    expect(entry.errorCount).toBe(1);
+    await runWithTestContext(async () => {
+      expect(await getSafe()).toBeUndefined();
+      let entry: CacheEntry = JSON.parse(vals[nameSpacedKey][0]);
+      expect(entry.error).toBe('foo');
+      expect(entry.errorCount).toBe(1);
 
-    let limit = 5;
-    // Error retry probability is 10%, but since the clientRetryDelay hasn't passed yet, we will not retry
-    random.next = 0; // Always attempt to retry
-    for (let i = 0; i < limit; i++) {
-      await getSafe();
-    }
-    entry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.errorCount).toBe(1); // because the clientRetryDelay hasn't been reached;
+      let limit = 5;
+      // Error retry probability is 10%, but since the clientRetryDelay hasn't passed yet, we will not retry
+      random.next = 0; // Always attempt to retry
+      for (let i = 0; i < limit; i++) {
+        await getSafe();
+      }
+      entry = JSON.parse(vals[nameSpacedKey][0]);
+      expect(entry.errorCount).toBe(1); // because the clientRetryDelay hasn't been reached;
 
-    clock.advance(clientRetryDelay + 1);
-    // Now we will retry once, since the clientRetryDelay has passed
-    for (let i = 0; i < limit; i++) {
-      await getSafe();
-    }
-    entry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.errorCount).toBe(2); // because the clientRetryDelay has happened once
-
-    // Increase the limit to verify we won't retry past the retryLimit, despite the probabilistic retry and the clientRetryDelay passing
-    limit = 1000;
-    for (let i = 0; i < limit; i++) {
-      await getSafe();
       clock.advance(clientRetryDelay + 1);
-    }
+      // Now we will retry once, since the clientRetryDelay has passed
+      for (let i = 0; i < limit; i++) {
+        await getSafe();
+      }
+      entry = JSON.parse(vals[nameSpacedKey][0]);
+      expect(entry.errorCount).toBe(2); // because the clientRetryDelay has happened once
 
-    entry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.errorCount).toBe(retryLimit);
-    expect(entry.error).toBe('foo');
-    expect(entry.value).toBeNull();
+      // Increase the limit to verify we won't retry past the retryLimit, despite the probabilistic retry and the clientRetryDelay passing
+      limit = 1000;
+      for (let i = 0; i < limit; i++) {
+        await getSafe();
+        clock.advance(clientRetryDelay + 1);
+      }
+
+      entry = JSON.parse(vals[nameSpacedKey][0]);
+      expect(entry.errorCount).toBe(retryLimit);
+      expect(entry.error).toBe('foo');
+      expect(entry.value).toBeNull();
+    });
   });
 
   test('retries on failures doesnt retry every time', async () => {
@@ -417,21 +438,23 @@ describe('cache works functionality', () => {
       }
     };
 
-    expect(await getSafe()).toBeUndefined();
-    let entry: CacheEntry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.error).toBe('foo');
-    expect(entry.errorCount).toBe(1);
+    await runWithTestContext(async () => {
+      expect(await getSafe()).toBeUndefined();
+      let entry: CacheEntry = JSON.parse(vals[nameSpacedKey][0]);
+      expect(entry.error).toBe('foo');
+      expect(entry.errorCount).toBe(1);
 
-    const limit = retryLimit;
-    for (let i = 0; i < limit; i++) {
-      random.next = i / limit;
-      await getSafe();
-    }
+      const limit = retryLimit;
+      for (let i = 0; i < limit; i++) {
+        random.next = i / limit;
+        await getSafe();
+      }
 
-    entry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.errorCount).toBeLessThan(retryLimit);
-    expect(entry.error).toBe('foo');
-    expect(entry.value).toBeNull();
+      entry = JSON.parse(vals[nameSpacedKey][0]);
+      expect(entry.errorCount).toBeLessThan(retryLimit);
+      expect(entry.error).toBe('foo');
+      expect(entry.value).toBeNull();
+    });
   });
 
   test('allows stale', async () => {
@@ -455,14 +478,16 @@ describe('cache works functionality', () => {
         { ttl: 10, key: 'test' }
       );
 
-    expect(await get()).toBe(0);
-    const entry: CacheEntry = JSON.parse(vals[nameSpacedKey][0]);
-    expect(entry.expires).toBe(clock.now().getTime() + 10_000);
-    const redisExpiry: Date = vals[nameSpacedKey][1];
-    expect(redisExpiry.getTime()).toBe(clock.now().getTime() + 10_000 + allowStaleFor);
-    clock.advance(15_000);
+    await runWithTestContext(async () => {
+      expect(await get()).toBe(0);
+      const entry: CacheEntry = JSON.parse(vals[nameSpacedKey][0]);
+      expect(entry.expires).toBe(clock.now().getTime() + 10_000);
+      const redisExpiry: Date = vals[nameSpacedKey][1];
+      expect(redisExpiry.getTime()).toBe(clock.now().getTime() + 10_000 + allowStaleFor);
+      clock.advance(15_000);
 
-    expect(await get()).toBe(1);
+      expect(await get()).toBe(1);
+    });
   });
 
   test('allows stale, only re-fetches after delay', async () => {
@@ -481,12 +506,28 @@ describe('cache works functionality', () => {
         async () => {
           return n++;
         },
-        { ttl: 10, key: 'test' }
+        { ttl: 10, key }
       );
 
-    expect(await get()).toBe(0);
-    clock.advance(12_000);
-    localCache[key].checkedAt = clock.now().getTime() - 1;
-    expect(await get()).toBe(0);
+    await runWithTestContext(async () => {
+      expect(await get()).toBe(0);
+      clock.advance(12_000);
+      localCache[`t5_0:${key}`].checkedAt = clock.now().getTime() - 1;
+      expect(await get()).toBe(0);
+    });
   });
 });
+
+/** Runs a test callback with a fake devvit context populated with test header values. */
+function runWithTestContext<T>(
+  callback: () => Promise<T>,
+  bonusHeaders: { [header: string]: string } = {}
+): Promise<T> {
+  const context = Context({
+    [Header.AppUser]: 't2_appuser',
+    [Header.User]: 't2_1234',
+    [Header.Subreddit]: 't5_0',
+    ...bonusHeaders,
+  });
+  return runWithContext(context, callback);
+}

@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@devvit/redis": "0.12.17",
+    "@devvit/server": "0.12.17",
     "@devvit/shared-types": "0.12.17"
   },
   "devDependencies": {
