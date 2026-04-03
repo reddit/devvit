@@ -37,7 +37,7 @@ export function getWebViewMode(): WebViewMode {
  * @param event The gesture that triggered the request, must be a trusted event.
  * @param entry The destination URI name. Eg, `'splash'` or `'default'`. Entry
  *              names are the `devvit.json` `post.entrypoints` keys. Passing the
- *              same entrypoint as currently loaded causes a reload.
+ *              same entrypoint as currently loaded may cause a reload.
  * @returns A promise that resolves request has been received.
  * @throws When already expanded.
  *
