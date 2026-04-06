@@ -1,4 +1,5 @@
 import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import type { T3 } from '@devvit/shared';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { maxShareParamUserDataChars } from '@devvit/shared-types/client/share.js';
 import { ICON_FILE_PATH } from '@devvit/shared-types/constants.js';
@@ -10,9 +11,10 @@ export type ShareSheetOpts = {
   title?: string | undefined;
   /** Body text of share sheet. */
   text?: string | undefined;
+  /** Post to share. If not provided, a link to the current post will be shared. */
+  post?: T3 | undefined;
 };
 
-// to-do: unit test.
 // to-do: move to web view scripts.
 /** Show the native share sheet or copy to clipboard depending on device. */
 export async function showShareSheet(opts: Readonly<ShareSheetOpts>): Promise<void> {
@@ -29,6 +31,12 @@ export async function showShareSheet(opts: Readonly<ShareSheetOpts>): Promise<vo
     //
   }
 
+  let url: string | undefined;
+  if (opts.post) {
+    const postWithoutPrefix = opts.post.replace('t3_', '');
+    url = `https://reddit.com/comments/${postWithoutPrefix}`;
+  }
+
   emitEffect({
     type: EffectType.EFFECT_WEB_VIEW,
     share: {
@@ -36,6 +44,7 @@ export async function showShareSheet(opts: Readonly<ShareSheetOpts>): Promise<vo
       userData: opts.data,
       text: opts.text,
       title: opts.title,
+      url: url,
     },
   });
 }
