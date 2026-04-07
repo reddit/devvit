@@ -58,3 +58,6 @@ __e2e__/playwright/data/user/localSessionCookies.json
 
 # Ignore all build artifacts
 tsconfig.tsbuildinfo
+
+# local worktrees
+.worktrees/
