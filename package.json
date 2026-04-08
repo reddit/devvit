@@ -75,7 +75,7 @@
     "recursive-readdir/minimatch": "3.1.2",
     "serve-handler/minimatch": "3.1.2",
     "strip-ansi@3.0.1/ansi-regex": "3.0.1",
-    "vite": "7.2.7",
+    "vite": "7.3.2",
     "yosay/ansi-regex": "3.0.1",
     "form-data@^2.5.0": "2.5.4",
     "form-data@^4.0.0": "4.0.4",

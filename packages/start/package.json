@@ -40,7 +40,7 @@
     "@devvit/tsconfig": "0.12.18",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
-    "vite": "7.2.7",
+    "vite": "7.3.2",
     "vitest": "4.0.15"
   },
   "publishConfig": {
