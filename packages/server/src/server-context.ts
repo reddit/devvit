@@ -7,6 +7,7 @@ import { Header, headerPrefix } from '@devvit/shared-types/Header.js';
 
 /** Devvit server context for the lifetime of a request. */
 export type Context = BaseContext & {
+  /** @internal - Used for caching info within the lifespan of a request. Not for public use. */
   cache?: { [key: string]: unknown };
   metadata: Metadata;
 };

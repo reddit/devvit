@@ -61,7 +61,13 @@ export const context = new Proxy<Context>({} as Context, {
   },
 });
 
-/** For testing. @experimental */
+/**
+ * Save a value to the cache associated with this context/request. Does not persist past this
+ * request's lifespan. This can store complex objects, not just JSON-able values, if necessary!
+ * @internal - External devs should use @devvit/cache or @devvit/redis for this.
+ * @param key Key to store the value in
+ * @param value Value to store
+ */
 export function setContextCache(key: string, value: unknown): void {
   const context = getContext();
   if (!context.cache) {
@@ -70,7 +76,12 @@ export function setContextCache(key: string, value: unknown): void {
   context.cache[key] = value;
 }
 
-/** For testing. @experimental */
+/**
+ * Gets a value from the cache associated with this context/request.
+ * @internal - External devs should use @devvit/cache or @devvit/redis for this.
+ * @param key Key to get the value of
+ * @return The value retrieved, or `undefined` if no value has been saved
+ */
 export function getContextCache<T>(key: string): T | undefined {
   const context = getContext();
   if (!context.cache) {
