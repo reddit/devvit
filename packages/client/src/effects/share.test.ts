@@ -3,6 +3,7 @@ import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { ICON_FILE_PATH } from '@devvit/shared-types/constants.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { mockDevvit } from './helpers/test-helpers.js';
 import { showShareSheet } from './share.js';
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
@@ -14,6 +15,7 @@ const savedFetch = globalThis.fetch;
 
 describe('showShareSheet', () => {
   beforeEach(() => {
+    globalThis.devvit = mockDevvit;
     globalThis.location = { origin: 'https://reddit.com' } as Location;
     globalThis.fetch = vi.fn().mockResolvedValue({ ok: false });
   });
@@ -34,7 +36,7 @@ describe('showShareSheet', () => {
     expect(emitEffect).toHaveBeenCalledWith({
       type: EffectType.EFFECT_WEB_VIEW,
       share: {
-        url: 'https://reddit.com/comments/1se0nud',
+        url: 'https://reddit.com/r/_/comments/1se0nud',
         userData: 'test data',
         text: 'test text',
         title: 'test title',
@@ -69,7 +71,7 @@ describe('showShareSheet', () => {
     );
   });
 
-  it('should call emitEffect without the url if it is not provided', async () => {
+  it('should use current post from devvit context when post is not provided', async () => {
     await showShareSheet({
       data: 'test data',
       text: 'test text',
@@ -78,6 +80,7 @@ describe('showShareSheet', () => {
     expect(emitEffect).toHaveBeenCalledWith({
       type: EffectType.EFFECT_WEB_VIEW,
       share: {
+        url: 'https://reddit.com/r/_/comments/postId',
         userData: 'test data',
         text: 'test text',
         title: 'test title',

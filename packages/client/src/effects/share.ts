@@ -31,11 +31,10 @@ export async function showShareSheet(opts: Readonly<ShareSheetOpts>): Promise<vo
     //
   }
 
-  let url: string | undefined;
-  if (opts.post) {
-    const postWithoutPrefix = opts.post.replace('t3_', '');
-    url = `https://reddit.com/comments/${postWithoutPrefix}`;
-  }
+  // Create the share URL using the post from the props, or the current post if not provided.
+  const postId = opts.post ?? devvit.context.postId;
+  const postWithoutPrefix = postId.replace('t3_', '');
+  const url = `https://reddit.com/r/_/comments/${postWithoutPrefix}`;
 
   emitEffect({
     type: EffectType.EFFECT_WEB_VIEW,
