@@ -6,7 +6,6 @@
 export const Header = Object.freeze({
   Actor: 'devvit-actor',
   App: 'devvit-app',
-  AppDependencies: 'devvit-app-dependencies',
   AppUser: 'devvit-app-user',
   Canary: 'devvit-canary',
   Context: 'devvit-context',
