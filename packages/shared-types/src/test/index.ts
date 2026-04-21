@@ -15,7 +15,6 @@ export const MOCK_HEADERS = {
   [Header.AppUser]: 't2_testuser',
   [Header.App]: 'test-app',
   [Header.Version]: '0.0.0-test',
-  [Header.AppViewerAuthToken]: 'test-token',
 };
 
 export const installGlobalConfig = (config: Config, appConfig?: AppConfig): void => {
