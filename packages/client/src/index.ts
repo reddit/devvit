@@ -2,6 +2,7 @@ import { initWebViewMode } from './effects/web-view-mode.js';
 
 export * from './clientContext.js';
 export * from './effects/helpers/form-types.js';
+export * from './effects/login-prompt.js';
 export * from './effects/navigate-to.js';
 export * from './effects/run-as-user.js';
 export * from './effects/share.js';
