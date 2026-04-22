@@ -16,6 +16,7 @@ import { assertUserScope, RunAs } from '../common.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
+import { filterThing } from '../RedditClient.js';
 import type { CommonFlair } from './Flair.js';
 import { convertProtosFlairToCommonFlair } from './Flair.js';
 import type { ListingFetchOptions, ListingFetchResponse, MoreObject } from './Listing.js';
@@ -396,6 +397,13 @@ export class Comment {
     await Comment.remove(this.id, isSpam);
     this.#removed = true;
     this.#spam = isSpam;
+    this.#approved = false;
+  }
+
+  async filter(reason: string): Promise<void> {
+    await filterThing(this.id, reason, context.metadata);
+    this.#removed = true;
+    this.#spam = false;
     this.#approved = false;
   }
 

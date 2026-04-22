@@ -47,6 +47,7 @@ import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
 import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
+import { filterThing } from '../RedditClient.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { CommonFlair } from './Flair.js';
@@ -1142,6 +1143,13 @@ export class Post {
     await Post.approve(this.id);
     this.#approved = true;
     this.#removed = false;
+  }
+
+  async filter(reason: string): Promise<void> {
+    await filterThing(this.id, reason, context.metadata);
+    this.#removed = true;
+    this.#spam = false;
+    this.#approved = false;
   }
 
   async remove(isSpam: boolean = false): Promise<void> {

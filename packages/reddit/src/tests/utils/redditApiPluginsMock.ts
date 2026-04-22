@@ -87,6 +87,7 @@ export const redditApiPlugins = {
     IgnoreReports: vi.fn(),
     LeaveContributor: vi.fn(),
     LeaveModerator: vi.fn(),
+    Filter: vi.fn(),
     MuteMessageAuthor: vi.fn(),
     Remove: vi.fn(),
     ShowComment: vi.fn(),

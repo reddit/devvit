@@ -92,6 +92,20 @@ const CACHE_KEY_CURRENT_USER = 'RedditClient.currentUser';
 
 type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;
 
+export async function filterThing(
+  id: T1 | T3,
+  reason: string,
+  metadata: Metadata | undefined
+): Promise<void> {
+  await getRedditApiPlugins().Moderation.Filter(
+    {
+      id,
+      reason,
+    },
+    metadata
+  );
+}
+
 export type InviteModeratorOptions = {
   /** The name of the subreddit to invite the user to moderate */
   subredditName: string;
@@ -1294,6 +1308,13 @@ export class RedditClient {
       return Post.remove(id, isSpam);
     }
 
+    throw new Error('id must start with either t1_ or t3_');
+  }
+
+  async filter(id: T1 | T3, reason: string): Promise<void> {
+    if (isT1(id) || isT3(id)) {
+      return filterThing(id, reason, context.metadata);
+    }
     throw new Error('id must start with either t1_ or t3_');
   }
 
