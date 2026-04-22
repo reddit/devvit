@@ -6,7 +6,6 @@ module.exports = {
   // Note the md for running prettier markdown files!
   // https://prettier.io/blog/2017/11/07/1.8.0.html
   '*devvit-docs/**/*.{md,cjs,js,jsx,mjs,cts,mts,ts,tsx}': ['prettier --write'],
-  '*devvit-dev-portal/**/*.graphql': ['prettier --write', 'make gql-types'],
   '*.proto': ['npx yarn workspace @devvit/protos format'],
   'package.json': ['prettier-package-json --write'],
 
