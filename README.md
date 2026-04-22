@@ -2,7 +2,7 @@
 
 ## Contributing to the Devvit public repo
 
-Reddit has a number of open source projects that developers are invited to contribute to in our GitHub repo. The Developer Platform has several [first-party example apps](https://github.com/reddit/devvit/tree/main/packages/apps) open for contribution. There's also a [public issue board](https://github.com/reddit/devvit/issues) that tracks feature requests and bugs. All feedback is welcome!
+Reddit has a number of open source projects that developers are invited to contribute to in our GitHub repo. The Developer Platform has several [first-party example apps](https://github.com/reddit/devvit/tree/main/packages/apps) and the [developer documentation](https://github.com/reddit/devvit-docs) open for contribution. There's also a [public issue board](https://github.com/reddit/devvit/issues) that tracks feature requests and bugs. All feedback is welcome!
 
 ## Contributor License Agreement
 
