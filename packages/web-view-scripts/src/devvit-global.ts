@@ -109,6 +109,7 @@ export function contextFromRequestContext(
     appSlug: reqCtx.app.slug,
     appVersion: reqCtx.app.version,
     client,
+    commentId: undefined,
     loid:
       reqCtx.user?.devvitLoid ?? (reqCtx.user as { devvit_loid?: string } | undefined)?.devvit_loid,
     postAuthorId: T2(reqCtx.post.author),
@@ -133,6 +134,7 @@ export function contextFromWebViewContext(
     appSlug: webViewCtx.appName,
     appVersion: webViewCtx.appVersion,
     client,
+    commentId: undefined,
     loid: undefined,
     postData: postData?.developerData,
     postAuthorId: undefined,

@@ -1,5 +1,5 @@
 import type { PostData } from '../PostData.js';
-import type { T2, T3, T5 } from '../tid.js';
+import type { T1, T2, T3, T5 } from '../tid.js';
 
 /** Client or server request context. */
 export type BaseContext = {
@@ -26,6 +26,8 @@ export type BaseContext = {
   loid: string | undefined;
   /** The ID of the current post, if applicable to the context. */
   postId: T3 | undefined;
+  /** The ID of the current comment, if applicable to the context. */
+  commentId: T1 | undefined;
   /**
    * Post data included in the current post.
    * This data is set at custom Post creation via `submitPost({ postData: {...} })` and can be updated via `Post.setPostData({...})`.

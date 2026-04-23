@@ -2,7 +2,8 @@ import type { Metadata } from '@devvit/protos/lib/Types.js';
 // to-do: inline a copy here. this is the only dependency on @devvit/public-api
 //        and it's a functional one, not a devDependencies.
 import { getContextFromMetadata } from '@devvit/public-api/devvit/internals/context.js';
-import { type BaseContext, T2, T3, T5 } from '@devvit/shared';
+import type { BaseContext } from '@devvit/shared';
+import { T1, T2 as asT2, T3 as asT3, T5 as asT5 } from '@devvit/shared';
 import { Header, headerPrefix } from '@devvit/shared-types/Header.js';
 
 /** Devvit server context for the lifetime of a request. */
@@ -18,12 +19,17 @@ type Headers = { [header: string]: string | string[] | undefined };
 /** Constructs a new Context. */
 export let Context = (headers: Readonly<Headers>): Context => {
   const meta = metaFromIncomingMessage(headers);
-  const publicApiContext = getContextFromMetadata(meta, meta[Header.Post]?.values[0]);
+  const publicApiContext = getContextFromMetadata(
+    meta,
+    meta[Header.Post]?.values[0],
+    meta[Header.Comment]?.values[0]
+  );
   return {
     ...publicApiContext,
-    subredditId: T5(publicApiContext.subredditId),
-    userId: publicApiContext.userId ? T2(publicApiContext.userId) : undefined,
-    postId: publicApiContext.postId ? T3(publicApiContext.postId) : undefined,
+    commentId: publicApiContext.commentId ? T1(publicApiContext.commentId) : undefined,
+    subredditId: asT5(publicApiContext.subredditId),
+    userId: publicApiContext.userId ? asT2(publicApiContext.userId) : undefined,
+    postId: publicApiContext.postId ? asT3(publicApiContext.postId) : undefined,
     subredditName: publicApiContext.subredditName!, // This is guaranteed to be defined
     snoovatar: publicApiContext.snoovatar,
     username: publicApiContext.username,

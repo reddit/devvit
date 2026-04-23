@@ -8,6 +8,7 @@ export const Header = Object.freeze({
   App: 'devvit-app',
   AppUser: 'devvit-app-user',
   Canary: 'devvit-canary',
+  Comment: 'devvit-comment',
   Context: 'devvit-context',
   Debug: 'devvit-debug',
   FeaturedGames: 'devvit-featured-games',

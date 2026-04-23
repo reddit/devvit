@@ -98,6 +98,7 @@ describe('contextFromRequestContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.0.0",
         "client": undefined,
+        "commentId": undefined,
         "loid": "NAntSOVzPGlf5ge0Z0UbDAz-5-r22CdusQb4f9Rfaws",
         "postAuthorId": "t2_400",
         "postData": {
@@ -163,6 +164,7 @@ describe('contextFromWebViewContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.0.0",
         "client": undefined,
+        "commentId": undefined,
         "loid": undefined,
         "postAuthorId": undefined,
         "postData": {
@@ -237,6 +239,7 @@ describe('initContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.2.3",
         "client": undefined,
+        "commentId": undefined,
         "loid": undefined,
         "postAuthorId": undefined,
         "postData": {
@@ -291,6 +294,7 @@ describe('initContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.2.3",
         "client": undefined,
+        "commentId": undefined,
         "loid": undefined,
         "postAuthorId": undefined,
         "postData": {
@@ -346,6 +350,7 @@ describe('initContext()', () => {
         "appSlug": "test-app-slug",
         "appVersion": "1.2.3",
         "client": undefined,
+        "commentId": undefined,
         "loid": "loid-from-jwt-snake",
         "postAuthorId": "t2_400",
         "postData": undefined,
@@ -384,6 +389,7 @@ describe('initContext()', () => {
         "appSlug": "fromJwt",
         "appVersion": "2.0.0",
         "client": undefined,
+        "commentId": undefined,
         "loid": undefined,
         "postAuthorId": "t2_400",
         "postData": undefined,

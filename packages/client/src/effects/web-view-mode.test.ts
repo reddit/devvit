@@ -49,6 +49,7 @@ beforeEach(() => {
       appSlug: 'test-app-123',
       appVersion: '1.0.0',
       client: undefined,
+      commentId: undefined,
       loid: undefined,
       postAuthorId: undefined,
       postData: undefined,
