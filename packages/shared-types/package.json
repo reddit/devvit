@@ -34,7 +34,7 @@
   "dependencies": {
     "@devvit/protos": "0.12.20",
     "jsonschema": "1.4.1",
-    "uuid": "9.0.0"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@devvit/tsconfig": "0.12.20",
