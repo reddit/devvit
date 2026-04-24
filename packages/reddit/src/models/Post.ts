@@ -1145,7 +1145,7 @@ export class Post {
     this.#removed = false;
   }
 
-  async filter(reason: string): Promise<void> {
+  async filter(reason?: string): Promise<void> {
     await filterThing(this.id, reason, context.metadata);
     this.#removed = true;
     this.#spam = false;
