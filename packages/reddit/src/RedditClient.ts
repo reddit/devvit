@@ -95,12 +95,14 @@ type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;
 export async function filterThing(
   id: T1 | T3,
   reason: string | undefined,
+  keep: boolean | undefined,
   metadata: Metadata | undefined
 ): Promise<void> {
   await getRedditApiPlugins().Moderation.Filter(
     {
       id,
       reason,
+      keep,
     },
     metadata
   );
@@ -1312,16 +1314,17 @@ export class RedditClient {
   }
 
   /**
-   * Filters a post or comment. When a post or comment is filtered, it is removed from view and added to the ModQueue for review.
+   * Filters a post or comment. When a post or comment is filtered, it is removed from view (by default) and added to the ModQueue for review.
    *
    * @param id - The id of the post (t3_) or comment (t1_) to filter.
-   * @param reason - (Optional) The reason for filtering the post or comment. Eg: "contains sensitive content"
+   * @param reason - (optional) The reason for filtering the post or comment. Eg: "contains sensitive content"
+   * @param keep - (optional) Whether to keep the post or comment instead of removing it. Defaults to false if not specified.
    * @returns A Promise that resolves if the post or comment was filtered successfully.
    * @experimental
    */
-  async filter(id: T1 | T3, reason?: string): Promise<void> {
+  async filter(id: T1 | T3, reason: string | undefined, keep: boolean | undefined): Promise<void> {
     if (isT1(id) || isT3(id)) {
-      return filterThing(id, reason, context.metadata);
+      return filterThing(id, reason, keep, context.metadata);
     }
     throw new Error('id must start with either t1_ or t3_');
   }

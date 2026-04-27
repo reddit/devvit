@@ -1145,9 +1145,17 @@ export class Post {
     this.#removed = false;
   }
 
-  async filter(reason?: string): Promise<void> {
-    await filterThing(this.id, reason, context.metadata);
-    this.#removed = true;
+  /*
+   * Filters a post. When a post is filtered, it is removed from view (by default) and added to the ModQueue for review.
+   *
+   * @param reason - (optional) The reason for filtering the post. Eg: "contains sensitive content"
+   * @param keep - (optional) Whether to keep the post instead of removing it. Defaults to false if not specified.
+   * @returns A Promise that resolves if the post was filtered successfully.
+   * @experimental
+   */
+  async filter(reason: string | undefined, keep: boolean | undefined): Promise<void> {
+    await filterThing(this.id, reason, keep, context.metadata);
+    this.#removed = !keep;
     this.#spam = false;
     this.#approved = false;
   }
