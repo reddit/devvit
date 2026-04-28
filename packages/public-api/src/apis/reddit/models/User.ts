@@ -208,6 +208,8 @@ export class User {
   #commentKarma: number;
   #nsfw: boolean;
   #isAdmin: boolean;
+  #isModerator: boolean;
+  #isGold: boolean;  
   #modPermissionsBySubreddit: Map<string, ModeratorPermission[]> = new Map();
   // R2 bug: user.url is a permalink path
   #url: string;
@@ -235,8 +237,10 @@ export class User {
     // UserDataByAccountIds returns the ID without the t2_ prefix
     this.#id = asT2ID(isT2ID(data.id) ? data.id : `t2_${data.id}`);
     this.#username = data.name;
-    this.#nsfw = data.over18 ?? false;
+    this.#nsfw = data.subreddit?.over18 ?? false;
     this.#isAdmin = data.isEmployee ?? false;
+    this.#isModerator = data.isMod ?? false;
+    this.#isGold = data.isGold ?? false;
 
     const createdAt = new Date(0);
     createdAt.setUTCSeconds(data.createdUtc);
@@ -310,6 +314,16 @@ export class User {
    */
   get isAdmin(): boolean {
     return this.#isAdmin;
+  }
+
+    /** Whether the user is a moderator of any subreddit. */
+  get isModerator(): boolean {
+    return this.#isModerator;
+  }
+
+  /** Whether the user has Reddit Premium. */
+  get hasRedditPremium(): boolean {
+    return this.#isGold;
   }
 
   /**
