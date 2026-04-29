@@ -2,6 +2,7 @@ import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
 import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { emitTelemetryClickEffect } from '@devvit/shared-types/client/telemetry.js';
 import { tokenParam } from '@devvit/shared-types/webbit.js';
 
 /**
@@ -52,7 +53,9 @@ export function getWebViewMode(): WebViewMode {
 export function requestExpandedMode(event: MouseEvent, entry: string): void {
   if (devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE)
     throw Error('web view is already expanded');
-  return emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry);
+  // Count a click in case web view is destroyed when entry changes.
+  emitTelemetryClickEffect(event);
+  emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry);
 }
 
 /**
@@ -74,7 +77,9 @@ export function requestExpandedMode(event: MouseEvent, entry: string): void {
 export function exitExpandedMode(event: MouseEvent): void {
   if (devvit.webViewMode === WebViewImmersiveMode.INLINE_MODE)
     throw Error('web view is already inlined');
-  return emitModeEffect(WebViewImmersiveMode.INLINE_MODE, event, undefined);
+  // Count a click in case web view is destroyed when entry changes.
+  emitTelemetryClickEffect(event);
+  emitModeEffect(WebViewImmersiveMode.INLINE_MODE, event, undefined);
 }
 
 /**

@@ -4,6 +4,7 @@ import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
 import type { WebViewMessageEvent } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import { type Effect, emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { emitTelemetryClickEffect } from '@devvit/shared-types/client/telemetry.js';
 import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -18,6 +19,10 @@ import {
 
 vi.mock('@devvit/shared-types/client/emit-effect.js', () => ({
   emitEffect: vi.fn(() => Promise.resolve(undefined)),
+}));
+
+vi.mock('@devvit/shared-types/client/telemetry.js', () => ({
+  emitTelemetryClickEffect: vi.fn(),
 }));
 
 const sendEvent = (mode: WebViewImmersiveMode) => {
@@ -77,6 +82,7 @@ describe('requestExpandedMode()', () => {
   it('should emit a message for expanded mode', () => {
     requestExpandedMode(trustedEvent, 'default');
 
+    expect(emitTelemetryClickEffect).toHaveBeenCalledWith(trustedEvent);
     expect(emitEffect).toHaveBeenCalledWith({
       immersiveMode: {
         entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html?token=0.0.0',
@@ -89,6 +95,7 @@ describe('requestExpandedMode()', () => {
   it('should emit a message for expanded mode nondefault entry', () => {
     requestExpandedMode(trustedEvent, 'splash');
 
+    expect(emitTelemetryClickEffect).toHaveBeenCalledWith(trustedEvent);
     expect(emitEffect).toHaveBeenCalledWith({
       immersiveMode: {
         entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html?token=0.0.0',
@@ -194,6 +201,7 @@ describe('exitExpandedMode()', () => {
   it('should emit a message for inline mode', () => {
     exitExpandedMode(trustedEvent);
 
+    expect(emitTelemetryClickEffect).toHaveBeenCalledWith(trustedEvent);
     expect(emitEffect).toHaveBeenCalledWith({
       immersiveMode: {
         entryUrl: undefined,

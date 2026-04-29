@@ -220,7 +220,10 @@ export class User {
   #commentKarma: number;
   #nsfw: boolean;
   #isAdmin: boolean;
+  #isModerator: boolean;
+  #isGold: boolean;
   #modPermissionsBySubreddit: Map<string, ModeratorPermission[]> = new Map();
+  #showNsfw: boolean;
   // R2 bug: user.url is a permalink path
   #url: string;
   // R2 bug: user object does not contain a permalink field
@@ -242,8 +245,11 @@ export class User {
     // UserDataByAccountIds returns the ID without the t2_ prefix
     this.#id = T2(isT2(data.id) ? data.id : `t2_${data.id}`);
     this.#username = data.name;
-    this.#nsfw = data.over18 ?? false;
+    this.#nsfw = data.subreddit?.over18 ?? false;
     this.#isAdmin = data.isEmployee ?? false;
+    this.#isModerator = data.isMod ?? false;
+    this.#isGold = data.isGold ?? false;
+    this.#showNsfw = data.over18 ?? false;
 
     const createdAt = new Date(0);
     createdAt.setUTCSeconds(data.createdUtc);
@@ -315,11 +321,26 @@ export class User {
     return this.#isAdmin;
   }
 
+  /** Whether the user is a moderator of any subreddit. */
+  get isModerator(): boolean {
+    return this.#isModerator;
+  }
+
+  /** Whether the user has Reddit Premium. */
+  get hasRedditPremium(): boolean {
+    return this.#isGold;
+  }
+
   /**
    * The permissions the user has on the subreddit.
    */
   get modPermissions(): Map<string, ModeratorPermission[]> {
     return this.#modPermissionsBySubreddit;
+  }
+
+  /** Whether the user is over 18 and wishes to see NSFW content.*/
+  get showNsfw(): boolean {
+    return this.#showNsfw;
   }
 
   /**
