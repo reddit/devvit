@@ -23,6 +23,7 @@
     "clobber": "npx --yes turbo run clobber --output-logs=new-only && rm -rf node_modules",
     "docs:build": "yarn workspace devvit-docs docs:build",
     "docs:gen-devvit-docs": "yarn workspace devvit-docs gen:devvit-docs",
+    "docs:gen-next": "node ./packages/repo-tools/bin/gen-next-docs.mjs",
     "docs:gen-private-docs": "yarn workspace devvit-docs gen:private-docs",
     "docs:start": "yarn workspace devvit-docs docs:start",
     "docs:update-versioned": "node ./packages/repo-tools/bin/update-versioned-docs.mjs",
