@@ -19,7 +19,6 @@ export const Header = Object.freeze({
   PostAuthor: 'devvit-post-author',
   PostData: 'devvit-post-data',
   RemoteHostname: 'devvit-remote-hostname',
-  SettingsUri: 'devvit-sec-settings-uri',
   StreamID: 'devvit-stream-id',
   Subreddit: 'devvit-subreddit',
   SubredditName: 'devvit-subreddit-name',
