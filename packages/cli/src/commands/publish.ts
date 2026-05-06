@@ -90,6 +90,13 @@ export default class Publish extends DevvitCommand {
       },
       exclusive: ['bump'],
     })(),
+    'employee-update': Flags.boolean({
+      aliases: ['employeeUpdate'],
+      description:
+        "I'm an employee and I want to publish someone else's app. (This will only work if you're an employee.)",
+      required: false,
+      hidden: true,
+    }),
     'copy-paste': Flags.boolean({
       aliases: ['copyPaste'],
       description: 'Copy-paste the auth code instead of opening a browser',
@@ -190,9 +197,17 @@ export default class Publish extends DevvitCommand {
 
     const isOwner = appInfo.app.owner?.displayName === username;
     if (!isOwner) {
-      this.error(
-        `You are not the owner of the app "${this.project.name}". Please check that you are logged in as the correct user (${appInfo.app.owner?.displayName ?? '<unknown>'}).`
-      );
+      if (flags['employee-update']) {
+        const isEmployee = await isCurrentUserEmployee(token);
+        if (!isEmployee) {
+          this.error(`You're not an employee, so you can't publish someone else's app.`);
+        }
+        this.warn(`Overriding ownership check because you're an employee and told me to!`);
+      } else {
+        this.error(
+          `You are not the owner of the app "${this.project.name}". Please check that you are logged in as the correct user (${appInfo.app.owner?.displayName ?? '<unknown>'}).`
+        );
+      }
     }
 
     if (flags.verbose) {
