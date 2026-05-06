@@ -11,6 +11,7 @@ export const Header = Object.freeze({
   Comment: 'devvit-comment',
   Context: 'devvit-context',
   Debug: 'devvit-debug',
+  ElysiumInstallationOverride: 'devvit-elysium-installation-override',
   FeaturedGames: 'devvit-featured-games',
   GQLHost: 'devvit-gql-host',
   Installation: 'devvit-installation',
