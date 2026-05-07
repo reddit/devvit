@@ -221,9 +221,9 @@ export type SubredditSettings = {
    */
   wikiEnabled: boolean;
   /**
-   * The types of post allowed in this subreddit. Either "any", "link", or "self".
+   * The types of post allowed in this subreddit. Either "any", "link", "self", or "other".
    */
-  allowedPostType: 'any' | 'link' | 'self';
+  allowedPostType: 'any' | 'link' | 'self' | 'other';
   /**
    * List of allowed media types in the comments made in the subreddit.
    */
@@ -1721,8 +1721,8 @@ function asSubredditType(type?: string): SubredditType {
   throw new Error(`invalid subreddit type: ${type}`);
 }
 
-function asAllowedPostType(type?: string): 'any' | 'link' | 'self' {
-  if (type === 'any' || type === 'link' || type === 'self') {
+function asAllowedPostType(type?: string): 'any' | 'link' | 'self' | 'other' {
+  if (type === 'any' || type === 'link' || type === 'self' || type === 'other') {
     return type;
   }
 
