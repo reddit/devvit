@@ -2,12 +2,12 @@ import type { Metadata } from '@devvit/protos/lib/Types.js';
 import type {
   FulfillOrderRequest,
   FulfillOrderResponse,
-  Order as ProtoOrder,
   PaymentProcessor,
   RefundOrderRequest,
   RefundOrderResponse,
-} from '@devvit/protos/payments.js';
-import { PaymentProcessorDefinition } from '@devvit/protos/payments.js';
+} from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
+import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
+import type { Order as ProtoOrder } from '@devvit/protos/types/devvit/payments/v1alpha/order.js';
 import { Devvit, type TriggerContext } from '@devvit/public-api';
 import { makeAPIClients } from '@devvit/public-api/apis/makeAPIClients.js';
 import { getContextFromMetadata } from '@devvit/public-api/devvit/internals/context.js';

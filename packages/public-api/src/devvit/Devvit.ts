@@ -1,7 +1,7 @@
 import type { UnknownMessage } from '@devvit/protos';
 import * as protos from '@devvit/protos';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import type { PaymentsService } from '@devvit/protos/payments.js';
+import type { PaymentsService } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import type { Config } from '@devvit/shared-types/Config.js';

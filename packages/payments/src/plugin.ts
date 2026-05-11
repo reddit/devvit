@@ -1,4 +1,7 @@
-import { type PaymentsService, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
+import {
+  type PaymentsService,
+  PaymentsServiceDefinition,
+} from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
 import { Devvit } from '@devvit/public-api';
 
 import { paymentHelpMenuItem } from './paymentHelpMenuItem.js';

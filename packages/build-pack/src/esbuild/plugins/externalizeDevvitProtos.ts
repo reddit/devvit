@@ -3,7 +3,7 @@ import type { OnResolveArgs, OnResolveResult, Plugin, PluginBuild } from 'esbuil
 /**
  * Plugin for externalizing `@devvit/protos` imports from the bundle. This is done as a plugin rather than using
  * the `external` option in the build config to ensure we only externalize the root of the @devvit/protos package.
- * Other imports like @devvit/protos/payments.js will still be bundled.
+ * Other imports like @devvit/protos/types/... will still be bundled.
  *
  * @param disableExternDevvitProtos -- If true, the plugin will not externalize @devvit/protos.
  * @returns

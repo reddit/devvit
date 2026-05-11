@@ -1,6 +1,6 @@
 import { access, readFile } from 'node:fs/promises';
 
-import { PaymentProcessorDefinition } from '@devvit/protos/payments.js';
+import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { AccountingType } from '@devvit/shared-types/payments/Product.js';

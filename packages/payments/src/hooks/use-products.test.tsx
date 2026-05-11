@@ -2,7 +2,7 @@
 /** @jsxFrag Devvit.Fragment */
 
 import { UIEventScope, type UIRequest } from '@devvit/protos';
-import type { UIEvent } from '@devvit/protos/payments.js';
+import type { UIEvent } from '@devvit/protos/json/devvit/ui/events/v1alpha/event.js';
 import { Devvit } from '@devvit/public-api';
 import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { captureHookRef } from '@devvit/public-api/devvit/internals/blocks/handler/refs.js';

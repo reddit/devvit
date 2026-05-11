@@ -1,4 +1,4 @@
-import type { GetProductsRequest } from '@devvit/protos/payments.js';
+import type { GetProductsRequest } from '@devvit/protos/json/devvit/plugin/payments/v1alpha/payments.js';
 import { type Devvit, useAsync, useState } from '@devvit/public-api';
 import type { Product, SKU } from '@devvit/shared-types/payments/Product.js';
 import { productFromProto } from '@devvit/shared-types/payments/Product.js';

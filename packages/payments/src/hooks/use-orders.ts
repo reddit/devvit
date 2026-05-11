@@ -1,4 +1,4 @@
-import type { GetOrdersRequest } from '@devvit/protos/payments.js';
+import type { GetOrdersRequest } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
 import { type Devvit, useAsync, useState } from '@devvit/public-api';
 import type { Order } from '@devvit/shared-types/payments/Order.js';
 import { orderFromProto } from '@devvit/shared-types/payments/Order.js';

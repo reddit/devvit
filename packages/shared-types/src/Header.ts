@@ -23,7 +23,6 @@ export const Header = Object.freeze({
   StreamID: 'devvit-stream-id',
   Subreddit: 'devvit-subreddit',
   SubredditName: 'devvit-subreddit-name',
-  TraceID: 'devvit-trace-id',
   User: 'devvit-user',
   Username: 'devvit-user-name',
   UserSnoovatarUrl: 'devvit-user-snoovatar-url',

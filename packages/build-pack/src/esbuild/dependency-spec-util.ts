@@ -46,9 +46,10 @@ import {
   WikiDefinition,
 } from '@devvit/protos';
 import type { ActorSpec, DependencySpec } from '@devvit/protos/community.js';
-import { PaymentProcessorDefinition, PaymentsServiceDefinition } from '@devvit/protos/payments.js';
+import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
 import { WebbitServerDefinition } from '@devvit/protos/types/devvit/actor/webbit/webbit.js';
 import { BlobServiceDefinition } from '@devvit/protos/types/devvit/plugin/blob/v1alpha/blob.js';
+import { PaymentsServiceDefinition } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
 import { normalizeDomains } from '@devvit/shared-types/fetch-domains.js';
 import { PLUGIN_NAME, resolveActorHostname } from '@devvit/shared-types/HostnameUtil.js';
 import type { Namespace } from '@devvit/shared-types/Namespace.js';

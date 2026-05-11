@@ -1,6 +1,6 @@
-import type { Product as ProductProto } from '@devvit/protos/payments.js';
-import { AccountingType as AccountingTypeProto } from '@devvit/protos/payments.js';
-import { Environment } from '@devvit/protos/payments.js';
+import { Environment } from '@devvit/protos/json/devvit/payments/v1alpha/common.js';
+import type { Product as ProductProto } from '@devvit/protos/json/devvit/payments/v1alpha/product.js';
+import { AccountingType as AccountingTypeProto } from '@devvit/protos/json/devvit/payments/v1alpha/product.js';
 import { type Product, productFromProto } from '@devvit/shared-types/payments/Product.js';
 
 const FOX: Readonly<ProductProto> = {

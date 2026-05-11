@@ -1,5 +1,6 @@
-import type { Order as OrderProto } from '@devvit/protos/payments.js';
-import { Environment, OrderStatus as OrderStatusProto } from '@devvit/protos/payments.js';
+import { Environment } from '@devvit/protos/json/devvit/payments/v1alpha/common.js';
+import { OrderStatus as OrderStatusProto } from '@devvit/protos/json/devvit/payments/v1alpha/order.js';
+import type { Order as OrderProto } from '@devvit/protos/types/devvit/payments/v1alpha/order.js';
 import type { Order } from '@devvit/shared-types/payments/Order.js';
 import { orderFromProto } from '@devvit/shared-types/payments/Order.js';
 

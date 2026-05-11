@@ -2,16 +2,14 @@ import fs from 'node:fs';
 import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import {
-  Currency,
-  Environment,
-  PaymentProcessorDefinition,
-  PaymentsServiceDefinition,
-} from '@devvit/protos/payments.js';
+import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
+import { Environment } from '@devvit/protos/types/devvit/payments/v1alpha/common.js';
+import { Currency } from '@devvit/protos/types/devvit/payments/v1alpha/product.js';
 import type {
   Bundle,
   PaymentsConfig,
 } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+import { PaymentsServiceDefinition } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
 import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { mapAccountingTypeToProto } from '@devvit/shared-types/payments/Product.js';
