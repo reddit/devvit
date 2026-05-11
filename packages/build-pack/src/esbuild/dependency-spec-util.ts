@@ -1,18 +1,10 @@
 import {
-  AppSettingsDefinition,
-  ContextActionDefinition,
-  CustomPostDefinition,
-  Definition,
-  FlairDefinition,
-  GraphQLDefinition,
-  HTTPDefinition,
-  InstallationSettingsDefinition,
-  LinksAndCommentsDefinition,
-  ListingsDefinition,
-  MediaServiceDefinition,
-  ModerationDefinition,
-  ModNoteDefinition,
-  NewModmailDefinition,
+  type ActorSpec,
+  type DependencySpec,
+  type Permissions,
+} from '@devvit/protos/json/devvit/runtime/bundle.js';
+import { Definition } from '@devvit/protos/lib/Types.js';
+import {
   OnAppInstallDefinition,
   OnAppUpgradeDefinition,
   OnAutomoderatorFilterCommentDefinition,
@@ -32,24 +24,36 @@ import {
   OnPostSpoilerUpdateDefinition,
   OnPostSubmitDefinition,
   OnPostUpdateDefinition,
-  type Permissions,
-  PrivateMessagesDefinition,
-  RealtimeDefinition,
-  RedisAPIDefinition,
-  SchedulerHandlerDefinition,
-  SettingsDefinition,
-  SubredditsDefinition,
-  UIEventHandlerDefinition,
-  UserActionsDefinition,
-  UsersDefinition,
-  WidgetsDefinition,
-  WikiDefinition,
-} from '@devvit/protos';
-import type { ActorSpec, DependencySpec } from '@devvit/protos/community.js';
+} from '@devvit/protos/types/devvit/actor/automation/v1alpha/event_handlers.js';
 import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
+import { ContextActionDefinition } from '@devvit/protos/types/devvit/actor/reddit/context_action.js';
+import { SchedulerHandlerDefinition } from '@devvit/protos/types/devvit/actor/scheduler/handler.js';
+import { AppSettingsDefinition } from '@devvit/protos/types/devvit/actor/settings/v1alpha/app_settings.js';
+import { InstallationSettingsDefinition } from '@devvit/protos/types/devvit/actor/settings/v1alpha/installation_settings.js';
 import { WebbitServerDefinition } from '@devvit/protos/types/devvit/actor/webbit/webbit.js';
+import { RealtimeDefinition } from '@devvit/protos/types/devvit/events/v1alpha/realtime.js';
 import { BlobServiceDefinition } from '@devvit/protos/types/devvit/plugin/blob/v1alpha/blob.js';
+import { ExternalEndpointsDefinition } from '@devvit/protos/types/devvit/plugin/externalendpoints/v1alpha/externalendpoints.js';
+import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
+import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
 import { PaymentsServiceDefinition } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
+import { FlairDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/flair/flair_svc.js';
+import { GraphQLDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_svc.js';
+import { LinksAndCommentsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
+import { ListingsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/listings/listings_svc.js';
+import { ModerationDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/moderation/moderation_svc.js';
+import { ModNoteDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/modnote/modnote_svc.js';
+import { NewModmailDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/newmodmail/newmodmail_svc.js';
+import { PrivateMessagesDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/privatemessages/privatemessages_svc.js';
+import { SubredditsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_svc.js';
+import { UsersDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/users/users_svc.js';
+import { WidgetsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/widgets/widgets_svc.js';
+import { WikiDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/wiki/wiki_svc.js';
+import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
+import { UserActionsDefinition } from '@devvit/protos/types/devvit/plugin/useractions/useractions.js';
+import { CustomPostDefinition } from '@devvit/protos/types/devvit/reddit/custom_post/v1alpha/custom_post.js';
+import { UIEventHandlerDefinition } from '@devvit/protos/types/devvit/ui/events/v1alpha/handle_ui.js';
 import { normalizeDomains } from '@devvit/shared-types/fetch-domains.js';
 import { PLUGIN_NAME, resolveActorHostname } from '@devvit/shared-types/HostnameUtil.js';
 import type { Namespace } from '@devvit/shared-types/Namespace.js';
@@ -127,6 +131,7 @@ export function createDependencySpec(
   if (config.post) provide(spec, CustomPostDefinition, UIEventHandlerDefinition);
 
   if (config.server) provide(spec, WebbitServerDefinition);
+  if (config.server?.externalEndpoints) use(spec, ExternalEndpointsDefinition);
 
   if (config.menu) provide(spec, ContextActionDefinition);
 

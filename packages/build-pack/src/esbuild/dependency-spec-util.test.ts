@@ -1,4 +1,5 @@
-import { Scope } from '@devvit/protos';
+import { Scope as ExternalEndpointsScope } from '@devvit/protos/json/devvit/plugin/externalendpoints/v1alpha/externalendpoints.js';
+import { Scope as RunAsScope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import type { AppPermissionConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import { test } from 'vitest';
 
@@ -13,7 +14,7 @@ const allPermissions: Readonly<AppPermissionConfig> = {
   payments: true,
   realtime: true,
   redis: true,
-  reddit: { enable: true, scope: 'user', asUser: [Scope.SUBMIT_POST] },
+  reddit: { enable: true, scope: 'user', asUser: [RunAsScope.SUBMIT_POST] },
   settings: true,
   triggers: true,
 };
@@ -39,7 +40,7 @@ const asUserPermissions: Readonly<AppPermissionConfig> = {
   payments: false,
   realtime: false,
   redis: false,
-  reddit: { enable: true, scope: 'user', asUser: [Scope.SUBMIT_POST] },
+  reddit: { enable: true, scope: 'user', asUser: [RunAsScope.SUBMIT_POST] },
   settings: false,
   triggers: false,
 };
@@ -671,6 +672,71 @@ test('server', () =>
         },
       ],
       "uses": [],
+    }
+  `));
+
+test('server with externalEndpoints', () =>
+  expect(
+    createDependencySpec(
+      { name: 'actor name', owner: 'actor owner', version: '1.2.3' },
+      {
+        schema: 'v1',
+        name: 'name',
+        permissions: noPermissions,
+        server: {
+          dir: 'dir',
+          entry: 'entry',
+          externalEndpoints: {
+            hello: {
+              name: 'hello',
+              endpoint: '/external/hello',
+              scopes: [ExternalEndpointsScope.SCOPE_INSTALL],
+            },
+          },
+        },
+      },
+      { hostname: 'hostname' }
+    )
+  ).toMatchInlineSnapshot(`
+    {
+      "actor": {
+        "name": "actor name",
+        "owner": "actor owner",
+        "version": "1.2.3",
+      },
+      "hostname": "actor name.hostname",
+      "permissions": [],
+      "provides": [
+        {
+          "actor": {
+            "name": "actor name",
+            "owner": "actor owner",
+            "version": "1.2.3",
+          },
+          "definition": {
+            "fullName": "devvit.actor.webbit.WebbitServer",
+            "methods": [
+              {
+                "fullName": "/devvit.actor.webbit.WebbitServer/Request",
+                "name": "Request",
+                "requestStream": false,
+                "requestType": "devvit.actor.webbit.WebbitHttpRequest",
+                "responseStream": false,
+                "responseType": "devvit.actor.webbit.WebbitHttpResponse",
+              },
+            ],
+            "name": "WebbitServer",
+            "version": "",
+          },
+          "partitionsBy": [],
+        },
+      ],
+      "uses": [
+        {
+          "name": "default",
+          "typeName": "devvit.plugin.externalendpoints.v1alpha.ExternalEndpoints",
+        },
+      ],
     }
   `));
 
