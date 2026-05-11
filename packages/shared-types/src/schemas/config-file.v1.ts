@@ -5,7 +5,8 @@
 
 import { readFileSync } from 'node:fs';
 
-import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+import { Scope as ExternalEndpointsScope } from '@devvit/protos/json/devvit/plugin/externalendpoints/v1alpha/externalendpoints.js';
+import { Scope as RunAsScope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import jsonschema, { type Schema } from 'jsonschema/lib/index.js';
 
 import type { JsonObject, JsonValue } from '../json.js';
@@ -44,13 +45,14 @@ export type AppBlocksConfig = { entry: string };
 /** Describes plugin usage. */
 export type AppPermissionConfig = {
   blob: boolean;
+  externalEndpoints: boolean;
   http: { enable: boolean; domains: string[] };
   media: boolean;
   menu: boolean;
   payments: boolean;
   realtime: boolean;
   redis: boolean;
-  reddit: { enable: boolean; scope: AppScopeConfig; asUser: Scope[] };
+  reddit: { enable: boolean; scope: AppScopeConfig; asUser: RunAsScope[] };
   settings: boolean;
   triggers: boolean;
 };
@@ -67,7 +69,17 @@ export type AppPostEntrypointConfig = {
 };
 export type AppPostHeightConfig = 'regular' | 'tall';
 export type AppScopeConfig = 'user' | 'moderator';
-export type AppServerConfig = { dir: string; entry: string };
+export type AppServerConfig = {
+  dir: string;
+  entry: string;
+  externalEndpoints?: ExternalEndpointsConfig;
+};
+export type ExternalEndpointsConfig = { [name: string]: ExternalEndpointConfig };
+export type ExternalEndpointConfig = {
+  endpoint: string;
+  name: string;
+  scopes: ExternalEndpointsScope[];
+};
 
 /**
  * Keys are assumed to have the format of `on${keyof TriggerEventType}` in
@@ -204,7 +216,13 @@ export type AppConfigJson = {
   media?: { dir?: string };
   permissions?: AppPermissionConfigJson;
   post?: AppPostConfigJson;
-  server?: { dir?: string; entry?: string };
+  server?: {
+    dir?: string;
+    entry?: string;
+    externalEndpoints?: {
+      [name: string]: { endpoint: string; scopes?: AppExternalEndpointsScopeJSON[] };
+    };
+  };
   triggers?: AppTriggersConfig;
   blocks?: AppBlocksConfigJson;
   menu?: AppMenuConfigJson;
@@ -222,6 +240,7 @@ export type AppConfigJson = {
   [key: string]: JsonValue;
 };
 
+export type AppExternalEndpointsScopeJSON = 'install' | 'global';
 export type AppFormsConfigJson = { [formName: string]: string };
 export type AppMenuConfigJson = {
   items?: {
@@ -359,11 +378,25 @@ function AppConfig(json: Readonly<AppConfigJson>): AppConfig {
       dir: json.media.dir ?? schema.properties.media.properties.dir.default,
     };
   if (json.post) partial.post = AppPostConfig(json.post);
-  if (json.server)
+  if (json.server) {
     partial.server = {
       dir: json.server.dir ?? schema.properties.server.properties.dir.default,
       entry: json.server.entry ?? schema.properties.server.properties.entry.default,
     };
+    if (json.server.externalEndpoints && Object.keys(json.server.externalEndpoints).length > 0) {
+      partial.server.externalEndpoints = {};
+      for (const [name, config] of Object.entries(json.server.externalEndpoints))
+        partial.server.externalEndpoints[name] = {
+          name,
+          endpoint: config.endpoint,
+          scopes: (
+            config.scopes ??
+            (schema.$defs.ExternalEndpoint.properties.scopes
+              .default as readonly AppExternalEndpointsScopeJSON[])
+          ).map(externalEndpointsScopeFromJSON),
+        };
+    }
+  }
   const blocksTriggers = json.blocks
     ? (json.blocks.triggers ?? schema.properties.blocks.properties.triggers.default)
     : undefined;
@@ -443,6 +476,7 @@ function AppPermissionConfig(
         schema.properties.permissions.properties.http.properties.domains.default,
     },
     blob: permissions?.blob ?? schema.properties.permissions.properties.blob.default,
+    externalEndpoints: !!partial.server?.externalEndpoints,
     media: permissions?.media ?? schema.properties.permissions.properties.media.default,
     menu: !!partial.menu,
     payments:
@@ -654,6 +688,22 @@ export function validate(config: Readonly<AppConfig>): void {
   if (errs.length) throw Error(`${errs.join('; ')}.`);
 }
 
-function scopeFromJSON(scope: string): Scope {
-  return scope in Scope ? Scope[scope as keyof typeof Scope] : Scope.UNRECOGNIZED;
+function scopeFromJSON(scope: string): RunAsScope {
+  return scope in RunAsScope
+    ? RunAsScope[scope as keyof typeof RunAsScope]
+    : RunAsScope.UNRECOGNIZED;
+}
+
+function externalEndpointsScopeFromJSON(
+  scope: AppExternalEndpointsScopeJSON
+): ExternalEndpointsScope {
+  switch (scope) {
+    default:
+      scope satisfies never;
+    // fallthrough
+    case 'install':
+      return ExternalEndpointsScope.SCOPE_INSTALL;
+    case 'global':
+      return ExternalEndpointsScope.SCOPE_GLOBAL;
+  }
 }

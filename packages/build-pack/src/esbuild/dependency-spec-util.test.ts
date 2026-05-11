@@ -5,6 +5,7 @@ import { test } from 'vitest';
 import { createDependencySpec } from './dependency-spec-util.js';
 
 const allPermissions: Readonly<AppPermissionConfig> = {
+  externalEndpoints: true,
   http: { enable: true, domains: ['example.com'] },
   blob: true,
   media: true,
@@ -17,6 +18,7 @@ const allPermissions: Readonly<AppPermissionConfig> = {
   triggers: true,
 };
 const noPermissions: Readonly<AppPermissionConfig> = {
+  externalEndpoints: false,
   http: { enable: false, domains: [] },
   blob: false,
   media: false,
@@ -29,6 +31,7 @@ const noPermissions: Readonly<AppPermissionConfig> = {
   triggers: false,
 };
 const asUserPermissions: Readonly<AppPermissionConfig> = {
+  externalEndpoints: false,
   http: { enable: false, domains: [] },
   blob: false,
   media: false,
@@ -41,6 +44,7 @@ const asUserPermissions: Readonly<AppPermissionConfig> = {
   triggers: false,
 };
 const redditPermissionsWithoutAsUser: Readonly<AppPermissionConfig> = {
+  externalEndpoints: false,
   http: { enable: false, domains: [] },
   blob: false,
   media: false,

@@ -1,3 +1,4 @@
+import { Scope as ExternalEndpointsScope } from '@devvit/protos/json/devvit/plugin/externalendpoints/v1alpha/externalendpoints.js';
 import { describe, test } from 'vitest';
 
 import {
@@ -27,6 +28,7 @@ describe('parseAppConfig()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -62,6 +64,7 @@ describe('parseAppConfig()', () => {
         "name": "<% name %>",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -140,6 +143,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -200,6 +204,7 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "externalEndpoints": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -235,6 +240,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -311,6 +317,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -366,6 +373,7 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "externalEndpoints": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -402,6 +410,7 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "externalEndpoints": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -439,6 +448,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -492,6 +502,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -543,6 +554,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -598,6 +610,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -650,6 +663,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -717,6 +731,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -778,6 +793,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -824,6 +840,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -872,6 +889,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -922,6 +940,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [
               "example.com",
@@ -969,6 +988,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1028,6 +1048,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1194,6 +1215,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "test-app",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1388,6 +1410,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1476,6 +1499,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1543,6 +1567,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1625,6 +1650,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1702,6 +1728,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1771,6 +1798,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1822,6 +1850,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1869,6 +1898,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1897,6 +1927,228 @@ describe('parseAppConfigJSON()', () => {
         ],
       }
     `));
+
+  test('externalEndpoints single', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: {
+            externalEndpoints: {
+              webhook: { endpoint: '/external/webhook' },
+            },
+          },
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "json": {
+          "name": "abc",
+          "server": {
+            "externalEndpoints": {
+              "webhook": {
+                "endpoint": "/external/webhook",
+              },
+            },
+          },
+        },
+        "name": "abc",
+        "permissions": {
+          "blob": false,
+          "externalEndpoints": true,
+          "http": {
+            "domains": [],
+            "enable": false,
+          },
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": false,
+            "scope": "user",
+          },
+          "redis": false,
+          "settings": false,
+          "triggers": false,
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+          "externalEndpoints": {
+            "webhook": {
+              "endpoint": "/external/webhook",
+              "name": "webhook",
+              "scopes": [
+                1,
+              ],
+            },
+          },
+        },
+      }
+    `));
+
+  test('externalEndpoints multiple', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: {
+            externalEndpoints: {
+              'my-hook': { endpoint: '/external/my-hook' },
+              feed: { endpoint: '/external/feed' },
+            },
+          },
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "json": {
+          "name": "abc",
+          "server": {
+            "externalEndpoints": {
+              "feed": {
+                "endpoint": "/external/feed",
+              },
+              "my-hook": {
+                "endpoint": "/external/my-hook",
+              },
+            },
+          },
+        },
+        "name": "abc",
+        "permissions": {
+          "blob": false,
+          "externalEndpoints": true,
+          "http": {
+            "domains": [],
+            "enable": false,
+          },
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": false,
+            "scope": "user",
+          },
+          "redis": false,
+          "settings": false,
+          "triggers": false,
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+          "externalEndpoints": {
+            "feed": {
+              "endpoint": "/external/feed",
+              "name": "feed",
+              "scopes": [
+                1,
+              ],
+            },
+            "my-hook": {
+              "endpoint": "/external/my-hook",
+              "name": "my-hook",
+              "scopes": [
+                1,
+              ],
+            },
+          },
+        },
+      }
+    `));
+
+  test('externalEndpoints absent gives false permission', () =>
+    expect(
+      parseAppConfigJson({ name: 'abc', server: {} } satisfies AppConfigJson, false).permissions
+        .externalEndpoints
+    ).toBe(false));
+
+  test('externalEndpoints empty object gives false permission', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: { externalEndpoints: {} },
+        } satisfies AppConfigJson,
+        false
+      ).permissions.externalEndpoints
+    ).toBe(false));
+
+  test('externalEndpoints name injected from key', () => {
+    const config = parseAppConfigJson(
+      {
+        name: 'abc',
+        server: { externalEndpoints: { myEndpoint: { endpoint: '/external/my' } } },
+      } satisfies AppConfigJson,
+      false
+    );
+    expect(config.server?.externalEndpoints?.myEndpoint?.name).toBe('myEndpoint');
+  });
+
+  test('externalEndpoints entry without /external/ prefix is rejected', () =>
+    expect(() =>
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: { externalEndpoints: { ep: { endpoint: 'bare-path' } } },
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toThrow());
+
+  test('externalEndpoints scopes defaults to install', () => {
+    const config = parseAppConfigJson(
+      {
+        name: 'abc',
+        server: { externalEndpoints: { ep: { endpoint: '/external/ep' } } },
+      } satisfies AppConfigJson,
+      false
+    );
+    expect(config.server?.externalEndpoints?.ep?.scopes).toStrictEqual([
+      ExternalEndpointsScope.SCOPE_INSTALL,
+    ]);
+  });
+
+  test('externalEndpoints scopes explicit global', () => {
+    const config = parseAppConfigJson(
+      {
+        name: 'abc',
+        server: {
+          externalEndpoints: { ep: { endpoint: '/external/ep', scopes: ['global'] } },
+        },
+      } satisfies AppConfigJson,
+      false
+    );
+    expect(config.server?.externalEndpoints?.ep?.scopes).toStrictEqual([
+      ExternalEndpointsScope.SCOPE_GLOBAL,
+    ]);
+  });
+
+  test('externalEndpoints scopes both values', () => {
+    const config = parseAppConfigJson(
+      {
+        name: 'abc',
+        server: {
+          externalEndpoints: {
+            ep: { endpoint: '/external/ep', scopes: ['install', 'global'] },
+          },
+        },
+      } satisfies AppConfigJson,
+      false
+    );
+    expect(config.server?.externalEndpoints?.ep?.scopes).toStrictEqual([
+      ExternalEndpointsScope.SCOPE_INSTALL,
+      ExternalEndpointsScope.SCOPE_GLOBAL,
+    ]);
+  });
 });
 
 describe('validate()', () => {
@@ -2063,6 +2315,7 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2136,6 +2389,7 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2208,6 +2462,7 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "externalEndpoints": false,
           "http": {
             "domains": [],
             "enable": false,

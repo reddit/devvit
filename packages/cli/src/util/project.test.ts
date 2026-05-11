@@ -17,6 +17,7 @@ import {
 } from './project.js';
 
 const noPermissions: AppPermissionConfig = {
+  externalEndpoints: false,
   http: { enable: false, domains: [] },
   blob: false,
   media: false,
