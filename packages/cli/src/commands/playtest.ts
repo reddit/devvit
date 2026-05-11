@@ -43,6 +43,7 @@ import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredd
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
+import { killProcessTree, killProcessTreeSync } from '../util/kill-process-tree.js';
 import { isWebContainer } from '../util/platform-util.js';
 import { devvitClassicConfigFilename, devvitV1ConfigFilename } from '../util/project.js';
 import { logInBox } from '../util/ui.js';
@@ -51,9 +52,32 @@ import Logs from './logs.js';
 const CONFIG_RELOAD_STORM_WINDOW_MILLIS = 3_000;
 const MAX_CONFIG_RELOADS_PER_WINDOW = 2;
 
+/**
+ * How long the `scripts.dev` output directories must stay quiet (no file
+ * additions/changes observed by chokidar) before we treat the first build
+ * as complete. Picked to absorb back-to-back writes across vite's
+ * client/server environments without adding noticeable startup latency.
+ */
+const DEV_SCRIPT_BUILD_STABLE_MILLIS = 300;
+/** Hard ceiling so a misconfigured `scripts.dev` cannot hang playtest forever. */
+const DEV_SCRIPT_BUILD_TIMEOUT_MILLIS = 60_000;
+/**
+ * Grace period between SIGTERM and SIGKILL to the `scripts.dev` process group.
+ * Long enough for vite/esbuild to flush, short enough that Ctrl+C feels snappy.
+ */
+const DEV_SCRIPT_KILL_GRACE_MILLIS = 2_000;
+
 type RunningDevScript = {
   subprocess: ReturnType<typeof execaCommand>;
-  abortController: AbortController;
+  /**
+   * Synchronous cleanup registered on `process.on('exit', ...)` to kill the
+   * subprocess tree when the parent exits via paths that bypass our SIGINT
+   * handler (e.g. `this.error()`, uncaught exceptions, oclif's
+   * `process.exit(2)` after a thrown `CLIError`). Without this hook the
+   * shell and its vite/esbuild children would be reparented to PID 1 (or
+   * leak as a Windows job) and keep running.
+   */
+  killOnExit: () => void;
 };
 
 export default class Playtest extends DevvitCommand {
@@ -129,18 +153,28 @@ export default class Playtest extends DevvitCommand {
       ux.action.start(`Starting dev command: "${truncatedCommand}"`);
     }
     try {
-      const abortController = new AbortController();
+      // `shell: true` wraps the user's command in `/bin/sh -c …` (or
+      // `cmd.exe`), so a SIGTERM sent to the subprocess only kills the
+      // shell - vite/esbuild children would be reparented to PID 1 and keep
+      // running. execa cannot abstract this for us:
+      // https://github.com/sindresorhus/execa/issues/96. `detached: true`
+      // puts the shell in its own POSIX process group so we can signal the
+      // whole tree with `process.kill(-pid, ...)`; on Windows we rely on
+      // `taskkill /T /F` instead. See `util/kill-process-tree.ts`.
       const subprocess = execaCommand(devCommand, {
         cwd: this.project.root,
         preferLocal: true,
         shell: true,
         stdout: 'inherit',
         stderr: 'inherit',
-        cancelSignal: abortController.signal,
-        gracefulCancel: true,
+        detached: process.platform !== 'win32',
       });
 
-      this.#devScript = { subprocess, abortController };
+      const killOnExit = () => {
+        killProcessTreeSync(subprocess);
+      };
+      process.once('exit', killOnExit);
+      this.#devScript = { subprocess, killOnExit };
 
       await new Promise<void>((resolve, reject) => {
         subprocess.once('spawn', () => resolve());
@@ -168,12 +202,149 @@ export default class Playtest extends DevvitCommand {
     if (!this.#devScript) return;
     const running = this.#devScript;
     this.#devScript = undefined;
-    running.abortController.abort();
+    process.removeListener('exit', running.killOnExit);
+
+    await killProcessTree(running.subprocess, {
+      gracePeriodMillis: DEV_SCRIPT_KILL_GRACE_MILLIS,
+    });
+  }
+
+  /**
+   * Block until `scripts.dev` produces a complete first build.
+   *
+   * `#startDevScript` only awaits the subprocess `spawn` event, so without
+   * this gate we'd race vite/esbuild's first write of `dist/server` and
+   * `dist/client` and bundle/install whatever happens to be on disk -
+   * typically empty or partially written on a fresh checkout, or stale
+   * artifacts from a previous run.
+   *
+   * We watch the configured output directories with chokidar. Every
+   * add/change resets a `DEV_SCRIPT_BUILD_STABLE_MILLIS` debounce; the
+   * build is "done" when no events fire for that long. `ignoreInitial:
+   * true` ensures we don't accept a leftover `dist/` as proof of a
+   * successful first build - we always require at least one post-start
+   * write event. Watching whole output dirs (rather than the configured
+   * entrypoints) means partial builds where the entrypoint is flushed
+   * before chunks/sourcemaps don't trip us up.
+   *
+   * Returns early if `scripts.dev` exits, and times out after
+   * `DEV_SCRIPT_BUILD_TIMEOUT_MILLIS` so a misconfigured script can't
+   * hang playtest indefinitely.
+   */
+  async #waitForFirstBuild(): Promise<void> {
+    if (!this.project.appConfig?.scripts?.dev) return;
+
+    const watchPaths = this.#devScriptOutputDirs();
+    if (watchPaths.length === 0) return;
+
+    // No spinner: the dev script's stdout (vite/esbuild startup logs) would
+    // interrupt cli-ux's in-place rendering and produce duplicated lines.
+    this.log('Starting the build...');
+    const watcher = chokidar.watch(watchPaths, {
+      ignoreInitial: true,
+      // Don't fire `add`/`change` until each file has finished being
+      // written, to avoid resolving on a half-flushed bundle.
+      awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 50 },
+    });
+    const subprocess = this.#devScript?.subprocess;
+
+    type Outcome = 'ok' | 'timeout' | 'devScriptExited' | { error: Error };
     try {
-      await running.subprocess;
-    } catch {
-      // Ignore: expected when aborted / terminated.
+      const outcome = await new Promise<Outcome>((resolve) => {
+        let stableTimer: ReturnType<typeof setTimeout> | undefined;
+        let settled = false;
+        const settle = (value: Outcome): void => {
+          if (settled) return;
+          settled = true;
+          if (stableTimer) clearTimeout(stableTimer);
+          clearTimeout(timeoutTimer);
+          resolve(value);
+        };
+        const onActivity = (): void => {
+          if (stableTimer) clearTimeout(stableTimer);
+          stableTimer = setTimeout(() => settle('ok'), DEV_SCRIPT_BUILD_STABLE_MILLIS);
+        };
+
+        const timeoutTimer = setTimeout(() => settle('timeout'), DEV_SCRIPT_BUILD_TIMEOUT_MILLIS);
+
+        watcher.on('add', onActivity);
+        watcher.on('change', onActivity);
+        watcher.on('error', (err) =>
+          settle({ error: err instanceof Error ? err : new Error(String(err)) })
+        );
+
+        // Race against the subprocess promise (rather than .once('exit')) so
+        // we still catch the case where it has already exited by the time
+        // we attach.
+        const onDevScriptExited = (): void => settle('devScriptExited');
+        subprocess?.then(onDevScriptExited, onDevScriptExited);
+      });
+
+      if (outcome === 'devScriptExited') {
+        this.warn('scripts.dev exited before producing a first build.');
+      } else if (outcome === 'timeout') {
+        this.warn(
+          `scripts.dev did not produce expected build outputs within ${
+            DEV_SCRIPT_BUILD_TIMEOUT_MILLIS / 1_000
+          }s; continuing with whatever is on disk.`
+        );
+      } else if (outcome !== 'ok') {
+        this.warn(
+          `Failed to watch for first build: ${StringUtil.caughtToString(outcome.error, 'message')}; continuing.`
+        );
+      }
+    } finally {
+      await watcher.close();
     }
+  }
+
+  /** Output directories `scripts.dev` is expected to populate. */
+  #devScriptOutputDirs(): string[] {
+    const dirs = new Set<string>();
+    if (this.project.server) {
+      dirs.add(path.resolve(this.project.root, this.project.server.dir));
+    }
+    if (this.project.post) {
+      dirs.add(path.resolve(this.project.root, this.project.post.dir));
+    }
+    return [...dirs];
+  }
+
+  /**
+   * Build a bundle from the developer's local source and create a new private
+   * app version on the server. Always waits for `scripts.dev`'s first build
+   * (`firstBuild`) before bundling so we never upload a stale or partial
+   * `dist/`.
+   */
+  async #createPlaytestVersion(args: {
+    version: DevvitVersion;
+    username: string;
+    firstBuild: Promise<void>;
+    preventSubredditCreation: boolean;
+  }): Promise<AppVersionInfo> {
+    if (!this.#bundler) throw Error('no bundler');
+    if (!this.#appInfo?.app) throw Error('no app info');
+
+    await args.firstBuild;
+
+    const bundles = await this.#bundler.bundle(this.project, {
+      name: ACTOR_SRC_PRIMARY_NAME,
+      owner: args.username,
+      version: args.version.toString(),
+    });
+
+    return await new AppVersionUploader(this, {
+      verbose: Boolean(this.#flags?.verbose),
+    }).createVersion(
+      {
+        appId: this.#appInfo.app.id,
+        appSlug: this.#appInfo.app.slug,
+        appSemver: args.version,
+        visibility: VersionVisibility.PRIVATE,
+      },
+      bundles,
+      args.preventSubredditCreation
+    );
   }
 
   async #getExistingInstallInfo(
@@ -217,6 +388,10 @@ export default class Playtest extends DevvitCommand {
     this.project.flag.subreddit = args.subreddit;
 
     await this.#startDevScript();
+    // Block until the dev script has produced a complete first build, so we
+    // never bundle/install a stale or partial dist/. Done in parallel with
+    // auth so we don't add latency for users without a `scripts.dev`.
+    const firstBuild = this.#waitForFirstBuild();
 
     const token = await getAccessTokenAndLoginIfNeeded(
       isWebContainer() ? 'CopyPaste' : 'LocalSocket'
@@ -265,31 +440,22 @@ export default class Playtest extends DevvitCommand {
     }
     const shouldWriteToConfig = !this.#subreddit;
 
-    let latestVersion: AppVersionInfo;
-    if (this.#appInfo.versions.length > 0 && this.#appInfo.versions[0]) {
-      latestVersion = this.#appInfo.versions[0];
-    } else {
-      // Need to upload version 0.0.1
-      const firstVersion = new DevvitVersion(0, 0, 1);
-      const appVersionCreator = new AppVersionUploader(this, {
-        verbose: Boolean(this.#flags?.verbose),
-      });
-      const bundles = await this.#bundler.bundle(this.project, {
-        name: ACTOR_SRC_PRIMARY_NAME,
-        owner: username,
-        version: firstVersion.toString(),
-      });
+    const hasDevScript = !!this.project.appConfig?.scripts?.dev;
+    let latestVersion: AppVersionInfo | undefined =
+      this.#appInfo.versions.length > 0 ? this.#appInfo.versions[0] : undefined;
+    // Tracks whether `latestVersion` was just built from the developer's
+    // current source. When true, we skip the redundant upload below.
+    let uploadedFromLocalSource = false;
+
+    if (!latestVersion) {
       this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
-      latestVersion = await appVersionCreator.createVersion(
-        {
-          appId: this.#appInfo.app.id,
-          appSlug: this.#appInfo.app.slug,
-          appSemver: firstVersion,
-          visibility: VersionVisibility.PRIVATE,
-        },
-        bundles,
-        false
-      );
+      latestVersion = await this.#createPlaytestVersion({
+        version: new DevvitVersion(0, 0, 1),
+        username,
+        firstBuild,
+        preventSubredditCreation: false,
+      });
+      uploadedFromLocalSource = true;
       await this.#refreshAppInfoAndSetSubreddit();
       // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
     }
@@ -310,34 +476,35 @@ export default class Playtest extends DevvitCommand {
           `Playtest can only be used in a small test subreddit. Please try again in a community with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} members.`
         );
       }
-    } else {
-      this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
-      // TODO: consider having a dedicated endpoint to create the playtest subreddit so we don't have to upload a new version
-      // We need to upload a new version to create a new playtest subreddit
+    }
+
+    // Build & upload a fresh playtest version from the developer's local source
+    // unless we just created v0.0.1 above. Without this, a fresh subreddit (or
+    // a re-install after `devvit uninstall`) would install whatever was last
+    // published, firing that version's `onAppInstall` and other triggers
+    // instead of the developer's current code. Skipped when there is no
+    // `scripts.dev` and the playtest subreddit already exists - then there's
+    // nothing local to upload yet, so we install the published version as
+    // before. The no-subreddit case always uploads to trigger playtest
+    // subreddit creation server-side.
+    const shouldCreatePlaytestSubreddit = !this.#subreddit;
+    const shouldUploadFreshVersion =
+      !uploadedFromLocalSource && (shouldCreatePlaytestSubreddit || hasDevScript);
+    if (shouldUploadFreshVersion) {
+      if (shouldCreatePlaytestSubreddit) {
+        this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
+      }
       this.#version.bumpVersion(VersionBumpType.Prerelease);
-
-      const appVersionCreator = new AppVersionUploader(this, {
-        verbose: Boolean(this.#flags?.verbose),
+      latestVersion = await this.#createPlaytestVersion({
+        version: this.#version,
+        username,
+        firstBuild,
+        preventSubredditCreation: !shouldCreatePlaytestSubreddit,
       });
-
-      const bundles = await this.#bundler.bundle(this.project, {
-        name: ACTOR_SRC_PRIMARY_NAME,
-        owner: username,
-        version: this.#version.toString(),
-      });
-      latestVersion = await appVersionCreator.createVersion(
-        {
-          appId: this.#appInfo.app.id,
-          appSlug: this.#appInfo.app.slug,
-          appSemver: this.#version,
-          visibility: VersionVisibility.PRIVATE,
-        },
-        bundles,
-        false
-      );
-
-      await this.#refreshAppInfoAndSetSubreddit();
-      // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
+      if (shouldCreatePlaytestSubreddit) {
+        await this.#refreshAppInfoAndSetSubreddit();
+        // Delay writing to the config so we can write the subreddit name from the installation instead of the ID
+      }
     }
 
     if (!this.#subreddit) {
