@@ -1,8 +1,8 @@
-// eslint-disable-next-line no-restricted-imports
-import type { LinkedBundle } from '@devvit/protos';
 import { NutritionCategory } from '@devvit/protos/json/devvit/dev_portal/nutrition/nutrition.js';
 // eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+// eslint-disable-next-line no-restricted-imports
+import type { LinkedBundle } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { expect, test } from 'vitest';
 
 import {
@@ -36,6 +36,7 @@ const ACTORS = [
   'devvit.actor.automation.v1alpha.OnPostUpdate',
 ];
 const PLUGINS = [
+  'devvit.plugin.externalendpoints.v1alpha.ExternalEndpoints',
   'devvit.plugin.http.HTTP',
   'devvit.plugin.kvstore.KVStore',
   'devvit.plugin.redis.RedisAPI',
@@ -82,6 +83,7 @@ describe(appCapabilitiesFromActor.name, () => {
       NutritionCategory.DATA,
       NutritionCategory.APP_TRIGGERS,
       NutritionCategory.REDDIT_TRIGGERS,
+      NutritionCategory.EXTERNAL_ENDPOINTS,
       NutritionCategory.HTTP,
       NutritionCategory.REDDIT_API,
       NutritionCategory.PAYMENTS,
@@ -137,6 +139,7 @@ describe(appCapabilitiesFromLinkedBundle.name, () => {
       NutritionCategory.DATA,
       NutritionCategory.APP_TRIGGERS,
       NutritionCategory.REDDIT_TRIGGERS,
+      NutritionCategory.EXTERNAL_ENDPOINTS,
       NutritionCategory.HTTP,
       NutritionCategory.REDDIT_API,
       NutritionCategory.PAYMENTS,
@@ -203,6 +206,7 @@ describe(appCapabilitiesFromBundle.name, () => {
       NutritionCategory.DATA,
       NutritionCategory.APP_TRIGGERS,
       NutritionCategory.REDDIT_TRIGGERS,
+      NutritionCategory.EXTERNAL_ENDPOINTS,
       NutritionCategory.HTTP,
       NutritionCategory.REDDIT_API,
       NutritionCategory.PAYMENTS,

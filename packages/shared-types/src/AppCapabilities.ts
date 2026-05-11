@@ -1,4 +1,3 @@
-import { KVStoreDefinition, type LinkedBundle, SchedulerDefinition } from '@devvit/protos/index.js';
 import { NutritionCategory } from '@devvit/protos/json/devvit/dev_portal/nutrition/nutrition.js';
 // eslint-disable-next-line no-restricted-imports
 import {
@@ -36,7 +35,11 @@ import { BlobServiceDefinition } from '@devvit/protos/types/devvit/plugin/blob/v
 // eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 // eslint-disable-next-line no-restricted-imports
+import { ExternalEndpointsDefinition } from '@devvit/protos/types/devvit/plugin/externalendpoints/v1alpha/externalendpoints.js';
+// eslint-disable-next-line no-restricted-imports
 import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
+// eslint-disable-next-line no-restricted-imports
+import { KVStoreDefinition } from '@devvit/protos/types/devvit/plugin/kvstore/kvstore.js';
 // eslint-disable-next-line no-restricted-imports
 import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
 // eslint-disable-next-line no-restricted-imports
@@ -68,11 +71,15 @@ import { WikiDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/wik
 // eslint-disable-next-line no-restricted-imports
 import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
 // eslint-disable-next-line no-restricted-imports
+import { SchedulerDefinition } from '@devvit/protos/types/devvit/plugin/scheduler/scheduler.js';
+// eslint-disable-next-line no-restricted-imports
 import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 // eslint-disable-next-line no-restricted-imports
 import { UserActionsDefinition } from '@devvit/protos/types/devvit/plugin/useractions/useractions.js';
 // eslint-disable-next-line no-restricted-imports
 import { CustomPostDefinition } from '@devvit/protos/types/devvit/reddit/custom_post/v1alpha/custom_post.js';
+// eslint-disable-next-line no-restricted-imports
+import type { LinkedBundle } from '@devvit/protos/types/devvit/runtime/bundle.js';
 // eslint-disable-next-line no-restricted-imports
 import { UIEventHandlerDefinition } from '@devvit/protos/types/devvit/ui/events/v1alpha/handle_ui.js';
 
@@ -198,6 +205,9 @@ function appCapabilityFromFullName(fullName: string): (NutritionCategory | undef
     case MediaServiceDefinition.fullName:
     case RedisAPIDefinition.fullName:
       return [NutritionCategory.DATA];
+
+    case ExternalEndpointsDefinition.fullName:
+      return [NutritionCategory.EXTERNAL_ENDPOINTS];
 
     case HTTPDefinition.fullName:
       return [NutritionCategory.HTTP];
