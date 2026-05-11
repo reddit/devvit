@@ -30,9 +30,9 @@ export type UIClient = {
   showToast(textOrToast: string | Toast): void;
   /** Navigate to a URL */
   navigateTo(url: string): void;
-  navigateTo(subreddit: Pick<Subreddit, 'url'>): void;
-  navigateTo(post: Pick<Post, 'url'>): void;
-  navigateTo(comment: Pick<Comment, 'url'>): void;
-  navigateTo(user: Pick<User, 'url'>): void;
-  navigateTo(urlOrThing: string | { url: string }): void;
+  navigateTo(subreddit: Pick<Subreddit, 'permalink' | 'url'>): void;
+  navigateTo(post: Pick<Post, 'permalink' | 'url'>): void;
+  navigateTo(comment: Pick<Comment, 'permalink' | 'url'>): void;
+  navigateTo(user: Pick<User, 'permalink' | 'url'>): void;
+  navigateTo(urlOrThing: string | { url: string; permalink?: string }): void;
 };

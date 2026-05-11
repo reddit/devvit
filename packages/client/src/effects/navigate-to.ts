@@ -1,13 +1,16 @@
 import type { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
+import { resolveNavigationInput } from '@devvit/shared-types/thing-navigation.js';
 
 /**
  * Navigates to a URL, subreddit, post, comment, or user.
  *
  * @param thingOrUrl - The URL, subreddit, post, comment, or user to navigate to
  */
-export function navigateTo(thingOrUrl: string | { readonly url: string }): void {
-  const inputUrl = typeof thingOrUrl === 'string' ? thingOrUrl : thingOrUrl.url;
+export function navigateTo(
+  thingOrUrl: string | { readonly url: string; readonly permalink?: string }
+): void {
+  const inputUrl = resolveNavigationInput(thingOrUrl);
   let normalizedUrl: string;
   try {
     normalizedUrl = new URL(inputUrl).toString();

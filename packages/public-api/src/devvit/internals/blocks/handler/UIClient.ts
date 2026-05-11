@@ -5,6 +5,7 @@ import {
   ToastAppearance,
 } from '@devvit/protos';
 import type { Form } from '@devvit/shared';
+import { resolveNavigationInput } from '@devvit/shared-types/thing-navigation.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import type { Comment, Post, Subreddit, User } from '../../../../apis/reddit/models/index.js';
@@ -111,12 +112,12 @@ export class UIClient implements _UIClient {
   }
 
   navigateTo(url: string): void;
-  navigateTo(subreddit: Pick<Subreddit, 'url'>): void;
-  navigateTo(post: Pick<Post, 'url'>): void;
-  navigateTo(comment: Pick<Comment, 'url'>): void;
-  navigateTo(user: Pick<User, 'url'>): void;
-  navigateTo(thingOrUrl: string | { url: string }): void {
-    const inputUrl = typeof thingOrUrl === 'string' ? thingOrUrl : thingOrUrl.url;
+  navigateTo(subreddit: Pick<Subreddit, 'permalink' | 'url'>): void;
+  navigateTo(post: Pick<Post, 'permalink' | 'url'>): void;
+  navigateTo(comment: Pick<Comment, 'permalink' | 'url'>): void;
+  navigateTo(user: Pick<User, 'permalink' | 'url'>): void;
+  navigateTo(thingOrUrl: string | { url: string; permalink?: string }): void {
+    const inputUrl = resolveNavigationInput(thingOrUrl);
     if (!URL.canParse(inputUrl)) {
       throw new TypeError(`Invalid URL: ${inputUrl}`);
     }

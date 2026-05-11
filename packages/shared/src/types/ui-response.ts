@@ -8,8 +8,9 @@ import type { Form, FormValues } from '@devvit/shared-types/shared/form.js';
  * actions in cases where the Devvit app is not in the direct code path.
  */
 export type UiResponse<InitFormData extends JsonObject = JsonObject> = {
-  /** Navigate the user's reddit client to this URL or Reddit Thing (containing `url`). */
-  navigateTo?: string | { url: string };
+  /** Navigate the user's reddit client to this URL or Reddit Thing (Post, Subreddit, etc)
+   */
+  navigateTo?: string | { url: string; permalink?: string };
   /** Show a toast to the user's reddit client. */
   showToast?: string | Toast;
   /** Display a form in the user's reddit client. */
