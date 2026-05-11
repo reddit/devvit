@@ -201,6 +201,7 @@ const nutritionCategoryToString: Readonly<Record<NutritionCategory, string>> = {
   [NutritionCategory.APP_TRIGGERS]: 'Execute when installed or upgraded.',
   [NutritionCategory.ASSETS]: 'Present predefined audio-visual media.',
   [NutritionCategory.DATA]: 'Read and write _app_ data to Reddit servers.',
+  [NutritionCategory.EXTERNAL_ENDPOINTS]: 'Can be invoked by third-parties outside of Reddit.',
   [NutritionCategory.HTTP]: 'Read and write _any_ data to and from the internet.',
   [NutritionCategory.MODERATOR]:
     "Appear and act as a moderator on subreddits where it's installed.",
@@ -214,5 +215,5 @@ const nutritionCategoryToString: Readonly<Record<NutritionCategory, string>> = {
   [NutritionCategory.UNRECOGNIZED]: 'Use unknown permissions.',
   [NutritionCategory.WEBVIEW]: 'Embed webapps to display rich content.',
   [NutritionCategory.CUSTOM_POST]: 'Can create a custom post.',
-  [NutritionCategory.USER_ACTIONS]: 'Can call Reddit APIs on behalf of the user.',
+  [NutritionCategory.USER_ACTIONS]: 'Can invoke Reddit APIs on behalf of the user.',
 };
