@@ -1,12 +1,15 @@
 import type { PaymentHandlerResponse } from '@devvit/payments';
 import type { PaymentHandler } from '@devvit/payments';
 import { addPaymentHandler, paymentHelpMenuItem } from '@devvit/payments/shared';
-import type { Logger, Metadata } from '@devvit/protos';
-import { LoggerDefinition, Severity } from '@devvit/protos';
+import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
 import {
   type DevvitPostData,
   type SplashPostData,
 } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import { type Logger, LoggerDefinition } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   type Context,
   Devvit,

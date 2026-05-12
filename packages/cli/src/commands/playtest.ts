@@ -2,8 +2,17 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import { updateBundleServer, updateBundleVersion } from '@devvit/build-pack/esbuild/ESBuildPack.js';
-import type { AppVersionInfo, FullInstallationInfo } from '@devvit/protos/community.js';
-import { type FullAppInfo, InstallationType, VersionVisibility } from '@devvit/protos/community.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullAppInfo } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type AppVersionInfo,
+  InstallationType,
+  VersionVisibility,
+} from '@devvit/protos/types/devvit/dev_portal/app_version/info/app_version_info.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullInstallationInfo } from '@devvit/protos/types/devvit/dev_portal/installation/installation.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import {
   ACTOR_SRC_DIR,

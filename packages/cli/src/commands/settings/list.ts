@@ -1,5 +1,5 @@
-import type { Form } from '@devvit/protos';
-import { FormFieldType } from '@devvit/protos';
+import type { Form } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/form.js';
+import { FormFieldType } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/type.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { ux } from '@oclif/core';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';

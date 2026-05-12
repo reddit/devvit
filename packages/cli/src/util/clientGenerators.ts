@@ -1,29 +1,32 @@
+// eslint-disable-next-line no-restricted-imports
 import type {
   AppClient,
   AppVersionClient,
   DeveloperAccountClient,
+  DevPortalAppPublishRequestClient,
   DevPortalAppSettingsClient,
+  DevPortalDeveloperSettingsClient,
   EventsClient,
   FeedbackClient,
   InstallationsClient,
-  WaitlistClient,
-} from '@devvit/protos/community.js';
+} from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   AppClientJSON,
   AppVersionClientJSON,
   DeveloperAccountClientJSON,
+  DevPortalAppPublishRequestClientJSON,
   DevPortalAppSettingsClientJSON,
   DevPortalDeveloperSettingsClientJSON,
   EventsClientJSON,
   FeedbackClientJSON,
   InstallationsClientJSON,
-  WaitlistClientJSON,
-} from '@devvit/protos/community.js';
-import type {
-  DevPortalAppPublishRequestClient,
-  DevPortalDeveloperSettingsClient,
 } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
-import { DevPortalAppPublishRequestClientJSON } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
+// eslint-disable-next-line no-restricted-imports
+import type { WaitlistClient } from '@devvit/protos/types/devvit/dev_portal/waitlist/waitlist.twirp-client.js';
+// eslint-disable-next-line no-restricted-imports
+import { WaitlistClientJSON } from '@devvit/protos/types/devvit/dev_portal/waitlist/waitlist.twirp-client.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   type RemoteLogConsumer,
   RemoteLogConsumerClientImpl,

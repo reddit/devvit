@@ -1,6 +1,8 @@
 import { access, readFile } from 'node:fs/promises';
 
+// eslint-disable-next-line no-restricted-imports
 import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
+// eslint-disable-next-line no-restricted-imports
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { AccountingType } from '@devvit/shared-types/payments/Product.js';

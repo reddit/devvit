@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { Devvit } from '@devvit/public-api';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 

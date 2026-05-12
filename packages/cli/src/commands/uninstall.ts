@@ -1,4 +1,4 @@
-import { InstallationType } from '@devvit/protos/community.js';
+import { InstallationType } from '@devvit/protos/json/devvit/dev_portal/app_version/info/app_version_info.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, ux } from '@oclif/core';
 

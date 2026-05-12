@@ -1,4 +1,4 @@
-import { Severity } from '@devvit/protos';
+import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
 
 import { formatAppLogDivider, formatAppLogMessage, parseAppLogDuration } from './app-log-util.js';
 

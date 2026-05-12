@@ -1,11 +1,14 @@
 import os from 'node:os';
 
+import { InstallationType } from '@devvit/protos/json/devvit/dev_portal/app_version/info/app_version_info.js';
+import { NutritionCategory } from '@devvit/protos/json/devvit/dev_portal/nutrition/nutrition.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullAppInfo } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
+// eslint-disable-next-line no-restricted-imports
 import type {
-  FullAppInfo,
   FullInstallationInfo,
   MultipleInstallationsResponse,
-} from '@devvit/protos/community.js';
-import { InstallationType, NutritionCategory } from '@devvit/protos/community.js';
+} from '@devvit/protos/types/devvit/dev_portal/installation/installation.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';

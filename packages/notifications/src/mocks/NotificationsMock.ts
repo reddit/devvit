@@ -1,27 +1,31 @@
-import { type Metadata } from '@devvit/protos';
-import {
-  type DismissGameBadgeRequest,
-  type DismissGameBadgeResponse,
-  type GetGameBadgeStatusRequest,
-  type GetGameBadgeStatusResponse,
-  type ShowGameBadgeRequest,
-  type ShowGameBadgeResponse,
+import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type {
+  DismissGameBadgeRequest,
+  DismissGameBadgeResponse,
+  GetGameBadgeStatusRequest,
+  GetGameBadgeStatusResponse,
+  ShowGameBadgeRequest,
+  ShowGameBadgeResponse,
 } from '@devvit/protos/types/devvit/plugin/notifications/gamesdrawerbadge_msg.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Notifications } from '@devvit/protos/types/devvit/plugin/notifications/notifications_svc.js';
-import {
-  type IsOptedInRequest,
-  type IsOptedInResponse,
-  type ListOptedInUsersRequest,
-  type ListOptedInUsersResponse,
-  type OptInCurrentUserResponse,
-  type OptOutCurrentUserResponse,
+// eslint-disable-next-line no-restricted-imports
+import type {
+  IsOptedInRequest,
+  IsOptedInResponse,
+  ListOptedInUsersRequest,
+  ListOptedInUsersResponse,
+  OptInCurrentUserResponse,
+  OptOutCurrentUserResponse,
 } from '@devvit/protos/types/devvit/plugin/notifications/optin_msg.js';
-import {
-  type EnqueueError,
-  type EnqueueRequest,
-  type EnqueueResponse,
+// eslint-disable-next-line no-restricted-imports
+import type {
+  EnqueueError,
+  EnqueueRequest,
+  EnqueueResponse,
 } from '@devvit/protos/types/devvit/plugin/notifications/pushnotif_msg.js';
-import { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 import { isT1, isT2, isT3, T2, T3 } from '@devvit/shared-types/tid.js';

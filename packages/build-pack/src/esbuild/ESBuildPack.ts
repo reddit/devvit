@@ -1,13 +1,14 @@
 import fs, { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import {
   type ActorSpec,
   type DependencySpec,
   type ServerBundle,
   TargetRuntime,
-} from '@devvit/protos/types/devvit/runtime/bundle.js';
+} from '@devvit/protos/json/devvit/runtime/bundle.js';
+// eslint-disable-next-line no-restricted-imports
+import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { ClientFactory } from '@devvit/shared-types/ConfigImpl.js';
 import { ConfigImpl as Config } from '@devvit/shared-types/ConfigImpl.js';
 import type { Namespace } from '@devvit/shared-types/Namespace.js';

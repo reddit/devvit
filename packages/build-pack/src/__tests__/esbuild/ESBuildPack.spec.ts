@@ -1,7 +1,8 @@
 import path from 'node:path';
 
+import { TargetRuntime } from '@devvit/protos/json/devvit/runtime/bundle.js';
+// eslint-disable-next-line no-restricted-imports
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { TargetRuntime } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { build, type BuildResult, type OutputFile, type PluginBuild } from 'esbuild';
 import type { Observable } from 'rxjs';
 import { vi } from 'vitest';

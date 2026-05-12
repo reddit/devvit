@@ -1,4 +1,10 @@
-import type { AppClient, FullAppInfo, GetAppBySlugRequest } from '@devvit/protos/community.js';
+// eslint-disable-next-line no-restricted-imports
+import type {
+  FullAppInfo,
+  GetAppBySlugRequest,
+} from '@devvit/protos/types/devvit/dev_portal/app/app.js';
+// eslint-disable-next-line no-restricted-imports
+import type { AppClient } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { TwirpError, TwirpErrorCode } from 'twirp-ts';
 

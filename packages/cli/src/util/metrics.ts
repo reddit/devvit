@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { Value } from '@devvit/protos/types/google/protobuf/struct.js';
+import type { Value } from '@devvit/protos/json/google/protobuf/struct.js';
 
 import { DOT_DEVVIT_DIR_FILENAME } from '../lib/config.js';
 import { createEventsClient } from './clientGenerators.js';

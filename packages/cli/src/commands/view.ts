@@ -1,4 +1,5 @@
-import type { FullAppInfo } from '@devvit/protos/community.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullAppInfo } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, Flags } from '@oclif/core';

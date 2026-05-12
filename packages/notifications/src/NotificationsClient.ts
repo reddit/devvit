@@ -1,4 +1,5 @@
-import type { Metadata } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   type Notifications as NotificationsPlugin,
   NotificationsDefinition,

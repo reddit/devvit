@@ -1,5 +1,6 @@
-import type { LogMessage } from '@devvit/protos';
-import { Severity } from '@devvit/protos';
+import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
+// eslint-disable-next-line no-restricted-imports
+import type { LogMessage } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
 import chalk from 'chalk';
 import { format as formatDate } from 'date-fns';
 

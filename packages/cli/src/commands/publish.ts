@@ -3,19 +3,29 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import {
-  AppInfo,
+  AppPublishRequestStatus,
   AppPublishRequestVisibility,
-  AppVersionInfo,
-  type AppVersionUpdateRequest,
-  FullAppInfo,
-  type FullAppVersionInfo,
-  FullInstallationInfo,
+} from '@devvit/protos/json/devvit/dev_portal/app_publish_request/app_publish_request.js';
+import {
   InstallationType,
-  NutritionCategory,
   VersionVisibility,
-} from '@devvit/protos/community.js';
-import { AppPublishRequestStatus } from '@devvit/protos/types/devvit/dev_portal/app_publish_request/app_publish_request.js';
-import { PaymentsVerificationStatus } from '@devvit/protos/types/devvit/dev_portal/payments/payments_verification.js';
+} from '@devvit/protos/json/devvit/dev_portal/app_version/info/app_version_info.js';
+import { NutritionCategory } from '@devvit/protos/json/devvit/dev_portal/nutrition/nutrition.js';
+import { PaymentsVerificationStatus } from '@devvit/protos/json/devvit/dev_portal/payments/payments_verification.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullAppInfo } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
+// eslint-disable-next-line no-restricted-imports
+import type { AppInfo } from '@devvit/protos/types/devvit/dev_portal/app/info/app_info.js';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type AppVersionUpdateRequest,
+  type FullAppVersionInfo,
+} from '@devvit/protos/types/devvit/dev_portal/app_version/app_version.js';
+// eslint-disable-next-line no-restricted-imports
+import type { AppVersionInfo } from '@devvit/protos/types/devvit/dev_portal/app_version/info/app_version_info.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullInstallationInfo } from '@devvit/protos/types/devvit/dev_portal/installation/installation.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { appCapabilitiesFromBundle } from '@devvit/shared-types/AppCapabilities.js';
 import { ACTOR_SRC_PRIMARY_NAME } from '@devvit/shared-types/constants.js';

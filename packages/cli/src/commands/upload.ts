@@ -2,12 +2,16 @@ import { exec } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
+// eslint-disable-next-line no-restricted-imports
+import type { FullAppInfo } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
+// eslint-disable-next-line no-restricted-imports
 import {
-  AppVersionInfo,
-  FullAppInfo,
-  FullInstallationInfo,
+  type AppVersionInfo,
   VersionVisibility,
-} from '@devvit/protos/community.js';
+} from '@devvit/protos/types/devvit/dev_portal/app_version/info/app_version_info.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullInstallationInfo } from '@devvit/protos/types/devvit/dev_portal/installation/installation.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import {
   ACTOR_SRC_PRIMARY_NAME,

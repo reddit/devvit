@@ -1,9 +1,10 @@
-import { Severity } from '@devvit/protos';
+import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   type RemoteLogQuery,
   type RemoteLogSubredditAppNameFilter,
   RemoteLogType,
-} from '@devvit/protos/community.js';
+} from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import { defer, filter, map, merge, onErrorResumeNextWith, retry, Subscription } from 'rxjs';
 
 import type Logs from '../../commands/logs.js';

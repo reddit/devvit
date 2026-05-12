@@ -6,6 +6,7 @@ import path from 'node:path';
 import querystring from 'node:querystring';
 import util from 'node:util';
 
+// eslint-disable-next-line no-restricted-imports
 import { InitAppResponse } from '@devvit/protos/types/devvit/cli/init.js';
 import { isDevvitDependency } from '@devvit/shared-types/isDevvitDependency.js';
 import { UNINITIALIZED_APP_NAME } from '@devvit/shared-types/schemas/constants.js';

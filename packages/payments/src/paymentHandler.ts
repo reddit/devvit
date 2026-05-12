@@ -1,13 +1,19 @@
+import type {
+  FulfillOrderResponse,
+  RefundOrderResponse,
+} from '@devvit/protos/json/devvit/actor/payments/v1alpha/payments.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import type {
   FulfillOrderRequest,
-  FulfillOrderResponse,
   PaymentProcessor,
   RefundOrderRequest,
-  RefundOrderResponse,
 } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
+// eslint-disable-next-line no-restricted-imports
 import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Order as ProtoOrder } from '@devvit/protos/types/devvit/payments/v1alpha/order.js';
+// eslint-disable-next-line no-restricted-imports
 import { Devvit, type TriggerContext } from '@devvit/public-api';
 import { makeAPIClients } from '@devvit/public-api/apis/makeAPIClients.js';
 import { getContextFromMetadata } from '@devvit/public-api/devvit/internals/context.js';

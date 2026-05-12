@@ -1,5 +1,6 @@
 declare global {
   declare module '@devvit/public-api' {
+    // eslint-disable-next-line no-restricted-imports
     export * from '@devvit/public-api';
 
     // Extend the Devvit namespace with the payments related props and methods

@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-restricted-imports
 import type { PlaytestSubscriberMessage } from '@devvit/protos/types/devvit/cli/playtest.js';
+// eslint-disable-next-line no-restricted-imports
 import { PlaytestProviderMessage } from '@devvit/protos/types/devvit/cli/playtest.js';
 import type { ErrorEvent, MessageEvent, VerifyClientCallbackSync, WebSocket } from 'ws';
 import { WebSocketServer } from 'ws';

@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import querystring from 'node:querystring';
 
-import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
+import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import inquirer from 'inquirer';
 import open from 'open';

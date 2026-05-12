@@ -1,4 +1,5 @@
-import type { FullAppInfo } from '@devvit/protos/community.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullAppInfo } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
 import {
   APP_SLUG_BASE_MAX_LENGTH,
   makeSlug,

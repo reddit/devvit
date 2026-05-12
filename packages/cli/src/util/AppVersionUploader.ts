@@ -1,11 +1,13 @@
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 
+// eslint-disable-next-line no-restricted-imports
 import {
   type AppVersionInfo,
   InstallationType,
   type VersionVisibility,
-} from '@devvit/protos/community.js';
+} from '@devvit/protos/types/devvit/dev_portal/app_version/info/app_version_info.js';
+// eslint-disable-next-line no-restricted-imports
 import type { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import { PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';

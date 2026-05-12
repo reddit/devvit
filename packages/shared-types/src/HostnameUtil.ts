@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-restricted-imports
-import type { Definition } from '@devvit/protos';
+import type { Definition } from '@devvit/protos/lib/Types.js';
 // eslint-disable-next-line no-restricted-imports
 import type { SerializableServiceDefinition } from '@devvit/protos/types/devvit/runtime/serializable.js';
 

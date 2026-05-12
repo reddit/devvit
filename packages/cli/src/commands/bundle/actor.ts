@@ -5,12 +5,11 @@ import { ESBuildPack } from '@devvit/build-pack';
 import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
 import { DefaultBuilder } from '@devvit/builders/Builder.js';
 import { ResolverWithPlugins } from '@devvit/linkers/ResolverWithPlugins.js';
+import { type ActorSpec, TargetRuntime } from '@devvit/protos/json/devvit/runtime/bundle.js';
+// eslint-disable-next-line no-restricted-imports
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import {
-  ActorSpec,
-  LinkedBundle,
-  TargetRuntime,
-} from '@devvit/protos/types/devvit/runtime/bundle.js';
+// eslint-disable-next-line no-restricted-imports
+import { LinkedBundle } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { LOCAL_HOSTNAME } from '@devvit/shared-types/HostnameUtil.js';
 import { Args, Flags } from '@oclif/core';
 

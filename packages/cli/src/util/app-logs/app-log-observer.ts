@@ -1,9 +1,11 @@
+// eslint-disable-next-line no-restricted-imports
 import {
   LogErrorMessage,
   LogEventMessage,
   LogMessage,
   Severity,
 } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
+// eslint-disable-next-line no-restricted-imports
 import type { RemoteLogMessage } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import chalk from 'chalk';

@@ -2,13 +2,16 @@ import fs from 'node:fs';
 import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { Environment } from '@devvit/protos/json/devvit/payments/v1alpha/common.js';
+import { Currency } from '@devvit/protos/json/devvit/payments/v1alpha/product.js';
+// eslint-disable-next-line no-restricted-imports
 import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/payments/v1alpha/payments.js';
-import { Environment } from '@devvit/protos/types/devvit/payments/v1alpha/common.js';
-import { Currency } from '@devvit/protos/types/devvit/payments/v1alpha/product.js';
+// eslint-disable-next-line no-restricted-imports
 import type {
   Bundle,
   PaymentsConfig,
 } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+// eslint-disable-next-line no-restricted-imports
 import { PaymentsServiceDefinition } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
 import { ACTOR_SRC_DIR, PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';

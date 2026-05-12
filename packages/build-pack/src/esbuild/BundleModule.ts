@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module';
 
+// eslint-disable-next-line no-restricted-imports
 import * as protos from '@devvit/protos'; // The bootstrap provides protos.
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { Config } from '@devvit/shared-types/Config.js';

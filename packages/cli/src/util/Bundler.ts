@@ -1,7 +1,8 @@
 import { ESBuildPack } from '@devvit/build-pack/esbuild/ESBuildPack.js';
 import { formatLogs, type ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
+import type { ActorSpec } from '@devvit/protos/json/devvit/runtime/bundle.js';
+// eslint-disable-next-line no-restricted-imports
 import { type Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import type { ActorSpec } from '@devvit/protos/types/devvit/runtime/bundle.js';
 import { LOCAL_HOSTNAME } from '@devvit/shared-types/HostnameUtil.js';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';

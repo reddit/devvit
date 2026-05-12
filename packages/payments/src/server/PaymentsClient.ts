@@ -6,6 +6,7 @@ import type {
   GetProductsRequest,
   GetProductsResponse,
 } from '@devvit/protos/json/devvit/plugin/payments/v1alpha/payments.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   type PaymentsService,
   PaymentsServiceDefinition,

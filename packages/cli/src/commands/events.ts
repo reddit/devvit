@@ -1,8 +1,8 @@
+import { RemoteLogType } from '@devvit/protos/json/devvit/remote_logger/remote_logger.js';
+// eslint-disable-next-line no-restricted-imports
 import { LogEventMessage } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
-import {
-  type RemoteLogMessage,
-  RemoteLogType,
-} from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
+// eslint-disable-next-line no-restricted-imports
+import type { RemoteLogMessage } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, Flags } from '@oclif/core';
 import chalk from 'chalk';

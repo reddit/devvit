@@ -6,7 +6,7 @@ import type {
   MediaSignature,
   MediaSignatureStatus,
   UploadNewMediaResponse,
-} from '@devvit/protos/community.js';
+} from '@devvit/protos/json/devvit/dev_portal/app/app.js';
 import {
   ALLOWED_ASSET_EXTENSIONS,
   type AssetMap,

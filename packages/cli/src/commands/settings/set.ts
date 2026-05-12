@@ -1,4 +1,4 @@
-import { FormFieldType } from '@devvit/protos';
+import { FormFieldType } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/type.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import { Args, ux } from '@oclif/core';
 import inquirer from 'inquirer';

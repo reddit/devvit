@@ -4,7 +4,7 @@ import { NodeHttpTransport } from '@improbable-eng/grpc-web-node-http-transport'
 import { defer, mergeMap, Observable } from 'rxjs';
 const { grpc } = pkg;
 
-import type { Rpc } from '@devvit/protos';
+import type { Rpc } from '@devvit/protos/lib/Types.js';
 
 import { HEADER_AUTHORIZATION } from '../constants/Headers.js';
 import type { StoredToken } from '../lib/auth/StoredToken.js';

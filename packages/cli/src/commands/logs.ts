@@ -1,5 +1,5 @@
-import { InstallationType } from '@devvit/protos/community.js';
-import { RemoteLogSubredditAppNameFilter } from '@devvit/protos/types/devvit/remote_logger/remote_logger.js';
+import { InstallationType } from '@devvit/protos/json/devvit/dev_portal/app_version/info/app_version_info.js';
+import type { RemoteLogSubredditAppNameFilter } from '@devvit/protos/json/devvit/remote_logger/remote_logger.js';
 import { Args, Flags } from '@oclif/core';
 import { sub } from 'date-fns';
 import { Subscription } from 'rxjs';

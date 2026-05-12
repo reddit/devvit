@@ -1,4 +1,5 @@
-import type { AppVersionInfo } from '@devvit/protos/community.js';
+// eslint-disable-next-line no-restricted-imports
+import type { AppVersionInfo } from '@devvit/protos/types/devvit/dev_portal/app_version/info/app_version_info.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 
 export function getVersionByNumber(version: string, appVersions: AppVersionInfo[]): AppVersionInfo {

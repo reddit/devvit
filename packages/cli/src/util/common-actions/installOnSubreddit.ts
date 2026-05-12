@@ -1,10 +1,13 @@
-import {
-  type AppVersionClient,
-  AppVersionInfo,
-  FullInstallationInfo,
-  type InstallationsClient,
-  InstallationType,
-} from '@devvit/protos/community.js';
+import { InstallationType } from '@devvit/protos/json/devvit/dev_portal/app_version/info/app_version_info.js';
+// eslint-disable-next-line no-restricted-imports
+import type { AppVersionInfo } from '@devvit/protos/types/devvit/dev_portal/app_version/info/app_version_info.js';
+// eslint-disable-next-line no-restricted-imports
+import type {
+  AppVersionClient,
+  InstallationsClient,
+} from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
+// eslint-disable-next-line no-restricted-imports
+import type { FullInstallationInfo } from '@devvit/protos/types/devvit/dev_portal/installation/installation.js';
 
 import { DevvitCommand } from '../commands/DevvitCommand.js';
 import { waitUntilVersionBuildComplete } from '../common-actions/waitUntilVersionBuildComplete.js';

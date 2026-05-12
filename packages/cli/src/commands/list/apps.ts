@@ -1,4 +1,5 @@
-import type { AppInfo } from '@devvit/protos/community.js';
+// eslint-disable-next-line no-restricted-imports
+import type { AppInfo } from '@devvit/protos/types/devvit/dev_portal/app/info/app_info.js';
 import { ux } from '@oclif/core';
 
 import { getAccessTokenAndLoginIfNeeded } from '../../util/auth.js';

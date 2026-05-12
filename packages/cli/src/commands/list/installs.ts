@@ -1,10 +1,12 @@
+import { InstallationType } from '@devvit/protos/json/devvit/dev_portal/app_version/info/app_version_info.js';
+// eslint-disable-next-line no-restricted-imports
+import type { AppInfo } from '@devvit/protos/types/devvit/dev_portal/app/info/app_info.js';
+// eslint-disable-next-line no-restricted-imports
 import type {
-  AppInfo,
   FullInstallationInfo,
   InstallationInfo,
   MultipleInstallationsResponse,
-} from '@devvit/protos/community.js';
-import { InstallationType } from '@devvit/protos/community.js';
+} from '@devvit/protos/types/devvit/dev_portal/installation/installation.js';
 import { DevvitVersion } from '@devvit/shared-types/Version.js';
 import { Args, ux } from '@oclif/core';
 

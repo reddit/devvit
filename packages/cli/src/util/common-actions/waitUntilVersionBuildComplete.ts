@@ -1,4 +1,10 @@
-import { type AppVersionClient, AppVersionInfo, BuildStatus } from '@devvit/protos/community.js';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type AppVersionInfo,
+  BuildStatus,
+} from '@devvit/protos/types/devvit/dev_portal/app_version/info/app_version_info.js';
+// eslint-disable-next-line no-restricted-imports
+import type { AppVersionClient } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 import { ux } from '@oclif/core';
 
 import { DevvitCommand } from '../commands/DevvitCommand.js';
