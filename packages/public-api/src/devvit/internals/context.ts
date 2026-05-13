@@ -49,7 +49,9 @@ export function getContextFromMetadata(
   try {
     // TODO - Use the RequestContext to extract other metadata like postData, userId, username, etc.
     const signedRequestContext = decodeSignedRequestContext(metadata[Header.Context]?.values[0]);
-    loid = signedRequestContext?.user?.devvitLoid;
+    loid =
+      signedRequestContext?.user?.devvitLoid ??
+      (signedRequestContext?.user as { devvit_loid?: string } | undefined)?.devvit_loid;
   } catch {
     loid = undefined;
   }
