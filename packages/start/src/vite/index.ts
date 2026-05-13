@@ -62,6 +62,10 @@ type ResolvedRoots = {
   root: string;
 };
 
+function isVitestRun(env: { mode: string }): boolean {
+  return process.env.VITEST === 'true' || env.mode === 'test';
+}
+
 function resolveBuildRoots(
   configRoot: string | undefined,
   shouldBuildClient: boolean,
@@ -133,6 +137,9 @@ export function devvit(opts: DevvitPluginOptions = {}): Plugin {
   return {
     name: 'devvit',
     enforce: 'pre',
+    apply(_config, env) {
+      return env.command === 'build' || !isVitestRun(env);
+    },
     perEnvironmentStartEndDuringDev: true,
     config(config, env) {
       // Only support build command for now

@@ -58,6 +58,25 @@ function withMockedCwd<T>(projectRoot: string, runner: () => T): T {
   }
 }
 
+function withVitestEnv<T>(value: string | undefined, runner: () => T): T {
+  const original = process.env.VITEST;
+  if (value === undefined) {
+    delete process.env.VITEST;
+  } else {
+    process.env.VITEST = value;
+  }
+
+  try {
+    return runner();
+  } finally {
+    if (original === undefined) {
+      delete process.env.VITEST;
+    } else {
+      process.env.VITEST = original;
+    }
+  }
+}
+
 class PluginHarness {
   constructor(private readonly _plugin: Plugin) {}
 
@@ -83,6 +102,13 @@ class PluginHarness {
       return hook;
     }
     return hook?.handler;
+  }
+
+  applies(config: UserConfig, env: ConfigEnv): boolean {
+    const { apply } = this._plugin;
+    if (apply === undefined) return true;
+    if (typeof apply === 'function') return apply(config, env);
+    return apply === env.command;
   }
 
   runConfig(config: UserConfig, env: ConfigEnv) {
@@ -185,6 +211,39 @@ class TestProject {
 }
 
 describe('devvit Vite plugin', () => {
+  test('applies during vite build', () => {
+    const harness = new PluginHarness(devvit());
+
+    const applies = withVitestEnv(undefined, () =>
+      harness.applies({}, { command: 'build', mode: 'production' })
+    );
+
+    expect(applies).toBe(true);
+  });
+
+  test('applies during normal vite serve so the unsupported command stays guarded', () => {
+    const harness = new PluginHarness(devvit());
+
+    const applies = withVitestEnv(undefined, () =>
+      harness.applies({}, { command: 'serve', mode: 'development' })
+    );
+
+    expect(applies).toBe(true);
+  });
+
+  test('does not apply during vitest', () => {
+    const harness = new PluginHarness(devvit());
+
+    const cases: ConfigEnv[] = [
+      { command: 'serve', mode: 'test' },
+      { command: 'serve', mode: 'production' },
+    ];
+
+    const results = cases.map((env) => withVitestEnv('true', () => harness.applies({}, env)));
+
+    expect(results).toStrictEqual([false, false]);
+  });
+
   test('prints a helpful error when used outside vite build', () => {
     const harness = new PluginHarness(devvit());
 
