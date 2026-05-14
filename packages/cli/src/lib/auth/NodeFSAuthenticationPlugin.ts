@@ -205,6 +205,8 @@ export class NodeFSAuthenticationPlugin {
   async #login(): Promise<StoredToken> {
     const state = crypto.randomBytes(16).toString('hex');
     const authenticationUrl = `${this.#authenticationUrl}?${querystring.stringify({
+      // Force English locale to avoid OAuth redirect issues in non-English locales
+      locale: 'en',
       client_id: this.#authCfg.clientId,
       duration: this.#authCfg.tokenDuration,
       redirect_uri: this.#authCfg.redirectUri,
