@@ -18,7 +18,7 @@ export enum T_PREFIX {
 }
 
 // string literal types
-/** Commment thing ID. */
+/** Comment thing ID. */
 export type T1 = `${T_PREFIX.COMMENT}${string}`;
 /** Account thing ID. */
 export type T2 = `${T_PREFIX.ACCOUNT}${string}`;
