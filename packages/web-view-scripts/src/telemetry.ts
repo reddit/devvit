@@ -136,8 +136,18 @@ function initPerformanceMonitoring(): void {
     for (const entry of list.getEntries()) {
       if (entry.name === 'first-contentful-paint') {
         const fcp = measureFcp();
-        if (fcp) telemetryMetrics.push(fcp);
         observer.disconnect();
+        if (!fcp) break;
+        if (document.readyState === 'complete') {
+          // load already fired without FCP — emit it now as a standalone metric
+          emitEffect({
+            type: EffectType.EFFECT_TELEMETRY,
+            telemetry: { metrics: { metrics: [fcp] } },
+          });
+        } else {
+          telemetryMetrics.push(fcp);
+        }
+        break;
       }
     }
   });

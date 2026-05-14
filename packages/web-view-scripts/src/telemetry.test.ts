@@ -452,6 +452,63 @@ describe('performance monitoring', () => {
     );
   });
 
+  it('sends fcp as a standalone metric when fcp fires after load', async () => {
+    const paintEntry = {
+      name: 'first-contentful-paint',
+      startTime: 300,
+    } as PerformancePaintTiming;
+
+    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
+      if (type === 'paint') return [paintEntry];
+      if (type === 'navigation') {
+        return [
+          {
+            requestStart: 100,
+            responseStart: 200,
+            domInteractive: 300,
+            loadEventEnd: 400,
+          } as PerformanceNavigationTiming,
+        ];
+      }
+      return [];
+    });
+
+    // Simulate load firing before FCP arrives
+    const loadHandlers = addEventListenerMock.mock.calls
+      .filter((call) => call[0] === 'load')
+      .map((call) => call[1]);
+    loadHandlers.forEach((handler) => handler?.({}));
+
+    // After load, readyState becomes 'complete'
+    (globalThis.document as unknown as { readyState: string }).readyState = 'complete';
+
+    postMessageMock.mockClear();
+
+    // FCP observer fires late, after load
+    observerCallbacks['paint']?.({
+      getEntries: () => [paintEntry],
+    } as PerformanceObserverEntryList);
+
+    expect(postMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: WebViewInternalMessageScope.CLIENT,
+        type: webViewInternalMessageType,
+        telemetry: {
+          metrics: {
+            metrics: [
+              {
+                spanName: 'web_view_first_contentful_paint',
+                timeStart: 1717171717171,
+                timeEnd: 1717171717171 + 300,
+              },
+            ],
+          },
+        },
+      }),
+      '*'
+    );
+  });
+
   it('captures tti metric', async () => {
     // Mock getEntriesByType for navigation
     vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
