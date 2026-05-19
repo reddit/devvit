@@ -56,7 +56,7 @@
   },
   "workspaces": [
     "__e2e__/*",
-    "__e2e__/apps/**",
+    "__e2e__/performance/apps/**",
     "devvit-compute-go/images/*",
     "devvit-docs",
     "packages/*",
