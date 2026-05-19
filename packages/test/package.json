@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@devvit/analytics": "0.12.24",
+    "@devvit/external-endpoints": "0.12.24",
     "@devvit/media": "0.12.24",
     "@devvit/notifications": "0.12.24",
     "@devvit/protos": "0.12.24",
