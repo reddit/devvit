@@ -521,6 +521,7 @@ export class Post {
   #userReportReasons: string[];
   #gallery: GalleryMedia[];
   #pollData: PollData | undefined;
+  #crosspostParentId: T3 | undefined;
 
   /**
    * @internal
@@ -640,6 +641,8 @@ export class Post {
         votingEndTimestamp: raw.votingEndTimestamp,
       };
     }
+
+    this.#crosspostParentId = data.crosspostParent ? T3(data.crosspostParent) : undefined;
   }
 
   get id(): T3 {
@@ -830,6 +833,13 @@ export class Post {
     return this.#pollData;
   }
 
+  /**
+   * The ID of the original post this was crossposted from. Undefined if this post is not a crosspost.
+   */
+  get crosspostParentId(): T3 | undefined {
+    return this.#crosspostParentId;
+  }
+
   toJSON(): Pick<
     Post,
     | 'id'
@@ -867,6 +877,7 @@ export class Post {
     | 'secureMedia'
     | 'userReportReasons'
     | 'modReportReasons'
+    | 'crosspostParentId'
   > {
     return {
       id: this.id,
@@ -904,6 +915,7 @@ export class Post {
       secureMedia: this.secureMedia,
       modReportReasons: this.#modReportReasons,
       userReportReasons: this.#userReportReasons,
+      crosspostParentId: this.#crosspostParentId,
     };
   }
 

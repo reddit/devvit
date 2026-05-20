@@ -31,6 +31,7 @@ exports[`Post API > RedditAPIClient > Post matches JSON snapshot 1`] = `
   "body": undefined,
   "bodyHtml": undefined,
   "createdAt": +053979-04-14T00:00:00.000Z,
+  "crosspostParentId": undefined,
   "distinguishedBy": undefined,
   "edited": false,
   "flair": {
