@@ -418,7 +418,55 @@ describe('Post API', () => {
         ).rejects.toThrow(expectedErrMessage);
       });
     });
+    test('submit(): can create gallery post with multiple images', async () => {
+      const { reddit, metadata } = createTestRedditApiClient();
+      const mockedPost = new Post(
+        {
+          ...defaultPostData,
+          gallery: [
+            {
+              url: 'https://example.com/1.jpg',
+              width: 1080,
+              height: 1080,
+              status: GalleryMediaStatus.VALID,
+            },
+            {
+              url: 'https://example.com/2.jpg',
+              width: 1080,
+              height: 1080,
+              status: GalleryMediaStatus.VALID,
+            },
+          ],
+        },
+        metadata
+      );
 
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.LinksAndComments, 'Submit');
+      spyPlugin.mockImplementationOnce(async () => ({
+        json: { data: { id: 'post' }, errors: [] },
+      }));
+
+      vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+      const imageUrls = ['https://example.com/1.jpg', 'https://example.com/2.jpg'];
+
+      await reddit.submitPost({
+        title: 'My Gallery Post',
+        subredditName: 'askReddit',
+        kind: 'image',
+        imageUrls,
+      });
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        expect.objectContaining({
+          kind: 'image',
+          imageUrls,
+        
+        }),
+        metadata
+      );
+    });
+  });
     describe('setTextFallback()', () => {
       test('throws error if no fallback was set', async () => {
         const { metadata } = createTestRedditApiClient();
