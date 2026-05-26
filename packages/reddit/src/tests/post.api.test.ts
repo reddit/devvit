@@ -1,6 +1,4 @@
 import type { QueryResponse } from '@devvit/protos/json/devvit/plugin/redditapi/graphql/graphql_msg.js';
-// eslint-disable-next-line no-restricted-imports
-import { Devvit } from '@devvit/public-api';
 import { context } from '@devvit/server';
 import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
@@ -264,11 +262,11 @@ describe('Post API', () => {
 
     describe('submitCustomPost()', () => {
       const commonPostFields = {
+        customPostStyles: undefined,
         flairId: undefined,
         flairText: undefined,
         kind: 'custom',
         nsfw: undefined,
-        richtextJson: '',
         sendreplies: undefined,
         spoiler: undefined,
         sr: 'askReddit',
@@ -293,13 +291,6 @@ describe('Post API', () => {
             title: mockedPost.title,
             subredditName: mockedPost.subredditName,
             postData: { abc: 'def' },
-            splash: {
-              appDisplayName: 'appDisplayName',
-              appIconUri: 'appIconUri',
-              backgroundUri: 'backgroundUri',
-              buttonLabel: 'buttonLabel',
-              description: 'description',
-            },
             runAs: 'USER',
             userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
           });
@@ -307,22 +298,13 @@ describe('Post API', () => {
           expect(spyPlugin).toHaveBeenCalledWith(
             {
               ...commonPostFields,
-              richtextJson:
-                'GkgKRgpBCAQqEhIHCgUNAADIQhoHCgUNAADIQhopKicQgBAYgAgiHWFwcERpc3BsYXlOYW1lIGxvYWRpbmcgc2NyZWVuKAIQgAQ=',
               richtextFallback: '',
+              richtextJson: 'GgUKAxCABA==',
               runAs: RunAs.USER,
               userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
               postData: {
                 developerData: { abc: 'def' },
-                splash: {
-                  appDisplayName: 'appDisplayName',
-                  appIconUri: 'appIconUri',
-                  backgroundUri: 'backgroundUri',
-                  buttonLabel: 'buttonLabel',
-                  description: 'description',
-                  entry: 'default',
-                  title: 'My First Post',
-                },
+                splash: { entry: 'default' },
               },
             },
             context.metadata
@@ -342,7 +324,6 @@ describe('Post API', () => {
             reddit.submitCustomPost({
               title: 'Some post title',
               subredditName: 'askReddit',
-              splash: { appDisplayName: 'appDisplayName' },
               runAs: 'USER',
               userGeneratedContent: { text: 'some ugc text', imageUrls: ['image.png'] },
             })
@@ -356,7 +337,6 @@ describe('Post API', () => {
             reddit.submitCustomPost({
               title: 'Some post title',
               subredditName: 'askReddit',
-              splash: { appDisplayName: 'appDisplayName' },
               runAs: 'USER',
             })
           ).rejects.toThrow(/userGeneratedContent must be set/);
@@ -377,28 +357,19 @@ describe('Post API', () => {
           await reddit.submitCustomPost({
             title: mockedPost.title,
             subredditName: mockedPost.subredditName,
-            splash: { appDisplayName: 'appDisplayName' },
             textFallback: { text: 'This is a post with text as a fallback' },
           });
 
           expect(spyPlugin).toHaveBeenCalledWith(
             {
               ...commonPostFields,
-              richtextJson:
-                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
               richtextFallback: 'This is a post with text as a fallback',
+              richtextJson: 'GgUKAxCABA==',
               runAs: RunAs.APP,
+              userGeneratedContent: undefined,
               postData: {
                 developerData: undefined,
-                splash: {
-                  appDisplayName: 'appDisplayName',
-                  appIconUri: undefined,
-                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
-                  buttonLabel: undefined,
-                  description: undefined,
-                  entry: 'default',
-                  title: 'My First Post',
-                },
+                splash: { entry: 'default' },
               },
             },
             context.metadata
@@ -428,30 +399,20 @@ describe('Post API', () => {
           await reddit.submitCustomPost({
             title: mockedPost.title,
             subredditName: mockedPost.subredditName,
-            splash: { appDisplayName: 'appDisplayName' },
             textFallback: { richtext: textFallbackRichtext },
           });
 
           expect(spyPlugin).toHaveBeenCalledWith(
             {
               ...commonPostFields,
-              richtextJson:
-                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
               richtextFallback:
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
+              richtextJson: 'GgUKAxCABA==',
               runAs: RunAs.APP,
+              userGeneratedContent: undefined,
               postData: {
                 developerData: undefined,
-                splash: {
-                  appDisplayName: 'appDisplayName',
-                  appIconUri: undefined,
-                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
-                  buttonLabel: undefined,
-                  description: undefined,
-                  entry: 'default',
-                  title: 'My First Post',
-                  userGeneratedContent: undefined,
-                },
+                splash: { entry: 'default' },
               },
             },
             context.metadata
@@ -482,91 +443,20 @@ describe('Post API', () => {
           await reddit.submitCustomPost({
             title: mockedPost.title,
             subredditName: mockedPost.subredditName,
-            splash: { appDisplayName: 'appDisplayName' },
             textFallback: { richtext: textFallbackRichtext },
           });
 
           expect(spyPlugin).toHaveBeenCalledWith(
             {
               ...commonPostFields,
-              richtextJson:
-                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
               richtextFallback:
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
-              runAs: RunAs.APP,
-              postData: {
-                developerData: undefined,
-                splash: {
-                  appDisplayName: 'appDisplayName',
-                  appIconUri: undefined,
-                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
-                  buttonLabel: undefined,
-                  description: undefined,
-                  entry: 'default',
-                  title: 'My First Post',
-                },
-              },
-              userGeneratedContent: undefined,
-            },
-            context.metadata
-          );
-        });
-      });
-
-      test('submitCustomPost(): uses loading prop when provided', async () => {
-        const mockedPost = new Post({ ...defaultPostData });
-
-        const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
-        spyPlugin.mockImplementationOnce(async () => ({
-          json: { data: { id: 'post' }, errors: [] },
-        }));
-
-        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
-
-        const loading = Devvit.createElement('blocks', {
-          height: 'tall',
-          children: [
-            Devvit.createElement('vstack', {
-              height: '100%',
-              width: '100%',
-              backgroundColor: '#abc123',
-            }),
-          ],
-        });
-
-        await runWithTestContext(async () => {
-          await reddit.submitCustomPost({
-            title: mockedPost.title,
-            subredditName: mockedPost.subredditName,
-            loading,
-            splash: { appDisplayName: 'appDisplayName' },
-          });
-
-          expect(spyPlugin).toHaveBeenCalledWith(
-            {
-              kind: 'custom',
-              sr: 'askReddit',
               richtextJson: 'GgUKAxCABA==',
-              richtextFallback: '',
               runAs: RunAs.APP,
-              flairId: undefined,
-              flairText: undefined,
-              nsfw: undefined,
-              sendreplies: undefined,
-              spoiler: undefined,
-              title: 'My First Post',
               userGeneratedContent: undefined,
               postData: {
                 developerData: undefined,
-                splash: {
-                  appDisplayName: 'appDisplayName',
-                  appIconUri: undefined,
-                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
-                  buttonLabel: undefined,
-                  description: undefined,
-                  entry: 'default',
-                  title: 'My First Post',
-                },
+                splash: { entry: 'default' },
               },
             },
             context.metadata
@@ -605,14 +495,13 @@ describe('Post API', () => {
             reddit.submitCustomPost({
               title: 'Test Post',
               subredditName: 'askReddit',
-              splash: { appDisplayName: 'appDisplayName' },
             })
           ).rejects.toThrow(expectedErrMessage);
         });
       });
     });
 
-    test('submitCustomPost() prefers entry to splash.entry', async () => {
+    test('submitCustomPost() records entry in postData', async () => {
       const mockedPost = new Post({ ...defaultPostData });
 
       const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
@@ -627,16 +516,15 @@ describe('Post API', () => {
           title: mockedPost.title,
           subredditName: mockedPost.subredditName,
           entry: 'game',
-          splash: { appDisplayName: 'appDisplayName', entry: 'default' },
         });
 
         expect(spyPlugin).toHaveBeenCalledWith(
           {
+            customPostStyles: undefined,
             kind: 'custom',
             sr: 'askReddit',
-            richtextJson:
-              'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEMAC',
             richtextFallback: '',
+            richtextJson: 'GgUKAxCABA==',
             runAs: RunAs.APP,
             flairId: undefined,
             flairText: undefined,
@@ -647,15 +535,7 @@ describe('Post API', () => {
             userGeneratedContent: undefined,
             postData: {
               developerData: undefined,
-              splash: {
-                appDisplayName: 'appDisplayName',
-                appIconUri: undefined,
-                backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
-                buttonLabel: undefined,
-                description: undefined,
-                entry: 'game',
-                title: 'My First Post',
-              },
+              splash: { entry: 'game' },
             },
           },
           context.metadata
@@ -789,166 +669,6 @@ describe('Post API', () => {
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               thingId: 't3_qwerty',
               postData: { developerData: { riddle: 'hello' } },
-            },
-            context.metadata
-          );
-        });
-      });
-    });
-
-    describe('setSplash()', () => {
-      test('sets custom post splash', async () => {
-        const mockedPost = new Post({ ...defaultPostData, selftext });
-
-        const spyGql = vi.spyOn(GraphQL, 'query');
-        spyGql.mockImplementationOnce(
-          async () =>
-            ({
-              data: {
-                postInfoById: {
-                  devvit: {
-                    postData: '{"developerData":{"riddle":"hello"}}',
-                  },
-                },
-              },
-              errors: [],
-            }) satisfies QueryResponse
-        );
-
-        const spyPlugin = redditApiPlugins.LinksAndComments.EditCustomPost;
-        spyPlugin.mockImplementationOnce(async () => ({
-          json: { data: { things: [{ kind: 'post' }] }, errors: [] },
-        }));
-
-        const spyPreviewPlugin = redditApiPlugins.LinksAndComments.SetCustomPostPreview;
-        spyPreviewPlugin.mockImplementationOnce(async () => ({}));
-
-        await runWithTestContext(async () => {
-          await mockedPost.setSplash({ appDisplayName: 'appDisplayName' });
-
-          expect(spyPlugin).toHaveBeenCalledWith(
-            {
-              thingId: 't3_qwerty',
-              postData: {
-                developerData: { riddle: 'hello' },
-                splash: {
-                  appDisplayName: 'appDisplayName',
-                  appIconUri: undefined,
-                  backgroundUri: 'https://i.redd.it/cpsxzbp96pdf1.png',
-                  buttonLabel: undefined,
-                  description: undefined,
-                  entry: 'default',
-                  title: 'My First Post',
-                },
-              },
-            },
-            context.metadata
-          );
-
-          expect(spyPreviewPlugin).toHaveBeenCalledWith(
-            {
-              thingId: 't3_qwerty',
-              bodyType: 1,
-              blocksRenderContent:
-                'Gm0KawpmCAQqEhIHCgUNAADIQhoHCgUNAADIQhpOKkwKI2h0dHBzOi8vaS5yZWRkLml0L2Nwc3h6YnA5NnBkZjEucG5nEIAQGIAIIh1hcHBEaXNwbGF5TmFtZSBsb2FkaW5nIHNjcmVlbigCEIAE',
-            },
-            context.metadata
-          );
-        });
-      });
-
-      test('sets custom post splash with rendered preview', async () => {
-        const mockedPost = new Post({ ...defaultPostData, selftext });
-
-        const spyGql = vi.spyOn(GraphQL, 'query');
-        spyGql.mockImplementationOnce(
-          async () =>
-            ({
-              data: {
-                postInfoById: {
-                  devvit: {
-                    postData: '{"developerData":{"riddle":"hello"}}',
-                  },
-                },
-              },
-              errors: [],
-            }) satisfies QueryResponse
-        );
-
-        const spyPlugin = redditApiPlugins.LinksAndComments.EditCustomPost;
-        spyPlugin.mockImplementationOnce(async () => ({
-          json: { data: { things: [{ kind: 'post' }] }, errors: [] },
-        }));
-
-        const spyPreviewPlugin = redditApiPlugins.LinksAndComments.SetCustomPostPreview;
-        spyPreviewPlugin.mockImplementationOnce(async () => ({}));
-
-        await runWithTestContext(async () => {
-          await mockedPost.setSplash({
-            appDisplayName: 'Test App',
-            appIconUri: 'https://example.com/icon.png',
-            backgroundUri: 'https://example.com/bg.jpg',
-            buttonLabel: 'Click Me',
-            description: 'Test description',
-          });
-
-          expect(spyPlugin).toHaveBeenCalledWith(
-            {
-              thingId: 't3_qwerty',
-              postData: {
-                developerData: { riddle: 'hello' },
-                splash: {
-                  appDisplayName: 'Test App',
-                  appIconUri: 'https://example.com/icon.png',
-                  backgroundUri: 'https://example.com/bg.jpg',
-                  buttonLabel: 'Click Me',
-                  description: 'Test description',
-                  entry: 'default',
-                  title: 'My First Post',
-                },
-              },
-            },
-            context.metadata
-          );
-
-          expect(spyPreviewPlugin).toHaveBeenCalledWith(
-            {
-              thingId: 't3_qwerty',
-              bodyType: 1,
-              blocksRenderContent:
-                'Gl4KXApXCAQqEhIHCgUNAADIQhoHCgUNAADIQho/Kj0KGmh0dHBzOi8vZXhhbXBsZS5jb20vYmcuanBnEIAQGIAIIhdUZXN0IEFwcCBsb2FkaW5nIHNjcmVlbigCEIAE',
-            },
-            context.metadata
-          );
-        });
-      });
-    });
-
-    describe('setLoadingScreen()', () => {
-      test('sets custom post loading screen', async () => {
-        const mockedPost = new Post({ ...defaultPostData, selftext });
-
-        const spyPlugin = redditApiPlugins.LinksAndComments.SetCustomPostPreview;
-        spyPlugin.mockImplementationOnce(async () => ({}));
-
-        await runWithTestContext(async () => {
-          const loading = Devvit.createElement('blocks', {
-            height: 'tall',
-            children: [
-              Devvit.createElement('vstack', {
-                height: '100%',
-                width: '100%',
-                backgroundColor: '#abc123',
-              }),
-            ],
-          });
-          await mockedPost.setLoadingScreen(loading);
-
-          expect(spyPlugin).toHaveBeenCalledWith(
-            {
-              blocksRenderContent: 'GgUKAxCABA==',
-              bodyType: 1,
-              thingId: 't3_qwerty',
             },
             context.metadata
           );

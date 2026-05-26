@@ -34,19 +34,19 @@ test('loid is undefined when neither key is present', () => {
 test('one header', () => {
   const meta = { 'devvit-debug': { values: ['blocks'] } };
   const debug = parseDebug(meta);
-  expect(debug).toStrictEqual({ metadata: meta, blocks: 'true' });
+  expect(debug).toStrictEqual({ blocks: 'true' });
 });
 
 test('headers are case-insensitive', () => {
   const meta = { 'devvit-debug': { values: ['EmitSnapshots=foo'] } };
   const debug = parseDebug(meta);
-  expect(debug).toStrictEqual({ metadata: meta, emitSnapshots: 'foo' });
+  expect(debug).toStrictEqual({ emitSnapshots: 'foo' });
 });
 
 test('multiple headers', () => {
   const meta = { 'devvit-debug': { values: ['blocks=foo,runtime,surface=bar'] } };
   const debug = parseDebug(meta);
-  expect(debug).toStrictEqual({ metadata: meta, blocks: 'foo', runtime: 'true', surface: 'bar' });
+  expect(debug).toStrictEqual({ blocks: 'foo', runtime: 'true', surface: 'bar' });
 });
 
 test('multiple distinct headers', () => {
@@ -54,17 +54,17 @@ test('multiple distinct headers', () => {
     'devvit-debug': { values: ['blocks=foo', 'runtime', 'surface=bar'] },
   };
   const debug = parseDebug(meta);
-  expect(debug).toStrictEqual({ metadata: meta, blocks: 'foo', runtime: 'true', surface: 'bar' });
+  expect(debug).toStrictEqual({ blocks: 'foo', runtime: 'true', surface: 'bar' });
 });
 
 test('unknown header', () => {
   const meta = { 'devvit-debug': { values: ['foo=bar,baz,runtime'] } };
   const debug = parseDebug(meta);
-  expect(debug).toStrictEqual({ metadata: meta, foo: 'bar', baz: 'true', runtime: 'true' });
+  expect(debug).toStrictEqual({ foo: 'bar', baz: 'true', runtime: 'true' });
 });
 
 test('no header', () => {
   const meta = { 'devvit-debug': { values: [] } };
   const debug = parseDebug(meta);
-  expect(debug).toStrictEqual({ metadata: meta });
+  expect(debug).toStrictEqual({});
 });

@@ -1,5 +1,6 @@
-import type { DevvitPostData, Metadata } from '@devvit/protos';
 import type { RequestContext } from '@devvit/protos/json/devvit/platform/v1/request_context.js';
+import type { DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import type { AppDebug } from '@devvit/shared-types/Header.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
@@ -107,11 +108,10 @@ export function parseDebug(meta: Readonly<Metadata>): ContextDebugInfo {
     blocks: undefined,
     emitSnapshots: undefined,
     emitState: undefined,
-    realtime: undefined,
+    realtime: undefined, // Deprecated in public-api; use @devvit/web instead
     runtime: undefined,
     surface: undefined,
-    useAsync: undefined,
-    payments: undefined,
+    payments: undefined, // Deprecated in public-api; use @devvit/payments instead
     bootstrap: undefined,
     webView: undefined,
   };
@@ -142,7 +142,7 @@ export function parseDebug(meta: Readonly<Metadata>): ContextDebugInfo {
         .join(' ')}`
     );
 
-  return { ...debug, metadata: meta };
+  return { ...debug };
 }
 
 /**

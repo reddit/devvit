@@ -2,14 +2,18 @@ import type {
   BitfieldCommand as BitfieldCommandProto,
   HScanRequest,
   HScanResponse,
-  Metadata,
-  RedisAPI,
   TransactionId,
   ZMember,
   ZScanRequest,
   ZScanResponse,
-} from '@devvit/protos';
-import { BitfieldOverflowBehavior, RedisKeyScope } from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
+import {
+  BitfieldOverflowBehavior,
+  RedisKeyScope,
+} from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { RedisAPI } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
 import type {

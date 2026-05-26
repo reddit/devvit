@@ -1,14 +1,11 @@
 import { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
-import {
-  type CustomPostStylesInput,
-  SetCustomPostPreviewRequest_BodyType,
-} from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
-import {
-  type DevvitPostData,
-  type SplashPostData,
-} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import { type CustomPostStylesInput } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import { type DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import type { Metadata } from '@devvit/protos/lib/Types.js';
+import {
+  type CustomPostStyles,
+  EntrypointHeight,
+} from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
 // eslint-disable-next-line no-restricted-imports
 import type {
   Listing as ListingProto,
@@ -16,16 +13,6 @@ import type {
 } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 // eslint-disable-next-line no-restricted-imports
 import { type SubmitResponse } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
-// eslint-disable-next-line no-restricted-imports
-import { Block } from '@devvit/protos/types/devvit/ui/block_kit/v1beta/block.js';
-// eslint-disable-next-line no-restricted-imports
-import { UIResponse } from '@devvit/protos/types/devvit/ui/block_kit/v1beta/ui.js';
-// eslint-disable-next-line no-restricted-imports
-import {
-  type CustomPostStyles,
-  EntrypointHeight,
-} from '@devvit/protos/types/reddit/devvit/post/v1/post.js';
-import { BlocksHandler } from '@devvit/public-api/devvit/internals/blocks/handler/BlocksHandler.js';
 import { context } from '@devvit/server';
 import { decodeProtoErrors } from '@devvit/shared-types/helpers/protoErrorDecoder.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
@@ -38,8 +25,6 @@ import type {
 import { defaultPostEntry } from '@devvit/shared-types/schemas/constants.js';
 import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
 import { isT3, T2, T3, T5 } from '@devvit/shared-types/tid.js';
-import { Loading } from '@devvit/splash/loading.js';
-import { backgroundUrl } from '@devvit/splash/utils/assets.js';
 
 import { assertUserScope, RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
@@ -189,74 +174,6 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
 
 export type SubmitSelfPostOptions = CommonSubmitPostOptions & PostTextOptions;
 
-/**
- * @deprecated Splash and loading screens should be implemented in HTML as an
- *             inline entrypoint. Splash support will be removed soon.
- */
-export type SubmitCustomPostSplashOptions = {
-  /**
-   * Application name.
-   *
-   * @deprecated Splash and loading screens should be implemented in HTML as an
-   *             inline entrypoint. Splash support will be removed soon.
-   * @example `'Comment Mop'`.
-   */
-  appDisplayName?: string;
-  /**
-   * @deprecated Splash screens should be implemented in HTML as an inline
-   *             entrypoint. Splash support will be removed soon.
-   */
-  appIconUri?: string | undefined;
-  /**
-   * Media directory relative background image URL without a leading slash or
-   * data URI.
-   *
-   * @deprecated Splash and loading screens should be implemented in HTML as an
-   *             inline entrypoint. Splash support will be removed soon.
-   * @example `'background.png'`.
-   */
-  backgroundUri?: string;
-  /**
-   * @deprecated Splash screens should be implemented in HTML as an inline
-   *             entrypoint. Splash support will be removed soon.
-   */
-  buttonLabel?: string | undefined;
-  /**
-   * @deprecated Splash screens should be implemented in HTML as an inline
-   *             entrypoint. Splash support will be removed soon.
-   */
-  description?: string | undefined;
-  /**
-   * The inline screen entrypoint name. Must correspond to a `post.entrypoints`
-   * key in the app's `devvit.json`.
-   *
-   * @default The default `devvit.json` entrypoint (`'default'`).
-   *
-   * @example Only `'default'` and `'game'` are valid entries given the
-   * following `devvit.json` configuration:
-   * ```json
-   * {
-   *   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-   *   "name": "example",
-   *   "post": {
-   *     "entrypoints": {
-   *       "default": {"entry": "splash.html"},
-   *       "game": {"entry": "game.html"}
-   *     }
-   *   }
-   * }
-   * ```
-   *
-   * @deprecated Use `SubmitCustomPostOptions.entry`.
-   */
-  entry?: string;
-  /**
-   * @deprecated Splash screens should be implemented in HTML as an inline
-   *             entrypoint. Splash support will be removed soon.
-   */
-  heading?: string | undefined;
-};
-
 export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
   /**
    * The entrypoint name. Must correspond to a `post.entrypoints` key in the
@@ -289,29 +206,6 @@ export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
   /** Content to show when rendered on `https://old.reddit.com`. */
   textFallback?: CustomPostTextFallbackOptions;
   userGeneratedContent?: UserGeneratedContent;
-  /**
-   * Override the splash loading screen with the provided Blocks component.
-   * @example
-   * ```ts
-   * Devvit.createElement(
-   *   'blocks',
-   *   {height: 'tall'},
-   *   Devvit.createElement(
-   *     'vstack',
-   *     {backgroundColor: '#abc123', height: '100%'},
-   *     Devvit.createElement('text', {}, 'hello'),
-   *   ),
-   * )
-   * ```
-   * @deprecated Loading screens should be implemented in HTML as an inline
-   *             entrypoint.
-   */
-  loading?: JSX.Element;
-  /**
-   * @deprecated Splash and loading screens should be implemented in HTML as an
-   *             inline entrypoint. Splash support will be removed soon.
-   */
-  splash?: SubmitCustomPostSplashOptions;
   /**
    * Styles associated with the custom post, such as height or background color.
    */
@@ -1062,59 +956,6 @@ export class Post {
   }
 
   /**
-   * Set the launch and loading screens for the custom post.
-   *
-   * @deprecated Splash screens should be implemented in HTML as an inline
-   *             entrypoint. Splash support will be removed soon.
-   * @example
-   * ```ts
-   * const post = await reddit.getPostById(context.postId);
-   * await post.setSplash({ appDisplayName: "Pixelary" });
-   * ```
-   */
-  async setSplash(opts: Readonly<SubmitCustomPostSplashOptions> | undefined): Promise<void> {
-    const prev = await Post.getDevvitPostData(this.id);
-    const config = getConfig();
-    const entry = getEntry(config, opts?.entry);
-    const splash = SplashPostData(config, entry, opts, this.title);
-    await Promise.all([
-      Post.setPostData({ postId: this.id, postData: { ...prev, splash } }),
-      this.#setCustomPostPreview(
-        Loading({
-          appDisplayName: splash.appDisplayName,
-          backgroundUri: splash.backgroundUri,
-          height: entry.height,
-        })
-      ),
-    ]);
-  }
-
-  /**
-   * Override the splash loading screen with the provided Blocks component for
-   * the custom post.
-   *
-   * @example
-   * ```ts
-   * const loading = Devvit.createElement(
-   *   'blocks',
-   *   {height: 'tall'},
-   *   Devvit.createElement(
-   *     'vstack',
-   *     {backgroundColor: '#abc123', height: '100%'},
-   *     Devvit.createElement('text', {}, 'hello'),
-   *   ),
-   * )
-   * const post = await reddit.getPostById(context.postId);
-   * await post.setLoadingScreen(loading);
-   * ```
-   * @deprecated Loading screens should be implemented in HTML as an inline
-   *             entrypoint.
-   */
-  async setLoadingScreen(loading: JSX.Element): Promise<void> {
-    await this.#setCustomPostPreview(loading);
-  }
-
-  /**
    * Set a text fallback for the custom post.
    *
    * @param opts - A text or a richtext to render in a fallback
@@ -1424,18 +1265,7 @@ export class Post {
     }
 
     const config = getConfig();
-    const entry = getEntry(config, opts.entry ?? opts.splash?.entry);
-    const splash = SplashPostData(config, entry, opts.splash, opts.title);
-    const richtextJson = await renderLoadingAsRichTextJson(
-      'loading' in opts
-        ? opts.loading
-        : Loading({
-            appDisplayName: splash.appDisplayName,
-            backgroundUri: splash.backgroundUri,
-            height: entry.height,
-          }),
-      context.metadata
-    );
+    const entry = getEntry(config, opts.entry);
 
     const richtextFallback = opts.textFallback
       ? getCustomPostRichTextFallback(opts.textFallback)
@@ -1453,8 +1283,11 @@ export class Post {
     const rsp = await client.SubmitCustomPost(
       {
         kind: 'custom',
+        // Minimal non-empty Block proto (height=tall, no children),
+        // base64-encoded. devvit-plugins requires RichTextJSON and gateway
+        // requires initialRender to be set to nonempty. DX-10914 DX-10915.
+        richtextJson: 'GgUKAxCABA==',
         sr: opts.subredditName ?? context.subredditName,
-        richtextJson,
         richtextFallback,
         flairId: opts.flairId,
         flairText: opts.flairText,
@@ -1464,7 +1297,7 @@ export class Post {
         title: opts.title,
         userGeneratedContent,
         runAs: runAsType,
-        postData: { developerData: opts.postData, splash },
+        postData: { developerData: opts.postData, splash: { entry: entry.name } },
         customPostStyles: opts.styles
           ? {
               backgroundColor: opts.styles.backgroundColor ?? '',
@@ -1765,19 +1598,6 @@ export class Post {
     await client.Unspoiler(
       {
         id,
-      },
-      context.metadata
-    );
-  }
-
-  async #setCustomPostPreview(loading: JSX.Element): Promise<void> {
-    const richtextJson = await renderLoadingAsRichTextJson(loading, context.metadata);
-    const client = getRedditApiPlugins().LinksAndComments;
-    await client.SetCustomPostPreview(
-      {
-        thingId: this.id,
-        bodyType: SetCustomPostPreviewRequest_BodyType.BLOCKS,
-        blocksRenderContent: richtextJson,
       },
       context.metadata
     );
@@ -2214,31 +2034,6 @@ function getEntry(
   return entrypoint;
 }
 
-function SplashPostData(
-  config: Readonly<AppConfig>,
-  entry: Readonly<AppPostEntrypointConfig>,
-  opts: Readonly<SubmitCustomPostSplashOptions> | undefined,
-  title: string
-): SplashPostData & { appDisplayName: string; backgroundUri: string } {
-  // Align to `blocks.template.tsx`. The "preview" or loading screen is rendered
-  // at post time so it can't float to whatever the current code default is. The
-  // recorded post data must record the current state for `LoadingProps` and no
-  // defaults for anything else.
-  return {
-    // Loading. In the case that `loading` is provided, a `Loading` component is
-    // never used. If the user wants to change these props, they have to also
-    // provide a `splash` prop.
-    appDisplayName: opts?.appDisplayName ?? config.name,
-    backgroundUri: opts?.backgroundUri ?? backgroundUrl,
-
-    appIconUri: opts?.appIconUri,
-    buttonLabel: opts?.buttonLabel,
-    description: opts?.description,
-    entry: entry.name,
-    title: opts?.heading ?? title,
-  };
-}
-
 function postFromSubmitResponse(rsp: Readonly<SubmitResponse>): Promise<Post> {
   if (!rsp.json?.data?.id || rsp.json.errors?.length) {
     const errorMessages = rsp.json?.errors ? decodeProtoErrors(rsp.json.errors) : [];
@@ -2247,14 +2042,4 @@ function postFromSubmitResponse(rsp: Readonly<SubmitResponse>): Promise<Post> {
   }
 
   return Post.getById(`t3_${rsp.json.data.id}`);
-}
-
-async function renderLoadingAsRichTextJson(
-  loading: JSX.Element,
-  meta: Readonly<Metadata>
-): Promise<string> {
-  const handler = new BlocksHandler(() => loading);
-  const { blocks } = UIResponse.fromJSON(await handler.handle({ events: [] }, meta));
-  const encodedCached = Block.encode(blocks!).finish();
-  return Buffer.from(encodedCached).toString('base64');
 }

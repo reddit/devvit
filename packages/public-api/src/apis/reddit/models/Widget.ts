@@ -1,3 +1,4 @@
+import type { SubredditAboutRulesResponse } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
 import type {
   AddButtonWidgetRequest,
   AddCalendarWidgetRequest,
@@ -8,8 +9,6 @@ import type {
   AddTextAreaWidgetRequest,
   CalendarWidgetConfiguration,
   GetWidgetsResponse_WidgetItem_PostFlairTemplate as PostFlairTemplateData,
-  Metadata,
-  SubredditAboutRulesResponse,
   UpdateButtonWidgetRequest,
   UpdateCalendarWidgetRequest,
   UpdateCommunityListWidgetRequest,
@@ -20,11 +19,13 @@ import type {
   WidgetButton,
   WidgetImage,
   WidgetStyles,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redditapi/widgets/widgets_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import {
   CommunityListWidget_CommunityData as CommunityData,
   GetWidgetsResponse_WidgetItem as WidgetItem,
-} from '@devvit/protos';
+} from '@devvit/protos/types/devvit/plugin/redditapi/widgets/widgets_msg.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';

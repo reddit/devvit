@@ -1,4 +1,7 @@
-import { FormFieldType, type FormFieldValue, type Metadata } from '@devvit/protos';
+import { FormFieldType } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/type.js';
+import type { FormFieldValue } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/value.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import type { SettingsResponse } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 
 import { Devvit } from '../../devvit/Devvit.js';

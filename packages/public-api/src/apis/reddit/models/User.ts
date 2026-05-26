@@ -1,14 +1,15 @@
 import type {
-  Listing as ListingProto,
-  Metadata,
-  User as UserProto,
   UserDataByAccountIdsResponse,
   UserDataByAccountIdsResponse_UserAccountData,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import type {
   GetUserKarmaForSubredditResponse,
   UserTrophiesResponse,
 } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
+import type { User as UserProto } from '@devvit/protos/json/devvit/reddit/user.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Listing as ListingProto } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 

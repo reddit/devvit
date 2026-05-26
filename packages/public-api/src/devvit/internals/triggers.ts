@@ -1,26 +1,6 @@
-import type { Metadata } from '@devvit/protos';
-import {
-  HandlerResult,
-  OnAppInstallDefinition,
-  OnAppUpgradeDefinition,
-  OnAutomoderatorFilterCommentDefinition,
-  OnAutomoderatorFilterPostDefinition,
-  OnCommentCreateDefinition,
-  OnCommentDeleteDefinition,
-  OnCommentReportDefinition,
-  OnCommentSubmitDefinition,
-  OnCommentUpdateDefinition,
-  OnModActionDefinition,
-  OnModMailDefinition,
-  OnPostCreateDefinition,
-  OnPostDeleteDefinition,
-  OnPostFlairUpdateDefinition,
-  OnPostNsfwUpdateDefinition,
-  OnPostReportDefinition,
-  OnPostSpoilerUpdateDefinition,
-  OnPostSubmitDefinition,
-  OnPostUpdateDefinition,
-} from '@devvit/protos';
+import type { HandlerResult } from '@devvit/protos/json/devvit/actor/automation/v1alpha/event_handlers.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import type {
   OnAppInstall,
   OnAppUpgrade,
@@ -41,6 +21,28 @@ import type {
   OnPostSpoilerUpdate,
   OnPostSubmit,
   OnPostUpdate,
+} from '@devvit/protos/types/devvit/actor/automation/v1alpha/event_handlers.js';
+// eslint-disable-next-line no-restricted-imports
+import {
+  OnAppInstallDefinition,
+  OnAppUpgradeDefinition,
+  OnAutomoderatorFilterCommentDefinition,
+  OnAutomoderatorFilterPostDefinition,
+  OnCommentCreateDefinition,
+  OnCommentDeleteDefinition,
+  OnCommentReportDefinition,
+  OnCommentSubmitDefinition,
+  OnCommentUpdateDefinition,
+  OnModActionDefinition,
+  OnModMailDefinition,
+  OnPostCreateDefinition,
+  OnPostDeleteDefinition,
+  OnPostFlairUpdateDefinition,
+  OnPostNsfwUpdateDefinition,
+  OnPostReportDefinition,
+  OnPostSpoilerUpdateDefinition,
+  OnPostSubmitDefinition,
+  OnPostUpdateDefinition,
 } from '@devvit/protos/types/devvit/actor/automation/v1alpha/event_handlers.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';

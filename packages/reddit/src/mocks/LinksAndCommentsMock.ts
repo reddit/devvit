@@ -24,6 +24,12 @@ import type {
   SubmitRequest,
   VoteRequest,
 } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import type {
+  GetCustomPostStylesRequest,
+  GetUserPollOptionRequest,
+  GetUserPollOptionResponse,
+  SetCustomPostStylesRequest,
+} from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import type { Comment } from '@devvit/protos/json/devvit/reddit/comment.js';
 import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
 import type { CustomPostStyles } from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
@@ -36,13 +42,7 @@ import type {
 // eslint-disable-next-line no-restricted-imports
 import { type RedditObject } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 // eslint-disable-next-line no-restricted-imports
-import type {
-  GetCustomPostStylesRequest,
-  GetUserPollOptionRequest,
-  GetUserPollOptionResponse,
-  SetCustomPostStylesRequest,
-  SubmitResponse,
-} from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import type { SubmitResponse } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 // eslint-disable-next-line no-restricted-imports
 import { type LinksAndComments } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
 import { type JsonObject, T3 } from '@devvit/shared';

@@ -1,9 +1,15 @@
-import type * as protos from '@devvit/protos';
+// eslint-disable-next-line no-restricted-imports
 import type * as EventTypes from '@devvit/protos/types/devvit/events/v1alpha/events.d.ts';
+// eslint-disable-next-line no-restricted-imports
+import type * as Events from '@devvit/protos/types/devvit/events/v1alpha/events.js';
+// eslint-disable-next-line no-restricted-imports
+import type { ModAction } from '@devvit/protos/types/devvit/reddit/v2alpha/modaction.js';
+// eslint-disable-next-line no-restricted-imports
+import type { ModMail } from '@devvit/protos/types/devvit/reddit/v2alpha/modmail.js';
 
 import type { Devvit } from '../devvit/Devvit.js';
 
-export { DeletionReason, EventSource } from '@devvit/protos';
+export { DeletionReason, EventSource } from '@devvit/protos/json/devvit/events/v1alpha/events.js';
 export type { EventTypes };
 
 /** The event name for when a post is submitted */
@@ -47,27 +53,27 @@ export type AutomoderatorFilterComment = 'AutomoderatorFilterComment';
 
 /** Maps a TriggerEvent to a Protobuf message and type. */
 export type TriggerEventType = {
-  PostSubmit: { type: 'PostSubmit' } & protos.PostSubmit;
-  PostCreate: { type: 'PostCreate' } & protos.PostCreate;
-  PostUpdate: { type: 'PostUpdate' } & protos.PostUpdate;
-  PostReport: { type: 'PostReport' } & protos.PostReport;
-  PostDelete: { type: 'PostDelete' } & protos.PostDelete;
-  PostFlairUpdate: { type: 'PostFlairUpdate' } & protos.PostFlairUpdate;
-  CommentSubmit: { type: 'CommentSubmit' } & protos.CommentSubmit;
-  CommentCreate: { type: 'CommentCreate' } & protos.CommentCreate;
-  CommentUpdate: { type: 'CommentUpdate' } & protos.CommentUpdate;
-  CommentReport: { type: 'CommentReport' } & protos.CommentReport;
-  CommentDelete: { type: 'CommentDelete' } & protos.CommentDelete;
-  AppInstall: { type: 'AppInstall' } & protos.AppInstall;
-  AppUpgrade: { type: 'AppUpgrade' } & protos.AppUpgrade;
-  ModAction: { type: 'ModAction' } & protos.ModAction;
-  ModMail: { type: 'ModMail' } & protos.ModMail;
-  PostNsfwUpdate: { type: 'PostNsfwUpdate' } & protos.PostNsfwUpdate;
-  PostSpoilerUpdate: { type: 'PostSpoilerUpdate' } & protos.PostSpoilerUpdate;
-  AutomoderatorFilterPost: { type: 'AutomoderatorFilterPost' } & protos.AutomoderatorFilterPost;
+  PostSubmit: { type: 'PostSubmit' } & Events.PostSubmit;
+  PostCreate: { type: 'PostCreate' } & Events.PostCreate;
+  PostUpdate: { type: 'PostUpdate' } & Events.PostUpdate;
+  PostReport: { type: 'PostReport' } & Events.PostReport;
+  PostDelete: { type: 'PostDelete' } & Events.PostDelete;
+  PostFlairUpdate: { type: 'PostFlairUpdate' } & Events.PostFlairUpdate;
+  CommentSubmit: { type: 'CommentSubmit' } & Events.CommentSubmit;
+  CommentCreate: { type: 'CommentCreate' } & Events.CommentCreate;
+  CommentUpdate: { type: 'CommentUpdate' } & Events.CommentUpdate;
+  CommentReport: { type: 'CommentReport' } & Events.CommentReport;
+  CommentDelete: { type: 'CommentDelete' } & Events.CommentDelete;
+  AppInstall: { type: 'AppInstall' } & Events.AppInstall;
+  AppUpgrade: { type: 'AppUpgrade' } & Events.AppUpgrade;
+  ModAction: { type: 'ModAction' } & ModAction;
+  ModMail: { type: 'ModMail' } & ModMail;
+  PostNsfwUpdate: { type: 'PostNsfwUpdate' } & Events.PostNsfwUpdate;
+  PostSpoilerUpdate: { type: 'PostSpoilerUpdate' } & Events.PostSpoilerUpdate;
+  AutomoderatorFilterPost: { type: 'AutomoderatorFilterPost' } & Events.AutomoderatorFilterPost;
   AutomoderatorFilterComment: {
     type: 'AutomoderatorFilterComment';
-  } & protos.AutomoderatorFilterComment;
+  } & Events.AutomoderatorFilterComment;
 };
 
 export type TriggerEvent =
@@ -102,97 +108,97 @@ export type TriggerOnEventHandler<RequestType> = (
 
 export type PostSubmitDefinition = {
   event: PostSubmit;
-  onEvent: TriggerOnEventHandler<protos.PostSubmit>;
+  onEvent: TriggerOnEventHandler<Events.PostSubmit>;
 };
 
 export type PostCreateDefinition = {
   event: PostCreate;
-  onEvent: TriggerOnEventHandler<protos.PostCreate>;
+  onEvent: TriggerOnEventHandler<Events.PostCreate>;
 };
 
 export type PostUpdateDefinition = {
   event: PostUpdate;
-  onEvent: TriggerOnEventHandler<protos.PostUpdate>;
+  onEvent: TriggerOnEventHandler<Events.PostUpdate>;
 };
 
 export type PostReportDefinition = {
   event: PostReport;
-  onEvent: TriggerOnEventHandler<protos.PostReport>;
+  onEvent: TriggerOnEventHandler<Events.PostReport>;
 };
 
 export type PostDeleteDefinition = {
   event: PostDelete;
-  onEvent: TriggerOnEventHandler<protos.PostDelete>;
+  onEvent: TriggerOnEventHandler<Events.PostDelete>;
 };
 
 export type PostFlairUpdateDefinition = {
   event: PostFlairUpdate;
-  onEvent: TriggerOnEventHandler<protos.PostFlairUpdate>;
+  onEvent: TriggerOnEventHandler<Events.PostFlairUpdate>;
 };
 
 export type CommentSubmitDefinition = {
   event: CommentSubmit;
-  onEvent: TriggerOnEventHandler<protos.CommentSubmit>;
+  onEvent: TriggerOnEventHandler<Events.CommentSubmit>;
 };
 
 export type CommentCreateDefinition = {
   event: CommentCreate;
-  onEvent: TriggerOnEventHandler<protos.CommentCreate>;
+  onEvent: TriggerOnEventHandler<Events.CommentCreate>;
 };
 
 export type CommentUpdateDefinition = {
   event: CommentUpdate;
-  onEvent: TriggerOnEventHandler<protos.CommentUpdate>;
+  onEvent: TriggerOnEventHandler<Events.CommentUpdate>;
 };
 
 export type CommentReportDefinition = {
   event: CommentReport;
-  onEvent: TriggerOnEventHandler<protos.CommentReport>;
+  onEvent: TriggerOnEventHandler<Events.CommentReport>;
 };
 
 export type CommentDeleteDefinition = {
   event: CommentDelete;
-  onEvent: TriggerOnEventHandler<protos.CommentDelete>;
+  onEvent: TriggerOnEventHandler<Events.CommentDelete>;
 };
 
 export type AppInstallDefinition = {
   event: AppInstall;
-  onEvent: TriggerOnEventHandler<protos.AppInstall>;
+  onEvent: TriggerOnEventHandler<Events.AppInstall>;
 };
 
 export type AppUpgradeDefinition = {
   event: AppUpgrade;
-  onEvent: TriggerOnEventHandler<protos.AppUpgrade>;
+  onEvent: TriggerOnEventHandler<Events.AppUpgrade>;
 };
 
 export type ModActionDefinition = {
   event: ModActionTrigger;
-  onEvent: TriggerOnEventHandler<protos.ModAction>;
+  onEvent: TriggerOnEventHandler<ModAction>;
 };
 
 export type ModMailDefinition = {
   event: ModMailTrigger;
-  onEvent: TriggerOnEventHandler<protos.ModMail>;
+  onEvent: TriggerOnEventHandler<ModMail>;
 };
 
 export type PostNsfwUpdateDefinition = {
   event: PostNsfwUpdate;
-  onEvent: TriggerOnEventHandler<protos.PostNsfwUpdate>;
+  onEvent: TriggerOnEventHandler<Events.PostNsfwUpdate>;
 };
 
 export type PostSpoilerUpdateDefinition = {
   event: PostSpoilerUpdate;
-  onEvent: TriggerOnEventHandler<protos.PostSpoilerUpdate>;
+  onEvent: TriggerOnEventHandler<Events.PostSpoilerUpdate>;
 };
 
 export type OnAutomoderatorFilterPostDefinition = {
   event: AutomoderatorFilterPost;
-  onEvent: TriggerOnEventHandler<protos.AutomoderatorFilterPost>;
+  onEvent: TriggerOnEventHandler<Events.AutomoderatorFilterPost>;
 };
 
 export type OnAutomoderatorFilterCommentDefinition = {
   event: AutomoderatorFilterComment;
-  onEvent: TriggerOnEventHandler<protos.AutomoderatorFilterComment>;
+  onEvent: TriggerOnEventHandler<Events.AutomoderatorFilterComment>;
 };
 
 export type MultiTriggerDefinition<Event extends TriggerEvent> = {
@@ -222,22 +228,22 @@ export type TriggerDefinition =
   | OnAutomoderatorFilterCommentDefinition;
 
 export type OnTriggerRequest =
-  | protos.PostFlairUpdate
-  | protos.PostSubmit
-  | protos.PostCreate
-  | protos.PostUpdate
-  | protos.PostReport
-  | protos.PostDelete
-  | protos.CommentSubmit
-  | protos.CommentCreate
-  | protos.CommentUpdate
-  | protos.CommentReport
-  | protos.CommentDelete
-  | protos.AppInstall
-  | protos.AppUpgrade
-  | protos.ModAction
-  | protos.ModMail
-  | protos.PostNsfwUpdate
-  | protos.PostSpoilerUpdate
-  | protos.AutomoderatorFilterPost
-  | protos.AutomoderatorFilterComment;
+  | Events.PostFlairUpdate
+  | Events.PostSubmit
+  | Events.PostCreate
+  | Events.PostUpdate
+  | Events.PostReport
+  | Events.PostDelete
+  | Events.CommentSubmit
+  | Events.CommentCreate
+  | Events.CommentUpdate
+  | Events.CommentReport
+  | Events.CommentDelete
+  | Events.AppInstall
+  | Events.AppUpgrade
+  | ModAction
+  | ModMail
+  | Events.PostNsfwUpdate
+  | Events.PostSpoilerUpdate
+  | Events.AutomoderatorFilterPost
+  | Events.AutomoderatorFilterComment;

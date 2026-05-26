@@ -17,12 +17,11 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "yarn && yarn build:semantic-colors && tsc && cp -af devvit.tsconfig.json dist/ && yarn build:min",
+    "build": "tsc && cp -af devvit.tsconfig.json dist/ && yarn build:min",
     "build:min": "esbuild --bundle --sourcemap=linked --target=es2020 --format=esm  --metafile=dist/meta.min.json --outfile=dist/public-api.min.js --external:@devvit/protos --minify src/index.ts",
-    "build:semantic-colors": "node scripts/make-semantic-colors.js",
-    "clean": "rm -rf .turbo coverage dist src/devvit/internals/semanticColors.ts src/types/icons.ts || :",
+    "clean": "rm -rf .turbo coverage dist src/devvit/internals/semanticColors.ts || :",
     "clobber": "yarn clean && rm -rf node_modules",
-    "dev:build": "chokidar ./src ../shared-types/dist --command 'yarn build' --ignore './src/types/icons.ts' --ignore './src/devvit/internals/semanticColors.ts'",
+    "dev:build": "chokidar ./src ../shared-types/dist --command 'yarn build' --ignore './src/devvit/internals/semanticColors.ts'",
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",
     "prepublishOnly": "publish-package-json",

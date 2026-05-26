@@ -1,7 +1,7 @@
 import type {
   WebViewInternalMessage,
   WebViewInternalMessageScope,
-} from '@devvit/protos/types/devvit/ui/effects/web_view/v1alpha/post_message.js';
+} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
 
 /**
  * Messages which are scoped to "client" and are of type "devvit-internal" should not be sent to the app.

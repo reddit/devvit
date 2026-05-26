@@ -33,7 +33,6 @@
     "@devvit/payments": "0.12.24",
     "@devvit/protos": "0.12.24",
     "@devvit/shared-types": "0.12.24",
-    "@devvit/splash": "0.12.24",
     "@types/node": "20.14.12",
     "esbuild": "0.25.9",
     "rxjs": "7.8.1",

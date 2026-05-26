@@ -1,7 +1,85 @@
-import type { UnknownMessage } from '@devvit/protos';
-import * as protos from '@devvit/protos';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import type { PaymentsService } from '@devvit/protos/types/devvit/plugin/payments/v1alpha/payments.js';
+import type { Definition, Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { ContextAction } from '@devvit/protos/types/devvit/actor/reddit/context_action.js';
+// eslint-disable-next-line no-restricted-imports
+import type { SchedulerHandler } from '@devvit/protos/types/devvit/actor/scheduler/handler.js';
+// eslint-disable-next-line no-restricted-imports
+import type { HTTP } from '@devvit/protos/types/devvit/plugin/http/http.js';
+// eslint-disable-next-line no-restricted-imports
+import { HTTPDefinition } from '@devvit/protos/types/devvit/plugin/http/http.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Logger } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
+// eslint-disable-next-line no-restricted-imports
+import type { MediaService } from '@devvit/protos/types/devvit/plugin/media/media.js';
+// eslint-disable-next-line no-restricted-imports
+import { MediaServiceDefinition } from '@devvit/protos/types/devvit/plugin/media/media.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Flair } from '@devvit/protos/types/devvit/plugin/redditapi/flair/flair_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { FlairDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/flair/flair_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { GraphQL } from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { GraphQLDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/graphql/graphql_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { LinksAndComments } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { LinksAndCommentsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/linksandcomments/linksandcomments_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Listings } from '@devvit/protos/types/devvit/plugin/redditapi/listings/listings_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { ListingsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/listings/listings_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Moderation } from '@devvit/protos/types/devvit/plugin/redditapi/moderation/moderation_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { ModerationDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/moderation/moderation_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { ModNote } from '@devvit/protos/types/devvit/plugin/redditapi/modnote/modnote_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { ModNoteDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/modnote/modnote_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { NewModmail } from '@devvit/protos/types/devvit/plugin/redditapi/newmodmail/newmodmail_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { NewModmailDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/newmodmail/newmodmail_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { PrivateMessages } from '@devvit/protos/types/devvit/plugin/redditapi/privatemessages/privatemessages_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { PrivateMessagesDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/privatemessages/privatemessages_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Subreddits } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { SubredditsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Users } from '@devvit/protos/types/devvit/plugin/redditapi/users/users_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { UsersDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/users/users_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Widgets } from '@devvit/protos/types/devvit/plugin/redditapi/widgets/widgets_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { WidgetsDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/widgets/widgets_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Wiki } from '@devvit/protos/types/devvit/plugin/redditapi/wiki/wiki_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import { WikiDefinition } from '@devvit/protos/types/devvit/plugin/redditapi/wiki/wiki_svc.js';
+// eslint-disable-next-line no-restricted-imports
+import type { RedisAPI } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+// eslint-disable-next-line no-restricted-imports
+import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Scheduler } from '@devvit/protos/types/devvit/plugin/scheduler/scheduler.js';
+// eslint-disable-next-line no-restricted-imports
+import { SchedulerDefinition } from '@devvit/protos/types/devvit/plugin/scheduler/scheduler.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Settings } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
+// eslint-disable-next-line no-restricted-imports
+import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
+// eslint-disable-next-line no-restricted-imports
+import type { UserActions } from '@devvit/protos/types/devvit/plugin/useractions/useractions.js';
+// eslint-disable-next-line no-restricted-imports
+import { UserActionsDefinition } from '@devvit/protos/types/devvit/plugin/useractions/useractions.js';
+// eslint-disable-next-line no-restricted-imports
+import type { UnknownMessage } from '@devvit/protos/types/typeRegistry.js';
 import { Actor } from '@devvit/shared-types/Actor.js';
 import type { AssetMap } from '@devvit/shared-types/Assets.js';
 import type { Config } from '@devvit/shared-types/Config.js';
@@ -17,13 +95,11 @@ import type {
   BaseContext,
   Configuration,
   ContextAPIClients,
-  CustomPostType,
   Form,
   FormDefinition,
   FormFunction,
   FormOnSubmitEventHandler,
   FormToFormValues,
-  IconName,
   MenuItem,
   MultiTriggerDefinition,
   OnTriggerRequest,
@@ -38,46 +114,41 @@ import type {
   TriggerOnEventHandler,
 } from '../types/index.js';
 import { SettingScope } from '../types/index.js';
-import type { JSONObject, JSONValue } from '../types/json.js';
+import type { JSONObject } from '../types/json.js';
 import { registerAppSettings } from './internals/app-settings.js';
-import { registerCustomPost } from './internals/custom-post.js';
 import { registerInstallationSettings } from './internals/installation-settings.js';
 import { registerMenuItems } from './internals/menu-items.js';
 import { pluginIsEnabled } from './internals/plugins.js';
 import { registerScheduler } from './internals/scheduler.js';
 import { registerTriggers } from './internals/triggers.js';
 import { registerUIEventHandler } from './internals/ui-event-handler.js';
-import { registerUIRequestHandlers } from './internals/ui-request-handler.js';
 
 type UseHandler = {
-  [name: string]: (args: UnknownMessage | undefined, metadata?: protos.Metadata) => void;
+  [name: string]: (args: UnknownMessage | undefined, metadata?: Metadata) => void;
 };
 
 type PluginType =
-  | protos.HTTP
-  | protos.Logger
-  | protos.Scheduler
-  | protos.ContextAction
-  | protos.KVStore
-  | protos.SchedulerHandler
-  | protos.Flair
-  | protos.GraphQL
-  | protos.LinksAndComments
-  | protos.Listings
-  | protos.Moderation
-  | protos.ModNote
-  | protos.NewModmail
-  | protos.PrivateMessages
-  | protos.RedisAPI
-  | protos.Settings
-  | protos.Subreddits
-  | protos.Users
-  | protos.Widgets
-  | protos.Wiki
-  | protos.MediaService
-  | protos.Realtime
-  | protos.UserActions
-  | PaymentsService;
+  | HTTP
+  | Logger
+  | Scheduler
+  | ContextAction
+  | SchedulerHandler
+  | Flair
+  | GraphQL
+  | LinksAndComments
+  | Listings
+  | Moderation
+  | ModNote
+  | NewModmail
+  | PrivateMessages
+  | RedisAPI
+  | Settings
+  | Subreddits
+  | Users
+  | Widgets
+  | Wiki
+  | MediaService
+  | UserActions;
 
 /**
  * Home for debug flags, settings, and other information. Any type removals
@@ -105,7 +176,6 @@ export class Devvit extends Actor {
   static debug: DevvitDebug = {};
   static #appSettings: SettingsFormField[] | undefined;
   static #config: Configuration = {};
-  static #customPostType: CustomPostType | undefined;
   static #formDefinitions: Map<FormKey, FormDefinition> | undefined;
   static #installationSettings: SettingsFormField[] | undefined;
   static #menuItems: MenuItem[] | undefined;
@@ -114,11 +184,10 @@ export class Devvit extends Actor {
     TriggerEvent,
     TriggerOnEventHandler<OnTriggerRequest>[]
   > = new Map();
-  static #webViewAssets: Readonly<AssetMap> = {};
   static #domains: string[] = [];
-  static #scopes: protos.Scope[] = [];
+  static #scopes: Scope[] = [];
 
-  static #additionallyProvides: protos.Definition[] = [];
+  static #additionallyProvides: Definition[] = [];
 
   /**
    * To use certain APIs and features of Devvit, you must enable them using this function.
@@ -126,7 +195,6 @@ export class Devvit extends Actor {
    * @param config - The configuration object.
    * @param config.http - Enables the HTTP API.
    * @param config.redditAPI - Enables the Reddit API.
-   * @param config.kvStore - Enables the Key Value Storage API.
    * @example
    * ```ts
    * Devvit.configure({
@@ -150,39 +218,34 @@ export class Devvit extends Actor {
         assertRequestedFetchDomainsLimit(httpConfig.domains);
         this.#domains = normalizeDomains(httpConfig.domains);
       }
-      this.use(protos.HTTPDefinition);
+      this.use(HTTPDefinition);
     }
 
     // We're now defaulting this to on.
     const redisNotSpecified = config.redis === undefined;
-    if (redisNotSpecified || pluginIsEnabled(config.kvStore) || pluginIsEnabled(config.redis)) {
-      this.use(protos.KVStoreDefinition);
-      this.use(protos.RedisAPIDefinition);
+    if (redisNotSpecified || pluginIsEnabled(config.redis)) {
+      this.use(RedisAPIDefinition);
     }
 
     if (pluginIsEnabled(config.media)) {
-      this.use(protos.MediaServiceDefinition);
+      this.use(MediaServiceDefinition);
     }
 
     if (pluginIsEnabled(config.redditAPI)) {
       // Loading all Reddit API plugins for now.
       // In the future we can split this by oauth scope or section.
-      this.use(protos.FlairDefinition);
-      this.use(protos.GraphQLDefinition);
-      this.use(protos.LinksAndCommentsDefinition);
-      this.use(protos.ListingsDefinition);
-      this.use(protos.ModerationDefinition);
-      this.use(protos.ModNoteDefinition);
-      this.use(protos.NewModmailDefinition);
-      this.use(protos.PrivateMessagesDefinition);
-      this.use(protos.SubredditsDefinition);
-      this.use(protos.UsersDefinition);
-      this.use(protos.WidgetsDefinition);
-      this.use(protos.WikiDefinition);
-    }
-
-    if (pluginIsEnabled(config.realtime)) {
-      this.use(protos.RealtimeDefinition);
+      this.use(FlairDefinition);
+      this.use(GraphQLDefinition);
+      this.use(LinksAndCommentsDefinition);
+      this.use(ListingsDefinition);
+      this.use(ModerationDefinition);
+      this.use(ModNoteDefinition);
+      this.use(NewModmailDefinition);
+      this.use(PrivateMessagesDefinition);
+      this.use(SubredditsDefinition);
+      this.use(UsersDefinition);
+      this.use(WidgetsDefinition);
+      this.use(WikiDefinition);
     }
 
     const userActionsConfig = config.userActions;
@@ -192,15 +255,15 @@ export class Devvit extends Actor {
       : userActionsConfig;
 
     if (pluginIsEnabled(pluginEnabled)) {
-      this.use(protos.UserActionsDefinition);
+      this.use(UserActionsDefinition);
       this.#scopes = this.#getUserScopesFromConfig(config);
     }
   }
 
   /**
    * Add a menu item to the Reddit UI.
-   * @param menuItem - The menu item to add.
-   * @param menuItem.label - The label of the menu item.
+   * @param item - The menu item to add.
+   * @param item.label - The label of the menu item.
    * @example
    * ```ts
    * Devvit.addMenuItem({
@@ -220,40 +283,7 @@ export class Devvit extends Actor {
   }
 
   /**
-   * @deprecated Blocks is deprecated. Use {@link https://developers.reddit.com/docs/capabilities/devvit-web/devvit_web_overview|Devvit Web} instead
-   *
-   * Add a custom post type for your app.
-   * @param customPostType - The custom post type to add.
-   * @param customPostType.name - The name of the custom post type.
-   * @param customPostType.description - An optional description.
-   * @param customPostType.height - An optional parameter to set post height, defaults to 'regular'.
-   * @param customPostType.render - A function or `Devvit.CustomPostComponent` that returns the UI for the custom post.
-   * @example
-   * ```ts
-   * import { Devvit, useState } from '@devvit/public-api';
-   *
-   * Devvit.addCustomPostType({
-   *   name: 'Counter',
-   *   description: 'A simple click counter post.',
-   *   render: (context) => {
-   *     const [counter, setCounter] = useState();
-   *
-   *     return (
-   *       <vstack>
-   *         <text>{counter}</text>
-   *         <button onPress={() => setCounter((counter) => counter + 1)}>Click me!</button>
-   *       </vstack>
-   *     );
-   *   },
-   * });
-   * ```
-   */
-  static addCustomPostType(customPostType: CustomPostType): void {
-    this.#customPostType = customPostType;
-  }
-
-  /**
-   * Create a form that can be opened from menu items and custom posts.
+   * Create a form that can be opened from menu items.
    * @param form - The form or a function that returns the form.
    * @param onSubmit - The function to call when the form is submitted.
    * @returns A unique key for the form that can used with `ui.showForm`.
@@ -409,8 +439,8 @@ export class Devvit extends Actor {
 
     assertValidFormFields([...(this.#installationSettings ?? []), ...(this.#appSettings ?? [])]);
 
-    if (!this.#pluginClients[protos.SettingsDefinition.fullName]) {
-      this.use(protos.SettingsDefinition);
+    if (!this.#pluginClients[SettingsDefinition.fullName]) {
+      this.use(SettingsDefinition);
     }
 
     // Save the settings to the global devvit object so that they can be accessed by the settings
@@ -427,10 +457,10 @@ export class Devvit extends Actor {
    * Add a trigger handler that will be invoked when the given event
    * occurs in a subreddit where the app is installed.
    *
-   * @param triggerDefinition - The trigger definition.
-   * @param triggerDefinition.event - The event to listen for.
-   * @param triggerDefinition.events - The events to listen for.
-   * @param triggerDefinition.onEvent - The function to call when the event happens.
+   * @param definition - The trigger definition.
+   * @param definition.event - The event to listen for.
+   * @param definition.events - The events to listen for.
+   * @param definition.onEvent - The function to call when the event happens.
    * @example
    * ```ts
    * Devvit.addTrigger({
@@ -491,30 +521,30 @@ export class Devvit extends Actor {
    * utility static method to register additional actor types without exposing an explicit
    * registration hook such as `addTrigger` or `addMenuItem`
    */
-  static provide(def: protos.Definition): void {
+  static provide(def: Definition): void {
     this.#additionallyProvides.push(def);
   }
 
   /** @internal */
   static #uses: {
-    [fullName: protos.Definition['fullName']]: {
-      def: protos.Definition;
+    [fullName: Definition['fullName']]: {
+      def: Definition;
       handler: Readonly<UseHandler> | undefined;
     };
   } = {};
 
   /** @internal */
   static #pluginClients: {
-    [fullName: protos.Definition['fullName']]: PluginType;
+    [fullName: Definition['fullName']]: PluginType;
   } = {};
 
   /** @internal */
-  static use<T>(d: protos.Definition): T {
+  static use<T>(d: Definition): T {
     this.#uses[d.fullName] = { def: d, handler: undefined };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const wrapped: any = {};
     for (const method of Object.values(d.methods)) {
-      wrapped[method.name] = (args: UnknownMessage | undefined, metadata?: protos.Metadata) =>
+      wrapped[method.name] = (args: UnknownMessage | undefined, metadata?: Metadata) =>
         this.#uses[d.fullName].handler?.[method.name]?.(
           // eslint-disable-next-line no-restricted-properties
           method.requestType?.fromPartial(args ?? {}),
@@ -529,18 +559,18 @@ export class Devvit extends Actor {
 
   /** @internal */
   static get redditAPIPlugins(): {
-    NewModmail: protos.NewModmail;
-    Widgets: protos.Widgets;
-    ModNote: protos.ModNote;
-    LinksAndComments: protos.LinksAndComments;
-    Moderation: protos.Moderation;
-    GraphQL: protos.GraphQL;
-    Listings: protos.Listings;
-    Flair: protos.Flair;
-    Wiki: protos.Wiki;
-    Users: protos.Users;
-    PrivateMessages: protos.PrivateMessages;
-    Subreddits: protos.Subreddits;
+    NewModmail: NewModmail;
+    Widgets: Widgets;
+    ModNote: ModNote;
+    LinksAndComments: LinksAndComments;
+    Moderation: Moderation;
+    GraphQL: GraphQL;
+    Listings: Listings;
+    Flair: Flair;
+    Wiki: Wiki;
+    Users: Users;
+    PrivateMessages: PrivateMessages;
+    Subreddits: Subreddits;
   } {
     if (!pluginIsEnabled(this.#config.redditAPI)) {
       throw new Error(
@@ -549,28 +579,26 @@ export class Devvit extends Actor {
     }
 
     return {
-      Flair: this.#pluginClients[protos.FlairDefinition.fullName] as protos.Flair,
-      GraphQL: this.#pluginClients[protos.GraphQLDefinition.fullName] as protos.GraphQL,
+      Flair: this.#pluginClients[FlairDefinition.fullName] as Flair,
+      GraphQL: this.#pluginClients[GraphQLDefinition.fullName] as GraphQL,
       LinksAndComments: this.#pluginClients[
-        protos.LinksAndCommentsDefinition.fullName
-      ] as protos.LinksAndComments,
-      Listings: this.#pluginClients[protos.ListingsDefinition.fullName] as protos.Listings,
-      Moderation: this.#pluginClients[protos.ModerationDefinition.fullName] as protos.Moderation,
-      ModNote: this.#pluginClients[protos.ModNoteDefinition.fullName] as protos.ModNote,
-      NewModmail: this.#pluginClients[protos.NewModmailDefinition.fullName] as protos.NewModmail,
-      PrivateMessages: this.#pluginClients[
-        protos.PrivateMessagesDefinition.fullName
-      ] as protos.PrivateMessages,
-      Subreddits: this.#pluginClients[protos.SubredditsDefinition.fullName] as protos.Subreddits,
-      Users: this.#pluginClients[protos.UsersDefinition.fullName] as protos.Users,
-      Widgets: this.#pluginClients[protos.WidgetsDefinition.fullName] as protos.Widgets,
-      Wiki: this.#pluginClients[protos.WikiDefinition.fullName] as protos.Wiki,
+        LinksAndCommentsDefinition.fullName
+      ] as LinksAndComments,
+      Listings: this.#pluginClients[ListingsDefinition.fullName] as Listings,
+      Moderation: this.#pluginClients[ModerationDefinition.fullName] as Moderation,
+      ModNote: this.#pluginClients[ModNoteDefinition.fullName] as ModNote,
+      NewModmail: this.#pluginClients[NewModmailDefinition.fullName] as NewModmail,
+      PrivateMessages: this.#pluginClients[PrivateMessagesDefinition.fullName] as PrivateMessages,
+      Subreddits: this.#pluginClients[SubredditsDefinition.fullName] as Subreddits,
+      Users: this.#pluginClients[UsersDefinition.fullName] as Users,
+      Widgets: this.#pluginClients[WidgetsDefinition.fullName] as Widgets,
+      Wiki: this.#pluginClients[WikiDefinition.fullName] as Wiki,
     };
   }
 
   /** @internal */
-  static get schedulerPlugin(): protos.Scheduler {
-    const scheduler = this.#pluginClients[protos.SchedulerDefinition.fullName];
+  static get schedulerPlugin(): Scheduler {
+    const scheduler = this.#pluginClients[SchedulerDefinition.fullName];
 
     if (!scheduler) {
       // todo: better error with more details
@@ -579,25 +607,12 @@ export class Devvit extends Actor {
       );
     }
 
-    return scheduler as protos.Scheduler;
+    return scheduler as Scheduler;
   }
 
   /** @internal */
-  static get kvStorePlugin(): protos.KVStore {
-    const kvStore = this.#pluginClients[protos.KVStoreDefinition.fullName];
-
-    if (!kvStore) {
-      throw new Error(
-        'Key Value Store is not enabled. You can enable it by passing `kvStore: true` to `Devvit.configure`'
-      );
-    }
-
-    return kvStore as protos.KVStore;
-  }
-
-  /** @internal */
-  static get redisPlugin(): protos.RedisAPI {
-    const redis = this.#pluginClients[protos.RedisAPIDefinition.fullName];
+  static get redisPlugin(): RedisAPI {
+    const redis = this.#pluginClients[RedisAPIDefinition.fullName];
 
     if (!redis) {
       throw new Error(
@@ -605,23 +620,23 @@ export class Devvit extends Actor {
       );
     }
 
-    return redis as protos.RedisAPI;
+    return redis as RedisAPI;
   }
 
   /** @internal */
-  static get mediaPlugin(): protos.MediaService {
-    const media = this.#pluginClients[protos.MediaServiceDefinition.fullName];
+  static get mediaPlugin(): MediaService {
+    const media = this.#pluginClients[MediaServiceDefinition.fullName];
     if (!media) {
       throw new Error(
         'MediaService is not enabled. You can enable it by passing `media: true` to `Devvit.configure`'
       );
     }
-    return media as protos.MediaService;
+    return media as MediaService;
   }
 
   /** @internal */
-  static get settingsPlugin(): protos.Settings {
-    const settings = this.#pluginClients[protos.SettingsDefinition.fullName];
+  static get settingsPlugin(): Settings {
+    const settings = this.#pluginClients[SettingsDefinition.fullName];
 
     if (!settings) {
       throw new Error(
@@ -629,24 +644,11 @@ export class Devvit extends Actor {
       );
     }
 
-    return settings as protos.Settings;
+    return settings as Settings;
   }
 
   /** @internal */
-  static get realtimePlugin(): protos.Realtime {
-    const realtime = this.#pluginClients[protos.RealtimeDefinition.fullName];
-
-    if (!realtime) {
-      throw new Error(
-        'Realtime is not enabled. You can enable it by passing `realtime: true` to `Devvit.configure`'
-      );
-    }
-
-    return realtime as protos.Realtime;
-  }
-
-  /** @internal */
-  static get userActionsPlugin(): protos.UserActions {
+  static get userActionsPlugin(): UserActions {
     const userActionsAndRedditApiEnabled =
       this.#scopes.length > 0 && pluginIsEnabled(this.#config.redditAPI);
 
@@ -656,7 +658,7 @@ export class Devvit extends Actor {
       );
     }
 
-    return this.#pluginClients[protos.UserActionsDefinition.fullName] as protos.UserActions;
+    return this.#pluginClients[UserActionsDefinition.fullName] as UserActions;
   }
 
   /** @internal */
@@ -667,11 +669,6 @@ export class Devvit extends Actor {
   /** @internal */
   static get menuItems(): MenuItem[] {
     return this.#menuItems ?? [];
-  }
-
-  /** @internal */
-  static get customPostType(): CustomPostType | undefined {
-    return this.#customPostType;
   }
 
   /** @internal */
@@ -707,11 +704,6 @@ export class Devvit extends Actor {
     return globalThis.devvit?.assets ?? {};
   }
 
-  /** @internal */
-  static get webViewAssets(): Readonly<AssetMap> {
-    return this.#webViewAssets;
-  }
-
   /**
    * Force service implementation. Keep in sync with `blocks.template.tsx`.
    * @internal
@@ -733,8 +725,8 @@ export class Devvit extends Actor {
    * @internal
    */
   private static _initScheduler(): void {
-    if (!this.#pluginClients[protos.SchedulerDefinition.fullName]) {
-      this.use(protos.SchedulerDefinition);
+    if (!this.#pluginClients[SchedulerDefinition.fullName]) {
+      this.use(SchedulerDefinition);
     }
     this.#scheduledJobHandlers ??= new Map();
   }
@@ -758,8 +750,6 @@ export class Devvit extends Actor {
     // @ts-expect-error no type.
     globalThis.devvit.appConfig ??= globalThis.__devvit__?.config;
 
-    Devvit.#webViewAssets = config.webviewAssets ?? {};
-
     for (const fullName in Devvit.#uses) {
       const use = Devvit.#uses[fullName];
       use.handler = config.use<UseHandler>(use.def);
@@ -777,16 +767,7 @@ export class Devvit extends Actor {
       registerScheduler(config);
     }
 
-    if (Devvit.#customPostType) {
-      registerCustomPost(config);
-      /**
-       * We're trying to migrate custom posts to generic ui handlers, but they'll
-       * both work for now.
-       */
-      registerUIRequestHandlers(config);
-    }
-
-    if (Devvit.#customPostType || Devvit.#formDefinitions) {
+    if (Devvit.#formDefinitions) {
       registerUIEventHandler(config);
     }
 
@@ -859,325 +840,11 @@ export class Devvit extends Actor {
 }
 
 export namespace Devvit {
-  export type Fragment = JSX.Fragment;
-  export type ElementChildren = JSX.Element | JSX.Children | undefined;
-  export type StringChild = Fragment | string | number;
-  export type StringChildren = StringChild | (StringChild | StringChild[])[] | undefined;
-  type ComponentFunctionValue = BlockElement | Fragment | undefined;
-
-  // Generic createElement to handle Blocks, custom elements, etc...
-  export function createElement(
-    type: Blocks.IntrinsicElementsType,
-    props: { [key: string]: unknown } | undefined,
-    ...children: JSX.Children[]
-  ): BlockElement;
-  export function createElement(
-    type: JSX.ComponentFunction | string | undefined,
-    props: { [key: string]: unknown } | undefined,
-    ...children: JSX.Children[]
-  ): ComponentFunctionValue | Promise<ComponentFunctionValue> {
-    const blockElement: BlockElement = {
-      type,
-      props,
-      children,
-    };
-
-    return blockElement;
-  }
-
   // Workaround for typing: aliasing global Context as Devvit.Context bundles
   // incorrectly as `type Context = Context`.
-  /** The current app context of the event or render. */
+  /**
+   *  The current app context of the event or render.
+   *  @deprecated - Please switch to the `Context` type exported by public-api.
+   */
   export type Context = ContextAPIClients & BaseContext;
-
-  export type BlockComponentProps<P = { [key: string]: unknown }> = P & { children?: JSX.Children };
-  export type BlockComponent<P = { [key: string]: unknown }> = (
-    props: BlockComponentProps<P>,
-    context: Context
-  ) => JSX.Element;
-  export type CustomPostComponent = (context: Context) => JSX.Element;
-
-  export namespace Blocks {
-    export interface IntrinsicElements {
-      blocks: Devvit.Blocks.RootProps;
-      hstack: Devvit.Blocks.StackProps;
-      vstack: Devvit.Blocks.StackProps;
-      zstack: Devvit.Blocks.StackProps;
-      text: Devvit.Blocks.TextProps;
-      button: Devvit.Blocks.ButtonProps;
-      image: Devvit.Blocks.ImageProps;
-      spacer: Devvit.Blocks.SpacerProps;
-      icon: Devvit.Blocks.IconProps;
-      avatar: Devvit.Blocks.AvatarProps;
-      webview: Devvit.Blocks.WebViewProps;
-    }
-
-    export type IntrinsicElementsType = keyof IntrinsicElements;
-
-    //region Attribute Values
-    export type SizePixels = `${number}px`;
-    export type SizePercent = `${number}%`;
-    export type SizeString = SizePixels | SizePercent | number;
-    export type Alignment =
-      | `${VerticalAlignment}`
-      | `${HorizontalAlignment}`
-      | `${VerticalAlignment} ${HorizontalAlignment}`
-      | `${HorizontalAlignment} ${VerticalAlignment}`;
-    export type AvatarBackground = 'light' | 'dark';
-    export type AvatarFacing = 'left' | 'right';
-    export type AvatarSize =
-      | 'xxsmall'
-      | 'xsmall'
-      | 'small'
-      | 'medium'
-      | 'large'
-      | 'xlarge'
-      | 'xxlarge'
-      | 'xxxlarge';
-    export type ButtonAppearance =
-      | 'secondary'
-      | 'primary'
-      | 'plain'
-      | 'bordered'
-      | 'media'
-      | 'destructive'
-      | 'caution'
-      | 'success';
-    /**
-     * Affects the button height.
-     * small = 32px;
-     * medium = 40px;
-     * large = 48px;
-     */
-    export type ButtonSize = 'small' | 'medium' | 'large';
-    export type ColorString = string;
-    /**
-     * thin = 1px;
-     * thick = 2px;
-     */
-    export type ContainerBorderWidth = Thickness;
-    /**
-     * small = 8px;
-     * medium = 16px;
-     * large = 24px;
-     */
-    export type ContainerCornerRadius = 'none' | 'small' | 'medium' | 'large' | 'full';
-    /**
-     * small = 8px;
-     * medium = 16px;
-     * large = 32px;
-     */
-    export type ContainerGap = 'none' | 'small' | 'medium' | 'large';
-    /**
-     * xsmall = 4px;
-     * small = 8px;
-     * medium = 16px;
-     * large = 32px;
-     */
-    export type ContainerPadding = 'none' | 'xsmall' | 'small' | 'medium' | 'large';
-    export type HorizontalAlignment = 'start' | 'center' | 'end';
-    /**
-     * xsmall = 12px;
-     * small = 16px;
-     * medium = 20px;
-     * large = 24px;
-     */
-    export type IconSize = 'xsmall' | 'small' | 'medium' | 'large';
-    export type ImageResizeMode = 'none' | 'fit' | 'fill' | 'cover' | 'scale-down';
-    /**
-     * xsmall = 4px;
-     * small = 8px;
-     * medium = 16px;
-     * large = 32px;
-     */
-    export type SpacerSize = 'xsmall' | 'small' | 'medium' | 'large';
-    export type SpacerShape = 'invisible' | 'thin' | 'square';
-    /**
-     * thin = 1px;
-     * thick = 2px;
-     */
-    export type TextOutline = Thickness;
-    /**
-     * xsmall = 10px;
-     * small = 12px;
-     * medium = 14px;
-     * large = 16px;
-     * xlarge = 18px;
-     * xxlarge = 24px;
-     */
-    export type TextSize = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge';
-    export type TextStyle = 'body' | 'metadata' | 'heading';
-    export type TextWeight = 'regular' | 'bold';
-    export type TextOverflow = 'clip' | 'ellipsis';
-    export type Thickness = 'none' | 'thin' | 'thick';
-    export type VerticalAlignment = 'top' | 'middle' | 'bottom';
-    export type RootHeight = 'regular' | 'tall';
-    //endregion
-
-    //region Element Attributes
-    export type BaseProps = {
-      width?: SizeString;
-      height?: SizeString;
-      minWidth?: SizeString;
-      minHeight?: SizeString;
-      maxWidth?: SizeString;
-      maxHeight?: SizeString;
-      grow?: boolean;
-
-      /**
-       * This optional field provides some efficiencies around re-ordering elements in a list.  Rather
-       * Than re-rendering the entire list, the client can use the key to determine if the element has
-       * changed.  In the example below, if a and b were swapped, the client would know to reuse the
-       * existing elements from b, rather than re-creating an expensive tree of elements.
-       *
-       * Unlike id, key is local to the parent element.  This means that the same key can be used in different
-       * parts of the tree without conflict.
-       *
-       *     <hstack>
-       *         <text key="a">hi world</text>
-       *         <hstack key="b">...deeply nested content...</hstack>
-       *     </hstack>
-       */
-      key?: string;
-
-      /**
-       * This optional field provides a unique identifier for the element.  This is useful for ensuring
-       * re-use of elements across renders.  See the `key` field for more information.  Unlike key, id
-       * is global.  You cannot have two elements with the same id in the same tree.
-       */
-      id?: string;
-    };
-
-    export type OnPressEventHandler = (data: JSONObject) => void | Promise<void>;
-
-    export type OnWebViewEventHandler = <T extends JSONValue>(message: T) => void | Promise<void>;
-
-    export type Actionable = {
-      onPress?: OnPressEventHandler | undefined;
-    };
-
-    export type WebViewActionable = {
-      onMessage?: OnWebViewEventHandler | undefined;
-    };
-
-    export type ActionHandlers = keyof (Actionable & WebViewActionable);
-
-    export type HasElementChildren = {
-      children?: Devvit.ElementChildren;
-    };
-
-    export type HasStringChildren = {
-      children?: Devvit.StringChildren;
-    };
-
-    export type RootProps = HasElementChildren & {
-      height?: Devvit.Blocks.RootHeight | undefined;
-    };
-
-    export type StackProps = BaseProps &
-      HasElementChildren &
-      Actionable & {
-        reverse?: boolean | undefined;
-        alignment?: Alignment;
-        padding?: ContainerPadding | undefined;
-        gap?: ContainerGap | undefined;
-        border?: ContainerBorderWidth | undefined;
-        borderColor?: ColorString | undefined;
-        lightBorderColor?: ColorString | undefined;
-        darkBorderColor?: ColorString | undefined;
-        cornerRadius?: ContainerCornerRadius | undefined;
-        backgroundColor?: ColorString | undefined;
-        lightBackgroundColor?: ColorString | undefined;
-        darkBackgroundColor?: ColorString | undefined;
-      };
-
-    export type TextProps = BaseProps &
-      HasStringChildren &
-      Actionable & {
-        size?: TextSize | undefined;
-        weight?: TextWeight | undefined;
-        color?: ColorString | undefined;
-        lightColor?: ColorString | undefined;
-        darkColor?: ColorString | undefined;
-        alignment?: Alignment | undefined;
-        outline?: TextOutline | undefined;
-        style?: TextStyle | undefined;
-        selectable?: boolean | undefined;
-        wrap?: boolean | undefined;
-        overflow?: TextOverflow | undefined;
-      };
-
-    export type ButtonProps = BaseProps &
-      HasStringChildren &
-      Actionable & {
-        icon?: IconName | undefined;
-        size?: ButtonSize | undefined;
-        appearance?: ButtonAppearance | undefined;
-        textColor?: ColorString | undefined;
-        lightTextColor?: ColorString | undefined;
-        darkTextColor?: ColorString | undefined;
-        // not available in all platforms yet
-        // backgroundColor?: ColorString | undefined;
-        disabled?: boolean | undefined;
-      };
-
-    export type ImageProps = BaseProps &
-      Actionable & {
-        url: string;
-        imageWidth: SizePixels | number;
-        imageHeight: SizePixels | number;
-        description?: string | undefined;
-        resizeMode?: ImageResizeMode | undefined;
-      };
-
-    export type SpacerProps = BaseProps & {
-      size?: SpacerSize | undefined;
-      shape?: SpacerShape | undefined;
-    };
-
-    export type IconProps = BaseProps &
-      HasStringChildren &
-      Actionable & {
-        name: IconName;
-        color?: ColorString | undefined;
-        lightColor?: ColorString | undefined;
-        darkColor?: ColorString | undefined;
-        size?: IconSize | undefined;
-      };
-
-    export type AvatarProps = BaseProps &
-      Actionable & {
-        thingId: string;
-        facing?: AvatarFacing | undefined;
-        size?: AvatarSize | undefined;
-        background?: AvatarBackground | undefined;
-      };
-
-    export type WebViewProps = BaseProps &
-      WebViewActionable & {
-        url: string;
-      };
-  }
-}
-
-export type BlockElement = {
-  type: JSX.ComponentFunction | string | undefined;
-
-  props: { [key: string]: unknown } | undefined;
-  children: JSX.Element[];
-};
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements extends Devvit.Blocks.IntrinsicElements {}
-
-    type Fragment = Iterable<JSX.Element>;
-    type SyncElement = BlockElement | JSX.Fragment | string | number | boolean | null;
-    type Element = SyncElement | Promise<SyncElement>;
-    type ElementChildrenAttribute = { children: {} };
-    type Children = JSX.Element | JSX.Element[];
-    type Props<T extends {} = {}> = T & { children?: Devvit.ElementChildren };
-
-    type ComponentFunction = (props: JSX.Props, context: Devvit.Context) => JSX.Element;
-  }
 }

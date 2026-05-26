@@ -1,4 +1,4 @@
-import type { Metadata } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
 import type { MediaAsset, MediaPlugin, UploadMediaOptions } from '../../types/media.js';

@@ -1,4 +1,4 @@
-import type { Metadata } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { Header } from '@devvit/shared-types/Header.js';
 
 import { Devvit } from '../../../../devvit/Devvit.js';

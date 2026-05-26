@@ -55,8 +55,6 @@ export const enum AppDebug {
   Runtime = 'runtime',
   /** Enable debug logging for devvit-surface and dispatcher. */
   Surface = 'surface',
-  /** Enable debug logging for the useAsync() hook family. */
-  UseAsync = 'useAsync',
   /** Enable debug logging for payments APIs */
   Payments = 'payments',
   /** Enable bootstrap logging */

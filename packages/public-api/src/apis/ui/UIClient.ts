@@ -1,39 +1,23 @@
+import { type Effect, EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import type { Form as FormProto } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/form.js';
 import {
-  type Effect,
-  EffectType,
-  Form as FormProto,
   type Toast as ToastProto,
   ToastAppearance,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/ui/toast/toast.js';
 import type { Form } from '@devvit/shared';
 import { resolveNavigationInput } from '@devvit/shared-types/thing-navigation.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
-import type { BlocksReconciler } from '../../devvit/internals/blocks/BlocksReconciler.js';
-import type { JSONObject, JSONValue } from '../../types/json.js';
+import type { JSONObject } from '../../types/json.js';
 import type { Toast } from '../../types/toast.js';
 import type { UIClient as _UIClient } from '../../types/ui-client.js';
-import type { WebViewUIClient } from '../../types/web-view-ui-client.js';
 import type { Comment, Post, Subreddit, User } from '../reddit/models/index.js';
 import { assertValidFormFields } from './helpers/assertValidFormFields.js';
 import { transformFormFields } from './helpers/transformForm.js';
 
 export class UIClient implements _UIClient {
   readonly #effects: Effect[] = [];
-  readonly #reconciler: BlocksReconciler | undefined;
-  readonly #webViewClient: WebViewUIClient;
-
-  constructor(reconciler?: BlocksReconciler) {
-    this.#reconciler = reconciler;
-    this.#webViewClient = {
-      postMessage: this.#postMessage,
-    };
-  }
-
-  get webView(): WebViewUIClient {
-    return this.#webViewClient;
-  }
 
   showForm(formKey: FormKey, data?: JSONObject | undefined): void {
     return this.showFormInternal(formKey, data);
@@ -44,18 +28,7 @@ export class UIClient implements _UIClient {
     data?: JSONObject | undefined,
     formInternalOverride?: Form | undefined
   ): void {
-    let formDefinition = Devvit.formDefinitions?.get(formKey);
-
-    if (!formDefinition && this.#reconciler) {
-      const hookForm = this.#reconciler.forms.get(formKey);
-
-      if (hookForm) {
-        formDefinition = {
-          form: hookForm,
-          onSubmit: () => {}, // no-op
-        };
-      }
-    }
+    const formDefinition = Devvit.formDefinitions?.get(formKey);
 
     if (!formDefinition) {
       throw new Error(
@@ -132,23 +105,6 @@ export class UIClient implements _UIClient {
       },
     });
   }
-
-  #postMessage: WebViewUIClient['postMessage'] = <T extends JSONValue>(
-    webViewIdOrMessage: string | T,
-    message?: T | undefined
-  ): void => {
-    const webViewId = message !== undefined ? (webViewIdOrMessage as string) : '';
-    const msg = message !== undefined ? message : webViewIdOrMessage;
-    this.#effects.push({
-      type: EffectType.EFFECT_WEB_VIEW,
-      webView: {
-        postMessage: {
-          webViewId,
-          app: { message: msg },
-        },
-      },
-    });
-  };
 
   /** @internal */
   get __effects(): Effect[] {

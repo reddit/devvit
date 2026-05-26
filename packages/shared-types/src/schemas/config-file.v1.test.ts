@@ -167,7 +167,7 @@ describe('parseAppConfigJSON()', () => {
             "default": {
               "entry": "index.html",
               "height": "tall",
-              "inline": false,
+              "inline": true,
               "name": "default",
             },
           },
@@ -264,7 +264,7 @@ describe('parseAppConfigJSON()', () => {
             "default": {
               "entry": "index.html",
               "height": "tall",
-              "inline": false,
+              "inline": true,
               "name": "default",
             },
           },
@@ -341,13 +341,13 @@ describe('parseAppConfigJSON()', () => {
             "default": {
               "entry": "abc",
               "height": "tall",
-              "inline": false,
+              "inline": true,
               "name": "default",
             },
             "foo": {
               "entry": "bar",
               "height": "tall",
-              "inline": false,
+              "inline": true,
               "name": "foo",
             },
           },
@@ -687,7 +687,7 @@ describe('parseAppConfigJSON()', () => {
             "default": {
               "entry": "index.html",
               "height": "tall",
-              "inline": false,
+              "inline": true,
               "name": "default",
             },
           },
@@ -695,14 +695,14 @@ describe('parseAppConfigJSON()', () => {
         "schema": "v1",
       }
     `));
-  test('override inline', () =>
+  test('inline does nothing', () =>
     expect(
       parseAppConfigJson(
         {
           name: 'name',
           post: {
             entrypoints: {
-              default: { entry: 'splash', inline: true, height: 'regular' },
+              default: { entry: 'splash', inline: false, height: 'regular' },
               game: { entry: 'game', inline: true, height: 'regular' },
             },
           },
@@ -718,7 +718,7 @@ describe('parseAppConfigJSON()', () => {
               "default": {
                 "entry": "splash",
                 "height": "regular",
-                "inline": true,
+                "inline": false,
               },
               "game": {
                 "entry": "game",

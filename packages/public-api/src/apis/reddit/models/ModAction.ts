@@ -1,4 +1,5 @@
-import type { AboutLogResponse, Metadata } from '@devvit/protos';
+import type { AboutLogResponse } from '@devvit/protos/json/devvit/plugin/redditapi/moderation/moderation_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';

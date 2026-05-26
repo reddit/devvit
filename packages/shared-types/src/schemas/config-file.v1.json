@@ -27,7 +27,9 @@
         },
         "inline": {
           "type": "boolean",
-          "description": "Whether the web view should start in inline or expanded mode. Expanded mode uses a splash launch screen. Splash support will be removed in v0.13 and inline will be the default."
+          "description": "Deprecated. Has no effect. Inline is always implied for post entrypoints and any entrypoint may be opened in expanded mode.",
+          "deprecated": true,
+          "default": true
         }
       }
     },

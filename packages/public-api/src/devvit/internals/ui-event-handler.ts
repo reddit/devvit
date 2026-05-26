@@ -1,6 +1,12 @@
-import type { HandleUIEventRequest, Metadata } from '@devvit/protos';
-import { EffectType, HandleUIEventResponse, UIEventHandlerDefinition } from '@devvit/protos';
+import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import type { HandleUIEventRequest } from '@devvit/protos/json/devvit/ui/events/v1alpha/handle_ui.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
 import type { UIEventHandler } from '@devvit/protos/types/devvit/ui/events/v1alpha/handle_ui.js';
+// eslint-disable-next-line no-restricted-imports
+import { HandleUIEventResponse } from '@devvit/protos/types/devvit/ui/events/v1alpha/handle_ui.js';
+// eslint-disable-next-line no-restricted-imports
+import { UIEventHandlerDefinition } from '@devvit/protos/types/devvit/ui/events/v1alpha/handle_ui.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
@@ -11,7 +17,6 @@ import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';
 import { getFormValues } from '../../apis/ui/helpers/getFormValues.js';
 import { Devvit } from '../Devvit.js';
-import { BlocksReconciler } from './blocks/BlocksReconciler.js';
 import { getContextFromMetadata } from './context.js';
 import { validateCSRFToken } from './csrf.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
@@ -32,25 +37,6 @@ async function handleUIEvent(
 
   if (req.event?.formSubmitted && req.event.formSubmitted.formId) {
     const formKey = req.event.formSubmitted.formId as FormKey;
-
-    if (formKey.includes('form.hook.')) {
-      if (Devvit.customPostType) {
-        const blocksReconciler = new BlocksReconciler(
-          (_props: {}, context: Devvit.Context) => Devvit.customPostType?.render(context) ?? null,
-          req.event,
-          req.state,
-          metadata,
-          undefined
-        );
-
-        await blocksReconciler.reconcile();
-
-        return HandleUIEventResponse.fromJSON({
-          state: blocksReconciler.state,
-          effects: blocksReconciler.getEffects(),
-        });
-      }
-    }
 
     const formDefinition = Devvit.formDefinitions?.get(formKey);
 
@@ -91,23 +77,6 @@ async function handleUIEvent(
       },
       context
     );
-  } else if (req.event?.realtimeEvent) {
-    if (Devvit.customPostType) {
-      const blocksReconciler = new BlocksReconciler(
-        (_props: {}, context: Devvit.Context) => Devvit.customPostType?.render(context) ?? null,
-        req.event,
-        req.state,
-        metadata,
-        undefined
-      );
-
-      await blocksReconciler.reconcile();
-
-      return HandleUIEventResponse.fromJSON({
-        state: blocksReconciler.state,
-        effects: blocksReconciler.getEffects(),
-      });
-    }
   } else if (req.event?.toastAction) {
     throw new Error('Toast actions not yet implemented');
   }

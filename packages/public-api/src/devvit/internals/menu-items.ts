@@ -1,11 +1,17 @@
-import type {
-  ContextAction,
-  ContextActionDescription,
-  ContextActionRequest,
-  Metadata,
-} from '@devvit/protos';
-import { ContextActionDefinition, ContextActionList, ContextActionResponse } from '@devvit/protos';
-import type { Empty } from '@devvit/protos/types/google/protobuf/empty.js';
+import type { ContextActionDescription } from '@devvit/protos/json/devvit/actor/reddit/context_action.js';
+import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { ContextAction } from '@devvit/protos/types/devvit/actor/reddit/context_action.js';
+// eslint-disable-next-line no-restricted-imports
+import type { ContextActionRequest } from '@devvit/protos/types/devvit/actor/reddit/context_action.js';
+// eslint-disable-next-line no-restricted-imports
+import {
+  ContextActionList,
+  ContextActionResponse,
+} from '@devvit/protos/types/devvit/actor/reddit/context_action.js';
+// eslint-disable-next-line no-restricted-imports
+import { ContextActionDefinition } from '@devvit/protos/types/devvit/actor/reddit/context_action.js';
 import type { DeepPartial } from '@devvit/shared-types/BuiltinTypes.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';

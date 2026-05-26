@@ -1,5 +1,6 @@
-import { type JsonWrappedComment, type Metadata } from '@devvit/protos';
-import { Scope } from '@devvit/protos';
+import type { JsonWrappedComment } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
+import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test } from 'vitest';
 

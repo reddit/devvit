@@ -1,6 +1,6 @@
 import { PaymentsClient } from './PaymentsClient.js';
 
-export type { PaymentHandlerResponse } from '../paymentHandler.js';
+export type { PaymentHandlerResponse } from '../shared/index.js';
 export { type PaymentsClient };
 
 /**

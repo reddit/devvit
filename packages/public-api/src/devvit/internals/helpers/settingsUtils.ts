@@ -1,5 +1,7 @@
-import type { Metadata, ValidateFormRequest } from '@devvit/protos';
-import { ValidateFormResponse } from '@devvit/protos';
+import type { ValidateFormRequest } from '@devvit/protos/json/devvit/actor/settings/v1alpha/shared.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import { ValidateFormResponse } from '@devvit/protos/types/devvit/actor/settings/v1alpha/shared.js';
 
 import { makeAPIClients } from '../../../apis/makeAPIClients.js';
 import { getFormValues } from '../../../apis/ui/helpers/getFormValues.js';

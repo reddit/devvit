@@ -434,7 +434,6 @@ export class RedditClient {
    * const post = await reddit.submitCustomPost({
    *   subredditName: 'devvit',
    *   title: 'Hello World',
-   *   splash: {appDisplayName: 'Field', height: 'regular'},
    * });
    * ```
    * 
@@ -453,7 +452,6 @@ export class RedditClient {
    *  textFallback: {
    *    text: 'This is a Devvit post!',
    *  },
-   *  splash: {appDisplayName: 'Pixelary'},
    * });
    * ```
    *

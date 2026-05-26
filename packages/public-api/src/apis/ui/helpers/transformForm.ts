@@ -1,4 +1,5 @@
-import { FormField as FormFieldProto, FormFieldType } from '@devvit/protos';
+import type { FormField as FormFieldProto } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/field.js';
+import { FormFieldType } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/type.js';
 
 import type {
   BooleanField,

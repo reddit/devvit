@@ -41,9 +41,6 @@
     "test:unit": {
       "outputs": []
     },
-    "test:ui": {
-      "outputs": []
-    },
     "test:unit-with-coverage": {
       "outputs": []
     },

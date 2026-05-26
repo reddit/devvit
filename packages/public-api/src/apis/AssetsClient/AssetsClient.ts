@@ -2,10 +2,6 @@ import type { AssetMap } from '@devvit/shared-types/Assets.js';
 
 import { Devvit } from '../../devvit/Devvit.js';
 
-export type GetURLOptions = {
-  webView?: boolean | undefined;
-};
-
 function assertValidUrl(path: string): void | never {
   // This will throw an exception if it's an invalid URL such as a relative path
   // NOTE: substring is here to only check up until the data segment if this is a data URL so we don't waste time needlessly parsing data.
@@ -14,21 +10,12 @@ function assertValidUrl(path: string): void | never {
 }
 
 export class AssetsClient {
-  readonly #webViewAssetMap: AssetMap = {};
-
-  constructor() {
-    this.#webViewAssetMap = Devvit.webViewAssets;
-  }
-
   /**
    * Gets the public URLs for an asset.
    * @param assetPath A path, relative to the media (or 'assets/') folder.
-   * @param options
    * @returns The public URL for that asset (https://i.redd.it/<id>.<ext>)
    */
   getURL(assetPath: string): string;
-
-  getURL(assetPath: string, options: GetURLOptions | undefined): string;
 
   /**
    * Gets the public URLs for multiple assets.
@@ -36,28 +23,22 @@ export class AssetsClient {
    * @returns A map of each asset path to its public URL (https://i.redd.it/<id>.<ext>)
    */
   getURL(assetPaths: string[]): AssetMap;
-
-  getURL(assetPaths: string[], options: GetURLOptions | undefined): AssetMap;
   /**
    * Takes one or more asset names, relative to the media (or 'assets/') folder, and returns either the
    * public URL for that one asset, or a map of each asset name to its URL.
    * @param assetPathOrPaths - Either the path you need the public URL for, or an array of paths.
-   * @param options
    * @returns Either the public URL for the one asset you asked for, or a map of assets to their URLs.
    */
-  getURL(
-    assetPathOrPaths: string | string[],
-    options?: GetURLOptions | undefined
-  ): string | AssetMap {
+  getURL(assetPathOrPaths: string | string[]): string | AssetMap {
     if (typeof assetPathOrPaths === 'string') {
-      return this.#getURL(assetPathOrPaths, options ?? { webView: false });
+      return this.#getURL(assetPathOrPaths);
     }
-    return this.#getURLs(assetPathOrPaths, options ?? { webView: false });
+    return this.#getURLs(assetPathOrPaths);
   }
 
-  #getURL(assetPath: string, options: GetURLOptions): string {
+  #getURL(assetPath: string): string {
     // Has the assetPath already been resolved?
-    const localUrl = options.webView ? this.#webViewAssetMap[assetPath] : Devvit.assets[assetPath];
+    const localUrl = Devvit.assets[assetPath];
     if (localUrl) {
       return localUrl;
     }
@@ -72,13 +53,13 @@ export class AssetsClient {
     }
   }
 
-  #getURLs(assetPaths: string[], options: GetURLOptions): AssetMap {
+  #getURLs(assetPaths: string[]): AssetMap {
     const retval: Record<string, string> = {};
     let missingPaths: string[] = [];
 
     // Try and short circuit using the locally available assets list if possible, keeping a list
     // of all the paths that we couldn't find locally to ask the backend about
-    const cache = options.webView ? this.#webViewAssetMap : Devvit.assets;
+    const cache = Devvit.assets;
     if (cache) {
       for (const path of assetPaths) {
         if (cache[path]) {

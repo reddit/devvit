@@ -1,4 +1,4 @@
-import type { Metadata } from '@devvit/protos';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { describe, expect, test, vi } from 'vitest';
 
 import { Devvit } from '../../../devvit/Devvit.js';

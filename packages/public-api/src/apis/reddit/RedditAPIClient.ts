@@ -1,5 +1,7 @@
-import { type FlairCsvResult, type JsonStatus, type Metadata } from '@devvit/protos';
+import type { JsonStatus } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
+import type { FlairCsvResult } from '@devvit/protos/json/devvit/plugin/redditapi/flair/flair_msg.js';
 import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { Header } from '@devvit/shared-types/Header.js';
 
 import { Devvit } from '../../devvit/Devvit.js';

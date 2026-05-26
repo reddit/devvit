@@ -42,6 +42,7 @@ import type {
   UserSearchResponse,
   UsersSearchRequest,
 } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+import type { StickyRequest } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
 import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
 import type { StringValue } from '@devvit/protos/json/google/protobuf/wrappers.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
@@ -51,10 +52,7 @@ import type {
   Listing,
 } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 // eslint-disable-next-line no-restricted-imports
-import type {
-  StickyRequest,
-  StickyResponse,
-} from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+import type { StickyResponse } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
 // eslint-disable-next-line no-restricted-imports
 import type { Subreddits } from '@devvit/protos/types/devvit/plugin/redditapi/subreddits/subreddits_svc.js';
 import type { T5 } from '@devvit/shared';

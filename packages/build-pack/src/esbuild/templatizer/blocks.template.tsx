@@ -1,11 +1,10 @@
-import type { PaymentHandlerResponse } from '@devvit/payments';
-import type { PaymentHandler } from '@devvit/payments';
-import { addPaymentHandler, paymentHelpMenuItem } from '@devvit/payments/shared';
-import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
 import {
-  type DevvitPostData,
-  type SplashPostData,
-} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+  addPaymentHandler,
+  type PaymentHandler,
+  paymentHelpMenuItem,
+} from '@devvit/payments/internal';
+import type { PaymentHandlerResponse } from '@devvit/payments/shared';
+import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 // eslint-disable-next-line no-restricted-imports
 import { type Logger, LoggerDefinition } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
@@ -22,7 +21,6 @@ import {
 } from '@devvit/public-api';
 import type { TaskRequest } from '@devvit/scheduler';
 import type { SettingsValidationResponse, Toast, TriggerRequest, UiResponse } from '@devvit/shared';
-import { Header } from '@devvit/shared-types/Header.js';
 import type { JsonObject, JsonValue, PartialJsonObject } from '@devvit/shared-types/json.js';
 import type {
   AppConfig,
@@ -30,8 +28,6 @@ import type {
   AppMenuItemConfig,
   AppPaymentsConfig,
   AppPermissionConfig,
-  AppPostConfig,
-  AppPostEntrypointConfig,
   AppSchedulerConfig,
   AppSettingConfig,
   AppTriggersConfig,
@@ -39,8 +35,6 @@ import type {
 import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
 import { getServerPort } from '@devvit/shared-types/server/get-server-port.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
-import { Splash } from '@devvit/splash/splash.js';
-import { backgroundUrl } from '@devvit/splash/utils/assets.js';
 
 declare module '@devvit/public-api' {
   // Expose privates in the `Devvit` singleton. These signatures must be
@@ -51,15 +45,6 @@ declare module '@devvit/public-api' {
     function _initScheduler(): void;
     function _initSettings(global: boolean, sub: boolean): void;
   }
-}
-
-declare module '@devvit/payments/shared' {
-  // This is copied over from @devvit/payments/paymentHandler.ts to avoid exposing the unnecessary
-  // internal-only function to Webbit users. If you change this here, change it there too.
-  export const addPaymentHandler: (paymentHandler: PaymentHandler) => void;
-  // This is copied over from @devvit/payments/paymentHelpMenuItem.ts to avoid exposing the unnecessary
-  // internal-only object to Webbit users. If you change this here, change it there too.
-  export const paymentHelpMenuItem: MenuItem;
 }
 
 // Hack: rename config2 to workaround declaration in
@@ -86,54 +71,10 @@ function configurePermissions(permissions: Readonly<AppPermissionConfig>): void 
     blob: permissions.blob,
     media: permissions.media,
     // to-do: payments permissions.
-    realtime: permissions.realtime,
     redditAPI: permissions.reddit.enable,
     userActions:
       permissions.reddit.asUser.length > 0 ? { scopes: permissions.reddit.asUser } : false,
     redis: permissions.redis,
-  });
-}
-
-function configurePost(name: string, post: Readonly<AppPostConfig>): void {
-  const renderSplash = (
-    entrypoint: Readonly<AppPostEntrypointConfig>,
-    splash: SplashPostData | undefined
-  ) => {
-    return (
-      // Align to `submitCustomPost()`.
-      <Splash
-        appDisplayName={splash?.appDisplayName ?? name}
-        appIconUri={splash?.appIconUri}
-        backgroundUri={splash?.backgroundUri ?? backgroundUrl}
-        buttonLabel={splash?.buttonLabel}
-        description={splash?.description}
-        entryUri={entrypoint.entry}
-        heading={splash?.title}
-        height={entrypoint.height}
-      />
-    );
-  };
-
-  const renderInline = (entrypoint: Readonly<AppPostEntrypointConfig>) => {
-    return (
-      <blocks height={entrypoint.height}>
-        <webview url={entrypoint.entry} width="100%" height="100%" />
-      </blocks>
-    );
-  };
-
-  const defaultEntrypoint = post.entrypoints.default;
-  Devvit.addCustomPostType({
-    name: '',
-    render: (ctx) => {
-      const postDataHeader = ctx.metadata[Header.PostData]?.values[0];
-      const postData: DevvitPostData = postDataHeader
-        ? JSON.parse(postDataHeader)
-        : ({} satisfies DevvitPostData);
-      const splash = postData.splash;
-      const entry = splash?.entry ? post.entrypoints[splash.entry] : defaultEntrypoint;
-      return entry.inline ? renderInline(entry) : renderSplash(entry, splash);
-    },
   });
 }
 
@@ -567,7 +508,9 @@ function coerceSettingForClassic(
 
 if (config2) {
   configurePermissions(config2.permissions);
-  if (config2.post) configurePost(config2.name, config2.post);
+  // Posts are no longer configured here. Native Blocks apps are no longer supported, and Devvit Web
+  // apps no longer use a Blocks bootstrap, opting instead to directly render the entrypoint in
+  // an iframe.
   if (config2.menu) configureMenuItems(config2.menu.items);
   if (config2.scheduler) configureScheduler(config2.scheduler);
   if (config2.forms) configureForms(config2.forms);

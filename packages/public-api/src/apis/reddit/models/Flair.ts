@@ -1,11 +1,13 @@
-import {
-  type FlairCsvResult,
-  type FlairObject,
-  type Metadata,
-  type RedditObject_AuthorFlairRichText,
-  type RedditObject_LinkFlairRichText,
-  type UserFlair as UserFlairProto,
-} from '@devvit/protos';
+import type {
+  RedditObject_AuthorFlairRichText,
+  RedditObject_LinkFlairRichText,
+} from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
+import type {
+  FlairCsvResult,
+  FlairObject,
+  UserFlair as UserFlairProto,
+} from '@devvit/protos/json/devvit/plugin/redditapi/flair/flair_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 
 import { Devvit } from '../../../devvit/Devvit.js';

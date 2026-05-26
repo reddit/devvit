@@ -2,9 +2,9 @@ import type {
   ConversationData,
   ConversationUserData,
   MessageData,
-  Metadata,
   ModActionData,
-} from '@devvit/protos';
+} from '@devvit/protos/json/devvit/plugin/redditapi/newmodmail/newmodmail_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
 import type { MockInstance } from 'vitest';
 import { describe, expect, test, vi } from 'vitest';
 

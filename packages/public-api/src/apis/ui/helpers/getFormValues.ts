@@ -1,5 +1,5 @@
-import type { FormFieldValue } from '@devvit/protos';
-import { FormFieldType } from '@devvit/protos';
+import { FormFieldType } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/type.js';
+import type { FormFieldValue } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/value.js';
 
 import type { FormValues } from '../../../types/form.js';
 

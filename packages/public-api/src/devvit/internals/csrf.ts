@@ -1,4 +1,6 @@
-import type { ContextActionRequest, HandleUIEventRequest } from '@devvit/protos';
+import type { HandleUIEventRequest } from '@devvit/protos/json/devvit/ui/events/v1alpha/handle_ui.js';
+// eslint-disable-next-line no-restricted-imports
+import type { ContextActionRequest } from '@devvit/protos/types/devvit/actor/reddit/context_action.js';
 import { Header } from '@devvit/shared-types/Header.js';
 
 import type { BaseContext, ContextAPIClients } from '../../types/context.js';

@@ -1,4 +1,7 @@
-import type { HScanResponse, ZScanResponse } from '@devvit/protos';
+import type {
+  HScanResponse,
+  ZScanResponse,
+} from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
 
 // TODO: This code is currently cloned to the Devvit Web world in the `@devvit/redis` package. If
 //  you change this code, please make sure to update the other package as well. Eventually, this

@@ -49,7 +49,6 @@
     "test:go": "make -C devvit-compute-go run-go-tests && make -C devvit-gateway-service test && make -C services/snooron-worker-devvit test-unit",
     "test:size": "turbo run test:size --output-logs=new-only",
     "test:types": "turbo run test:types --output-logs=new-only",
-    "test:ui": "turbo run test:ui --output-logs=new-only",
     "test:unit": "turbo run test:unit --output-logs=new-only",
     "test:unit-with-coverage": "turbo run test:unit-with-coverage --output-logs=new-only",
     "test:update": "yarn test:unit -- -- -u"

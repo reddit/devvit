@@ -1,8 +1,7 @@
-import type {
-  Listing as ListingProto,
-  Metadata,
-  SubredditAboutResponse_AboutData,
-} from '@devvit/protos';
+import type { SubredditAboutResponse_AboutData } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type { Listing as ListingProto } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { describe, expect, test, vi } from 'vitest';
 
 import { Devvit } from '../../../devvit/Devvit.js';

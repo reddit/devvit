@@ -1,34 +1,24 @@
-import type {
-  Listing as ListingProto,
-  Metadata,
-  RedditObject,
-  SubmitRequest,
-  SubmitResponse,
-} from '@devvit/protos';
-import type {
-  GalleryMediaStatus as GalleryMediaStatusProto,
-  SetCustomPostPreviewRequest_BodyType,
-} from '@devvit/protos';
-import { Block, UIResponse } from '@devvit/protos';
+import type { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import type { DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
+import type { Metadata } from '@devvit/protos/lib/Types.js';
+// eslint-disable-next-line no-restricted-imports
+import type {
+  Listing as ListingProto,
+  RedditObject,
+} from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { decodeProtoErrors } from '@devvit/shared-types/helpers/protoErrorDecoder.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { PostData } from '@devvit/shared-types/PostData.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
-import { fromByteArray } from 'base64-js';
 
 import { Devvit } from '../../../devvit/Devvit.js';
-import { BlocksReconciler } from '../../../devvit/internals/blocks/BlocksReconciler.js';
-import { BlocksHandler } from '../../../devvit/internals/blocks/handler/BlocksHandler.js';
 import type { T2ID, T3ID, T5ID } from '../../../types/tid.js';
 import { asT2ID, asT3ID, asT5ID, isT3ID } from '../../../types/tid.js';
-import { RunAs, type UserGeneratedContent } from '../common.js';
+import { RunAs } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
-import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { CommonFlair } from './Flair.js';
@@ -210,28 +200,8 @@ export type PostTextOptions =
       richtext: object | RichTextBuilder;
     };
 
-export type CustomPostRichTextFallback = RichTextBuilder | string;
-
-export type CustomPostTextFallbackOptions =
-  | {
-      /**
-       * May also include markdown. See https://www.reddit.com/r/reddit.com/wiki/markdown/
-       */
-      text: string;
-    }
-  | {
-      richtext: CustomPostRichTextFallback;
-    };
-
-// TODO - refactor submit post options
 export type SubmitLinkOptions = CommonSubmitPostOptions & {
   url: string;
-  /**
-   * @deprecated Unsupported. This property is for backwards compatibility and
-   * has no effect. It will removed in a future version. New code should not
-   * use it.
-   */
-  resubmit?: boolean;
 };
 
 export type SubmitMediaOptions = CommonSubmitPostOptions & {
@@ -246,17 +216,6 @@ export type SubmitMediaOptions = CommonSubmitPostOptions & {
 
 export type SubmitSelfPostOptions = PostTextOptions & CommonSubmitPostOptions;
 
-export type SubmitCustomPostTextFallbackOptions = {
-  textFallback?: CustomPostTextFallbackOptions;
-};
-
-export type SubmitCustomPostOptions = CommonSubmitPostOptions &
-  SubmitCustomPostTextFallbackOptions & {
-    preview: JSX.Element;
-    userGeneratedContent?: UserGeneratedContent;
-    postData?: PostData;
-  };
-
 export type CommonSubmitPostOptions = {
   title: string;
   sendreplies?: boolean;
@@ -267,23 +226,9 @@ export type CommonSubmitPostOptions = {
   runAs?: 'USER' | 'APP';
 };
 
-export type SubmitPostOptions = (
-  | SubmitLinkOptions
-  | SubmitSelfPostOptions
-  | SubmitCustomPostOptions
-  | SubmitMediaOptions
-) & {
+export type SubmitPostOptions = (SubmitLinkOptions | SubmitSelfPostOptions | SubmitMediaOptions) & {
   subredditName: string;
 };
-
-const SetCustomPostPreviewRequestBodyType = {
-  NONE: 0,
-  BLOCKS: 1,
-  UNRECOGNIZED: -1,
-} as const;
-
-type SetCustomPostPreviewRequestBodyType =
-  (typeof SetCustomPostPreviewRequest_BodyType)[keyof typeof SetCustomPostPreviewRequest_BodyType];
 
 export type CrosspostOptions = CommonSubmitPostOptions & {
   subredditName: string;
@@ -950,88 +895,6 @@ export class Post {
     );
   }
 
-  /**
-   * Get the postData for the post.
-   *
-   * @example
-   * ```ts
-   * const post = await context.reddit.getPostById(context.postId);
-   * const postData = await post.getPostData();
-   * ```
-   */
-  async getPostData(): Promise<PostData | undefined> {
-    const devvitPostData = await Post.getDevvitPostData(this.id, this.#metadata);
-    return devvitPostData?.developerData;
-  }
-
-  /**
-   * Set the postData on a custom post.
-   *
-   * @param {PostData} postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
-   * @throws {Error} Throws an error if the postData could not be set.
-   * @example
-   * ```ts
-   * const post = await reddit.getPostById(context.postId);
-   * await post.setPostData({
-   *   currentScore: 55,
-   *   secretWord: 'barbeque',
-   * });
-   * ```
-   */
-  async setPostData(postData: PostData): Promise<void> {
-    const prev = await Post.getDevvitPostData(this.id, this.#metadata);
-    await Post.setPostData(
-      { postId: this.id, postData: { ...prev, developerData: postData } },
-      this.#metadata
-    );
-  }
-
-  /**
-   * Set a lightweight UI that shows while the custom post renders
-   *
-   * @param {JSX.ComponentFunction} ui - A JSX component function that returns a simple ui to be rendered.
-   * @throws {Error} Throws an error if the preview could not be set.
-   * @example
-   * ```ts
-   * const preview = (
-   *   <vstack height="100%" width="100%" alignment="middle center">
-   *     <text size="large">An updated preview!</text>
-   *   </vstack>
-   * );
-   * const post = await reddit.getPostById(context.postId);
-   * await post.setCustomPostPreview(() => preview);
-   * ```
-   */
-  async setCustomPostPreview(ui: JSX.ComponentFunction): Promise<void> {
-    await Post.setCustomPostPreview(
-      {
-        id: this.id,
-        ui,
-      },
-      this.#metadata
-    );
-  }
-
-  /**
-   * Set a text fallback for the custom post
-   *
-   * @param {CustomPostTextFallbackOptions} options - A text or a richtext to render in a fallback
-   * @throws {Error} Throws an error if the fallback could not be set.
-   * @example
-   * ```ts
-   * // from a menu action, form, scheduler, trigger, custom post click event, etc
-   * const newTextFallback = { text: 'This is an updated text fallback' };
-   * const post = await context.reddit.getPostById(context.postId);
-   * await post.setTextFallback(newTextFallback);
-   * ```
-   */
-  async setTextFallback(options: CustomPostTextFallbackOptions): Promise<void> {
-    const newPost = await Post.setTextFallback(options, this.id, this.#metadata);
-
-    this.#body = newPost.body;
-    this.#edited = newPost.edited;
-  }
-
   async addComment(options: CommentSubmissionOptions): Promise<Comment> {
     return Comment.submit(
       {
@@ -1284,66 +1147,16 @@ export class Post {
       Devvit.assertUserScope(Scope.SUBMIT_POST);
     }
 
-    let response: SubmitResponse;
-
-    if ('preview' in options) {
-      assertNonNull(metadata, 'Missing metadata in `SubmitPostOptions`');
-      if (runAsType === RunAs.USER) {
-        assertNonNull(
-          options.userGeneratedContent,
-          'userGeneratedContent must be set in `SubmitPostOptions` when RunAs=USER for experience posts'
-        );
-      }
-      const reconciler = new BlocksReconciler(
-        () => options.preview,
-        undefined,
-        {},
-        metadata,
-        undefined
-      );
-      const previewBlock = await reconciler.buildBlocksUI();
-      const encodedCached = Block.encode(previewBlock).finish();
-
-      const { textFallback, ...sanitizedOptions } = options;
-      const richtextFallback = textFallback ? getCustomPostRichTextFallback(textFallback) : '';
-
-      const userGeneratedContent = options.userGeneratedContent
-        ? {
-            text: options.userGeneratedContent.text ?? '',
-            imageUrls: options.userGeneratedContent.imageUrls ?? [],
-          }
-        : undefined;
-
-      const devvitPostData = options.postData
-        ? {
-            developerData: options.postData,
-          }
-        : undefined;
-
-      const submitRequest: SubmitRequest = {
-        kind: 'custom',
+    const response = await client.Submit(
+      {
+        kind: 'kind' in options ? options.kind : 'url' in options ? 'link' : 'self',
         sr: options.subredditName,
-        richtextJson: fromByteArray(encodedCached),
-        richtextFallback,
-        ...sanitizedOptions,
-        userGeneratedContent,
+        richtextJson: 'richtext' in options ? richtextToString(options.richtext) : undefined,
+        ...options,
         runAs: runAsType,
-        postData: devvitPostData,
-      };
-
-      response = await client.SubmitCustomPost(submitRequest, metadata);
-    } else {
-      response = await client.Submit(
-        {
-          kind: 'kind' in options ? options.kind : 'url' in options ? 'link' : 'self',
-          sr: options.subredditName,
-          richtextJson: 'richtext' in options ? richtextToString(options.richtext) : undefined,
-          ...options,
-          runAs: runAsType,
-        },
-        metadata
-      );
-    }
+      },
+      metadata
+    );
 
     // Post Id might not be present as image/video post creation can happen asynchronously
     const isAllowedMediaType =
@@ -1514,62 +1327,6 @@ export class Post {
       const errorMessages = decodeProtoErrors(res.json.errors);
       throw new Error(`Failed to set post data, errors: ${errorMessages.join(', ')}`);
     }
-  }
-
-  /** @internal */
-  static async setCustomPostPreview(
-    options: { id: T3ID; ui: JSX.ComponentFunction },
-    metadata: Metadata | undefined
-  ): Promise<void> {
-    if (!metadata) {
-      throw new Error('Failed to set custom post preview. Metadata not found');
-    }
-
-    const client = Devvit.redditAPIPlugins.LinksAndComments;
-
-    const handler = new BlocksHandler(options.ui);
-    const handlerResponse = UIResponse.fromJSON(await handler.handle({ events: [] }, metadata));
-    const block = handlerResponse.blocks as Block;
-    const blocksRenderContent = fromByteArray(Block.encode(block).finish());
-
-    await client.SetCustomPostPreview(
-      {
-        thingId: options.id,
-        bodyType: SetCustomPostPreviewRequestBodyType.BLOCKS,
-        blocksRenderContent,
-      },
-      metadata
-    );
-  }
-
-  /** @internal */
-  static async setTextFallback(
-    options: CustomPostTextFallbackOptions,
-    postId: T3ID,
-    metadata: Metadata | undefined
-  ): Promise<Post> {
-    if (!('text' in options) && !('richtext' in options)) {
-      throw new Error(`No text fallback provided for post ${postId}.`);
-    }
-
-    const client = Devvit.redditAPIPlugins.LinksAndComments;
-
-    const richtextFallback = getCustomPostRichTextFallback(options);
-
-    const response = await client.EditCustomPost(
-      {
-        thingId: postId,
-        richtextFallback,
-      },
-      metadata
-    );
-
-    if (response.json?.errors?.length) {
-      const errorMessages = decodeProtoErrors(response.json.errors);
-      throw Error(`set post ${postId} text fallback failed: ${errorMessages.join(', ')}`);
-    }
-
-    return Post.getById(postId, metadata);
   }
 
   /** @internal */

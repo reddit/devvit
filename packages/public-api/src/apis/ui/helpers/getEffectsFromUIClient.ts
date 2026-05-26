@@ -1,4 +1,4 @@
-import type { Effect } from '@devvit/protos';
+import type { Effect } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 
 import type { UIClient as UIClientType } from '../../../types/ui-client.js';
 import type { UIClient } from '../UIClient.js';

@@ -4,14 +4,13 @@ import { Devvit } from '@devvit/public-api';
 import { specialSauce } from './server/hidden.js';
 import { secret, theQuestion } from './split.server.js';
 
-Devvit.addCustomPostType({
-  name: '',
-  render: () => {
+Devvit.addMenuItem({
+  label: '',
+  location: 'subreddit',
+  onPress: () => {
     console.log(theQuestion());
     console.log(secret);
     console.log(specialSauce());
-
-    return <text></text>;
   },
 });
 

@@ -6,41 +6,17 @@ import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_p
 import type { JSONObject, JSONValue } from '../types/json.js';
 import { Devvit } from './Devvit.js';
 
-const Box: Devvit.BlockComponent = ({ children }) => {
-  return (
-    <hstack>
-      <button onPress={() => console.log('hi')}>hi</button>
-      {children ?? null}
-    </hstack>
-  );
-};
-const Boxed: Devvit.BlockComponent = () => {
-  return (
-    <Box>
-      <vstack>
-        <text>hi world!</text>
-      </vstack>
-    </Box>
-  );
-};
-
 describe('configure', () => {
   test('should throw error if no config is provided', () => {
-    expect(() => Devvit.realtimePlugin).toThrowError(/realtime is not enabled/i);
+    expect(() => Devvit.redisPlugin).toThrowError(/redis is not enabled/i);
   });
 
   test('should configure plugins', () => {
     Devvit.configure({
-      realtime: true,
+      redis: true,
     });
 
-    expect(() => Devvit.realtimePlugin).toBeDefined();
-  });
-});
-
-describe('components type system', () => {
-  test('should not bork out', async () => {
-    <Boxed />;
+    expect(() => Devvit.redisPlugin).toBeDefined();
   });
 });
 

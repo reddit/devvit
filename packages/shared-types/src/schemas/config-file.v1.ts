@@ -522,7 +522,7 @@ function AppPostConfig(post: Readonly<AppPostConfigJson>): AppPostConfig {
         post.entrypoints?.default.entry ??
         schema.properties.post.properties.entrypoints.properties.default.properties.entry.default,
       height: post.entrypoints?.default.height ?? defaultHeight,
-      inline: post.entrypoints?.default.inline ?? false,
+      inline: true,
     },
   };
 
@@ -532,7 +532,7 @@ function AppPostConfig(post: Readonly<AppPostConfigJson>): AppPostConfig {
         name,
         entry: pt.entry!,
         height: pt.height ?? defaultHeight,
-        inline: pt.inline ?? false,
+        inline: true,
       };
   }
   return { dir, entrypoints };
