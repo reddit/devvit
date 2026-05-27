@@ -1,4 +1,7 @@
-import type { RequestContext } from '@devvit/protos/json/devvit/platform/v1/request_context.js';
+import {
+  type RequestContext,
+  RequestSource,
+} from '@devvit/protos/json/devvit/platform/v1/request_context.js';
 import {
   type BridgeContext,
   Client,
@@ -86,6 +89,7 @@ describe('contextFromRequestContext()', () => {
         devvitLoid: 'NAntSOVzPGlf5ge0Z0UbDAz-5-r22CdusQb4f9Rfaws',
       },
       post: { id: 't3_789', author: 't2_400' },
+      source: RequestSource.USER_WEBBIT,
     };
 
     const result = contextFromRequestContext(reqCtx, undefined, {
@@ -132,6 +136,7 @@ describe('contextFromRequestContext()', () => {
         sessionId: '',
         devvitLoid: 'NAntSOVzPGlf5ge0Z0UbDAz-5-r22CdusQb4f9Rfaws',
       },
+      source: RequestSource.USER_WEBBIT,
     };
 
     const result = contextFromRequestContext(reqCtx, undefined, undefined);

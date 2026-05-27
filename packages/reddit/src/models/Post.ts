@@ -5,6 +5,7 @@ import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_p
 import {
   type CustomPostStyles,
   EntrypointHeight,
+  RenderStyle,
 } from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
 // eslint-disable-next-line no-restricted-imports
 import type {
@@ -1305,6 +1306,7 @@ export class Post {
               height: opts.styles.height ?? EntrypointHeight.HEIGHT_UNSPECIFIED,
               shareImageUrl: opts.styles.shareImageUrl ?? '',
               heightPixels: 0,
+              renderStyle: RenderStyle.RENDER_STYLE_UNSPECIFIED,
             }
           : undefined,
       },
