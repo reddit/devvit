@@ -3,7 +3,6 @@ import type { FlairCsvResult } from '@devvit/protos/json/devvit/plugin/redditapi
 import type { CustomPostStylesInput } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import type { CustomPostStyles } from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context, getContextCache, setContextCache } from '@devvit/server';
 import type { PostData } from '@devvit/shared-types/PostData.js';
@@ -125,6 +124,11 @@ export type MuteUserOptions = {
   /** A mod note on why the user was muted. (optional) */
   note?: string;
 };
+
+type StrictRequired<T> = {
+  [K in keyof T]-?: Exclude<T[K], undefined>;
+};
+export type CustomPostStyles = StrictRequired<CustomPostStylesInput>;
 
 /**
  * The Reddit API Client

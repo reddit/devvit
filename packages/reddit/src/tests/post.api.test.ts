@@ -1,4 +1,5 @@
 import type { QueryResponse } from '@devvit/protos/json/devvit/plugin/redditapi/graphql/graphql_msg.js';
+import { RenderStyle } from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
 import { context } from '@devvit/server';
 import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
@@ -197,6 +198,48 @@ describe('Post API', () => {
           },
           context.metadata
         );
+      });
+    });
+
+    describe('getPostStyles()', () => {
+      test('returns supportsChromeless=true when renderStyle is chromeless', async () => {
+        const spyPlugin = redditApiPlugins.LinksAndComments.GetCustomPostStyles;
+        spyPlugin.mockResolvedValueOnce({
+          backgroundColor: '#00000000',
+          backgroundColorDark: '#00000000',
+          heightPixels: 320,
+          height: 2,
+          shareImageUrl: 'https://i.redd.it/o0h58lzmax6a1.png',
+          renderStyle: RenderStyle.RENDER_STYLE_CHROMELESS,
+        });
+
+        await runWithTestContext(async () => {
+          const styles = await reddit.getPostStyles('t3_qwerty');
+
+          expect(spyPlugin).toHaveBeenCalledWith({ postId: 't3_qwerty' });
+          expect(styles.supportsChromeless).toBe(true);
+          expect(styles).not.toHaveProperty('renderStyle');
+        });
+      });
+
+      test('returns supportsChromeless=false when renderStyle is default', async () => {
+        const spyPlugin = redditApiPlugins.LinksAndComments.GetCustomPostStyles;
+        spyPlugin.mockResolvedValueOnce({
+          backgroundColor: '#00000000',
+          backgroundColorDark: '#00000000',
+          heightPixels: 320,
+          height: 2,
+          shareImageUrl: 'https://i.redd.it/o0h58lzmax6a1.png',
+          renderStyle: RenderStyle.RENDER_STYLE_DEFAULT,
+        });
+
+        await runWithTestContext(async () => {
+          const styles = await reddit.getPostStyles('t3_qwerty');
+
+          expect(spyPlugin).toHaveBeenCalledWith({ postId: 't3_qwerty' });
+          expect(styles.supportsChromeless).toBe(false);
+          expect(styles).not.toHaveProperty('renderStyle');
+        });
       });
     });
 
@@ -497,6 +540,50 @@ describe('Post API', () => {
               subredditName: 'askReddit',
             })
           ).rejects.toThrow(expectedErrMessage);
+        });
+      });
+
+      test.each([
+        {
+          supportsChromeless: undefined,
+          expected: RenderStyle.RENDER_STYLE_UNSPECIFIED,
+          name: 'maps undefined supportsChromeless to RENDER_STYLE_UNSPECIFIED',
+        },
+        {
+          supportsChromeless: false,
+          expected: RenderStyle.RENDER_STYLE_DEFAULT,
+          name: 'maps false supportsChromeless to RENDER_STYLE_DEFAULT',
+        },
+        {
+          supportsChromeless: true,
+          expected: RenderStyle.RENDER_STYLE_CHROMELESS,
+          name: 'maps true supportsChromeless to RENDER_STYLE_CHROMELESS',
+        },
+      ])('$name', async ({ supportsChromeless, expected }) => {
+        const mockedPost = new Post({ ...defaultPostData });
+        const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await runWithTestContext(async () => {
+          await reddit.submitCustomPost({
+            title: mockedPost.title,
+            subredditName: mockedPost.subredditName,
+            styles: {
+              supportsChromeless,
+            },
+          });
+
+          expect(spyPlugin).toHaveBeenCalledWith(
+            expect.objectContaining({
+              customPostStyles: expect.objectContaining({
+                renderStyle: expected,
+              }),
+            }),
+            context.metadata
+          );
         });
       });
     });

@@ -2,11 +2,7 @@ import { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos/js
 import { type CustomPostStylesInput } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import { type DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
-import {
-  type CustomPostStyles,
-  EntrypointHeight,
-  RenderStyle,
-} from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
+import { EntrypointHeight, RenderStyle } from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
 // eslint-disable-next-line no-restricted-imports
 import type {
   Listing as ListingProto,
@@ -33,7 +29,7 @@ import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
 import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
-import { filterThing } from '../RedditClient.js';
+import { type CustomPostStyles, filterThing } from '../RedditClient.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { CommonFlair } from './Flair.js';
@@ -1306,7 +1302,12 @@ export class Post {
               height: opts.styles.height ?? EntrypointHeight.HEIGHT_UNSPECIFIED,
               shareImageUrl: opts.styles.shareImageUrl ?? '',
               heightPixels: 0,
-              renderStyle: RenderStyle.RENDER_STYLE_UNSPECIFIED,
+              renderStyle:
+                opts.styles.supportsChromeless === undefined
+                  ? RenderStyle.RENDER_STYLE_UNSPECIFIED
+                  : opts.styles.supportsChromeless
+                    ? RenderStyle.RENDER_STYLE_CHROMELESS
+                    : RenderStyle.RENDER_STYLE_DEFAULT,
             }
           : undefined,
       },
@@ -1436,7 +1437,12 @@ export class Post {
   /** @internal */
   static async getDevvitCustomPostStyles(postId: T3): Promise<CustomPostStyles> {
     const client = getRedditApiPlugins().LinksAndComments;
-    return await client.GetCustomPostStyles({ postId });
+    const styles = await client.GetCustomPostStyles({ postId });
+    const { renderStyle, ...publicStyles } = styles;
+    return {
+      ...publicStyles,
+      supportsChromeless: renderStyle === RenderStyle.RENDER_STYLE_CHROMELESS,
+    };
   }
 
   /** @internal */
