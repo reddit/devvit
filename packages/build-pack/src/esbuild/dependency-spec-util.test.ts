@@ -936,6 +936,23 @@ test('triggers', () =>
     }
   `));
 
+test('mention in comment trigger', () => {
+  const spec = createDependencySpec(
+    { name: 'actor name', owner: 'actor owner', version: '1.2.3' },
+    {
+      schema: 'v1',
+      name: 'name',
+      permissions: noPermissions,
+      triggers: { onMentionInCommentCreate: '/internal/triggers/on-mention-in-comment-create' },
+    },
+    { hostname: 'hostname' }
+  );
+
+  expect(spec.provides.map((provided) => provided.definition?.fullName)).toContain(
+    'devvit.actor.automation.v1alpha.OnMentionInCommentCreate'
+  );
+});
+
 test('blocks triggers', () =>
   expect(
     createDependencySpec(

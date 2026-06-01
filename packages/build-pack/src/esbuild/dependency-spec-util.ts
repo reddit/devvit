@@ -15,6 +15,7 @@ import {
   OnCommentReportDefinition,
   OnCommentSubmitDefinition,
   OnCommentUpdateDefinition,
+  OnMentionInCommentCreateDefinition,
   OnModActionDefinition,
   OnModMailDefinition,
   OnPostCreateDefinition,
@@ -193,6 +194,8 @@ export function createDependencySpec(
     if (config.triggers.onCommentReport != null) provide(spec, OnCommentReportDefinition);
     if (config.triggers.onCommentSubmit != null) provide(spec, OnCommentSubmitDefinition);
     if (config.triggers.onCommentUpdate != null) provide(spec, OnCommentUpdateDefinition);
+    if (config.triggers.onMentionInCommentCreate != null)
+      provide(spec, OnMentionInCommentCreateDefinition);
     if (config.triggers.onModAction != null) provide(spec, OnModActionDefinition);
     if (config.triggers.onModMail != null) provide(spec, OnModMailDefinition);
     if (config.triggers.onPostCreate != null) provide(spec, OnPostCreateDefinition);

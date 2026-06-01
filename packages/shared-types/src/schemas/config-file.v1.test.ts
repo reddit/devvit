@@ -1549,6 +1549,7 @@ describe('parseAppConfigJSON()', () => {
           server: {},
           triggers: {
             onAppInstall: '/internal/on/install',
+            onMentionInCommentCreate: '/internal/on/mention',
             onPostCreate: '/internal/on/post/create',
           },
         } satisfies AppConfigJson,
@@ -1561,6 +1562,7 @@ describe('parseAppConfigJSON()', () => {
           "server": {},
           "triggers": {
             "onAppInstall": "/internal/on/install",
+            "onMentionInCommentCreate": "/internal/on/mention",
             "onPostCreate": "/internal/on/post/create",
           },
         },
@@ -1592,6 +1594,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "triggers": {
           "onAppInstall": "/internal/on/install",
+          "onMentionInCommentCreate": "/internal/on/mention",
           "onPostCreate": "/internal/on/post/create",
         },
       }

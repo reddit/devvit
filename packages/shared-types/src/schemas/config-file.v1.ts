@@ -95,6 +95,7 @@ export type AppTriggersConfig = {
   onCommentReport?: string;
   onCommentSubmit?: string;
   onCommentUpdate?: string;
+  onMentionInCommentCreate?: string;
   onModAction?: string;
   onModMail?: string;
   onPostCreate?: string;
