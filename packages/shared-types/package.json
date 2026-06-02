@@ -47,7 +47,7 @@
     "redis": "4.6.6",
     "redis-mock": "0.56.3",
     "typescript": "5.8.3",
-    "vitest": "4.0.15"
+    "vitest": "4.1.0"
   },
   "publishConfig": {
     "directory": "dist"
