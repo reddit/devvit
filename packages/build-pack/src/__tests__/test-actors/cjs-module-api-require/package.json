@@ -1,10 +1,10 @@
 {
   "private": true,
   "name": "cjs-module-api-require",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "license": "BSD-3-Clause",
   "type": "commonjs",
   "dependencies": {
-    "@devvit/public-api": "0.13.0"
+    "@devvit/public-api": "0.13.1"
   }
 }
