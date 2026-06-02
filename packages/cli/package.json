@@ -75,7 +75,7 @@
     "string-length": "5.0.1",
     "tiny-glob": "0.2.9",
     "twirp-ts": "2.5.0",
-    "ws": "8.18.0"
+    "ws": "8.20.1"
   },
   "devDependencies": {
     "@devvit/tsconfig": "0.13.0",
