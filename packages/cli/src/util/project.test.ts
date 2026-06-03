@@ -20,6 +20,7 @@ const noPermissions: AppPermissionConfig = {
   externalEndpoints: false,
   http: { enable: false, domains: [] },
   blob: false,
+  chromeless: false,
   media: false,
   menu: false,
   payments: false,

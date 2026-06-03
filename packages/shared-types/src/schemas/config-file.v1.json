@@ -418,6 +418,11 @@
           "description": "Enables the Redis plugin (storage).",
           "default": false
         },
+        "chromeless": {
+          "type": "boolean",
+          "description": "Enables use of `supportsChromeless` in the CustomPostStyles API. When enabled on a custom post and highlighted within the subreddit, the post can be rendered without its header and footer, and without horizontal margins.",
+          "default": false
+        },
         "reddit": {
           "oneOf": [
             {

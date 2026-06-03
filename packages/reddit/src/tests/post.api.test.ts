@@ -131,6 +131,7 @@ describe('Post API', () => {
       name: '',
       permissions: {
         blob: false,
+        chromeless: false,
         externalEndpoints: false,
         http: {
           enable: false,

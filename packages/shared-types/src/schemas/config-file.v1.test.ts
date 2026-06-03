@@ -28,6 +28,7 @@ describe('parseAppConfig()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -64,6 +65,7 @@ describe('parseAppConfig()', () => {
         "name": "<% name %>",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -143,6 +145,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -204,6 +207,7 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "chromeless": false,
             "externalEndpoints": false,
             "http": {
               "domains": [],
@@ -240,6 +244,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -317,6 +322,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -373,6 +379,7 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "chromeless": false,
             "externalEndpoints": false,
             "http": {
               "domains": [],
@@ -410,6 +417,7 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "chromeless": false,
             "externalEndpoints": false,
             "http": {
               "domains": [],
@@ -448,6 +456,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -502,6 +511,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -554,6 +564,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -610,6 +621,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -663,6 +675,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -731,6 +744,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -793,6 +807,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -840,6 +855,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -852,6 +868,54 @@ describe('parseAppConfigJSON()', () => {
           "reddit": {
             "asUser": [],
             "enable": true,
+            "scope": "user",
+          },
+          "redis": false,
+          "settings": false,
+          "triggers": false,
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+        },
+      }
+    `));
+  test('override permissions.chromeless', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'name',
+          permissions: { chromeless: true },
+          server: {},
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "json": {
+          "name": "name",
+          "permissions": {
+            "chromeless": true,
+          },
+          "server": {},
+        },
+        "name": "name",
+        "permissions": {
+          "blob": false,
+          "chromeless": true,
+          "externalEndpoints": false,
+          "http": {
+            "domains": [],
+            "enable": false,
+          },
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": false,
             "scope": "user",
           },
           "redis": false,
@@ -889,6 +953,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -940,6 +1005,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [
@@ -988,6 +1054,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1048,6 +1115,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1215,6 +1283,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "test-app",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1410,6 +1479,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1499,6 +1569,7 @@ describe('parseAppConfigJSON()', () => {
         },
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1569,6 +1640,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1653,6 +1725,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1731,6 +1804,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1801,6 +1875,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1853,6 +1928,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1901,6 +1977,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -1959,6 +2036,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": true,
           "http": {
             "domains": [],
@@ -2026,6 +2104,7 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": true,
           "http": {
             "domains": [],
@@ -2318,6 +2397,7 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -2392,6 +2472,7 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
@@ -2465,6 +2546,7 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "chromeless": false,
           "externalEndpoints": false,
           "http": {
             "domains": [],
