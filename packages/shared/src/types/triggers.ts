@@ -14,6 +14,7 @@ import {
   type CommentReport,
   type CommentSubmit,
   type CommentUpdate,
+  type MentionInCommentCreate,
   type PostCreate,
   type PostDelete,
   type PostFlairUpdate,
@@ -56,6 +57,9 @@ export type OnCommentDeleteRequest = CommentDelete & { type: 'CommentDelete' };
 export type OnCommentReportRequest = CommentReport & { type: 'CommentReport' };
 export type OnCommentSubmitRequest = CommentSubmit & { type: 'CommentSubmit' };
 export type OnCommentUpdateRequest = CommentUpdate & { type: 'CommentUpdate' };
+export type OnMentionInCommentCreateRequest = MentionInCommentCreate & {
+  type: 'MentionInCommentCreate';
+};
 export type OnModActionRequest = ModAction & { type: 'ModAction' };
 export type OnModMailRequest = ModMail & { type: 'ModMail' };
 export type OnPostCreateRequest = PostCreate & { type: 'PostCreate' };
@@ -77,6 +81,7 @@ export type TriggerRequest =
   | OnCommentReportRequest
   | OnCommentSubmitRequest
   | OnCommentUpdateRequest
+  | OnMentionInCommentCreateRequest
   | OnModActionRequest
   | OnModMailRequest
   | OnPostCreateRequest

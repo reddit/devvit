@@ -11,6 +11,7 @@ import type {
   OnCommentReport,
   OnCommentSubmit,
   OnCommentUpdate,
+  OnMentionInCommentCreate,
   OnModAction,
   OnModMail,
   OnPostCreate,
@@ -33,6 +34,7 @@ import {
   OnCommentReportDefinition,
   OnCommentSubmitDefinition,
   OnCommentUpdateDefinition,
+  OnMentionInCommentCreateDefinition,
   OnModActionDefinition,
   OnModMailDefinition,
   OnPostCreateDefinition,
@@ -163,6 +165,13 @@ export function registerTriggers(config: Config): void {
         extendDevvitPrototype<OnCommentDelete>(
           'OnCommentDelete',
           createCombinedHandler('CommentDelete', Devvit.triggerOnEventHandlers.get(event))
+        );
+        break;
+      case 'MentionInCommentCreate':
+        config.provides(OnMentionInCommentCreateDefinition);
+        extendDevvitPrototype<OnMentionInCommentCreate>(
+          'OnMentionInCommentCreate',
+          createCombinedHandler('MentionInCommentCreate', Devvit.triggerOnEventHandlers.get(event))
         );
         break;
       case 'AppInstall':

@@ -34,6 +34,8 @@ export type CommentUpdate = 'CommentUpdate';
 export type CommentReport = 'CommentReport';
 /** The event name for when a comment is deleted */
 export type CommentDelete = 'CommentDelete';
+/** The event name for when a newly created comment mentions the app */
+export type MentionInCommentCreate = 'MentionInCommentCreate';
 /** The event name for when your app is installed */
 export type AppInstall = 'AppInstall';
 /** The event name for when your app is upgraded */
@@ -64,6 +66,7 @@ export type TriggerEventType = {
   CommentUpdate: { type: 'CommentUpdate' } & Events.CommentUpdate;
   CommentReport: { type: 'CommentReport' } & Events.CommentReport;
   CommentDelete: { type: 'CommentDelete' } & Events.CommentDelete;
+  MentionInCommentCreate: { type: 'MentionInCommentCreate' } & Events.MentionInCommentCreate;
   AppInstall: { type: 'AppInstall' } & Events.AppInstall;
   AppUpgrade: { type: 'AppUpgrade' } & Events.AppUpgrade;
   ModAction: { type: 'ModAction' } & ModAction;
@@ -88,6 +91,7 @@ export type TriggerEvent =
   | CommentUpdate
   | CommentReport
   | CommentDelete
+  | MentionInCommentCreate
   | AppInstall
   | AppUpgrade
   | ModActionTrigger
@@ -161,6 +165,11 @@ export type CommentDeleteDefinition = {
   onEvent: TriggerOnEventHandler<Events.CommentDelete>;
 };
 
+export type MentionInCommentCreateDefinition = {
+  event: MentionInCommentCreate;
+  onEvent: TriggerOnEventHandler<Events.MentionInCommentCreate>;
+};
+
 export type AppInstallDefinition = {
   event: AppInstall;
   onEvent: TriggerOnEventHandler<Events.AppInstall>;
@@ -218,6 +227,7 @@ export type TriggerDefinition =
   | CommentUpdateDefinition
   | CommentReportDefinition
   | CommentDeleteDefinition
+  | MentionInCommentCreateDefinition
   | AppInstallDefinition
   | AppUpgradeDefinition
   | ModActionDefinition
@@ -239,6 +249,7 @@ export type OnTriggerRequest =
   | Events.CommentUpdate
   | Events.CommentReport
   | Events.CommentDelete
+  | Events.MentionInCommentCreate
   | Events.AppInstall
   | Events.AppUpgrade
   | ModAction
