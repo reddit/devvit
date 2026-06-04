@@ -6,7 +6,7 @@ import { createDevvitTest } from './devvitTest.js';
 const test = createDevvitTest();
 
 test('telemetry records sessions through the plugin client', async ({ mocks }) => {
-  const journeyId = await telemetry.startJourney();
+  const { journeyId } = await telemetry.startJourney();
   expect(journeyId.length).toBeGreaterThan(0);
 
   await telemetry.journeyProgress({
