@@ -23,7 +23,7 @@ describe('validateProductsJson', () => {
       product: {
         sku: 'sku',
         displayName: 'product',
-        price: 42,
+        price: 1251,
         images: { icon: 'icon' },
       },
       expectedError: 'price is not one of enum values',
@@ -115,7 +115,7 @@ describe('validateProductsJson', () => {
       product: {
         sku: 'sku',
         displayName: '🗡️ sword',
-        price: 5,
+        price: 1250,
         images: { icon: 'icon' },
         metadata: Object.fromEntries(Array.from({ length: 10 }, (_, i) => [`key${i}`, 'value'])),
         accountingType: 'INSTANT',

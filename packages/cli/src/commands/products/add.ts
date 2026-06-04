@@ -2,6 +2,7 @@ import { readdir, writeFile } from 'node:fs/promises';
 
 import { PRODUCTS_JSON_FILE } from '@devvit/shared-types/constants.js';
 import { AccountingType } from '@devvit/shared-types/payments/Product.js';
+import productsSchema from '@devvit/shared-types/schemas/products.json' with { type: 'json' };
 import { Args, Flags, ux } from '@oclif/core';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
@@ -10,8 +11,7 @@ import * as path from 'path';
 import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
 import { type JSONProduct, readProducts } from '../../util/payments/paymentsConfig.js';
 
-// TODO: Import these from the products.json schema file.
-const ALLOWED_PRICES = [5, 25, 50, 100, 150, 250, 500, 1000, 2500];
+const ALLOWED_PRICES = productsSchema.properties.products.items.properties.price.enum;
 type ValidAccountingType =
   | AccountingType.CONSUMABLE
   | AccountingType.DURABLE
