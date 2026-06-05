@@ -42,6 +42,7 @@ client-manifest.json
 # drone artifacts
 .npmrc
 .terraform/
+drone-slack-message.txt
 
 # Go workspace
 go.work.sum
