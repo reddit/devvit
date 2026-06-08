@@ -14,6 +14,7 @@ describe('fetch()', () => {
     dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
     entrypoints: {},
     share: undefined,
+    adPayload: undefined,
     appPermissionState: undefined,
     token: 'authToken' as WebbitToken,
     webViewMode: undefined,

@@ -1,4 +1,7 @@
-import type { AppPermissionState } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
+import type {
+  AdPayload,
+  AppPermissionState,
+} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import type { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
 
 import type { WebbitToken } from '../webbit.js';
@@ -16,6 +19,8 @@ export type DevvitGlobal = {
   entrypoints: { [name: string]: string };
   /** App deep link data if any. */
   share: Share | undefined;
+  /** Render-time ad data for promoted posts. Absent for non-promoted posts. */
+  adPayload: AdPayload | undefined;
   /** Data required for the "run as user" feature. */
   appPermissionState: AppPermissionState | undefined;
   /** The auth bearer token shared across all entries. */

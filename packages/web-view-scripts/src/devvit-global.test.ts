@@ -429,6 +429,27 @@ describe('initContext()', () => {
     expect(devvit.share).toStrictEqual({ userData: 'shareData' });
   });
 
+  test('adPayload is set', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.SHREDDIT,
+      webViewContext: {
+        subredditId: 't5_123',
+        subredditName: 'subredditName',
+        appName: 'test-app-123',
+        appVersion: '1.0.0',
+        postId: 't3_123',
+        userId: 't2_123',
+      },
+      adPayload: { data: { clickUrl: 'https://example.com' } },
+      webbitToken: noWebbitToken,
+    };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
+
+    expect(devvit.adPayload).toStrictEqual({ data: { clickUrl: 'https://example.com' } });
+  });
+
   test('webViewMode is set', () => {
     const bridge: BridgeContext = {
       devvitDebug: '',

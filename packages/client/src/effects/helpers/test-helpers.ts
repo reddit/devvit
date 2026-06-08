@@ -26,6 +26,7 @@ export const mockDevvit: Readonly<DevvitGlobal> = {
     username: 'username',
   },
   share: undefined,
+  adPayload: undefined,
   token: noWebbitToken,
   webViewMode: undefined,
   startTime: undefined,
