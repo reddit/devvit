@@ -125,16 +125,33 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
         }
 
         ux.action.start('Uploading app source bundle...');
-        const resp = await fetch(appVersionInfo.sourceUploadInfo.uploadUrl, {
-          method: 'PUT',
-          body: appInfo.appSourceBuffer,
-          headers: appVersionInfo.sourceUploadInfo.requiredHeaders,
-        });
-        if (!resp.ok) {
-          const body = await resp.text();
-          this.#cmd.error(
-            `Failed to upload app source: ${resp.status} ${resp.statusText}:\n${body}\n\nDepending on what that error is, trying again may help. If the problem persists, contact a Devvit team member.`
-          );
+
+        const LARGE_BUNDLE_WARNING_THRESHOLD = 50 * 1024 * 1024;
+        if (appInfo.appSourceBuffer.byteLength > LARGE_BUNDLE_WARNING_THRESHOLD) {
+          // The source code bundle is over ~50mb - warn the user that uploading it might take a couple minutes
+          this.#cmd.warn('This is a large file, it may take a couple minutes to upload.');
+        }
+        try {
+          const resp = await fetch(appVersionInfo.sourceUploadInfo.uploadUrl, {
+            method: 'PUT',
+            body: appInfo.appSourceBuffer,
+            headers: appVersionInfo.sourceUploadInfo.requiredHeaders,
+          });
+          if (!resp.ok) {
+            const body = await resp.text();
+            const msg = `Failed to upload app source ${appVersionInfo.sourceUploadInfo.uploadUrl} - HTTP ${resp.status}:\n${body}`;
+            throw new Error(msg);
+          }
+        } catch (e) {
+          const error = e as Error;
+          let errorMessage = error?.message;
+          if (errorMessage === 'fetch failed') {
+            // This is the most common, and least helpful error message. And it usually has a useful
+            // cause, so go get that instead.
+            errorMessage = (error.cause as Error)?.message || error.message;
+          }
+          const msg = `Failed to upload app source: ${appVersionInfo.sourceUploadInfo.uploadUrl}: ${errorMessage}`;
+          this.#cmd.error(msg);
         }
         ux.action.stop('Done');
       }
