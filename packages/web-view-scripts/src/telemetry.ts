@@ -71,31 +71,69 @@ function measureTtfb(): WebViewTelemetryMetric | undefined {
   };
 }
 
-function measureFcp(): WebViewTelemetryMetric | undefined {
+/**
+ * Builds both the legacy v1 metric and the clock-aligned v2 metric for a span.
+ *
+ * The v1 metric keeps its historical (flawed) anchoring of the native `startTime`
+ * clock against a `performance.timeOrigin`-relative offset, preserving the existing
+ * series. The v2 metric anchors `timeStart` to `performance.timeOrigin`, the same
+ * clock the offset is measured from, so its absolute timestamps are correct while
+ * the duration stays identical to v1.
+ */
+function buildMetricPair(spanName: string, offset: number): WebViewTelemetryMetric[] {
+  if (!startTime) {
+    return [];
+  }
+
+  return [
+    {
+      spanName,
+      timeStart: startTime,
+      timeEnd: startTime + offset,
+    },
+    {
+      spanName: `${spanName}_v2`,
+      timeStart: performance.timeOrigin,
+      timeEnd: performance.timeOrigin + offset,
+    },
+  ];
+}
+
+/**
+ * Measures the native startup window between the app launch (`startTime`) and the
+ * moment the WebView began loading the page (`performance.timeOrigin`). This gap
+ * covers WebView inflation, bridge setup, data fetching, and navigation triggers,
+ * none of which is reflected in the in-page performance offsets.
+ */
+function measureWebViewInitialization(): WebViewTelemetryMetric | undefined {
+  if (!startTime) {
+    return undefined;
+  }
+
+  return {
+    spanName: 'web_view_initialization',
+    timeStart: startTime,
+    timeEnd: performance.timeOrigin,
+  };
+}
+
+function measureFcp(): WebViewTelemetryMetric[] {
   const paintEntries = performance.getEntriesByType('paint');
   const fcpEntry = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
 
   if (!fcpEntry || !startTime) {
-    return;
+    return [];
   }
 
-  return {
-    spanName: 'web_view_first_contentful_paint',
-    timeStart: startTime,
-    timeEnd: startTime + fcpEntry.startTime,
-  };
+  return buildMetricPair('web_view_first_contentful_paint', fcpEntry.startTime);
 }
 
-function measureLoad(): WebViewTelemetryMetric | undefined {
+function measureLoad(): WebViewTelemetryMetric[] {
   if (!startTime) {
-    return;
+    return [];
   }
 
-  return {
-    spanName: 'web_view_load',
-    timeStart: startTime,
-    timeEnd: startTime + performance.now(),
-  };
+  return buildMetricPair('web_view_load', performance.now());
 }
 
 /**
@@ -104,19 +142,15 @@ function measureLoad(): WebViewTelemetryMetric | undefined {
  * This represents when the page is fully interactive and stable.
  * Avoids long task API which isn't supported on iOS.
  */
-function measureTti(): WebViewTelemetryMetric | undefined {
+function measureTti(): WebViewTelemetryMetric[] {
   const navTiming = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
   const ttiTime = navTiming.domInteractive;
 
   if (!startTime || !ttiTime) {
-    return undefined;
+    return [];
   }
 
-  return {
-    spanName: 'web_view_time_to_interactive',
-    timeStart: startTime,
-    timeEnd: startTime + ttiTime,
-  };
+  return buildMetricPair('web_view_time_to_interactive', ttiTime);
 }
 
 function initPerformanceMonitoring(): void {
@@ -125,6 +159,9 @@ function initPerformanceMonitoring(): void {
   if (!startTime) {
     return;
   }
+
+  const initialization = measureWebViewInitialization();
+  if (initialization) telemetryMetrics.push(initialization);
 
   // Measure TTFB immediately if ready, otherwise handled in load event
   if (document.readyState === 'complete') {
@@ -137,15 +174,15 @@ function initPerformanceMonitoring(): void {
       if (entry.name === 'first-contentful-paint') {
         const fcp = measureFcp();
         observer.disconnect();
-        if (!fcp) break;
+        if (fcp.length === 0) break;
         if (document.readyState === 'complete') {
           // load already fired without FCP — emit it now as a standalone metric
           emitEffect({
             type: EffectType.EFFECT_TELEMETRY,
-            telemetry: { metrics: { metrics: [fcp] } },
+            telemetry: { metrics: { metrics: fcp } },
           });
         } else {
-          telemetryMetrics.push(fcp);
+          telemetryMetrics.push(...fcp);
         }
         break;
       }
@@ -156,12 +193,10 @@ function initPerformanceMonitoring(): void {
 
   if (document.readyState === 'loading') {
     globalThis.addEventListener('DOMContentLoaded', () => {
-      const tti = measureTti();
-      if (tti) telemetryMetrics.push(tti);
+      telemetryMetrics.push(...measureTti());
     });
   } else {
-    const tti = measureTti();
-    if (tti) telemetryMetrics.push(tti);
+    telemetryMetrics.push(...measureTti());
   }
 
   // Emit metrics after page is fully loaded
@@ -169,8 +204,7 @@ function initPerformanceMonitoring(): void {
     const ttfb = measureTtfb();
     if (ttfb) telemetryMetrics.push(ttfb);
 
-    const load = measureLoad();
-    if (load) telemetryMetrics.push(load);
+    telemetryMetrics.push(...measureLoad());
 
     emitEffect({
       type: EffectType.EFFECT_TELEMETRY,

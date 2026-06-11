@@ -445,6 +445,11 @@ describe('performance monitoring', () => {
                 timeStart: 1717171717171,
                 timeEnd: 1717171717171 + 300,
               },
+              {
+                spanName: 'web_view_first_contentful_paint_v2',
+                timeStart: performance.timeOrigin,
+                timeEnd: performance.timeOrigin + 300,
+              },
             ]),
           },
         },
@@ -502,6 +507,11 @@ describe('performance monitoring', () => {
                 timeStart: 1717171717171,
                 timeEnd: 1717171717171 + 300,
               },
+              {
+                spanName: 'web_view_first_contentful_paint_v2',
+                timeStart: performance.timeOrigin,
+                timeEnd: performance.timeOrigin + 300,
+              },
             ],
           },
         },
@@ -544,6 +554,71 @@ describe('performance monitoring', () => {
                 spanName: 'web_view_time_to_interactive',
                 timeStart: 1717171717171,
                 timeEnd: 1717171717171 + 300,
+              },
+              {
+                spanName: 'web_view_time_to_interactive_v2',
+                timeStart: performance.timeOrigin,
+                timeEnd: performance.timeOrigin + 300,
+              },
+            ]),
+          },
+        },
+      }),
+      '*'
+    );
+  });
+
+  it('captures the web_view_initialization gap metric', async () => {
+    const loadHandlers = addEventListenerMock.mock.calls
+      .filter((call) => call[0] === 'load')
+      .map((call) => call[1]);
+    loadHandlers.forEach((handler) => handler?.({}));
+
+    expect(postMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: WebViewInternalMessageScope.CLIENT,
+        type: webViewInternalMessageType,
+        telemetry: {
+          metrics: {
+            metrics: expect.arrayContaining([
+              {
+                spanName: 'web_view_initialization',
+                timeStart: 1717171717171,
+                timeEnd: performance.timeOrigin,
+              },
+            ]),
+          },
+        },
+      }),
+      '*'
+    );
+  });
+
+  it('captures load metric with a clock-aligned v2 variant', async () => {
+    const performanceNow = 400;
+    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
+
+    const loadHandlers = addEventListenerMock.mock.calls
+      .filter((call) => call[0] === 'load')
+      .map((call) => call[1]);
+    loadHandlers.forEach((handler) => handler?.({}));
+
+    expect(postMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: WebViewInternalMessageScope.CLIENT,
+        type: webViewInternalMessageType,
+        telemetry: {
+          metrics: {
+            metrics: expect.arrayContaining([
+              {
+                spanName: 'web_view_load',
+                timeStart: 1717171717171,
+                timeEnd: 1717171717171 + performanceNow,
+              },
+              {
+                spanName: 'web_view_load_v2',
+                timeStart: performance.timeOrigin,
+                timeEnd: performance.timeOrigin + performanceNow,
               },
             ]),
           },
