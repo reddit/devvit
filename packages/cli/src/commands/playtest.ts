@@ -405,7 +405,7 @@ export default class Playtest extends DevvitCommand {
     const token = await getAccessTokenAndLoginIfNeeded(
       isWebContainer() ? 'CopyPaste' : 'LocalSocket'
     );
-    const username = await this.getUserDisplayName(token);
+    const userInfo = await this.getUserInfo(token);
     await this.checkDeveloperAccount();
 
     if (flags.connect) {
@@ -433,7 +433,7 @@ export default class Playtest extends DevvitCommand {
     }
     this.project.app.defaultPlaytestSubredditId = this.#appInfo.app.defaultPlaytestSubredditId;
 
-    const isOwner = this.#appInfo?.app?.owner?.displayName === username;
+    const isOwner = this.#appInfo?.app?.owner?.id === userInfo.id;
     await this.#checkIfUserAllowedToPlaytestThisApp(
       this.project.name,
       isOwner,
@@ -460,7 +460,7 @@ export default class Playtest extends DevvitCommand {
       this.log(chalk.green(`We'll create a default playtest subreddit for your app!`));
       latestVersion = await this.#createPlaytestVersion({
         version: new DevvitVersion(0, 0, 1),
-        username,
+        username: userInfo.username,
         firstBuild,
         preventSubredditCreation: false,
       });
@@ -506,7 +506,7 @@ export default class Playtest extends DevvitCommand {
       this.#version.bumpVersion(VersionBumpType.Prerelease);
       latestVersion = await this.#createPlaytestVersion({
         version: this.#version,
-        username,
+        username: userInfo.username,
         firstBuild,
         preventSubredditCreation: !shouldCreatePlaytestSubreddit,
       });
@@ -561,7 +561,7 @@ export default class Playtest extends DevvitCommand {
       flags as CommandFlags<typeof Logs>
     );
 
-    this.#startWatchingSrc(username);
+    this.#startWatchingSrc(userInfo.username);
     this.#startWatchingAssets();
     this.#startWatchingConfigFile();
 

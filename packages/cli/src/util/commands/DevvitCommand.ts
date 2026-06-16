@@ -15,7 +15,12 @@ import {
   newProject,
   type Project,
 } from '../project.js';
-import { fetchUserDisplayName, fetchUserT2Id } from '../r2Api/user.js';
+import {
+  fetchUserDisplayName,
+  fetchUserInfo,
+  fetchUserT2Id,
+  type UserInfo,
+} from '../r2Api/user.js';
 
 /**
  * Note: we have to return `Promise<string>` here rather than just `string`
@@ -142,6 +147,17 @@ export abstract class DevvitCommand extends Command {
     if (!token) {
       this.error('Not currently logged in. Try `devvit login` first');
     }
+  }
+
+  /**
+   * @description Get the user's info from the stored token.
+   */
+  protected async getUserInfo(token: StoredToken): Promise<UserInfo> {
+    const res = await fetchUserInfo(token);
+    if (!res.ok) {
+      this.error(`${res.error}. Try again or re-login with \`devvit login\`.`);
+    }
+    return res.value;
   }
 
   /**

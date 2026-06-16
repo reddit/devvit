@@ -1,4 +1,3 @@
-import type { JsonObject } from '@devvit/shared-types/json.js';
 import { isT2, T2 } from '@devvit/shared-types/tid.js';
 
 import type { StoredToken } from '../../lib/auth/StoredToken.js';
@@ -11,17 +10,15 @@ import { Result } from './result.js';
 // doesn't seem to add much value over throwing an error and letting the caller
 // catch and format a message.
 
+export type UserInfo = { id: T2; username: string };
+
 export async function fetchUserDisplayName(token: StoredToken): Promise<Result<string>> {
   const fetchUserRes = await fetchUserInfo(token);
   if (!fetchUserRes.ok) {
     return Result.Err(fetchUserRes.error);
   }
 
-  const username = fetchUserRes.value.name;
-  if (typeof username !== 'string') {
-    return Result.Err(`Failed to fetch user display name as string. Got: ${fetchUserRes.value}`);
-  }
-  return Result.Ok(username);
+  return Result.Ok(fetchUserRes.value.username);
 }
 
 export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2>> {
@@ -30,9 +27,25 @@ export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2>> {
     return Result.Err(fetchUserRes.error);
   }
 
-  const userId = fetchUserRes.value.id;
+  return Result.Ok(fetchUserRes.value.id);
+}
+
+export async function fetchUserInfo(token: StoredToken): Promise<Result<UserInfo>> {
+  const headers = authHeaders(token);
+
+  const response = await fetch(`${REDDIT_OAUTH_API}/api/v1/me.json`, {
+    headers,
+    redirect: 'follow',
+  });
+
+  if (!response.ok) {
+    return Result.Err(`Failed to fetch user info: ${response.status} ${response.statusText}`);
+  }
+  const fetchUserRes = await response.json();
+
+  const userId = fetchUserRes.id;
   if (typeof userId !== 'string') {
-    return Result.Err(`Failed to fetch user id as string. Got: ${fetchUserRes.value}`);
+    return Result.Err(`Failed to fetch user id as string. Got: ${fetchUserRes}`);
   }
   if (userId === '') {
     return Result.Err(`Failed to fetch user id - got an empty string somehow.`);
@@ -45,20 +58,10 @@ export async function fetchUserT2Id(token: StoredToken): Promise<Result<T2>> {
     return Result.Err(`Failed to convert user id to T2. Got: ${userId}`);
   }
 
-  return Result.Ok(t2);
-}
-
-async function fetchUserInfo(token: StoredToken): Promise<Result<JsonObject>> {
-  const headers = authHeaders(token);
-
-  const response = await fetch(`${REDDIT_OAUTH_API}/api/v1/me.json`, {
-    headers,
-    redirect: 'follow',
-  });
-
-  if (!response.ok) {
-    return Result.Err(`Failed to fetch user info: ${response.status} ${response.statusText}`);
+  const username = fetchUserRes.name;
+  if (typeof username !== 'string') {
+    return Result.Err(`Failed to fetch user display name as string. Got: ${fetchUserRes}`);
   }
 
-  return Result.Ok(await response.json());
+  return Result.Ok({ id: t2, username });
 }
