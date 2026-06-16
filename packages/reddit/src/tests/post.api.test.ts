@@ -137,6 +137,7 @@ describe('Post API', () => {
           enable: false,
           domains: [],
         },
+        journeys: false,
         media: false,
         menu: false,
         payments: false,

@@ -210,6 +210,7 @@ const nutritionCategoryToString: Readonly<Record<NutritionCategory, string>> = {
     "Appear and act as a moderator on subreddits where it's installed.",
   [NutritionCategory.MODLOG]: 'Read and write to Reddit moderator logs.',
   [NutritionCategory.PAYMENTS]: 'Sell digital goods or services.',
+  [NutritionCategory.JOURNEYS]: 'Record app journey telemetry.',
   [NutritionCategory.REDDIT_API]: 'Read and write _any_ Reddit data.',
   [NutritionCategory.REDDIT_TRIGGERS]:
     'Observe Reddit events such as post creation, comment deletion, and more.',

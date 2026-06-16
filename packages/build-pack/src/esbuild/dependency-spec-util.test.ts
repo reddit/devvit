@@ -10,6 +10,7 @@ const allPermissions: Readonly<AppPermissionConfig> = {
   http: { enable: true, domains: ['example.com'] },
   blob: true,
   chromeless: true,
+  journeys: true,
   media: true,
   menu: true,
   payments: true,
@@ -24,6 +25,7 @@ const noPermissions: Readonly<AppPermissionConfig> = {
   http: { enable: false, domains: [] },
   blob: false,
   chromeless: false,
+  journeys: false,
   media: false,
   menu: false,
   payments: false,
@@ -38,6 +40,7 @@ const asUserPermissions: Readonly<AppPermissionConfig> = {
   http: { enable: false, domains: [] },
   blob: false,
   chromeless: false,
+  journeys: false,
   media: false,
   menu: false,
   payments: false,
@@ -52,6 +55,7 @@ const redditPermissionsWithoutAsUser: Readonly<AppPermissionConfig> = {
   http: { enable: false, domains: [] },
   blob: false,
   chromeless: false,
+  journeys: false,
   media: false,
   menu: false,
   payments: false,
@@ -227,6 +231,10 @@ test('permissions', () =>
         {
           "name": "default",
           "typeName": "devvit.plugin.media.MediaService",
+        },
+        {
+          "name": "default",
+          "typeName": "devvit.plugin.telemetry.TelemetryPlugin",
         },
         {
           "name": "default",
@@ -955,6 +963,20 @@ test('mention in comment trigger', () => {
   expect(spec.provides.map((provided) => provided.definition?.fullName)).toContain(
     'devvit.actor.automation.v1alpha.OnMentionInCommentCreate'
   );
+});
+
+test('journeys permission uses the telemetry plugin', () => {
+  const spec = createDependencySpec(
+    { name: 'actor name', owner: 'actor owner', version: '1.2.3' },
+    {
+      schema: 'v1',
+      name: 'name',
+      permissions: { ...noPermissions, journeys: true },
+    },
+    { hostname: 'hostname' }
+  );
+
+  expect(spec.uses.map((use) => use.typeName)).toContain('devvit.plugin.telemetry.TelemetryPlugin');
 });
 
 test('blocks triggers', () =>
@@ -1759,6 +1781,10 @@ test('everything', () =>
         {
           "name": "default",
           "typeName": "devvit.plugin.media.MediaService",
+        },
+        {
+          "name": "default",
+          "typeName": "devvit.plugin.telemetry.TelemetryPlugin",
         },
         {
           "name": "default",

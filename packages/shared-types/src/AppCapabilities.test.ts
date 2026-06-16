@@ -90,6 +90,16 @@ describe(appCapabilitiesFromActor.name, () => {
       NutritionCategory.MODERATOR,
     ]);
   });
+
+  test('an actor with the telemetry plugin', async () => {
+    expect(
+      appCapabilitiesFromActor({
+        actorPlugins: [{ fullname: 'devvit.plugin.telemetry.TelemetryPlugin' }],
+        actorTypes: [],
+        hasWebView: false,
+      })
+    ).toStrictEqual([NutritionCategory.JOURNEYS, NutritionCategory.MODERATOR]);
+  });
 });
 
 describe(appCapabilitiesFromLinkedBundle.name, () => {
@@ -143,6 +153,28 @@ describe(appCapabilitiesFromLinkedBundle.name, () => {
       NutritionCategory.HTTP,
       NutritionCategory.REDDIT_API,
       NutritionCategory.PAYMENTS,
+      NutritionCategory.MODERATOR,
+    ]);
+  });
+
+  test('a linked bundle using the telemetry plugin', async () => {
+    const bundle: LinkedBundle = {
+      ...baseLinkedBundle,
+      uses: [
+        {
+          ...baseLinkedBundle,
+          provides: [
+            {
+              ...baseActorDefinition,
+              fullName: 'devvit.plugin.telemetry.TelemetryPlugin',
+            },
+          ],
+        },
+      ],
+    };
+
+    expect(appCapabilitiesFromLinkedBundle(bundle)).toStrictEqual([
+      NutritionCategory.JOURNEYS,
       NutritionCategory.MODERATOR,
     ]);
   });
@@ -210,6 +242,26 @@ describe(appCapabilitiesFromBundle.name, () => {
       NutritionCategory.HTTP,
       NutritionCategory.REDDIT_API,
       NutritionCategory.PAYMENTS,
+      NutritionCategory.MODERATOR,
+    ]);
+  });
+
+  test('a bundle using the telemetry plugin', async () => {
+    const bundle: Bundle = {
+      ...baseBundle,
+      dependencies: {
+        ...baseDependencies,
+        uses: [
+          {
+            ...basePlugin,
+            typeName: 'devvit.plugin.telemetry.TelemetryPlugin',
+          },
+        ],
+      },
+    };
+
+    expect(appCapabilitiesFromBundle(bundle)).toStrictEqual([
+      NutritionCategory.JOURNEYS,
       NutritionCategory.MODERATOR,
     ]);
   });

@@ -21,6 +21,7 @@ const noPermissions: AppPermissionConfig = {
   http: { enable: false, domains: [] },
   blob: false,
   chromeless: false,
+  journeys: false,
   media: false,
   menu: false,
   payments: false,

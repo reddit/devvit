@@ -398,6 +398,11 @@
           "description": "Enables the media plugin (uploads).",
           "default": false
         },
+        "journeys": {
+          "type": "boolean",
+          "description": "Enables journey telemetry.",
+          "default": false
+        },
         "payments": {
           "type": "boolean",
           "description": "Enables the payments plugin.",

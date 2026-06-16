@@ -33,6 +33,7 @@ export const getDefaultAppConfig = (): AppConfig => {
       chromeless: false,
       externalEndpoints: true,
       http: { enable: true, domains: [] },
+      journeys: true,
       media: true,
       menu: true,
       payments: true,

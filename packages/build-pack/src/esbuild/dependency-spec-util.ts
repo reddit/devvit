@@ -80,6 +80,8 @@ import { RedisAPIDefinition } from '@devvit/protos/types/devvit/plugin/redis/red
 // eslint-disable-next-line no-restricted-imports
 import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 // eslint-disable-next-line no-restricted-imports
+import { TelemetryPluginDefinition } from '@devvit/protos/types/devvit/plugin/telemetry/telemetry.js';
+// eslint-disable-next-line no-restricted-imports
 import { UserActionsDefinition } from '@devvit/protos/types/devvit/plugin/useractions/useractions.js';
 // eslint-disable-next-line no-restricted-imports
 import { CustomPostDefinition } from '@devvit/protos/types/devvit/reddit/custom_post/v1alpha/custom_post.js';
@@ -124,6 +126,7 @@ export function createDependencySpec(
     permissions.requestedFetchDomains.push(...normalizeDomains(config.permissions.http.domains));
   }
   if (config.permissions.media) use(spec, MediaServiceDefinition);
+  if (config.permissions.journeys) use(spec, TelemetryPluginDefinition);
   if (config.permissions.payments) {
     use(spec, PaymentsServiceDefinition);
     provide(spec, PaymentProcessorDefinition);

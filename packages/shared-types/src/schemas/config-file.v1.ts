@@ -48,6 +48,7 @@ export type AppPermissionConfig = {
   chromeless: boolean;
   externalEndpoints: boolean;
   http: { enable: boolean; domains: string[] };
+  journeys: boolean;
   media: boolean;
   menu: boolean;
   payments: boolean;
@@ -264,6 +265,7 @@ export type AppPermissionConfigJson = {
   blob?: boolean;
   chromeless?: boolean;
   http?: { enable?: boolean; domains?: string[] };
+  journeys?: boolean;
   media?: boolean;
   payments?: boolean;
   realtime?: boolean;
@@ -482,6 +484,7 @@ function AppPermissionConfig(
     chromeless:
       permissions?.chromeless ?? schema.properties.permissions.properties.chromeless.default,
     externalEndpoints: !!partial.server?.externalEndpoints,
+    journeys: permissions?.journeys ?? schema.properties.permissions.properties.journeys.default,
     media: permissions?.media ?? schema.properties.permissions.properties.media.default,
     menu: !!partial.menu,
     payments:

@@ -75,6 +75,8 @@ import { SchedulerDefinition } from '@devvit/protos/types/devvit/plugin/schedule
 // eslint-disable-next-line no-restricted-imports
 import { SettingsDefinition } from '@devvit/protos/types/devvit/plugin/settings/v1alpha/settings.js';
 // eslint-disable-next-line no-restricted-imports
+import { TelemetryPluginDefinition } from '@devvit/protos/types/devvit/plugin/telemetry/telemetry.js';
+// eslint-disable-next-line no-restricted-imports
 import { UserActionsDefinition } from '@devvit/protos/types/devvit/plugin/useractions/useractions.js';
 // eslint-disable-next-line no-restricted-imports
 import { CustomPostDefinition } from '@devvit/protos/types/devvit/reddit/custom_post/v1alpha/custom_post.js';
@@ -257,6 +259,9 @@ function appCapabilityFromFullName(fullName: string): (NutritionCategory | undef
     case PaymentsServiceDefinition.fullName:
     case PaymentProcessorDefinition.fullName:
       return [NutritionCategory.PAYMENTS];
+
+    case TelemetryPluginDefinition.fullName:
+      return [NutritionCategory.JOURNEYS];
   }
 
   return [NutritionCategory.UNRECOGNIZED];
