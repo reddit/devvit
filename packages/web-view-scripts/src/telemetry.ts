@@ -11,6 +11,9 @@ let telemetryMetrics: WebViewTelemetryMetric[];
 /** startTime (UTC milliseconds) is provided by the client within the bridge context, to be used for all metrics */
 let startTime: number | undefined;
 
+// Render duration still needs an emit guard because both FCP and navigation callbacks can attempt it.
+let renderDurationSent: boolean = false;
+
 /**
  * `initTelemetry()` is added to all Devvit apps which use web views.
  *
@@ -55,10 +58,12 @@ function initClickEvent(): void {
   );
 }
 
+function getNavigationTiming(): PerformanceNavigationTiming | undefined {
+  return performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+}
+
 function measureTtfb(): WebViewTelemetryMetric | undefined {
-  const navigationTiming = performance.getEntriesByType('navigation')[0] as
-    | PerformanceNavigationTiming
-    | undefined;
+  const navigationTiming = getNavigationTiming();
 
   if (!startTime || !navigationTiming) {
     return undefined;
@@ -117,6 +122,30 @@ function measureWebViewInitialization(): WebViewTelemetryMetric | undefined {
   };
 }
 
+// Match the existing app-readiness signal by ending at the slower of first paint and page load.
+function maybeMeasureRenderDuration(): WebViewTelemetryMetric | undefined {
+  const navigationTiming = getNavigationTiming();
+  const fcpOffset = performance
+    .getEntriesByType('paint')
+    .find((entry) => entry.name === 'first-contentful-paint')?.startTime;
+  const loadEventEndOffset = measureLoadEventEnd(navigationTiming);
+
+  if (
+    fcpOffset == null ||
+    loadEventEndOffset == null ||
+    !navigationTiming ||
+    navigationTiming.responseStart <= 0
+  ) {
+    return undefined;
+  }
+
+  return {
+    spanName: 'web_view_render_duration',
+    timeStart: performance.timeOrigin + navigationTiming.responseStart,
+    timeEnd: performance.timeOrigin + Math.max(fcpOffset, loadEventEndOffset),
+  };
+}
+
 function measureFcp(): WebViewTelemetryMetric[] {
   const paintEntries = performance.getEntriesByType('paint');
   const fcpEntry = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
@@ -136,6 +165,31 @@ function measureLoad(): WebViewTelemetryMetric[] {
   return buildMetricPair('web_view_load', performance.now());
 }
 
+function measureLoadEventEnd(
+  navigationTiming: PerformanceNavigationTiming | undefined = getNavigationTiming()
+): number | undefined {
+  return navigationTiming && navigationTiming.loadEventEnd > 0
+    ? navigationTiming.loadEventEnd
+    : undefined;
+}
+
+function emitRenderDuration(): void {
+  if (renderDurationSent) {
+    return;
+  }
+
+  const renderDuration = maybeMeasureRenderDuration();
+  if (!renderDuration) {
+    return;
+  }
+
+  renderDurationSent = true;
+  emitEffect({
+    type: EffectType.EFFECT_TELEMETRY,
+    telemetry: { metrics: { metrics: [renderDuration] } },
+  });
+}
+
 /**
  * Measure Time to Interactive (TTI)
  * Uses a heuristic: measured after a quiet window period following page load.
@@ -143,7 +197,7 @@ function measureLoad(): WebViewTelemetryMetric[] {
  * Avoids long task API which isn't supported on iOS.
  */
 function measureTti(): WebViewTelemetryMetric[] {
-  const navTiming = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+  const navTiming = getNavigationTiming() as PerformanceNavigationTiming;
   const ttiTime = navTiming.domInteractive;
 
   if (!startTime || !ttiTime) {
@@ -156,6 +210,7 @@ function measureTti(): WebViewTelemetryMetric[] {
 function initPerformanceMonitoring(): void {
   telemetryMetrics = [];
   startTime = globalThis.devvit?.startTime;
+  renderDurationSent = false;
   if (!startTime) {
     return;
   }
@@ -175,21 +230,34 @@ function initPerformanceMonitoring(): void {
         const fcp = measureFcp();
         observer.disconnect();
         if (fcp.length === 0) break;
+        const renderDuration = renderDurationSent ? undefined : maybeMeasureRenderDuration();
+        if (renderDuration) renderDurationSent = true;
         if (document.readyState === 'complete') {
-          // load already fired without FCP — emit it now as a standalone metric
+          // load may already have emitted its batch, so late FCP emits standalone.
           emitEffect({
             type: EffectType.EFFECT_TELEMETRY,
-            telemetry: { metrics: { metrics: fcp } },
+            telemetry: { metrics: { metrics: renderDuration ? [...fcp, renderDuration] : fcp } },
           });
         } else {
           telemetryMetrics.push(...fcp);
+          if (renderDuration) telemetryMetrics.push(renderDuration);
         }
         break;
       }
     }
   });
 
-  observer.observe({ entryTypes: ['paint'] });
+  observer.observe({ type: 'paint', buffered: true });
+
+  const navigationObserver = new PerformanceObserver((list) => {
+    const navigationEntry = list.getEntries().find((entry) => entry.entryType === 'navigation');
+    if (navigationEntry) {
+      navigationObserver.disconnect();
+      emitRenderDuration();
+    }
+  });
+
+  navigationObserver.observe({ type: 'navigation', buffered: true });
 
   if (document.readyState === 'loading') {
     globalThis.addEventListener('DOMContentLoaded', () => {
