@@ -16,6 +16,8 @@ export type Context = BaseContext & {
 /** Designed to be compatible with IncomingHttpHeaders and any KV. */
 type Headers = { [header: string]: string | string[] | undefined };
 
+const nonDevvitMetadataHeaders = new Set<string>([Header.Traceparent, Header.Tracestate]);
+
 /** Constructs a new Context. */
 export let Context = (headers: Readonly<Headers>): Context => {
   const meta = metaFromIncomingMessage(headers);
@@ -49,7 +51,7 @@ export function setContext(fn: typeof Context): void {
 export function metaFromIncomingMessage(headers: Readonly<Headers>): Metadata {
   const meta: Metadata = {};
   for (const [key, val] of Object.entries(headers))
-    if (key.startsWith(headerPrefix))
+    if (key.startsWith(headerPrefix) || nonDevvitMetadataHeaders.has(key))
       meta[key] = { values: typeof val === 'object' ? val : val == null ? [] : [val] };
   return meta;
 }

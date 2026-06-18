@@ -31,6 +31,7 @@ export const Header = Object.freeze({
   Language: 'devvit-accept-language',
   Timezone: 'devvit-accept-timezone',
   Traceparent: 'traceparent',
+  Tracestate: 'tracestate',
 });
 export type Header = (typeof Header)[keyof typeof Header];
 
