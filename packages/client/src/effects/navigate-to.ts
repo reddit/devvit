@@ -5,12 +5,12 @@ import { resolveNavigationInput } from '@devvit/shared-types/thing-navigation.js
 /**
  * Navigates to a URL, subreddit, post, comment, or user.
  *
- * @param thingOrUrl - The URL, subreddit, post, comment, or user to navigate to
+ * @param url - The URL, subreddit, post, comment, or user to navigate to
  */
 export function navigateTo(
-  thingOrUrl: string | { readonly url: string; readonly permalink?: string }
+  url: string | { readonly url: string; readonly permalink?: string }
 ): void {
-  const inputUrl = resolveNavigationInput(thingOrUrl);
+  const inputUrl = resolveNavigationInput(url);
   let normalizedUrl: string;
   try {
     normalizedUrl = new URL(inputUrl).toString();
