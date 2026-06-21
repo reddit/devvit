@@ -54,9 +54,9 @@ export type UserNoteLabel =
   | 'HELPFUL_USER';
 
 export type UserNote = {
-  note?: string | undefined;
-  redditId?: T1ID | T3ID | T5ID | undefined;
-  label?: UserNoteLabel | undefined;
+  note?: string;
+  redditId?: T1ID | T3ID | T5ID;
+  label?: UserNoteLabel;
 };
 
 export interface ModNote {
@@ -75,7 +75,7 @@ export interface ModNote {
   };
   type: ModNoteType;
   createdAt: Date;
-  userNote?: UserNote | undefined;
+  userNote?: UserNote;
   modAction?: ModNoteAction;
 }
 
@@ -116,7 +116,6 @@ export class ModNote {
     assertNonNull(protoModNote.userNoteData, 'Mod note userNote is null or undefined');
     assertNonNull(protoModNote.modActionData, 'Mod note modAction is null or undefined');
 
-    const createdAt = new Date(protoModNote.createdAt! * 1000); // convert to ms
     const modActionData = protoModNote.modActionData;
 
     return {
@@ -133,7 +132,7 @@ export class ModNote {
         id: asT2ID(protoModNote.operatorId ?? ''),
         name: protoModNote.operator,
       },
-      createdAt,
+      createdAt: new Date(protoModNote.createdAt! * 1000), // convert to ms
       userNote: {
         note: protoModNote.userNoteData?.note,
         redditId: protoModNote.userNoteData?.redditId
