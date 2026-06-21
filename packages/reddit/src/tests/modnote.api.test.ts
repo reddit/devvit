@@ -36,6 +36,7 @@ describe('ModNote API', () => {
               action: 'banuser',
               details: '14 day ban',
               description: 'Second ban',
+              redditId: 't2_target',
             },
           },
         ],
@@ -54,16 +55,10 @@ describe('ModNote API', () => {
 
         expect(notes).toHaveLength(1);
         expect(notes[0]?.modAction).toEqual({
-          id: 'ModNote_test',
-          type: 'banuser',
-          moderatorName: 'test-mod',
-          moderatorId: 't2_mod',
-          createdAt: new Date('2024-03-01T00:00:00Z'),
-          subredditName: 'testsub',
-          subredditId: 't5_test',
+          action: 'banuser',
           description: 'Second ban',
           details: '14 day ban',
-          target: undefined,
+          redditId: 't2_target',
         });
       });
     });

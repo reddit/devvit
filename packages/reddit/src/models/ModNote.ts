@@ -14,7 +14,7 @@ import { asTid, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
-import type { ModAction, ModActionType } from './ModAction.js';
+import type { ModActionType } from './ModAction.js';
 
 export type ModNoteType =
   | 'NOTE'
@@ -27,6 +27,15 @@ export type ModNoteType =
   | 'CONTENT_CHANGE'
   | 'MOD_ACTION'
   | 'ALL';
+
+export type ModNoteAction = {
+  action: ModActionType;
+  redditId?: T1 | T2 | T3 | undefined;
+  /** For `banuser` actions, the number of days in a format like `"1 days"` */
+  details?: string | undefined;
+  /** For `banuser` actions, the reasoning for the ban */
+  description?: string | undefined;
+};
 
 export type UserNoteLabel =
   | 'BOT_BAN'
@@ -61,7 +70,7 @@ export interface ModNote {
   type: ModNoteType;
   createdAt: Date;
   userNote?: UserNote | undefined;
-  modAction?: ModAction;
+  modAction?: ModNoteAction;
 }
 
 export type GetModNotesOptions = Prettify<
@@ -102,7 +111,7 @@ export class ModNote {
     assertNonNull(protoModNote.modActionData, 'Mod note modAction is null or undefined');
 
     const createdAt = new Date(protoModNote.createdAt! * 1000); // convert to ms
-    const modAction = this.#modActionDataToModAction(protoModNote, createdAt);
+    const modActionData = protoModNote.modActionData;
 
     return {
       id: protoModNote.id,
@@ -127,30 +136,16 @@ export class ModNote {
         label: protoModNote.userNoteData?.label as UserNoteLabel,
       },
       type: protoModNote.type as ModNoteType,
-      modAction,
-    };
-  }
-
-  static #modActionDataToModAction(
-    protoModNote: ModNoteObject,
-    createdAt: Date
-  ): ModAction | undefined {
-    const modActionData = protoModNote.modActionData;
-    if (!modActionData?.action) {
-      return undefined;
-    }
-
-    return {
-      id: protoModNote.id!,
-      type: modActionData.action as ModActionType,
-      moderatorName: protoModNote.operator ?? '',
-      moderatorId: T2(protoModNote.operatorId ?? ''),
-      createdAt,
-      subredditName: protoModNote.subreddit ?? '',
-      subredditId: T5(protoModNote.subredditId ?? ''),
-      description: modActionData.description,
-      details: modActionData.details,
-      target: modActionData.redditId ? { id: modActionData.redditId } : undefined,
+      modAction: modActionData?.action
+        ? {
+            action: modActionData.action as ModActionType,
+            redditId: modActionData.redditId
+              ? asTid<T1 | T2 | T3>(modActionData.redditId)
+              : undefined,
+            details: modActionData.details,
+            description: modActionData.description,
+          }
+        : undefined,
     };
   }
 
