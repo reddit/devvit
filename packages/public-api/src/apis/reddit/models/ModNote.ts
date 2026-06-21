@@ -28,6 +28,12 @@ export type ModNoteType =
   | 'MOD_ACTION'
   | 'ALL';
 
+/**
+ * Action metadata from a mod note's `modActionData`. Kept separate from
+ * {@link ModAction} to reduce field duplication — mod notes and moderation
+ * log entries are distinct use cases, and {@link ModNote} already provides
+ * moderator, subreddit, and timestamp context.
+ */
 export type ModNoteAction = {
   action: ModActionType;
   redditId?: T1ID | T2ID | T3ID | undefined;
