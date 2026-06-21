@@ -13,6 +13,55 @@ describe('ModNote API', () => {
   });
 
   describe('RedditAPIClient:ModNote', () => {
+    test('getModNotes() maps modActionData to modAction', async () => {
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.ModNote, 'GetNotes');
+      spyPlugin.mockImplementationOnce(async () => ({
+        modNotes: [
+          {
+            id: 'ModNote_test',
+            createdAt: 1_709_251_200,
+            type: 'MOD_ACTION',
+            subreddit: 'testsub',
+            subredditId: 't5_test',
+            user: 'test-user',
+            userId: 't2_user',
+            operator: 'test-mod',
+            operatorId: 't2_mod',
+            userNoteData: {},
+            modActionData: {
+              action: 'banuser',
+              details: '14 day ban',
+              description: 'Second ban',
+            },
+          },
+        ],
+        hasNextPage: false,
+      }));
+
+      const notes = await api.reddit
+        .getModNotes({
+          subreddit: 'testsub',
+          user: 'test-user',
+          filter: 'MOD_ACTION',
+          limit: 100,
+        })
+        .all();
+
+      expect(notes).toHaveLength(1);
+      expect(notes[0]?.modAction).toEqual({
+        id: 'ModNote_test',
+        type: 'banuser',
+        moderatorName: 'test-mod',
+        moderatorId: 't2_mod',
+        createdAt: new Date('2024-03-01T00:00:00Z'),
+        subredditName: 'testsub',
+        subredditId: 't5_test',
+        description: 'Second ban',
+        details: '14 day ban',
+        target: undefined,
+      });
+    });
+
     test('addRemovalNote()', async () => {
       const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.ModNote, 'PostRemovalNote');
       spyPlugin.mockImplementationOnce(async () => ({}));

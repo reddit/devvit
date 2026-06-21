@@ -14,7 +14,7 @@ import { asTid, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
-import type { ModAction } from './ModAction.js';
+import type { ModAction, ModActionType } from './ModAction.js';
 
 export type ModNoteType =
   | 'NOTE'
@@ -101,6 +101,9 @@ export class ModNote {
     assertNonNull(protoModNote.userNoteData, 'Mod note userNote is null or undefined');
     assertNonNull(protoModNote.modActionData, 'Mod note modAction is null or undefined');
 
+    const createdAt = new Date(protoModNote.createdAt! * 1000); // convert to ms
+    const modAction = this.#modActionDataToModAction(protoModNote, createdAt);
+
     return {
       id: protoModNote.id,
       user: {
@@ -115,7 +118,7 @@ export class ModNote {
         id: T2(protoModNote.operatorId ?? ''),
         name: protoModNote.operator,
       },
-      createdAt: new Date(protoModNote.createdAt! * 1000), // convert to ms
+      createdAt,
       userNote: {
         note: protoModNote.userNoteData?.note,
         redditId: protoModNote.userNoteData?.redditId
@@ -124,6 +127,30 @@ export class ModNote {
         label: protoModNote.userNoteData?.label as UserNoteLabel,
       },
       type: protoModNote.type as ModNoteType,
+      modAction,
+    };
+  }
+
+  static #modActionDataToModAction(
+    protoModNote: ModNoteObject,
+    createdAt: Date
+  ): ModAction | undefined {
+    const modActionData = protoModNote.modActionData;
+    if (!modActionData?.action) {
+      return undefined;
+    }
+
+    return {
+      id: protoModNote.id!,
+      type: modActionData.action as ModActionType,
+      moderatorName: protoModNote.operator ?? '',
+      moderatorId: T2(protoModNote.operatorId ?? ''),
+      createdAt,
+      subredditName: protoModNote.subreddit ?? '',
+      subredditId: T5(protoModNote.subredditId ?? ''),
+      description: modActionData.description,
+      details: modActionData.details,
+      target: modActionData.redditId ? { id: modActionData.redditId } : undefined,
     };
   }
 
