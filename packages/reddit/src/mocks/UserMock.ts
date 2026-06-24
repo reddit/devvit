@@ -31,10 +31,23 @@ import type { Users } from '@devvit/protos/types/devvit/plugin/redditapi/users/u
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
 import { isT2, T2 } from '@devvit/shared-types/tid.js';
 
+import type { UserAccountStatus } from '../models/User.js';
+
 type Username = string;
 
+type UserAccountStatusFields = {
+  accountStatus?: UserAccountStatus | undefined;
+  isAccountLocked?: boolean | undefined;
+  isLocked?: boolean | undefined;
+};
+
+type UserWithAccountStatus = User & UserAccountStatusFields;
+
+type UserDataByAccountIdsResponseWithAccountStatus =
+  UserDataByAccountIdsResponse_UserAccountData & UserAccountStatusFields;
+
 type UserStore = {
-  users: Map<Username, User>;
+  users: Map<Username, UserWithAccountStatus>;
 };
 
 export class UserPluginMock implements Users {
@@ -58,7 +71,7 @@ export class UserPluginMock implements Users {
     _metadata?: Metadata
   ): Promise<UserDataByAccountIdsResponse> {
     const ids = request.ids.split(',');
-    const responseUsers: { [key: string]: UserDataByAccountIdsResponse_UserAccountData } = {};
+    const responseUsers: { [key: string]: UserDataByAccountIdsResponseWithAccountStatus } = {};
 
     for (const id of ids) {
       const targetId = T2(isT2(id) ? id : `t2_${id}`);
@@ -78,6 +91,8 @@ export class UserPluginMock implements Users {
           linkKarma: user.linkKarma,
           commentKarma: user.commentKarma,
           profileOver18: user.over18,
+          accountStatus: user.accountStatus,
+          isAccountLocked: user.isAccountLocked ?? user.isLocked,
         };
       }
     }
@@ -200,8 +215,10 @@ export class UserMock implements PluginMock<Users> {
    * Seeds the mock database with a User.
    * This allows tests to set up state before calling `reddit.getUserByUsername`.
    */
-  addUser(data: Omit<Partial<User>, 'id'> & { name: string; id: T2 }): User {
-    const user: User = {
+  addUser(
+    data: Omit<Partial<UserWithAccountStatus>, 'id'> & { name: string; id: T2 }
+  ): UserWithAccountStatus {
+    const user: UserWithAccountStatus = {
       createdUtc: data.createdUtc ?? Math.floor(Date.now() / 1000),
       linkKarma: data.linkKarma ?? 0,
       commentKarma: data.commentKarma ?? 0,
@@ -221,6 +238,8 @@ export class UserMock implements PluginMock<Users> {
       prefShowSnoovatar: data.prefShowSnoovatar ?? true,
       snoovatarSize: data.snoovatarSize ?? [],
       ...data,
+      accountStatus: data.accountStatus,
+      isAccountLocked: data.isAccountLocked ?? data.isLocked ?? false,
       id: data.id.replace(/^t2_/, ''),
     };
 

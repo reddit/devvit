@@ -55,6 +55,47 @@ export type ModeratorPermission =
   | 'channels'
   | 'community_chat';
 
+export type UserAccountStatus = 'active' | 'locked' | 'suspended' | 'unknown';
+
+type UserAccountStatusData = {
+  accountStatus?: UserAccountStatus | string | undefined;
+  isAccountLocked?: boolean | null | undefined;
+  isLocked?: boolean | null | undefined;
+  isSuspended?: boolean | null | undefined;
+};
+
+type UserProtoWithAccountStatus = UserProto & UserAccountStatusData;
+
+function normalizeUserAccountStatus(data: UserAccountStatusData): UserAccountStatus {
+  const accountStatus =
+    typeof data.accountStatus === 'string'
+      ? data.accountStatus.toLowerCase().replace(/^user_account_status_/, '')
+      : undefined;
+
+  if (
+    accountStatus === 'active' ||
+    accountStatus === 'locked' ||
+    accountStatus === 'suspended' ||
+    accountStatus === 'unknown'
+  ) {
+    return accountStatus;
+  }
+
+  if (data.isAccountLocked === true || data.isLocked === true) {
+    return 'locked';
+  }
+
+  if (data.isSuspended === true) {
+    return 'suspended';
+  }
+
+  if (data.isAccountLocked === false || data.isLocked === false || data.isSuspended === false) {
+    return 'active';
+  }
+
+  return 'unknown';
+}
+
 export type CreateRelationshipOptions = {
   subredditName: string;
   username: string;
@@ -220,6 +261,7 @@ export class User {
   #hasVerifiedEmail: boolean;
   #displayName: string;
   #about: string;
+  #accountStatus: UserAccountStatus;
 
   #metadata: Metadata | undefined;
 
@@ -227,7 +269,7 @@ export class User {
    * @internal
    */
   constructor(
-    data: UserProto & { modPermissions?: { [subredditName: string]: string[] } },
+    data: UserProtoWithAccountStatus & { modPermissions?: { [subredditName: string]: string[] } },
     metadata: Metadata | undefined
   ) {
     makeGettersEnumerable(this);
@@ -264,6 +306,7 @@ export class User {
 
     this.#displayName = data.subreddit?.title ?? this.#username;
     this.#about = data.subreddit?.publicDescription ?? '';
+    this.#accountStatus = normalizeUserAccountStatus(data);
 
     this.#metadata = metadata;
   }
@@ -376,7 +419,32 @@ export class User {
     return this.#about;
   }
 
-  toJSON(): Pick<User, 'id' | 'username' | 'createdAt' | 'linkKarma' | 'commentKarma' | 'nsfw'> & {
+  /**
+   * The user's account availability status, when provided by the Reddit API.
+   *
+   * `unknown` means the current API response did not include enough information to distinguish the
+   * account from an active account.
+   */
+  get accountStatus(): UserAccountStatus {
+    return this.#accountStatus;
+  }
+
+  /** Whether the user's account is locked for account-access or security reasons. */
+  get isAccountLocked(): boolean {
+    return this.#accountStatus === 'locked';
+  }
+
+  toJSON(): Pick<
+    User,
+    | 'id'
+    | 'username'
+    | 'createdAt'
+    | 'linkKarma'
+    | 'commentKarma'
+    | 'nsfw'
+    | 'accountStatus'
+    | 'isAccountLocked'
+  > & {
     modPermissionsBySubreddit: Record<string, ModeratorPermission[]>;
   } {
     return {
@@ -386,6 +454,8 @@ export class User {
       linkKarma: this.linkKarma,
       commentKarma: this.commentKarma,
       nsfw: this.nsfw,
+      accountStatus: this.accountStatus,
+      isAccountLocked: this.isAccountLocked,
       modPermissionsBySubreddit: Object.fromEntries(this.modPermissions),
     };
   }
