@@ -13,7 +13,7 @@ describe('sluggable', () => {
       'i_love_snake_case',
       'hello~hello~',
       'r2',
-      't23456789012345678',
+      't234567890123456789012',
       'devvit-post_filter~',
       'reddit-app',
     ];
@@ -22,7 +22,14 @@ describe('sluggable', () => {
     });
   });
   describe('Should return true if string is sluggable', () => {
-    const validStrings = ['ALLCAPSSSSSSSS', 'abcdef', 'abc', 'test-app-1', 'Test app 1 App'];
+    const validStrings = [
+      'ALLCAPSSSSSSSS',
+      'abcdef',
+      'abc',
+      'test-app-1',
+      'Test app 1 App',
+      'long-but-valid-slug',
+    ];
     it.each(validStrings)('String %#: %s', (input) => {
       console.log(validateSluggable(input));
       expect(validateSluggable(input)).toBeUndefined();

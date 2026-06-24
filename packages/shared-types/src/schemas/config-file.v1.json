@@ -350,7 +350,7 @@
       "type": "string",
       "description": "App account name and Community URL slug.",
       "minLength": 3,
-      "maxLength": 16,
+      "maxLength": 20,
       "pattern": "^[a-z][a-z0-9-]*$"
     },
     "media": {

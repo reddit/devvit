@@ -1,10 +1,5 @@
-export const APP_ACCOUNT_NAME_LENGTH_LIMIT = 20;
-export const UNIQUE_SLUG_SUFFIX_LENGTH = 3;
-
-// -1 for the dash between the slug and the suffix
 export const APP_SLUG_BASE_MIN_LENGTH = 3;
-export const APP_SLUG_BASE_MAX_LENGTH =
-  APP_ACCOUNT_NAME_LENGTH_LIMIT - UNIQUE_SLUG_SUFFIX_LENGTH - 1;
+export const APP_SLUG_BASE_MAX_LENGTH = 20;
 
 const ALLOWED_SLUG_REGEX = /^[a-z][a-z0-9-]*$/;
 
