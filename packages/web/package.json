@@ -37,6 +37,7 @@
   "dependencies": {
     "@devvit/cache": "0.13.5",
     "@devvit/client": "0.13.5",
+    "@devvit/external-endpoints": "0.13.5",
     "@devvit/media": "0.13.5",
     "@devvit/notifications": "0.13.5",
     "@devvit/payments": "0.13.5",
