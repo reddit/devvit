@@ -22,7 +22,7 @@ import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUICl
 import type { MenuItem, MenuItemOnPressEvent } from '../../types/index.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
-import { addCSRFTokenToContext } from './csrf.js';
+import { addFormSubmitGrants, getFormIdsFromEffects } from './form-submit-grants.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 
 const getActionId = (index: number): string => {
@@ -105,12 +105,14 @@ async function onAction(
     }
   );
 
-  await addCSRFTokenToContext(context, req);
-
   await menuItem.onPress(event, context);
+  const effects = getEffectsFromUIClient(context.ui);
+
+  // Forms opened by this action will be valid for this user to submit for the next 10 minutes.
+  await addFormSubmitGrants(context, getFormIdsFromEffects(effects));
 
   return ContextActionResponse.fromJSON({
-    effects: getEffectsFromUIClient(context.ui),
+    effects,
   });
 }
 

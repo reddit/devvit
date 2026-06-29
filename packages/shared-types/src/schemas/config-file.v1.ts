@@ -493,7 +493,7 @@ function AppPermissionConfig(
     realtime: permissions?.realtime ?? schema.properties.permissions.properties.realtime.default,
     redis:
       permissions?.redis ??
-      // Menu items call addCSRFTokenToContext() which uses Redis.
+      // Menu items store form submit grants in Redis.
       (partial.menu
         ? true
         : partial.post

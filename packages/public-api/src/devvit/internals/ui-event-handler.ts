@@ -9,7 +9,7 @@ import { HandleUIEventResponse } from '@devvit/protos/types/devvit/ui/events/v1a
 import { UIEventHandlerDefinition } from '@devvit/protos/types/devvit/ui/events/v1alpha/handle_ui.js';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';
-import type { FormKey } from '@devvit/shared-types/useForm.js';
+import { type FormKey } from '@devvit/shared-types/useForm.js';
 import cloneDeep from 'clone-deep';
 import { isEqual } from 'moderndash';
 
@@ -18,7 +18,11 @@ import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUICl
 import { getFormValues } from '../../apis/ui/helpers/getFormValues.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
-import { validateCSRFToken } from './csrf.js';
+import {
+  addFormSubmitGrants,
+  getFormIdsFromEffects,
+  validateFormSubmitGrant,
+} from './form-submit-grants.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
 import { getMenuItemById, menuItemPertainsToLocation } from './menu-items.js';
 
@@ -35,18 +39,11 @@ async function handleUIEvent(
     metadata,
   });
 
-  if (req.event?.formSubmitted && req.event.formSubmitted.formId) {
-    const formKey = req.event.formSubmitted.formId as FormKey;
+  let postId: string | undefined = metadata[Header.Post]?.values[0];
+  let commentId: string | undefined = metadata[Header.Comment]?.values[0];
 
-    const formDefinition = Devvit.formDefinitions?.get(formKey);
-
-    if (!formDefinition) {
-      throw new Error(`Form with key ${formKey} not found`);
-    }
-
-    let postId: string | undefined;
-    let commentId: string | undefined;
-
+  const formSubmitted = req.event?.formSubmitted;
+  if (formSubmitted?.formId) {
     if (state.__contextAction) {
       const { actionId, thingId } = state.__contextAction;
       const menuItem = getMenuItemById(actionId);
@@ -57,23 +54,33 @@ async function handleUIEvent(
         commentId = thingId;
       }
     }
+  }
 
-    const context: Devvit.Context = Object.assign(
-      apiClients,
-      getContextFromMetadata(metadata, postId, commentId),
-      {
-        uiEnvironment: {
-          timezone: metadata[Header.Timezone]?.values[0],
-          locale: metadata[Header.Language]?.values[0],
-        },
-      }
-    );
+  const context: Devvit.Context = Object.assign(
+    apiClients,
+    getContextFromMetadata(metadata, postId, commentId),
+    {
+      uiEnvironment: {
+        timezone: metadata[Header.Timezone]?.values[0],
+        locale: metadata[Header.Language]?.values[0],
+      },
+    }
+  );
 
-    await validateCSRFToken(context, req);
+  if (formSubmitted?.formId) {
+    const formKey = formSubmitted.formId as FormKey;
+    const formDefinition = Devvit.formDefinitions?.get(formKey);
+
+    if (!formDefinition) {
+      throw new Error(`Form with key ${formKey} not found`);
+    }
+
+    // If the UI event is a form submission, validate that the user was granted access to submit this form
+    await validateFormSubmitGrant(context, formKey);
 
     await formDefinition.onSubmit(
       {
-        values: getFormValues(req.event.formSubmitted.results),
+        values: getFormValues(formSubmitted.results),
       },
       context
     );
@@ -96,6 +103,9 @@ async function handleUIEvent(
         },
       ]
     : uiEffects;
+
+  // Forms opened by this ui event will be valid for this user to submit for the next 10 minutes.
+  await addFormSubmitGrants(context, getFormIdsFromEffects(effects));
 
   return HandleUIEventResponse.fromJSON({
     state,
