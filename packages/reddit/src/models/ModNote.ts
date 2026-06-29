@@ -14,7 +14,7 @@ import { asTid, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { getRedditApiPlugins } from '../plugin.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
-import type { ModAction } from './ModAction.js';
+import type { ModActionType } from './ModAction.js';
 
 export type ModNoteType =
   | 'NOTE'
@@ -27,6 +27,21 @@ export type ModNoteType =
   | 'CONTENT_CHANGE'
   | 'MOD_ACTION'
   | 'ALL';
+
+/**
+ * Action metadata from a mod note's `modActionData`. Kept separate from
+ * {@link ModAction} to reduce field duplication — mod notes and moderation
+ * log entries are distinct use cases, and {@link ModNote} already provides
+ * moderator, subreddit, and timestamp context.
+ */
+export type ModNoteAction = {
+  action: ModActionType;
+  redditId?: T1 | T2 | T3 | undefined;
+  /** For `banuser` actions, the number of days in a format like `"1 days"` */
+  details?: string | undefined;
+  /** For `banuser` actions, the reasoning for the ban */
+  description?: string | undefined;
+};
 
 export type UserNoteLabel =
   | 'BOT_BAN'
@@ -60,8 +75,8 @@ export interface ModNote {
   };
   type: ModNoteType;
   createdAt: Date;
-  userNote?: UserNote | undefined;
-  modAction?: ModAction;
+  userNote?: UserNote;
+  modAction?: ModNoteAction;
 }
 
 export type GetModNotesOptions = Prettify<
@@ -101,6 +116,8 @@ export class ModNote {
     assertNonNull(protoModNote.userNoteData, 'Mod note userNote is null or undefined');
     assertNonNull(protoModNote.modActionData, 'Mod note modAction is null or undefined');
 
+    const modActionData = protoModNote.modActionData;
+
     return {
       id: protoModNote.id,
       user: {
@@ -124,6 +141,16 @@ export class ModNote {
         label: protoModNote.userNoteData?.label as UserNoteLabel,
       },
       type: protoModNote.type as ModNoteType,
+      modAction: modActionData?.action
+        ? {
+            action: modActionData.action as ModActionType,
+            redditId: modActionData.redditId
+              ? asTid<T1 | T2 | T3>(modActionData.redditId)
+              : undefined,
+            details: modActionData.details,
+            description: modActionData.description,
+          }
+        : undefined,
     };
   }
 

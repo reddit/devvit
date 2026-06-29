@@ -17,6 +17,52 @@ describe('ModNote API', () => {
   const redditAPI = new RedditClient();
 
   describe('RedditClient:ModNote', () => {
+    test('getModNotes() maps modActionData to modAction', async () => {
+      const spyPlugin = redditApiPlugins.ModNote.GetNotes;
+      spyPlugin.mockImplementationOnce(async () => ({
+        modNotes: [
+          {
+            id: 'ModNote_test',
+            createdAt: 1_709_251_200,
+            type: 'MOD_ACTION',
+            subreddit: 'testsub',
+            subredditId: 't5_test',
+            user: 'test-user',
+            userId: 't2_user',
+            operator: 'test-mod',
+            operatorId: 't2_mod',
+            userNoteData: {},
+            modActionData: {
+              action: 'banuser',
+              details: '14 day ban',
+              description: 'Second ban',
+              redditId: 't2_target',
+            },
+          },
+        ],
+        hasNextPage: false,
+      }));
+
+      await runWithTestContext(async () => {
+        const notes = await redditAPI
+          .getModNotes({
+            subreddit: 'testsub',
+            user: 'test-user',
+            filter: 'MOD_ACTION',
+            limit: 100,
+          })
+          .all();
+
+        expect(notes).toHaveLength(1);
+        expect(notes[0]?.modAction).toEqual({
+          action: 'banuser',
+          description: 'Second ban',
+          details: '14 day ban',
+          redditId: 't2_target',
+        });
+      });
+    });
+
     test('addRemovalNote()', async () => {
       const spyPlugin = redditApiPlugins.ModNote.PostRemovalNote;
       spyPlugin.mockImplementationOnce(async () => ({}));
