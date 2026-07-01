@@ -1301,7 +1301,7 @@ export class Post {
               backgroundColorDark: opts.styles.backgroundColorDark ?? '',
               height: opts.styles.height ?? EntrypointHeight.HEIGHT_UNSPECIFIED,
               shareImageUrl: opts.styles.shareImageUrl ?? '',
-              heightPixels: 0,
+              heightPixels: opts.styles.heightPixels ?? 0,
               renderStyle:
                 opts.styles.supportsChromeless === undefined
                   ? RenderStyle.RENDER_STYLE_UNSPECIFIED

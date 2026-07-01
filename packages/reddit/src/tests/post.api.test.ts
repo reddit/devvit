@@ -545,6 +545,34 @@ describe('Post API', () => {
         });
       });
 
+      test('passes heightPixels to custom post styles', async () => {
+        const mockedPost = new Post({ ...defaultPostData });
+        const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
+        spyPlugin.mockImplementationOnce(async () => ({
+          json: { data: { id: 'post' }, errors: [] },
+        }));
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await runWithTestContext(async () => {
+          await reddit.submitCustomPost({
+            title: mockedPost.title,
+            subredditName: mockedPost.subredditName,
+            styles: {
+              heightPixels: 200,
+            },
+          });
+
+          expect(spyPlugin).toHaveBeenCalledWith(
+            expect.objectContaining({
+              customPostStyles: expect.objectContaining({
+                heightPixels: 200,
+              }),
+            }),
+            context.metadata
+          );
+        });
+      });
+
       test.each([
         {
           supportsChromeless: undefined,
