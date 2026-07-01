@@ -318,5 +318,37 @@ describe('User API', () => {
 
       expect(user.modPermissions).toEqual(understoodPermissions);
     });
+
+    test('accountStatus distinguishes locked users', () => {
+      const user = new User(
+        {
+          id: 'someID',
+          name: username,
+          createdUtc: Date.now(),
+          snoovatarSize: [1],
+          isAccountLocked: true,
+        },
+        api.metadata
+      );
+
+      expect(user.accountStatus).toBe('locked');
+      expect(user.isAccountLocked).toBe(true);
+    });
+
+    test('accountStatus falls back to suspended when lock status is unavailable', () => {
+      const user = new User(
+        {
+          id: 'someID',
+          name: username,
+          createdUtc: Date.now(),
+          snoovatarSize: [1],
+          isSuspended: true,
+        },
+        api.metadata
+      );
+
+      expect(user.accountStatus).toBe('suspended');
+      expect(user.isAccountLocked).toBe(false);
+    });
   });
 });

@@ -40,6 +40,19 @@ test('can retrieve current user', async () => {
   expect(user?.id).toBe('t2_testuser');
 });
 
+test('can mock and retrieve a locked user', async ({ mocks }) => {
+  mocks.reddit.users.addUser({
+    id: 't2_locked_user',
+    name: 'locked_user',
+    isAccountLocked: true,
+  });
+
+  const user = await reddit.getUserByUsername('locked_user');
+  expect(user).toBeDefined();
+  expect(user?.accountStatus).toBe('locked');
+  expect(user?.isAccountLocked).toBe(true);
+});
+
 test('can retrieve current username', async () => {
   const username = await reddit.getCurrentUsername();
   expect(username).toBe('testuser');
