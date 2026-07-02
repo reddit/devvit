@@ -298,6 +298,7 @@ export function devvit(opts: DevvitPluginOptions = {}): Plugin {
       const serverEntry = shouldBuildServer ? getServerEntry(repoRoot) : undefined;
       logVerbose(`server entry: ${serverEntry ?? 'disabled'}`);
 
+      const useRolldown = Number(this.meta?.viteVersion.split('.')[0]) >= 8;
       const environments: Record<string, EnvironmentOptions> = {};
       if (shouldBuildClient && clientInputs) {
         environments.client = mergeConfig<EnvironmentOptions, EnvironmentOptions>(
@@ -355,7 +356,8 @@ export function devvit(opts: DevvitPluginOptions = {}): Plugin {
                 output: {
                   format: 'cjs',
                   entryFileNames: 'index.cjs',
-                  inlineDynamicImports: true,
+                  // Keep Vite 7 and 8 support so devs can sync Devvit to latest without a Vite major bump.
+                  ...(useRolldown ? { codeSplitting: false } : { inlineDynamicImports: true }),
                 },
               },
             },
