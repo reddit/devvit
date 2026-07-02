@@ -203,6 +203,54 @@ describe('Post API', () => {
       });
     });
 
+    test('filter() filters a post', async () => {
+      const spyPlugin = redditApiPlugins.Moderation.Filter;
+      spyPlugin.mockImplementationOnce(async () => ({}));
+
+      await runWithTestContext(async () => {
+        await reddit.filter('t3_qwerty', {
+          reason: 'contains sensitive content',
+          keep: false,
+        });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            id: 't3_qwerty',
+            reason: 'contains sensitive content',
+            keep: false,
+          },
+          context.metadata
+        );
+      });
+    });
+
+    test('Post.filter() filters and updates state', async () => {
+      const spyPlugin = redditApiPlugins.Moderation.Filter;
+      spyPlugin.mockImplementationOnce(async () => ({}));
+      const post = new Post({
+        ...defaultPostData,
+        approved: true,
+        removed: false,
+        spam: true,
+      });
+
+      await runWithTestContext(async () => {
+        await post.filter({ reason: 'contains sensitive content' });
+
+        expect(spyPlugin).toHaveBeenCalledWith(
+          {
+            id: 't3_qwerty',
+            reason: 'contains sensitive content',
+            keep: undefined,
+          },
+          context.metadata
+        );
+        expect(post.removed).toBe(true);
+        expect(post.spam).toBe(false);
+        expect(post.approved).toBe(false);
+      });
+    });
+
     describe('getPostStyles()', () => {
       test('returns supportsChromeless=true when renderStyle is chromeless', async () => {
         const spyPlugin = redditApiPlugins.LinksAndComments.GetCustomPostStyles;

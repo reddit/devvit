@@ -17,6 +17,7 @@ import type { T2ID, T3ID, T5ID } from '../../../types/tid.js';
 import { asT2ID, asT3ID, asT5ID, isT3ID } from '../../../types/tid.js';
 import { RunAs } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
+import { type FilterOptions, filterThing } from '../helpers/filterThing.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import type { CommentSubmissionOptions } from './Comment.js';
@@ -920,6 +921,22 @@ export class Post {
     await Post.approve(this.id, this.#metadata);
     this.#approved = true;
     this.#removed = false;
+  }
+
+  /**
+   * Filters a post. When a post is filtered, it is added to the ModQueue for review, and in addition:
+   * - if @param options.keep is `false`, the post stops being in displayed the subreddit
+   * - if @param options.keep is `true`, the post is still displayed in the subreddit
+   *
+   * @param options - The options for this filter action.
+   * @returns A Promise that resolves if the post was filtered successfully.
+   * @experimental
+   */
+  async filter(options?: FilterOptions): Promise<void> {
+    await filterThing(this.id, options, this.#metadata);
+    this.#removed = !options?.keep;
+    this.#spam = false;
+    this.#approved = false;
   }
 
   async remove(isSpam: boolean = false): Promise<void> {

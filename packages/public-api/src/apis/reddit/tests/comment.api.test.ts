@@ -120,6 +120,35 @@ describe('Commment API', () => {
       );
     });
 
+    test('Comment.filter() filters and updates state', async () => {
+      const { metadata } = createTestRedditApiClient();
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Moderation, 'Filter');
+      spyPlugin.mockImplementationOnce(async () => ({}));
+      const comment = new Comment(
+        {
+          ...defaultCommentData,
+          approved: true,
+          removed: true,
+          spam: true,
+        },
+        metadata
+      );
+
+      await comment.filter({ reason: 'contains sensitive content', keep: true });
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        {
+          id: 't1_commentid',
+          reason: 'contains sensitive content',
+          keep: true,
+        },
+        metadata
+      );
+      expect(comment.removed).toBe(false);
+      expect(comment.spam).toBe(false);
+      expect(comment.approved).toBe(false);
+    });
+
     test('submitComment() should return a new comment when successful', async () => {
       const { reddit } = api;
 

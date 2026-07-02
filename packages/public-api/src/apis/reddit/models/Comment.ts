@@ -14,6 +14,7 @@ import { Devvit } from '../../../devvit/Devvit.js';
 import type { T1ID, T2ID, T3ID, T5ID } from '../../../types/tid.js';
 import { asT1ID, asT2ID, asT3ID, asT5ID, isCommentId, isT1ID } from '../../../types/tid.js';
 import { RunAs } from '../common.js';
+import { type FilterOptions, filterThing } from '../helpers/filterThing.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import type { CommonFlair } from './Flair.js';
@@ -412,6 +413,22 @@ export class Comment {
     await Comment.remove(this.id, isSpam, this.#metadata);
     this.#removed = true;
     this.#spam = isSpam;
+    this.#approved = false;
+  }
+
+  /**
+   * Filters the comment. When a comment is filtered, it is added to the ModQueue for review, and in addition:
+   * - if @param options.keep is `false`, the comment stops being in displayed the subreddit
+   * - if @param options.keep is `true`, the comment is still displayed in the subreddit
+   *
+   * @param options - The options for this filter action.
+   * @returns A Promise that resolves if the comment was filtered successfully.
+   * @experimental
+   */
+  async filter(options?: FilterOptions): Promise<void> {
+    await filterThing(this.id, options, this.#metadata);
+    this.#removed = !options?.keep;
+    this.#spam = false;
     this.#approved = false;
   }
 

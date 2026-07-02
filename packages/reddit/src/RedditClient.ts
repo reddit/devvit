@@ -9,6 +9,7 @@ import type { PostData } from '@devvit/shared-types/PostData.js';
 import { asTid, isT1, isT3, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
 import { assertUserScope } from './common.js';
+import { type FilterOptions, filterThing } from './helpers/filterThing.js';
 import type {
   AboutSubredditTypes,
   AddRemovalNoteOptions,
@@ -90,22 +91,6 @@ import { getRedditApiPlugins } from './plugin.js';
 const CACHE_KEY_CURRENT_USER = 'RedditClient.currentUser';
 
 type GetSubredditUsersOptions = Omit<GetSubredditUsersByTypeOptions, 'type'>;
-
-export async function filterThing(
-  id: T1 | T3,
-  reason: string | undefined,
-  keep: boolean | undefined,
-  metadata: Metadata | undefined
-): Promise<void> {
-  await getRedditApiPlugins().Moderation.Filter(
-    {
-      id,
-      reason,
-      keep,
-    },
-    metadata
-  );
-}
 
 export type InviteModeratorOptions = {
   /** The name of the subreddit to invite the user to moderate */
@@ -1316,19 +1301,17 @@ export class RedditClient {
   }
 
   /**
-   * Filters a post or comment. When a post or comment is filtered, it is removed from view (by default) and added to the ModQueue for review.
+   * Filters a post or comment. When a post or comment is filtered, it is added to the ModQueue for review, and in addition:
+   * - if @param options.keep is `false`, the post/comment stops being in displayed the subreddit
+   * - if @param options.keep is `true`, the post/comment is still displayed in the subreddit
    *
    * @param id - The id of the post (t3_) or comment (t1_) to filter.
-   * @param reason - (optional) The reason for filtering the post or comment. Eg: "contains sensitive content"
-   * @param keep - (optional) Whether to keep the post or comment instead of removing it. Defaults to false if not specified.
+   * @param options - The options for this filter action.
    * @returns A Promise that resolves if the post or comment was filtered successfully.
    * @experimental
    */
-  async filter(id: T1 | T3, reason: string | undefined, keep: boolean | undefined): Promise<void> {
-    if (isT1(id) || isT3(id)) {
-      return filterThing(id, reason, keep, context.metadata);
-    }
-    throw new Error('id must start with either t1_ or t3_');
+  async filter(id: T1 | T3, options?: FilterOptions): Promise<void> {
+    return filterThing(id, options, context.metadata);
   }
 
   /**

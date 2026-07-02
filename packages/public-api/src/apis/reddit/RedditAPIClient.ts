@@ -7,6 +7,7 @@ import { Header } from '@devvit/shared-types/Header.js';
 import { Devvit } from '../../devvit/Devvit.js';
 import type { T1ID, T2ID, T3ID, T5ID } from '../../types/tid.js';
 import { asT3ID, asT5ID, asTID, isT1ID, isT3ID } from '../../types/tid.js';
+import { type FilterOptions, filterThing } from './helpers/filterThing.js';
 import type {
   AboutSubredditTypes,
   AddRemovalNoteOptions,
@@ -1326,6 +1327,20 @@ export class RedditAPIClient {
     }
 
     throw new Error('id must start with either t1_ or t3_');
+  }
+
+  /**
+   * Filters a post or comment. When a post or comment is filtered, it is added to the ModQueue for review, and in addition:
+   * - if @param options.keep is `false`, the post/comment stops being in displayed the subreddit
+   * - if @param options.keep is `true`, the post/comment is still displayed in the subreddit
+   *
+   * @param id - The id of the post (t3_) or comment (t1_) to filter.
+   * @param options - The options for this filter action.
+   * @returns A Promise that resolves if the post or comment was filtered successfully.
+   * @experimental
+   */
+  async filter(id: T1ID | T3ID, options?: FilterOptions): Promise<void> {
+    return filterThing(id, options, this.#metadata);
   }
 
   /**

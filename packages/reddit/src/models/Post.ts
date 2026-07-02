@@ -25,11 +25,12 @@ import { isT3, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
 import { assertUserScope, RunAs, type UserGeneratedContent } from '../common.js';
 import { GraphQL } from '../graphql/GraphQL.js';
+import { type FilterOptions, filterThing } from '../helpers/filterThing.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
 import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
-import { type CustomPostStyles, filterThing } from '../RedditClient.js';
+import { type CustomPostStyles } from '../RedditClient.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { CommonFlair } from './Flair.js';
@@ -995,17 +996,18 @@ export class Post {
     this.#removed = false;
   }
 
-  /*
-   * Filters a post. When a post is filtered, it is removed from view (by default) and added to the ModQueue for review.
+  /**
+   * Filters a post. When a post is filtered, it is added to the ModQueue for review, and in addition:
+   * - if @param options.keep is `false`, the post stops being in displayed the subreddit
+   * - if @param options.keep is `true`, the post is still displayed in the subreddit
    *
-   * @param reason - (optional) The reason for filtering the post. Eg: "contains sensitive content"
-   * @param keep - (optional) Whether to keep the post instead of removing it. Defaults to false if not specified.
+   * @param options - The options for this filter action.
    * @returns A Promise that resolves if the post was filtered successfully.
    * @experimental
    */
-  async filter(reason: string | undefined, keep: boolean | undefined): Promise<void> {
-    await filterThing(this.id, reason, keep, context.metadata);
-    this.#removed = !keep;
+  async filter(options?: FilterOptions): Promise<void> {
+    await filterThing(this.id, options, context.metadata);
+    this.#removed = !options?.keep;
     this.#spam = false;
     this.#approved = false;
   }

@@ -119,6 +119,74 @@ describe('Post API', () => {
         metadata
       );
     });
+
+    test('filter() filters a post', async () => {
+      const { reddit, metadata } = createTestRedditApiClient();
+
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Moderation, 'Filter');
+      spyPlugin.mockImplementationOnce(async () => ({}));
+
+      await reddit.filter('t3_qwerty', {
+        reason: 'contains sensitive content',
+        keep: false,
+      });
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        {
+          id: 't3_qwerty',
+          reason: 'contains sensitive content',
+          keep: false,
+        },
+        metadata
+      );
+    });
+
+    test('filter() filters a comment', async () => {
+      const { reddit, metadata } = createTestRedditApiClient();
+
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Moderation, 'Filter');
+      spyPlugin.mockImplementationOnce(async () => ({}));
+
+      await reddit.filter('t1_commentid');
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        {
+          id: 't1_commentid',
+          reason: undefined,
+          keep: undefined,
+        },
+        metadata
+      );
+    });
+
+    test('Post.filter() filters and updates state', async () => {
+      const { metadata } = createTestRedditApiClient();
+      const spyPlugin = vi.spyOn(Devvit.redditAPIPlugins.Moderation, 'Filter');
+      spyPlugin.mockImplementationOnce(async () => ({}));
+      const post = new Post(
+        {
+          ...defaultPostData,
+          approved: true,
+          removed: false,
+          spam: true,
+        },
+        metadata
+      );
+
+      await post.filter({ reason: 'contains sensitive content' });
+
+      expect(spyPlugin).toHaveBeenCalledWith(
+        {
+          id: 't3_qwerty',
+          reason: 'contains sensitive content',
+          keep: undefined,
+        },
+        metadata
+      );
+      expect(post.removed).toBe(true);
+      expect(post.spam).toBe(false);
+      expect(post.approved).toBe(false);
+    });
   });
 
   describe('setSuggestedCommentSort()', () => {

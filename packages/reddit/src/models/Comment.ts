@@ -13,10 +13,10 @@ import type { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuil
 import { asTid, isT1, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
 import { assertUserScope, RunAs } from '../common.js';
+import { type FilterOptions, filterThing } from '../helpers/filterThing.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
-import { filterThing } from '../RedditClient.js';
 import type { CommonFlair } from './Flair.js';
 import { convertProtosFlairToCommonFlair } from './Flair.js';
 import type { ListingFetchOptions, ListingFetchResponse, MoreObject } from './Listing.js';
@@ -400,17 +400,18 @@ export class Comment {
     this.#approved = false;
   }
 
-  /*
-   * Filters a comment. When a comment is filtered, it is removed from view (by default) and added to the ModQueue for review.
+  /**
+   * Filters the comment. When a comment is filtered, it is added to the ModQueue for review, and in addition:
+   * - if @param options.keep is `false`, the comment stops being in displayed the subreddit
+   * - if @param options.keep is `true`, the comment is still displayed in the subreddit
    *
-   * @param reason - (optional) The reason for filtering the comment. Eg: "contains sensitive content"
-   * @param keep - (optional) Whether to keep the comment instead of removing it. Defaults to false if not specified.
+   * @param options - The options for this filter action.
    * @returns A Promise that resolves if the comment was filtered successfully.
    * @experimental
    */
-  async filter(reason: string | undefined, keep: boolean | undefined): Promise<void> {
-    await filterThing(this.id, reason, keep, context.metadata);
-    this.#removed = !keep;
+  async filter(options?: FilterOptions): Promise<void> {
+    await filterThing(this.id, options, context.metadata);
+    this.#removed = !options?.keep;
     this.#spam = false;
     this.#approved = false;
   }
