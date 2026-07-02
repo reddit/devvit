@@ -51,10 +51,16 @@ import type {
   SetUserFlairOptions,
   SubmitCustomPostOptions,
   SubmitPostOptions,
+  SubredditBannedUser,
+  SubredditContributorUser,
   SubredditInfo,
   SubredditLeaderboard,
+  SubredditModeratorUser,
+  SubredditMutedUser,
   SubredditOptions,
   SubredditStyles,
+  SubredditWikiBannedUser,
+  SubredditWikiContributorUser,
   UpdatePageSettingsOptions,
   UpdateWidgetData,
   UpdateWikiPageOptions,
@@ -872,9 +878,9 @@ export class RedditClient {
    * @param options.username - Use this to see if a user is approved to post in the subreddit.
    * @param options.limit - The maximum number of users to return. e.g. 1000
    * @param options.pageSize - The number of users to return per request. e.g. 100
-   * @returns A Listing of User objects.
+   * @returns A Listing of SubredditContributorUser objects.
    */
-  getApprovedUsers(options: GetSubredditUsersOptions): Listing<User> {
+  getApprovedUsers(options: GetSubredditUsersOptions): Listing<SubredditContributorUser> {
     return User.getSubredditUsersByType({
       type: 'contributors',
       ...options,
@@ -917,9 +923,9 @@ export class RedditClient {
    * @param options.username - Use this to see if a user is a wiki contributor for the subreddit.
    * @param options.limit - The maximum number of users to return. e.g. 1000
    * @param options.pageSize - The number of users to return per request. e.g. 100
-   * @returns A Listing of User objects.
+   * @returns A Listing of SubredditWikiContributorUser objects.
    */
-  getWikiContributors(options: GetSubredditUsersOptions): Listing<User> {
+  getWikiContributors(options: GetSubredditUsersOptions): Listing<SubredditWikiContributorUser> {
     return User.getSubredditUsersByType({
       type: 'wikicontributors',
       ...options,
@@ -962,9 +968,9 @@ export class RedditClient {
    * @param options.username - Use this to see if a user is banned from the subreddit.
    * @param options.limit - The maximum number of users to return. e.g. 1000
    * @param options.pageSize - The number of users to return per request. e.g. 100
-   * @returns A Listing of User objects.
+   * @returns A Listing of SubredditBannedUser objects.
    */
-  getBannedUsers(options: GetSubredditUsersOptions): Listing<User> {
+  getBannedUsers(options: GetSubredditUsersOptions): Listing<SubredditBannedUser> {
     return User.getSubredditUsersByType({
       type: 'banned',
       ...options,
@@ -1018,9 +1024,9 @@ export class RedditClient {
    * @param options.username - Use this to see if a user is banned from contributing to the wiki on a subreddit.
    * @param options.limit - The maximum number of users to return. e.g. 1000
    * @param options.pageSize - The number of users to return per request. e.g. 100
-   * @returns A Listing of User objects.
+   * @returns A Listing of SubredditWikiBannedUser objects.
    */
-  getBannedWikiContributors(options: GetSubredditUsersOptions): Listing<User> {
+  getBannedWikiContributors(options: GetSubredditUsersOptions): Listing<SubredditWikiBannedUser> {
     return User.getSubredditUsersByType({
       type: 'wikibanned',
       ...options,
@@ -1065,9 +1071,9 @@ export class RedditClient {
    * @param options.username - Use this to see if a user is a moderator of the subreddit.
    * @param options.limit - The maximum number of users to return. e.g. 1000
    * @param options.pageSize - The number of users to return per request. e.g. 100
-   * @returns A Listing of User objects.
+   * @returns A Listing of SubredditModeratorUser objects.
    */
-  getModerators(options: GetSubredditUsersOptions): Listing<User> {
+  getModerators(options: GetSubredditUsersOptions): Listing<SubredditModeratorUser> {
     return User.getSubredditUsersByType({
       type: 'moderators',
       ...options,
@@ -1142,9 +1148,9 @@ export class RedditClient {
    * @param options.username - Use this to see if a user is muted in the subreddit.
    * @param options.limit - The maximum number of users to return. e.g. 1000
    * @param options.pageSize - The number of users to return per request. e.g. 100
-   * @returns A listing of User objects.
+   * @returns A listing of SubredditMutedUser objects.
    */
-  getMutedUsers(options: GetSubredditUsersOptions): Listing<User> {
+  getMutedUsers(options: GetSubredditUsersOptions): Listing<SubredditMutedUser> {
     return User.getSubredditUsersByType({
       type: 'muted',
       ...options,

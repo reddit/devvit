@@ -47,9 +47,15 @@ import type {
   SetUserFlairBatchConfig,
   SetUserFlairOptions,
   SubmitPostOptions,
+  SubredditBannedUser,
+  SubredditContributorUser,
   SubredditInfo,
   SubredditLeaderboard,
+  SubredditModeratorUser,
+  SubredditMutedUser,
   SubredditStyles,
+  SubredditWikiBannedUser,
+  SubredditWikiContributorUser,
   UpdatePageSettingsOptions,
   UpdateWidgetData,
   UpdateWikiPageOptions,
@@ -846,7 +852,7 @@ export class RedditAPIClient {
    * @param options.pageSize - The number of users to return per request. e.g. 100
    * @returns A Listing of User objects.
    */
-  getApprovedUsers(options: GetSubredditUsersOptions): Listing<User> {
+  getApprovedUsers(options: GetSubredditUsersOptions): Listing<SubredditContributorUser> {
     return User.getSubredditUsersByType(
       {
         type: 'contributors',
@@ -900,7 +906,7 @@ export class RedditAPIClient {
    * @param options.pageSize - The number of users to return per request. e.g. 100
    * @returns A Listing of User objects.
    */
-  getWikiContributors(options: GetSubredditUsersOptions): Listing<User> {
+  getWikiContributors(options: GetSubredditUsersOptions): Listing<SubredditWikiContributorUser> {
     return User.getSubredditUsersByType(
       {
         type: 'wikicontributors',
@@ -954,7 +960,7 @@ export class RedditAPIClient {
    * @param options.pageSize - The number of users to return per request. e.g. 100
    * @returns A Listing of User objects.
    */
-  getBannedUsers(options: GetSubredditUsersOptions): Listing<User> {
+  getBannedUsers(options: GetSubredditUsersOptions): Listing<SubredditBannedUser> {
     return User.getSubredditUsersByType(
       {
         type: 'banned',
@@ -1019,7 +1025,7 @@ export class RedditAPIClient {
    * @param options.pageSize - The number of users to return per request. e.g. 100
    * @returns A Listing of User objects.
    */
-  getBannedWikiContributors(options: GetSubredditUsersOptions): Listing<User> {
+  getBannedWikiContributors(options: GetSubredditUsersOptions): Listing<SubredditWikiBannedUser> {
     return User.getSubredditUsersByType(
       {
         type: 'wikibanned',
@@ -1075,7 +1081,7 @@ export class RedditAPIClient {
    * @param options.pageSize - The number of users to return per request. e.g. 100
    * @returns A Listing of User objects.
    */
-  getModerators(options: GetSubredditUsersOptions): Listing<User> {
+  getModerators(options: GetSubredditUsersOptions): Listing<SubredditModeratorUser> {
     return User.getSubredditUsersByType(
       {
         type: 'moderators',
@@ -1164,7 +1170,7 @@ export class RedditAPIClient {
    * @param options.pageSize - The number of users to return per request. e.g. 100
    * @returns A listing of User objects.
    */
-  getMutedUsers(options: GetSubredditUsersOptions): Listing<User> {
+  getMutedUsers(options: GetSubredditUsersOptions): Listing<SubredditMutedUser> {
     return User.getSubredditUsersByType(
       {
         type: 'muted',

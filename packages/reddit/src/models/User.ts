@@ -1,6 +1,5 @@
 import type {
   GetUserKarmaForSubredditResponse,
-  UserDataByAccountIdsResponse,
   UserDataByAccountIdsResponse_UserAccountData,
   UserTrophiesResponse,
 } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
@@ -413,7 +412,7 @@ export class User {
       return [];
     }
 
-    const permissions = mods[0].modPermissions.get(subredditName) ?? [];
+    const permissions = mods[0].moderatorInfo.modPermissions;
 
     if (permissions.length > 0) {
       this.#modPermissionsBySubreddit.set(subredditName, permissions);
@@ -554,8 +553,43 @@ export class User {
     }
   }
 
+  /**
+   * Returns a listing of subreddit users by relationship type. Items are built from AboutWhere child data only.
+   * - `'banned'` → SubredditBannedUser (id, name, date, note?)
+   * - `'muted'` → SubredditMutedUser (id, name, date?)
+   * - `'wikibanned'` → SubredditWikiBannedUser (id, name, date?, note?)
+   * - `'contributors'` → SubredditContributorUser (id, name, date?)
+   * - `'wikicontributors'` → SubredditWikiContributorUser (id, name, date?)
+   * - `'moderators'` → SubredditModeratorUser (id, name, date?, modPermissions)
+   * @internal
+   */
+  static getSubredditUsersByType(
+    options: GetSubredditUsersByTypeOptions & { type: 'banned' }
+  ): Listing<SubredditBannedUser>;
   /** @internal */
-  static getSubredditUsersByType(options: GetSubredditUsersByTypeOptions): Listing<User> {
+  static getSubredditUsersByType(
+    options: GetSubredditUsersByTypeOptions & { type: 'muted' }
+  ): Listing<SubredditMutedUser>;
+  /** @internal */
+  static getSubredditUsersByType(
+    options: GetSubredditUsersByTypeOptions & { type: 'wikibanned' }
+  ): Listing<SubredditWikiBannedUser>;
+  /** @internal */
+  static getSubredditUsersByType(
+    options: GetSubredditUsersByTypeOptions & { type: 'contributors' }
+  ): Listing<SubredditContributorUser>;
+  /** @internal */
+  static getSubredditUsersByType(
+    options: GetSubredditUsersByTypeOptions & { type: 'wikicontributors' }
+  ): Listing<SubredditWikiContributorUser>;
+  /** @internal */
+  static getSubredditUsersByType(
+    options: GetSubredditUsersByTypeOptions & { type: 'moderators' }
+  ): Listing<SubredditModeratorUser>;
+  /** @internal */
+  static getSubredditUsersByType(
+    options: GetSubredditUsersByTypeOptions
+  ): Listing<SubredditUserByType> {
     const client = getRedditApiPlugins().Subreddits;
 
     return new Listing({
@@ -565,15 +599,22 @@ export class User {
       after: options.after,
       before: options.before,
       fetch: async (fetchOptions: ListingFetchOptions) => {
-        const response = await client.AboutWhere({
-          where: options.type,
-          user: options.username,
-          subreddit: options.subredditName,
-          show: 'all',
-          ...fetchOptions,
-        });
+        const response = await client.AboutWhere(
+          {
+            where: options.type,
+            user: options.username,
+            subreddit: options.subredditName,
+            show: 'all',
+            ...fetchOptions,
+          },
+          this.#metadata
+        );
 
-        return listingProtosToUsers(response, options.subredditName);
+        return await listingProtosToSubredditUsersByType(
+          response,
+          options.type,
+          options.subredditName
+        );
       },
     });
   }
@@ -702,6 +743,157 @@ export class User {
   }
 }
 
+/**
+ * User on a subreddit's banned list; data from the AboutWhere response.
+ * Use `getBannedUsers()` or `subreddit.getBannedUsers()` to receive a listing of these.
+ */
+export class SubredditBannedUser extends User {
+  /** When the ban was created (UTC). */
+  readonly date: Date;
+  /** Moderator note (visible only to mods). */
+  readonly note?: string;
+  /** Days remaining on a temporary ban (undefined if permanent). */
+  readonly daysLeft?: number;
+
+  /** @internal */
+  constructor(
+    data: UserProto,
+    banData: { date: Date; note: string | undefined; daysLeft: number | undefined }
+  ) {
+    super(data);
+    this.date = banData.date;
+    if (banData.note !== undefined) this.note = banData.note;
+    if (banData.daysLeft !== undefined) this.daysLeft = banData.daysLeft;
+  }
+}
+
+/**
+ * User on a subreddit's muted list; data from the AboutWhere response.
+ * Use `getMutedUsers()` or `subreddit.getMutedUsers()` to receive a listing of these.
+ */
+export class SubredditMutedUser extends User {
+  /** When the mute was created (UTC). */
+  readonly date: Date;
+
+  /** @internal */
+  constructor(data: UserProto, muteData: { date: Date }) {
+    super(data);
+    this.date = muteData.date;
+  }
+}
+
+/**
+ * User on a subreddit's wiki-banned list; data from the AboutWhere response.
+ * Use `getBannedWikiContributors()` or `subreddit.getBannedWikiContributors()` to receive a listing of these.
+ */
+export class SubredditWikiBannedUser extends User {
+  /** When the wiki ban was created (UTC). */
+  readonly date: Date;
+  /** Moderator note. */
+  readonly note?: string;
+  /** Days remaining on a temporary ban (undefined if permanent). */
+  readonly daysLeft?: number;
+
+  /** @internal */
+  constructor(
+    data: UserProto,
+    wikiBanData: { date: Date; note: string | undefined; daysLeft: number | undefined }
+  ) {
+    super(data);
+    this.date = wikiBanData.date;
+    if (wikiBanData.note !== undefined) this.note = wikiBanData.note;
+    if (wikiBanData.daysLeft !== undefined) this.daysLeft = wikiBanData.daysLeft;
+  }
+}
+
+/**
+ * User approved to post in a subreddit (contributor); data from the AboutWhere response.
+ * Use `getApprovedUsers()` or `subreddit.getApprovedUsers()` to receive a listing of these.
+ */
+export class SubredditContributorUser extends User {
+  /** When the contributor relationship was created (UTC). */
+  readonly date: Date;
+
+  /** @internal */
+  constructor(data: UserProto, contributorData: { date: Date }) {
+    super(data);
+    this.date = contributorData.date;
+  }
+}
+
+/**
+ * User with wiki contributor access; data from the AboutWhere response.
+ * Use `getWikiContributors()` or `subreddit.getWikiContributors()` to receive a listing of these.
+ */
+export class SubredditWikiContributorUser extends User {
+  /** When the wiki contributor relationship was created (UTC). */
+  readonly date: Date;
+
+  /** @internal */
+  constructor(data: UserProto, wikiContributorData: { date: Date }) {
+    super(data);
+    this.date = wikiContributorData.date;
+  }
+}
+
+/**
+ * Moderator of a subreddit; data from the AboutWhere response.
+ * Use `getModerators()` or `subreddit.getModerators()` to receive a listing of these.
+ */
+export class SubredditModeratorUser extends User {
+  /** When the moderator relationship was created (UTC). */
+  readonly date: Date;
+  /**
+   * Moderator relationship data for the subreddit.
+   * Nested to avoid shadowing {@link User.modPermissions}, which stores permissions across all subreddits.
+   */
+  readonly moderatorInfo: {
+    /** Moderator permissions for this subreddit. */
+    modPermissions: ModeratorPermission[];
+    /** User flair CSS class in the subreddit. */
+    authorFlairCssClass?: string;
+    /** User flair text in the subreddit. */
+    authorFlairText?: string;
+  };
+
+  /** @internal */
+  constructor(
+    data: UserProto,
+    modData: {
+      date: Date;
+      subredditName: string | undefined;
+      modPermissions: ModeratorPermission[];
+      authorFlairCssClass: string | undefined;
+      authorFlairText: string | undefined;
+    }
+  ) {
+    super({
+      ...data,
+      ...(modData.subredditName !== undefined
+        ? { modPermissions: { [modData.subredditName]: modData.modPermissions } }
+        : {}),
+    });
+    this.date = modData.date;
+    this.moderatorInfo = {
+      modPermissions: modData.modPermissions,
+      ...(modData.authorFlairCssClass !== undefined
+        ? { authorFlairCssClass: modData.authorFlairCssClass }
+        : {}),
+      ...(modData.authorFlairText !== undefined
+        ? { authorFlairText: modData.authorFlairText }
+        : {}),
+    };
+  }
+}
+
+type SubredditUserByType =
+  | SubredditBannedUser
+  | SubredditMutedUser
+  | SubredditWikiBannedUser
+  | SubredditContributorUser
+  | SubredditWikiContributorUser
+  | SubredditModeratorUser;
+
 function listingProtosToPostsOrComments(
   listingProto: ListingProto
 ): ListingFetchResponse<Post | Comment> {
@@ -726,55 +918,59 @@ function listingProtosToPostsOrComments(
   };
 }
 
-async function listingProtosToUsers(
+async function listingProtosToSubredditUsersByType(
   listingProto: ListingProto,
+  type: GetSubredditUsersByTypeOptions['type'],
   subredditName: string
-): Promise<ListingFetchResponse<User>> {
-  const client = getRedditApiPlugins().Users;
-
+): Promise<ListingFetchResponse<SubredditUserByType>> {
   if (!listingProto.data?.children) {
     throw new Error('Listing response is missing children');
   }
 
-  const userIds = listingProto.data.children.map((child) => {
-    assertNonNull(child.data?.id, 'User id is still from listing data');
+  const children = listingProto.data.children;
+
+  const userIds = children.map((child) => {
+    assertNonNull(child.data?.id, 'User id is missing from listing');
     return child.data.id;
   });
 
-  // break the ids into chunks since they're passed over a query parameter
+  // Chunk IDs since they are passed as a query parameter.
   const chunkSize = 100;
-  const userIdChunks = [];
+  const userIdChunks: string[][] = [];
   for (let i = 0; i < userIds.length; i += chunkSize) {
     userIdChunks.push(userIds.slice(i, i + chunkSize));
   }
 
-  // perform the requests
-  const usersMapResponses: UserDataByAccountIdsResponse[] = await Promise.all(
-    userIdChunks.map((userIds) =>
-      client.UserDataByAccountIds(
-        {
-          ids: userIds.join(','),
-        },
-        context.metadata
-      )
+  const client = getRedditApiPlugins().Users;
+  const usersMapResponses = await Promise.all(
+    userIdChunks.map((chunk) =>
+      client.UserDataByAccountIds({ ids: chunk.join(',') }, context.metadata)
     )
   );
 
-  // join the responses back into a single map of user data
-  const userDataById: { [key: string]: UserDataByAccountIdsResponse_UserAccountData } =
-    usersMapResponses.reduce((allUsers, response) => ({ ...allUsers, ...response.users }), {});
+  const userDataById: Record<string, UserDataByAccountIdsResponse_UserAccountData> =
+    usersMapResponses.reduce((acc, response) => ({ ...acc, ...response.users }), {});
 
-  const children = listingProto.data.children.map((child) => {
-    const id = child.data?.id;
+  const result = children.map((child) => {
+    const data = child.data;
+    assertNonNull(data, 'User data is missing from listing');
+
+    const id = data.id;
     assertNonNull(id, 'User id is missing from listing');
 
     const userData = userDataById[id];
-
-    // Casting to unknown because Typescript assumes that userData is always defined
-    // because of how we defined the UserDataByAccountIdsResponse_UserAccountData protobuf.
+    // Casting to unknown because TypeScript assumes userData is always defined
+    // due to how UserDataByAccountIdsResponse_UserAccountData is typed in the protobuf.
     assertNonNull(userData as unknown, 'User data is missing from response');
 
-    return new User({
+    // date is a Unix timestamp in seconds; convert to a Date object.
+    const unixTime = data.date;
+    assertNonNull(unixTime, `Date is missing from user type ${type}`);
+    const date = new Date(unixTime * 1000);
+
+    const modPermissions = validModPermissions(data.modPermissions ?? []);
+
+    const userProtoData = {
       id,
       name: userData.name,
       linkKarma: userData.linkKarma,
@@ -783,13 +979,43 @@ async function listingProtosToUsers(
       over18: userData.profileOver18,
       snoovatarSize: [],
       modPermissions: {
-        [subredditName]: child.data?.modPermissions ?? [],
+        [subredditName]: modPermissions,
       },
-    });
+    };
+
+    switch (type) {
+      case 'banned':
+        return new SubredditBannedUser(userProtoData, {
+          date,
+          daysLeft: data.daysLeft,
+          note: data.note,
+        });
+      case 'muted':
+        return new SubredditMutedUser(userProtoData, { date });
+      case 'wikibanned':
+        return new SubredditWikiBannedUser(userProtoData, {
+          date,
+          daysLeft: data.daysLeft,
+          note: data.note,
+        });
+      case 'contributors':
+        return new SubredditContributorUser(userProtoData, { date });
+      case 'wikicontributors':
+        return new SubredditWikiContributorUser(userProtoData, { date });
+      case 'moderators': {
+        return new SubredditModeratorUser(userProtoData, {
+          date,
+          subredditName,
+          modPermissions,
+          authorFlairCssClass: data.authorFlairCssClass,
+          authorFlairText: data.authorFlairText,
+        });
+      }
+    }
   });
 
   return {
-    children,
+    children: result,
     before: listingProto.data.before,
     after: listingProto.data.after,
   };

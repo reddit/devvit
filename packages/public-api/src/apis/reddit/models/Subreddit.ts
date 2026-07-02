@@ -45,6 +45,12 @@ import type {
   BanWikiContributorOptions,
   GetSubredditUsersByTypeOptions,
   ModeratorPermission,
+  SubredditBannedUser,
+  SubredditContributorUser,
+  SubredditModeratorUser,
+  SubredditMutedUser,
+  SubredditWikiBannedUser,
+  SubredditWikiContributorUser,
 } from './User.js';
 import { User } from './User.js';
 
@@ -777,7 +783,7 @@ export class Subreddit {
     );
   }
 
-  getApprovedUsers(options: GetUsersOptions = {}): Listing<User> {
+  getApprovedUsers(options: GetUsersOptions = {}): Listing<SubredditContributorUser> {
     return User.getSubredditUsersByType(
       {
         type: 'contributors',
@@ -810,7 +816,7 @@ export class Subreddit {
     );
   }
 
-  getWikiContributors(options: GetUsersOptions = {}): Listing<User> {
+  getWikiContributors(options: GetUsersOptions = {}): Listing<SubredditWikiContributorUser> {
     return User.getSubredditUsersByType(
       {
         type: 'wikicontributors',
@@ -843,7 +849,7 @@ export class Subreddit {
     );
   }
 
-  getBannedUsers(options: GetUsersOptions = {}): Listing<User> {
+  getBannedUsers(options: GetUsersOptions = {}): Listing<SubredditBannedUser> {
     return User.getSubredditUsersByType(
       {
         type: 'banned',
@@ -881,7 +887,7 @@ export class Subreddit {
     );
   }
 
-  getBannedWikiContributors(options: GetUsersOptions = {}): Listing<User> {
+  getBannedWikiContributors(options: GetUsersOptions = {}): Listing<SubredditWikiBannedUser> {
     return User.getSubredditUsersByType(
       {
         type: 'wikibanned',
@@ -917,7 +923,7 @@ export class Subreddit {
     );
   }
 
-  getModerators(options: GetUsersOptions = {}): Listing<User> {
+  getModerators(options: GetUsersOptions = {}): Listing<SubredditModeratorUser> {
     return User.getSubredditUsersByType(
       {
         type: 'moderators',
@@ -966,7 +972,7 @@ export class Subreddit {
     return User.setModeratorPermissions(username, this.#name, permissions, this.#metadata);
   }
 
-  getMutedUsers(options: GetUsersOptions = {}): Listing<User> {
+  getMutedUsers(options: GetUsersOptions = {}): Listing<SubredditMutedUser> {
     return User.getSubredditUsersByType(
       {
         type: 'muted',
