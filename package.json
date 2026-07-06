@@ -68,7 +68,7 @@
     "@babel/traverse": "^7.23.2",
     "@mdn/browser-compat-data": "^7.1.14",
     "chalk": "4.1.2",
-    "dompurify": "^3.0.0",
+    "dompurify": "^3.4.11",
     "http-cache-semantics": "^4.1.1",
     "nan": "2.20.0",
     "protobufjs": "7.6.3",
