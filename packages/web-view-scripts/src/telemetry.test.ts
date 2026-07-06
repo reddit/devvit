@@ -8,11 +8,27 @@ import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
 import { initTelemetry } from './telemetry.js';
 
 type EventListenerMock = Mock<(type: string, listener: (event: unknown) => void) => void>;
-type MetricsMessage = { telemetry?: { metrics?: { metrics?: { spanName: string }[] } } };
+type TelemetryMetricForTest = { spanName: string };
+type MetricsMessage = { telemetry?: { metrics?: { metrics?: TelemetryMetricForTest[] } } };
 
 const addEventListenerMock: EventListenerMock = vi.fn();
 const docAddEventListenerMock: EventListenerMock = vi.fn();
 const postMessageMock: EventListenerMock = vi.fn();
+
+const getMetricsPayloads = (): TelemetryMetricForTest[][] =>
+  postMessageMock.mock.calls
+    .map(([message]) => (message as MetricsMessage).telemetry?.metrics?.metrics)
+    .filter((metrics): metrics is TelemetryMetricForTest[] => metrics != null);
+
+const getFirstMetricsPayload = (): TelemetryMetricForTest[] => {
+  const [metrics] = getMetricsPayloads();
+  expect(metrics).toBeDefined();
+  return metrics ?? [];
+};
+
+const expectMetricSpanNames = (metrics: TelemetryMetricForTest[], spanNames: string[]): void => {
+  expect(metrics.map((metric) => metric.spanName)).toEqual(spanNames);
+};
 
 const createMockDevvit = (): DevvitGlobal => ({
   context: {} as DevvitGlobal['context'],
@@ -276,9 +292,10 @@ describe('telemetry', () => {
 it('sends load telemetry on window load', async () => {
   initTelemetry();
 
-  const onLoad = addEventListenerMock.mock.calls.find((call) => call[0] === 'load')?.[1];
-
-  onLoad?.({});
+  const loadHandlers = addEventListenerMock.mock.calls
+    .filter((call) => call[0] === 'load')
+    .map((call) => call[1]);
+  loadHandlers.forEach((handler) => handler?.({}));
 
   expect(postMessageMock).toHaveBeenCalledWith(
     {
@@ -419,6 +436,12 @@ describe('performance monitoring', () => {
       }),
       '*'
     );
+    expectMetricSpanNames(getFirstMetricsPayload(), [
+      'web_view_initialization',
+      'web_view_time_to_interactive',
+      'web_view_time_to_first_byte',
+      'web_view_load',
+    ]);
   });
 
   it('captures fcp metric', async () => {
@@ -465,11 +488,6 @@ describe('performance monitoring', () => {
             metrics: expect.arrayContaining([
               {
                 spanName: 'web_view_first_contentful_paint',
-                timeStart: 1717171717171,
-                timeEnd: 1717171717171 + 300,
-              },
-              {
-                spanName: 'web_view_first_contentful_paint_v2',
                 timeStart: performance.timeOrigin,
                 timeEnd: performance.timeOrigin + 300,
               },
@@ -479,6 +497,14 @@ describe('performance monitoring', () => {
       }),
       '*'
     );
+    expectMetricSpanNames(getFirstMetricsPayload(), [
+      'web_view_initialization',
+      'web_view_time_to_interactive',
+      'web_view_first_contentful_paint',
+      'web_view_render_duration',
+      'web_view_time_to_first_byte',
+      'web_view_load',
+    ]);
   });
 
   it('sends fcp as a standalone metric when fcp fires after load', async () => {
@@ -532,11 +558,6 @@ describe('performance monitoring', () => {
             metrics: expect.arrayContaining([
               {
                 spanName: 'web_view_first_contentful_paint',
-                timeStart: 1717171717171,
-                timeEnd: 1717171717171 + 300,
-              },
-              {
-                spanName: 'web_view_first_contentful_paint_v2',
                 timeStart: performance.timeOrigin,
                 timeEnd: performance.timeOrigin + 300,
               },
@@ -551,6 +572,10 @@ describe('performance monitoring', () => {
       }),
       '*'
     );
+    expectMetricSpanNames(getFirstMetricsPayload(), [
+      'web_view_first_contentful_paint',
+      'web_view_render_duration',
+    ]);
   });
 
   it('captures tti metric', async () => {
@@ -585,11 +610,6 @@ describe('performance monitoring', () => {
             metrics: expect.arrayContaining([
               {
                 spanName: 'web_view_time_to_interactive',
-                timeStart: 1717171717171,
-                timeEnd: 1717171717171 + 300,
-              },
-              {
-                spanName: 'web_view_time_to_interactive_v2',
                 timeStart: performance.timeOrigin,
                 timeEnd: performance.timeOrigin + 300,
               },
@@ -599,6 +619,12 @@ describe('performance monitoring', () => {
       }),
       '*'
     );
+    expectMetricSpanNames(getFirstMetricsPayload(), [
+      'web_view_initialization',
+      'web_view_time_to_interactive',
+      'web_view_time_to_first_byte',
+      'web_view_load',
+    ]);
   });
 
   it('captures the web_view_initialization gap metric', async () => {
@@ -625,9 +651,15 @@ describe('performance monitoring', () => {
       }),
       '*'
     );
+    expectMetricSpanNames(getFirstMetricsPayload(), [
+      'web_view_initialization',
+      'web_view_time_to_interactive',
+      'web_view_time_to_first_byte',
+      'web_view_load',
+    ]);
   });
 
-  it('captures load metric with a clock-aligned v2 variant', async () => {
+  it('captures load metric with timeOrigin-aligned timestamps', async () => {
     const performanceNow = 400;
     vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
 
@@ -645,11 +677,6 @@ describe('performance monitoring', () => {
             metrics: expect.arrayContaining([
               {
                 spanName: 'web_view_load',
-                timeStart: 1717171717171,
-                timeEnd: 1717171717171 + performanceNow,
-              },
-              {
-                spanName: 'web_view_load_v2',
                 timeStart: performance.timeOrigin,
                 timeEnd: performance.timeOrigin + performanceNow,
               },
@@ -659,6 +686,90 @@ describe('performance monitoring', () => {
       }),
       '*'
     );
+    expectMetricSpanNames(getFirstMetricsPayload(), [
+      'web_view_initialization',
+      'web_view_time_to_interactive',
+      'web_view_time_to_first_byte',
+      'web_view_load',
+    ]);
+  });
+
+  it('emits timeOrigin metrics without startTime', async () => {
+    const paintEntry = {
+      name: 'first-contentful-paint',
+      startTime: 300,
+    } as PerformancePaintTiming;
+    const performanceNow = 400;
+    vi.clearAllMocks();
+    Object.keys(observerCallbacks).forEach((key) => delete observerCallbacks[key]);
+    globalThis.devvit = { ...createMockDevvit(), startTime: undefined };
+    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
+
+    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
+      if (type === 'paint') return [paintEntry];
+      if (type === 'navigation') {
+        return [
+          {
+            requestStart: 100,
+            responseStart: 200,
+            domInteractive: 300,
+            loadEventEnd: 400,
+          } as PerformanceNavigationTiming,
+        ];
+      }
+      return [];
+    });
+
+    initTelemetry();
+
+    observerCallbacks['paint']?.({
+      getEntries: () => [paintEntry],
+    } as PerformanceObserverEntryList);
+
+    const loadHandlers = addEventListenerMock.mock.calls
+      .filter((call) => call[0] === 'load')
+      .map((call) => call[1]);
+    loadHandlers.forEach((handler) => handler?.({}));
+
+    expect(postMessageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: WebViewInternalMessageScope.CLIENT,
+        type: webViewInternalMessageType,
+        telemetry: {
+          metrics: {
+            metrics: [
+              {
+                spanName: 'web_view_time_to_interactive',
+                timeStart: performance.timeOrigin,
+                timeEnd: performance.timeOrigin + 300,
+              },
+              {
+                spanName: 'web_view_first_contentful_paint',
+                timeStart: performance.timeOrigin,
+                timeEnd: performance.timeOrigin + paintEntry.startTime,
+              },
+              {
+                spanName: 'web_view_render_duration',
+                timeStart: performance.timeOrigin + 200,
+                timeEnd: performance.timeOrigin + 400,
+              },
+              {
+                spanName: 'web_view_load',
+                timeStart: performance.timeOrigin,
+                timeEnd: performance.timeOrigin + performanceNow,
+              },
+            ],
+          },
+        },
+      }),
+      '*'
+    );
+    expectMetricSpanNames(getFirstMetricsPayload(), [
+      'web_view_time_to_interactive',
+      'web_view_first_contentful_paint',
+      'web_view_render_duration',
+      'web_view_load',
+    ]);
   });
 
   it('captures render duration from the navigation observer when fcp fires before load', async () => {
@@ -1065,11 +1176,6 @@ describe('performance monitoring', () => {
             metrics: expect.arrayContaining([
               {
                 spanName: 'web_view_first_contentful_paint',
-                timeStart: 1717171717171,
-                timeEnd: 1717171717171 + paintEntry.startTime,
-              },
-              {
-                spanName: 'web_view_first_contentful_paint_v2',
                 timeStart: performance.timeOrigin,
                 timeEnd: performance.timeOrigin + paintEntry.startTime,
               },

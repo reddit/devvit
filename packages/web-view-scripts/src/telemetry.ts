@@ -8,7 +8,7 @@ import { emitTelemetryClickEffect } from '@devvit/shared-types/client/telemetry.
 
 let telemetryMetrics: WebViewTelemetryMetric[];
 
-/** startTime (UTC milliseconds) is provided by the client within the bridge context, to be used for all metrics */
+/** startTime (UTC milliseconds) is provided by the client within the bridge context for native-clock metrics. */
 let startTime: number | undefined;
 
 // Render duration still needs an emit guard because both FCP and navigation callbacks can attempt it.
@@ -76,28 +76,10 @@ function measureTtfb(): WebViewTelemetryMetric | undefined {
   };
 }
 
-/**
- * Builds both the legacy v1 metric and the clock-aligned v2 metric for a span.
- *
- * The v1 metric keeps its historical (flawed) anchoring of the native `startTime`
- * clock against a `performance.timeOrigin`-relative offset, preserving the existing
- * series. The v2 metric anchors `timeStart` to `performance.timeOrigin`, the same
- * clock the offset is measured from, so its absolute timestamps are correct while
- * the duration stays identical to v1.
- */
-function buildMetricPair(spanName: string, offset: number): WebViewTelemetryMetric[] {
-  if (!startTime) {
-    return [];
-  }
-
+function buildTimeOriginMetric(spanName: string, offset: number): WebViewTelemetryMetric[] {
   return [
     {
       spanName,
-      timeStart: startTime,
-      timeEnd: startTime + offset,
-    },
-    {
-      spanName: `${spanName}_v2`,
       timeStart: performance.timeOrigin,
       timeEnd: performance.timeOrigin + offset,
     },
@@ -150,19 +132,15 @@ function measureFcp(): WebViewTelemetryMetric[] {
   const paintEntries = performance.getEntriesByType('paint');
   const fcpEntry = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
 
-  if (!fcpEntry || !startTime) {
+  if (!fcpEntry) {
     return [];
   }
 
-  return buildMetricPair('web_view_first_contentful_paint', fcpEntry.startTime);
+  return buildTimeOriginMetric('web_view_first_contentful_paint', fcpEntry.startTime);
 }
 
 function measureLoad(): WebViewTelemetryMetric[] {
-  if (!startTime) {
-    return [];
-  }
-
-  return buildMetricPair('web_view_load', performance.now());
+  return buildTimeOriginMetric('web_view_load', performance.now());
 }
 
 function measureLoadEventEnd(
@@ -197,23 +175,20 @@ function emitRenderDuration(): void {
  * Avoids long task API which isn't supported on iOS.
  */
 function measureTti(): WebViewTelemetryMetric[] {
-  const navTiming = getNavigationTiming() as PerformanceNavigationTiming;
-  const ttiTime = navTiming.domInteractive;
+  const navTiming = getNavigationTiming();
+  const ttiTime = navTiming?.domInteractive;
 
-  if (!startTime || !ttiTime) {
+  if (!ttiTime) {
     return [];
   }
 
-  return buildMetricPair('web_view_time_to_interactive', ttiTime);
+  return buildTimeOriginMetric('web_view_time_to_interactive', ttiTime);
 }
 
 function initPerformanceMonitoring(): void {
   telemetryMetrics = [];
   startTime = globalThis.devvit?.startTime;
   renderDurationSent = false;
-  if (!startTime) {
-    return;
-  }
 
   const initialization = measureWebViewInitialization();
   if (initialization) telemetryMetrics.push(initialization);
