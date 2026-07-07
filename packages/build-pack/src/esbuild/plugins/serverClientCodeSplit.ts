@@ -10,17 +10,6 @@ import type {
   PluginBuild,
 } from 'esbuild';
 
-// public-api paths to strip from client builds
-// subfolders of: packages/public-api/src/apis/
-const SERVER_ONLY_PLUGIN_PATHS = [
-  'key-value-storage',
-  'media',
-  'modLog',
-  'reddit',
-  'redis',
-  'scheduler',
-];
-
 // Code stamped in client builds that replaces server-only code as `server-stub.js`
 const CLIENT_CIRCUITBREAK_STUB = `
   let circuitBreak = globalThis.circuitBreak;
@@ -65,18 +54,6 @@ export function serverClientCodeSplit(watchMode: boolean = false): Plugin {
   return {
     name: 'removeServerCode',
     setup(build: PluginBuild) {
-      let publicApiDir: string;
-
-      // We can't call build.resolve() outside of one of the plugin callbacks
-      build.onStart(async () => {
-        const { path: resolvedPath } = await build.resolve('@devvit/public-api', {
-          resolveDir: '.',
-          kind: 'import-statement',
-          pluginData: 'removeServerCodeStart',
-        });
-        publicApiDir = path.dirname(resolvedPath);
-      });
-
       // Remove code the developer has marked as server-only by naming convention:
       build.onResolve(
         { filter: /(\/server\/)|(\.server\.(js|ts)x?$)/ },
@@ -112,26 +89,6 @@ export function serverClientCodeSplit(watchMode: boolean = false): Plugin {
           return resolved;
         }
       );
-
-      // If set, don't strip plugin code from client bundles
-      if (process.env.DEVVIT_BUNDLE_STRIP_PLUGINS === '1') {
-        // Remove plugins from public-api that are non-op on clients and always
-        // result in a circuit break:
-        // eslint-disable-next-line security/detect-non-literal-regexp
-        const publicApiFilter = new RegExp(`/(${SERVER_ONLY_PLUGIN_PATHS.join('|')})/`);
-        build.onResolve({ filter: publicApiFilter }, (args: OnResolveArgs): OnResolveResult => {
-          // Since the regex for public-api paths is so broad, ensure the resolved import is from
-          // @devvit/public-api and not someplace else
-          if (!args.importer.startsWith(publicApiDir)) {
-            return {};
-          }
-
-          return {
-            namespace: SERVER_ONLY_NAMESPACE,
-            path: SERVER_ONLY_FILENAME,
-          };
-        });
-      }
 
       // Create the circuit break stub and return a Proxy object so any
       // fields or functions imported throw a CircuitBreak exception instead

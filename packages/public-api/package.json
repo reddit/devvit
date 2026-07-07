@@ -33,7 +33,6 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/metrics": "0.13.7",
     "@devvit/protos": "0.13.7",
     "@devvit/shared": "0.13.7",
     "@devvit/shared-types": "0.13.7",

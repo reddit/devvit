@@ -534,30 +534,6 @@ describe('ES Build Pack', () => {
         expect(cleanedUpCode).not.toContain(`__toESM(require_${stub}(), 1)`)
       );
     });
-
-    it('removes plugin code when DEVVIT_BUNDLE_STRIP_PLUGINS is set', async () => {
-      process.env.DEVVIT_BUNDLE_STRIP_PLUGINS = '1';
-      const result = await build({
-        bundle: true,
-        entryPoints: [path.resolve(__dirname, '..', 'test-actors', 'code-split', 'main.tsx')],
-        minify: false,
-        outfile: 'main.js',
-        plugins: [serverClientCodeSplit(true)],
-        format: 'cjs',
-        jsxFactory: 'Devvit.createFragment',
-        jsxFragment: 'Devvit.Fragment',
-        target: 'es2020',
-        write: false,
-      });
-      const clientBundle = result.outputFiles.find((bundle) =>
-        bundle.text.includes('"server-only:')
-      );
-      expect(clientBundle?.text).not.toBeUndefined();
-      const stubbedRedis = result.outputFiles?.[0]?.text.match(
-        /var import_RedisClient[0-9]* = __toESM\(require_server_stub\(\), 1\)/gm
-      );
-      expect(stubbedRedis).toBeTruthy();
-    });
   });
 });
 
