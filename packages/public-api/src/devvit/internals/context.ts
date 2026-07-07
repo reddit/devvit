@@ -1,96 +1,54 @@
-import type { RequestContext } from '@devvit/protos/json/devvit/platform/v1/request_context.js';
-import type { DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
-import type { AppDebug } from '@devvit/shared-types/Header.js';
-import { Header } from '@devvit/shared-types/Header.js';
+import { type AppDebug, Header } from '@devvit/shared-types/Header.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { PostData } from '@devvit/shared-types/PostData.js';
-import { jwtDecode, type JwtPayload } from 'jwt-decode';
+import { BaseContextFromMetadata } from '@devvit/shared-types/server/base-context.js';
 
 import type { BaseContext, ContextDebugInfo } from '../../types/context.js';
 import pkg from '../../version.json' with { type: 'json' };
-
-/**
- * Claims payload extracted from a Devvit JWT.
- * This represents a JSON Web Token (JWT) that holds the `devvit` platform request context
- */
-type ContextClaims = JwtPayload & { devvit: RequestContext };
 
 export function getContextFromMetadata(
   metadata: Metadata,
   postId?: string,
   commentId?: string
 ): BaseContext {
-  const subredditId = metadata[Header.Subreddit]?.values[0];
-  assertNonNull<string | undefined>(subredditId, 'subreddit is missing from Context');
-
-  const subredditName = metadata[Header.SubredditName]?.values[0];
-
-  // 'devvit-post-data' is a JSON string. If set in the header, parse it as
-  // DevvitPostData.
-  let postData: PostData | undefined;
-  const postDataJSON = metadata[Header.PostData]?.values[0];
-  if (postDataJSON) {
-    // Hack: assume DevvitPostData is JSON compatible for outdated iOS releases
-    //       around 2025.39.1.616587.
-    postData = (JSON.parse(postDataJSON) as DevvitPostData).developerData;
-  }
-
-  // devvit-app-user is only available in the remote runtime.
+  const baseCtx = BaseContextFromMetadata(metadata, postId, commentId);
   const appAccountId = metadata[Header.AppUser]?.values[0];
-  const appSlug = metadata[Header.App]?.values[0];
-  const appVersion = metadata[Header.Version]?.values[0];
-  const snoovatar = metadata[Header.UserSnoovatarUrl]?.values[0];
-  const username = metadata[Header.Username]?.values[0];
-
-  const userId = metadata[Header.User]?.values[0];
   const debug = parseDebug(metadata);
-
-  let loid: string | undefined;
-  try {
-    // TODO - Use the RequestContext to extract other metadata like postData, userId, username, etc.
-    const signedRequestContext = decodeSignedRequestContext(metadata[Header.Context]?.values[0]);
-    loid =
-      signedRequestContext?.user?.devvitLoid ??
-      (signedRequestContext?.user as { devvit_loid?: string } | undefined)?.devvit_loid;
-  } catch {
-    loid = undefined;
-  }
 
   return {
     get appAccountId() {
       assertNonNull<string | undefined>(appAccountId, 'appAccountId is missing from Context');
       return appAccountId;
     },
-    subredditId,
-    subredditName,
-    userId,
-    postId,
-    postData,
-    commentId,
-    appName: appSlug,
-    appSlug,
-    appVersion,
-    snoovatar,
-    username,
-    loid,
+    subredditId: baseCtx.subredditId,
+    subredditName: baseCtx.subredditName,
+    userId: baseCtx.userId,
+    postId: baseCtx.postId,
+    postData: baseCtx.postData,
+    commentId: baseCtx.commentId,
+    appName: baseCtx.appName,
+    appSlug: baseCtx.appSlug,
+    appVersion: baseCtx.appVersion,
+    snoovatar: baseCtx.snoovatar,
+    username: baseCtx.username,
+    loid: baseCtx.loid,
     debug,
     metadata,
     toJSON() {
       return {
         appAccountId,
-        appName: appSlug,
-        appSlug,
-        appVersion,
-        subredditId,
-        subredditName,
-        userId,
-        postId,
-        postData,
-        commentId,
-        snoovatar,
-        username,
-        loid,
+        appName: baseCtx.appName,
+        appSlug: baseCtx.appSlug,
+        appVersion: baseCtx.appVersion,
+        subredditId: baseCtx.subredditId,
+        subredditName: baseCtx.subredditName,
+        userId: baseCtx.userId,
+        postId: baseCtx.postId,
+        postData: baseCtx.postData,
+        commentId: baseCtx.commentId,
+        snoovatar: baseCtx.snoovatar,
+        username: baseCtx.username,
+        loid: baseCtx.loid,
         debug,
         metadata,
       };
@@ -143,16 +101,4 @@ export function parseDebug(meta: Readonly<Metadata>): ContextDebugInfo {
     );
 
   return { ...debug };
-}
-
-/**
- * Decodes the signed request-context JWT.
- */
-function decodeSignedRequestContext(token: string | undefined): RequestContext | undefined {
-  if (!token) return;
-  try {
-    return jwtDecode<ContextClaims>(token)?.devvit;
-  } catch (err) {
-    throw Error('token decode failure', { cause: err });
-  }
 }

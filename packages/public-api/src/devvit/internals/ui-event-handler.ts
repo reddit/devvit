@@ -16,6 +16,7 @@ import { isEqual } from 'moderndash';
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';
 import { getFormValues } from '../../apis/ui/helpers/getFormValues.js';
+import { isT1ID, isT3ID } from '../../types/tid.js';
 import { Devvit } from '../Devvit.js';
 import { getContextFromMetadata } from './context.js';
 import {
@@ -24,7 +25,7 @@ import {
   validateFormSubmitGrant,
 } from './form-submit-grants.js';
 import { extendDevvitPrototype } from './helpers/extendDevvitPrototype.js';
-import { getMenuItemById, menuItemPertainsToLocation } from './menu-items.js';
+import { getMenuItemById } from './menu-items.js';
 
 async function handleUIEvent(
   req: HandleUIEventRequest,
@@ -48,9 +49,9 @@ async function handleUIEvent(
       const { actionId, thingId } = state.__contextAction;
       const menuItem = getMenuItemById(actionId);
 
-      if (menuItemPertainsToLocation(menuItem, 'post')) {
+      if (menuItem?.location.includes('post') && isT3ID(thingId)) {
         postId = thingId;
-      } else if (menuItemPertainsToLocation(menuItem, 'comment')) {
+      } else if (menuItem?.location.includes('comment') && isT1ID(thingId)) {
         commentId = thingId;
       }
     }

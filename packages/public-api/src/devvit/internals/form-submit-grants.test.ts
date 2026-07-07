@@ -411,6 +411,66 @@ describe('form submit handler grant behavior', () => {
     expect(onSubmit.mock.calls[0]?.[1].commentId).toBe(commentThingId);
   });
 
+  test('does not assign comment action target to post id for post and comment actions', async () => {
+    const onSubmit = vi.fn();
+    mockFormDefinitions({ 'form.0': onSubmit });
+    mockRedisPlugin({
+      [formSubmitGrantKey('form.0')]: JSON.stringify({
+        openedAt: 123,
+      }),
+    });
+    vi.spyOn(Devvit, 'menuItems', 'get').mockReturnValue([
+      {
+        label: 'Post and comment action',
+        location: ['post', 'comment'],
+        onPress: vi.fn(),
+      } as MenuItem,
+    ]);
+
+    const handleUIEvent = registerHandleUIEvent();
+
+    await expect(
+      handleUIEvent(
+        makeHandleUIEventRequest('form.0', commentThingId),
+        makeMetadata({
+          [Header.Post]: { values: [''] },
+          [Header.Comment]: { values: [commentThingId] },
+        })
+      )
+    ).resolves.toBeDefined();
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0]?.[1].postId).toBeUndefined();
+    expect(onSubmit.mock.calls[0]?.[1].commentId).toBe(commentThingId);
+  });
+
+  test('ignores context action state when action id no longer resolves', async () => {
+    const onSubmit = vi.fn();
+    mockFormDefinitions({ 'form.0': onSubmit });
+    mockRedisPlugin({
+      [formSubmitGrantKey('form.0')]: JSON.stringify({
+        openedAt: 123,
+      }),
+    });
+    vi.spyOn(Devvit, 'menuItems', 'get').mockReturnValue([]);
+
+    const handleUIEvent = registerHandleUIEvent();
+
+    await expect(
+      handleUIEvent(
+        makeHandleUIEventRequest('form.0', 't3_tampered'),
+        makeMetadata({
+          [Header.Post]: { values: [''] },
+          [Header.Comment]: { values: [commentThingId] },
+        })
+      )
+    ).resolves.toBeDefined();
+
+    expect(onSubmit).toHaveBeenCalledOnce();
+    expect(onSubmit.mock.calls[0]?.[1].postId).toBeUndefined();
+    expect(onSubmit.mock.calls[0]?.[1].commentId).toBe(commentThingId);
+  });
+
   test('allows the same form through a moderator-only context action and custom post', async () => {
     const hookFormId = 'form.hook.test-hook.0';
     const hookSubmit = vi.fn((_ev, context) => {

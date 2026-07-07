@@ -39,7 +39,6 @@
     "@devvit/shared-types": "0.13.7",
     "base64-js": "1.5.1",
     "clone-deep": "4.0.1",
-    "jwt-decode": "4.0.0",
     "moderndash": "4.0.0"
   },
   "devDependencies": {

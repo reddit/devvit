@@ -1,18 +1,15 @@
 import { Header } from '@devvit/shared-types/Header.js';
+import { fakeContextJwt, type PartialRequestContext } from '@devvit/shared-types/test/fake-jwt.js';
 import { expect, test } from 'vitest';
 
 import { getContextFromMetadata, parseDebug } from './context.js';
 
-function makeContextJwt(devvit: object): string {
-  const header = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' }));
-  const payload = btoa(JSON.stringify({ devvit }));
-  return `${header}.${payload}.`;
-}
-
-function metadataWith(devvit: object): { [key: string]: { values: string[] } } {
+function metadataWith(reqCtx: Readonly<PartialRequestContext>): {
+  [key: string]: { values: string[] };
+} {
   return {
     [Header.Subreddit]: { values: ['t5_test'] },
-    [Header.Context]: { values: [makeContextJwt(devvit)] },
+    [Header.Context]: { values: [fakeContextJwt(reqCtx)] },
   };
 }
 

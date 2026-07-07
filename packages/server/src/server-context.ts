@@ -1,10 +1,7 @@
 import type { Metadata } from '@devvit/protos/lib/Types.js';
-// to-do: inline a copy here. this is the only dependency on @devvit/public-api
-//        and it's a functional one, not a devDependencies.
-import { getContextFromMetadata } from '@devvit/public-api/devvit/internals/context.js';
 import type { BaseContext } from '@devvit/shared';
-import { T1, T2 as asT2, T3 as asT3, T5 as asT5 } from '@devvit/shared';
 import { Header, headerPrefix } from '@devvit/shared-types/Header.js';
+import { BaseContextFromMetadata } from '@devvit/shared-types/server/base-context.js';
 
 /** Devvit server context for the lifetime of a request. */
 export type Context = BaseContext & {
@@ -21,21 +18,26 @@ const nonDevvitMetadataHeaders = new Set<string>([Header.Traceparent, Header.Tra
 /** Constructs a new Context. */
 export let Context = (headers: Readonly<Headers>): Context => {
   const meta = metaFromIncomingMessage(headers);
-  const publicApiContext = getContextFromMetadata(
+  const baseCtx = BaseContextFromMetadata(
     meta,
     meta[Header.Post]?.values[0],
     meta[Header.Comment]?.values[0]
   );
   return {
-    ...publicApiContext,
-    commentId: publicApiContext.commentId ? T1(publicApiContext.commentId) : undefined,
-    subredditId: asT5(publicApiContext.subredditId),
-    userId: publicApiContext.userId ? asT2(publicApiContext.userId) : undefined,
-    postId: publicApiContext.postId ? asT3(publicApiContext.postId) : undefined,
-    subredditName: publicApiContext.subredditName!, // This is guaranteed to be defined
-    snoovatar: publicApiContext.snoovatar,
-    username: publicApiContext.username,
-    loid: publicApiContext.loid,
+    // `cache` lifetime matches `Context` so nothing to init here.
+    appName: baseCtx.appName,
+    appSlug: baseCtx.appSlug,
+    appVersion: baseCtx.appVersion,
+    commentId: baseCtx.commentId,
+    loid: baseCtx.loid,
+    postData: baseCtx.postData,
+    postId: baseCtx.postId,
+    snoovatar: baseCtx.snoovatar,
+    subredditId: baseCtx.subredditId,
+    subredditName: baseCtx.subredditName,
+    userId: baseCtx.userId,
+    username: baseCtx.username,
+    metadata: meta,
   };
 };
 
