@@ -55,6 +55,11 @@ import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
+import {
+  canWriteAppVersion,
+  getAppAuthorizationErrorMessage,
+  getAppAuthorizationRole,
+} from '../util/authorization/appAuthorization.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { getAppSourceZip } from '../util/getAppSourceZip.js';
 import { readLine } from '../util/input-util.js';
@@ -205,8 +210,8 @@ export default class Publish extends DevvitCommand {
 
     const shouldCreatePlaytestSubreddit = !this.project.getSubreddit('Dev');
 
-    const isOwner = appInfo.app.owner?.displayName === username;
-    if (!isOwner) {
+    const appAuthorizationRole = getAppAuthorizationRole(appInfo, username);
+    if (!canWriteAppVersion(appAuthorizationRole)) {
       if (flags['employee-update']) {
         const isEmployee = await isCurrentUserEmployee(token);
         if (!isEmployee) {
@@ -214,9 +219,7 @@ export default class Publish extends DevvitCommand {
         }
         this.warn(`Overriding ownership check because you're an employee and told me to!`);
       } else {
-        this.error(
-          `You are not the owner of the app "${this.project.name}". Please check that you are logged in as the correct user (${appInfo.app.owner?.displayName ?? '<unknown>'}).`
-        );
+        this.error(getAppAuthorizationErrorMessage(appInfo, this.project.name, 'publish'));
       }
     }
 

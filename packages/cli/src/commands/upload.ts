@@ -38,6 +38,10 @@ import {
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
+import {
+  canWriteAppVersion,
+  getAppAuthorizationRole,
+} from '../util/authorization/appAuthorization.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
 import {
@@ -143,8 +147,8 @@ export default class Upload extends DevvitCommand {
     let shouldCreateNewApp = false;
     let shouldCreatePlaytestSubreddit = !this.project.getSubreddit('Dev');
 
-    const isOwner = appInfo?.app?.owner?.displayName === username;
-    if (!isOwner) {
+    const appAuthorizationRole = getAppAuthorizationRole(appInfo, username);
+    if (!canWriteAppVersion(appAuthorizationRole)) {
       shouldCreateNewApp = true;
       // Unless...
       if (flags['employee-update'] || flags['just-do-it']) {
