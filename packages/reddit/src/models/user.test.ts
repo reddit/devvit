@@ -50,24 +50,6 @@ type ConstructorTestCase = {
   expected: Record<string, unknown>;
 };
 
-function subredditRelationshipUserOutput(user: SubredditRelationshipUser): Record<string, unknown> {
-  const output: Record<string, unknown> = {
-    ...user.toJSON(),
-    date: user.date,
-  };
-
-  if (user instanceof SubredditBannedUser || user instanceof SubredditWikiBannedUser) {
-    output.note = user.note;
-    output.daysLeft = user.daysLeft;
-  }
-
-  if (user instanceof SubredditModeratorUser) {
-    output.moderatorInfo = user.moderatorInfo;
-  }
-
-  return output;
-}
-
 describe('subreddit relationship user constructors', () => {
   const testCases: ConstructorTestCase[] = [
     {
@@ -150,8 +132,8 @@ describe('subreddit relationship user constructors', () => {
   ];
 
   for (const testCase of testCases) {
-    test(`${testCase.name} maps constructor data`, () => {
-      expect(subredditRelationshipUserOutput(testCase.create())).toStrictEqual(testCase.expected);
+    test(`${testCase.name} serializes relationship data`, () => {
+      expect(testCase.create().toJSON()).toStrictEqual(testCase.expected);
     });
   }
 });

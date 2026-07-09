@@ -765,6 +765,19 @@ export class SubredditBannedUser extends User {
     if (banData.note !== undefined) this.note = banData.note;
     if (banData.daysLeft !== undefined) this.daysLeft = banData.daysLeft;
   }
+
+  override toJSON(): ReturnType<User['toJSON']> &
+    Pick<SubredditBannedUser, 'date'> & {
+      note: SubredditBannedUser['note'];
+      daysLeft: SubredditBannedUser['daysLeft'];
+    } {
+    return {
+      ...super.toJSON(),
+      date: this.date,
+      note: this.note,
+      daysLeft: this.daysLeft,
+    };
+  }
 }
 
 /**
@@ -779,6 +792,13 @@ export class SubredditMutedUser extends User {
   constructor(data: UserProto, muteData: { date: Date }) {
     super(data);
     this.date = muteData.date;
+  }
+
+  override toJSON(): ReturnType<User['toJSON']> & Pick<SubredditMutedUser, 'date'> {
+    return {
+      ...super.toJSON(),
+      date: this.date,
+    };
   }
 }
 
@@ -804,6 +824,20 @@ export class SubredditWikiBannedUser extends User {
     if (wikiBanData.note !== undefined) this.note = wikiBanData.note;
     if (wikiBanData.daysLeft !== undefined) this.daysLeft = wikiBanData.daysLeft;
   }
+
+  // eslint-disable-next-line sonarjs/no-identical-functions
+  override toJSON(): ReturnType<User['toJSON']> &
+    Pick<SubredditWikiBannedUser, 'date'> & {
+      note: SubredditWikiBannedUser['note'];
+      daysLeft: SubredditWikiBannedUser['daysLeft'];
+    } {
+    return {
+      ...super.toJSON(),
+      date: this.date,
+      note: this.note,
+      daysLeft: this.daysLeft,
+    };
+  }
 }
 
 /**
@@ -819,6 +853,14 @@ export class SubredditContributorUser extends User {
     super(data);
     this.date = contributorData.date;
   }
+
+  // eslint-disable-next-line sonarjs/no-identical-functions
+  override toJSON(): ReturnType<User['toJSON']> & Pick<SubredditContributorUser, 'date'> {
+    return {
+      ...super.toJSON(),
+      date: this.date,
+    };
+  }
 }
 
 /**
@@ -833,6 +875,14 @@ export class SubredditWikiContributorUser extends User {
   constructor(data: UserProto, wikiContributorData: { date: Date }) {
     super(data);
     this.date = wikiContributorData.date;
+  }
+
+  // eslint-disable-next-line sonarjs/no-identical-functions
+  override toJSON(): ReturnType<User['toJSON']> & Pick<SubredditWikiContributorUser, 'date'> {
+    return {
+      ...super.toJSON(),
+      date: this.date,
+    };
   }
 }
 
@@ -882,6 +932,15 @@ export class SubredditModeratorUser extends User {
       ...(modData.authorFlairText !== undefined
         ? { authorFlairText: modData.authorFlairText }
         : {}),
+    };
+  }
+
+  override toJSON(): ReturnType<User['toJSON']> &
+    Pick<SubredditModeratorUser, 'date' | 'moderatorInfo'> {
+    return {
+      ...super.toJSON(),
+      date: this.date,
+      moderatorInfo: this.moderatorInfo,
     };
   }
 }
