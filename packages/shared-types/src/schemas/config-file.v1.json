@@ -22,7 +22,7 @@
         },
         "height": {
           "description": "The height configuration for this post view. Height is only applicable when app is shown inline and ignored when expanded.",
-          "enum": ["regular", "tall"],
+          "enum": ["short", "regular", "tall"],
           "default": "tall"
         },
         "inline": {
@@ -30,6 +30,43 @@
           "description": "Deprecated. Has no effect. Inline is always implied for post entrypoints and any entrypoint may be opened in expanded mode.",
           "deprecated": true,
           "default": true
+        },
+        "styles": {
+          "description": "[experimental] Presentation styles for this entrypoint.",
+          "$ref": "#/$defs/EntrypointStyles"
+        }
+      }
+    },
+    "EntrypointStyles": {
+      "type": "object",
+      "description": "[experimental] Presentation styles for an entrypoint.",
+      "additionalProperties": false,
+      "properties": {
+        "backgroundColor": {
+          "type": "string",
+          "description": "Default light mode background color. Runtime post data for the entrypoint can override this value for existing posts."
+        },
+        "backgroundColorDark": {
+          "type": "string",
+          "description": "Default dark mode background color. Runtime post data for the entrypoint can override this value for existing posts."
+        },
+        "height": {
+          "description": "Default web view height when this entrypoint is shown inline or as a modal. Use a named height (`short`, `regular`, or `tall`) or an exact pixel height from 72 to 512. Ignored when the entrypoint is opened fullscreen. Runtime post data for the entrypoint can override this value for existing posts.",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": ["short", "regular", "tall"]
+            },
+            {
+              "type": "integer",
+              "minimum": 72,
+              "maximum": 512
+            }
+          ]
+        },
+        "shareImageUrl": {
+          "type": "string",
+          "description": "Default image URL to use when this entrypoint is shared. Runtime post data for the entrypoint can override this value for existing posts."
         }
       }
     },

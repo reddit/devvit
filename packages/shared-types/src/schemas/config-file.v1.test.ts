@@ -296,6 +296,41 @@ describe('parseAppConfigJSON()', () => {
       expect(l).toStrictEqual(r);
     }
   });
+  test('post entrypoint styles', () => {
+    const defaultStyles = {
+      backgroundColor: '#11223344',
+      backgroundColorDark: '#55667788',
+      height: 'short',
+      shareImageUrl: 'https://example.com/share.png',
+    } as const;
+    const gameStyles = {
+      height: 320,
+    } as const;
+
+    const config = parseAppConfigJson(
+      {
+        name: 'abc',
+        post: {
+          entrypoints: {
+            default: {
+              entry: 'index.html',
+              styles: defaultStyles,
+            },
+            game: {
+              entry: 'game.html',
+              styles: gameStyles,
+            },
+          },
+        },
+      } satisfies AppConfigJson,
+      false
+    );
+
+    expect(config.post?.entrypoints.default.styles).toStrictEqual(defaultStyles);
+    expect(config.post?.entrypoints.game.styles).toStrictEqual(gameStyles);
+    expect(config.json.post?.entrypoints?.default.styles).toStrictEqual(defaultStyles);
+    expect(config.json.post?.entrypoints?.game.styles).toStrictEqual(gameStyles);
+  });
   test('default post entry', () =>
     expect(
       parseAppConfigJson(

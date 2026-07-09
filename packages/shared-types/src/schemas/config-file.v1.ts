@@ -68,8 +68,16 @@ export type AppPostEntrypointConfig = {
   name: string;
   height: AppPostHeightConfig;
   inline?: boolean;
+  styles?: AppPostEntrypointStylesConfig;
 };
-export type AppPostHeightConfig = 'regular' | 'tall';
+export type AppPostHeightConfig = 'short' | 'regular' | 'tall';
+export type AppPostEntrypointStyleHeightConfig = AppPostHeightConfig | number;
+export type AppPostEntrypointStylesConfig = {
+  backgroundColor?: string;
+  backgroundColorDark?: string;
+  height?: AppPostEntrypointStyleHeightConfig;
+  shareImageUrl?: string;
+};
 export type AppScopeConfig = 'user' | 'moderator';
 export type AppServerConfig = {
   dir: string;
@@ -282,6 +290,7 @@ export type AppPostEntrypointConfigJson = {
   entry: string;
   height?: AppPostHeightConfig;
   inline?: boolean;
+  styles?: AppPostEntrypointStylesConfig;
 };
 export type AppSchedulerConfigJson = {
   tasks: { [name: string]: AppSchedulerTaskConfig | string };
@@ -531,6 +540,9 @@ function AppPostConfig(post: Readonly<AppPostConfigJson>): AppPostConfig {
         schema.properties.post.properties.entrypoints.properties.default.properties.entry.default,
       height: post.entrypoints?.default.height ?? defaultHeight,
       inline: true,
+      ...(post.entrypoints?.default.styles != null
+        ? { styles: post.entrypoints.default.styles }
+        : {}),
     },
   };
 
@@ -541,6 +553,7 @@ function AppPostConfig(post: Readonly<AppPostConfigJson>): AppPostConfig {
         entry: pt.entry!,
         height: pt.height ?? defaultHeight,
         inline: true,
+        ...(pt.styles != null ? { styles: pt.styles } : {}),
       };
   }
   return { dir, entrypoints };
