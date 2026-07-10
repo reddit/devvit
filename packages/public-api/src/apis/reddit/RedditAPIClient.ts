@@ -1,3 +1,5 @@
+// snoofactor-ignore max-file-length
+
 import type { JsonStatus } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import type { FlairCsvResult } from '@devvit/protos/json/devvit/plugin/redditapi/flair/flair_msg.js';
 import type { GetUserKarmaForSubredditResponse } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
