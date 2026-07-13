@@ -331,6 +331,53 @@ describe('parseAppConfigJSON()', () => {
     expect(config.json.post?.entrypoints?.default.styles).toStrictEqual(defaultStyles);
     expect(config.json.post?.entrypoints?.game.styles).toStrictEqual(gameStyles);
   });
+  test.each([
+    { property: 'backgroundColor', value: '11223344', expectedError: 'does not match pattern' },
+    { property: 'backgroundColor', value: '#1122334', expectedError: 'does not match pattern' },
+    {
+      property: 'backgroundColorDark',
+      value: '#GG223344',
+      expectedError: 'does not match pattern',
+    },
+    { property: 'height', value: 71, expectedError: 'must be greater than or equal to 72' },
+    { property: 'height', value: 513, expectedError: 'must be less than or equal to 512' },
+    { property: 'height', value: 320.5, expectedError: 'is not of a type(s) integer' },
+    {
+      property: 'height',
+      value: 'medium',
+      expectedError: 'is not one of enum values: short,regular,tall',
+    },
+    {
+      property: 'shareImageUrl',
+      value: '/share.png',
+      expectedError: 'does not conform to the "https-url" format',
+    },
+    {
+      property: 'shareImageUrl',
+      value: 'http://example.com/share.png',
+      expectedError: 'does not conform to the "https-url" format',
+    },
+  ])(
+    'rejects invalid post entrypoint style $property: $value',
+    ({ property, value, expectedError }) => {
+      expect(() =>
+        parseAppConfigJson(
+          {
+            name: 'abc',
+            post: {
+              entrypoints: {
+                default: {
+                  entry: 'index.html',
+                  styles: { [property]: value },
+                },
+              },
+            },
+          } as AppConfigJson,
+          false
+        )
+      ).toThrow(expectedError);
+    }
+  );
   test('default post entry', () =>
     expect(
       parseAppConfigJson(

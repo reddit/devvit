@@ -337,6 +337,14 @@ export function parseAppConfigJson(json: JsonValue, allowUninitializedConfig: bo
     : schema) as unknown as Schema;
 
   const validator = new jsonschema.Validator();
+  validator.customFormats['https-url'] = (value) => {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' && url.hostname !== '';
+    } catch {
+      return false;
+    }
+  };
   validator.addSchema(devvitSchema, schema.$id!);
   validator.addSchema(productsSchema, productsSchema.$id!);
   const ret = validator.validate(json, devvitSchema);

@@ -44,29 +44,29 @@
       "properties": {
         "backgroundColor": {
           "type": "string",
-          "description": "Default light mode background color. Runtime post data for the entrypoint can override this value for existing posts."
+          "description": "Default light mode background color as an eight-digit hex value including alpha (`#RRGGBBAA`). Runtime post data for the entrypoint can override this value for existing posts.",
+          "pattern": "^#[0-9A-Fa-f]{8}$"
         },
         "backgroundColorDark": {
           "type": "string",
-          "description": "Default dark mode background color. Runtime post data for the entrypoint can override this value for existing posts."
+          "description": "Default dark mode background color as an eight-digit hex value including alpha (`#RRGGBBAA`). Runtime post data for the entrypoint can override this value for existing posts.",
+          "pattern": "^#[0-9A-Fa-f]{8}$"
         },
         "height": {
           "description": "Default web view height when this entrypoint is shown inline or as a modal. Use a named height (`short`, `regular`, or `tall`) or an exact pixel height from 72 to 512. Ignored when the entrypoint is opened fullscreen. Runtime post data for the entrypoint can override this value for existing posts.",
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": ["short", "regular", "tall"]
-            },
-            {
-              "type": "integer",
-              "minimum": 72,
-              "maximum": 512
-            }
-          ]
+          "type": ["string", "number"],
+          "if": { "type": "string" },
+          "then": { "enum": ["short", "regular", "tall"] },
+          "else": {
+            "type": "integer",
+            "minimum": 72,
+            "maximum": 512
+          }
         },
         "shareImageUrl": {
           "type": "string",
-          "description": "Default image URL to use when this entrypoint is shared. Runtime post data for the entrypoint can override this value for existing posts."
+          "description": "Default absolute HTTPS image URL to use when this entrypoint is shared. Runtime post data for the entrypoint can override this value for existing posts.",
+          "format": "https-url"
         }
       }
     },
