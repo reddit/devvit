@@ -1,5 +1,3 @@
-// eslint-disable-next-line no-restricted-imports
-import type { FullAppInfo } from '@devvit/protos/types/devvit/dev_portal/app/app.js';
 import { describe, expect, test } from 'vitest';
 
 import {
@@ -9,34 +7,69 @@ import {
 } from './appAuthorization.js';
 
 describe('appAuthorization', () => {
-  test('allows the app owner to write app versions', () => {
+  test('recognizes the app owner by stable account ID', () => {
     const appInfo = {
       app: {
-        owner: { displayName: 'OwnerName' },
+        owner: { id: 't2_owner', displayName: 'OriginalOwnerName' },
       },
     };
 
-    const role = getAppAuthorizationRole(appInfo as FullAppInfo, 'ownername');
+    const role = getAppAuthorizationRole(appInfo, {
+      id: 't2_owner',
+      displayName: 'RenamedOwner',
+    });
 
     expect(role).toBe('owner');
     expect(canWriteAppVersion(role)).toBe(true);
   });
 
-  test('allows a designated app maintainer to write app versions', () => {
+  test('does not fall back to a matching display name when stable IDs disagree', () => {
     const appInfo = {
       app: {
-        owner: { displayName: 'OwnerName' },
-        maintainers: [{ displayName: 'MaintainerName' }],
+        owner: { id: 't2_owner', displayName: 'SharedName' },
       },
     };
 
-    const role = getAppAuthorizationRole(appInfo as FullAppInfo, 'maintainername');
+    expect(
+      getAppAuthorizationRole(appInfo, {
+        id: 't2_other',
+        displayName: 'SharedName',
+      })
+    ).toBe('unauthorized');
+  });
+
+  test('recognizes a maintainer from typed authorization metadata by account ID', () => {
+    const appInfo = {
+      app: {
+        owner: { id: 't2_owner', displayName: 'OwnerName' },
+        authorization: {
+          maintainers: [{ id: 't2_maintainer', displayName: 'MaintainerName' }],
+        },
+      },
+    };
+
+    const role = getAppAuthorizationRole(appInfo, {
+      id: 't2_maintainer',
+      displayName: 'RenamedMaintainer',
+    });
 
     expect(role).toBe('maintainer');
     expect(canWriteAppVersion(role)).toBe(true);
   });
 
-  test('does not allow unrelated developers to write app versions', () => {
+  test('accepts a backend-computed current-user role', () => {
+    const appInfo = {
+      app: {
+        authorization: {
+          currentUserRole: 'maintainer',
+        },
+      },
+    };
+
+    expect(getAppAuthorizationRole(appInfo, '')).toBe('maintainer');
+  });
+
+  test('temporarily supports the prototype maintainer list by display name', () => {
     const appInfo = {
       app: {
         owner: { displayName: 'OwnerName' },
@@ -44,16 +77,45 @@ describe('appAuthorization', () => {
       },
     };
 
-    const role = getAppAuthorizationRole(appInfo as FullAppInfo, 'OtherDeveloper');
+    expect(getAppAuthorizationRole(appInfo, ' maintainername ')).toBe('maintainer');
+  });
+
+  test('does not authorize an unrelated developer', () => {
+    const appInfo = {
+      app: {
+        owner: { id: 't2_owner', displayName: 'OwnerName' },
+        authorization: {
+          maintainers: [{ id: 't2_maintainer', displayName: 'MaintainerName' }],
+        },
+      },
+    };
+
+    const role = getAppAuthorizationRole(appInfo, {
+      id: 't2_other',
+      displayName: 'OtherDeveloper',
+    });
 
     expect(role).toBe('unauthorized');
     expect(canWriteAppVersion(role)).toBe(false);
   });
 
+  test.each(['owner', 'maintainer'] as const)(
+    'allows the %s role to upload, publish, and playtest app versions',
+    (role) => {
+      expect(canWriteAppVersion(role)).toBe(true);
+    }
+  );
+
+  test('denies app-version writes when authorization metadata is missing', () => {
+    expect(getAppAuthorizationRole(undefined, 'OwnerName')).toBe('unauthorized');
+    expect(getAppAuthorizationRole({ app: null }, 'OwnerName')).toBe('unauthorized');
+    expect(getAppAuthorizationRole({ app: {} }, '')).toBe('unauthorized');
+  });
+
   test('uses a maintainer-aware error message', () => {
     expect(
       getAppAuthorizationErrorMessage(
-        { app: { owner: { displayName: 'OwnerName' } } } as FullAppInfo,
+        { app: { owner: { displayName: 'OwnerName' } } },
         'example-app',
         'publish'
       )

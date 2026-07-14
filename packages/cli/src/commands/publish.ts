@@ -183,7 +183,8 @@ export default class Publish extends DevvitCommand {
     const token = await getAccessTokenAndLoginIfNeeded(
       flags['copy-paste'] ? 'CopyPaste' : 'LocalSocket'
     );
-    const username = await this.getUserDisplayName(token);
+    const userInfo = await this.getUserInfo(token);
+    const username = userInfo.username;
 
     await this.checkDeveloperAccount();
 
@@ -210,7 +211,10 @@ export default class Publish extends DevvitCommand {
 
     const shouldCreatePlaytestSubreddit = !this.project.getSubreddit('Dev');
 
-    const appAuthorizationRole = getAppAuthorizationRole(appInfo, username);
+    const appAuthorizationRole = getAppAuthorizationRole(appInfo, {
+      id: userInfo.id,
+      displayName: username,
+    });
     if (!canWriteAppVersion(appAuthorizationRole)) {
       if (flags['employee-update']) {
         const isEmployee = await isCurrentUserEmployee(token);
