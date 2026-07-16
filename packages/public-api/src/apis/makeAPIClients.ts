@@ -1,9 +1,9 @@
+import { media } from '@devvit/media';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 
 import { makeCache } from '../devvit/internals/cache.js';
 import type { ContextAPIClients } from '../index.js';
 import { AssetsClient } from './AssetsClient/AssetsClient.js';
-import { MediaClient } from './media/MediaClient.js';
 import { RedditAPIClient } from './reddit/RedditAPIClient.js';
 import { RedisClient } from './redis/RedisClient.js';
 import { SchedulerClient } from './scheduler/SchedulerClient.js';
@@ -22,7 +22,6 @@ export function makeAPIClients({ metadata, ui }: MakeAPIClientsOptions): Context
   const scheduler = new SchedulerClient(metadata);
   const settings = new SettingsClient(metadata);
   const uiClient = ui ? new UIClient() : undefined;
-  const media = new MediaClient(metadata);
   const assets = new AssetsClient();
 
   return {
