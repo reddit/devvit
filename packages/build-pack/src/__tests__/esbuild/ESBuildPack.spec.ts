@@ -3,7 +3,7 @@ import path from 'node:path';
 import { TargetRuntime } from '@devvit/protos/json/devvit/runtime/bundle.js';
 // eslint-disable-next-line no-restricted-imports
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import { build, type BuildResult, type OutputFile, type PluginBuild } from 'esbuild';
+import type { BuildResult, OutputFile, PluginBuild } from 'esbuild';
 import type { Observable } from 'rxjs';
 import { vi } from 'vitest';
 
@@ -16,10 +16,6 @@ import {
   updateBundleVersion,
   Watcher,
 } from '../../esbuild/ESBuildPack.js';
-import {
-  postProcessServerStubCode,
-  serverClientCodeSplit,
-} from '../../esbuild/plugins/serverClientCodeSplit.js';
 
 const OUTPUT_FILES = [{ path: 'code.js', text: '' } as OutputFile];
 
@@ -88,21 +84,6 @@ describe('Watcher', () => {
         val = v;
       });
 
-      // first bundle.
-      await onEnd({
-        errors: [
-          {
-            id: 'id',
-            pluginName: 'pluginName',
-            text: 'text',
-            location: null,
-            notes: [],
-            detail: undefined,
-          },
-        ],
-        warnings: [],
-      });
-      // second bundle.
       await onEnd({
         errors: [
           {
@@ -325,40 +306,6 @@ describe('ES Build Pack', () => {
       });
     }
 
-    describe('Code split', () => {
-      test('multiple distinct bundles are created', async () => {
-        const req: CompileParams = {
-          config: undefined,
-          root: path.resolve(__dirname, '..', 'test-actors', 'code-split'),
-          info: {
-            name: 'code-split',
-            owner: 'snoo',
-            version: '0.0.0',
-          },
-          minify: 'None',
-          includeMetafile: false,
-        };
-
-        const rsp = await esBuildPack.compile(req);
-
-        expect(rsp.bundles.length).toBeGreaterThan(1);
-
-        const code: Map<TargetRuntime, string> = new Map();
-
-        rsp.bundles.forEach((bundle) => {
-          expect(bundle.code).toBeDefined();
-          code.set(bundle.buildInfo!.targetRuntime, bundle.code);
-        });
-
-        const strings = ['Life, the Universe, and Everything', 'alfredo'];
-
-        for (const string of strings) {
-          expect(code.get(TargetRuntime.CLIENT)).not.toContain(string);
-          expect(code.get(TargetRuntime.UNIVERSAL)).toContain(string);
-        }
-      });
-    });
-
     describe('Metafile', () => {
       it('produces a metafile when requested', async () => {
         const req: CompileParams = {
@@ -480,61 +427,6 @@ describe('ES Build Pack', () => {
       );
     });
   });
-  describe('ESBuild output', () => {
-    it('wraps CJS code in __toESM() calls', async () => {
-      const result = await build({
-        bundle: true,
-        entryPoints: [path.resolve(__dirname, '..', 'test-actors', 'code-split', 'main.tsx')],
-        minify: false,
-        outfile: 'main.js',
-        plugins: [serverClientCodeSplit()],
-        format: 'cjs',
-        jsxFactory: 'Devvit.createFragment',
-        jsxFragment: 'Devvit.Fragment',
-        target: 'es2020',
-        write: false,
-      });
-
-      // Validate that ESBuild is wrapping CJS code to act like ESM code in the
-      // way `postProcessServerStubCode()` assumes itd  in order to clean it up
-      expect(
-        result.outputFiles.some((bundle) =>
-          bundle.text.includes('__toESM(require_server_stub(), 1)')
-        )
-      ).toBeTruthy();
-      const stubbedRedis = result.outputFiles?.[0]?.text.match(
-        /var import_RedisClient[0-9]* = __toESM\(require_server_stub\(\), 1\)/gm
-      );
-      expect(stubbedRedis).toBeFalsy();
-    });
-
-    it('has __toESM() calls stripped from stubbed server code', async () => {
-      const result = await build({
-        bundle: true,
-        entryPoints: [path.resolve(__dirname, '..', 'test-actors', 'code-split', 'main.tsx')],
-        minify: false,
-        outfile: 'main.js',
-        plugins: [serverClientCodeSplit(true)],
-        format: 'cjs',
-        jsxFactory: 'Devvit.createFragment',
-        jsxFragment: 'Devvit.Fragment',
-        target: 'es2020',
-        write: false,
-      });
-
-      const clientBundle = result.outputFiles.find((bundle) =>
-        bundle.text.includes('"server-only:')
-      );
-      expect(clientBundle?.text).not.toBeUndefined();
-      const cleanedUpCode = postProcessServerStubCode(clientBundle!.text);
-      const stubs = Array.from(
-        cleanedUpCode.matchAll(/var require_([a-zA-Z_-]+) = __commonJS\(\{\n[^\n]*"server-only:/gm)
-      );
-      stubs.forEach(([_, stub]) =>
-        expect(cleanedUpCode).not.toContain(`__toESM(require_${stub}(), 1)`)
-      );
-    });
-  });
 });
 
 describe('findSourceMapURL()', () => {
@@ -602,7 +494,7 @@ describe('updateBundleServer()', () => {
     `);
   });
 
-  test('client bundles are unmodified', () => {
+  test('non-universal bundles are unmodified', () => {
     const bundle: Bundle = {
       assetIds: {},
       buildInfo: {

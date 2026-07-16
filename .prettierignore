@@ -7,6 +7,7 @@ server/bin/
 /docs/spec/headers.md
 /docs/spec/redditapi-security.md
 /AGENTS.md
+*.snap.md
 
 node_modules/
 

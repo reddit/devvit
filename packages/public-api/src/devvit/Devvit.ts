@@ -745,6 +745,7 @@ export class Devvit extends Actor {
     super(config);
 
     globalThis.devvit ??= {};
+    globalThis.devvit.config = config;
     globalThis.devvit.assets ??= config.assets;
     // __devvit__ is initialized by ESBuildPack for Webbit apps only.
     // @ts-expect-error no type.

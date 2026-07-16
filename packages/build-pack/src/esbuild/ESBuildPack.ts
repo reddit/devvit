@@ -28,10 +28,6 @@ import type { ConcreteActorType } from './BundleModule.js';
 import { dangerouslyGetBundleActor } from './BundleModule.js';
 import { createDependencySpec } from './dependency-spec-util.js';
 import { externalizeDevvitProtos } from './plugins/externalizeDevvitProtos.js';
-import {
-  postProcessServerStubCode,
-  serverClientCodeSplit,
-} from './plugins/serverClientCodeSplit.js';
 import { templatize } from './templatizer/templatizer.js';
 import { prefixBuildResultLogs } from './utils.js';
 
@@ -75,7 +71,7 @@ const FAKE_FACTORY: ClientFactory = {
   Build(): any {},
 };
 
-const BUILD_TARGETS = [TargetRuntime.UNIVERSAL, TargetRuntime.CLIENT];
+const BUILD_TARGETS = [TargetRuntime.UNIVERSAL];
 
 type BuildTarget = {
   ctx: BuildContext;
@@ -158,7 +154,7 @@ export class Watcher {
 
   async #init(actorSpec: ActorSpec): Promise<void> {
     const entry = this.#makeEntry();
-    // Building for Universal and Client targets. May include Server in the future.
+    // Building for Universal target. May include Server in the future.
     for (const target of BUILD_TARGETS) {
       this.#buildTargets.set(target, {
         ctx: await this.#makeEsbuildContext(actorSpec, target, entry),
@@ -201,7 +197,7 @@ export class Watcher {
     targetRuntime: TargetRuntime,
     entry: string
   ): Promise<BuildContext> {
-    const cfg = esbuildConfig(this.#config, this.#disableExternDevvitProtos, targetRuntime, true);
+    const cfg = esbuildConfig(this.#config, this.#disableExternDevvitProtos);
     return await esbuild.context({
       ...cfg,
       entryPoints: [entry],
@@ -306,7 +302,7 @@ export class ESBuildPack {
     const buildResults: Map<TargetRuntime, BuildResult> = new Map();
 
     for (const targetRuntime of BUILD_TARGETS) {
-      const cfg = esbuildConfig(config, this.#disableExternDevvitProtos, targetRuntime);
+      const cfg = esbuildConfig(config, this.#disableExternDevvitProtos);
       try {
         const buildResult = await esbuild.build({
           ...cfg,
@@ -439,10 +435,7 @@ async function newCompileResponse(
         if (code) {
           throw new Error('There should only be one bundle after build');
         }
-        // ESBuild is wrapping our Proxy stub in this which binds the proxy to the `default` export of the module.
-        // We want our proxy to be the mapper when importing from the stubbed file so we need to unwrap this so
-        // the import statement doesn't become the object: { default: <proxy> } but just <proxy>.
-        code = postProcessServerStubCode(outputFile.text);
+        code = outputFile.text;
       } else if (outputFile.path?.endsWith('.js.map')) {
         sourceMap = outputFile.text;
       } else {
@@ -558,9 +551,7 @@ function isEsbuildResult(err: unknown): err is esbuild.BuildResult {
 /** Call with defined config for v1 behavior. */
 function esbuildConfig(
   config: Readonly<AppConfig> | undefined,
-  disableExternDevvitProtos: boolean,
-  targetRuntime: TargetRuntime,
-  watchMode: boolean = false
+  disableExternDevvitProtos: boolean
 ): esbuild.BuildOptions {
   return {
     // When Blocks migration is used, the Devvit singleton used in the template
@@ -630,10 +621,7 @@ function esbuildConfig(
     ],
     // Split the @devvit/protos from the LinkedBundle. This means apps assume
     // @devvit/protos is available for import at execution time.
-    plugins: [
-      externalizeDevvitProtos(disableExternDevvitProtos),
-      ...(targetRuntime === TargetRuntime.CLIENT ? [serverClientCodeSplit(watchMode)] : []),
-    ],
+    plugins: [externalizeDevvitProtos(disableExternDevvitProtos)],
     // to-do: uncomment once runtime is split aware and deployed everywhere.
     // external: ['@devvit/protos'],
     // Both format and target are intended to align to
@@ -649,7 +637,7 @@ function esbuildConfig(
     // Do not show any console output. Warnings and errors are reported in the
     // response.
     logLevel: 'silent',
-    platform: targetRuntime === TargetRuntime.UNIVERSAL ? 'node' : 'browser',
+    platform: 'node',
     target: 'es2020',
     // Write to in-memory buffers.
     write: false,

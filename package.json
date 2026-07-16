@@ -58,6 +58,7 @@
     "__e2e__/performance/apps/**",
     "devvit-compute-go/images/*",
     "devvit-docs",
+    "scripts",
     "packages/*",
     "packages/apps/**",
     "packages/build-pack/src/__tests__/test-actors/**/*",
