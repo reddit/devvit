@@ -140,11 +140,16 @@ function mockRedisPlugin(redisValues: Record<string, string> = {}) {
   };
 
   vi.spyOn(Devvit, 'redisPlugin', 'get').mockReturnValue(redisPlugin as never);
+  globalThis.devvit ??= {};
+  globalThis.devvit.config = {
+    use: () => redisPlugin,
+  } as unknown as Config;
   return redisPlugin;
 }
 
 afterEach(() => {
   vi.restoreAllMocks();
+  delete globalThis.devvit;
 });
 
 describe('form submit handler grant behavior', () => {

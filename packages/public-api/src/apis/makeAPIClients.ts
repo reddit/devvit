@@ -5,7 +5,7 @@ import { makeCache } from '../devvit/internals/cache.js';
 import type { ContextAPIClients } from '../index.js';
 import { AssetsClient } from './AssetsClient/AssetsClient.js';
 import { RedditAPIClient } from './reddit/RedditAPIClient.js';
-import { RedisClient } from './redis/RedisClient.js';
+import { redis } from './redis/RedisClient.js';
 import { SchedulerClient } from './scheduler/SchedulerClient.js';
 import { SettingsClient } from './settings/SettingsClient.js';
 import { UIClient } from './ui/UIClient.js';
@@ -16,7 +16,6 @@ export type MakeAPIClientsOptions = {
 };
 
 export function makeAPIClients({ metadata, ui }: MakeAPIClientsOptions): ContextAPIClients {
-  const redis = new RedisClient(metadata);
   const cache = makeCache(redis, {});
   const reddit = new RedditAPIClient(metadata);
   const scheduler = new SchedulerClient(metadata);

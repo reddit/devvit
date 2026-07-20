@@ -14,7 +14,7 @@ export type {
   ZScanResponse,
 } from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
 
-export type TxClientLike = {
+export interface TxClientLike {
   /**
    * Executes all previously queued commands in a transaction and
    * restores the connection state to normal. https://redis.io/commands/exec/
@@ -84,7 +84,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  watch(...keys: string[]): Promise<TxClientLike>;
+  watch(...keys: string[]): Promise<this>;
   /**
    * Flushes all the previously watched keys for a transaction.
    * If you call EXEC or DISCARD, there's no need to manually call UNWATCH.
@@ -110,7 +110,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  unwatch(): Promise<TxClientLike>;
+  unwatch(): Promise<this>;
   /**
    * Get the value of key. If the key does not exist the special value nil is returned.
    * https://redis.io/commands/get/
@@ -125,7 +125,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  get(key: string): Promise<TxClientLike>;
+  get(key: string): Promise<this>;
   /**
    * Set key to hold the string value. If key already holds a value, it is overwritten
    * https://redis.io/commands/set/
@@ -139,7 +139,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  set(key: string, value: string, options?: SetOptions): Promise<TxClientLike>;
+  set(key: string, value: string, options?: SetOptions): Promise<this>;
   /**
    * Removes the specified keys. A key is ignored if it does not exist.
    * https://redis.io/commands/del/
@@ -152,7 +152,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  del(...keys: string[]): Promise<TxClientLike>;
+  del(...keys: string[]): Promise<this>;
   /**
    * Increments the number stored at key by increment.
    * https://redis.io/commands/incrby/
@@ -167,7 +167,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  incrBy(key: string, value: number): Promise<TxClientLike>;
+  incrBy(key: string, value: number): Promise<this>;
   /**
    * Returns the string representation of the type of the value stored at key
    * https://redis.io/commands/type/
@@ -182,7 +182,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  type(key: string): Promise<TxClientLike>;
+  type(key: string): Promise<this>;
   /**
    * Returns the substring of the string value stored at key, determined by
    * the offsets start and end (both are inclusive).
@@ -200,7 +200,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  getRange(key: string, start: number, end: number): Promise<TxClientLike>;
+  getRange(key: string, start: number, end: number): Promise<this>;
   /**
    * Overwrites part of the string stored at key, starting at the
    * specified offset, for the entire length of value.
@@ -217,7 +217,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  setRange(key: string, offset: number, value: string): Promise<TxClientLike>;
+  setRange(key: string, offset: number, value: string): Promise<this>;
   /**
    * Returns the length of the string value stored at key.
    * An error is returned when key holds a non-string value.
@@ -233,7 +233,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  strLen(key: string): Promise<TxClientLike>;
+  strLen(key: string): Promise<this>;
   /**
    * Returns the values of all specified keys.
    * https://redis.io/commands/mget/
@@ -250,7 +250,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  mGet(keys: string[]): Promise<TxClientLike>;
+  mGet(keys: string[]): Promise<this>;
   /**
    * Sets the given keys to their respective values.
    * https://redis.io/commands/mset/
@@ -266,7 +266,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  mSet(keyValues: { [key: string]: string }): Promise<TxClientLike>;
+  mSet(keyValues: { [key: string]: string }): Promise<this>;
   /**
    * Set a timeout on key.
    * https://redis.io/commands/expire/
@@ -280,7 +280,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  expire(key: string, seconds: number): Promise<TxClientLike>;
+  expire(key: string, seconds: number): Promise<this>;
   /**
    * Returns the absolute Unix timestamp in seconds at which the given key will expire
    * https://redis.io/commands/expiretime/
@@ -293,7 +293,7 @@ export type TxClientLike = {
    *  console.log("Expire time: " + expireTime);
    * }
    */
-  expireTime(key: string): Promise<TxClientLike>;
+  expireTime(key: string): Promise<this>;
   /**
    * Adds all the specified members with the specified scores to the sorted set stored at key.
    * https://redis.io/commands/zadd/
@@ -313,7 +313,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zAdd(key: string, ...members: ZMember[]): Promise<TxClientLike>;
+  zAdd(key: string, ...members: ZMember[]): Promise<this>;
   /**
    * Returns the cardinality (number of elements) of the sorted set stored at key.
    * https://redis.io/commands/zcard/
@@ -333,7 +333,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zCard(key: string): Promise<TxClientLike>;
+  zCard(key: string): Promise<this>;
   /**
    * Increments the score of member in the sorted set stored at key by value
    * https://redis.io/commands/zincrby/
@@ -355,7 +355,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zIncrBy(key: string, member: string, value: number): Promise<TxClientLike>;
+  zIncrBy(key: string, member: string, value: number): Promise<this>;
   /**
    * Returns the rank of member in the sorted set stored at key
    * https://redis.io/commands/zrank/
@@ -377,7 +377,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zRank(key: string, member: string): Promise<TxClientLike>;
+  zRank(key: string, member: string): Promise<this>;
   /**
    * Returns the score of member in the sorted set at key.
    * https://redis.io/commands/zscore/
@@ -400,7 +400,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zScore(key: string, member: string): Promise<TxClientLike>;
+  zScore(key: string, member: string): Promise<this>;
   /**
    * Iterates elements of Sorted Set types and their associated scores.
    * @arg {} key
@@ -427,7 +427,7 @@ export type TxClientLike = {
     cursor: number,
     pattern?: string | undefined,
     count?: number | undefined
-  ): Promise<TxClientLike>;
+  ): Promise<this>;
   /**
    * Returns the specified range of elements in the sorted set stored at key.
    * https://redis.io/commands/zrange/
@@ -462,7 +462,7 @@ export type TxClientLike = {
     start: number | string,
     stop: number | string,
     options?: ZRangeOptions
-  ): Promise<TxClientLike>;
+  ): Promise<this>;
   /**
    * Removes the specified members from the sorted set stored at key.
    * https://redis.io/commands/zrem/
@@ -483,7 +483,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zRem(key: string, members: string[]): Promise<TxClientLike>;
+  zRem(key: string, members: string[]): Promise<this>;
   /**
    * removes all elements in the sorted set stored at key between the
    * lexicographical range specified by min and max
@@ -510,7 +510,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zRemRangeByLex(key: string, min: string, max: string): Promise<TxClientLike>;
+  zRemRangeByLex(key: string, min: string, max: string): Promise<this>;
   /**
    * Removes all elements in the sorted set stored at key with rank between start and stop.
    * https://redis.io/commands/zremrangebyrank/
@@ -535,7 +535,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zRemRangeByRank(key: string, start: number, stop: number): Promise<TxClientLike>;
+  zRemRangeByRank(key: string, start: number, stop: number): Promise<this>;
   /**
    * Removes all elements in the sorted set stored at key with a score between min and max
    * https://redis.io/commands/zremrangebyscore/
@@ -559,7 +559,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  zRemRangeByScore(key: string, min: number, max: number): Promise<TxClientLike>;
+  zRemRangeByScore(key: string, min: number, max: number): Promise<this>;
   /**
    * Sets the specified fields to their respective values in the hash stored at key.
    * https://redis.io/commands/hset
@@ -574,8 +574,8 @@ export type TxClientLike = {
    * }
    * ```
    */
-  hSet(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike>;
-  hSetNX(key: string, field: string, value: string): Promise<TxClientLike>;
+  hSet(key: string, fieldValues: { [field: string]: string }): Promise<this>;
+  hSetNX(key: string, field: string, value: string): Promise<this>;
   /**
    * Returns the value associated with field in the hash stored at key.
    * https://redis.io/commands/hget
@@ -591,7 +591,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  hGet(key: string, field: string): Promise<TxClientLike>;
+  hGet(key: string, field: string): Promise<this>;
   /**
    * Returns the values associated with fields in the hash stored at key.
    * https://redis.io/commands/hmget
@@ -607,7 +607,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  hMGet(key: string, fields: string[]): Promise<TxClientLike>;
+  hMGet(key: string, fields: string[]): Promise<this>;
   /**
    * Returns all fields and values of the hash stored at key
    * https://redis.io/commands/hgetall
@@ -630,7 +630,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  hGetAll(key: string): Promise<TxClientLike>;
+  hGetAll(key: string): Promise<this>;
   /**
    * Removes the specified fields from the hash stored at key.
    * https://redis.io/commands/hdel/
@@ -645,7 +645,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  hDel(key: string, fields: string[]): Promise<TxClientLike>;
+  hDel(key: string, fields: string[]): Promise<this>;
   /**
    * Iterates fields of Hash types and their associated values.
    * @arg {} key
@@ -674,7 +674,7 @@ export type TxClientLike = {
     cursor: number,
     pattern?: string | undefined,
     count?: number | undefined
-  ): Promise<TxClientLike>;
+  ): Promise<this>;
   /**
    * Returns all field names in the hash stored at key.
    * @arg {} key
@@ -691,7 +691,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  hKeys(key: string): Promise<TxClientLike>;
+  hKeys(key: string): Promise<this>;
   /**
    * Increments the number stored at field in the hash stored at key by increment.
    * https://redis.io/commands/hincrby/
@@ -707,7 +707,7 @@ export type TxClientLike = {
    * }
    * ```
    */
-  hIncrBy(key: string, field: string, value: number): Promise<TxClientLike>;
+  hIncrBy(key: string, field: string, value: number): Promise<this>;
   /**
    * Returns the number of fields contained in the hash stored at key.
    * @arg {} key
@@ -726,8 +726,8 @@ export type TxClientLike = {
    * }
    * ```
    */
-  hLen(key: string): Promise<TxClientLike>;
-};
+  hLen(key: string): Promise<this>;
+}
 
 // See redis.io/commands for what these do.
 export type RedisClient = {

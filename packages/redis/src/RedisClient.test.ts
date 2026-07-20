@@ -1,9 +1,11 @@
 import { RedisKeyScope } from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
 // eslint-disable-next-line no-restricted-imports
 import { type RedisAPI } from '@devvit/protos/types/devvit/plugin/redis/redisapi.js';
+import { Context, runWithContext } from '@devvit/server';
+import { Header } from '@devvit/shared-types/Header.js';
 import { expect, test, vi } from 'vitest';
 
-import { RedisClient } from './RedisClient.js';
+import { RedisClient, TxClient } from './RedisClient.js';
 
 // TODO: This code is currently cloned into the Devvit Web world from `@devvit/public-api`. If
 //  you change this code, please make sure to update the other package as well. Eventually, that
@@ -25,6 +27,22 @@ vi.mock('@devvit/shared-types/server/get-devvit-config.js', () => {
       };
     },
   };
+});
+
+test('transaction results preserve boolean responses', async () => {
+  const ctx = Context({
+    [Header.AppUser]: 't2_appuser',
+    [Header.Subreddit]: 't5_testsub',
+    [Header.SubredditName]: 'testsub',
+  });
+  const plugin = {
+    Exec: vi.fn().mockResolvedValue({ response: [{ bool: true }, { bool: false }] }),
+  } as unknown as RedisAPI;
+  const client = new TxClient(plugin, { id: 'transaction' }, ctx.metadata);
+
+  await runWithContext(ctx, async () => {
+    await expect(client.exec()).resolves.toEqual([true, false]);
+  });
 });
 
 test('bitfield typing is intuitive', async () => {

@@ -41,7 +41,7 @@ export class TxClient implements TxClientLike {
     this.#txnStartMetadata = metadata;
   }
 
-  async get(key: string): Promise<TxClientLike> {
+  async get(key: string): Promise<this> {
     await this.#plugin.Get({ key: key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
@@ -50,7 +50,7 @@ export class TxClient implements TxClientLike {
     await this.#plugin.Multi(this.#transactionId, this.#metadata);
   }
 
-  async set(key: string, value: string, options?: SetOptions): Promise<TxClientLike> {
+  async set(key: string, value: string, options?: SetOptions): Promise<this> {
     let expiration;
     if (options?.expiration) {
       expiration = Math.floor((options.expiration.getTime() - Date.now()) / 1000); // convert to seconds
@@ -72,12 +72,12 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async del(...keys: string[]): Promise<TxClientLike> {
+  async del(...keys: string[]): Promise<this> {
     await this.#plugin.Del({ keys: keys, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async type(key: string): Promise<TxClientLike> {
+  async type(key: string): Promise<this> {
     await this.#plugin.Type({ key: key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
@@ -100,6 +100,8 @@ export class TxClient implements TxClientLike {
         output.push(result.str);
       } else if (result.dbl !== undefined) {
         output.push(result.dbl);
+      } else if (result.bool !== undefined) {
+        output.push(result.bool);
       }
     }
     return output;
@@ -109,24 +111,24 @@ export class TxClient implements TxClientLike {
     await this.#plugin.Discard(this.#transactionId, this.#metadata);
   }
 
-  async watch(...keys: string[]): Promise<TxClientLike> {
+  async watch(...keys: string[]): Promise<this> {
     await this.#plugin.Watch({ keys: keys, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async unwatch(): Promise<TxClientLike> {
+  async unwatch(): Promise<this> {
     await this.#plugin.Unwatch(this.#transactionId, this.#metadata);
     return this;
   }
 
-  async getRange(key: string, start: number, end: number): Promise<TxClientLike> {
+  async getRange(key: string, start: number, end: number): Promise<this> {
     await this.#plugin.GetRange(
       { key, start, end, transactionId: this.#transactionId },
       this.#metadata
     );
     return this;
   }
-  async setRange(key: string, offset: number, value: string): Promise<TxClientLike> {
+  async setRange(key: string, offset: number, value: string): Promise<this> {
     await this.#plugin.SetRange(
       { key, offset, value, transactionId: this.#transactionId },
       this.#metadata
@@ -134,43 +136,43 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async strLen(key: string): Promise<TxClientLike> {
+  async strLen(key: string): Promise<this> {
     await this.#plugin.Strlen({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async mGet(keys: string[]): Promise<TxClientLike> {
+  async mGet(keys: string[]): Promise<this> {
     await this.#plugin.MGet({ keys, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async mSet(keyValues: { [key: string]: string }): Promise<TxClientLike> {
+  async mSet(keyValues: { [key: string]: string }): Promise<this> {
     const kv = Object.entries(keyValues).map(([key, value]) => ({ key, value }));
     await this.#plugin.MSet({ kv, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async incrBy(key: string, value: number): Promise<TxClientLike> {
+  async incrBy(key: string, value: number): Promise<this> {
     await this.#plugin.IncrBy({ key, value, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async expire(key: string, seconds: number): Promise<TxClientLike> {
+  async expire(key: string, seconds: number): Promise<this> {
     await this.#plugin.Expire({ key, seconds, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async expireTime(key: string): Promise<TxClientLike> {
+  async expireTime(key: string): Promise<this> {
     await this.#plugin.ExpireTime({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async zAdd(key: string, ...members: ZMember[]): Promise<TxClientLike> {
+  async zAdd(key: string, ...members: ZMember[]): Promise<this> {
     await this.#plugin.ZAdd({ key, members, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async zScore(key: string, member: string): Promise<TxClientLike> {
+  async zScore(key: string, member: string): Promise<this> {
     await this.#plugin.ZScore(
       { key: { key, transactionId: this.#transactionId }, member },
       this.#metadata
@@ -178,7 +180,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async zRank(key: string, member: string): Promise<TxClientLike> {
+  async zRank(key: string, member: string): Promise<this> {
     await this.#plugin.ZRank(
       { key: { key, transactionId: this.#transactionId }, member },
       this.#metadata
@@ -186,7 +188,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async zIncrBy(key: string, member: string, value: number): Promise<TxClientLike> {
+  async zIncrBy(key: string, member: string, value: number): Promise<this> {
     await this.#plugin.ZIncrBy(
       { key, member, value, transactionId: this.#transactionId },
       this.#metadata
@@ -199,7 +201,7 @@ export class TxClient implements TxClientLike {
     cursor: number,
     pattern?: string | undefined,
     count?: number | undefined
-  ): Promise<TxClientLike> {
+  ): Promise<this> {
     const request: ZScanRequest = {
       key,
       cursor,
@@ -211,7 +213,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async zCard(key: string): Promise<TxClientLike> {
+  async zCard(key: string): Promise<this> {
     await this.#plugin.ZCard({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
@@ -221,7 +223,7 @@ export class TxClient implements TxClientLike {
     start: number | string,
     stop: number | string,
     options?: ZRangeOptions
-  ): Promise<TxClientLike> {
+  ): Promise<this> {
     // eslint-disable-next-line
     let opts = { rev: false, byLex: false, byScore: false, offset: 0, count: 1000 };
     if (options?.reverse) {
@@ -255,7 +257,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async zRem(key: string, members: string[]): Promise<TxClientLike> {
+  async zRem(key: string, members: string[]): Promise<this> {
     await this.#plugin.ZRem(
       { key: { key, transactionId: this.#transactionId }, members: members },
       this.#metadata
@@ -263,7 +265,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async zRemRangeByLex(key: string, min: string, max: string): Promise<TxClientLike> {
+  async zRemRangeByLex(key: string, min: string, max: string): Promise<this> {
     await this.#plugin.ZRemRangeByLex(
       { key: { key, transactionId: this.#transactionId }, min: min, max: max },
       this.#metadata
@@ -271,7 +273,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async zRemRangeByRank(key: string, start: number, stop: number): Promise<TxClientLike> {
+  async zRemRangeByRank(key: string, start: number, stop: number): Promise<this> {
     await this.#plugin.ZRemRangeByRank(
       { key: { key, transactionId: this.#transactionId }, start: start, stop: stop },
       this.#metadata
@@ -279,7 +281,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async zRemRangeByScore(key: string, min: number, max: number): Promise<TxClientLike> {
+  async zRemRangeByScore(key: string, min: number, max: number): Promise<this> {
     await this.#plugin.ZRemRangeByScore(
       { key: { key, transactionId: this.#transactionId }, min: min, max: max },
       this.#metadata
@@ -287,12 +289,12 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async hGetAll(key: string): Promise<TxClientLike> {
+  async hGetAll(key: string): Promise<this> {
     await this.#plugin.HGetAll({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async hGet(key: string, field: string): Promise<TxClientLike> {
+  async hGet(key: string, field: string): Promise<this> {
     await this.#plugin.HGet(
       { key: key, field: field, transactionId: this.#transactionId },
       this.#metadata
@@ -300,7 +302,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async hMGet(key: string, fields: string[]): Promise<TxClientLike> {
+  async hMGet(key: string, fields: string[]): Promise<this> {
     await this.#plugin.HMGet(
       { key: key, fields: fields, transactionId: this.#transactionId },
       this.#metadata
@@ -308,13 +310,13 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async hSet(key: string, fieldValues: { [field: string]: string }): Promise<TxClientLike> {
+  async hSet(key: string, fieldValues: { [field: string]: string }): Promise<this> {
     const fv = Object.entries(fieldValues).map(([field, value]) => ({ field, value }));
     await this.#plugin.HSet({ key, fv, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async hSetNX(key: string, field: string, value: string): Promise<TxClientLike> {
+  async hSetNX(key: string, field: string, value: string): Promise<this> {
     await this.#plugin.HSetNX(
       { key, field, value, transactionId: this.#transactionId },
       this.#metadata
@@ -322,7 +324,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async hIncrBy(key: string, field: string, value: number): Promise<TxClientLike> {
+  async hIncrBy(key: string, field: string, value: number): Promise<this> {
     await this.#plugin.HIncrBy(
       { key, field, value, transactionId: this.#transactionId },
       this.#metadata
@@ -330,7 +332,7 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async hDel(key: string, fields: string[]): Promise<TxClientLike> {
+  async hDel(key: string, fields: string[]): Promise<this> {
     await this.#plugin.HDel({ key, fields, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
@@ -340,7 +342,7 @@ export class TxClient implements TxClientLike {
     cursor: number,
     pattern?: string | undefined,
     count?: number | undefined
-  ): Promise<TxClientLike> {
+  ): Promise<this> {
     const request: HScanRequest = {
       key,
       cursor,
@@ -352,12 +354,12 @@ export class TxClient implements TxClientLike {
     return this;
   }
 
-  async hKeys(key: string): Promise<TxClientLike> {
+  async hKeys(key: string): Promise<this> {
     await this.#plugin.HKeys({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
 
-  async hLen(key: string): Promise<TxClientLike> {
+  async hLen(key: string): Promise<this> {
     await this.#plugin.HLen({ key, transactionId: this.#transactionId }, this.#metadata);
     return this;
   }
@@ -386,8 +388,8 @@ export class RedisClient implements RedisClientLike {
   }
 
   async watch(...keys: string[]): Promise<TxClientLike> {
-    const txId = await this.#plugin.Watch({ keys }, this.#metadata);
-    return new TxClient(this.#plugin, txId, this.#metadata);
+    const txId = await this.#plugin.Watch({ keys }, this.metadata);
+    return new TxClient(this.#plugin, txId, this.metadata);
   }
 
   async get(key: string): Promise<string | undefined> {
@@ -395,7 +397,7 @@ export class RedisClient implements RedisClientLike {
       const response = await this.#plugin.Get(
         { key, scope: this.scope },
         {
-          ...this.#metadata,
+          ...this.metadata,
           'throw-redis-nil': { values: ['true'] },
         }
       );
@@ -414,7 +416,7 @@ export class RedisClient implements RedisClientLike {
       const response = await this.#plugin.GetBytes(
         { key, scope: this.scope },
         {
-          ...this.#metadata,
+          ...this.metadata,
           'throw-redis-nil': { values: ['true'] },
         }
       );
@@ -446,29 +448,29 @@ export class RedisClient implements RedisClientLike {
         expiration: expiration || 0,
         scope: this.scope,
       },
-      this.#metadata
+      this.metadata
     );
     return response.value;
   }
 
   async exists(...keys: string[]): Promise<number> {
-    const response = await this.#plugin.Exists({ keys, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.Exists({ keys, scope: this.scope }, this.metadata);
     return response.existingKeys;
   }
 
   async del(...keys: string[]): Promise<void> {
-    await this.#plugin.Del({ keys, scope: this.scope }, this.#metadata);
+    await this.#plugin.Del({ keys, scope: this.scope }, this.metadata);
   }
 
   async incrBy(key: string, value: number): Promise<number> {
-    const response = await this.#plugin.IncrBy({ key, value, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.IncrBy({ key, value, scope: this.scope }, this.metadata);
     return response.value;
   }
 
   async getRange(key: string, start: number, end: number): Promise<string> {
     const response = await this.#plugin.GetRange(
       { key, start, end, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response !== null ? response.value : response;
   }
@@ -476,27 +478,27 @@ export class RedisClient implements RedisClientLike {
   async setRange(key: string, offset: number, value: string): Promise<number> {
     const response = await this.#plugin.SetRange(
       { key, offset, value, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response.value;
   }
 
   async strLen(key: string): Promise<number> {
-    const response = await this.#plugin.Strlen({ key, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.Strlen({ key, scope: this.scope }, this.metadata);
     return response.value;
   }
 
   async expire(key: string, seconds: number): Promise<void> {
-    await this.#plugin.Expire({ key, seconds, scope: this.scope }, this.#metadata);
+    await this.#plugin.Expire({ key, seconds, scope: this.scope }, this.metadata);
   }
 
   async expireTime(key: string): Promise<number> {
-    const response = await this.#plugin.ExpireTime({ key, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.ExpireTime({ key, scope: this.scope }, this.metadata);
     return response.value;
   }
 
   async zAdd(key: string, ...members: ZMember[]): Promise<number> {
-    return (await this.#plugin.ZAdd({ key, members, scope: this.scope }, this.#metadata)).value;
+    return (await this.#plugin.ZAdd({ key, members, scope: this.scope }, this.metadata)).value;
   }
 
   async zRange(
@@ -534,7 +536,7 @@ export class RedisClient implements RedisClientLike {
     return (
       await this.#plugin.ZRange(
         { key: { key: key }, start: start + '', stop: stop + '', ...opts, scope: this.scope },
-        this.#metadata
+        this.metadata
       )
     ).members;
   }
@@ -542,7 +544,7 @@ export class RedisClient implements RedisClientLike {
   async zRem(key: string, members: string[]): Promise<number> {
     const response = await this.#plugin.ZRem(
       { key: { key }, members, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response.value;
   }
@@ -550,7 +552,7 @@ export class RedisClient implements RedisClientLike {
   async zRemRangeByLex(key: string, min: string, max: string): Promise<number> {
     const response = await this.#plugin.ZRemRangeByLex(
       { key: { key }, min, max, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response.value;
   }
@@ -558,7 +560,7 @@ export class RedisClient implements RedisClientLike {
   async zRemRangeByRank(key: string, start: number, stop: number): Promise<number> {
     const response = await this.#plugin.ZRemRangeByRank(
       { key: { key }, start, stop, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response.value;
   }
@@ -566,7 +568,7 @@ export class RedisClient implements RedisClientLike {
   async zRemRangeByScore(key: string, min: number, max: number): Promise<number> {
     const response = await this.#plugin.ZRemRangeByScore(
       { key: { key }, min, max, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response.value;
   }
@@ -576,7 +578,7 @@ export class RedisClient implements RedisClientLike {
       const response = await this.#plugin.ZScore(
         { key: { key }, member, scope: this.scope },
         {
-          ...this.#metadata,
+          ...this.metadata,
           'throw-redis-nil': { values: ['true'] },
         }
       );
@@ -596,7 +598,7 @@ export class RedisClient implements RedisClientLike {
       const response = await this.#plugin.ZRank(
         { key: { key }, member, scope: this.scope },
         {
-          ...this.#metadata,
+          ...this.metadata,
           'throw-redis-nil': { values: ['true'] },
         }
       );
@@ -613,23 +615,23 @@ export class RedisClient implements RedisClientLike {
   async zIncrBy(key: string, member: string, value: number): Promise<number> {
     const response = await this.#plugin.ZIncrBy(
       { key, member, value, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response !== null ? response.value : response;
   }
 
   async mGet(keys: string[]): Promise<(string | null)[]> {
-    const response = await this.#plugin.MGet({ keys, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.MGet({ keys, scope: this.scope }, this.metadata);
     return response !== null ? response.values.map((value) => value || null) : response;
   }
 
   async mSet(keyValues: { [key: string]: string }): Promise<void> {
     const kv = Object.entries(keyValues).map(([key, value]) => ({ key, value }));
-    await this.#plugin.MSet({ kv, scope: this.scope }, this.#metadata);
+    await this.#plugin.MSet({ kv, scope: this.scope }, this.metadata);
   }
 
   async zCard(key: string): Promise<number> {
-    const response = await this.#plugin.ZCard({ key, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.ZCard({ key, scope: this.scope }, this.metadata);
     return response !== null ? response.value : response;
   }
 
@@ -640,16 +642,16 @@ export class RedisClient implements RedisClientLike {
     count?: number | undefined
   ): Promise<ZScanResponse> {
     const request: ZScanRequest = { key, cursor, pattern, count, scope: this.scope };
-    return await this.#plugin.ZScan(request, this.#metadata);
+    return await this.#plugin.ZScan(request, this.metadata);
   }
 
   async type(key: string): Promise<string> {
-    const response = await this.#plugin.Type({ key: key, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.Type({ key: key, scope: this.scope }, this.metadata);
     return response !== null ? response.value : response;
   }
 
   async rename(key: string, newKey: string): Promise<string> {
-    const response = await this.#plugin.Rename({ key, newKey, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.Rename({ key, newKey, scope: this.scope }, this.metadata);
     return response.result;
   }
 
@@ -658,7 +660,7 @@ export class RedisClient implements RedisClientLike {
       const response = await this.#plugin.HGet(
         { key, field, scope: this.scope },
         {
-          ...this.#metadata,
+          ...this.metadata,
           'throw-redis-nil': { values: ['true'] },
         }
       );
@@ -673,31 +675,31 @@ export class RedisClient implements RedisClientLike {
   }
 
   async hMGet(key: string, fields: string[]): Promise<(string | null)[]> {
-    const response = await this.#plugin.HMGet({ key, fields, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.HMGet({ key, fields, scope: this.scope }, this.metadata);
     return response !== null ? response.values.map((value) => value || null) : response;
   }
 
   async hSet(key: string, fieldValues: { [field: string]: string }): Promise<number> {
     const fv = Object.entries(fieldValues).map(([field, value]) => ({ field, value }));
-    const response = await this.#plugin.HSet({ key, fv, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.HSet({ key, fv, scope: this.scope }, this.metadata);
     return response.value;
   }
 
   async hSetNX(key: string, field: string, value: string): Promise<number> {
     const response = await this.#plugin.HSetNX(
       { key, field, value, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response.success;
   }
 
   async hGetAll(key: string): Promise<Record<string, string>> {
-    const response = await this.#plugin.HGetAll({ key, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.HGetAll({ key, scope: this.scope }, this.metadata);
     return response !== null ? response.fieldValues : response;
   }
 
   async hDel(key: string, fields: string[]): Promise<number> {
-    const response = await this.#plugin.HDel({ key, fields, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.HDel({ key, fields, scope: this.scope }, this.metadata);
     return response.value;
   }
 
@@ -708,18 +710,18 @@ export class RedisClient implements RedisClientLike {
     count?: number | undefined
   ): Promise<HScanResponse> {
     const request: HScanRequest = { key, cursor, pattern, count, scope: this.scope };
-    return await this.#plugin.HScan(request, this.#metadata);
+    return await this.#plugin.HScan(request, this.metadata);
   }
 
   async hKeys(key: string): Promise<string[]> {
-    const response = await this.#plugin.HKeys({ key, scope: this.scope }, this.#metadata);
+    const response = await this.#plugin.HKeys({ key, scope: this.scope }, this.metadata);
     return response !== null ? response.keys : response;
   }
 
   async hIncrBy(key: string, field: string, value: number): Promise<number> {
     const response = await this.#plugin.HIncrBy(
       { key, field, value, scope: this.scope },
-      this.#metadata
+      this.metadata
     );
     return response.value;
   }
@@ -816,8 +818,12 @@ export class RedisClient implements RedisClientLike {
     return response.results;
   }
 
-  get #metadata(): Metadata {
+  protected get metadata(): Metadata {
     return context.metadata;
+  }
+
+  protected get plugin(): RedisAPI {
+    return this.#plugin;
   }
 
   get #plugin(): RedisAPI {

@@ -2,6 +2,10 @@ import { RedisClient as RedisClientImpl } from './RedisClient.js';
 import { RedisCompressionProxy } from './redisCompression.js';
 import { type RedisClient, RedisKeyScope } from './types/redis.js';
 
+export {
+  RedisClient as RedisClientImplementation,
+  TxClient as TxClientImplementation,
+} from './RedisClient.js';
 export * from './types/redis.js';
 
 const redisClientImpl: RedisClientImpl = new RedisClientImpl(RedisKeyScope.INSTALLATION);
