@@ -27,7 +27,6 @@ import { newBuildInfoDependencies } from './BuildInfoUtil.js';
 import type { ConcreteActorType } from './BundleModule.js';
 import { dangerouslyGetBundleActor } from './BundleModule.js';
 import { createDependencySpec } from './dependency-spec-util.js';
-import { externalizeDevvitProtos } from './plugins/externalizeDevvitProtos.js';
 import { templatize } from './templatizer/templatizer.js';
 import { prefixBuildResultLogs } from './utils.js';
 
@@ -35,7 +34,6 @@ export type CompileParams = {
   config: AppConfig | undefined;
   minify: 'None' | 'All';
   info: ActorSpec;
-  includeMetafile: boolean;
   root: ProjectRootDir;
 };
 
@@ -79,8 +77,6 @@ type BuildTarget = {
 };
 
 export class Watcher {
-  readonly #disableExternDevvitProtos: boolean;
-
   readonly #config: Readonly<AppConfig> | undefined;
   readonly #root: ProjectRootDir;
   /**
@@ -103,23 +99,15 @@ export class Watcher {
 
   readonly #ready: Promise<void>;
 
-  /**
-   * The default behavior is to externalize @devvit/protos. Set
-   * disableExternDevvitProtos to bundle this large dependency.
-   */
   constructor(
     config: Readonly<AppConfig> | undefined,
     namespace: Readonly<Namespace>,
     root: ProjectRootDir,
-    actorSpec: ActorSpec,
-    options?: Readonly<ESBuildPackOptions>
+    actorSpec: ActorSpec
   ) {
     this.#config = config;
     this.#namespace = namespace;
     this.#root = root;
-
-    this.#disableExternDevvitProtos = options?.disableExternDevvitProtos ?? false;
-
     //  observers of this will be subscribed until this.disposedNotifier emits a value
     const sourceObservable = new Observable<CompileResponse>().pipe(
       takeUntil(this.#disposedNotifier)
@@ -197,7 +185,7 @@ export class Watcher {
     targetRuntime: TargetRuntime,
     entry: string
   ): Promise<BuildContext> {
-    const cfg = esbuildConfig(this.#config, this.#disableExternDevvitProtos);
+    const cfg = esbuildConfig(this.#config);
     return await esbuild.context({
       ...cfg,
       entryPoints: [entry],
@@ -257,10 +245,6 @@ export class Watcher {
   }
 }
 
-type ESBuildPackOptions = {
-  readonly disableExternDevvitProtos?: boolean | undefined;
-};
-
 export class ESBuildPack {
   /**
    * @property {Map} bundleUpdateEmitters [note] A BehaviorSubject implements the Observable interface. Any observer who subscribes to a behavior subject will receive the last emitted value
@@ -269,25 +253,11 @@ export class ESBuildPack {
   readonly #bundleWatchers: Map<string, Watcher> = new Map();
   readonly #namespace: Readonly<Namespace>;
 
-  // EsbuildPack options
-  readonly #disableExternDevvitProtos: boolean;
-
-  /**
-   * The default behavior is to externalize @devvit/protos. Set
-   * disableExternDevvitProtos to bundle this large dependency.
-   */
-  constructor(namespace: Readonly<Namespace>, options?: Readonly<ESBuildPackOptions>) {
+  constructor(namespace: Readonly<Namespace>) {
     this.#namespace = namespace;
-    this.#disableExternDevvitProtos = options?.disableExternDevvitProtos ?? false;
   }
 
-  async compile({
-    config,
-    minify,
-    info,
-    includeMetafile,
-    root,
-  }: CompileParams): Promise<CompileResponse> {
+  async compile({ config, minify, info, root }: CompileParams): Promise<CompileResponse> {
     const entry = getModuleEntrypoint(config, root);
 
     if (config) {
@@ -302,12 +272,11 @@ export class ESBuildPack {
     const buildResults: Map<TargetRuntime, BuildResult> = new Map();
 
     for (const targetRuntime of BUILD_TARGETS) {
-      const cfg = esbuildConfig(config, this.#disableExternDevvitProtos);
+      const cfg = esbuildConfig(config);
       try {
         const buildResult = await esbuild.build({
           ...cfg,
           entryPoints: [entry],
-          metafile: true,
           sourcemap: 'external',
           plugins: [excludeNodeModulesFromSourceMapsPlugin(), ...(cfg.plugins || [])],
           sourcesContent: false,
@@ -323,8 +292,7 @@ export class ESBuildPack {
               this.#namespace,
               info,
               new Map([[targetRuntime, err]]),
-              root,
-              includeMetafile
+              root
             )
           : unknownToErrorCompileResponse('Compilation', err);
       }
@@ -335,8 +303,7 @@ export class ESBuildPack {
       this.#namespace,
       info,
       buildResults,
-      root,
-      includeMetafile
+      root
     );
 
     if (esbuildCompileResult.bundles.length === 0) {
@@ -358,9 +325,7 @@ export class ESBuildPack {
     if (!this.#bundleWatchers.has(blocksEntry)) {
       let watcher;
       try {
-        watcher = new Watcher(config, this.#namespace, root, info, {
-          disableExternDevvitProtos: this.#disableExternDevvitProtos,
-        });
+        watcher = new Watcher(config, this.#namespace, root, info);
       } catch (err) {
         return of(unknownToErrorCompileResponse('Compilation', err));
       }
@@ -413,8 +378,7 @@ async function newCompileResponse(
   namespace: Readonly<Namespace>,
   actorSpec: ActorSpec,
   buildResults: Map<TargetRuntime, BuildResult>,
-  root: ProjectRootDir,
-  includeMetafile: boolean = false
+  root: ProjectRootDir
 ): Promise<CompileResponse> {
   const errors: CompileLog[] = [];
   const warnings: CompileLog[] = [];
@@ -456,11 +420,6 @@ async function newCompileResponse(
       return unknownToErrorCompileResponse('Evaluation', err);
     }
 
-    let metafile: string | undefined;
-    if (includeMetafile && buildResult.metafile) {
-      metafile = JSON.stringify(buildResult.metafile);
-    }
-
     bundles.push({
       assetIds: {},
       code,
@@ -472,7 +431,6 @@ async function newCompileResponse(
         targetRuntime,
       },
       webviewAssetIds: {},
-      metafile,
     });
   }
 
@@ -549,10 +507,7 @@ function isEsbuildResult(err: unknown): err is esbuild.BuildResult {
 }
 
 /** Call with defined config for v1 behavior. */
-function esbuildConfig(
-  config: Readonly<AppConfig> | undefined,
-  disableExternDevvitProtos: boolean
-): esbuild.BuildOptions {
+function esbuildConfig(config: Readonly<AppConfig> | undefined): esbuild.BuildOptions {
   return {
     // When Blocks migration is used, the Devvit singleton used in the template
     // must be the same instance as that used elsewhere. Aliases are resolved
@@ -619,11 +574,6 @@ function esbuildConfig(
       'worker_threads',
       'zlib',
     ],
-    // Split the @devvit/protos from the LinkedBundle. This means apps assume
-    // @devvit/protos is available for import at execution time.
-    plugins: [externalizeDevvitProtos(disableExternDevvitProtos)],
-    // to-do: uncomment once runtime is split aware and deployed everywhere.
-    // external: ['@devvit/protos'],
     // Both format and target are intended to align to
     // @devvit/runtimes/package.json's build scripts for bootstrap compatibility.
     format: 'cjs',

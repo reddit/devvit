@@ -147,7 +147,6 @@ describe('ES Build Pack', () => {
           root: path.resolve(__dirname, '..', 'test-actors', 'v1-blocks'),
           info: { name: 'name', owner: 'owner', version: '0.0.0' },
           minify: 'None',
-          includeMetafile: false,
         };
         const rsp = await esBuildPack.compile(req);
 
@@ -202,7 +201,6 @@ describe('ES Build Pack', () => {
           root: path.resolve(__dirname, '..', 'test-actors', 'bad-syntax'),
           info: { name: 'name', owner: 'owner', version: '0.0.0' },
           minify: 'None',
-          includeMetafile: false,
         };
         const rsp = await esBuildPack.compile(req);
 
@@ -241,7 +239,6 @@ describe('ES Build Pack', () => {
           root: path.resolve(__dirname, '..', 'test-actors', 'server'),
           info: { name: 'name', owner: 'owner', version: '0.0.0' },
           minify: 'None',
-          includeMetafile: false,
         };
         const rsp = await esBuildPack.compile(req);
 
@@ -266,7 +263,6 @@ describe('ES Build Pack', () => {
             version: '0.0.0',
           },
           minify: 'None',
-          includeMetafile: false,
         };
         const rsp = await esBuildPack.compile(req);
 
@@ -296,7 +292,6 @@ describe('ES Build Pack', () => {
             version: '0.0.0',
           },
           minify: 'None',
-          includeMetafile: false,
         };
         const rsp = await esBuildPack.compile(req);
 
@@ -305,40 +300,6 @@ describe('ES Build Pack', () => {
         expect(rsp).toMatchSnapshot();
       });
     }
-
-    describe('Metafile', () => {
-      it('produces a metafile when requested', async () => {
-        const req: CompileParams = {
-          config: undefined,
-          root: path.resolve(__dirname, '..', 'test-actors', 'hello-devvit'),
-          info: {
-            name: 'hello-devvit',
-            owner: 'snoo',
-            version: '0.0.0',
-          },
-          minify: 'None',
-          includeMetafile: true,
-        };
-        const bundleResponse = await esBuildPack.compile(req);
-        expect(bundleResponse.bundles.some((bundle) => bundle.metafile !== undefined)).toBeTruthy();
-      });
-
-      it('does not produce a metafile when disabled', async () => {
-        const req: CompileParams = {
-          config: undefined,
-          root: path.resolve(__dirname, '..', 'test-actors', 'hello-devvit'),
-          info: {
-            name: 'hello-devvit',
-            owner: 'snoo',
-            version: '0.0.0',
-          },
-          minify: 'None',
-          includeMetafile: false,
-        };
-        const bundleResponse = await esBuildPack.compile(req);
-        expect(bundleResponse.bundles.some((bundle) => bundle.metafile !== undefined)).toBeFalsy();
-      });
-    });
 
     describe('WatchBundleUpdate', () => {
       let observable: Observable<CompileResponse>;
@@ -355,7 +316,6 @@ describe('ES Build Pack', () => {
             version: '0.0.0',
           },
           minify: 'None',
-          includeMetafile: false,
         });
 
         await onEnd({

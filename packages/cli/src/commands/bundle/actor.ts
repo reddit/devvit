@@ -17,7 +17,7 @@ import { getAccessToken } from '../../util/auth.js';
 import { Bundler } from '../../util/Bundler.js';
 import { toLowerCaseArgParser } from '../../util/commands/DevvitCommand.js';
 import { DevvitCommand } from '../../util/commands/DevvitCommand.js';
-import { DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS, distDirFilename } from '../../util/config.js';
+import { distDirFilename } from '../../util/config.js';
 import { getPaymentsConfig, readProducts } from '../../util/payments/paymentsConfig.js';
 
 export default class BundleActor extends DevvitCommand {
@@ -38,10 +38,6 @@ export default class BundleActor extends DevvitCommand {
   } as const;
 
   static override flags = {
-    metafile: Flags.boolean({
-      description: 'Produce a metafile to analyze the size of the bundle',
-      required: false,
-    }),
     linked: Flags.boolean({
       description: 'Build and link locally using DefaultLinker',
       required: false,
@@ -68,14 +64,14 @@ export default class BundleActor extends DevvitCommand {
       return;
     }
 
-    await this.#makeBundles(actorSpec, flags.metafile);
+    await this.#makeBundles(actorSpec);
     this.log(`Successfully bundled actor: ${actorSpec.name}`);
   }
 
-  async #makeBundles(actorSpec: ActorSpec, includeMetafile: boolean): Promise<void> {
+  async #makeBundles(actorSpec: ActorSpec): Promise<void> {
     const actorBundler = new Bundler();
 
-    const bundles = await actorBundler.bundle(this.project, actorSpec, includeMetafile);
+    const bundles = await actorBundler.bundle(this.project, actorSpec);
     const products = await readProducts(this.project);
 
     await mkdir(path.join(this.project.root, distDirFilename), { recursive: true });
@@ -96,29 +92,18 @@ export default class BundleActor extends DevvitCommand {
           path.join(this.project.root, distDirFilename, `${actorSpec.name}.bundle${type}.json`),
           JSON.stringify(Bundle.toJSON(bundle))
         );
-
-        if (bundle.metafile) {
-          await writeFile(
-            path.join(this.project.root, distDirFilename, `${actorSpec.name}.metafile${type}.json`),
-            bundle.metafile
-          );
-        }
       })
     );
   }
 
   async #makeLinkedBundles(actorSpec: ActorSpec): Promise<void> {
-    const buildPack = new ESBuildPack(
-      { hostname: LOCAL_HOSTNAME },
-      { disableExternDevvitProtos: DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS }
-    );
+    const buildPack = new ESBuildPack({ hostname: LOCAL_HOSTNAME });
     const builder = new DefaultBuilder(buildPack, new ResolverWithPlugins());
 
     const response = await builder.build({
       config: this.project.appConfig,
       minify: 'None',
       info: actorSpec,
-      includeMetafile: false,
       root: this.project.root,
     });
 

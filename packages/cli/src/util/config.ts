@@ -33,9 +33,6 @@ export const DEVVIT_GATEWAY_URL: string = (() => {
   return 'https://devvit-gateway.reddit.com';
 })();
 
-export const DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS: boolean =
-  process.env.DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS === '1';
-
 export const GQL_QUERY_URL: string = (() => {
   if (MY_PORTAL_ENABLED) {
     return `https://reddit-service-graphql.${STAGE_USER_NAME}.snoo.dev`;

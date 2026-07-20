@@ -7,7 +7,6 @@ import { LOCAL_HOSTNAME } from '@devvit/shared-types/HostnameUtil.js';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs';
 
-import { DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS } from './config.js';
 import type { Project } from './project.js';
 
 export type BundlerResult = {
@@ -18,24 +17,16 @@ export class Bundler {
   #buildPack: ESBuildPack;
 
   constructor() {
-    this.#buildPack = new ESBuildPack(
-      { hostname: LOCAL_HOSTNAME },
-      { disableExternDevvitProtos: DEVVIT_DISABLE_EXTERN_DEVVIT_PROTOS }
-    );
+    this.#buildPack = new ESBuildPack({ hostname: LOCAL_HOSTNAME });
   }
 
-  async bundle(
-    project: Readonly<Project>,
-    actorSpec: ActorSpec,
-    includeMetafile: boolean = false
-  ): Promise<Bundle[]> {
+  async bundle(project: Readonly<Project>, actorSpec: ActorSpec): Promise<Bundle[]> {
     const compiledRes = await this.#buildPack.compile(
       // to-do: why no minify?
       {
         config: project.appConfig,
         info: actorSpec,
         minify: 'None',
-        includeMetafile,
         root: project.root,
       }
     );
@@ -69,7 +60,6 @@ export class Bundler {
         config: project?.appConfig,
         info: actorSpec,
         minify: 'None',
-        includeMetafile: false,
         root,
       })
       .pipe(

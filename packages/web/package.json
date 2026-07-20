@@ -1,6 +1,6 @@
 {
   "name": "@devvit/web",
-  "version": "0.13.8",
+  "version": "0.13.9",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -35,22 +35,22 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/cache": "0.13.8",
-    "@devvit/client": "0.13.8",
-    "@devvit/external-endpoints": "0.13.8",
-    "@devvit/media": "0.13.8",
-    "@devvit/notifications": "0.13.8",
-    "@devvit/payments": "0.13.8",
-    "@devvit/realtime": "0.13.8",
-    "@devvit/reddit": "0.13.8",
-    "@devvit/redis": "0.13.8",
-    "@devvit/scheduler": "0.13.8",
-    "@devvit/server": "0.13.8",
-    "@devvit/settings": "0.13.8",
-    "@devvit/shared": "0.13.8"
+    "@devvit/cache": "0.13.9",
+    "@devvit/client": "0.13.9",
+    "@devvit/external-endpoints": "0.13.9",
+    "@devvit/media": "0.13.9",
+    "@devvit/notifications": "0.13.9",
+    "@devvit/payments": "0.13.9",
+    "@devvit/realtime": "0.13.9",
+    "@devvit/reddit": "0.13.9",
+    "@devvit/redis": "0.13.9",
+    "@devvit/scheduler": "0.13.9",
+    "@devvit/server": "0.13.9",
+    "@devvit/settings": "0.13.9",
+    "@devvit/shared": "0.13.9"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.13.8",
+    "@devvit/tsconfig": "0.13.9",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "4.1.0"
