@@ -1,18 +1,18 @@
+import { cache as cacheWithSeconds } from '@devvit/cache';
+
 import type { JSONValue } from '../../types/json.js';
-import type { RedisClient } from '../../types/redis.js';
-import type { CacheOptions, Clock, LocalCache } from './promise_cache.js';
-import { PromiseCache, SystemClock } from './promise_cache.js';
+
+export type CacheOptions = {
+  /** Time to live in milliseconds. */
+  ttl: number;
+  /** Key to use for caching. */
+  key: string;
+};
 
 export type CacheHelper = <T extends JSONValue>(
   fn: () => Promise<T>,
   options: CacheOptions
 ) => Promise<T>;
 
-export function makeCache(
-  redis: RedisClient,
-  state: { __cache?: LocalCache },
-  clock: Clock = SystemClock
-): CacheHelper {
-  const pc = new PromiseCache(redis, state, clock);
-  return pc.cache.bind(pc);
-}
+export const cache: CacheHelper = (fn, options) =>
+  cacheWithSeconds(fn, { ...options, ttl: options.ttl / 1000 });

@@ -18,9 +18,9 @@
   ],
   "scripts": {
     "build": "tsc && cp -af devvit.tsconfig.json dist/",
-    "clean": "rm -rf .turbo coverage dist src/devvit/internals/semanticColors.ts || :",
+    "clean": "rm -rf .turbo coverage dist",
     "clobber": "yarn clean && rm -rf node_modules",
-    "dev:build": "chokidar ./src ../shared-types/dist --command 'yarn build' --ignore './src/devvit/internals/semanticColors.ts'",
+    "dev:build": "chokidar ./src ../shared-types/dist --command 'yarn build'",
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",
     "prepublishOnly": "publish-package-json",
@@ -41,14 +41,11 @@
     "@devvit/settings": "0.13.8",
     "@devvit/shared": "0.13.8",
     "@devvit/shared-types": "0.13.8",
-    "base64-js": "1.5.1",
     "clone-deep": "4.0.1",
     "moderndash": "4.0.0"
   },
   "devDependencies": {
     "@devvit/tsconfig": "0.13.8",
-    "@reddit/faceplate-ui": "18.2.2",
-    "@reddit/rpl-styles": "1.0.2",
     "@types/clone-deep": "4.0.1",
     "@types/node": "20.14.12",
     "chokidar-cli": "3.0.0",

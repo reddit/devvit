@@ -47,11 +47,9 @@ declare module '@devvit/public-api' {
   }
 }
 
-// Hack: rename config2 to workaround declaration in
-//       packages/runtime-lite/src/runtime/SandboxedRuntimeLite.ts.
 // __devvit__ is initialized by ESBuildPack and undefined in tests only.
 // @ts-expect-error no type.
-const config2: AppConfig | undefined = globalThis.__devvit__?.config;
+const config: AppConfig | undefined = globalThis.__devvit__?.config;
 
 /** @internal [state] Map of devvit.json form keys to Devvit-singleton form keys. */
 export const formKeyMap: { [formKey: string]: FormKey } = {};
@@ -506,17 +504,17 @@ function coerceSettingForClassic(
   return classicSetting;
 }
 
-if (config2) {
-  configurePermissions(config2.permissions);
+if (config) {
+  configurePermissions(config.permissions);
   // Posts are no longer configured here. Native Blocks apps are no longer supported, and Devvit Web
   // apps no longer use a Blocks bootstrap, opting instead to directly render the entrypoint in
   // an iframe.
-  if (config2.menu) configureMenuItems(config2.menu.items);
-  if (config2.scheduler) configureScheduler(config2.scheduler);
-  if (config2.forms) configureForms(config2.forms);
-  if (config2.triggers) configureTriggers(config2.triggers);
-  if (config2.settings) configureSettings(config2.settings);
-  if (config2.payments) configurePayments(config2.payments);
+  if (config.menu) configureMenuItems(config.menu.items);
+  if (config.scheduler) configureScheduler(config.scheduler);
+  if (config.forms) configureForms(config.forms);
+  if (config.triggers) configureTriggers(config.triggers);
+  if (config.settings) configureSettings(config.settings);
+  if (config.payments) configurePayments(config.payments);
 }
 
 export default Devvit;

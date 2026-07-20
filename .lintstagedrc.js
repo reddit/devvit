@@ -1,5 +1,5 @@
 module.exports = {
-  '!({packages/protos/src/json/**/*,packages/protos/src/types/**/*,packages/ui-renderer/scripts/**/*,*}).{cjs,js,jsx,mjs,cts,mts,ts,tsx}':
+  '!({packages/protos/src/json/**/*,packages/protos/src/types/**/*,*}).{cjs,js,jsx,mjs,cts,mts,ts,tsx}':
     [`npx yarn exec redlint --fix`],
   '!({packages/protos/src/json/**/*,packages/protos/src/types/**/*}).{cjs,js,jsx,mjs,cts,mts,ts,tsx}':
     ['prettier --write'],

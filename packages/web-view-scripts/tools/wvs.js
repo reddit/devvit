@@ -42,7 +42,7 @@
 
 const json = JSON.stringify(bridge);
 if (new URL(location.href).searchParams.has('hash')) {
-  // See packages/ui-renderer/library/src/client/web-view.ts.
+  // See Shreddit packages/components/devvit2/devvit2-surface/elements/devvit2-web-view.ts.
   const hash = `#${encodeURIComponent(json)}`;
   // eslint-disable-next-line security/detect-possible-timing-attacks
   if (location.hash !== hash) {

@@ -1,7 +1,7 @@
 import { media } from '@devvit/media';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 
-import { makeCache } from '../devvit/internals/cache.js';
+import { cache } from '../devvit/internals/cache.js';
 import type { ContextAPIClients } from '../index.js';
 import { AssetsClient } from './AssetsClient/AssetsClient.js';
 import { RedditAPIClient } from './reddit/RedditAPIClient.js';
@@ -16,7 +16,6 @@ export type MakeAPIClientsOptions = {
 };
 
 export function makeAPIClients({ metadata, ui }: MakeAPIClientsOptions): ContextAPIClients {
-  const cache = makeCache(redis, {});
   const reddit = new RedditAPIClient(metadata);
   const scheduler = new SchedulerClient(metadata);
   const settings = new SettingsClient(metadata);
@@ -30,14 +29,7 @@ export function makeAPIClients({ metadata, ui }: MakeAPIClientsOptions): Context
     settings,
     media,
     assets,
-    get cache() {
-      return (
-        cache ??
-        (() => {
-          throw new Error('cache() is unavailable');
-        })
-      );
-    },
+    cache,
     get ui() {
       if (!uiClient) {
         throw new Error('ui client is not available');

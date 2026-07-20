@@ -4,7 +4,7 @@
     "rootDir": "src",
     "checkJs": false
   },
-  "exclude": ["node_modules", "src/templates/pen/**/*"],
+  "exclude": ["node_modules"],
   "extends": "@devvit/tsconfig/base.json",
   "include": ["src/**/*"]
 }

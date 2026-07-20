@@ -16,8 +16,6 @@ server/bin/
 node_modules/
 
 /packages/build-pack/src/__tests__/test-actors/bad-syntax/main.ts
-/packages/public-api/src/types/icons.ts
-
 /devvit-dev-portal/graphql/operations.json
 /devvit-docs/docs/capabilities/http-fetch.mdx
 *.mdx
