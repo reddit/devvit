@@ -3,11 +3,10 @@ import {
   type WebViewInternalMessage,
   WebViewInternalMessageScope,
 } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
-// eslint-disable-next-line no-restricted-imports
-import {
+import type {
   WebViewInternalEventMessage,
   WebViewMessageEvent_MessageData,
-} from '@devvit/protos/types/devvit/ui/events/v1alpha/web_view.js'; // to-do: use /json/ not /types/.
+} from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 
 /** `WebViewInternalMessage.type`. */
 export const webViewInternalMessageType = 'devvit-internal';
@@ -74,9 +73,7 @@ export const emitEffectWithResponse = (
 
     const handleEffect = (event: MessageEvent<WebViewMessageEvent_MessageData>): void => {
       if (event.data?.type === 'devvit-message' && event.data?.data?.id === id) {
-        // to-do: drop fromJSON() when iOS is sending fully hydrated messages.
-        const serializedMessage = WebViewInternalEventMessage.fromJSON(event.data.data);
-        resolve(serializedMessage);
+        resolve(event.data.data);
         removeEventListener('message', handleEffect);
       }
     };

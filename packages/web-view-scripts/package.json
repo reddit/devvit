@@ -55,12 +55,12 @@
   },
   "filesize": {
     "dist/scripts/devvit.v1.min.js": {
-      "gzip": "30 kb",
-      "none": "129 kb"
+      "gzip": "4 kb",
+      "none": "11 kb"
     },
     "dist/scripts/screenshot.v1.min.js": {
-      "gzip": "28 kb",
-      "none": "121 kb"
+      "gzip": "6 kb",
+      "none": "13 kb"
     }
   },
   "source": "./src/index.ts"

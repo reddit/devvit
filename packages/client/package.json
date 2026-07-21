@@ -50,8 +50,8 @@
   },
   "filesize": {
     "dist/client.min.js": {
-      "gzip": "30 KB",
-      "none": "131 KB"
+      "gzip": "5 KB",
+      "none": "13 KB"
     }
   }
 }
