@@ -118,7 +118,6 @@ import type { JSONObject } from '../types/json.js';
 import { registerAppSettings } from './internals/app-settings.js';
 import { registerInstallationSettings } from './internals/installation-settings.js';
 import { registerMenuItems } from './internals/menu-items.js';
-import { pluginIsEnabled } from './internals/plugins.js';
 import { registerScheduler } from './internals/scheduler.js';
 import { registerTriggers } from './internals/triggers.js';
 import { registerUIEventHandler } from './internals/ui-event-handler.js';
@@ -848,4 +847,16 @@ export namespace Devvit {
    *  @deprecated - Please switch to the `Context` type exported by public-api.
    */
   export type Context = ContextAPIClients & BaseContext;
+}
+
+function pluginIsEnabled(settings: PluginSettings | boolean | undefined): boolean {
+  if (!settings) {
+    return false;
+  }
+
+  if (settings === true) {
+    return true;
+  }
+
+  return settings.enabled;
 }
