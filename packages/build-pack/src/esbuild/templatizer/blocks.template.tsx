@@ -475,6 +475,11 @@ function coerceSettingForClassic(
       multiSelect: true,
       scope,
     };
+  } else if (setting.type === 'group') {
+    classicSetting = {
+      ...setting,
+      fields: Object.values(setting.fields).map((field) => coerceSettingForClassic(field, scope)),
+    };
   } else {
     classicSetting = {
       ...setting,
@@ -482,7 +487,8 @@ function coerceSettingForClassic(
     };
   }
 
-  if (setting.validationEndpoint) {
+  // Redundant check necessary to keep TS happy
+  if (classicSetting.type !== 'group' && setting.type !== 'group' && setting.validationEndpoint) {
     classicSetting.onValidate = async function validateSettingsField(
       event: SettingsFormFieldValidatorEvent<string | boolean | number | string[]>,
       context: Devvit.Context

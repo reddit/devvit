@@ -369,8 +369,37 @@
         { "$ref": "#/$defs/NumberSetting" },
         { "$ref": "#/$defs/BooleanSetting" },
         { "$ref": "#/$defs/SelectSetting" },
-        { "$ref": "#/$defs/MultiSelectSetting" }
+        { "$ref": "#/$defs/MultiSelectSetting" },
+        { "$ref": "#/$defs/SubredditSettingGroup" }
       ]
+    },
+    "SubredditSettingGroup": {
+      "type": "object",
+      "required": ["type", "label", "fields"],
+      "additionalProperties": false,
+      "description": "A group of related settings. These are displayed grouped together in the UI.",
+      "properties": {
+        "type": {
+          "const": "group"
+        },
+        "label": {
+          "type": "string",
+          "description": "The label of the group that is displayed in the UI when a moderator is editing these settings."
+        },
+        "helpText": {
+          "type": "string",
+          "description": "An optional help text that will be displayed below the group."
+        },
+        "fields": {
+          "type": "object",
+          "description": "The fields that will be displayed in the group.",
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_-]*$": {
+              "$ref": "#/$defs/SubredditSetting"
+            }
+          }
+        }
+      }
     }
   },
   "required": ["name"],

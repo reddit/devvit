@@ -1311,6 +1311,31 @@ describe('parseAppConfigJSON()', () => {
                 ],
                 defaultValue: ['Option 1', 'Option 2'],
               },
+              'my-group': {
+                type: 'group',
+                label: 'Group test',
+                fields: {
+                  'feature-sauce-nested': {
+                    type: 'string',
+                    label: 'Feature sauce 2!',
+                  },
+                  'my-nested-multi-select': {
+                    type: 'multiSelect',
+                    label: 'Select multiple options, again:',
+                    options: [
+                      {
+                        label: 'Option 1',
+                        value: 'Option 1',
+                      },
+                      {
+                        label: 'Option 2',
+                        value: 'Option 2',
+                      },
+                    ],
+                    defaultValue: ['Option 1', 'Option 2'],
+                  },
+                },
+              },
             },
           },
         } satisfies AppConfigJson,
@@ -1338,6 +1363,34 @@ describe('parseAppConfigJSON()', () => {
               "feature-sauce": {
                 "label": "Feature sauce",
                 "type": "string",
+              },
+              "my-group": {
+                "fields": {
+                  "feature-sauce-nested": {
+                    "label": "Feature sauce 2!",
+                    "type": "string",
+                  },
+                  "my-nested-multi-select": {
+                    "defaultValue": [
+                      "Option 1",
+                      "Option 2",
+                    ],
+                    "label": "Select multiple options, again:",
+                    "options": [
+                      {
+                        "label": "Option 1",
+                        "value": "Option 1",
+                      },
+                      {
+                        "label": "Option 2",
+                        "value": "Option 2",
+                      },
+                    ],
+                    "type": "multiSelect",
+                  },
+                },
+                "label": "Group test",
+                "type": "group",
               },
               "my-multi-select": {
                 "defaultValue": [
@@ -1432,6 +1485,37 @@ describe('parseAppConfigJSON()', () => {
               "name": "feature-sauce",
               "type": "string",
             },
+            "my-group": {
+              "fields": {
+                "feature-sauce-nested": {
+                  "label": "Feature sauce 2!",
+                  "name": "feature-sauce-nested",
+                  "type": "string",
+                },
+                "my-nested-multi-select": {
+                  "defaultValue": [
+                    "Option 1",
+                    "Option 2",
+                  ],
+                  "label": "Select multiple options, again:",
+                  "name": "my-nested-multi-select",
+                  "options": [
+                    {
+                      "label": "Option 1",
+                      "value": "Option 1",
+                    },
+                    {
+                      "label": "Option 2",
+                      "value": "Option 2",
+                    },
+                  ],
+                  "type": "multiSelect",
+                },
+              },
+              "label": "Group test",
+              "name": "my-group",
+              "type": "group",
+            },
             "my-multi-select": {
               "defaultValue": [
                 "Option 1",
@@ -1482,6 +1566,45 @@ describe('parseAppConfigJSON()', () => {
       }
     `));
 
+  test('duplicate names are not allowed in groups', () =>
+    expect(() =>
+      parseAppConfigJson(
+        {
+          name: 'test-app',
+          server: {},
+          settings: {
+            global: {
+              'my-feature-flag': {
+                type: 'string',
+                label: 'Feature flag to rollout a new change',
+                validationEndpoint: '/internal/settings/validate',
+                isSecret: false,
+              },
+            },
+            subreddit: {
+              'feature-sauce': {
+                type: 'string',
+                label: 'Feature sauce',
+              },
+              'my-group': {
+                type: 'group',
+                label: 'Group test',
+                fields: {
+                  'feature-sauce': {
+                    type: 'string',
+                    label: 'Feature sauce 2!',
+                  },
+                },
+              },
+            },
+          },
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toThrowErrorMatchingInlineSnapshot(
+      `[Error: More than one setting has the name "feature-sauce"; all settings must have a unique name.]`
+    ));
+
   test('ban duplicate setting names in settings config', () =>
     expect(() =>
       parseAppConfigJson(
@@ -1506,8 +1629,47 @@ describe('parseAppConfigJSON()', () => {
         false
       )
     ).toThrowErrorMatchingInlineSnapshot(
-      `[Error: Duplicate setting name "test-flag" in global and subreddit scopes. Rename or remove one of them..]`
+      `[Error: More than one setting has the name "test-flag"; all settings must have a unique name.]`
     ));
+
+  test('ensure selects nested in groups have valid defaults if provided', () =>
+    expect(() =>
+      parseAppConfigJson(
+        {
+          name: 'test-app',
+          server: {},
+          settings: {
+            subreddit: {
+              'test-group': {
+                type: 'group',
+                label: 'Test group',
+                fields: {
+                  'my-select': {
+                    type: 'select',
+                    label: 'Select multiple options:',
+                    options: [
+                      {
+                        label: 'Option 1',
+                        value: 'Option 1',
+                      },
+                      {
+                        label: 'Option 2',
+                        value: 'Option 2',
+                      },
+                    ],
+                    defaultValue: 'Option -1',
+                  },
+                },
+              },
+            },
+          },
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toThrowErrorMatchingInlineSnapshot(`
+      [Error: Setting "my-select" default value "Option -1" is not in
+                options "Option 1, Option 2".]
+    `));
 
   test('menu items', () =>
     expect(

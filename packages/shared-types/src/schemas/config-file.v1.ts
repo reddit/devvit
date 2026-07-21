@@ -163,7 +163,7 @@ export type AppSchedulerTaskConfig = {
   data?: JsonObject;
 };
 export type AppSettingsConfig = {
-  global?: { [name: string]: AppSettingConfig };
+  global?: { [name: string]: Exclude<AppSettingConfig, AppSettingGroupConfig> };
   subreddit?: { [name: string]: AppSettingConfig };
 };
 export type AppSettingConfig =
@@ -172,7 +172,8 @@ export type AppSettingConfig =
   | AppNumberSettingConfig
   | AppBooleanSettingConfig
   | AppSelectSettingConfig
-  | AppMultiSelectSettingConfig;
+  | AppMultiSelectSettingConfig
+  | AppSettingGroupConfig;
 
 export type AppBaseSettingConfig = {
   name: string;
@@ -208,6 +209,10 @@ export type AppMultiSelectSettingConfig = AppBaseSettingConfig & {
   type: 'multiSelect';
   options: Array<{ label: string; value: string }>;
   defaultValue?: string[];
+};
+export type AppSettingGroupConfig = Omit<AppBaseSettingConfig, 'validationEndpoint'> & {
+  type: 'group';
+  fields: { [name: string]: AppSettingConfig };
 };
 
 export type AppBlocksConfigJson = {
@@ -301,10 +306,14 @@ export type AppSettingConfigJson =
   | Omit<AppNumberSettingConfig, 'name'>
   | Omit<AppBooleanSettingConfig, 'name'>
   | Omit<AppSelectSettingConfig, 'name'>
-  | Omit<AppMultiSelectSettingConfig, 'name'>;
+  | Omit<AppMultiSelectSettingConfig, 'name'>
+  | AppSettingGroupConfigJson;
 export type AppSettingsConfigJson = {
-  global?: { [name: string]: AppSettingConfigJson };
+  global?: { [name: string]: Exclude<AppSettingConfigJson, AppSettingGroupConfigJson> };
   subreddit?: { [name: string]: AppSettingConfigJson };
+};
+export type AppSettingGroupConfigJson = Omit<AppSettingGroupConfig, 'name' | 'fields'> & {
+  fields: { [name: string]: AppSettingConfigJson };
 };
 
 export function parseAppConfig(str: string, allowUninitializedConfig: boolean): AppConfig {
@@ -648,7 +657,18 @@ function AppSettingsConfig(
   if (settings?.subreddit || blocksSettings) {
     config.subreddit = {};
     for (const [name, setting] of Object.entries(settings?.subreddit ?? {})) {
-      config.subreddit[name] = { ...setting, name: name };
+      if (setting.type === 'group') {
+        // Convert the nested fields recursively
+        config.subreddit[name] = {
+          ...setting,
+          name: name,
+          fields: AppSettingsConfig(false, {
+            subreddit: setting.fields,
+          }).subreddit!,
+        };
+      } else {
+        config.subreddit[name] = { ...setting, name: name };
+      }
     }
   }
 
@@ -680,11 +700,19 @@ export function validate(config: Readonly<AppConfig>): void {
 
   // If there are any select settings, their default values must be in the options,
   // and if it's not a multi-select, the default value must be a single string.
-  const settingValues = [
+  const settingValues = flatSettings([
     ...Object.values(config.settings?.global ?? {}),
     ...Object.values(config.settings?.subreddit ?? {}),
-  ];
+  ]);
+  const seenSettingNames = new Set<string>();
   for (const setting of settingValues) {
+    if (seenSettingNames.has(setting.name)) {
+      errs.push(
+        `More than one setting has the name "${setting.name}"; all settings must have a unique name`
+      );
+    }
+    seenSettingNames.add(setting.name);
+
     if (setting.type === 'select' && setting.defaultValue) {
       if (!setting.options.some((option) => option.value === setting.defaultValue))
         errs.push(
@@ -704,17 +732,23 @@ export function validate(config: Readonly<AppConfig>): void {
     }
   }
 
-  // DR-300: settings names must be unique across global and subreddit scopes
-  const globalSettingNames = new Set<string>(Object.keys(config.settings?.global ?? {}));
-  for (const subredditSettingName of Object.keys(config.settings?.subreddit ?? {})) {
-    if (globalSettingNames.has(subredditSettingName)) {
-      errs.push(
-        `Duplicate setting name "${subredditSettingName}" in global and subreddit scopes. Rename or remove one of them.`
-      );
-    }
-  }
-
   if (errs.length) throw Error(`${errs.join('; ')}.`);
+}
+
+function flatSettings(settings: Readonly<AppSettingConfig[]>): AppSettingConfig[] {
+  const retval: AppSettingConfig[] = [];
+  for (const setting of settings) {
+    if (setting.type !== 'group') {
+      retval.push(setting);
+      continue;
+    }
+    // Groups get their nested fields extracted
+    const fields = flatSettings(Object.values(setting.fields)).map((field) => ({
+      ...field,
+    }));
+    retval.push(...fields);
+  }
+  return retval;
 }
 
 function scopeFromJSON(scope: string): RunAsScope {
