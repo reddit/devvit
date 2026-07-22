@@ -180,6 +180,13 @@ describe('Post API', () => {
       expect(post.toJSON()).toMatchSnapshot();
     });
 
+    test('maps moderator report reasons and authors', () => {
+      const post = new Post({ ...defaultPostData });
+
+      expect(post.modReports).toStrictEqual([{ reason: 'This is spam', author: 'spez' }]);
+      expect(post.modReportReasons).toStrictEqual(['This is spam']);
+    });
+
     test('report()', async () => {
       const spyPlugin = redditApiPlugins.LinksAndComments.Report;
       spyPlugin.mockImplementationOnce(async () => ({}));

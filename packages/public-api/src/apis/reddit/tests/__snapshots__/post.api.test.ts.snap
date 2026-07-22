@@ -63,6 +63,12 @@ exports[`Post API > RedditAPIClient > Post matches JSON snapshot 1`] = `
   "modReportReasons": [
     "This is spam",
   ],
+  "modReports": [
+    {
+      "author": "spez",
+      "reason": "This is spam",
+    },
+  ],
   "nsfw": false,
   "numberOfComments": 0,
   "numberOfReports": 0,

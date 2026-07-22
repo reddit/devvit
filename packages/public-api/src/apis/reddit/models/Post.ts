@@ -29,6 +29,13 @@ import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
 import { User } from './User.js';
 
+/** A moderator report attached to a post or comment. */
+export type ModeratorReport = {
+  reason: string;
+  /** Username of the author without the u/ prefix, e.g. 'spez' */
+  author: string;
+};
+
 /**
  * Crowd control level for posts. Determines which comments should be collapsed due to crowd control.
  * OFF: Anyone with a Reddit account can comment freely.
@@ -409,6 +416,7 @@ export class Post {
   #flair?: CommonFlair;
   #authorFlair?: CommonFlair;
   #secureMedia?: SecureMedia;
+  #modReports: ModeratorReport[];
   #modReportReasons: string[];
   #userReportReasons: string[];
   #gallery: GalleryMedia[];
@@ -485,6 +493,9 @@ export class Post {
     this.#distinguishedBy = data.distinguished;
     this.#secureMedia = data.secureMedia;
 
+    this.#modReports = ((data.modReports as unknown as [string, string][]) ?? []).map(
+      ([reason, author]) => ({ reason, author })
+    );
     this.#modReportReasons = ((data.modReports as unknown as [string, string]) ?? []).map(
       ([reason]) => reason
     );
@@ -710,6 +721,11 @@ export class Post {
     return this.#userReportReasons;
   }
 
+  get modReports(): ModeratorReport[] {
+    return this.#modReports;
+  }
+
+  /** @deprecated Use {@link modReports} to retain each report's author. */
   get modReportReasons(): string[] {
     return this.#modReportReasons;
   }
@@ -771,6 +787,7 @@ export class Post {
     | 'authorFlair'
     | 'secureMedia'
     | 'userReportReasons'
+    | 'modReports'
     | 'modReportReasons'
     | 'crosspostParentId'
   > {
@@ -808,6 +825,7 @@ export class Post {
       flair: this.flair,
       authorFlair: this.authorFlair,
       secureMedia: this.secureMedia,
+      modReports: this.#modReports,
       modReportReasons: this.#modReportReasons,
       userReportReasons: this.#userReportReasons,
       crosspostParentId: this.#crosspostParentId,

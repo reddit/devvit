@@ -97,6 +97,13 @@ describe('Post API', () => {
       expect(post.toJSON()).toMatchSnapshot();
     });
 
+    test('maps moderator report reasons and authors', () => {
+      const post = new Post({ ...defaultPostData }, undefined);
+
+      expect(post.modReports).toStrictEqual([{ reason: 'This is spam', author: 'spez' }]);
+      expect(post.modReportReasons).toStrictEqual(['This is spam']);
+    });
+
     test('report()', async () => {
       const { reddit, metadata } = createTestRedditApiClient();
 

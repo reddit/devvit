@@ -22,6 +22,7 @@ import { convertProtosFlairToCommonFlair } from './Flair.js';
 import type { ListingFetchOptions, ListingFetchResponse, MoreObject } from './Listing.js';
 import { Listing } from './Listing.js';
 import { ModNote } from './ModNote.js';
+import type { ModeratorReport } from './Post.js';
 import { User } from './User.js';
 
 export type CommentSort =
@@ -99,6 +100,7 @@ export class Comment {
   #collapsedBecauseCrowdControl: boolean;
   #score: number;
   #permalink: string;
+  #modReports: ModeratorReport[];
   #modReportReasons: string[];
   #userReportReasons: string[];
   #url: string;
@@ -156,6 +158,9 @@ export class Comment {
       flairTextColor: data.authorFlairTextColor,
     });
 
+    this.#modReports = ((data.modReports as unknown as [string, string][]) ?? []).map(
+      ([reason, author]) => ({ reason, author })
+    );
     this.#modReportReasons = ((data.modReports as unknown as [string, string]) ?? []).map(
       ([reason]) => reason
     );
@@ -269,6 +274,11 @@ export class Comment {
     return this.#userReportReasons;
   }
 
+  get modReports(): ModeratorReport[] {
+    return this.#modReports;
+  }
+
+  /** @deprecated Use {@link modReports} to retain each report's author. */
   get modReportReasons(): string[] {
     return this.#modReportReasons;
   }
@@ -308,6 +318,7 @@ export class Comment {
     | 'score'
     | 'permalink'
     | 'userReportReasons'
+    | 'modReports'
     | 'modReportReasons'
     | 'url'
     | 'ignoringReports'
@@ -334,6 +345,7 @@ export class Comment {
       collapsedBecauseCrowdControl: this.collapsedBecauseCrowdControl,
       score: this.score,
       permalink: this.permalink,
+      modReports: this.modReports,
       modReportReasons: this.modReportReasons,
       userReportReasons: this.userReportReasons,
       url: this.url,
