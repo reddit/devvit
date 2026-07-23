@@ -1,8 +1,9 @@
-import type {
-  WikiPage as WikiPageProto,
-  WikiPageRevision as WikiPageRevisionProto,
-  WikiPageRevisionListing,
-  WikiPageSettings_Data,
+import {
+  type WikiPage as WikiPageProto,
+  type WikiPageRevision as WikiPageRevisionProto,
+  type WikiPageRevisionListing,
+  type WikiPageSettings_Data,
+  WikiVersion,
 } from '@devvit/protos/json/devvit/plugin/redditapi/wiki/wiki_msg.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
@@ -261,7 +262,13 @@ export class WikiPage {
   /** @internal */
   static async getPages(subredditName: string, metadata: Metadata | undefined): Promise<string[]> {
     const client = Devvit.redditAPIPlugins.Wiki;
-    const response = await client.GetWikiPages({ subreddit: subredditName }, metadata);
+    const response = await client.GetWikiPages(
+      {
+        subreddit: subredditName,
+        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+      },
+      metadata
+    );
 
     return response.data || [];
   }
@@ -286,6 +293,7 @@ export class WikiPage {
         page: options.page,
         content: options.content,
         reason: options.reason ?? '',
+        wikiVersion: WikiVersion.WIKI_VERSION_V1,
       },
       metadata
     );
