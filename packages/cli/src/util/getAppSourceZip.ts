@@ -1,12 +1,14 @@
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 
+import { mapAsyncWithMaxConcurrency } from '@devvit/shared-types/mapAsyncWithMaxConcurrency.js';
 import ignore from 'ignore';
 import JSZip from 'jszip';
 
 import { DevvitCommand } from './commands/DevvitCommand.js';
 
 const ALWAYS_IGNORED_PATHS = Object.freeze(['node_modules', '.env', '.git']);
+const MAX_PARALLEL_SOURCE_READS = 16;
 
 export async function getAppSourceZip(cmd: DevvitCommand): Promise<ArrayBuffer> {
   const zip = new JSZip();
@@ -51,7 +53,7 @@ async function addDirectoryToZip(
   const entries = await fsp.readdir(dir, { withFileTypes: true });
 
   // Process entries in parallel
-  const filePromises: Promise<void>[] = [];
+  const fileCallbacks: (() => Promise<void>)[] = [];
   const dirCallbacks: (() => Promise<void>)[] = [];
 
   for (const entry of entries) {
@@ -71,18 +73,20 @@ async function addDirectoryToZip(
         );
       }
     } else if (entry.isFile()) {
-      // Read files & add them in parallel though
-      filePromises.push(
-        (async () => {
-          const content = await fsp.readFile(fullPath);
-          zipFolder.file(entry.name, content);
-        })()
-      );
+      // Defer file reads so concurrency can be bounded below.
+      fileCallbacks.push(async () => {
+        const content = await fsp.readFile(fullPath);
+        zipFolder.file(entry.name, content);
+      });
     }
   }
 
-  // Wait for all file reads to complete
-  await Promise.all(filePromises);
+  // Read files concurrently without opening every file at once.
+  await mapAsyncWithMaxConcurrency(
+    fileCallbacks,
+    (readFile) => readFile(),
+    MAX_PARALLEL_SOURCE_READS
+  );
 
   // Then, process the directories in serial
   for (const dirCallback of dirCallbacks) {
