@@ -1,6 +1,6 @@
 {
   "name": "@devvit/shared-types",
-  "version": "0.13.9",
+  "version": "0.13.10",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -20,7 +20,6 @@
     "build": "tsc && yarn postbuild:copy-schemas",
     "clean": "rm -rf .turbo coverage dist",
     "clobber": "yarn clean && rm -rf node_modules",
-    "dev:build": "chokidar ./src --command 'yarn build && echo \"BUILD COMPLETE\"'",
     "lint": "redlint .",
     "lint:fix": "yarn lint --fix",
     "postbuild:copy-schemas": "cp -af src/schemas/*.json dist/schemas/",
@@ -32,17 +31,16 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.13.9",
+    "@devvit/protos": "0.13.10",
     "jsonschema": "1.4.1",
     "jwt-decode": "4.0.0",
     "uuid": "14.0.0"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.13.9",
+    "@devvit/tsconfig": "0.13.10",
     "@types/node": "20.14.12",
     "@types/redis-mock": "0.17.1",
     "@types/uuid": "9.0.0",
-    "chokidar-cli": "3.0.0",
     "eslint": "9.11.1",
     "lit": "2.5.0",
     "redis": "4.6.6",

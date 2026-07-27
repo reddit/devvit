@@ -1,5 +1,7 @@
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
 
+export type { SettingsClient, SettingsValues } from '@devvit/settings';
+
 import type { Devvit } from '../devvit/Devvit.js';
 import type {
   BooleanField,
@@ -43,23 +45,3 @@ export type SettingsFormField =
   | ValidatedBooleanField
   | ValidatedSelectField
   | SettingsFormFieldGroup;
-
-export type SettingsValues = { [key: string]: string | string[] | boolean | number | undefined };
-
-/**
- * The Settings API Client lets you retrieve the settings values for your app set by the installer.
- * Use this in conjunction with `Devvit.addSettings`.
- */
-export type SettingsClient = {
-  /**
-   * Get a single setting value by name.
-   * @param name The name of the setting to retrieve.
-   * @returns A promise that resolves to the setting value, or undefined if the setting doesn't exist.
-   */
-  get<T = string | string[] | boolean | number>(name: string): Promise<T | undefined>;
-  /**
-   * Get all settings values.
-   * @returns A promise that resolves to an object containing all settings values.
-   */
-  getAll<T extends object = SettingsValues>(): Promise<T>;
-};
