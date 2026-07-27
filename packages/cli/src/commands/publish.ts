@@ -378,7 +378,7 @@ export default class Publish extends DevvitCommand {
       (!appInfo.termsAndConditions || !appInfo.privacyPolicy)
     ) {
       this.log(
-        'Apps that use the http plugin must have terms & conditions and a privacy policy linked before publishing. Add these links on the app details page and run `devvit publish` again.'
+        'Apps that use the http plugin must have terms & conditions and a privacy policy linked before publishing. Please create these and add the links to your policies on the developer settings page. Once complete, you can run devvit publish again.'
       );
       await this.#promptOpenURL(appSettingsURL);
     }
@@ -386,7 +386,7 @@ export default class Publish extends DevvitCommand {
     if (appCapabilities.includes(NutritionCategory.PAYMENTS)) {
       if (!appInfo.termsAndConditions) {
         this.log(
-          'Apps that sell goods must have terms & conditions linked before publishing. Add this link on the app details page and run `devvit publish` again.'
+          'Apps that sell goods must have terms & conditions linked before publishing. Please create terms & conditions for your app and add the link to your policies on the developer settings page. Once complete, you can run devvit publish again.'
         );
         await this.#promptOpenURL(appSettingsURL);
       }
