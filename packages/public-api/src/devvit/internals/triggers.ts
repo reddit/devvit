@@ -67,12 +67,7 @@ function createCombinedHandler<Arg>(
       type: eventType,
     };
 
-    const context = Object.assign(
-      makeAPIClients({
-        metadata,
-      }),
-      getContextFromMetadata(metadata)
-    );
+    const context = Object.assign(makeAPIClients(), getContextFromMetadata(metadata));
 
     // Users can set multiple triggers for a single event. An error in one
     // shouldn't technically impact another but there's no actual guarantees

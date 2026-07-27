@@ -1,7 +1,7 @@
+import type { Comment, Post, Subreddit, User } from '@devvit/reddit';
 import type { Form } from '@devvit/shared';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
 
-import type { Comment, Post, Subreddit, User } from '../apis/reddit/models/index.js';
 import type { JSONObject } from './json.js';
 import type { Toast } from './toast.js';
 

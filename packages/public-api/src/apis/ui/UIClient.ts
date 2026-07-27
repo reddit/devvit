@@ -4,6 +4,7 @@ import {
   type Toast as ToastProto,
   ToastAppearance,
 } from '@devvit/protos/json/devvit/ui/toast/toast.js';
+import type { Comment, Post, Subreddit, User } from '@devvit/reddit';
 import type { Form } from '@devvit/shared';
 import { resolveNavigationInput } from '@devvit/shared-types/thing-navigation.js';
 import type { FormKey } from '@devvit/shared-types/useForm.js';
@@ -12,7 +13,6 @@ import { Devvit } from '../../devvit/Devvit.js';
 import type { JSONObject } from '../../types/json.js';
 import type { Toast } from '../../types/toast.js';
 import type { UIClient as _UIClient } from '../../types/ui-client.js';
-import type { Comment, Post, Subreddit, User } from '../reddit/models/index.js';
 import { assertValidFormFields } from './helpers/assertValidFormFields.js';
 import { transformFormFields } from './helpers/transformForm.js';
 

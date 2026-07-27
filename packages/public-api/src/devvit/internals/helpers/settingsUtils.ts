@@ -49,12 +49,7 @@ export async function onValidateFormHelper(
         const value = formValues[fieldName];
         const validator = field.onValidate as OnValidateHandler<unknown>;
 
-        const context = Object.assign(
-          makeAPIClients({
-            metadata,
-          }),
-          getContextFromMetadata(metadata)
-        );
+        const context = Object.assign(makeAPIClients(), getContextFromMetadata(metadata));
 
         const error = await validator(
           {

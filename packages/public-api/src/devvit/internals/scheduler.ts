@@ -25,12 +25,7 @@ async function handleScheduledAction(args: ScheduledAction, metadata: Metadata):
     data: args.data,
   };
 
-  const context = Object.assign(
-    makeAPIClients({
-      metadata,
-    }),
-    getContextFromMetadata(metadata)
-  );
+  const context = Object.assign(makeAPIClients(), getContextFromMetadata(metadata));
 
   await scheduledJobHandler(event, context);
 

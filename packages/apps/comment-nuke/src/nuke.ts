@@ -1,4 +1,5 @@
-import { Comment, Devvit, Post } from '@devvit/public-api';
+// eslint-disable-next-line no-restricted-imports
+import { type Comment, Devvit, type Post } from '@devvit/public-api';
 
 export type NukeProps = {
   remove: boolean;

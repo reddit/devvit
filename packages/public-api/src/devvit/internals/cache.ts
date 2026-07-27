@@ -14,5 +14,6 @@ export type CacheHelper = <T extends JSONValue>(
   options: CacheOptions
 ) => Promise<T>;
 
+/** @internal */
 export const cache: CacheHelper = (fn, options) =>
   cacheWithSeconds(fn, { ...options, ttl: options.ttl / 1000 });

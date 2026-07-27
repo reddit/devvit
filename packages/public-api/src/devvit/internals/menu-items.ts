@@ -81,7 +81,6 @@ async function onAction(
   const context = Object.assign(
     makeAPIClients({
       ui: true,
-      metadata,
     }),
     getContextFromMetadata(metadata, postId, commentId),
     {

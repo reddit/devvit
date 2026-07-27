@@ -114,4 +114,5 @@ export class RedisClient extends RedisClientImplementation implements RedisClien
   }
 }
 
+/** @internal */
 export const redis: RedisClientLike = new RedisClient(RedisKeyScope.INSTALLATION);

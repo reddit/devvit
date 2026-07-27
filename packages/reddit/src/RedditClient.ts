@@ -445,7 +445,7 @@ export class RedditClient {
    *    text: "hello there", 
    *    imageUrls: ["https://styles.redditmedia.com/t5_5wa5ww/styles/communityIcon_wyopomb2xb0a1.png", "https://styles.redditmedia.com/t5_49fkib/styles/bannerBackgroundImage_5a4axis7cku61.png"]
       },
-   *  subredditName: await reddit.getCurrentSubredditName(),
+   *  subredditName: context.subredditName,
    *  textFallback: {
    *    text: 'This is a Devvit post!',
    *  },

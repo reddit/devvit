@@ -37,7 +37,6 @@ async function handleUIEvent(
 
   const apiClients = makeAPIClients({
     ui: true,
-    metadata,
   });
 
   let postId: string | undefined = metadata[Header.Post]?.values[0];

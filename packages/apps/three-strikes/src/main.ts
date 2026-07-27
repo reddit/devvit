@@ -1,4 +1,11 @@
-import { Comment, Devvit, MenuItemOnPressEvent, Post, User } from '@devvit/public-api';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type Comment,
+  Devvit,
+  type MenuItemOnPressEvent,
+  type Post,
+  type User,
+} from '@devvit/public-api';
 
 Devvit.configure({
   redis: true, // Enable access to Redis

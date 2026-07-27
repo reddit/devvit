@@ -46,7 +46,7 @@ export function makeWrappedHandler(userDefinedHandler: PaymentHandler): PaymentP
       }
 
       const context = Object.assign(
-        makeAPIClients({ metadata: md }),
+        makeAPIClients(),
         getContextFromMetadata(md, req.order.metadata[Header.Post])
       );
 
@@ -64,7 +64,7 @@ export function makeWrappedHandler(userDefinedHandler: PaymentHandler): PaymentP
         return {};
       }
 
-      const context = Object.assign(makeAPIClients({ metadata: md }), getContextFromMetadata(md));
+      const context = Object.assign(makeAPIClients(), getContextFromMetadata(md));
       const order = mapOrder(req.order);
       await userDefinedHandler.refundOrder(order, context);
       return {};
