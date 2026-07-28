@@ -46,6 +46,7 @@ beforeEach(() => {
     appPermissionState: undefined,
     dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
     entrypoints: {
+      api: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/api/expanded?foo=bar',
       default: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
       splash: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',
     },
@@ -86,7 +87,7 @@ describe('requestExpandedMode()', () => {
     expect(emitTelemetryClickEffect).toHaveBeenCalledWith(trustedEvent);
     expect(emitEffect).toHaveBeenCalledWith({
       immersiveMode: {
-        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html?token=0.0.0',
+        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
         immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE,
       },
       type: EffectType.EFFECT_WEB_VIEW,
@@ -99,7 +100,20 @@ describe('requestExpandedMode()', () => {
     expect(emitTelemetryClickEffect).toHaveBeenCalledWith(trustedEvent);
     expect(emitEffect).toHaveBeenCalledWith({
       immersiveMode: {
-        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html?token=0.0.0',
+        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',
+        immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE,
+      },
+      type: EffectType.EFFECT_WEB_VIEW,
+    } satisfies Effect);
+  });
+
+  it('should add the token to API entrypoints', () => {
+    requestExpandedMode(trustedEvent, 'api');
+
+    expect(emitEffect).toHaveBeenCalledWith({
+      immersiveMode: {
+        entryUrl:
+          'https://corridor-game-csipc4-0-0-9-webview.devvit.net/api/expanded?foo=bar&token=0.0.0',
         immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE,
       },
       type: EffectType.EFFECT_WEB_VIEW,

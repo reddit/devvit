@@ -3,6 +3,7 @@ import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_
 import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { emitTelemetryClickEffect } from '@devvit/shared-types/client/telemetry.js';
+import { apiPathPrefix } from '@devvit/shared-types/constants.js';
 import { tokenParam } from '@devvit/shared-types/webbit.js';
 
 /**
@@ -121,9 +122,8 @@ function emitModeEffect(mode: WebViewImmersiveMode, event: Event, entry: string 
 
   let entryUrl;
   if (entry) {
-    // Only `DevvitPost.entrypointUrl` has a token.
     const url = new URL(devvit.entrypoints[entry]);
-    url.searchParams.set(tokenParam, devvit.token);
+    if (url.pathname.startsWith(apiPathPrefix)) url.searchParams.set(tokenParam, devvit.token);
     entryUrl = `${url}`;
   }
 
