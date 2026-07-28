@@ -230,6 +230,7 @@ export class WikiPage {
         subreddit: subredditName,
         page,
         revisionId,
+        wikiVersion: WikiVersion.WIKI_VERSION_V1,
       },
       this.#metadata
     );
@@ -295,6 +296,7 @@ export class WikiPage {
             limit: fetchOptions.limit,
             after: fetchOptions.after,
             before: fetchOptions.before,
+            wikiVersion: WikiVersion.WIKI_VERSION_V1,
           },
           this.#metadata
         );
