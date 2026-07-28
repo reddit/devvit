@@ -313,6 +313,7 @@ export class WikiPage {
         subreddit: subredditName,
         page,
         revision: revisionId,
+        wikiVersion: WikiVersion.WIKI_VERSION_V1,
       },
       this.#metadata
     );
@@ -325,6 +326,7 @@ export class WikiPage {
       {
         subreddit: subredditName,
         page,
+        wikiVersion: WikiVersion.WIKI_VERSION_V1,
       },
       this.#metadata
     );
@@ -343,6 +345,7 @@ export class WikiPage {
         page: options.page,
         listed: options.listed ? 'on' : '',
         permlevel: options.permLevel,
+        wikiVersion: WikiVersion.WIKI_VERSION_V1,
       },
       this.#metadata
     );
@@ -361,6 +364,7 @@ export class WikiPage {
         subreddit: subredditName,
         page,
         username,
+        wikiVersion: WikiVersion.WIKI_VERSION_V1,
       },
       this.#metadata
     );
@@ -375,6 +379,7 @@ export class WikiPage {
         subreddit: subredditName,
         page,
         username,
+        wikiVersion: WikiVersion.WIKI_VERSION_V1,
       },
       this.#metadata
     );
