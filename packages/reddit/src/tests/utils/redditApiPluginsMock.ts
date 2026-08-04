@@ -207,6 +207,7 @@ export const redditApiPlugins = {
     GetWidgets: vi.fn(),
   },
   Wiki: {
+    IsWikiVersionEnabledInSubreddit: vi.fn(),
     GetWikiPages: vi.fn(),
     GetWikiPage: vi.fn(),
     EditWikiPage: vi.fn(),
