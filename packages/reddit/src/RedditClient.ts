@@ -41,6 +41,7 @@ import type {
   GetSubredditUsersByTypeOptions,
   GetSubscribedSubredditsForCurrentUserOptions,
   GetUserOverviewOptions,
+  GetWikiPageOptions,
   Listing,
   ModAction,
   ModeratorPermission,
@@ -70,6 +71,7 @@ import type {
   WikiPageRevision,
   WikiPageRevisionId,
   WikiPageSettings,
+  WikiVersionOptions,
 } from './models/index.js';
 import {
   AboutLocations,
@@ -1529,30 +1531,67 @@ export class RedditClient {
   }
 
   /**
+   * Check whether Wiki V2 is enabled for a subreddit.
+   *
+   * @param subredditName - The name of the subreddit to check.
+   * @returns Whether Wiki V2 is enabled for the subreddit.
+   */
+  async isWikiV2Enabled(subredditName: string): Promise<boolean> {
+    return WikiPage.isVersionEnabled(subredditName, 'v2');
+  }
+
+  /**
+   * Get a specific revision of a wiki page from a subreddit.
+   *
+   * @param subredditName - The name of the subreddit to get the wiki page from.
+   * @param page - The name of the wiki page to get.
+   * @param revisionId - The revision ID of the wiki page version to get. Leaving it empty returns the latest version.
+   * @returns The requested WikiPage object.
+   * @deprecated Pass a {@link GetWikiPageOptions} object as the third argument instead.
+   */
+  getWikiPage(
+    subredditName: string,
+    page: string,
+    revisionId?: WikiPageRevisionId | undefined
+  ): Promise<WikiPage>;
+
+  /**
    * Get a wiki page from a subreddit.
    *
    * @param subredditName - The name of the subreddit to get the wiki page from.
    * @param page - The name of the wiki page to get.
-   * @param revisionId - The revision ID of the wiki page version to get. Setting this value will return the wiki page
-   * version at that revision, and leaving it empty will return the latest version.
+   * @param options - Options for the request.
+   * @param options.revisionId - The revision ID of the wiki page version to get. Defaults to the latest version.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    * @returns The requested WikiPage object.
    */
+  getWikiPage(
+    subredditName: string,
+    page: string,
+    options?: GetWikiPageOptions | undefined
+  ): Promise<WikiPage>;
   async getWikiPage(
     subredditName: string,
     page: string,
-    revisionId?: WikiPageRevisionId | undefined
+    revisionIdOrOptions?: WikiPageRevisionId | GetWikiPageOptions | undefined
   ): Promise<WikiPage> {
-    return WikiPage.getPage(subredditName, page, revisionId);
+    const options =
+      typeof revisionIdOrOptions === 'string'
+        ? { revisionId: revisionIdOrOptions }
+        : revisionIdOrOptions;
+    return WikiPage.getPage(subredditName, page, options);
   }
 
   /**
    * Get the wiki pages for a subreddit.
    *
    * @param subredditName - The name of the subreddit to get the wiki pages from.
+   * @param options - Options for the request.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    * @returns A list of the wiki page names for the subreddit.
    */
-  async getWikiPages(subredditName: string): Promise<string[]> {
-    return WikiPage.getPages(subredditName);
+  async getWikiPages(subredditName: string, options?: WikiVersionOptions): Promise<string[]> {
+    return WikiPage.getPages(subredditName, options);
   }
 
   /**
@@ -1563,6 +1602,7 @@ export class RedditClient {
    * @param options.page - The name of the wiki page to create.
    * @param options.content - The Markdown content of the wiki page.
    * @param options.reason - The reason for creating the wiki page.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    * @returns - The created WikiPage object.
    */
   async createWikiPage(options: CreateWikiPageOptions): Promise<WikiPage> {
@@ -1577,6 +1617,7 @@ export class RedditClient {
    * @param options.page - The name of the wiki page to update.
    * @param options.content - The Markdown content of the wiki page.
    * @param options.reason - The reason for updating the wiki page.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    * @returns The updated WikiPage object.
    */
   async updateWikiPage(options: UpdateWikiPageOptions): Promise<WikiPage> {
@@ -1591,6 +1632,7 @@ export class RedditClient {
    * @param options.page - The name of the wiki page to get the revisions for.
    * @param options.limit - The maximum number of revisions to return.
    * @param options.after - The ID of the revision to start after.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    * @returns A Listing of WikiPageRevision objects.
    */
   getWikiPageRevisions(options: GetPageRevisionsOptions): Listing<WikiPageRevision> {
@@ -1603,9 +1645,16 @@ export class RedditClient {
    * @param subredditName - The name of the subreddit the wiki is in.
    * @param page - The name of the wiki page to revert.
    * @param revisionId - The ID of the revision to revert to.
+   * @param options - Options for the request.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    */
-  async revertWikiPage(subredditName: string, page: string, revisionId: string): Promise<void> {
-    return WikiPage.revertPage(subredditName, page, revisionId);
+  async revertWikiPage(
+    subredditName: string,
+    page: string,
+    revisionId: string,
+    options?: WikiVersionOptions
+  ): Promise<void> {
+    return WikiPage.revertPage(subredditName, page, revisionId, options);
   }
 
   /**
@@ -1613,10 +1662,16 @@ export class RedditClient {
    *
    * @param subredditName - The name of the subreddit the wiki is in.
    * @param page - The name of the wiki page to get the settings for.
+   * @param options - Options for the request.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    * @returns A WikiPageSettings object.
    */
-  async getWikiPageSettings(subredditName: string, page: string): Promise<WikiPageSettings> {
-    return WikiPage.getPageSettings(subredditName, page);
+  async getWikiPageSettings(
+    subredditName: string,
+    page: string,
+    options?: WikiVersionOptions
+  ): Promise<WikiPageSettings> {
+    return WikiPage.getPageSettings(subredditName, page, options);
   }
 
   /**
@@ -1627,6 +1682,7 @@ export class RedditClient {
    * @param options.page - The name of the wiki page to update the settings for.
    * @param options.listed - Whether the wiki page should be listed in the wiki index.
    * @param options.permLevel - The permission level required to edit the wiki page.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    * @returns A WikiPageSettings object.
    */
   async updateWikiPageSettings(options: UpdatePageSettingsOptions): Promise<WikiPageSettings> {
@@ -1639,9 +1695,16 @@ export class RedditClient {
    * @param subredditName - The name of the subreddit the wiki is in.
    * @param page - The name of the wiki page to add the editor to.
    * @param username - The username of the user to add as an editor.
+   * @param options - Options for the request.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    */
-  async addEditorToWikiPage(subredditName: string, page: string, username: string): Promise<void> {
-    return WikiPage.addEditor(subredditName, page, username);
+  async addEditorToWikiPage(
+    subredditName: string,
+    page: string,
+    username: string,
+    options?: WikiVersionOptions
+  ): Promise<void> {
+    return WikiPage.addEditor(subredditName, page, username, options);
   }
 
   /**
@@ -1650,13 +1713,16 @@ export class RedditClient {
    * @param subredditName - The name of the subreddit the wiki is in.
    * @param page - The name of the wiki page to remove the editor from.
    * @param username - The username of the user to remove as an editor.
+   * @param options - Options for the request.
+   * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    */
   async removeEditorFromWikiPage(
     subredditName: string,
     page: string,
-    username: string
+    username: string,
+    options?: WikiVersionOptions
   ): Promise<void> {
-    return WikiPage.removeEditor(subredditName, page, username);
+    return WikiPage.removeEditor(subredditName, page, username, options);
   }
 
   /**

@@ -3,18 +3,35 @@ import {
   type WikiPageRevision as WikiPageRevisionProto,
   type WikiPageRevisionListing,
   type WikiPageSettings_Data,
-  WikiVersion,
+  WikiVersion as WikiVersionProto,
 } from '@devvit/protos/json/devvit/plugin/redditapi/wiki/wiki_msg.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
+import { isT2, T2 } from '@devvit/shared-types/tid.js';
 
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { getRedditApiPlugins } from '../plugin.js';
 import { Listing, type ListingFetchOptions } from './Listing.js';
 import { User } from './User.js';
 
-export type CreateWikiPageOptions = {
+/**
+ * WikiVersion represents different wikis that an app can manage. The wiki versions operate independently: editing a page in one version will not
+ * edit the same page in the other version.
+ *
+ * v1 is the wiki seen in old reddit. Enabled in all subreddits by default. The `'config/'` pages are only available in v1, and attempting to access those in v2 will
+ * throw an error.
+ *
+ * v2 is the wiki seen in redit.com and the mobile apps. Call reddit.isWikiV2Enabled(subreddit) to check if a subreddit supports V2 wikis.
+ */
+export type WikiVersion = 'v1' | 'v2';
+
+export type WikiVersionOptions = {
+  /** Which wiki version to target. Defaults to `'v1'`. */
+  wikiVersion?: WikiVersion;
+};
+
+export type CreateWikiPageOptions = WikiVersionOptions & {
   /** The name of the subreddit to create the page in. */
   subredditName: string;
   /** The name of the page to create. */
@@ -25,7 +42,7 @@ export type CreateWikiPageOptions = {
   reason?: string;
 };
 
-export type UpdateWikiPageOptions = {
+export type UpdateWikiPageOptions = WikiVersionOptions & {
   /** The name of the subreddit the page is in. */
   subredditName: string;
   /** The name of the page to update. */
@@ -36,12 +53,13 @@ export type UpdateWikiPageOptions = {
   reason?: string | undefined;
 };
 
-export type GetPageRevisionsOptions = Omit<ListingFetchOptions, 'more'> & {
-  /** The name of the subreddit the page is in. */
-  subredditName: string;
-  /** The name of the page to get revisions for. */
-  page?: string;
-};
+export type GetPageRevisionsOptions = Omit<ListingFetchOptions, 'more'> &
+  WikiVersionOptions & {
+    /** The name of the subreddit the page is in. */
+    subredditName: string;
+    /** The name of the page to get revisions for. */
+    page?: string;
+  };
 
 export enum WikiPagePermissionLevel {
   /** Use subreddit wiki permissions */
@@ -52,7 +70,7 @@ export enum WikiPagePermissionLevel {
   MODS_ONLY = 2,
 }
 
-export type UpdatePageSettingsOptions = {
+export type UpdatePageSettingsOptions = WikiVersionOptions & {
   /** The name of the subreddit the page is in. */
   subredditName: string;
   /** The name of the page to update settings for. */
@@ -66,6 +84,11 @@ export type UpdatePageSettingsOptions = {
 /** The revision ID is a v4 UUID */
 export type WikiPageRevisionId = `${string}-${string}-${string}-${string}-${string}`;
 
+export type GetWikiPageOptions = WikiVersionOptions & {
+  /** The revision ID of the wiki page version to retrieve. */
+  revisionId?: WikiPageRevisionId;
+};
+
 /**
  * Listing endpoints expect the fullname of an object for the `before` and `after` parameters. Usually
  * this is a `tX_` ID, but the fullname of a wiki page revision is its ID prefixed with `WikiPageRevision_`.
@@ -78,27 +101,37 @@ const WikiPageRevisionPrefix = 'WikiPageRevision_';
 export class WikiPage {
   #name: string;
   #subredditName: string;
+  #wikiVersion: WikiVersion;
   #content: string;
   #contentHtml: string;
   #revisionId: WikiPageRevisionId;
   #revisionDate: Date;
   #revisionReason: string;
+  #revisionAuthorId: T2 | undefined;
   #revisionAuthor: User | undefined;
 
   /**
    * @internal
    */
-  constructor(name: string, subredditName: string, data: WikiPageProto) {
+  constructor(
+    name: string,
+    subredditName: string,
+    data: WikiPageProto,
+    wikiVersion: WikiVersion = 'v1'
+  ) {
     makeGettersEnumerable(this);
 
     this.#name = name;
     this.#subredditName = subredditName;
+    this.#wikiVersion = wikiVersion;
     this.#content = data.contentMd;
     this.#contentHtml = data.contentHtml;
     this.#revisionId = data.revisionId as WikiPageRevisionId;
     this.#revisionDate = new Date(data.revisionDate * 1000); // data.revisionDate is represented in seconds, so multiply by 1000 to get milliseconds
     this.#revisionReason = data.reason ?? '';
-    this.#revisionAuthor = data.revisionBy?.data ? new User(data.revisionBy.data) : undefined;
+    this.#revisionAuthorId = wikiUserId(data.revisionBy?.data?.id);
+    this.#revisionAuthor =
+      wikiVersion === 'v1' && data.revisionBy?.data ? new User(data.revisionBy.data) : undefined;
   }
 
   /** The name of the page. */
@@ -109,6 +142,11 @@ export class WikiPage {
   /** The name of the subreddit the page is in. */
   get subredditName(): string {
     return this.#subredditName;
+  }
+
+  /** The wiki version this page belongs to. */
+  get wikiVersion(): WikiVersion {
+    return this.#wikiVersion;
   }
 
   /** The Markdown content of the page. */
@@ -136,7 +174,16 @@ export class WikiPage {
     return this.#revisionReason;
   }
 
-  /** The author of this revision. */
+  /** The ID of the author of this revision. */
+  get revisionAuthorId(): T2 | undefined {
+    return this.#revisionAuthorId;
+  }
+
+  /**
+   * The author of this revision.
+   *
+   * @deprecated Use revisionAuthorId instead.
+   */
   get revisionAuthor(): User | undefined {
     return this.#revisionAuthor;
   }
@@ -151,6 +198,8 @@ export class WikiPage {
     | 'revisionDate'
     | 'revisionReason'
   > & {
+    revisionAuthorId: T2 | undefined;
+    /** @deprecated Use revisionAuthorId instead. */
     revisionAuthor: ReturnType<User['toJSON']> | undefined;
   } {
     return {
@@ -161,6 +210,7 @@ export class WikiPage {
       revisionId: this.#revisionId,
       revisionDate: this.#revisionDate,
       revisionReason: this.#revisionReason,
+      revisionAuthorId: this.#revisionAuthorId,
       revisionAuthor: this.#revisionAuthor?.toJSON(),
     };
   }
@@ -172,81 +222,108 @@ export class WikiPage {
       page: this.#name,
       content,
       reason,
+      wikiVersion: this.#wikiVersion,
     });
   }
 
   /** Get the revisions for this page. */
   async getRevisions(
-    options: Omit<GetPageRevisionsOptions, 'subredditName' | 'page'>
+    options: Omit<GetPageRevisionsOptions, 'subredditName' | 'page' | 'wikiVersion'>
   ): Promise<Listing<WikiPageRevision>> {
     return WikiPage.getPageRevisions({
       subredditName: this.#subredditName,
       page: this.#name,
+      wikiVersion: this.#wikiVersion,
       ...options,
     });
   }
 
   /** Revert this page to a previous revision. */
   async revertTo(revisionId: WikiPageRevisionId): Promise<void> {
-    return WikiPage.revertPage(this.#subredditName, this.#name, revisionId);
+    return WikiPage.revertPage(this.#subredditName, this.#name, revisionId, {
+      wikiVersion: this.#wikiVersion,
+    });
   }
 
   /** Get the settings for this page. */
   async getSettings(): Promise<WikiPageSettings> {
-    return WikiPage.getPageSettings(this.#subredditName, this.#name);
+    return WikiPage.getPageSettings(this.#subredditName, this.#name, {
+      wikiVersion: this.#wikiVersion,
+    });
   }
 
   /** Update the settings for this page. */
   async updateSettings(
-    options: Omit<UpdatePageSettingsOptions, 'subredditName' | 'page'>
+    options: Omit<UpdatePageSettingsOptions, 'subredditName' | 'page' | 'wikiVersion'>
   ): Promise<WikiPageSettings> {
     return WikiPage.updatePageSettings({
       subredditName: this.#subredditName,
       page: this.#name,
       listed: options.listed,
       permLevel: options.permLevel,
+      wikiVersion: this.#wikiVersion,
     });
   }
 
   /** Add an editor to this page. */
   async addEditor(username: string): Promise<void> {
-    return WikiPage.addEditor(this.#subredditName, this.#name, username);
+    return WikiPage.addEditor(this.#subredditName, this.#name, username, {
+      wikiVersion: this.#wikiVersion,
+    });
   }
 
   /** Remove an editor from this page. */
   async removeEditor(username: string): Promise<void> {
-    return WikiPage.removeEditor(this.#subredditName, this.#name, username);
+    return WikiPage.removeEditor(this.#subredditName, this.#name, username, {
+      wikiVersion: this.#wikiVersion,
+    });
+  }
+
+  /** @internal */
+  static async isVersionEnabled(subredditName: string, wikiVersion: WikiVersion): Promise<boolean> {
+    const response = await getRedditApiPlugins().Wiki.IsWikiVersionEnabledInSubreddit(
+      {
+        subreddit: subredditName,
+        wikiVersion: wikiVersionToProto(wikiVersion),
+      },
+      this.#metadata
+    );
+    return response.enabled;
   }
 
   /** @internal */
   static async getPage(
     subredditName: string,
     page: string,
-    revisionId: WikiPageRevisionId | undefined
+    options: GetWikiPageOptions = {}
   ): Promise<WikiPage> {
+    const wikiVersion = options.wikiVersion ?? 'v1';
     const client = getRedditApiPlugins().Wiki;
     const response = await client.GetWikiPage(
       {
         subreddit: subredditName,
         page,
-        revisionId,
-        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+        revisionId: options.revisionId,
+        wikiVersion: wikiVersionToProto(wikiVersion),
       },
       this.#metadata
     );
 
     assertNonNull(response.data, 'Failed to get wiki page');
 
-    return new WikiPage(page, subredditName, response.data);
+    return new WikiPage(page, subredditName, response.data, wikiVersion);
   }
 
   /** @internal */
-  static async getPages(subredditName: string): Promise<string[]> {
+  static async getPages(
+    subredditName: string,
+    options: WikiVersionOptions = {}
+  ): Promise<string[]> {
     const client = getRedditApiPlugins().Wiki;
     const response = await client.GetWikiPages(
       {
         subreddit: subredditName,
-        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+        wikiVersion: wikiVersionToProto(options.wikiVersion ?? 'v1'),
       },
       this.#metadata
     );
@@ -261,6 +338,7 @@ export class WikiPage {
 
   /** @internal */
   static async updatePage(options: UpdateWikiPageOptions): Promise<WikiPage> {
+    const wikiVersion = options.wikiVersion ?? 'v1';
     const client = getRedditApiPlugins().Wiki;
     await client.EditWikiPage(
       {
@@ -268,16 +346,17 @@ export class WikiPage {
         page: options.page,
         content: options.content,
         reason: options.reason ?? '',
-        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+        wikiVersion: wikiVersionToProto(wikiVersion),
       },
       this.#metadata
     );
 
-    return WikiPage.getPage(options.subredditName, options.page, undefined);
+    return WikiPage.getPage(options.subredditName, options.page, { wikiVersion });
   }
 
   /** @internal */
   static getPageRevisions(options: GetPageRevisionsOptions): Listing<WikiPageRevision> {
+    const wikiVersion = options.wikiVersion ?? 'v1';
     const client = getRedditApiPlugins().Wiki;
     const after = ensureWikiRevisionCursor(options.after);
     const before = ensureWikiRevisionCursor(options.before);
@@ -296,18 +375,23 @@ export class WikiPage {
             limit: fetchOptions.limit,
             after: fetchOptions.after,
             before: fetchOptions.before,
-            wikiVersion: WikiVersion.WIKI_VERSION_V1,
+            wikiVersion: wikiVersionToProto(wikiVersion),
           },
           this.#metadata
         );
 
-        return wikiPageRevisionListingProtoToWikiPageRevision(response);
+        return wikiPageRevisionListingProtoToWikiPageRevision(response, wikiVersion);
       },
     });
   }
 
   /** @internal */
-  static async revertPage(subredditName: string, page: string, revisionId: string): Promise<void> {
+  static async revertPage(
+    subredditName: string,
+    page: string,
+    revisionId: string,
+    options: WikiVersionOptions = {}
+  ): Promise<void> {
     const client = getRedditApiPlugins().Wiki;
 
     await client.RevertWikiPage(
@@ -315,31 +399,37 @@ export class WikiPage {
         subreddit: subredditName,
         page,
         revision: revisionId,
-        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+        wikiVersion: wikiVersionToProto(options.wikiVersion ?? 'v1'),
       },
       this.#metadata
     );
   }
 
   /** @internal */
-  static async getPageSettings(subredditName: string, page: string): Promise<WikiPageSettings> {
+  static async getPageSettings(
+    subredditName: string,
+    page: string,
+    options: WikiVersionOptions = {}
+  ): Promise<WikiPageSettings> {
+    const wikiVersion = options.wikiVersion ?? 'v1';
     const client = getRedditApiPlugins().Wiki;
     const response = await client.GetWikiPageSettings(
       {
         subreddit: subredditName,
         page,
-        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+        wikiVersion: wikiVersionToProto(wikiVersion),
       },
       this.#metadata
     );
 
     assertNonNull(response.data, 'Failed to get wiki page settings');
 
-    return new WikiPageSettings(response.data);
+    return new WikiPageSettings(response.data, wikiVersion);
   }
 
   /** @internal */
   static async updatePageSettings(options: UpdatePageSettingsOptions): Promise<WikiPageSettings> {
+    const wikiVersion = options.wikiVersion ?? 'v1';
     const client = getRedditApiPlugins().Wiki;
     const response = await client.UpdateWikiPageSettings(
       {
@@ -347,18 +437,23 @@ export class WikiPage {
         page: options.page,
         listed: options.listed ? 'on' : '',
         permlevel: options.permLevel,
-        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+        wikiVersion: wikiVersionToProto(wikiVersion),
       },
       this.#metadata
     );
 
     assertNonNull(response.data, 'Failed to update wiki page settings');
 
-    return new WikiPageSettings(response.data);
+    return new WikiPageSettings(response.data, wikiVersion);
   }
 
   /** @internal */
-  static async addEditor(subredditName: string, page: string, username: string): Promise<void> {
+  static async addEditor(
+    subredditName: string,
+    page: string,
+    username: string,
+    options: WikiVersionOptions = {}
+  ): Promise<void> {
     const client = getRedditApiPlugins().Wiki;
     await client.AllowEditor(
       {
@@ -366,14 +461,19 @@ export class WikiPage {
         subreddit: subredditName,
         page,
         username,
-        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+        wikiVersion: wikiVersionToProto(options.wikiVersion ?? 'v1'),
       },
       this.#metadata
     );
   }
 
   /** @internal */
-  static async removeEditor(subredditName: string, page: string, username: string): Promise<void> {
+  static async removeEditor(
+    subredditName: string,
+    page: string,
+    username: string,
+    options: WikiVersionOptions = {}
+  ): Promise<void> {
     const client = getRedditApiPlugins().Wiki;
     await client.AllowEditor(
       {
@@ -381,7 +481,7 @@ export class WikiPage {
         subreddit: subredditName,
         page,
         username,
-        wikiVersion: WikiVersion.WIKI_VERSION_V1,
+        wikiVersion: wikiVersionToProto(options.wikiVersion ?? 'v1'),
       },
       this.#metadata
     );
@@ -396,17 +496,21 @@ export class WikiPageRevision {
   #id: string;
   #page: string;
   #date: Date;
-  #author: User;
+  #authorId: T2 | undefined;
+  #author!: User;
   #reason: string;
   #hidden: boolean;
 
-  constructor(data: WikiPageRevisionProto) {
+  constructor(data: WikiPageRevisionProto, wikiVersion: WikiVersion = 'v1') {
     this.#id = data.id;
     this.#page = data.page;
     this.#date = new Date(data.timestamp);
 
     assertNonNull(data.author?.data, 'Wiki page revision author details are missing');
-    this.#author = new User(data.author.data);
+    this.#authorId = wikiUserId(data.author?.data.id);
+    if (wikiVersion === 'v1') {
+      this.#author = new User(data.author.data);
+    }
 
     this.#reason = data.reason ?? '';
     this.#hidden = data.revisionHidden ?? false;
@@ -424,6 +528,16 @@ export class WikiPageRevision {
     return this.#date;
   }
 
+  /** The ID of the author of this revision. */
+  get authorId(): T2 | undefined {
+    return this.#authorId;
+  }
+
+  /**
+   * The author of this revision.
+   *
+   * @deprecated Use authorId instead.
+   */
   get author(): User {
     return this.#author;
   }
@@ -437,13 +551,16 @@ export class WikiPageRevision {
   }
 
   toJSON(): Pick<WikiPageRevision, 'id' | 'page' | 'date' | 'reason' | 'hidden'> & {
-    author: ReturnType<User['toJSON']>;
+    authorId: T2 | undefined;
+    /** @deprecated Use authorId instead. */
+    author: ReturnType<User['toJSON']> | undefined;
   } {
     return {
       id: this.#id,
       page: this.#page,
       date: this.#date,
-      author: this.#author.toJSON(),
+      authorId: this.#authorId,
+      author: this.#author?.toJSON(),
       reason: this.#reason,
       hidden: this.#hidden,
     };
@@ -453,15 +570,22 @@ export class WikiPageRevision {
 export class WikiPageSettings {
   #listed: boolean;
   #permLevel: WikiPagePermissionLevel;
+  #editorIds: T2[];
   #editors: User[];
 
-  constructor(data: WikiPageSettings_Data) {
+  constructor(data: WikiPageSettings_Data, wikiVersion: WikiVersion = 'v1') {
     this.#listed = data.listed;
     this.#permLevel = data.permLevel;
-    this.#editors = data.editors.map((editor) => {
-      assertNonNull(editor.data, 'Wiki page editor details are missing');
-      return new User(editor.data);
-    });
+    this.#editorIds = data.editors
+      .map((editor) => wikiUserId(editor.data?.id))
+      .filter((editorId): editorId is T2 => editorId !== undefined);
+    this.#editors =
+      wikiVersion === 'v1'
+        ? data.editors.map((editor) => {
+            assertNonNull(editor.data, 'Wiki page editor details are missing');
+            return new User(editor.data);
+          })
+        : [];
   }
 
   get listed(): boolean {
@@ -472,22 +596,34 @@ export class WikiPageSettings {
     return this.#permLevel;
   }
 
+  /** The IDs of users who may edit this page. */
+  get editorIds(): T2[] {
+    return this.#editorIds;
+  }
+
+  /** @deprecated Use editorIds instead. */
   get editors(): User[] {
     return this.#editors;
   }
 
   toJSON(): Pick<WikiPageSettings, 'listed' | 'permLevel'> & {
+    editorIds: T2[];
+    /** @deprecated Use editorIds instead. */
     editors: ReturnType<User['toJSON']>[];
   } {
     return {
       listed: this.#listed,
       permLevel: this.#permLevel,
+      editorIds: this.#editorIds,
       editors: this.#editors.map((editor) => editor.toJSON()),
     };
   }
 }
 
-function wikiPageRevisionListingProtoToWikiPageRevision(listingProto: WikiPageRevisionListing): {
+function wikiPageRevisionListingProtoToWikiPageRevision(
+  listingProto: WikiPageRevisionListing,
+  wikiVersion: WikiVersion
+): {
   children: WikiPageRevision[];
   before: string | undefined;
   after: string | undefined;
@@ -495,7 +631,7 @@ function wikiPageRevisionListingProtoToWikiPageRevision(listingProto: WikiPageRe
   assertNonNull(listingProto.data?.children, 'Wiki page revision listing is missing children');
 
   const children = listingProto.data.children.map((child) => {
-    return new WikiPageRevision(child);
+    return new WikiPageRevision(child, wikiVersion);
   });
 
   return {
@@ -503,6 +639,17 @@ function wikiPageRevisionListingProtoToWikiPageRevision(listingProto: WikiPageRe
     before: listingProto.data.before,
     after: listingProto.data.after,
   };
+}
+
+function wikiVersionToProto(wikiVersion: WikiVersion): WikiVersionProto {
+  return wikiVersion === 'v2' ? WikiVersionProto.WIKI_VERSION_V2 : WikiVersionProto.WIKI_VERSION_V1;
+}
+
+function wikiUserId(userId: string | undefined): T2 | undefined {
+  if (!userId) {
+    return undefined;
+  }
+  return T2(isT2(userId) ? userId : `t2_${userId}`);
 }
 
 /**
