@@ -48,6 +48,18 @@ async function addDirectoryToZip(
   ignoredPaths: ignore.Ignore,
   relativePath = ''
 ): Promise<void> {
+  // Check for nested .gitignore
+  const nestedGitignorePath = path.join(dir, '.gitignore');
+  try {
+    const nestedGitignoreContent = await fsp.readFile(nestedGitignorePath, 'utf-8');
+    const nestedGitignorePaths = nestedGitignoreContent
+      .split(/\r?\n/)
+      .map((line) => line.trim());
+    ignoredPaths = ignore().add(ignoredPaths).add(nestedGitignorePaths);
+  } catch {
+    // no-op
+  }
+
   const entries = await fsp.readdir(dir, { withFileTypes: true });
 
   // Process entries in parallel
