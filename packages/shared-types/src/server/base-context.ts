@@ -39,6 +39,8 @@ export function BaseContextFromMetadata(
     // TODO - Use the RequestContext to extract other metadata like postData,
     // userId, username, etc.
     signedRequestContext = decodeSignedRequestContext(meta[Header.Context]?.values[0]);
+    postId = signedRequestContext?.post?.id || postId;
+    commentId = signedRequestContext?.comment?.id || commentId;
   } catch {
     //
   }
