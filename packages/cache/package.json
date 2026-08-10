@@ -1,6 +1,6 @@
 {
   "name": "@devvit/cache",
-  "version": "0.13.11",
+  "version": "0.14.0",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -30,12 +30,12 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/redis": "0.13.11",
-    "@devvit/server": "0.13.11",
-    "@devvit/shared-types": "0.13.11"
+    "@devvit/redis": "0.14.0",
+    "@devvit/server": "0.14.0",
+    "@devvit/shared-types": "0.14.0"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.13.11",
+    "@devvit/tsconfig": "0.14.0",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
     "vitest": "4.1.0"
