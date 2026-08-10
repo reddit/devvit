@@ -19,7 +19,7 @@
     "@devvit/public-api": "0.13.11",
     "@devvit/web": "0.13.11",
     "@types/express-serve-static-core": "5.1.0",
-    "devvit": "0.13.12-dev",
+    "devvit": "0.14.0-dev",
     "express": "5.1.0"
   },
   "devDependencies": {

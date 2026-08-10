@@ -85,7 +85,7 @@
     "@types/jsdom": "21.1.7",
     "@types/mime-types": "3.0.1",
     "@types/mustache": "4.2.2",
-    "@types/node": "20.14.12",
+    "@types/node": "24.13.3",
     "@types/semver": "7.5.8",
     "concurrently": "7.5.0",
     "eslint": "9.11.1",

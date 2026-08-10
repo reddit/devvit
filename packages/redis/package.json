@@ -41,7 +41,7 @@
     "@devvit/server": "0.13.11",
     "@devvit/tsconfig": "0.13.11",
     "@types/ioredis-mock": "8.2.8",
-    "@types/node": "20.14.12",
+    "@types/node": "24.13.3",
     "eslint": "9.11.1",
     "ioredis": "5.7.0",
     "ioredis-mock": "8.13.1",

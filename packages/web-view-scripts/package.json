@@ -43,7 +43,7 @@
     "@ampproject/filesize": "4.3.0",
     "@devvit/tsconfig": "0.13.11",
     "@types/jsdom": "21.1.7",
-    "@types/node": "20.14.12",
+    "@types/node": "24.13.3",
     "esbuild": "0.25.9",
     "eslint": "9.11.1",
     "jsdom": "24.1.0",
