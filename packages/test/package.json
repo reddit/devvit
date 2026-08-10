@@ -45,8 +45,9 @@
     "@devvit/server": "0.13.11",
     "@devvit/settings": "0.13.11",
     "@devvit/shared-types": "0.13.11",
+    "@types/ioredis-mock": "8.2.8",
     "ioredis": "5.7.0",
-    "redis-memory-server": "0.14.1"
+    "ioredis-mock": "8.13.1"
   },
   "peerDependencies": {
     "vitest": "*"

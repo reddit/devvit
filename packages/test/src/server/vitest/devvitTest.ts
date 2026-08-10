@@ -36,8 +36,7 @@ import {
   MOCK_HEADERS as headersMock,
 } from '@devvit/shared-types/test/index.js';
 import type { T2, T5 } from '@devvit/shared-types/tid.js';
-import { Redis } from 'ioredis';
-import { RedisMemoryServer } from 'redis-memory-server';
+import Redis from 'ioredis-mock';
 import type { TestAPI, TestFunction } from 'vitest';
 import { test as baseTest, vi } from 'vitest';
 
@@ -46,10 +45,7 @@ import { installDevvitInterceptors, runWithTestContext, type TestContext } from 
 
 installDevvitInterceptors();
 
-const redisServer = new RedisMemoryServer();
-const host = await redisServer.getHost();
-const port = await redisServer.getPort();
-const sharedRedisConn = new Redis({ host, port });
+const sharedRedisConn = new Redis();
 
 export type DevvitFixtures = {
   /**

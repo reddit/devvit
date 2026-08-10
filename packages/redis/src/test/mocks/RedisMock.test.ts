@@ -2,27 +2,22 @@ import {
   BitfieldOverflowBehavior,
   RedisKeyScope,
 } from '@devvit/protos/json/devvit/plugin/redis/redisapi.js';
-import { Redis } from 'ioredis';
-import { RedisMemoryServer } from 'redis-memory-server';
+import type { Redis as RedisClient } from 'ioredis';
+import Redis from 'ioredis-mock';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { RedisMock } from './RedisMock.js';
 
 describe('RedisMock', () => {
-  let redisServer: RedisMemoryServer;
-  let conn: Redis;
+  let conn: RedisClient;
   let redis: RedisMock;
 
   beforeAll(async () => {
-    redisServer = new RedisMemoryServer();
-    const host = await redisServer.getHost();
-    const port = await redisServer.getPort();
-    conn = new Redis({ host, port });
+    conn = new Redis();
   });
 
   afterAll(async () => {
     conn.disconnect();
-    await redisServer.stop();
   });
 
   beforeEach(async () => {
@@ -726,6 +721,51 @@ describe('RedisMock', () => {
         ],
       });
       expect(res.results).toEqual([0, -128, -128, 127, null]);
+    });
+
+    it('should apply scaled offsets and overflow behavior to set operations', async () => {
+      const res = await redis.plugin.Bitfield({
+        key: 'bf-set-overflow',
+        commands: [
+          { set: { encoding: 'u4', offset: '#1', value: '15' } },
+          { get: { encoding: 'u4', offset: '#1' } },
+          {
+            overflow: { behavior: BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_SAT },
+          },
+          { set: { encoding: 'i4', offset: '#0', value: '20' } },
+          { get: { encoding: 'i4', offset: '#0' } },
+          {
+            overflow: { behavior: BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_FAIL },
+          },
+          { set: { encoding: 'i4', offset: '#0', value: '20' } },
+          { get: { encoding: 'i4', offset: '#0' } },
+        ],
+      });
+      expect(res.results).toEqual([0, 15, 0, 7, null, 7]);
+    });
+
+    it('should read and write bitfields across byte boundaries', async () => {
+      const res = await redis.plugin.Bitfield({
+        key: 'bf-unaligned',
+        commands: [
+          { set: { encoding: 'u5', offset: '7', value: '23' } },
+          { get: { encoding: 'u5', offset: '7' } },
+        ],
+      });
+      expect(res.results).toEqual([0, 23]);
+    });
+
+    it('should preserve an existing expiration when mutating a bitfield', async () => {
+      await conn.set('bf-expiring', Buffer.from([0]), 'PX', 30_000);
+      const expiresAt = await conn.pexpiretime('bf-expiring');
+
+      const res = await redis.plugin.Bitfield({
+        key: 'bf-expiring',
+        commands: [{ set: { encoding: 'u4', offset: '0', value: '15' } }],
+      });
+
+      expect(res.results).toEqual([0]);
+      expect(await conn.pexpiretime('bf-expiring')).toBe(expiresAt);
     });
   });
 

@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
+import { setImmediate as scheduleImmediate } from 'node:timers';
 
 import {
+  BitfieldOverflowBehavior,
   type BitfieldRequest,
   type BitfieldResponse,
   type ExistsResponse,
@@ -55,9 +57,11 @@ import type { RedisAPI } from '@devvit/protos/types/devvit/plugin/redis/redisapi
 // eslint-disable-next-line no-restricted-imports
 import type { BytesValue } from '@devvit/protos/types/google/protobuf/wrappers.js';
 import type { PluginMock } from '@devvit/shared-types/test/index.js';
-import { Redis } from 'ioredis';
+import type { Redis } from 'ioredis';
 
 type QueuedCommand = () => Promise<TransactionResponse>;
+
+const waitForRedisTurn = (): Promise<void> => new Promise((resolve) => scheduleImmediate(resolve));
 
 type TransactionState = {
   id: string;
@@ -120,6 +124,96 @@ const pairsToMembers = (vals: string[]): ZMemberEntry[] => {
 const lexValsToMembers = (vals: string[]): ZMemberEntry[] =>
   vals.map((member) => ({ member, score: 0 }));
 
+type ParsedBitfieldEncoding = {
+  signed: boolean;
+  width: number;
+};
+
+const parseBitfieldEncoding = (encoding: string): ParsedBitfieldEncoding => {
+  const match = /^([iu])(\d+)$/.exec(encoding);
+  if (!match) throw new Error(`invalid bitfield encoding ${encoding}`);
+
+  const signed = match[1] === 'i';
+  const width = Number(match[2]);
+  const maxWidth = signed ? 64 : 63;
+  if (!Number.isInteger(width) || width < 1 || width > maxWidth) {
+    throw new Error(`invalid bitfield encoding ${encoding}`);
+  }
+  return { signed, width };
+};
+
+const parseBitfieldOffset = (offset: string, width: number): number => {
+  const usesEncodingWidth = offset.startsWith('#');
+  const parsedOffset = Number(usesEncodingWidth ? offset.slice(1) : offset);
+  const bitOffset = parsedOffset * (usesEncodingWidth ? width : 1);
+  if (!Number.isSafeInteger(bitOffset) || bitOffset < 0) {
+    throw new Error(`invalid bitfield offset ${offset}`);
+  }
+  return bitOffset;
+};
+
+const readBitfieldValue = (
+  data: Buffer,
+  bitOffset: number,
+  { signed, width }: ParsedBitfieldEncoding
+): bigint => {
+  let value = 0n;
+  for (let index = 0; index < width; index++) {
+    const absoluteBit = bitOffset + index;
+    const byte = data[Math.floor(absoluteBit / 8)] ?? 0;
+    const bit = (byte >> (7 - (absoluteBit % 8))) & 1;
+    value = (value << 1n) | BigInt(bit);
+  }
+
+  const modulus = 1n << BigInt(width);
+  const signBit = 1n << BigInt(width - 1);
+  return signed && value >= signBit ? value - modulus : value;
+};
+
+const writeBitfieldValue = (
+  data: Buffer,
+  bitOffset: number,
+  width: number,
+  value: bigint
+): Buffer => {
+  const requiredBytes = Math.ceil((bitOffset + width) / 8);
+  const updatedData = Buffer.alloc(Math.max(requiredBytes, data.length));
+  data.copy(updatedData);
+
+  const modulus = 1n << BigInt(width);
+  const encodedValue = ((value % modulus) + modulus) % modulus;
+  for (let index = 0; index < width; index++) {
+    const absoluteBit = bitOffset + index;
+    const byteIndex = Math.floor(absoluteBit / 8);
+    const bitMask = 1 << (7 - (absoluteBit % 8));
+    const sourceBit = Number((encodedValue >> BigInt(width - index - 1)) & 1n);
+    const byte = updatedData[byteIndex] ?? 0;
+    updatedData[byteIndex] = sourceBit === 1 ? byte | bitMask : byte & ~bitMask;
+  }
+  return updatedData;
+};
+
+const applyBitfieldOverflow = (
+  value: bigint,
+  encoding: ParsedBitfieldEncoding,
+  behavior: BitfieldOverflowBehavior
+): bigint | null => {
+  const width = BigInt(encoding.width);
+  const modulus = 1n << width;
+  const min = encoding.signed ? -(1n << (width - 1n)) : 0n;
+  const max = encoding.signed ? (1n << (width - 1n)) - 1n : modulus - 1n;
+  if (value >= min && value <= max) return value;
+
+  if (behavior === BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_FAIL) return null;
+  if (behavior === BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_SAT) {
+    return value < min ? min : max;
+  }
+
+  const wrapped = ((value % modulus) + modulus) % modulus;
+  const signBit = 1n << (width - 1n);
+  return encoding.signed && wrapped >= signBit ? wrapped - modulus : wrapped;
+};
+
 type RedisStore = {
   transactions: Map<string, TransactionState>;
   conn: Redis;
@@ -133,7 +227,7 @@ type RedisStore = {
 
 /**
  * Mock implementation of the Redis API for testing purposes.
- * Uses an in-memory Redis server to simulate actual Redis behavior.
+ * Uses an in-memory Redis-compatible client to simulate Redis behavior.
  */
 export class RedisPluginMock implements RedisAPI {
   private readonly _store: RedisStore;
@@ -246,7 +340,7 @@ export class RedisPluginMock implements RedisAPI {
     const operation = async (): Promise<Int64Value> => {
       // Redis 3.x only supports `HSET key field value` (single pair).
       // Redis 4+ supports variadic `HSET key f1 v1 f2 v2 ...`, which ioredis uses when given an object.
-      // To be compatible across versions (and OSes in redis-memory-server), issue one HSET per field and sum.
+      // To be compatible across Redis versions, issue one HSET per field and sum.
       const map = new Map<string, string>();
       for (const { field, value } of request.fv) map.set(field, value);
 
@@ -570,11 +664,10 @@ export class RedisPluginMock implements RedisAPI {
   }
   async ZRemRangeByLex(request: ZRemRangeByLexRequest): Promise<Int64Value> {
     const operation = async (): Promise<Int64Value> => {
-      const v = await this._store.conn.zremrangebylex(
-        this._makeKey(request.key?.key ?? '', request.scope ?? request.key?.scope),
-        request.min,
-        request.max
-      );
+      const key = this._makeKey(request.key?.key ?? '', request.scope ?? request.key?.scope);
+      // ioredis-mock does not implement ZREMRANGEBYLEX, so compose it from supported operations.
+      const members = await this._store.conn.zrangebylex(key, request.min, request.max);
+      const v = members.length === 0 ? 0 : await this._store.conn.zrem(key, ...members);
       return { value: Number(v) } as Int64Value;
     };
     return this._queueOrRun(
@@ -698,32 +791,51 @@ export class RedisPluginMock implements RedisAPI {
 
   // Bitfield
   async Bitfield(request: BitfieldRequest): Promise<BitfieldResponse> {
-    const flat: string[] = [];
+    const key = this._makeKey(request.key, request.scope);
+    const storedData = await this._store.conn.getBuffer(key);
+    const expiresAt = storedData == null ? -2 : await this._store.conn.pexpiretime(key);
+    let data = storedData == null ? Buffer.alloc(0) : Buffer.from(storedData);
+    let overflowBehavior = BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_WRAP;
+    const results: (number | null)[] = [];
+    let changed = false;
+
     for (const cmd of request.commands ?? []) {
       if (cmd.set) {
-        flat.push('SET', cmd.set.encoding, String(cmd.set.offset), String(cmd.set.value));
+        const encoding = parseBitfieldEncoding(cmd.set.encoding);
+        const offset = parseBitfieldOffset(cmd.set.offset, encoding.width);
+        const nextValue = applyBitfieldOverflow(BigInt(cmd.set.value), encoding, overflowBehavior);
+        results.push(nextValue == null ? null : Number(readBitfieldValue(data, offset, encoding)));
+        if (nextValue != null) {
+          data = writeBitfieldValue(data, offset, encoding.width, nextValue);
+          changed = true;
+        }
       } else if (cmd.get) {
-        flat.push('GET', cmd.get.encoding, String(cmd.get.offset));
+        const encoding = parseBitfieldEncoding(cmd.get.encoding);
+        const offset = parseBitfieldOffset(cmd.get.offset, encoding.width);
+        results.push(Number(readBitfieldValue(data, offset, encoding)));
       } else if (cmd.incrBy) {
-        flat.push(
-          'INCRBY',
-          cmd.incrBy.encoding,
-          String(cmd.incrBy.offset),
-          String(cmd.incrBy.increment)
+        const encoding = parseBitfieldEncoding(cmd.incrBy.encoding);
+        const offset = parseBitfieldOffset(cmd.incrBy.offset, encoding.width);
+        const nextValue = applyBitfieldOverflow(
+          readBitfieldValue(data, offset, encoding) + BigInt(cmd.incrBy.increment),
+          encoding,
+          overflowBehavior
         );
+        results.push(nextValue == null ? null : Number(nextValue));
+        if (nextValue != null) {
+          data = writeBitfieldValue(data, offset, encoding.width, nextValue);
+          changed = true;
+        }
       } else if (cmd.overflow) {
-        const behavior = cmd.overflow.behavior;
-        const mode = behavior === 1 ? 'WRAP' : behavior === 2 ? 'SAT' : 'FAIL';
-        flat.push('OVERFLOW', mode);
+        overflowBehavior = cmd.overflow.behavior;
       }
     }
-    // TODO: Fix this once BitfieldRequest supports scope. Looks like a bug that it doesn't?
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = await (this._store.conn.bitfield as any)(
-      this._makeKey(request.key, undefined),
-      ...flat
-    );
-    return { results: res } as BitfieldResponse;
+
+    if (changed) {
+      await this._store.conn.set(key, data);
+      if (expiresAt >= 0) await this._store.conn.pexpireat(key, expiresAt);
+    }
+    return { results } as BitfieldResponse;
   }
 
   private _createTransaction(keys: string[] = []): TransactionState {
@@ -767,7 +879,11 @@ export class RedisPluginMock implements RedisAPI {
     queuedValue?: T
   ): Promise<T> {
     if (!transactionId) {
-      return operation();
+      const result = await operation();
+      // A real Redis response always arrives on a later event-loop turn. Preserve that observable
+      // timing so tests do not behave differently just because the backing store is in-process.
+      await waitForRedisTurn();
+      return result;
     }
     const tx = this._getTransaction(transactionId);
     if (!tx.multiStarted) {
@@ -775,7 +891,11 @@ export class RedisPluginMock implements RedisAPI {
         `Transaction ${transactionId.id} must call multi() before executing commands`
       );
     }
-    tx.commands.push(async () => mapper(await operation()));
+    tx.commands.push(async () => {
+      const result = await operation();
+      await waitForRedisTurn();
+      return mapper(result);
+    });
     if (queuedValue !== undefined) {
       return queuedValue;
     }
