@@ -507,7 +507,7 @@
                   "default": true
                 },
                 "scope": {
-                  "description": "APIs available. `\"moderator\"` includes all of `\"user\"`.",
+                  "description": "APIs available. `\"moderator\"` is deprecated and treated as `\"user\"`.",
                   "enum": ["user", "moderator"],
                   "default": "user"
                 },
