@@ -54,6 +54,7 @@ import {
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
+import { warnIfOutdatedNodeVersion } from '../util/common-actions/warnIfOutdatedNodeVersion.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { getAppSourceZip } from '../util/getAppSourceZip.js';
@@ -238,6 +239,8 @@ export default class Publish extends DevvitCommand {
     ux.action.start('Building');
     const bundles = await this.#bundleActors(username, appVersionNumber.toString());
     ux.action.stop();
+
+    warnIfOutdatedNodeVersion(this, bundles);
 
     // We used to do this by downloading the linked bundle & checking it; instead, we can
     // just check the Bundle we already have!

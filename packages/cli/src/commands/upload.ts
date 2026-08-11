@@ -37,6 +37,7 @@ import {
 } from '../util/clientGenerators.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
+import { warnIfOutdatedNodeVersion } from '../util/common-actions/warnIfOutdatedNodeVersion.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
@@ -206,6 +207,8 @@ export default class Upload extends DevvitCommand {
     ux.action.start('Building');
     const bundles = await this.#bundleActors(username, appVersionNumber.toString());
     ux.action.stop();
+
+    warnIfOutdatedNodeVersion(this, bundles);
 
     try {
       const appVersionUploader = new AppVersionUploader(this, {

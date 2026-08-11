@@ -51,6 +51,7 @@ import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
+import { warnIfOutdatedNodeVersion } from '../util/common-actions/warnIfOutdatedNodeVersion.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { killProcessTree, killProcessTreeSync } from '../util/kill-process-tree.js';
 import { isWebContainer } from '../util/platform-util.js';
@@ -150,6 +151,8 @@ export default class Playtest extends DevvitCommand {
   #server?: PlaytestServer;
   #devScript?: RunningDevScript | undefined;
   #hasShownPlaytestReadyMessage: boolean = false;
+  // The Node.js version can't change mid-session, so we only check it once to prevent spamming in the logs.
+  #hasCheckedNodeVersion: boolean = false;
   #configReloadWindowStartMs: number | undefined;
   #configReloadCount: number = 0;
 
@@ -739,6 +742,11 @@ export default class Playtest extends DevvitCommand {
     }
 
     this.#lastBundles = result.bundles;
+
+    if (!this.#hasCheckedNodeVersion) {
+      this.#hasCheckedNodeVersion = true;
+      warnIfOutdatedNodeVersion(this, this.#lastBundles);
+    }
 
     this.#isOnWatchExecuting = true;
 
