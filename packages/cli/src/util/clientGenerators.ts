@@ -42,8 +42,8 @@ import {
 } from '../constants/Headers.js';
 import { getAccessToken } from './auth.js';
 import { DEVVIT_GATEWAY_URL, DEVVIT_PORTAL_API } from './config.js';
+import { NodeFetchRPC } from './fetch-twirp-rpc.js';
 import { GrpcWebRpc } from './grpc-web-rpc.js';
-import { NodeFetchRPC } from './node-fetch-twirp-rpc.js';
 import { generateTraceParent } from './opentelemetry.js';
 import { sleep } from './sleep.js';
 

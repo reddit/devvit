@@ -8,7 +8,7 @@ const NodeFetchRPC = {
 };
 
 beforeAll(() => {
-  vi.mock('./node-fetch-twirp-rpc.js', () => ({
+  vi.mock('./fetch-twirp-rpc.js', () => ({
     NodeFetchRPC: () => NodeFetchRPC,
   }));
 });

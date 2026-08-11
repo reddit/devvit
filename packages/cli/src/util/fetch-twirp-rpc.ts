@@ -22,6 +22,7 @@ export type FetchRPCOptions = Omit<RequestInit, 'body' | 'method'> & {
   isTokenOptional?: boolean;
 };
 
+/** NodeFetchRPC sends Twirp requests with Node's native Fetch API. */
 export const NodeFetchRPC: (options: FetchRPCOptions) => Rpc = (options) => {
   return {
     async request(service, method, contentType, data): Promise<object | Uint8Array> {
