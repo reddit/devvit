@@ -518,7 +518,7 @@ function esbuildConfig(config: Readonly<AppConfig> | undefined): esbuild.BuildOp
     alias: config?.blocks ? { '@devvit/public-api': '@devvit/public-api' } : {},
     // Recursively inline any imported dependencies.
     bundle: true,
-    // Tightly coupled to blocks.template.tsx.
+    // Tightly coupled to blocks.template.ts.
     define: {
       'globalThis.__devvit__': config ? JSON.stringify({ config }, undefined, 2) : 'undefined',
     },

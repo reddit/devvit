@@ -693,7 +693,7 @@ export class Devvit extends Actor {
   }
 
   /**
-   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * Force service implementation. Keep in sync with `blocks.template.ts`.
    * @internal
    */
   private static _initForms(): void {
@@ -701,7 +701,7 @@ export class Devvit extends Actor {
   }
 
   /**
-   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * Force service implementation. Keep in sync with `blocks.template.ts`.
    * @internal
    */
   private static _initMenu(): void {
@@ -709,7 +709,7 @@ export class Devvit extends Actor {
   }
 
   /**
-   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * Force service implementation. Keep in sync with `blocks.template.ts`.
    * @internal
    */
   private static _initScheduler(): void {
@@ -720,7 +720,7 @@ export class Devvit extends Actor {
   }
 
   /**
-   * Force service implementation. Keep in sync with `blocks.template.tsx`.
+   * Force service implementation. Keep in sync with `blocks.template.ts`.
    * @internal
    */
   private static _initSettings(global: boolean, sub: boolean): void {

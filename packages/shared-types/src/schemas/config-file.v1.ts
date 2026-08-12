@@ -93,7 +93,7 @@ export type ExternalEndpointConfig = {
 
 /**
  * Keys are assumed to have the format of `on${keyof TriggerEventType}` in
- * blocks.template.tsx. Values are empty when callback is provided by Blocks.
+ * blocks.template.ts. Values are empty when callback is provided by Blocks.
  */
 export type AppTriggersConfig = {
   onAppInstall?: string; // to-do: {entry: string, trigger}.

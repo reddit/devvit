@@ -23,6 +23,7 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import { Devvit, type MenuItem } from '@devvit/public-api';
 import * as publicApiPrototypeHelpers from '@devvit/public-api/devvit/internals/helpers/extendDevvitPrototype.js';
+import { context } from '@devvit/server';
 import type { ExtendDevvitPrototype } from '@devvit/shared-types/devvit-rpc.js';
 import { purgeReservedDevvitKeysFromMetadata } from '@devvit/shared-types/reservedDevvitMetadataKeys.js';
 import type { AppPaymentsConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
@@ -41,11 +42,11 @@ const paymentHelpMenuItem: Readonly<MenuItem> = {
   location: 'post',
   label: 'Get Payments Help',
   postFilter: 'currentApp',
-  onPress: async (_, context) => {
+  onPress: async (_, { ui }) => {
     const url = new URL(
       'https://support.reddithelp.com/hc/en-us/requests/new?ticket_form_id=29770197409428&tf_29764567374740=devvit_product_not_working'
     );
-    const username = await context.reddit.getCurrentUsername();
+    const username = context.username;
     if (username) url.searchParams.append('tf_360026362751', username);
 
     const postId = context.postId;
@@ -61,7 +62,7 @@ const paymentHelpMenuItem: Readonly<MenuItem> = {
       'tf_subject',
       `[${context.appName} v${context.appVersion}] Payments Help`
     );
-    context.ui.navigateTo(url.toString());
+    ui.navigateTo(url.toString());
   },
 };
 
@@ -82,25 +83,25 @@ export function configurePayments(payments: Readonly<AppPaymentsConfig>): void {
 /** @internal */
 export function newPaymentsProcessor(payments: Readonly<AppPaymentsConfig>): PaymentProcessor {
   return {
-    async FulfillOrder(req, meta) {
+    async FulfillOrder(req) {
       if (req.order == null || req.order.products.length === 0) return {};
 
       const rsp = (await fetchWebbit(
         payments.endpoints.fulfillOrder,
         mapOrder(req.order),
-        meta ?? {}
+        context.metadata
       )) as PaymentHandlerResponse;
 
       return !rsp || rsp.success ? { acknowledged: true } : { rejectionReason: rsp.reason };
     },
-    async RefundOrder(req, meta) {
+    async RefundOrder(req) {
       const refundEndpoint = payments.endpoints.refundOrder;
       if (req.order == null || !refundEndpoint) return {};
 
       const rsp = (await fetchWebbit(
         refundEndpoint,
         mapOrder(req.order),
-        meta ?? {}
+        context.metadata
       )) as PaymentHandlerResponse;
       return rsp ?? {};
     },

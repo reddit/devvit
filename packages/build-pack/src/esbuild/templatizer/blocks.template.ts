@@ -3,7 +3,6 @@ import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
 import { type Logger, LoggerDefinition } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
 // eslint-disable-next-line no-restricted-imports
 import {
-  type Context,
   Devvit,
   type FormKey,
   type MenuItem,
@@ -11,8 +10,10 @@ import {
   type SettingsFormField,
   type SettingsFormFieldValidatorEvent,
   type TriggerEventType,
+  type UIClient,
 } from '@devvit/public-api';
-import type { TaskRequest } from '@devvit/scheduler';
+import { scheduler, type TaskRequest } from '@devvit/scheduler';
+import { context } from '@devvit/server';
 import type { SettingsValidationResponse, Toast, TriggerRequest, UiResponse } from '@devvit/shared';
 import type { JsonObject, PartialJsonObject } from '@devvit/shared-types/json.js';
 import type {
@@ -61,11 +62,11 @@ function configureMenuItems(menuItems: Readonly<AppMenuItemConfig[]>): void {
     const menuItem: MenuItem = {
       label: action.label,
       location: action.location,
-      async onPress(ev, ctx) {
-        const rsp = await fetchWebbit(action.endpoint, ev, ctx.metadata);
+      async onPress(ev, { ui }) {
+        const rsp = await fetchWebbit(action.endpoint, ev, context.metadata);
         if (!rsp) return;
         assertUiResponse(action.endpoint, rsp);
-        handleUiResponse(ctx, rsp);
+        handleUiResponse(ui, rsp);
       },
     };
 
@@ -84,11 +85,11 @@ function configureMenuItems(menuItems: Readonly<AppMenuItemConfig[]>): void {
 function configureForms(forms: Readonly<AppFormsConfig>): void {
   Devvit._initForms();
   for (const [name, endpoint] of Object.entries(forms)) {
-    formKeyMap[name] = Devvit.createForm({ fields: [] }, async (ev, ctx) => {
-      const rsp = await fetchWebbit(endpoint, ev.values, ctx.metadata);
+    formKeyMap[name] = Devvit.createForm({ fields: [] }, async (ev, { ui }) => {
+      const rsp = await fetchWebbit(endpoint, ev.values, context.metadata);
       if (!rsp) return;
       assertUiResponse(endpoint, rsp);
-      handleUiResponse(ctx, rsp);
+      handleUiResponse(ui, rsp);
     });
   }
 }
@@ -197,12 +198,12 @@ function configureTriggers(triggers: Readonly<AppTriggersConfig>): void {
     const ev = name.replace(/^on/, '') as keyof TriggerEventType;
     Devvit.addTrigger({
       event: ev,
-      async onEvent(ev, ctx) {
+      async onEvent(ev) {
         if (!endpoint) return; // Implementation provided by Blocks.
         // Convert the hydrated old Protobuf to JSON. Don't use
         // Protobuf.toJSON() which would omit default values.
         const body: TriggerRequest = JSON.parse(JSON.stringify(ev));
-        await fetchWebbit(endpoint, body, ctx.metadata);
+        await fetchWebbit(endpoint, body, context.metadata);
         // Don't care about response.
       },
     });
@@ -216,17 +217,17 @@ function configureTriggers(triggers: Readonly<AppTriggersConfig>): void {
  *
  * If multiple effects are present in the UiResponse, they will all be applied.
  */
-function handleUiResponse(ctx: Context, uiResponse: UiResponse): void {
+function handleUiResponse(ui: UIClient, uiResponse: UiResponse): void {
   if (uiResponse.showToast) {
-    ctx.ui.showToast(uiResponse.showToast);
+    ui.showToast(uiResponse.showToast);
   }
 
   if (uiResponse.navigateTo) {
-    ctx.ui.navigateTo(uiResponse.navigateTo);
+    ui.navigateTo(uiResponse.navigateTo);
   }
 
   if (uiResponse.showForm) {
-    ctx.ui.showFormInternal(
+    ui.showFormInternal(
       formKeyMap[uiResponse.showForm.name],
       uiResponse.showForm.data,
       uiResponse.showForm.form
@@ -240,7 +241,7 @@ function configureScheduler(schedulerConfig: Readonly<AppSchedulerConfig>): void
   for (const [name, task] of Object.entries(schedulerConfig.tasks)) {
     Devvit.addSchedulerJob({
       name: name,
-      onRun: async (event, context) => {
+      onRun: async (event) => {
         await fetchWebbit(
           task.endpoint,
           { name: event.name, data: event.data } satisfies TaskRequest,
@@ -261,9 +262,9 @@ function configureScheduler(schedulerConfig: Readonly<AppSchedulerConfig>): void
   if (Object.keys(cronTasks).length > 0) {
     Devvit.addTrigger({
       events: ['AppInstall', 'AppUpgrade'],
-      onEvent: async (_event, context) => {
+      onEvent: async () => {
         // Get all jobs
-        const existingJobs = await context.scheduler.listJobs();
+        const existingJobs = await scheduler.listJobs();
         // Filter down to just cron jobs
         const jobsToCancel = existingJobs.filter((job) => {
           // Only cancel cron jobs
@@ -271,14 +272,14 @@ function configureScheduler(schedulerConfig: Readonly<AppSchedulerConfig>): void
         });
 
         // Cancel everything we need to
-        await Promise.all(jobsToCancel.map((job) => context.scheduler.cancelJob(job.id)));
+        await Promise.all(jobsToCancel.map((job) => scheduler.cancelJob(job.id)));
         // Schedule all the cron tasks we were given in the config
         await Promise.all(
           Object.entries(cronTasks).map(async ([name, task]) => {
             const logger = getDevvitConfig().use<Logger>(LoggerDefinition);
 
             try {
-              await context.scheduler.runJob({
+              await scheduler.runJob({
                 name: name,
                 cron: task.cron!,
                 ...(task.data ? { data: task.data } : {}),
@@ -355,8 +356,7 @@ function coerceSettingForClassic(
   // Redundant check necessary to keep TS happy
   if (classicSetting.type !== 'group' && setting.type !== 'group' && setting.validationEndpoint) {
     classicSetting.onValidate = async function validateSettingsField(
-      event: SettingsFormFieldValidatorEvent<string | boolean | number | string[]>,
-      context: Devvit.Context
+      event: SettingsFormFieldValidatorEvent<string | boolean | number | string[]>
     ): Promise<string | undefined> {
       const rsp = await fetchWebbit(
         setting.validationEndpoint!,

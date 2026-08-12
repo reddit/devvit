@@ -94,7 +94,7 @@ import type { AppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 
 /**
  * Convert a static `AppConfig` to a `DependencySpec`. Similar to the classic
- * `Devvit` singleton, `ConfigImpl`, `blocks.template.tsx`, and `paymentsPlugin`.
+ * `Devvit` singleton, `ConfigImpl`, `blocks.template.ts`, and `paymentsPlugin`.
  *
  * Consider the config objects to determine uses / provides since the config
  * objects have more granularity (eg, triggers). If a config and a permission
@@ -178,7 +178,7 @@ export function createDependencySpec(
   if (config.scheduler) {
     provide(spec, SchedulerHandlerDefinition);
     if (Object.values(config.scheduler.tasks).some((task) => task.cron)) {
-      // `blocks.template.tsx` resets tasks on install and upgrade triggers.
+      // `blocks.template.ts` resets tasks on install and upgrade triggers.
       provide(spec, OnAppInstallDefinition);
       provide(spec, OnAppUpgradeDefinition);
     }

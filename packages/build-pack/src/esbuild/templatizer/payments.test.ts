@@ -14,7 +14,7 @@ import {
 import type { Order as OrderProto } from '@devvit/protos/types/devvit/payments/v1alpha/order.js';
 // eslint-disable-next-line no-restricted-imports
 import { Devvit } from '@devvit/public-api';
-import { context } from '@devvit/server';
+import { Context, context, runWithContext } from '@devvit/server';
 import type { JsonObject } from '@devvit/shared';
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';
@@ -141,13 +141,13 @@ describe('newPaymentsProcessor', () => {
 
     const wrapped = newPaymentsProcessor(paymentsConfig);
 
-    const result = await wrapped.FulfillOrder({ order: protoOrders[0] }, {});
+    const result = await runInContext(() => wrapped.FulfillOrder({ order: protoOrders[0] }, {}));
     expect(userDefinedHandler.fulfillOrder).toBeCalled();
     expect(result).toStrictEqual({
       acknowledged: true,
     });
 
-    await wrapped.RefundOrder({ order: protoOrders[0] }, {});
+    await runInContext(() => wrapped.RefundOrder({ order: protoOrders[0] }, {}));
     expect(userDefinedHandler.refundOrder).toBeCalled();
   });
 
@@ -160,7 +160,7 @@ describe('newPaymentsProcessor', () => {
     mockPaymentEndpoints(userDefinedHandler);
 
     const wrapped = newPaymentsProcessor(paymentsConfig);
-    const result = await wrapped.FulfillOrder({ order: protoOrders[0] }, {});
+    const result = await runInContext(() => wrapped.FulfillOrder({ order: protoOrders[0] }, {}));
 
     expect(result).toStrictEqual({
       rejectionReason: 'No more swords left to sell',
@@ -181,13 +181,13 @@ describe('newPaymentsProcessor', () => {
 
     const wrapped = newPaymentsProcessor(paymentsConfig);
 
-    await expect(wrapped.FulfillOrder({ order: protoOrders[0] }, {})).rejects.toEqual(
-      expect.stringContaining(expectedError.message)
-    );
+    await expect(
+      runInContext(() => wrapped.FulfillOrder({ order: protoOrders[0] }, {}))
+    ).rejects.toEqual(expect.stringContaining(expectedError.message));
 
-    await expect(wrapped.RefundOrder({ order: protoOrders[0] })).rejects.toEqual(
-      expect.stringContaining(expectedError.message)
-    );
+    await expect(
+      runInContext(() => wrapped.RefundOrder({ order: protoOrders[0] }))
+    ).rejects.toEqual(expect.stringContaining(expectedError.message));
   });
 
   it('only developer provided metadata is passed in the order', async () => {
@@ -209,12 +209,12 @@ describe('newPaymentsProcessor', () => {
       },
     };
 
-    await wrapped.FulfillOrder({ order }, {});
+    await runInContext(() => wrapped.FulfillOrder({ order }, {}));
     expect(mockFulfillOrder).toBeCalledWith(
       expect.objectContaining({ metadata: devDefinedMetadata }) // only developer-defined metadata
     );
 
-    await wrapped.RefundOrder({ order }, {});
+    await runInContext(() => wrapped.RefundOrder({ order }, {}));
     expect(mockRefundOrder).toBeCalledWith(
       expect.objectContaining({ metadata: devDefinedMetadata }) // only developer-defined metadata
     );
@@ -224,13 +224,14 @@ describe('newPaymentsProcessor', () => {
     ['FOX', protoOrders[0], paymentHandlerRequests[0]],
     ['MOUSE', protoOrders[1], paymentHandlerRequests[1]],
   ])('maps the %s order to the Webbit handler contract', async (_, order, request) => {
-    const metadata = { [Header.Subreddit]: { values: ['t5_subreddit-id'] } };
     const fetchMock = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) =>
       jsonResponse({ success: true })
     );
     globalThis.fetch = fetchMock;
 
-    await newPaymentsProcessor(paymentsConfig).FulfillOrder({ order }, metadata);
+    await runInContext(() => newPaymentsProcessor(paymentsConfig).FulfillOrder({ order }, {}), {
+      [Header.Subreddit]: 't5_subreddit-id',
+    });
 
     const [, init] = fetchMock.mock.calls[0]!;
     expect(init?.headers).toMatchObject({ [Header.Subreddit]: 't5_subreddit-id' });
@@ -292,6 +293,13 @@ function mockPaymentEndpoints(paymentHandler: PaymentHandler): void {
 
     return response == null ? new Response(null) : jsonResponse(response);
   };
+}
+
+function runInContext<T>(
+  callback: () => Promise<T>,
+  headers: Readonly<Record<string, string>> = {}
+): Promise<T> {
+  return runWithContext(Context({ [Header.Subreddit]: 't5_subreddit-id', ...headers }), callback);
 }
 
 function jsonResponse(body: JsonObject): Response {
