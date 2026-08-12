@@ -94,8 +94,7 @@ import type { AppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 
 /**
  * Convert a static `AppConfig` to a `DependencySpec`. Similar to the classic
- * `Devvit` singleton, `ConfigImpl`, `addPaymentHandler()`, and
- * `paymentsPlugin`.
+ * `Devvit` singleton, `ConfigImpl`, `blocks.template.tsx`, and `paymentsPlugin`.
  *
  * Consider the config objects to determine uses / provides since the config
  * objects have more granularity (eg, triggers). If a config and a permission

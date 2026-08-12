@@ -1,3 +1,5 @@
+import { isDeepStrictEqual } from 'node:util';
+
 import { EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
 import type { HandleUIEventRequest } from '@devvit/protos/json/devvit/ui/events/v1alpha/handle_ui.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
@@ -10,8 +12,6 @@ import { UIEventHandlerDefinition } from '@devvit/protos/types/devvit/ui/events/
 import type { Config } from '@devvit/shared-types/Config.js';
 import { Header } from '@devvit/shared-types/Header.js';
 import { type FormKey } from '@devvit/shared-types/useForm.js';
-import cloneDeep from 'clone-deep';
-import { isEqual } from 'moderndash';
 
 import { makeAPIClients } from '../../apis/makeAPIClients.js';
 import { getEffectsFromUIClient } from '../../apis/ui/helpers/getEffectsFromUIClient.js';
@@ -33,7 +33,7 @@ async function handleUIEvent(
 ): Promise<HandleUIEventResponse> {
   // Keep track of the original state so we can check if it was updated.
   const originalState = req.state ?? {};
-  const state = cloneDeep(originalState);
+  const state = structuredClone(originalState);
 
   const apiClients = makeAPIClients({
     ui: true,
@@ -88,8 +88,9 @@ async function handleUIEvent(
     throw new Error('Toast actions not yet implemented');
   }
 
+  // to-do: is stateWasUpdated ever true?
   // Check if the state was updated to determine if we need to rerender.
-  const stateWasUpdated = !isEqual(originalState, state);
+  const stateWasUpdated = !isDeepStrictEqual(originalState, state);
 
   const uiEffects = getEffectsFromUIClient(apiClients.ui);
   const effects = stateWasUpdated

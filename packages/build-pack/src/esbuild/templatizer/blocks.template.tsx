@@ -1,11 +1,4 @@
-import {
-  addPaymentHandler,
-  type PaymentHandler,
-  paymentHelpMenuItem,
-} from '@devvit/payments/internal';
-import type { PaymentHandlerResponse } from '@devvit/payments/shared';
 import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
-import type { Metadata } from '@devvit/protos/lib/Types.js';
 // eslint-disable-next-line no-restricted-imports
 import { type Logger, LoggerDefinition } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
 // eslint-disable-next-line no-restricted-imports
@@ -21,31 +14,22 @@ import {
 } from '@devvit/public-api';
 import type { TaskRequest } from '@devvit/scheduler';
 import type { SettingsValidationResponse, Toast, TriggerRequest, UiResponse } from '@devvit/shared';
-import type { JsonObject, JsonValue, PartialJsonObject } from '@devvit/shared-types/json.js';
+import type { JsonObject, PartialJsonObject } from '@devvit/shared-types/json.js';
 import type {
   AppConfig,
   AppFormsConfig,
   AppMenuItemConfig,
-  AppPaymentsConfig,
   AppPermissionConfig,
   AppSchedulerConfig,
   AppSettingConfig,
   AppTriggersConfig,
 } from '@devvit/shared-types/schemas/config-file.v1.js';
 import { getDevvitConfig } from '@devvit/shared-types/server/get-devvit-config.js';
-import { getServerPort } from '@devvit/shared-types/server/get-server-port.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 
-declare module '@devvit/public-api' {
-  // Expose privates in the `Devvit` singleton. These signatures must be
-  // manually synced.
-  namespace Devvit {
-    function _initForms(): void;
-    function _initMenu(): void;
-    function _initScheduler(): void;
-    function _initSettings(global: boolean, sub: boolean): void;
-  }
-}
+import { abbreviate } from './error-utils.js';
+import { fetchWebbit } from './fetch-webbit.js';
+import { configurePayments } from './payments.js';
 
 // __devvit__ is initialized by ESBuildPack and undefined in tests only.
 // @ts-expect-error no type.
@@ -53,11 +37,6 @@ const config: AppConfig | undefined = globalThis.__devvit__?.config;
 
 /** @internal [state] Map of devvit.json form keys to Devvit-singleton form keys. */
 export const formKeyMap: { [formKey: string]: FormKey } = {};
-
-/** @internal */
-export function abbreviate(str: string): string {
-  return str.length > 256 ? `${str.slice(0, 256)}…` : str;
-}
 
 function configurePermissions(permissions: Readonly<AppPermissionConfig>): void {
   // to-do: remove. This is a relic of LinkedBundle generation.
@@ -100,36 +79,6 @@ function configureMenuItems(menuItems: Readonly<AppMenuItemConfig[]>): void {
 
     Devvit.addMenuItem(menuItem);
   }
-}
-
-function configurePayments(menuItems: Readonly<AppPaymentsConfig>): void {
-  const paymentHandler: PaymentHandler = {
-    fulfillOrder: async (order, ctx) => {
-      const jsonableOrder = {
-        ...order,
-        createdAt: order.createdAt ? order.createdAt.toISOString() : null,
-        updatedAt: order.updatedAt ? order.updatedAt.toISOString() : null,
-      };
-      const rsp = await fetchWebbit(menuItems.endpoints.fulfillOrder, jsonableOrder, ctx.metadata);
-      return rsp as PaymentHandlerResponse;
-    },
-  };
-
-  const refundEndpoint = menuItems.endpoints.refundOrder;
-  if (refundEndpoint) {
-    paymentHandler.refundOrder = async (order, ctx) => {
-      const jsonableOrder = {
-        ...order,
-        createdAt: order.createdAt ? order.createdAt.toISOString() : null,
-        updatedAt: order.updatedAt ? order.updatedAt.toISOString() : null,
-      };
-      await fetchWebbit(refundEndpoint, jsonableOrder, ctx.metadata);
-    };
-  }
-
-  addPaymentHandler(paymentHandler);
-  Devvit._initMenu();
-  Devvit.addMenuItem(paymentHelpMenuItem);
 }
 
 function configureForms(forms: Readonly<AppFormsConfig>): void {
@@ -283,90 +232,6 @@ function handleUiResponse(ctx: Context, uiResponse: UiResponse): void {
       uiResponse.showForm.form
     );
   }
-}
-
-/**
- * Post to endpoint and return user Node.js server response. All responses are
- * expected to be empty or a JSON _object_.
- *
- * @throws Throws on `!Response.ok`.
- * @throws Response body is nonempty and content-type is not JSON.
- * @throws Response body is nonempty and unparsable.
- * @throws Response body is nonempty and not a JSON object.
- * @internal
- */
-export async function fetchWebbit(
-  endpoint: string,
-  body: Readonly<PartialJsonObject>,
-  meta: Readonly<Metadata>
-): Promise<JsonObject | undefined> {
-  const url = new URL(endpoint, `http://webbit.local:${getServerPort()}/`);
-
-  const headers: { [k: string]: string } = {};
-  for (const [k, v] of Object.entries(meta)) headers[k] = v.values.join();
-  headers['Content-Type'] = 'application/json';
-  headers['Accept'] = 'application/json';
-
-  const preamble = `Failed to POST to Node.js server endpoint ${endpoint}; server responded with`;
-
-  let rsp;
-  try {
-    rsp = await fetch(url, {
-      body: JSON.stringify(body),
-      headers,
-      method: 'POST',
-      // to-do: redirect: 'manual'?
-    });
-  } catch (err) {
-    throw `${preamble} error: ${err instanceof Error ? err.message : err}`;
-  }
-
-  let text: string;
-  try {
-    text = await rsp.text();
-  } catch {
-    throw Error(
-      `${preamble} HTTP status ${rsp.status}: ${rsp.statusText}; unreadable response body`
-    );
-  }
-
-  const bodySuffix = text ? `; body: ${abbreviate(text)}` : '';
-
-  if (rsp.status === 404)
-    throw Error(
-      `${preamble} HTTP status ${rsp.status}: ensure the server handles the \`${endpoint}\` endpoint${bodySuffix}`
-    );
-
-  if (!rsp.ok) throw Error(`${preamble} HTTP status ${rsp.status}: ${rsp.statusText}${bodySuffix}`);
-
-  if (!text) return;
-
-  const contentLen = rsp.headers.get('Content-Length');
-  if (!Number(contentLen))
-    throw Error(
-      `${preamble} Content-Length header "${contentLen}" but greater than zero required for nonempty response`
-    );
-
-  const contentType = rsp.headers.get('Content-Type');
-  if (!contentType || !contentType.includes('application/json')) {
-    throw Error(
-      `${preamble} Content-Type header "${contentType}" but only "application/json" is supported`
-    );
-  }
-
-  let json: JsonValue;
-  try {
-    json = JSON.parse(text);
-  } catch {
-    throw Error(`${preamble} an unparsable JSON body: ${abbreviate(text)}`);
-  }
-
-  if (!json || typeof json !== 'object' || Array.isArray(json))
-    throw Error(
-      `${preamble} an unrecognized JSON body instead of an object \`{}\`: ${abbreviate(text)}`
-    );
-
-  return json;
 }
 
 function configureScheduler(schedulerConfig: Readonly<AppSchedulerConfig>): void {

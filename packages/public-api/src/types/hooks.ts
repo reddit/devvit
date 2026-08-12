@@ -11,8 +11,6 @@ import type {
   StringField,
 } from './form.js';
 
-export type Dispatch<A> = (value: A) => void;
-
 export type FormToFormValues<T extends Form | FormFunction = Form | FormFunction> =
   FormFieldsToFormValues<(T extends FormFunction ? ReturnType<T> : T)['fields']>;
 

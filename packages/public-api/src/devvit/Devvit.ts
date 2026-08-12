@@ -186,8 +186,6 @@ export class Devvit extends Actor {
   static #domains: string[] = [];
   static #scopes: Scope[] = [];
 
-  static #additionallyProvides: Definition[] = [];
-
   /**
    * To use certain APIs and features of Devvit, you must enable them using this function.
    *
@@ -515,15 +513,6 @@ export class Devvit extends Actor {
     return Devvit;
   }
 
-  /**
-   * @internal
-   * utility static method to register additional actor types without exposing an explicit
-   * registration hook such as `addTrigger` or `addMenuItem`
-   */
-  static provide(def: Definition): void {
-    this.#additionallyProvides.push(def);
-  }
-
   /** @internal */
   static #uses: {
     [fullName: Definition['fullName']]: {
@@ -781,10 +770,6 @@ export class Devvit extends Actor {
 
     if (Devvit.#triggerOnEventHandlers.size > 0) {
       registerTriggers(config);
-    }
-
-    for (const provides of Devvit.#additionallyProvides) {
-      config.provides(provides);
     }
 
     if (Devvit.#domains.length > 0 || Devvit.#scopes.length > 0) {

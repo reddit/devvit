@@ -1,14 +1,10 @@
-import type { Product as ProductProto } from '@devvit/protos/json/devvit/payments/v1alpha/product.js';
 import { AccountingType as AccountingTypeProto } from '@devvit/protos/json/devvit/payments/v1alpha/product.js';
 import { v5 as uuidv5 } from 'uuid';
-
-import { assertNonNull } from '../NonNull.js';
-import { purgeReservedDevvitKeysFromMetadata } from '../reservedDevvitMetadataKeys.js';
 
 /**
  * A unique identifier for a product.
  */
-export type SKU = string;
+export type Sku = string;
 
 export enum AccountingType {
   INSTANT = 'INSTANT',
@@ -40,19 +36,11 @@ export function mapAccountingTypeToProto(type: AccountingType): AccountingTypePr
 }
 
 /**
- * Maps an AccountingType protobuf enum value to the corresponding AccountingType enum.
- */
-export function mapProtoToAccountingType(typeProto: AccountingTypeProto): AccountingType {
-  const entry = Object.entries(accountTypeToProtoMapping).find(([_, value]) => value === typeProto);
-  return entry ? (entry[0] as AccountingType) : AccountingType.UNRECOGNIZED;
-}
-
-/**
  * A product that can be sold by Devvit developers
  * and purchased by Reddit users.
  */
 export type Product = {
-  sku: SKU;
+  sku: Sku;
   price: number;
   displayName: string;
   accountingType: AccountingType;
@@ -66,25 +54,6 @@ export type Product = {
     icon: string;
   };
 };
-
-/**
- * Converts an Product protobuf message to an Product object.
- */
-export function productFromProto(data: ProductProto): Product {
-  // Validate the incoming data
-  assertNonNull(data.price, 'Product price is null or undefined');
-
-  const productIcon = data.images['icon'];
-  return {
-    sku: data.sku,
-    price: data.price.amount, // In Reddit Gold
-    accountingType: mapProtoToAccountingType(data.accountingType),
-    displayName: data.name,
-    description: data.description,
-    metadata: purgeReservedDevvitKeysFromMetadata(data.productMetadata),
-    ...(productIcon ? { images: { icon: productIcon } } : {}),
-  };
-}
 
 export function newProductId(appVersionId: string, productSku: string): string {
   const uuidV5Name = productSku;
