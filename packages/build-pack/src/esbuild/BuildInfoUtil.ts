@@ -29,36 +29,29 @@ export function newBuildInfoDependencies(dir: string): BuildInfoDependencies {
   };
 
   const packages = [
-    {
-      // A user app should always have @devvit/public-api as a direct dependency.
-      // Absence is actionable.
-      name: '@devvit/protos',
-      throwIfNotFound: false,
-    },
-    { name: '@devvit/client', throwIfNotFound: false },
-    { name: '@devvit/server', throwIfNotFound: false },
-    { name: '@devvit/public-api', throwIfNotFound: true },
-    {
-      // Payments is not a required dependency for all apps,
-      // so we don't throw if it's not found.
-      name: '@devvit/payments',
-      throwIfNotFound: false,
-    },
-    { name: '@devvit/web', throwIfNotFound: false },
+    '@devvit/protos',
+    '@devvit/client',
+    '@devvit/server',
+    '@devvit/public-api',
+    '@devvit/payments',
+    '@devvit/web',
   ];
 
   // Get the version of each package.
-  // If the package is not found, throw an error if throwIfNotFound is true.
-  for (const { name, throwIfNotFound } of packages) {
+  let foundAtLeastOnePackage = false;
+  for (const name of packages) {
     const packageJSONPath = `${name}/package.json`;
     try {
       const packageJSON = requireFromDir(dir, packageJSONPath);
       deps[name] = (packageJSON as { version: string }).version;
-    } catch (err) {
-      if (throwIfNotFound) {
-        throw Error(`missing ${name} npm dependency`, { cause: err });
-      }
+      foundAtLeastOnePackage = true;
+    } catch {
+      // no op
     }
+  }
+
+  if (!foundAtLeastOnePackage) {
+    throw Error(`missing a dependency on at least one of: ${packages.join(', ')}`);
   }
 
   return deps;
