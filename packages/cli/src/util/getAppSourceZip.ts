@@ -11,18 +11,31 @@ const ALWAYS_IGNORED_PATHS = Object.freeze(['node_modules', '.env', '.git']);
 export async function getAppSourceZip(cmd: DevvitCommand): Promise<ArrayBuffer> {
   const zip = new JSZip();
 
-  const ignoredPaths = await getIgnoredPaths(cmd);
-
+  const ignoredPaths = await getIgnoredPaths(cmd, cmd.project.root);
   await addDirectoryToZip(cmd.project.root, zip, ignoredPaths);
+
+  for (const additionalRoot of cmd.project.appConfig?.additionalSourceRoots ?? []) {
+    const ignoredPaths = await getIgnoredPaths(cmd, additionalRoot);
+    const additionalRootZip = zip.folder(additionalRoot);
+    if (!additionalRootZip) {
+      cmd.error(`Could not create zip folder for additional root ${additionalRoot}`);
+    }
+
+    await addDirectoryToZip(
+      path.join(cmd.project.root, additionalRoot),
+      additionalRootZip,
+      ignoredPaths
+    );
+  }
 
   return await zip.generateAsync({ type: 'arraybuffer' });
 }
 
-async function getIgnoredPaths(cmd: DevvitCommand): Promise<ignore.Ignore> {
+async function getIgnoredPaths(cmd: DevvitCommand, gitignoreDir: string): Promise<ignore.Ignore> {
   const ignoreInstance = ignore();
 
   // Ignore everything in .gitignore
-  const gitignorePath = path.join(cmd.project.root, '.gitignore');
+  const gitignorePath = path.join(gitignoreDir, '.gitignore');
   try {
     const gitignoreContent = await fsp.readFile(gitignorePath, 'utf-8');
     const gitignorePaths = gitignoreContent

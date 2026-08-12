@@ -37,6 +37,7 @@ export type AppConfig = {
   settings?: AppSettingsConfig;
   forms?: AppFormsConfig;
   marketingAssets?: AppMarketingAssetsConfig;
+  additionalSourceRoots?: string[];
   sourceIgnores?: string[];
   /** The original config as parsed. Used for writebacks. */
   json: AppConfigJson;
@@ -251,6 +252,7 @@ export type AppConfigJson = {
   marketingAssets?: {
     icon?: string;
   };
+  additionalSourceRoots?: string[];
   sourceIgnores?: string[];
   /** User data. */
   [key: string]: JsonValue;
@@ -453,6 +455,7 @@ function AppConfig(json: Readonly<AppConfigJson>): AppConfig {
     : false;
   if (json.forms || blocksForms) partial.forms = json.forms ?? {};
   if (json.marketingAssets) partial.marketingAssets = json.marketingAssets;
+  if (json.additionalSourceRoots) partial.additionalSourceRoots = json.additionalSourceRoots;
   if (json.sourceIgnores) partial.sourceIgnores = json.sourceIgnores;
   if (json.dev) {
     partial.dev = {};

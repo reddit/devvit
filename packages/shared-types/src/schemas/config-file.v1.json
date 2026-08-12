@@ -910,6 +910,16 @@
       }
     },
 
+    "additionalSourceRoots": {
+      "type": "array",
+      "description": "List of directories to **include** in the source bundle when packaging the source code for app review (i.e. as part of the `devvit publish` command). Patterns are relative to the project root. You should only ever need to include files that are outside of that project root; everything inside the root is included by default. The `sourceIgnore` rules will also be applied here, along with any .gitignore files in the directory.",
+      "items": {
+        "type": "string",
+        "description": "A list of directories to include.",
+        "examples": ["../actual-project-code/src"]
+      }
+    },
+
     "sourceIgnores": {
       "type": "array",
       "description": "List of .gitignore-style patterns for source files and directories to ignore when packaging the source code for app review (i.e. as part of the `devvit publish` command). The contents of your root .gitignore file are applied first, then these rules, in the order listed. Patterns are relative to the project root. Note that some files/folders are always ignored, such as `node_modules/`, `.env`, and `.git/`.",

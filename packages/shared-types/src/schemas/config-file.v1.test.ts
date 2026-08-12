@@ -2227,6 +2227,61 @@ describe('parseAppConfigJSON()', () => {
         },
       }
     `));
+  test('additionalSourceRoots', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: {},
+          additionalSourceRoots: ['dist/*.js', 'generated/schema.json'],
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "additionalSourceRoots": [
+          "dist/*.js",
+          "generated/schema.json",
+        ],
+        "json": {
+          "additionalSourceRoots": [
+            "dist/*.js",
+            "generated/schema.json",
+          ],
+          "name": "abc",
+          "server": {},
+        },
+        "name": "abc",
+        "permissions": {
+          "blob": false,
+          "chromeless": false,
+          "externalEndpoints": false,
+          "http": {
+            "domains": [],
+            "enable": false,
+          },
+          "journeys": false,
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": false,
+            "scope": "user",
+          },
+          "redis": false,
+          "settings": false,
+          "triggers": false,
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+        },
+      }
+    `));
+
   test('sourceIgnores', () =>
     expect(
       parseAppConfigJson(
