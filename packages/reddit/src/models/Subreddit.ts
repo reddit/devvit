@@ -33,6 +33,7 @@ import { getModerationLog } from './ModAction.js';
 import type {
   CrosspostOptions,
   GetPostsOptionsWithTimeframe,
+  SearchPostsOptions,
   SubmitCustomPostOptions,
   SubmitPostOptions,
 } from './Post.js';
@@ -776,6 +777,18 @@ export class Subreddit {
     }
 
     return Post.getTopPosts({
+      ...options,
+      subredditName: this.#name,
+    });
+  }
+
+  /** Search for posts in this subreddit. */
+  searchPosts(options: Omit<SearchPostsOptions, 'subredditName'>): Listing<Post> {
+    if (!this.#name) {
+      throw new Error('subreddit missing displayName - it might not have been fetched');
+    }
+
+    return Post.searchPosts({
       ...options,
       subredditName: this.#name,
     });

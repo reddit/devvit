@@ -47,6 +47,7 @@ import type {
   ModeratorPermission,
   ModLogOptions,
   RemovalReason,
+  SearchPostsOptions,
   SendPrivateMessageAsSubredditOptions,
   SendPrivateMessageOptions,
   SetPostFlairOptions,
@@ -805,6 +806,32 @@ export class RedditClient {
    */
   getRisingPosts(options: GetPostsOptions): Listing<Post> {
     return Post.getRisingPosts(options);
+  }
+
+  /**
+   * Search for posts in a subreddit.
+   *
+   * @param options - Options for the search
+   * @param options.query - The search query. e.g. 'developer platform'
+   * @param options.subredditName - The subreddit to search without 'r/' prefix. If specified, will restrict the search to posts in this subreddit
+   * @param options.sort - How to sort the results. Defaults to 'relevance'.
+   * @param options.timeframe - Limit results to a timeframe. Defaults to 'all'.
+   * @param options.limit - The maximum number of posts to return.
+   * @param options.pageSize - The number of posts to return per request.
+   * @returns A Listing of Post objects.
+   * @example
+   * ```ts
+   * const posts = await reddit.searchPosts({
+   *   query: 'developer platform',
+   *   subredditName: 'devvit',
+   *   sort: 'new',
+   *   timeframe: 'month',
+   *   limit: 100,
+   * }).all();
+   * ```
+   */
+  searchPosts(options: SearchPostsOptions): Listing<Post> {
+    return Post.searchPosts(options);
   }
 
   /**

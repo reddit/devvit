@@ -64,6 +64,7 @@ export const redditApiPlugins = {
     Hot: vi.fn(),
     New: vi.fn(),
     Rising: vi.fn(),
+    SearchPosts: vi.fn(),
     Sort: vi.fn(),
   },
   ModNote: {

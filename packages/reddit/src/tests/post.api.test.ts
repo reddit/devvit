@@ -1,6 +1,7 @@
 import type { QueryResponse } from '@devvit/protos/json/devvit/plugin/redditapi/graphql/graphql_msg.js';
 import { RenderStyle } from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
 import { context } from '@devvit/server';
+import { Header } from '@devvit/shared-types/Header.js';
 import type { CodeBlockContext } from '@devvit/shared-types/richtext/contexts.js';
 import { RichTextBuilder } from '@devvit/shared-types/richtext/RichTextBuilder.js';
 import type { DevvitWorkerGlobal } from '@devvit/shared-types/shared/devvit-worker-global.js';
@@ -174,6 +175,66 @@ describe('Post API', () => {
   });
 
   describe('RedditClient', () => {
+    test('searchPosts()', async () => {
+      const spyPlugin = redditApiPlugins.Listings.SearchPosts;
+      spyPlugin.mockResolvedValueOnce({
+        data: {
+          children: [{ kind: 't3', data: defaultPostData }],
+        },
+      });
+
+      await runWithTestContext(
+        async () => {
+          const posts = await reddit
+            .searchPosts({
+              query: 'cats & dogs',
+              sort: 'new',
+              timeframe: 'month',
+              pageSize: 25,
+            })
+            .get(1);
+
+          expect(spyPlugin).toHaveBeenCalledWith(
+            {
+              q: 'cats & dogs',
+              restrictSr: false,
+              show: 'all',
+              sort: 'new',
+              subreddit: 'all',
+              t: 'month',
+              type: 'link',
+              limit: 25,
+            },
+            context.metadata
+          );
+          expect(posts).toHaveLength(1);
+          expect(posts[0]).toBeInstanceOf(Post);
+        },
+        { [Header.SubredditName]: 'installedSubreddit' }
+      );
+    });
+
+    test('searchPosts() with a subreddit', async () => {
+      const spyPlugin = redditApiPlugins.Listings.SearchPosts;
+      spyPlugin.mockResolvedValueOnce({ data: { children: [] } });
+
+      await runWithTestContext(
+        async () => {
+          await reddit.searchPosts({ query: 'cats', subredditName: 'cats' }).get(1);
+
+          expect(spyPlugin).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+              q: 'cats',
+              restrictSr: true,
+              subreddit: 'cats',
+            }),
+            context.metadata
+          );
+        },
+        { [Header.SubredditName]: 'installedSubreddit' }
+      );
+    });
+
     test('Post matches JSON snapshot', () => {
       const post = new Post({ ...defaultPostData });
 

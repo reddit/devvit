@@ -450,6 +450,25 @@ describe('Subreddit API', () => {
   });
 
   describe('Subreddit api model', () => {
+    test('searchPosts()', async () => {
+      const subreddit = createTestSub({ displayName: 'askReddit' });
+      const spyPlugin = redditApiPlugins.Listings.SearchPosts;
+      spyPlugin.mockResolvedValueOnce({ data: { children: [] } });
+
+      await runWithTestContext(async () => {
+        await subreddit.searchPosts({ query: 'cats' }).get(1);
+
+        expect(spyPlugin).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            q: 'cats',
+            restrictSr: true,
+            subreddit: 'askReddit',
+          }),
+          context.metadata
+        );
+      });
+    });
+
     test('getCommentsAndPostsByIds()', async () => {
       const subreddit = new Subreddit({
         id: subredditId,

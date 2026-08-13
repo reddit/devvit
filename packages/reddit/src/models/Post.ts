@@ -73,6 +73,17 @@ export type GetPostsOptions = ListingFetchOptions & {
 
 export type GetBestPostsOptions = ListingFetchOptions;
 
+export type SearchPostsOptions = ListingFetchOptions & {
+  /** Search query. */
+  query: string;
+  /** The subreddit to search without 'r/' prefix. If specified, will restrict the search to posts in this subreddit */
+  subredditName?: string;
+  /** How to sort the search results. Defaults to `relevance`. */
+  sort?: 'relevance' | 'hot' | 'top' | 'new' | 'comments';
+  /** Limit search results to a timeframe. Defaults to `all`. */
+  timeframe?: 'hour' | 'day' | 'week' | 'month' | 'year' | 'all';
+};
+
 export type GetDuplicatesOptions = ListingFetchOptions & {
   /** Post ID with t3_ prefix (e.g. `t3_abc123`). The prefix is stripped internally. */
   postId: T3;
@@ -1959,6 +1970,37 @@ export class Post {
           {
             show: 'all',
             subreddit: opts.subredditName,
+            ...fetchOpts,
+          },
+          context.metadata
+        );
+
+        return listingProtosToPosts(response);
+      },
+    });
+  }
+
+  /** @internal */
+  static searchPosts(opts: Readonly<SearchPostsOptions>): Listing<Post> {
+    const client = getRedditApiPlugins().Listings;
+
+    return new Listing({
+      hasMore: true,
+      before: opts.before,
+      after: opts.after,
+      pageSize: opts.pageSize,
+      limit: opts.limit,
+      fetch: async (fetchOpts: ListingFetchOptions) => {
+        const subredditName = opts.subredditName ?? 'all';
+        const response = await client.SearchPosts(
+          {
+            q: opts.query,
+            restrictSr: subredditName.toLowerCase() !== 'all',
+            show: 'all',
+            sort: opts.sort ?? 'relevance',
+            subreddit: subredditName,
+            t: opts.timeframe ?? 'all',
+            type: 'link',
             ...fetchOpts,
           },
           context.metadata
