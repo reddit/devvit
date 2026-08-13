@@ -23,7 +23,7 @@ import { decodeToken, requestTokenRefresh } from './token.js';
 declare global {
   // eslint-disable-next-line no-var
   var devvit: DevvitGlobal;
-  /** Defined by build.js. */
+  /** Defined by build.ts. */
   // eslint-disable-next-line no-var
   var webViewScriptsVersion: Readonly<WebViewScriptsVersion>;
 }

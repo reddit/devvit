@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc --build && yarn build:devvit",
     "build:devvit": "yarn bundle --minify",
-    "bundle": "tools/build.js",
+    "bundle": "tools/build.ts",
     "clean": "rm -rf .turbo coverage dist",
     "clobber": "yarn clean && rm -rf node_modules",
     "dev:wvs": "yarn bundle --watch",

@@ -1,25 +1,24 @@
 #!/usr/bin/env -S node --no-warnings=ExperimentalWarning
 // bundles devvit.v1.min.js.
 
-/** @import {WebViewScriptsVersion} from '@devvit/shared-types/client/devvit-global.js' */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 
+import type { WebViewScriptsVersion } from '@devvit/shared-types/client/devvit-global.js';
 import esbuild from 'esbuild';
 
 import packageJSON from '../package.json' with { type: 'json' };
 
-/** @type {boolean} */ const minify = process.argv.includes('--minify');
-/** @type {boolean} */ const watch = process.argv.includes('--watch');
+const minify: boolean = process.argv.includes('--minify');
+const watch: boolean = process.argv.includes('--watch');
 
-/** @type {WebViewScriptsVersion} */ const webViewScripts = {
+const webViewScripts: WebViewScriptsVersion = {
   hash: execFileSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim(),
   // Imported JSON doesn't treeshake. Define as a constant.
   version: packageJSON.version,
 };
 
-/** @type {esbuild.BuildOptions} */
-const baseOpts = {
+const baseOpts: esbuild.BuildOptions = {
   banner: watch
     ? {
         js: "new EventSource('/esbuild').addEventListener('change', () => location.reload());",
@@ -37,16 +36,14 @@ const baseOpts = {
   write: !watch,
 };
 
-/** @type {esbuild.BuildOptions} */
-const devvitOpts = {
+const devvitOpts: esbuild.BuildOptions = {
   ...baseOpts,
   external: ['./screenshot.v1.min.js'],
   entryPoints: ['src/devvit.v1.ts'],
   format: 'iife',
 };
 
-/** @type {esbuild.BuildOptions} */
-const screenshotOpts = {
+const screenshotOpts: esbuild.BuildOptions = {
   ...baseOpts,
   entryPoints: ['src/screenshot.v1.ts'],
   format: 'esm',
