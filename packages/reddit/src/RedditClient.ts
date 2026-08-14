@@ -1579,7 +1579,7 @@ export class RedditClient {
   getWikiPage(
     subredditName: string,
     page: string,
-    revisionId?: WikiPageRevisionId | undefined
+    revisionId: WikiPageRevisionId | undefined
   ): Promise<WikiPage>;
 
   /**
