@@ -233,7 +233,7 @@ describe('ES Build Pack', () => {
               settings: false,
               triggers: false,
             },
-            server: { dir: '.', entry: 'server.js' },
+            server: { dir: '.', entry: 'server.ts' },
             json: { name: 'name' },
           },
           root: path.resolve(__dirname, '..', 'test-actors', 'server'),
@@ -445,7 +445,7 @@ describe('updateBundleServer()', () => {
     };
     updateBundleServer([bundle], path.join(__dirname, '../test-actors/server'), {
       dir: '.',
-      entry: 'server.js',
+      entry: 'server.ts',
     });
 
     expect(bundle?.server?.code).toMatchInlineSnapshot(`
@@ -466,7 +466,7 @@ describe('updateBundleServer()', () => {
     };
     updateBundleServer([bundle], path.join(__dirname, '../test-actors/server'), {
       dir: '.',
-      entry: 'server.js',
+      entry: 'server.ts',
     });
 
     expect(bundle?.server).toBe(undefined);
