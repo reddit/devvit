@@ -54,6 +54,10 @@ type MediaSignatureWithContentsAndUploadInfo = MediaSignatureWithContents & {
   uploadHeaders: { [key: string]: string };
 };
 
+function getAssetSignature(asset: Pick<MediaSignature, 'hash' | 'size'>): string {
+  return `${asset.hash}:${asset.size}`;
+}
+
 type SyncAssetsResult = {
   assetMap: AssetMap | undefined;
   webViewAssetMap: AssetMap | undefined;
@@ -457,6 +461,7 @@ export class AssetUploader {
     ux.action.start(
       `Uploading new WebView assets, ${assetsRemaining} remaining (${prettyPrintSize(sizeRemaining)})`
     );
+    const uploadedUrlsBySignature = new Map<string, string>();
 
     await mapAsyncWithMaxConcurrency(
       newAssets,
@@ -487,11 +492,23 @@ export class AssetUploader {
         }
 
         const uploadUrl = new URL(newAsset.uploadUrl);
-        assetMap[newAsset.filePath] = uploadUrl.origin + uploadUrl.pathname;
+        const publicUploadUrl = uploadUrl.origin + uploadUrl.pathname;
+        assetMap[newAsset.filePath] = publicUploadUrl;
+        uploadedUrlsBySignature.set(getAssetSignature(newAsset), publicUploadUrl);
         updateUploadMsg(newAsset.size);
       },
       PARALLEL_UPLOADS
     );
+
+    for (const duplicateAsset of duplicateAssets) {
+      const uploadedUrl = uploadedUrlsBySignature.get(getAssetSignature(duplicateAsset));
+      if (!uploadedUrl) {
+        throw new Error(
+          `Could not find the uploaded WebView asset matching duplicate ${duplicateAsset.filePath}.`
+        );
+      }
+      assetMap[duplicateAsset.filePath] = uploadedUrl;
+    }
 
     ux.action.stop(`${newAssets.length} new WebView assets uploaded.`);
     ux.action.start(`Finishing upload`);
@@ -536,6 +553,7 @@ export class AssetUploader {
 
     const newAssets: (MediaSignatureWithContents | MediaSignatureWithContentsAndUploadInfo)[] = [];
     const duplicateAssets: MediaSignatureWithContents[] = [];
+    const newAssetSignatures = new Set<string>();
     const existingAssets: AssetMap = {};
     statuses.forEach((status) => {
       const asset = assetsByFilePath[status.filePath];
@@ -547,9 +565,11 @@ export class AssetUploader {
       if (status.isNew) {
         // The user may have the same asset in multiple places, but we need to
         // only upload it once
-        if (newAssets.find((a) => a.hash === asset.hash && a.size === asset.size)) {
+        const signature = getAssetSignature(asset);
+        if (newAssetSignatures.has(signature)) {
           duplicateAssets.push(asset);
         } else {
+          newAssetSignatures.add(signature);
           if (!areWebviewAssets) {
             newAssets.push(asset);
             return;
