@@ -9,6 +9,7 @@ export const mockDevvit: Readonly<DevvitGlobal> = {
   appPermissionState: undefined,
   dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
   entrypoints: {},
+  experiments: {},
   context: {
     appName: 'test-app-123',
     appSlug: 'test-app-123',

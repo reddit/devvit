@@ -26,6 +26,9 @@
           'https://snntest20250827a-fgcm25-0-0-2-120-webview.devvit.net/leaderboard.html',
       },
     },
+    featureConfig: {
+      experiments: { new_scoring: 'enabled' },
+    },
   }),
   viewMode: 1,
   webbitToken:

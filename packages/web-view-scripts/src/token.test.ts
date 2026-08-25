@@ -78,6 +78,7 @@ describe('refreshToken()', () => {
       context: {} as DevvitGlobal['context'],
       dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
       entrypoints: {},
+      experiments: {},
       share: undefined,
       adPayload: undefined,
       appPermissionState: undefined,

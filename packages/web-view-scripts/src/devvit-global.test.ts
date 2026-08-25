@@ -471,6 +471,54 @@ describe('initContext()', () => {
     expect(devvit.webViewMode).toBe(WebViewImmersiveMode.INLINE_MODE);
   });
 
+  test('experiments is exposed from featureConfig', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.SHREDDIT,
+      webViewContext: {
+        subredditId: 't5_123',
+        subredditName: 'subredditName',
+        appName: 'test-app-123',
+        appVersion: '1.0.0',
+        postId: 't3_123',
+        userId: 't2_123',
+      },
+      webViewClientData: {
+        appConfig: { entrypoints: { default: 'index.html' } },
+        featureConfig: { experiments: { new_scoring: 'enabled', beta_feature: 'v2' } },
+      },
+      webbitToken: noWebbitToken,
+    };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
+
+    expect(devvit.experiments).toStrictEqual({
+      new_scoring: 'enabled',
+      beta_feature: 'v2',
+    });
+  });
+
+  test('experiments falls back to an empty map when featureConfig omits it', () => {
+    const bridge: BridgeContext = {
+      devvitDebug: '',
+      client: Client.SHREDDIT,
+      webViewContext: {
+        subredditId: 't5_123',
+        subredditName: 'subredditName',
+        appName: 'test-app-123',
+        appVersion: '1.0.0',
+        postId: 't3_123',
+        userId: 't2_123',
+      },
+      webViewClientData: { appConfig: { entrypoints: { default: 'index.html' } } },
+      webbitToken: noWebbitToken,
+    };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
+
+    expect(devvit.experiments).toStrictEqual({});
+  });
+
   test('token uses signedRequestContext when available', () => {
     const signedRequestContext =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHAiOnsibmFtZSI6ImFwcCJ9fQ.test';

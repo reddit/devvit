@@ -50,6 +50,7 @@ beforeEach(() => {
       default: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
       splash: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/splash.html',
     },
+    experiments: {},
     context: {
       appName: 'test-app-123',
       appSlug: 'test-app-123',

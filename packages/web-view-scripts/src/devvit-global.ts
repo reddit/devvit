@@ -73,6 +73,7 @@ export const initDevvitGlobal = (
       webViewScripts: globalThis.webViewScriptsVersion,
     },
     entrypoints: clientData?.appConfig?.entrypoints ?? {},
+    experiments: clientData?.featureConfig?.experiments ?? {},
     share: bridge?.shareParam ? { userData: bridge?.shareParam.userData } : undefined,
     adPayload: bridge?.adPayload,
     appPermissionState,

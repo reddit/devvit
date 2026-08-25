@@ -17,6 +17,8 @@ export type DevvitGlobal = {
   };
   /** Entrypoint name to URL from `devvit.json` `post.entrypoints`. */
   entrypoints: { [name: string]: string };
+  /** Experiment flags keyed by name, sourced from `FeatureConfig.experiments`. */
+  experiments: { [name: string]: string };
   /** App deep link data if any. */
   share: Share | undefined;
   /** Render-time ad data for promoted posts. Absent for non-promoted posts. */
