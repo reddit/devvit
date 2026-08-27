@@ -4,9 +4,17 @@ import type { T1, T3 } from '@devvit/shared-types/tid.js';
 import { getRedditApiPlugins } from '../plugin.js';
 
 export type FilterOptions = {
-  /** The reason for filtering the post or comment. This is visible to moderators in the ModQueue entry and in the post/comment if it is kept. E.g.: "contains sensitive content" */
+  /**
+   * The reason shown to moderators in the moderation queue. If {@link keep} is
+   * `true`, the reason is also shown on the post or comment.
+   *
+   * @example "contains sensitive content"
+   */
   reason?: string;
-  /** Whether to keep showing the the post or comment or to remove it. Defaults to false if not specified. */
+  /**
+   * Whether the post or comment remains visible while it is in the moderation
+   * queue. Defaults to `false`.
+   */
   keep?: boolean;
 };
 

@@ -30,14 +30,14 @@ import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
 import { richtextToString } from '../helpers/richtextToString.js';
 import { getCustomPostRichTextFallback } from '../helpers/textFallbackToRichtext.js';
 import { getRedditApiPlugins, getUserActionsPlugin } from '../plugin.js';
-import { type CustomPostStyles } from '../RedditClient.js';
+import type { CustomPostStyles } from '../RedditClient.js';
 import type { CommentSubmissionOptions } from './Comment.js';
 import { Comment } from './Comment.js';
 import type { CommonFlair } from './Flair.js';
 import { convertProtosFlairToCommonFlair } from './Flair.js';
 import type { ListingFetchOptions, ListingFetchResponse } from './Listing.js';
 import { Listing } from './Listing.js';
-import { ModNote } from './ModNote.js';
+import { type AddRemovalNoteOptions, ModNote } from './ModNote.js';
 import { User } from './User.js';
 
 /** A moderator report attached to a post or comment. */
@@ -48,11 +48,14 @@ export type ModeratorReport = {
 };
 
 /**
- * Crowd control level for posts. Determines which comments should be collapsed due to crowd control.
- * OFF: Anyone with a Reddit account can comment freely.
- * LENIENT: Collapse comments from people who have negative karma in your community.
- * MEDIUM: Collapse comments from new Reddit users and people with negative karma in your community.
- * STRICT: Collapse comments from people who haven’t joined your community, new Reddit users, and people with negative karma in your community
+ * Crowd Control threshold for comments on a post. Determines which comments
+ * should be collapsed by default.
+ *
+ * OFF: Do not collapse or filter comments through Crowd Control.
+ * LENIENT: Collapse or filter comments from accounts with negative community
+ *          karma.
+ * MEDIUM: LENIENT but also applies to new accounts.
+ * STRICT: MEDIUM but applies to accounts that have not joined the community.
  */
 export type CrowdControlLevel = 'OFF' | 'LENIENT' | 'MEDIUM' | 'STRICT';
 
@@ -76,7 +79,10 @@ export type GetBestPostsOptions = ListingFetchOptions;
 export type SearchPostsOptions = ListingFetchOptions & {
   /** Search query. */
   query: string;
-  /** The subreddit to search without 'r/' prefix. If specified, will restrict the search to posts in this subreddit */
+  /**
+   * The subreddit to search without the `r/` prefix. If specified, restricts
+   * the search to posts in this subreddit.
+   */
   subredditName?: string;
   /** How to sort the search results. Defaults to `relevance`. */
   sort?: 'relevance' | 'hot' | 'top' | 'new' | 'comments';
@@ -85,7 +91,7 @@ export type SearchPostsOptions = ListingFetchOptions & {
 };
 
 export type GetDuplicatesOptions = ListingFetchOptions & {
-  /** Post ID with t3_ prefix (e.g. `t3_abc123`). The prefix is stripped internally. */
+  /** The post identifier. */
   postId: T3;
   /** One of: "num_comments", "new" */
   sort?: 'num_comments' | 'new';
@@ -93,7 +99,7 @@ export type GetDuplicatesOptions = ListingFetchOptions & {
   subredditName?: string;
   /** Only return duplicates that are crossposting this post. */
   crosspostsOnly?: boolean;
-  /** Adding the string "all" will show all results regardless of user preferences. */
+  /** Use `"all"` to include results hidden by the account's preferences. */
   show?: string;
 };
 
@@ -147,11 +153,14 @@ export type PostSuggestedCommentSort =
   /** Sort by top upvoted comments. */
   | 'TOP';
 
+/** Options for replacing a post body. */
 export type PostTextOptions =
   | {
+      /** The post body in Markdown. */
       text: string;
     }
   | {
+      /** The post body as rich text. */
       richtext: object | RichTextBuilder;
     };
 
@@ -160,11 +169,13 @@ export type CustomPostRichTextFallback = RichTextBuilder | string;
 export type CustomPostTextFallbackOptions =
   | {
       /**
-       * May also include markdown. See https://www.reddit.com/r/reddit.com/wiki/markdown/
+       * The fallback content as plaintext or Markdown. See
+       * https://www.reddit.com/r/reddit.com/wiki/markdown/.
        */
       text: string;
     }
   | {
+      /** The fallback content as richtext. */
       richtext: CustomPostRichTextFallback;
     };
 
@@ -229,12 +240,19 @@ export type SubmitCustomPostOptions = CommonSubmitPostOptions & {
 };
 
 export type CommonSubmitPostOptions = {
+  /** The title of the new post. */
   title: string;
+  /** Whether the author receives notifications for new comments. */
   sendreplies?: boolean;
+  /** Whether to mark the new post as NSFW. */
   nsfw?: boolean;
+  /** Whether to mark the new post as a spoiler. */
   spoiler?: boolean;
+  /** The flair template to apply to the new post. */
   flairId?: string;
+  /** The flair text to apply to the new post. */
   flairText?: string;
+  /** The account that creates the post. Defaults to the app account. */
   runAs?: 'USER' | 'APP';
 };
 
@@ -249,6 +267,7 @@ export type SubmitPostOptions =
   | (SubmitSelfPostOptions & { kind?: never; url?: never })
   | (SubmitMediaOptions & { richtext?: never; text?: never; url?: never });
 
+/** Options for creating a crosspost. */
 export type CrosspostOptions = CommonSubmitPostOptions &
   Required<SubredditOptions> & { postId: T3 };
 
@@ -256,13 +275,13 @@ export type CrosspostOptions = CommonSubmitPostOptions &
 export type LinkFlair = CommonFlair;
 
 /**
- * oEmbed is a format for allowing an embedded representation of a URL on third party sites.
- * The simple API allows a website to display embedded content (such as photos or videos)
- * when a user posts a link to that resource, without having to parse the resource directly.
+ * oEmbed is a format for allowing an embedded representation of a URL on
+ * third-party sites. The API lets a website display embedded content, such as
+ * photos or videos, without parsing the resource directly.
  * See: https://oembed.com/
  */
 export type Oembed = {
-  /** The resource type. Valid values, along with value-specific parameters, are described below. E.g. "video" */
+  /** The resource type and its type-specific parameters, such as `"video"`. */
   type: string;
   /** A text title, describing the resource. */
   title?: string | undefined;
@@ -278,13 +297,21 @@ export type Oembed = {
   thumbnailHeight?: number | undefined;
   /** A URL to a thumbnail image representing the resource. */
   thumbnailUrl?: string | undefined;
-  /** The HTML required to embed a video player. The HTML should have no padding or margins. Consumers may wish to load the HTML in an off-domain iframe to avoid XSS vulnerabilities. */
+  /**
+   * The HTML required to embed a video player. It should have no padding or
+   * margins. Consider loading it in a separate-origin iframe to avoid XSS
+   * vulnerabilities.
+   */
   html: string;
-  /** The width in pixels required to display the HTML. */
-  height?: number | undefined;
   /** The height in pixels required to display the HTML. */
+  height?: number | undefined;
+  /** The width in pixels required to display the HTML. */
   width?: number | undefined;
-  /** A URL for the author/owner of the resource. E.g. "https://www.youtube.com/@Reddit" */
+  /**
+   * A URL for the resource's author or owner.
+   *
+   * @example "https://www.youtube.com/@Reddit"
+   */
   authorUrl?: string | undefined;
   /** The name of the author/owner of the resource. E.g. "Reddit" */
   authorName?: string | undefined;
@@ -296,19 +323,35 @@ export type Oembed = {
 export type RedditVideo = {
   /** The bitrate of the video in kilobits per second. E.g. 450 */
   bitrateKbps?: number | undefined;
-  /** The URL to the DASH playlist file. E.g. "https://v.redd.it/abc123/DASHPlaylist.mpd" */
+  /**
+   * The URL to the DASH playlist file.
+   *
+   * @example "https://v.redd.it/abc123/DASHPlaylist.mpd"
+   */
   dashUrl?: string | undefined;
   /** The duration of the video in seconds. E.g. 30 */
   duration?: number | undefined;
-  /** The direct URL to the video. E.g. "https://v.redd.it/abc123/DASH_1080.mp4?source=fallback" */
+  /**
+   * The direct URL to the video.
+   *
+   * @example "https://v.redd.it/abc123/DASH_1080.mp4?source=fallback"
+   */
   fallbackUrl?: string | undefined;
   /** The height of the video in pixels. E.g. 1080 */
   height?: number | undefined;
-  /** The URL to the HLS playlist file. E.g. "https://v.redd.it/abc123/HLSPlaylist.m3u8" */
+  /**
+   * The URL to the HLS playlist file.
+   *
+   * @example "https://v.redd.it/abc123/HLSPlaylist.m3u8"
+   */
   hlsUrl?: string | undefined;
   /** If `true`, the video is a GIF */
   isGif?: boolean | undefined;
-  /** The URL to the scrubber media file. E.g. "https://v.redd.it/abc123/DASH_96.mp4" */
+  /**
+   * The URL to the scrubber media file.
+   *
+   * @example "https://v.redd.it/abc123/DASH_96.mp4"
+   */
   scrubberMediaUrl?: string | undefined;
   /** The status of the transcoding process. E.g. "completed" */
   transcodingStatus?: string | undefined;
@@ -324,12 +367,14 @@ export type SecureMedia = {
 };
 
 /**
- * Contains data about a post's thumbnail. Also contains a blurred version if the thumbnail is NSFW.
+ * Contains a post's thumbnail and, for NSFW content, its blurred version.
  */
 export type EnrichedThumbnail = {
   /** Attribution text for the thumbnail */
   attribution?: string;
-  /** The image used for the thumbnail. May have different resolution from Post.thumbnail */
+  /**
+   * The thumbnail image. Its resolution can differ from {@link Post.thumbnail}.
+   */
   image: {
     url: string;
     height: number;
@@ -358,7 +403,7 @@ export type GalleryMediaStatus =
  * Represents media that the post may contain.
  */
 export type GalleryMedia = {
-  /** Status of the media. Media that were successfully uplaoded will have GalleryMediaStatus.VALID status */
+  /** The media processing status. Successful uploads have `VALID` status. */
   status: GalleryMediaStatus;
   url: string;
   height: number;
@@ -379,7 +424,7 @@ export type PollOption = {
 export type PollData = {
   /** Options in the poll. */
   options: PollOption[];
-  /** Total number of votes cast in the poll. Aggregated across all PollOption objects. */
+  /** Total votes cast across all of the poll's options. */
   totalVoteCount: number;
   /** Time the poll voting closes, in Unix milliseconds. */
   votingEndTimestamp: number;
@@ -563,172 +608,263 @@ export class Post {
     return this.#id;
   }
 
+  /** The creator's account identifier, or `undefined` when unavailable. */
   get authorId(): T2 | undefined {
     return this.#authorId;
   }
 
+  /** The creator's username without the leading `u/`. */
   get authorName(): string {
     return this.#authorName;
   }
 
+  /** The subreddit identifier where the post was created. */
   get subredditId(): T5 {
     return this.#subredditId;
   }
 
+  /** The owning subreddit's name without the leading `r/`. */
   get subredditName(): string {
     return this.#subredditName;
   }
 
+  /**
+   * The post's path relative to `https://www.reddit.com`.
+   *
+   * @example "/r/wallstreetbets/comments/abc123/post/"
+   */
   get permalink(): string {
     return this.#permalink;
   }
 
+  /** The title displayed for the post. */
   get title(): string {
     return this.#title;
   }
 
+  /** The post body in Markdown. `undefined` if absent. */
   get body(): string | undefined {
     return this.#body;
   }
 
+  /** The post body rendered as HTML, or `undefined` when unavailable. */
   get bodyHtml(): string | undefined {
     return this.#bodyHtml;
   }
 
+  /**
+   * The post URL.
+   *
+   * This is the submitted URL for a link post or the full-size media URL for an
+   * image or video post. Use {@link permalink} for the relative path.
+   *
+   * @example "https://www.reddit.com/r/wallstreetbets/comments/abc123/post/"
+   */
   get url(): string {
     return this.#url;
   }
 
+  /**
+   * The post's preview thumbnail URL and dimensions in pixels.
+   *
+   * `undefined` means no thumbnail is available or the source field contains a
+   * placeholder such as `"self"` or `"nsfw"`.
+   */
   get thumbnail(): { url: string; height: number; width: number } | undefined {
     return this.#thumbnail;
   }
 
+  /** The date when the post was created. */
   get createdAt(): Date {
     return this.#createdAt;
   }
 
+  /** The post's upvotes minus downvotes, or `0` when unavailable. */
   get score(): number {
     return this.#score;
   }
 
+  /** The number of comments, or `0` when none are available. */
   get numberOfComments(): number {
     return this.#numberOfComments;
   }
 
+  /** The number of reports, or `0` when none are available. */
   get numberOfReports(): number {
     return this.#numberOfReports;
   }
 
+  /** Whether the post has been approved by a moderator. */
   get approved(): boolean {
     return this.#approved;
   }
 
+  /**
+   * The moderation approval time as Unix seconds, or `0` when unavailable.
+   *
+   * Use {@link approved} to check the current approval state. Convert a nonzero
+   * value to a `Date` with `new Date(post.approvedAtUtc * 1000)`.
+   */
   get approvedAtUtc(): number {
     return this.#approvedAtUtc;
   }
 
+  /**
+   * The ban time as Unix seconds, or `0` when unavailable.
+   *
+   * Convert a nonzero value to a `Date` with
+   * `new Date(post.bannedAtUtc * 1000)`.
+   */
   get bannedAtUtc(): number {
     return this.#bannedAtUtc;
   }
 
+  /** Whether the post has been marked as spam by a moderator. */
   get spam(): boolean {
     return this.#spam;
   }
 
+  /** Whether the post is presented before other posts in its subreddit. */
   get stickied(): boolean {
     return this.#stickied;
   }
 
+  /** Whether the post has been removed by a moderator. */
   get removed(): boolean {
     return this.#removed;
   }
 
   /**
-   * Who removed this object (username)
+   * The username of the account that removed the post, without the leading
+   * `u/`, or `undefined` when unavailable.
    */
   get removedBy(): string | undefined {
     return this.#removedBy;
   }
 
   /**
-   * who/what removed this object. It will return one of the following:
-   * - "anti_evil_ops": object is removed by a aeops member
-   * - "author": object is removed by author of the post
-   * - "automod_filtered": object is filtered by automod
-   * - "community_ops": object is removed by a community team member
-   * - "content_takedown": object is removed due to content violation
-   * - "copyright_takedown": object is removed due to copyright violation
-   * - "deleted": object is deleted
-   * - "moderator": object is removed by a mod of the sub
-   * - "reddit": object is removed by anyone else
-   * - undefined: object is not removed
+   * Identifies who or what removed the post:
+   *
+   * - `"anti_evil_ops"`: Reddit Anti-Evil Operations.
+   * - `"author"`: The post's author.
+   * - `"automod_filtered"`: AutoModerator filtering.
+   * - `"community_ops"`: Reddit Community Operations.
+   * - `"content_takedown"`: A content-policy takedown.
+   * - `"copyright_takedown"`: A copyright takedown.
+   * - `"deleted"`: The post was deleted.
+   * - `"moderator"`: A subreddit moderator.
+   * - `"reddit"`: Any other remover.
+   * - `undefined`: No removal category is available.
    */
   get removedByCategory(): string | undefined {
     return this.#removedByCategory;
   }
 
+  /** Whether the post is archived. */
   get archived(): boolean {
     return this.#archived;
   }
 
+  /** Whether the post body has been edited since it was created. */
   get edited(): boolean {
     return this.#edited;
   }
 
+  /** Whether the post is locked and new comments are disabled. */
   get locked(): boolean {
     return this.#locked;
   }
 
+  /** Whether the post is marked not safe for work (NSFW). */
   get nsfw(): boolean {
     return this.#nsfw;
   }
 
+  /** Whether the post is quarantined. */
   get quarantined(): boolean {
     return this.#quarantined;
   }
 
+  /**
+   * Whether the post's content is hidden until the user explicitly opens it.
+   */
   get spoiler(): boolean {
     return this.#spoiler;
   }
 
+  /** Whether the post is hidden from listings. */
   get hidden(): boolean {
     return this.#hidden;
   }
 
+  /** Whether reports on the post are being ignored. */
   get ignoringReports(): boolean {
     return this.#ignoringReports;
   }
 
+  /**
+   * The post's distinction category.
+   *
+   * For example, a post distinguished by a moderator or employee returns
+   * `"moderator"` or `"admin"`. `undefined` means no distinction is available.
+   */
   get distinguishedBy(): string | undefined {
     return this.#distinguishedBy;
   }
 
+  /**
+   * A listing of the post's top-level comments. Each comment exposes its
+   * replies separately.
+   *
+   * @example
+   * ```ts
+   * const comments = await post.comments.get(25);
+   * ```
+   */
   get comments(): Listing<Comment> {
     return Comment.getComments({
       postId: this.id,
     });
   }
 
+  /**
+   * A listing of other posts that reference the same URL.
+   *
+   * @example
+   * ```ts
+   * const duplicates = await post.getDuplicates().get(25);
+   * ```
+   */
   getDuplicates(opts: Omit<GetDuplicatesOptions, 'postId'> = {}): Listing<Post> {
     return Post.getDuplicates({ ...opts, postId: this.id });
   }
 
+  /** The post flair, or `undefined` when unavailable. */
   get flair(): CommonFlair | undefined {
     return this.#flair;
   }
 
+  /** The author's subreddit flair, or `undefined` when unavailable. */
   get authorFlair(): CommonFlair | undefined {
     return this.#authorFlair;
   }
 
+  /**
+   * Metadata for embedded or Reddit-hosted media, including oEmbed or Reddit
+   * video data.
+   *
+   * Returns `undefined` when the post has no secure media metadata.
+   */
   get secureMedia(): SecureMedia | undefined {
     return this.#secureMedia;
   }
 
+  /** User report reasons, or an empty array when none are available. */
   get userReportReasons(): string[] {
     return this.#userReportReasons;
   }
 
+  /** Moderator reports and authors, or an empty array when unavailable. */
   get modReports(): ModeratorReport[] {
     return this.#modReports;
   }
@@ -739,26 +875,33 @@ export class Post {
   }
 
   /**
-   * Get the media in the post. Empty if the post doesn't have any media.
+   * Get the image or GIF metadata in the post. Empty if the post doesn't have
+   * any media.
+   *
+   * Gallery posts can contain multiple entries. For other posts, one entry from
+   * the first preview image or GIF variant.
    */
   get gallery(): GalleryMedia[] {
     return this.#gallery;
   }
 
   /**
-   * Poll data for the post, if the post is a poll. Undefined otherwise.
+   * The post's poll options, vote totals, and voting end time. `undefined` if
+   * the post is not a poll.
    */
   get pollData(): PollData | undefined {
     return this.#pollData;
   }
 
   /**
-   * The ID of the original post this was crossposted from. Undefined if this post is not a crosspost.
+   * The original post's identifier when this post is a crosspost. `undefined`
+   * if not a crosspost or parent is unavailable.
    */
   get crosspostParentId(): T3 | undefined {
     return this.#crosspostParentId;
   }
 
+  /** JSON representation of public fields. */
   toJSON(): Pick<
     Post,
     | 'id'
@@ -840,58 +983,75 @@ export class Post {
     };
   }
 
+  /** The post's approval state. */
   isApproved(): boolean {
     return this.#approved;
   }
 
+  /** The post's spam state. */
   isSpam(): boolean {
     return this.#spam;
   }
 
+  /** The post's stickied state. */
   isStickied(): boolean {
     return this.#stickied;
   }
 
+  /** The post's removal state. */
   isRemoved(): boolean {
     return this.#removed;
   }
 
+  /** The post's archived state. */
   isArchived(): boolean {
     return this.#archived;
   }
 
+  /** The post's edited state. */
   isEdited(): boolean {
     return this.#edited;
   }
 
+  /** The post's locked state. */
   isLocked(): boolean {
     return this.#locked;
   }
 
+  /** The post's NSFW state. */
   isNsfw(): boolean {
     return this.#nsfw;
   }
 
+  /** The post's quarantine state. */
   isQuarantined(): boolean {
     return this.#quarantined;
   }
 
+  /** The post's spoiler state. */
   isSpoiler(): boolean {
     return this.#spoiler;
   }
 
+  /** The post's hidden state. */
   isHidden(): boolean {
     return this.#hidden;
   }
 
+  /** The post's report-ignore state. */
   isIgnoringReports(): boolean {
     return this.#ignoringReports;
   }
 
+  /** The post's distinction category. */
   isDistinguishedBy(): string | undefined {
     return this.#distinguishedBy;
   }
 
+  /**
+   * Replaces the post body as the app account, then updates the cached body and
+   * edited state from the response.
+   */
   async edit(opts: Readonly<PostTextOptions>): Promise<void> {
     const newPost = await Post.edit({
       id: this.id,
@@ -903,13 +1063,14 @@ export class Post {
   }
 
   /**
-   * Set the suggested sort for comments on a Post.
+   * Sets the suggested default sort for the post's comments.
    *
-   * @throws {Error} Throws an error if the suggested sort could not be set.
+   * @throws {Error} If the suggested sort is rejected.
+   *
    * @example
    * ```ts
    * const post = await reddit.getPostById(context.postId);
-   * await post.setSuggestedCommentSort("NEW");
+   * await post.setSuggestedCommentSort('NEW');
    * ```
    */
   async setSuggestedCommentSort(suggestedSort: PostSuggestedCommentSort): Promise<void> {
@@ -921,7 +1082,7 @@ export class Post {
   }
 
   /**
-   * Get the postData for the custom post.
+   * Get the post data for the custom post.
    *
    * @example
    * ```ts
@@ -935,8 +1096,7 @@ export class Post {
   }
 
   /**
-   * Set the postData for the custom post. This will replace the existing
-   * postData with the postData specified in the input.
+   * Replace the post data stored on a custom post.
    *
    * @param postData - Represents the postData to be set, eg: { currentScore: 55, secretWord: 'barbeque' }
    * @throws {Error} Throws an error if the postData could not be set.
@@ -959,15 +1119,19 @@ export class Post {
   }
 
   /**
-   * Merge the postData on a custom post with the postData specified in the input. This performs a shallow merge.
+   * Shallow-merge `postData` with any existing post data.
    *
-   * @param postData - Represents the postData to be merged with the existing postData.
-   * @throws {Error} Throws an error if the postData could not be merged.
+   * Existing top-level properties are preserved unless the input replaces
+   * them. Nested objects are replaced rather than deeply merged.
+   *
+   * @throws {Error} If the post data could not be updated.
+   *
    * @example
    * ```ts
    * const post = await reddit.getPostById(context.postId);
    *
-   * // Existing postData: { currentScore: 55, settings: { theme: 'dark', fontSize: 12 } }
+   * // Existing data:
+   * // { currentScore: 55, settings: { theme: 'dark', fontSize: 12 } }
    *
    * await post.mergePostData({ settings: { fontSize: 14 } });
    * // Result: { currentScore: 55, settings: { fontSize: 14 } }
@@ -983,13 +1147,16 @@ export class Post {
   }
 
   /**
-   * Set a text fallback for the custom post.
+   * Replaces the content shown when a custom post cannot be rendered. Eg, on
+   * `old.reddit.com`.
    *
-   * @param opts - A text or a richtext to render in a fallback
-   * @throws {Error} Throws an error if the fallback could not be set.
+   * The fallback may be plain text, Markdown, or rich text. This instance's
+   * body and edited state are updated from the response.
+   *
+   * @throws {Error} If the fallback could not be updated.
+   *
    * @example
    * ```ts
-   * // from a menu action, form, scheduler, trigger, custom post click event, etc
    * const newTextFallback = { text: 'This is an updated text fallback' };
    * const post = await context.reddit.getPostById(context.postId);
    * await post.setTextFallback(newTextFallback);
@@ -1002,6 +1169,7 @@ export class Post {
     this.#edited = newPost.edited;
   }
 
+  /** Creates a top-level comment on the post. */
   async addComment(opts: Readonly<CommentSubmissionOptions>): Promise<Comment> {
     return Comment.submit({
       id: this.id,
@@ -1009,6 +1177,7 @@ export class Post {
     });
   }
 
+  /** Deletes the post as the app account. */
   async delete(): Promise<void> {
     const appUsername = context.appName;
     if (appUsername !== this.#authorName) {
@@ -1019,6 +1188,7 @@ export class Post {
     return Post.delete(this.id);
   }
 
+  /** Approves the post and updates this instance's moderation state. */
   async approve(): Promise<void> {
     await Post.approve(this.id);
     this.#approved = true;
@@ -1030,8 +1200,6 @@ export class Post {
    * - if @param options.keep is `false`, the post stops being in displayed the subreddit
    * - if @param options.keep is `true`, the post is still displayed in the subreddit
    *
-   * @param options - The options for this filter action.
-   * @returns A Promise that resolves if the post was filtered successfully.
    * @experimental
    */
   async filter(options?: FilterOptions): Promise<void> {
@@ -1041,6 +1209,11 @@ export class Post {
     this.#approved = false;
   }
 
+  /**
+   * Removes the post and updates this instance's moderation state.
+   *
+   * @param isSpam - Whether to classify the removed post as spam.
+   */
   async remove(isSpam: boolean = false): Promise<void> {
     await Post.remove(this.id, isSpam);
     this.#removed = true;
@@ -1048,83 +1221,107 @@ export class Post {
     this.#approved = false;
   }
 
+  /** Disables new comments and updates this instance's locked state. */
   async lock(): Promise<void> {
     await Post.lock(this.id);
     this.#locked = true;
   }
 
+  /** Enables new comments and updates this instance's locked state. */
   async unlock(): Promise<void> {
     await Post.unlock(this.id);
     this.#locked = false;
   }
 
+  /** Hides the post from the app account and updates this instance. */
   async hide(): Promise<void> {
     await Post.hide(this.id);
     this.#hidden = true;
   }
 
+  /** Unhides the post for the app account and updates this instance. */
   async unhide(): Promise<void> {
     await Post.unhide(this.id);
     this.#hidden = false;
   }
 
+  /** Marks the post as NSFW and updates this instance. */
   async markAsNsfw(): Promise<void> {
     await Post.markAsNsfw(this.id);
     this.#nsfw = true;
   }
 
+  /** Removes the NSFW designation and updates this instance. */
   async unmarkAsNsfw(): Promise<void> {
     await Post.unmarkAsNsfw(this.id);
     this.#nsfw = false;
   }
 
+  /** Marks the post as a spoiler and updates this instance. */
   async markAsSpoiler(): Promise<void> {
     await Post.markAsSpoiler(this.id);
     this.#spoiler = true;
   }
 
+  /** Removes the spoiler designation and updates this instance. */
   async unmarkAsSpoiler(): Promise<void> {
     await Post.unmarkAsSpoiler(this.id);
     this.#spoiler = false;
   }
 
+  /**
+   * Pins the post in a sticky slot.
+   *
+   * @param position - The sticky slot. If omitted, the bottom-most available
+   * slot is used. Use 1 or 2 for subreddit posts. 3 and 4 are reserved for
+   * profile pins.
+   */
   async sticky(position?: 1 | 2 | 3 | 4): Promise<void> {
+    // to-do: update the cached {@link stickied} value on this instance?
     await Post.sticky(this.id, position);
   }
 
+  /**
+   * Unpins the post without updating this instance's cached {@link stickied}
+   * value.
+   */
   async unsticky(): Promise<void> {
     await Post.unsticky(this.id);
   }
 
+  /** Distinguishes the post as a moderator and updates this instance. */
   async distinguish(): Promise<void> {
     const { distinguishedBy } = await Post.distinguish(this.id, false);
     this.#distinguishedBy = distinguishedBy;
   }
 
+  /** Distinguishes the post as an administrator and updates this instance. */
   async distinguishAsAdmin(): Promise<void> {
     const { distinguishedBy } = await Post.distinguish(this.id, true);
     this.#distinguishedBy = distinguishedBy;
   }
 
+  /** Removes the post's distinction and updates this instance. */
   async undistinguish(): Promise<void> {
     const { distinguishedBy } = await Post.undistinguish(this.id);
     this.#distinguishedBy = distinguishedBy;
   }
 
+  /** Ignores reports and updates this instance's report-ignore state. */
   async ignoreReports(): Promise<void> {
     await Post.ignoreReports(this.id);
     this.#ignoringReports = true;
   }
 
+  /** Stops ignoring reports and updates this instance's cached state. */
   async unignoreReports(): Promise<void> {
     await Post.unignoreReports(this.id);
     this.#ignoringReports = false;
   }
 
   /**
-   * Snooze subsequent reports with the given reason from the same users for the next 7 days.
-   * Only works for free-form reports.
-   *
+   * Snoozes subsequent reports with the same reason from the same users for
+   * seven days. This only works for free-form reports.
    *
    * @param reason - The report reason to snooze.
    */
@@ -1133,8 +1330,8 @@ export class Post {
   }
 
   /**
-   * Unsnooze reports with the given reason.
-   * Only works for free-form reports.
+   * Unsnoozes reports with the given reason. This only works for free-form
+   * reports.
    *
    * @param reason - The report reason to unsnooze.
    */
@@ -1143,30 +1340,30 @@ export class Post {
   }
 
   /**
-   * Updates the crowd control level of the post to hide comments accordingly.
+   * Sets which comments Crowd Control collapses on this post.
    *
-   * @param level - The crowd control level to set. See {@link CrowdControlLevel} for more information.
+   * @param level - See {@link CrowdControlLevel} for the available levels.
    */
   async updateCrowdControlLevel(level: CrowdControlLevel): Promise<void> {
     await Post.updateCrowdControlLevel(this.id, level);
   }
 
+  /**
+   * Fetches the creator's account, or `undefined` if it is unavailable.
+   */
   async getAuthor(): Promise<User | undefined> {
     return User.getByUsername(this.#authorName);
   }
 
+  /** Creates a crosspost of this post in another subreddit. */
   async crosspost(opts: Readonly<Omit<CrosspostOptions, 'postId'>>): Promise<Post> {
     return Post.crosspost({ ...opts, postId: this.id });
   }
 
   /**
-   * Add a mod note for why the post was removed
-   *
-   * @param options.reasonId id of a Removal Reason - you can leave this as an empty string if you don't have one
-   * @param options.modNote the reason for removal (maximum 100 characters) (optional)
-   * @returns
+   * Adds a moderator note explaining why the post was removed.
    */
-  addRemovalNote(opts: { readonly reasonId: string; readonly modNote?: string }): Promise<void> {
+  addRemovalNote(opts: Readonly<Omit<AddRemovalNoteOptions, 'itemIds'>>): Promise<void> {
     return ModNote.addRemovalNote({ itemIds: [this.#id], ...opts });
   }
 
@@ -1189,10 +1386,12 @@ export class Post {
   }
 
   /**
-   * Set the custom styles for a custom post.
+   * Updates a custom post's styles.
+   *
+   * Unspecified properties retain their existing values. Passing `undefined`
+   * removes all custom styles.
+   *
    * @experimental
-   * @param styles The styles to set for the post. If a value isn't specified, its previous value
-   *   will be preserved. If `undefined` is passed, all custom styles will be removed.
    */
   async setCustomPostStyles(styles: CustomPostStylesInput | undefined): Promise<void> {
     return Post.setDevvitCustomPostStyles(this.#id, styles);
@@ -1263,7 +1462,8 @@ export class Post {
       context.metadata
     );
 
-    // Post Id might not be present as image/video post creation can happen asynchronously
+    // The post ID might be absent because image and video post creation can be
+    // asynchronous.
     const isAllowedMediaType = 'kind' in opts && ['image', 'video', 'videogif'].includes(opts.kind);
     if (isAllowedMediaType && !rsp.json?.data?.id) {
       if (opts.kind === 'image' && 'imageUrls' in opts) {
@@ -1888,9 +2088,8 @@ export class Post {
           context.metadata
         );
 
-        // We access the second listing because client.Duplicates returns a ListingResponse
-        // with a listings array of length 2. The first listing contains only the original post,
-        // while the second listing contains the duplicates.
+        // Duplicates returns two listings: the first contains the original
+        // post, and the second contains its duplicates.
         const duplicatesListing = response.listings?.[1];
         if (!duplicatesListing?.data?.children) {
           throw new Error('Duplicates response is missing children');

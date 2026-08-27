@@ -1,14 +1,7 @@
-import type {
-  DeleteNotesRequest,
-  GetNotesRequest,
-  ModNoteObject,
-  PostNotesRequest,
-  PostRemovalNoteRequest,
-} from '@devvit/protos/json/devvit/plugin/redditapi/modnote/modnote_msg.js';
+import type { ModNoteObject } from '@devvit/protos/json/devvit/plugin/redditapi/modnote/modnote_msg.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
-import type { Prettify } from '@devvit/shared-types/Prettify.js';
 import { asTid, T1, T2, T3, T5 } from '@devvit/shared-types/tid.js';
 
 import { getRedditApiPlugins } from '../plugin.js';
@@ -64,22 +57,67 @@ export interface ModNote {
   modAction?: ModAction;
 }
 
-export type GetModNotesOptions = Prettify<
-  Pick<GetNotesRequest, 'subreddit' | 'user'> & {
-    filter?: ModNoteType;
-  } & Pick<ListingFetchOptions, 'limit' | 'before'>
->;
+/** Options for retrieving a user's moderation notes from a subreddit. */
+export type GetModNotesOptions = {
+  /** The subreddit name without the leading `r/`. */
+  subreddit: string;
+  /** The username without the leading `u/`. */
+  user: string;
+  /** The type of moderation notes to return. Defaults to all types. */
+  filter?: ModNoteType;
+  /**
+   * The maximum total number of moderation notes to return.
+   *
+   * Accepts at most 100 notes per request. Omit this option to allow the
+   * listing to paginate beyond the first 100 notes.
+   */
+  limit?: number;
+  /** The pagination cursor before which results should be returned. */
+  before?: string;
+};
 
-export type CreateModNoteOptions = Prettify<
-  PostNotesRequest & {
-    redditId?: T1 | T3;
-    label?: UserNoteLabel;
-  }
->;
+/** Options for adding a moderation note to a user. */
+export type CreateModNoteOptions = {
+  /** The subreddit name without the leading `r/`. */
+  subreddit: string;
+  /** The username without the leading `u/`. */
+  user: string;
+  /** The text of the moderation note. The maximum length is 250 characters. */
+  note: string;
+  /** A label that categorizes the moderation note. */
+  label?: UserNoteLabel;
+  /** The comment or post associated with the moderation note. */
+  redditId?: T1 | T3;
+};
 
-export type DeleteNotesOptions = Prettify<DeleteNotesRequest>;
+/** Options for deleting a moderation note. */
+export type DeleteNotesOptions = {
+  /** The subreddit name without the leading `r/`. */
+  subreddit: string;
+  /** The unique moderation note identifier, including its `ModNote_` prefix. */
+  noteId: string;
+  /** The username without the leading `u/`. */
+  user: string;
+};
 
-export type AddRemovalNoteOptions = Prettify<PostRemovalNoteRequest>;
+/**
+ * Options for adding a note that explains why posts or comments were removed.
+ */
+export type AddRemovalNoteOptions = {
+  /** The IDs of the removed posts or comments. */
+  itemIds: string[];
+  /**
+   * The removal reason identifier, or an empty string when no removal reason is
+   * used.
+   */
+  reasonId: string;
+  /**
+   * The note explaining the removal. The maximum length is 100 characters.
+   *
+   * The plugin omits this field when it is `undefined` or an empty string.
+   */
+  modNote?: string;
+};
 
 export class ModNote {
   /**
@@ -88,7 +126,7 @@ export class ModNote {
   private constructor() {}
 
   static #fromProto(protoModNote: ModNoteObject): ModNote {
-    // check that all required fields of protoModNote needed to create a ModNote are present
+    // Check that all fields required to create a ModNote are present.
     assertNonNull(protoModNote.id, 'Mod note ID is null or undefined');
     assertNonNull(protoModNote.createdAt, 'Mod note createdAt is null or undefined');
     assertNonNull(protoModNote.type, 'Mod note type is null or undefined');
@@ -150,8 +188,8 @@ export class ModNote {
 
         return {
           children: protoRes.modNotes?.map((protoModNote) => this.#fromProto(protoModNote)) || [],
-          // if the response says that there are no more pages, then we should set before to undefined
-          // to prevent more requests from being made
+          // Clear the cursor when the response says there are no more pages so
+          // the listing does not make another request.
           before: protoRes.hasNextPage ? protoRes.endCursor : undefined,
           hasMore: protoRes.hasNextPage,
         } as ListingFetchResponse<ModNote>;

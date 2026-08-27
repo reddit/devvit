@@ -1218,42 +1218,40 @@ export class RedditClient {
   }
 
   /**
-   * Get a list of mod notes related to a user in a subreddit.
+   * Get a user's moderation notes within a subreddit.
    *
-   * @param options - Options for the request
-   * @param options.subredditName - The name of the subreddit to get the mod notes from. e.g. 'memes'
-   * @param options.username - The username of the user to get the mod notes for. e.g. 'spez'
-   * @param options.filter - Filter the mod notes by type. e.g. 'NOTE', 'BAN', 'APPROVAL'
-   * @param options.limit - The maximum number of mod notes to return. e.g. 1000
-   * @param options.pageSize - The number of mod notes to return per request. e.g. 100
-   * @returns A listing of ModNote objects.
+   * @example
+   * ```ts
+   * const notes = await reddit
+   *   .getModNotes({
+   *     subreddit: 'wallstreetbets',
+   *     user: 'spez',
+   *     filter: 'NOTE',
+   *   })
+   *   .get(25);
+   * ```
    */
   getModNotes(options: GetModNotesOptions): Listing<ModNote> {
     return ModNote.get(options);
   }
 
-  /**
-   * Delete a mod note.
-   *
-   * @param options - Options for the request
-   * @param options.subreddit - The name of the subreddit to delete the mod note from. e.g. 'memes'
-   * @param options.noteId - The ID of the mod note to delete (should have a ModNote_ prefix).
-   * @returns True if it was deleted successfully; false otherwise.
-   */
+  /** Deletes a moderation note. Returns true if successful. */
   deleteModNote(options: DeleteNotesOptions): Promise<boolean> {
     return ModNote.delete(options);
   }
 
   /**
-   * Add a mod note.
+   * Adds a moderation note to a user and returns the created note.
    *
-   * @param options - Options for the request
-   * @param options.subreddit - The name of the subreddit to add the mod note to. e.g. 'memes'
-   * @param options.user - The username of the user to add the mod note to. e.g. 'spez'
-   * @param options.redditId - (optional) The ID of the comment or post to add the mod note to. e.g. 't3_1234'
-   * @param options.label - (optional) The label of the mod note. e.g. 'SPAM_WARNING'
-   * @param options.note - The text of the mod note.
-   * @returns A Promise that resolves if the mod note was successfully added.
+   * @example
+   * ```ts
+   * const modNote = await reddit.addModNote({
+   *   subreddit: 'wallstreetbets',
+   *   user: 'spez',
+   *   note: 'Repeated rule 1 violations',
+   *   label: 'ABUSE_WARNING',
+   * });
+   * ```
    */
   addModNote(options: CreateModNoteOptions): Promise<ModNote> {
     const req = {
@@ -1264,11 +1262,16 @@ export class RedditClient {
   }
 
   /**
-   * Add a mod note for why a post or comment was removed
+   * Adds a removal note to each specified post or comment.
    *
-   * @param options.itemIds list of thing ids
-   * @param options.reasonId id of a Removal Reason - you can leave this as an empty string if you don't have one
-   * @param options.modNote the reason for removal (maximum 100 characters) (optional)
+   * @example
+   * ```ts
+   * await reddit.addRemovalNote({
+   *   itemIds: ['t1_abc123', 't3_def456'],
+   *   reasonId: '',
+   *   modNote: 'Removed for breaking rule 1',
+   * });
+   * ```
    */
   addRemovalNote(options: AddRemovalNoteOptions): Promise<void> {
     return ModNote.addRemovalNote(options);

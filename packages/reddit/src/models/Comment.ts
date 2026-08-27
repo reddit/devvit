@@ -21,7 +21,7 @@ import type { CommonFlair } from './Flair.js';
 import { convertProtosFlairToCommonFlair } from './Flair.js';
 import type { ListingFetchOptions, ListingFetchResponse, MoreObject } from './Listing.js';
 import { Listing } from './Listing.js';
-import { ModNote } from './ModNote.js';
+import { type AddRemovalNoteOptions, ModNote } from './ModNote.js';
 import type { ModeratorReport } from './Post.js';
 import { User } from './User.js';
 
@@ -53,17 +53,30 @@ type GetCommentsListingOptions = {
   sort?: CommentSort;
 };
 
+/** Options for submitting a comment body. */
 export type CommentSubmissionOptions =
   | {
+      /** The comment body in Markdown. */
       text: string;
+      /**
+       * The account used to create the comment. Defaults to the app account.
+       * This option is ignored by {@link Comment.edit}.
+       */
       runAs?: 'USER' | 'APP';
     }
   | {
+      /** The comment body as rich text. */
       richtext: object | RichTextBuilder;
+      /**
+       * The account used to create the comment. Defaults to the app account.
+       * This option is ignored by {@link Comment.edit}.
+       */
       runAs?: 'USER' | 'APP';
     };
 
+/** Options for replacing a comment body. */
 export type EditCommentOptions = CommentSubmissionOptions;
+/** Options for replying to a comment. */
 export type ReplyToCommentOptions = CommentSubmissionOptions;
 
 export type GetCommentsByUserOptions = {
@@ -182,98 +195,157 @@ export class Comment {
     return this.#id;
   }
 
+  /** The creator's account identifier or `undefined` when unavailable. */
   get authorId(): T2 | undefined {
     return this.#authorId;
   }
 
+  /**
+   * The creator's username without the leading `u/`. May be `"[deleted]"` when
+   * the author is unavailable.
+   *
+   * @example "Example_User"
+   */
   get authorName(): string {
     return this.#authorName;
   }
 
+  /** The subreddit identifier where the comment was created. */
   get subredditId(): T5 {
     return this.#subredditId;
   }
 
+  /**
+   * The name of the subreddit that contains the comment, without the leading
+   * `r/`.
+   *
+   * @example "AskReddit"
+   */
   get subredditName(): string {
     return this.#subredditName;
   }
 
+  /** The comment body in Markdown. */
   get body(): string {
     return this.#body;
   }
 
+  /** The date when the comment was created. */
   get createdAt(): Date {
     return this.#createdAt;
   }
 
+  /**
+   * The identifier of the comment's parent.
+   *
+   * A top-level comment returns the containing post's `T3`. A reply returns its
+   * parent comment's `T1`.
+   */
   get parentId(): T1 | T3 {
     return this.#parentId;
   }
 
+  /** The identifier of the post containing the comment. */
   get postId(): T3 {
     return this.#postId;
   }
 
+  /** The comment's direct replies. */
   get replies(): Listing<Comment> {
     return this.#replies;
   }
 
+  /**
+   * The comment's distinction category.
+   *
+   * For example, a comment distinguished by a moderator or administrator
+   * returns `"moderator"` or `"admin"`. `undefined` means no distinction is
+   * available.
+   */
   get distinguishedBy(): string | undefined {
     return this.#distinguishedBy;
   }
 
+  /** Whether the comment is locked and new replies are disabled. */
   get locked(): boolean {
     return this.#locked;
   }
 
+  /** Whether the comment is pinned to the top of its comment thread. */
   get stickied(): boolean {
     return this.#stickied;
   }
 
+  /** Whether the comment has been removed by a moderator. */
   get removed(): boolean {
     return this.#removed;
   }
 
+  /** Whether the comment has been approved by a moderator. */
   get approved(): boolean {
     return this.#approved;
   }
 
+  /**
+   * The moderation approval time as Unix seconds, or `0` when unavailable.
+   *
+   * Use {@link approved} to check the current approval state. Convert a
+   * nonzero value to a `Date` with `new Date(comment.approvedAtUtc * 1000)`.
+   */
   get approvedAtUtc(): number {
     return this.#approvedAtUtc;
   }
 
+  /**
+   * The ban time as Unix seconds, or `0` when unavailable.
+   *
+   * Convert a nonzero value to a `Date` with
+   * `new Date(comment.bannedAtUtc * 1000)`.
+   */
   get bannedAtUtc(): number {
     return this.#bannedAtUtc;
   }
 
+  /** Whether the comment has been marked as spam by a moderator. */
   get spam(): boolean {
     return this.#spam;
   }
 
+  /** Whether the comment body has been edited since it was created. */
   get edited(): boolean {
     return this.#edited;
   }
 
+  /** The number of reports, or `0` when none are available. */
   get numReports(): number {
     return this.#numReports;
   }
 
+  /** Whether Crowd Control caused the comment to be collapsed. */
   get collapsedBecauseCrowdControl(): boolean {
     return this.#collapsedBecauseCrowdControl;
   }
 
+  /** The comment's upvotes minus downvotes, or `0` when unavailable. */
   get score(): number {
     return this.#score;
   }
 
+  /**
+   * The comment's path relative to `https://www.reddit.com`.
+   *
+   * @example "/r/wallstreetbets/comments/abc123/example_post/def456/"
+   */
   get permalink(): string {
     return this.#permalink;
   }
 
+  /** User report reasons, or an empty array when none are available. */
   get userReportReasons(): string[] {
     return this.#userReportReasons;
   }
 
+  /** Moderator reports and authors, or an empty array when unavailable. */
   get modReports(): ModeratorReport[] {
     return this.#modReports;
   }
@@ -283,18 +355,26 @@ export class Comment {
     return this.#modReportReasons;
   }
 
+  /**
+   * The absolute `https://www.reddit.com` URL for the comment.
+   *
+   * @example "https://www.reddit.com/r/wallstreetbets/comments/abc123/post/def456/"
+   */
   get url(): string {
     return this.#url;
   }
 
+  /** Whether reports on the comment are being ignored. */
   get ignoringReports(): boolean {
     return this.#ignoringReports;
   }
 
+  /** The author's subreddit flair, or `undefined` when unavailable. */
   get authorFlair(): CommonFlair | undefined {
     return this.#authorFlair;
   }
 
+  /** Returns the public fields included when the comment is serialized. */
   toJSON(): Pick<
     Comment,
     | 'id'
@@ -354,42 +434,61 @@ export class Comment {
     };
   }
 
+  /** The comment's locked state. */
   isLocked(): boolean {
     return this.#locked;
   }
 
+  /** The comment's approval state. */
   isApproved(): boolean {
     return this.#approved;
   }
 
+  /** The comment's removal state. */
   isRemoved(): boolean {
     return this.#removed;
   }
 
+  /** The comment's spam state. */
   isSpam(): boolean {
     return this.#spam;
   }
 
+  /** The comment's stickied state. */
   isStickied(): boolean {
     return this.#stickied;
   }
 
+  /** The comment's distinguished category state. */
   isDistinguished(): boolean {
     return Boolean(this.#distinguishedBy);
   }
 
+  /** The comment's edited state. */
   isEdited(): boolean {
     return this.#edited;
   }
 
+  /** The comment's report-ignore state. */
   isIgnoringReports(): boolean {
     return this.#ignoringReports;
   }
 
+  /**
+   * Deletes the comment as the app account.
+   *
+   * The `runAs` option is ignored when editing a comment.
+   */
   async delete(): Promise<void> {
     return Comment.delete(this.id);
   }
 
+  /**
+   * Replaces the comment body as the app account, then updates the cached body
+   * and edited state from the response.
+   *
+   * The `runAs` option is ignored when editing a comment.
+   */
   async edit(opts: Readonly<EditCommentOptions>): Promise<this> {
     const newComment = await Comment.edit({ id: this.id, ...opts });
 
@@ -399,12 +498,18 @@ export class Comment {
     return this;
   }
 
+  /** Approves the comment and updates this instance's moderation state. */
   async approve(): Promise<void> {
     await Comment.approve(this.id);
     this.#approved = true;
     this.#removed = false;
   }
 
+  /**
+   * Removes the comment and updates this instance's moderation state.
+   *
+   * @param isSpam - Whether to classify the removed comment as spam.
+   */
   async remove(isSpam: boolean = false): Promise<void> {
     await Comment.remove(this.id, isSpam);
     this.#removed = true;
@@ -417,8 +522,6 @@ export class Comment {
    * - if @param options.keep is `false`, the comment stops being in displayed the subreddit
    * - if @param options.keep is `true`, the comment is still displayed in the subreddit
    *
-   * @param options - The options for this filter action.
-   * @returns A Promise that resolves if the comment was filtered successfully.
    * @experimental
    */
   async filter(options?: FilterOptions): Promise<void> {
@@ -428,55 +531,75 @@ export class Comment {
     this.#approved = false;
   }
 
+  /** Disables new replies and updates this instance's locked state. */
   async lock(): Promise<void> {
     await Comment.lock(this.id);
     this.#locked = true;
   }
 
+  /** Enables new replies and updates this instance's locked state. */
   async unlock(): Promise<void> {
     await Comment.unlock(this.id);
     this.#locked = false;
   }
 
+  /** Creates a direct reply to the comment. */
   async reply(opts: Readonly<ReplyToCommentOptions>): Promise<Comment> {
     return Comment.submit({ id: this.id, ...opts });
   }
 
+  /** Fetches the author's account, or `undefined` if it is unavailable. */
   async getAuthor(): Promise<User | undefined> {
     return User.getByUsername(this.#authorName);
   }
 
+  /**
+   * Distinguishes the comment as a moderator and updates this instance.
+   *
+   * @param makeSticky - Whether to pin the comment to the top of its thread.
+   */
   async distinguish(makeSticky: boolean = false): Promise<void> {
     const { distinguishedBy, stickied } = await Comment.distinguish(this.id, makeSticky, false);
     this.#distinguishedBy = distinguishedBy;
     this.#stickied = stickied;
   }
 
+  /**
+   * Distinguishes the comment as an employee and updates this instance.
+   *
+   * @param makeSticky - Whether to pin the comment to the top of its thread.
+   */
   async distinguishAsAdmin(makeSticky: boolean = false): Promise<void> {
     const { distinguishedBy, stickied } = await Comment.distinguish(this.id, makeSticky, true);
     this.#distinguishedBy = distinguishedBy;
     this.#stickied = stickied;
   }
 
+  /**
+   * Removes the distinction category and sticky status and updates this
+   * instance.
+   */
   async undistinguish(): Promise<void> {
     const { distinguishedBy, stickied } = await Comment.undistinguish(this.id);
     this.#distinguishedBy = distinguishedBy;
     this.#stickied = stickied;
   }
 
+  /** Ignores reports and updates this instance's report-ignore state. */
   async ignoreReports(): Promise<void> {
     await Comment.ignoreReports(this.id);
     this.#ignoringReports = true;
   }
 
+  /** Stops ignoring reports and updates this instance's cached state. */
   async unignoreReports(): Promise<void> {
     await Comment.unignoreReports(this.id);
     this.#ignoringReports = false;
   }
 
   /**
-   * Snooze subsequent reports with the given reason from the same users for the next 7 days.
-   * Only works for free-form reports.
+   * Snoozes subsequent reports with the same reason from the same users for
+   * seven days. This only works for free-form reports.
    *
    * @param reason - The report reason to snooze.
    */
@@ -485,8 +608,8 @@ export class Comment {
   }
 
   /**
-   * Unsnooze reports with the given reason.
-   * Only works for free-form reports.
+   * Unsnoozes reports with the given reason. This only works for free-form
+   * reports.
    *
    * @param reason - The report reason to unsnooze.
    */
@@ -495,8 +618,8 @@ export class Comment {
   }
 
   /**
-   * Marks that this comment should not be collapsed by the crowd control system.
-   * It can still be collapsed for other reasons.
+   * Prevents Crowd Control from collapsing the comment. Other rules can still
+   * collapse it.
    */
   async showComment(): Promise<void> {
     await Comment.showComment(this.id);
@@ -504,13 +627,9 @@ export class Comment {
   }
 
   /**
-   * Add a mod note for why the comment was removed
-   *
-   * @param options.reasonId id of a Removal Reason - you can leave this as an empty string if you don't have one
-   * @param options.modNote the reason for removal (maximum 100 characters) (optional)
-   * @returns
+   * Adds a moderator note explaining why the comment was removed.
    */
-  addRemovalNote(opts: { readonly reasonId: string; readonly modNote?: string }): Promise<void> {
+  addRemovalNote(opts: Readonly<Omit<AddRemovalNoteOptions, 'itemIds'>>): Promise<void> {
     return ModNote.addRemovalNote({ itemIds: [this.#id], ...opts });
   }
 
@@ -916,7 +1035,8 @@ export class Comment {
     const children: Comment[] = [];
     let more: MoreObject | undefined;
 
-    // Map of comments to help set parent-child relationship between comments returned by MoreChildren.
+    // Map comments so replies returned by MoreChildren can be attached to
+    // their parents.
     const commentsMap: { [id: string]: Comment } = {};
 
     for (const child of redditObjects) {
@@ -936,7 +1056,8 @@ export class Comment {
       const parentComment = child.data.parentId ? commentsMap[child.data.parentId] : undefined;
 
       if (child.kind === 't1') {
-        // Sometimes MoreChildren API returns a comment that has already been seen.
+        // MoreChildren sometimes returns a comment that has already been
+        // seen.
         if (child.data.name === parentId) {
           continue;
         }
@@ -972,7 +1093,8 @@ export class Comment {
           }
         }
 
-        // Since the replies for this comment were already load we can skip the first fetch call
+        // The replies for this comment are already loaded, so skip the first
+        // fetch call.
         comment.replies.preventInitialFetch();
 
         if (parentComment) {
