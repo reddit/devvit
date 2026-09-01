@@ -66,7 +66,7 @@ export abstract class DevvitCommand extends Command {
     //        below.
     const baseFlags = Object.keys(DevvitCommand.baseFlags).map((flag) => `--${flag}`);
     const baseArgv = this.argv.filter(
-      (arg) => !arg.startsWith('--') || baseFlags.some((flag) => arg.startsWith(flag))
+      (arg) => !arg.startsWith('-') || baseFlags.some((flag) => arg.startsWith(flag))
     );
     // call parse() instead of this.parse() which only knows of
     // DevvitCommand.baseFlags.

@@ -60,7 +60,7 @@ export function formatAppLogMessage(
   const level = config.verbose ? severity.color(`[${severity.label}]`) : '';
   const runtime = config.runtime ? `[${localRuntime ? 'local' : 'remote'}]` : '';
   const timestamp =
-    config.verbose && log.timestamp
+    (config.verbose || config.showTimestamps) && log.timestamp
       ? chalk.dim(formatAppLogDate(log.timestamp, config.dateFormat))
       : '';
   return [level, runtime, timestamp, log.message].filter(Boolean).join(' ');
