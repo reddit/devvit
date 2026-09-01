@@ -39,8 +39,13 @@ export type AppConfig = {
   marketingAssets?: AppMarketingAssetsConfig;
   additionalSourceRoots?: string[];
   sourceIgnores?: string[];
+  featureConfig?: AppFeatureConfig;
   /** The original config as parsed. Used for writebacks. */
   json: AppConfigJson;
+};
+export type AppFeatureConfig = {
+  /** First-party DDG experiment names resolved at app launch. */
+  experiments?: string[];
 };
 export type AppBlocksConfig = { entry: string };
 /** Describes plugin usage. */
@@ -254,6 +259,9 @@ export type AppConfigJson = {
   };
   additionalSourceRoots?: string[];
   sourceIgnores?: string[];
+  featureConfig?: {
+    experiments?: string[];
+  };
   /** User data. */
   [key: string]: JsonValue;
 };
@@ -463,6 +471,11 @@ function AppConfig(json: Readonly<AppConfigJson>): AppConfig {
   }
   if (json.scripts) {
     partial.scripts = json.scripts;
+  }
+  if (json.featureConfig) {
+    partial.featureConfig = {};
+    if (json.featureConfig.experiments?.length)
+      partial.featureConfig.experiments = json.featureConfig.experiments;
   }
 
   const config = { ...partial, permissions: AppPermissionConfig(json.permissions, partial) };

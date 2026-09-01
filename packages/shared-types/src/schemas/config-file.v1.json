@@ -928,6 +928,23 @@
         "description": "A .gitignore-style pattern to ignore.",
         "examples": ["node_modules/", "dist/", "*.log"]
       }
+    },
+
+    "featureConfig": {
+      "type": "object",
+      "description": "Feature-flag and experiment names declared by the app. Resolved variants attach to WebViewClientData.featureConfig at launch.",
+      "additionalProperties": false,
+      "properties": {
+        "experiments": {
+          "type": "array",
+          "description": "First-party DDG experiment names to resolve at app launch and attach to WebViewClientData.featureConfig.experiments. Exposure is not recorded until the client explicitly exposes the variant. Only apps with App.isFirstParty receive resolved variants.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
     }
   }
 }

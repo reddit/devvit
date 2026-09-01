@@ -2492,6 +2492,47 @@ describe('parseAppConfigJSON()', () => {
       ).permissions.journeys
     ).toBe(true));
 
+  test('experiments are parsed from featureConfig', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: {},
+          featureConfig: { experiments: ['devvit_foo_bar', 'devvit_baz_wax'] },
+        } satisfies AppConfigJson,
+        false
+      ).featureConfig?.experiments
+    ).toStrictEqual(['devvit_foo_bar', 'devvit_baz_wax']));
+
+  test('top-level experiments are rejected', () =>
+    expect(() =>
+      parseAppConfigJson({ name: 'abc', server: {}, experiments: ['devvit_foo_bar'] }, false)
+    ).toThrow());
+
+  test('empty experiments names are rejected', () =>
+    expect(() =>
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: {},
+          featureConfig: { experiments: [''] },
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toThrow());
+
+  test('duplicate experiments names are rejected', () =>
+    expect(() =>
+      parseAppConfigJson(
+        {
+          name: 'abc',
+          server: {},
+          featureConfig: { experiments: ['devvit_foo_bar', 'devvit_foo_bar'] },
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toThrow());
+
   test('externalEndpoints empty object gives false permission', () =>
     expect(
       parseAppConfigJson(
