@@ -7,7 +7,13 @@ import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
 
 import { initTelemetry } from './telemetry.js';
 
-type EventListenerMock = Mock<(type: string, listener: (event: unknown) => void) => void>;
+type EventListenerMock = Mock<
+  (
+    type: string,
+    listener: (event: unknown) => void,
+    options?: boolean | AddEventListenerOptions
+  ) => void
+>;
 type TelemetryMetricForTest = { spanName: string };
 type MetricsMessage = { telemetry?: { metrics?: { metrics?: TelemetryMetricForTest[] } } };
 
@@ -71,6 +77,13 @@ describe('telemetry', () => {
 
   beforeEach(() => {
     initTelemetry();
+  });
+
+  it('listens for clicks in the capture phase', () => {
+    expect(docAddEventListenerMock).toHaveBeenCalledWith('click', expect.any(Function), {
+      capture: true,
+      passive: true,
+    });
   });
 
   it('sends click telemetry on click', async () => {

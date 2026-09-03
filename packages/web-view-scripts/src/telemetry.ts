@@ -54,7 +54,7 @@ function initClickEvent(): void {
     (event) => {
       emitTelemetryClickEffect(event);
     },
-    { passive: true }
+    { capture: true, passive: true }
   );
 }
 
