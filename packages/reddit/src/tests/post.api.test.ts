@@ -837,6 +837,7 @@ describe('Post API', () => {
               richtextFallback: 'This is a post with text as a fallback',
               thingId: 't3_qwerty',
               postData: { developerData: { riddle: 'hello' } },
+              runAs: RunAs.APP,
             },
             context.metadata
           );
@@ -866,6 +867,7 @@ describe('Post API', () => {
                 '**[Megathread](https://www.reddit.com)** ^([View this post on Reddit redesign for more options](https://www.reddit.com/))',
               thingId: 't3_qwerty',
               postData: { developerData: { riddle: 'hello' } },
+              runAs: RunAs.APP,
             },
             context.metadata
           );
@@ -902,6 +904,7 @@ describe('Post API', () => {
                 '{"document":[{"e":"h","l":1,"c":[{"e":"raw","t":"Hello world"}]},{"e":"code","c":[{"e":"raw","t":"This post was created via the Devvit API"}]}]}',
               thingId: 't3_qwerty',
               postData: { developerData: { riddle: 'hello' } },
+              runAs: RunAs.APP,
             },
             context.metadata
           );
@@ -931,6 +934,7 @@ describe('Post API', () => {
             postData: {
               developerData: { currentScore: 55, settings: { fontSize: 14 } },
             },
+            runAs: RunAs.APP,
           },
           context.metadata
         );

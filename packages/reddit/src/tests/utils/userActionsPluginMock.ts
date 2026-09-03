@@ -5,4 +5,5 @@ export const userActionsPlugin = {
   Comment: vi.fn(),
   Submit: vi.fn(),
   SubmitCustomPost: vi.fn(),
+  EditCustomPost: vi.fn(),
 } satisfies UserActions;

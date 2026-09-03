@@ -179,6 +179,11 @@ export type CustomPostTextFallbackOptions =
       richtext: CustomPostRichTextFallback;
     };
 
+export type SetCustomPostTextFallbackOptions = CustomPostTextFallbackOptions & {
+  /** The identity used to update the custom Post. */
+  runAs?: 'USER' | 'APP';
+};
+
 export type SubmitLinkOptions = CommonSubmitPostOptions & {
   url: string;
   /**
@@ -1162,7 +1167,7 @@ export class Post {
    * await post.setTextFallback(newTextFallback);
    * ```
    */
-  async setTextFallback(opts: Readonly<CustomPostTextFallbackOptions>): Promise<void> {
+  async setTextFallback(opts: Readonly<SetCustomPostTextFallbackOptions>): Promise<void> {
     const newPost = await Post.setTextFallback(opts, this.id);
 
     this.#body = newPost.body;
@@ -1696,6 +1701,7 @@ export class Post {
         {
           thingId: opts.postId,
           postData: opts.postData,
+          runAs: RunAs.APP,
         },
         context.metadata
       ),
@@ -1707,12 +1713,18 @@ export class Post {
   }
 
   /** @internal */
-  static async setTextFallback(opts: CustomPostTextFallbackOptions, postId: T3): Promise<Post> {
+  static async setTextFallback(opts: SetCustomPostTextFallbackOptions, postId: T3): Promise<Post> {
     if (!('text' in opts) && !('richtext' in opts)) {
       throw new Error(`No text fallback provided for post ${postId}.`);
     }
 
-    const client = getRedditApiPlugins().LinksAndComments;
+    const runAsType = RunAs[opts.runAs ?? 'APP'];
+    if (runAsType === RunAs.USER) {
+      assertUserScope(Scope.SUBMIT_POST);
+    }
+
+    const client =
+      runAsType === RunAs.USER ? getUserActionsPlugin() : getRedditApiPlugins().LinksAndComments;
 
     const richtextFallback = getCustomPostRichTextFallback(opts);
 
@@ -1722,6 +1734,7 @@ export class Post {
         richtextFallback,
         // to-do: remove once server doesn't wipe post data (DXC-2359).
         postData: await this.getDevvitPostData(postId),
+        runAs: runAsType,
       },
       context.metadata
     );
