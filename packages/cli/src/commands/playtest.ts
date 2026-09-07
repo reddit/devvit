@@ -50,6 +50,10 @@ import { toLowerCaseArgParser } from '../util/commands/DevvitCommand.js';
 import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { getSubredditNameWithoutPrefix } from '../util/common-actions/getSubredditNameWithoutPrefix.js';
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
+import {
+  canWriteAppVersion,
+  getAppAuthorizationRole,
+} from '../util/authorization/appAuthorization.js';
 import { waitUntilVersionBuildComplete } from '../util/common-actions/waitUntilVersionBuildComplete.js';
 import { warnIfOutdatedNodeVersion } from '../util/common-actions/warnIfOutdatedNodeVersion.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
@@ -436,10 +440,13 @@ export default class Playtest extends DevvitCommand {
     }
     this.project.app.defaultPlaytestSubredditId = this.#appInfo.app.defaultPlaytestSubredditId;
 
-    const isOwner = this.#appInfo?.app?.owner?.id === userInfo.id;
+    const appAuthorizationRole = getAppAuthorizationRole(this.#appInfo, {
+      id: userInfo.id,
+      displayName: userInfo.username,
+    });
     await this.#checkIfUserAllowedToPlaytestThisApp(
       this.project.name,
-      isOwner,
+      canWriteAppVersion(appAuthorizationRole),
       token,
       flags['employee-update']
     );
@@ -877,11 +884,11 @@ export default class Playtest extends DevvitCommand {
 
   async #checkIfUserAllowedToPlaytestThisApp(
     appName: string,
-    isOwner: boolean,
+    isAuthorizedToWriteApp: boolean,
     token: StoredToken,
     employeeUpdateFlag: boolean
   ): Promise<void> {
-    if (isOwner) {
+    if (isAuthorizedToWriteApp) {
       return;
     }
 
@@ -896,7 +903,9 @@ export default class Playtest extends DevvitCommand {
       // Check if the app name is available, implying this is a first run
       const appExists = await checkAppNameAvailability(this.#appClient, appName);
       if (appExists.exists) {
-        this.error(`That app already exists, and you can't playtest someone else's app!`);
+        this.error(
+          `That app already exists, and you are not its owner or a designated maintainer.`
+        );
       }
 
       // App doesn't exist - tell the user to run `devvit upload` first
