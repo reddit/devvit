@@ -4,8 +4,18 @@ import { webViewInternalMessageType } from '@devvit/shared-types/client/emit-eff
 import type { WebbitToken } from '@devvit/shared-types/webbit.js';
 import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
+import type { FCPMetric, TTFBMetric } from 'web-vitals';
 
 import { initTelemetry } from './telemetry.js';
+
+const webVitalsMocks = vi.hoisted(() => ({
+  onFCP: vi.fn(),
+  onTTFB: vi.fn(),
+}));
+
+vi.mock('web-vitals', () => webVitalsMocks);
+vi.mock('web-vitals/onFCP.js', () => ({ onFCP: webVitalsMocks.onFCP }));
+vi.mock('web-vitals/onTTFB.js', () => ({ onTTFB: webVitalsMocks.onTTFB }));
 
 type EventListenerMock = Mock<
   (
@@ -14,12 +24,32 @@ type EventListenerMock = Mock<
     options?: boolean | AddEventListenerOptions
   ) => void
 >;
-type TelemetryMetricForTest = { spanName: string };
+type TelemetryMetricForTest = {
+  spanName: string;
+  timeStart?: number;
+  timeEnd?: number;
+};
 type MetricsMessage = { telemetry?: { metrics?: { metrics?: TelemetryMetricForTest[] } } };
 
 const addEventListenerMock: EventListenerMock = vi.fn();
 const docAddEventListenerMock: EventListenerMock = vi.fn();
 const postMessageMock: EventListenerMock = vi.fn();
+let reportFcp: ((metric: FCPMetric) => void) | undefined;
+let reportTtfb: ((metric: TTFBMetric) => void) | undefined;
+
+const triggerFcp = (
+  entry?: PerformancePaintTiming,
+  value: number = entry?.startTime ?? 0
+): void => {
+  reportFcp?.({ value, entries: entry ? [entry] : [] } as FCPMetric);
+};
+
+const triggerTtfb = (
+  entry?: PerformanceNavigationTiming,
+  value: number = entry?.responseStart ?? 0
+): void => {
+  reportTtfb?.({ value, entries: entry ? [entry] : [] } as TTFBMetric);
+};
 
 const getMetricsPayloads = (): TelemetryMetricForTest[][] =>
   postMessageMock.mock.calls
@@ -30,6 +60,24 @@ const getFirstMetricsPayload = (): TelemetryMetricForTest[] => {
   const [metrics] = getMetricsPayloads();
   expect(metrics).toBeDefined();
   return metrics ?? [];
+};
+
+const getAllMetrics = (): TelemetryMetricForTest[] => getMetricsPayloads().flat();
+
+const expectMetric = (spanName: string, timeStart: number, timeEnd: number): void => {
+  expect(getAllMetrics()).toContainEqual({ spanName, timeStart, timeEnd });
+};
+
+const expectNoMetric = (spanName: string): void => {
+  expect(getAllMetrics()).not.toEqual(
+    expect.arrayContaining([expect.objectContaining({ spanName })])
+  );
+};
+
+const triggerWindowEvent = (type: string): void => {
+  addEventListenerMock.mock.calls
+    .filter(([eventType]) => eventType === type)
+    .forEach(([, handler]) => handler?.({}));
 };
 
 const expectMetricSpanNames = (metrics: TelemetryMetricForTest[], spanNames: string[]): void => {
@@ -51,6 +99,12 @@ const createMockDevvit = (): DevvitGlobal => ({
 });
 
 beforeEach(() => {
+  webVitalsMocks.onFCP.mockImplementation((callback) => {
+    reportFcp = callback;
+  });
+  webVitalsMocks.onTTFB.mockImplementation((callback) => {
+    reportTtfb = callback;
+  });
   globalThis.addEventListener = addEventListenerMock as unknown as typeof addEventListener;
   globalThis.document = {
     addEventListener: docAddEventListenerMock,
@@ -62,7 +116,10 @@ beforeEach(() => {
   } as unknown as Window;
 });
 
-afterEach(() => {
+afterEach(async () => {
+  await new Promise((resolve) => setTimeout(resolve));
+  reportFcp = undefined;
+  reportTtfb = undefined;
   delete (globalThis as { document?: {} }).document;
   delete (globalThis as { parent?: {} }).parent;
   delete (globalThis as { addEventListener?: {} }).addEventListener;
@@ -306,10 +363,7 @@ describe('telemetry', () => {
 it('sends load telemetry on window load', async () => {
   initTelemetry();
 
-  const loadHandlers = addEventListenerMock.mock.calls
-    .filter((call) => call[0] === 'load')
-    .map((call) => call[1]);
-  loadHandlers.forEach((handler) => handler?.({}));
+  triggerWindowEvent('load');
 
   expect(postMessageMock).toHaveBeenCalledWith(
     {
@@ -337,447 +391,131 @@ it('sends load telemetry on window load', async () => {
 });
 
 describe('performance monitoring', () => {
-  // Capture callbacks by entry type since multiple observers are created
-  const observerCallbacks: Record<string, (list: PerformanceObserverEntryList) => void> = {};
+  const defaultNavigationTiming: Partial<PerformanceNavigationTiming> = {
+    requestStart: 100,
+    responseStart: 200,
+    domInteractive: 300,
+    loadEventEnd: 400,
+  };
+  let navigationTiming: PerformanceNavigationTiming | undefined;
 
-  const triggerNavigationObserver = (entry: Partial<PerformanceNavigationTiming> = {}) => {
-    const entries = [
-      {
-        entryType: 'navigation',
-        requestStart: 100,
-        responseStart: 200,
-        domInteractive: 300,
-        loadEventEnd: 400,
-        ...entry,
-      } as PerformanceNavigationTiming,
-    ];
+  const setNavigationTiming = (
+    overrides: Partial<PerformanceNavigationTiming> | null = {}
+  ): void => {
+    navigationTiming =
+      overrides != null
+        ? ({ ...defaultNavigationTiming, ...overrides } as PerformanceNavigationTiming)
+        : undefined;
+  };
 
-    observerCallbacks['navigation']?.({
-      getEntries: () => entries,
-      getEntriesByName: () => [],
-      getEntriesByType: () => entries,
-    });
+  const createPaintEntry = (startTime: number = 300): PerformancePaintTiming =>
+    ({ name: 'first-contentful-paint', startTime }) as PerformancePaintTiming;
+
+  const completeDocument = (): void => {
+    (globalThis.document as unknown as { readyState: string }).readyState = 'complete';
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.keys(observerCallbacks).forEach((key) => delete observerCallbacks[key]);
-
     globalThis.devvit = createMockDevvit();
-
-    // Add window.addEventListener mock for performance monitoring
     (globalThis as { window: Window }).window = {
       getComputedStyle: () => {},
       addEventListener: addEventListenerMock,
     } as unknown as Window;
 
-    // Mock PerformanceObserver on globalThis - capture callbacks by entry type
-    (globalThis as unknown as { PerformanceObserver: unknown }).PerformanceObserver =
-      class MockPerformanceObserver {
-        #callback: (list: PerformanceObserverEntryList) => void;
-
-        constructor(callback: (list: PerformanceObserverEntryList) => void) {
-          this.#callback = callback;
-        }
-        observe(options: PerformanceObserverInit) {
-          // Store callback by entry type for later triggering
-          options.entryTypes?.forEach((type) => {
-            observerCallbacks[type] = this.#callback;
-          });
-          if (options.type) {
-            observerCallbacks[options.type] = this.#callback;
-          }
-        }
-        disconnect() {}
-        static supportedEntryTypes = ['paint', 'longtask', 'navigation'];
-      };
-
-    // Default mock for performance.getEntriesByType - needed because measureTti runs during init
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
+    setNavigationTiming();
+    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) =>
+      type === 'navigation' && navigationTiming ? [navigationTiming] : []
+    );
     initTelemetry();
   });
 
-  it('captures ttfb metric', async () => {
-    // Stub performance.getEntriesByType for navigation timing
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
+  it('captures the TTFB reported by web-vitals', () => {
+    triggerWindowEvent('load');
+    triggerTtfb(navigationTiming, 150);
 
-    // Trigger ALL load handlers (initLoadedEvent and initPerformanceMonitoring both register load handlers)
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_time_to_first_byte',
-                timeStart: 1717171717171 + 100,
-                timeEnd: 1717171717171 + 200,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
+    expectMetric(
+      'web_view_time_to_first_byte',
+      performance.timeOrigin,
+      performance.timeOrigin + 200
     );
     expectMetricSpanNames(getFirstMetricsPayload(), [
       'web_view_initialization',
       'web_view_time_to_interactive',
-      'web_view_time_to_first_byte',
       'web_view_load',
     ]);
   });
 
-  it('captures fcp metric', async () => {
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
+  it('captures the FCP reported by web-vitals and uses its entry for render duration', () => {
+    const paintEntry = createPaintEntry(300);
 
-    // Stub performance.getEntriesByType for paint AND navigation entries
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') {
-        return [paintEntry];
-      }
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
+    triggerFcp(paintEntry, 250);
+    triggerWindowEvent('load');
 
-    // Trigger the paint PerformanceObserver callback with mock FCP entry
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
-
-    // Trigger ALL load handlers to emit metrics
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_first_contentful_paint',
-                timeStart: performance.timeOrigin,
-                timeEnd: performance.timeOrigin + 300,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
+    expectMetric(
+      'web_view_first_contentful_paint',
+      performance.timeOrigin,
+      performance.timeOrigin + 300
+    );
+    expectMetric(
+      'web_view_render_duration',
+      performance.timeOrigin + 200,
+      performance.timeOrigin + 400
     );
     expectMetricSpanNames(getFirstMetricsPayload(), [
       'web_view_initialization',
       'web_view_time_to_interactive',
       'web_view_first_contentful_paint',
       'web_view_render_duration',
-      'web_view_time_to_first_byte',
       'web_view_load',
     ]);
   });
 
-  it('sends fcp as a standalone metric when fcp fires after load', async () => {
-    const loadEventEnd = 400;
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    let paintEntries: PerformanceEntry[] = [];
-    vi.spyOn(performance, 'now').mockReturnValue(450);
+  it('captures initialization, DOM interactive, and load milestones', () => {
+    vi.spyOn(performance, 'now').mockReturnValue(400);
 
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return paintEntries;
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
+    triggerWindowEvent('load');
 
-    // Simulate load firing before FCP arrives
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    // After load, readyState becomes 'complete'
-    (globalThis.document as unknown as { readyState: string }).readyState = 'complete';
-    triggerNavigationObserver({ loadEventEnd });
-
-    postMessageMock.mockClear();
-
-    // FCP observer fires late, after load
-    paintEntries = [paintEntry];
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_first_contentful_paint',
-                timeStart: performance.timeOrigin,
-                timeEnd: performance.timeOrigin + 300,
-              },
-              {
-                spanName: 'web_view_render_duration',
-                timeStart: performance.timeOrigin + 200,
-                timeEnd: performance.timeOrigin + loadEventEnd,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
+    expectMetric('web_view_initialization', 1717171717171, performance.timeOrigin);
+    expectMetric(
+      'web_view_time_to_interactive',
+      performance.timeOrigin,
+      performance.timeOrigin + 300
     );
-    expectMetricSpanNames(getFirstMetricsPayload(), [
-      'web_view_first_contentful_paint',
-      'web_view_render_duration',
-    ]);
-  });
-
-  it('captures tti metric', async () => {
-    // Mock getEntriesByType for navigation
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
-    // Trigger ALL load handlers to emit metrics (TTI is captured during init since document.readyState !== 'loading')
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    // TTI timeEnd = timeStart + domInteractive (domInteractive = 300)
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_time_to_interactive',
-                timeStart: performance.timeOrigin,
-                timeEnd: performance.timeOrigin + 300,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
-    );
+    expectMetric('web_view_load', performance.timeOrigin, performance.timeOrigin + 400);
     expectMetricSpanNames(getFirstMetricsPayload(), [
       'web_view_initialization',
       'web_view_time_to_interactive',
-      'web_view_time_to_first_byte',
       'web_view_load',
     ]);
   });
 
-  it('captures the web_view_initialization gap metric', async () => {
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_initialization',
-                timeStart: 1717171717171,
-                timeEnd: performance.timeOrigin,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
-    );
-    expectMetricSpanNames(getFirstMetricsPayload(), [
-      'web_view_initialization',
-      'web_view_time_to_interactive',
-      'web_view_time_to_first_byte',
-      'web_view_load',
-    ]);
-  });
-
-  it('captures load metric with timeOrigin-aligned timestamps', async () => {
-    const performanceNow = 400;
-    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_load',
-                timeStart: performance.timeOrigin,
-                timeEnd: performance.timeOrigin + performanceNow,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
-    );
-    expectMetricSpanNames(getFirstMetricsPayload(), [
-      'web_view_initialization',
-      'web_view_time_to_interactive',
-      'web_view_time_to_first_byte',
-      'web_view_load',
-    ]);
-  });
-
-  it('emits timeOrigin metrics without startTime', async () => {
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    const performanceNow = 400;
+  it('emits browser-timed metrics without a bridge start time', () => {
     vi.clearAllMocks();
-    Object.keys(observerCallbacks).forEach((key) => delete observerCallbacks[key]);
     globalThis.devvit = { ...createMockDevvit(), startTime: undefined };
-    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
-
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return [paintEntry];
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
+    vi.spyOn(performance, 'now').mockReturnValue(400);
     initTelemetry();
 
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
+    triggerFcp(createPaintEntry());
+    triggerWindowEvent('load');
 
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: [
-              {
-                spanName: 'web_view_time_to_interactive',
-                timeStart: performance.timeOrigin,
-                timeEnd: performance.timeOrigin + 300,
-              },
-              {
-                spanName: 'web_view_first_contentful_paint',
-                timeStart: performance.timeOrigin,
-                timeEnd: performance.timeOrigin + paintEntry.startTime,
-              },
-              {
-                spanName: 'web_view_render_duration',
-                timeStart: performance.timeOrigin + 200,
-                timeEnd: performance.timeOrigin + 400,
-              },
-              {
-                spanName: 'web_view_load',
-                timeStart: performance.timeOrigin,
-                timeEnd: performance.timeOrigin + performanceNow,
-              },
-            ],
-          },
-        },
-      }),
-      '*'
+    expectNoMetric('web_view_initialization');
+    expectMetric(
+      'web_view_time_to_interactive',
+      performance.timeOrigin,
+      performance.timeOrigin + 300
     );
+    expectMetric(
+      'web_view_first_contentful_paint',
+      performance.timeOrigin,
+      performance.timeOrigin + 300
+    );
+    expectMetric(
+      'web_view_render_duration',
+      performance.timeOrigin + 200,
+      performance.timeOrigin + 400
+    );
+    expectMetric('web_view_load', performance.timeOrigin, performance.timeOrigin + 400);
     expectMetricSpanNames(getFirstMetricsPayload(), [
       'web_view_time_to_interactive',
       'web_view_first_contentful_paint',
@@ -786,469 +524,133 @@ describe('performance monitoring', () => {
     ]);
   });
 
-  it('captures render duration from the navigation observer when fcp fires before load', async () => {
-    const performanceNow = 450;
-    let loadEventEnd = 0;
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    const paintEntries: PerformanceEntry[] = [paintEntry];
-    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return paintEntries;
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    const loadMetricsMessage = postMessageMock.mock.calls
-      .map(([message]) => message as MetricsMessage)
-      .find((message) => message.telemetry?.metrics);
-    expect(loadMetricsMessage?.telemetry?.metrics?.metrics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ spanName: 'web_view_render_duration' })])
-    );
-
-    loadEventEnd = 400;
-    postMessageMock.mockClear();
-    triggerNavigationObserver({ loadEventEnd });
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_render_duration',
-                timeStart: performance.timeOrigin + 200,
-                timeEnd: performance.timeOrigin + loadEventEnd,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
-    );
-  });
-
-  it('captures render duration when buffered fcp arrives after navigation observer', async () => {
-    const performanceNow = 450;
-    const loadEventEnd = 400;
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    let paintEntries: PerformanceEntry[] = [];
-    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return paintEntries;
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    postMessageMock.mockClear();
-    triggerNavigationObserver({ loadEventEnd });
-
-    expect(postMessageMock).not.toHaveBeenCalled();
-
-    (globalThis.document as unknown as { readyState: string }).readyState = 'complete';
-
-    paintEntries = [paintEntry];
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_render_duration',
-                timeStart: performance.timeOrigin + 200,
-                timeEnd: performance.timeOrigin + loadEventEnd,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
-    );
-  });
-
-  it('captures render duration in the late fcp batch when load fires before fcp', async () => {
-    const performanceNow = 450;
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 500,
-    } as PerformancePaintTiming;
-    let paintEntries: PerformanceEntry[] = [];
-    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return paintEntries;
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    const loadMetricsMessage = postMessageMock.mock.calls
-      .map(([message]) => message as MetricsMessage)
-      .find((message) => message.telemetry?.metrics);
-    expect(loadMetricsMessage?.telemetry?.metrics?.metrics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ spanName: 'web_view_render_duration' })])
-    );
-
-    (globalThis.document as unknown as { readyState: string }).readyState = 'complete';
-    triggerNavigationObserver();
+  it.each([
+    { name: 'load when load is later', fcpOffset: 300, renderEndOffset: 400 },
+    { name: 'FCP when FCP is later', fcpOffset: 500, renderEndOffset: 500 },
+  ])('ends late render duration at $name', ({ fcpOffset, renderEndOffset }) => {
+    triggerWindowEvent('load');
+    completeDocument();
+    triggerTtfb(navigationTiming);
     postMessageMock.mockClear();
 
-    paintEntries = [paintEntry];
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
+    triggerFcp(createPaintEntry(fcpOffset));
 
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: WebViewInternalMessageScope.CLIENT,
-        type: webViewInternalMessageType,
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_render_duration',
-                timeStart: performance.timeOrigin + 200,
-                timeEnd: performance.timeOrigin + paintEntry.startTime,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
+    expectMetric(
+      'web_view_first_contentful_paint',
+      performance.timeOrigin,
+      performance.timeOrigin + fcpOffset
+    );
+    expectMetric(
+      'web_view_render_duration',
+      performance.timeOrigin + 200,
+      performance.timeOrigin + renderEndOffset
+    );
+    expectMetricSpanNames(getFirstMetricsPayload(), [
+      'web_view_first_contentful_paint',
+      'web_view_render_duration',
+    ]);
+  });
+
+  it('retries render duration on load when FCP and TTFB arrive before load timing completes', async () => {
+    setNavigationTiming({ loadEventEnd: 0 });
+    triggerFcp(createPaintEntry());
+    triggerTtfb(navigationTiming);
+    triggerWindowEvent('load');
+    expectNoMetric('web_view_render_duration');
+
+    Object.assign(navigationTiming!, { loadEventEnd: 400 });
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expectMetric(
+      'web_view_render_duration',
+      performance.timeOrigin + 200,
+      performance.timeOrigin + 400
     );
   });
 
-  it('does not capture render duration when loadEventEnd is unavailable', async () => {
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    vi.spyOn(performance, 'now').mockReturnValue(400);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return [paintEntry];
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 0,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
+  it.each([
+    {
+      name: 'FCP is unavailable',
+      navigation: {},
+      reportFcp: false,
+      reportTtfb: true,
+    },
+    {
+      name: 'navigation timing is unavailable',
+      navigation: null,
+      reportFcp: true,
+      reportTtfb: false,
+    },
+    {
+      name: 'responseStart is invalid',
+      navigation: { responseStart: 0 },
+      reportFcp: true,
+      reportTtfb: false,
+    },
+    {
+      name: 'loadEventEnd is unavailable',
+      navigation: { loadEventEnd: 0 },
+      reportFcp: true,
+      reportTtfb: true,
+    },
+  ])(
+    'does not capture render duration when $name',
+    ({ navigation, reportFcp: shouldReportFcp, reportTtfb: shouldReportTtfb }) => {
+      setNavigationTiming(navigation);
+      if (shouldReportFcp) triggerFcp(createPaintEntry());
+      triggerWindowEvent('load');
+      if (shouldReportTtfb) triggerTtfb(navigationTiming);
 
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
+      expectNoMetric('web_view_render_duration');
+    }
+  );
 
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-    triggerNavigationObserver({ loadEventEnd: 0 });
-
-    const metricsMessages = postMessageMock.mock.calls
-      .map(([message]) => message as MetricsMessage)
-      .filter((message) => message.telemetry?.metrics);
-    expect(metricsMessages[0]?.telemetry?.metrics?.metrics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ spanName: 'web_view_render_duration' })])
-    );
-  });
-
-  it('uses fcp as the render duration end when fcp is slower than load', async () => {
-    const performanceNow = 400;
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 600,
-    } as PerformancePaintTiming;
-    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return [paintEntry];
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-    triggerNavigationObserver();
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_render_duration',
-                timeStart: performance.timeOrigin + 200,
-                timeEnd: performance.timeOrigin + paintEntry.startTime,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
-    );
-  });
-
-  it('does not capture render duration without fcp', async () => {
-    vi.spyOn(performance, 'now').mockReturnValue(400);
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-    triggerNavigationObserver();
-
-    const metricsMessages = postMessageMock.mock.calls
-      .map(([message]) => message as MetricsMessage)
-      .filter((message) => message.telemetry?.metrics);
-    expect(metricsMessages).toHaveLength(1);
-    expect(metricsMessages[0]?.telemetry?.metrics?.metrics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ spanName: 'web_view_render_duration' })])
-    );
-  });
-
-  it('does not capture render duration without navigation timing', async () => {
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    vi.spyOn(performance, 'now').mockReturnValue(400);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return [paintEntry];
-      return [];
-    });
-
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-
-    const metricsMessages = postMessageMock.mock.calls
-      .map(([message]) => message as MetricsMessage)
-      .filter((message) => message.telemetry?.metrics);
-    expect(metricsMessages[0]?.telemetry?.metrics?.metrics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ spanName: 'web_view_render_duration' })])
-    );
-  });
-
-  it('does not capture render duration when responseStart is invalid', async () => {
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    vi.spyOn(performance, 'now').mockReturnValue(400);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return [paintEntry];
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 0,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-    triggerNavigationObserver({ responseStart: 0 });
-
-    const metricsMessages = postMessageMock.mock.calls
-      .map(([message]) => message as MetricsMessage)
-      .filter((message) => message.telemetry?.metrics);
-    expect(metricsMessages[0]?.telemetry?.metrics?.metrics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ spanName: 'web_view_render_duration' })])
-    );
-  });
-
-  it('sends late fcp without render duration when responseStart is invalid', async () => {
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    vi.spyOn(performance, 'now').mockReturnValue(400);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return [paintEntry];
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 0,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
-
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
-    triggerNavigationObserver({ responseStart: 0 });
-
-    (globalThis.document as unknown as { readyState: string }).readyState = 'complete';
+  it('sends a late FCP without render duration when responseStart is invalid', () => {
+    setNavigationTiming({ responseStart: 0 });
+    triggerWindowEvent('load');
+    completeDocument();
     postMessageMock.mockClear();
 
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
+    triggerFcp(createPaintEntry());
 
-    expect(postMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        telemetry: {
-          metrics: {
-            metrics: expect.arrayContaining([
-              {
-                spanName: 'web_view_first_contentful_paint',
-                timeStart: performance.timeOrigin,
-                timeEnd: performance.timeOrigin + paintEntry.startTime,
-              },
-            ]),
-          },
-        },
-      }),
-      '*'
+    expectMetric(
+      'web_view_first_contentful_paint',
+      performance.timeOrigin,
+      performance.timeOrigin + 300
     );
-
-    const metricsMessages = postMessageMock.mock.calls
-      .map(([message]) => message as MetricsMessage)
-      .filter((message) => message.telemetry?.metrics);
-    expect(metricsMessages[0]?.telemetry?.metrics?.metrics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ spanName: 'web_view_render_duration' })])
-    );
+    expectNoMetric('web_view_render_duration');
   });
 
-  it('does not emit duplicate render duration metrics from duplicate fcp callbacks', async () => {
-    const performanceNow = 400;
-    const paintEntry = {
-      name: 'first-contentful-paint',
-      startTime: 300,
-    } as PerformancePaintTiming;
-    vi.spyOn(performance, 'now').mockReturnValue(performanceNow);
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type: string) => {
-      if (type === 'paint') return [paintEntry];
-      if (type === 'navigation') {
-        return [
-          {
-            requestStart: 100,
-            responseStart: 200,
-            domInteractive: 300,
-            loadEventEnd: 400,
-          } as PerformanceNavigationTiming,
-        ];
-      }
-      return [];
-    });
+  it('emits render duration once when callbacks repeat', () => {
+    const paintEntry = createPaintEntry();
+    triggerFcp(paintEntry);
+    triggerWindowEvent('load');
+    completeDocument();
 
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
+    triggerTtfb(navigationTiming);
+    triggerFcp(paintEntry);
 
-    const loadHandlers = addEventListenerMock.mock.calls
-      .filter((call) => call[0] === 'load')
-      .map((call) => call[1]);
-    loadHandlers.forEach((handler) => handler?.({}));
+    expect(
+      getAllMetrics().filter((metric) => metric.spanName === 'web_view_render_duration')
+    ).toHaveLength(1);
+  });
 
-    (globalThis.document as unknown as { readyState: string }).readyState = 'complete';
-    triggerNavigationObserver();
-    observerCallbacks['paint']?.({
-      getEntries: () => [paintEntry],
-    } as PerformanceObserverEntryList);
+  it.each([
+    {
+      name: 'FCP',
+      spanName: 'web_view_first_contentful_paint',
+      report: () => triggerFcp(undefined, 300),
+    },
+    {
+      name: 'TTFB',
+      spanName: 'web_view_time_to_first_byte',
+      report: () => triggerTtfb(undefined, 200),
+    },
+  ])('ignores entry-less $name reports', ({ spanName, report }) => {
+    report();
+    triggerWindowEvent('load');
 
-    const renderDurationMetrics = postMessageMock.mock.calls
-      .flatMap(([message]) => (message as MetricsMessage).telemetry?.metrics?.metrics ?? [])
-      .filter((metric) => metric.spanName === 'web_view_render_duration');
-    expect(renderDurationMetrics).toHaveLength(1);
+    expectNoMetric(spanName);
   });
 });
 

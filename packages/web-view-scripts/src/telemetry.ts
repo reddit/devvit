@@ -5,14 +5,7 @@ import type {
 } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/telemetry.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { emitTelemetryClickEffect } from '@devvit/shared-types/client/telemetry.js';
-
-let telemetryMetrics: WebViewTelemetryMetric[];
-
-/** startTime (UTC milliseconds) is provided by the client within the bridge context for native-clock metrics. */
-let startTime: number | undefined;
-
-// Render duration still needs an emit guard because both FCP and navigation callbacks can attempt it.
-let renderDurationSent: boolean = false;
+import { onFCP, onTTFB } from 'web-vitals';
 
 /**
  * `initTelemetry()` is added to all Devvit apps which use web views.
@@ -62,28 +55,19 @@ function getNavigationTiming(): PerformanceNavigationTiming | undefined {
   return performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
 }
 
-function measureTtfb(): WebViewTelemetryMetric | undefined {
-  const navigationTiming = getNavigationTiming();
-
-  if (!startTime || !navigationTiming) {
-    return undefined;
-  }
-
+function buildTimeOriginMetric(spanName: string, offset: number): WebViewTelemetryMetric {
   return {
-    spanName: 'web_view_time_to_first_byte',
-    timeStart: startTime + navigationTiming.requestStart,
-    timeEnd: startTime + navigationTiming.responseStart,
+    spanName,
+    timeStart: performance.timeOrigin,
+    timeEnd: performance.timeOrigin + offset,
   };
 }
 
-function buildTimeOriginMetric(spanName: string, offset: number): WebViewTelemetryMetric[] {
-  return [
-    {
-      spanName,
-      timeStart: performance.timeOrigin,
-      timeEnd: performance.timeOrigin + offset,
-    },
-  ];
+function emitMetrics(metrics: WebViewTelemetryMetric[]): void {
+  emitEffect({
+    type: EffectType.EFFECT_TELEMETRY,
+    telemetry: { metrics: { metrics } },
+  });
 }
 
 /**
@@ -92,7 +76,9 @@ function buildTimeOriginMetric(spanName: string, offset: number): WebViewTelemet
  * covers WebView inflation, bridge setup, data fetching, and navigation triggers,
  * none of which is reflected in the in-page performance offsets.
  */
-function measureWebViewInitialization(): WebViewTelemetryMetric | undefined {
+function measureWebViewInitialization(
+  startTime: number | undefined
+): WebViewTelemetryMetric | undefined {
   if (!startTime) {
     return undefined;
   }
@@ -105,16 +91,16 @@ function measureWebViewInitialization(): WebViewTelemetryMetric | undefined {
 }
 
 // Match the existing app-readiness signal by ending at the slower of first paint and page load.
-function maybeMeasureRenderDuration(): WebViewTelemetryMetric | undefined {
+function measureRenderDuration(
+  firstContentfulPaintOffset: number | undefined
+): WebViewTelemetryMetric | undefined {
   const navigationTiming = getNavigationTiming();
-  const fcpOffset = performance
-    .getEntriesByType('paint')
-    .find((entry) => entry.name === 'first-contentful-paint')?.startTime;
-  const loadEventEndOffset = measureLoadEventEnd(navigationTiming);
+  const loadEventEndOffset = navigationTiming?.loadEventEnd;
 
   if (
-    fcpOffset == null ||
+    firstContentfulPaintOffset == null ||
     loadEventEndOffset == null ||
+    loadEventEndOffset <= 0 ||
     !navigationTiming ||
     navigationTiming.responseStart <= 0
   ) {
@@ -124,138 +110,103 @@ function maybeMeasureRenderDuration(): WebViewTelemetryMetric | undefined {
   return {
     spanName: 'web_view_render_duration',
     timeStart: performance.timeOrigin + navigationTiming.responseStart,
-    timeEnd: performance.timeOrigin + Math.max(fcpOffset, loadEventEndOffset),
+    timeEnd: performance.timeOrigin + Math.max(firstContentfulPaintOffset, loadEventEndOffset),
   };
 }
 
-function measureFcp(): WebViewTelemetryMetric[] {
-  const paintEntries = performance.getEntriesByType('paint');
-  const fcpEntry = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
-
-  if (!fcpEntry) {
-    return [];
-  }
-
-  return buildTimeOriginMetric('web_view_first_contentful_paint', fcpEntry.startTime);
-}
-
-function measureLoad(): WebViewTelemetryMetric[] {
-  return buildTimeOriginMetric('web_view_load', performance.now());
-}
-
-function measureLoadEventEnd(
-  navigationTiming: PerformanceNavigationTiming | undefined = getNavigationTiming()
-): number | undefined {
-  return navigationTiming && navigationTiming.loadEventEnd > 0
-    ? navigationTiming.loadEventEnd
-    : undefined;
-}
-
-function emitRenderDuration(): void {
-  if (renderDurationSent) {
-    return;
-  }
-
-  const renderDuration = maybeMeasureRenderDuration();
-  if (!renderDuration) {
-    return;
-  }
-
-  renderDurationSent = true;
-  emitEffect({
-    type: EffectType.EFFECT_TELEMETRY,
-    telemetry: { metrics: { metrics: [renderDuration] } },
-  });
-}
-
 /**
- * Measure Time to Interactive (TTI)
- * Uses a heuristic: measured after a quiet window period following page load.
- * This represents when the page is fully interactive and stable.
- * Avoids long task API which isn't supported on iOS.
+ * Measures the DOM interactive milestone emitted under the historical TTI span name.
  */
-function measureTti(): WebViewTelemetryMetric[] {
+function measureTti(): WebViewTelemetryMetric | undefined {
   const navTiming = getNavigationTiming();
   const ttiTime = navTiming?.domInteractive;
 
   if (!ttiTime) {
-    return [];
+    return undefined;
   }
 
   return buildTimeOriginMetric('web_view_time_to_interactive', ttiTime);
 }
 
 function initPerformanceMonitoring(): void {
-  telemetryMetrics = [];
-  startTime = globalThis.devvit?.startTime;
-  renderDurationSent = false;
+  const telemetryMetrics: WebViewTelemetryMetric[] = [];
+  let firstContentfulPaintOffset: number | undefined;
+  // FCP, TTFB, and load can complete the render-duration measurement.
+  let renderDurationSent = false;
 
-  const initialization = measureWebViewInitialization();
+  const takeRenderDuration = (): WebViewTelemetryMetric | undefined => {
+    if (renderDurationSent) return undefined;
+
+    const renderDuration = measureRenderDuration(firstContentfulPaintOffset);
+    if (!renderDuration) return undefined;
+
+    renderDurationSent = true;
+    return renderDuration;
+  };
+
+  const initialization = measureWebViewInitialization(globalThis.devvit?.startTime);
   if (initialization) telemetryMetrics.push(initialization);
 
-  // Measure TTFB immediately if ready, otherwise handled in load event
-  if (document.readyState === 'complete') {
-    const ttfb = measureTtfb();
-    if (ttfb) telemetryMetrics.push(ttfb);
-  }
+  onFCP((metric) => {
+    const firstContentfulPaintEntry = metric.entries[0];
+    if (!firstContentfulPaintEntry) return;
 
-  const observer = new PerformanceObserver((list) => {
-    for (const entry of list.getEntries()) {
-      if (entry.name === 'first-contentful-paint') {
-        const fcp = measureFcp();
-        observer.disconnect();
-        if (fcp.length === 0) break;
-        const renderDuration = renderDurationSent ? undefined : maybeMeasureRenderDuration();
-        if (renderDuration) renderDurationSent = true;
-        if (document.readyState === 'complete') {
-          // load may already have emitted its batch, so late FCP emits standalone.
-          emitEffect({
-            type: EffectType.EFFECT_TELEMETRY,
-            telemetry: { metrics: { metrics: renderDuration ? [...fcp, renderDuration] : fcp } },
-          });
-        } else {
-          telemetryMetrics.push(...fcp);
-          if (renderDuration) telemetryMetrics.push(renderDuration);
-        }
-        break;
-      }
+    firstContentfulPaintOffset = firstContentfulPaintEntry.startTime;
+    const fcp = buildTimeOriginMetric(
+      'web_view_first_contentful_paint',
+      firstContentfulPaintEntry.startTime
+    );
+    const renderDuration = takeRenderDuration();
+    if (document.readyState === 'complete') {
+      // load may already have emitted its batch, so late FCP emits standalone.
+      emitMetrics(renderDuration ? [fcp, renderDuration] : [fcp]);
+    } else {
+      telemetryMetrics.push(fcp);
+      if (renderDuration) telemetryMetrics.push(renderDuration);
     }
   });
 
-  observer.observe({ type: 'paint', buffered: true });
+  onTTFB((metric) => {
+    const navigationEntry = metric.entries[0];
+    if (!navigationEntry) return;
 
-  const navigationObserver = new PerformanceObserver((list) => {
-    const navigationEntry = list.getEntries().find((entry) => entry.entryType === 'navigation');
-    if (navigationEntry) {
-      navigationObserver.disconnect();
-      emitRenderDuration();
-    }
+    const ttfb = buildTimeOriginMetric(
+      'web_view_time_to_first_byte',
+      navigationEntry.responseStart
+    );
+    const renderDuration = takeRenderDuration();
+    emitMetrics(renderDuration ? [ttfb, renderDuration] : [ttfb]);
   });
-
-  navigationObserver.observe({ type: 'navigation', buffered: true });
 
   if (document.readyState === 'loading') {
     globalThis.addEventListener('DOMContentLoaded', () => {
-      telemetryMetrics.push(...measureTti());
+      const tti = measureTti();
+      if (tti) telemetryMetrics.push(tti);
     });
   } else {
-    telemetryMetrics.push(...measureTti());
+    const tti = measureTti();
+    if (tti) telemetryMetrics.push(tti);
   }
 
   // Emit metrics after page is fully loaded
   globalThis.addEventListener('load', () => {
-    const ttfb = measureTtfb();
-    if (ttfb) telemetryMetrics.push(ttfb);
+    const renderDuration = takeRenderDuration();
+    if (renderDuration) telemetryMetrics.push(renderDuration);
+    telemetryMetrics.push(buildTimeOriginMetric('web_view_load', performance.now()));
+    emitMetrics(telemetryMetrics);
 
-    telemetryMetrics.push(...measureLoad());
-
-    emitEffect({
-      type: EffectType.EFFECT_TELEMETRY,
-      telemetry: {
-        metrics: {
-          metrics: telemetryMetrics,
-        },
-      },
-    });
+    const navigationTiming = getNavigationTiming();
+    if (
+      !renderDuration &&
+      firstContentfulPaintOffset != null &&
+      navigationTiming?.responseStart &&
+      !navigationTiming.loadEventEnd
+    ) {
+      // loadEventEnd is finalized only after all load handlers finish.
+      globalThis.setTimeout(() => {
+        const completedRenderDuration = takeRenderDuration();
+        if (completedRenderDuration) emitMetrics([completedRenderDuration]);
+      });
+    }
   });
 }
