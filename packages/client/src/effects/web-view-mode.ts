@@ -41,7 +41,7 @@ export function getWebViewMode(): WebViewMode {
  *              names are the `devvit.json` `post.entrypoints` keys. Passing the
  *              same entrypoint as currently loaded may cause a reload.
  * @returns A promise that resolves request has been received.
- * @throws When already expanded.
+ * @throws When already expanded, except on iOS beta builds.
  *
  * @experimental
  * @example
@@ -52,7 +52,11 @@ export function getWebViewMode(): WebViewMode {
  * ```
  */
 export function requestExpandedMode(event: MouseEvent, entry: string): void {
-  if (devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE)
+  const client = devvit.context.client;
+  if (
+    devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE &&
+    !(client?.name === 'IOS' && client.version.number >= 999999)
+  )
     throw Error('web view is already expanded');
   // Count a click in case web view is destroyed when entry changes.
   emitTelemetryClickEffect(event);

@@ -151,6 +151,43 @@ describe('requestExpandedMode()', () => {
     );
   });
 
+  it.each<{
+    clientName: 'IOS' | 'ANDROID';
+    build: number;
+    allowed: boolean;
+  }>([
+    { clientName: 'IOS', build: 999998, allowed: false },
+    { clientName: 'IOS', build: 999999, allowed: true },
+    { clientName: 'IOS', build: 1000000, allowed: true },
+    { clientName: 'ANDROID', build: 1000000, allowed: false },
+  ])(
+    'handles already expanded mode on $clientName build $build (allowed: $allowed)',
+    ({ clientName, build, allowed }) => {
+      globalThis.devvit.webViewMode = WebViewImmersiveMode.IMMERSIVE_MODE;
+      globalThis.devvit.context.client = {
+        name: clientName,
+        version: { yyyy: 2026, release: 1, attempt: 0, number: build },
+      };
+
+      if (allowed) {
+        expect(() => requestExpandedMode(trustedEvent, 'default')).not.toThrow();
+        expect(emitTelemetryClickEffect).toHaveBeenCalledWith(trustedEvent);
+        expect(emitEffect).toHaveBeenCalledWith({
+          immersiveMode: {
+            entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
+            immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE,
+          },
+          type: EffectType.EFFECT_WEB_VIEW,
+        } satisfies Effect);
+      } else {
+        expect(() => requestExpandedMode(trustedEvent, 'default')).toThrow(
+          'web view is already expanded'
+        );
+        expect(emitEffect).not.toHaveBeenCalled();
+      }
+    }
+  );
+
   it('should not update the state of immersive mode during transitions to immersive', async () => {
     expect(getWebViewMode()).toBe('inline');
 
