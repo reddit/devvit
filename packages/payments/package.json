@@ -1,6 +1,6 @@
 {
   "name": "@devvit/payments",
-  "version": "0.14.3",
+  "version": "0.14.4",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -39,13 +39,13 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.14.3",
-    "@devvit/server": "0.14.3",
-    "@devvit/shared-types": "0.14.3"
+    "@devvit/protos": "0.14.4",
+    "@devvit/server": "0.14.4",
+    "@devvit/shared-types": "0.14.4"
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
-    "@devvit/tsconfig": "0.14.3",
+    "@devvit/tsconfig": "0.14.4",
     "esbuild": "0.25.9",
     "eslint": "9.11.1",
     "typescript": "5.8.3",
