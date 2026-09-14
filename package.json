@@ -58,7 +58,6 @@
     "__e2e__/*",
     "__e2e__/performance/apps/**",
     "devvit-e2e-smoke-test",
-    "devvit-compute-go/images/*",
     "devvit-docs",
     "scripts",
     "packages/*",
