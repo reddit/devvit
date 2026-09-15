@@ -134,7 +134,7 @@ export default class AddProduct extends DevvitCommand {
       await this.#writeProductsConfig(productsJSON);
       ux.action.stop(`Product "${product.sku}" added successfully!`);
       this.log(
-        `Go to ${chalk.underline('https://developers.reddit.com/docs/payments/payments_add#complete-the-payment-flow')} to integrate the product into your app.`
+        `Go to ${chalk.underline('https://developers.reddit.com/docs/earn-money/payments/payments_add#complete-the-payment-flow')} to integrate the product into your app.`
       );
     } catch (error) {
       this.error(`Failed to save product:\n${error}`);
