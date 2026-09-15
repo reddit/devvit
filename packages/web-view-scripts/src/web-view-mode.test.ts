@@ -1,4 +1,5 @@
 import { WebViewImmersiveMode } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/immersive_mode.js';
+import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
@@ -14,41 +15,72 @@ describe('onWebViewMessage()', () => {
   });
 
   test('updates mode on valid immersive mode message', () => {
-    onWebViewMessage(
-      new MessageEvent('message', {
+    globalThis.devvit.experiments = { devvit_require_trusted_events: 'enabled' };
+
+    onWebViewMessage({
+      isTrusted: true,
+      data: {
+        type: 'devvit-message',
         data: {
-          type: 'devvit-message',
-          data: {
-            id: '',
-            immersiveModeEvent: { immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE },
-          },
+          id: '',
+          immersiveModeEvent: { immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE },
         },
-      })
-    );
+      },
+    } as MessageEvent<WebViewMessageEvent_MessageData>);
     expect(globalThis.devvit?.webViewMode).toBe(WebViewImmersiveMode.IMMERSIVE_MODE);
   });
 
   test('ignores messages with wrong type', () => {
-    onWebViewMessage(
-      new MessageEvent('message', {
+    onWebViewMessage({
+      isTrusted: true,
+      data: {
+        type: 'other-message',
         data: {
-          type: 'other-message',
-          data: {
-            id: '',
-            immersiveModeEvent: { immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE },
-          },
+          id: '',
+          immersiveModeEvent: { immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE },
         },
-      })
-    );
+      },
+    } as MessageEvent<WebViewMessageEvent_MessageData>);
     expect(globalThis.devvit?.webViewMode).toBeUndefined();
   });
 
   test('ignores messages without immersiveModeEvent', () => {
-    onWebViewMessage(
-      new MessageEvent('message', {
-        data: { type: 'devvit-message', data: { id: '' } },
-      })
-    );
+    onWebViewMessage({
+      isTrusted: true,
+      data: { type: 'devvit-message', data: { id: '' } },
+    } as MessageEvent<WebViewMessageEvent_MessageData>);
     expect(globalThis.devvit?.webViewMode).toBeUndefined();
+  });
+
+  test('ignores untrusted immersive mode messages', () => {
+    globalThis.devvit.experiments = { devvit_require_trusted_events: 'enabled' };
+
+    onWebViewMessage({
+      isTrusted: false,
+      data: {
+        type: 'devvit-message',
+        data: {
+          id: '',
+          immersiveModeEvent: { immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE },
+        },
+      },
+    } as MessageEvent<WebViewMessageEvent_MessageData>);
+
+    expect(globalThis.devvit?.webViewMode).toBeUndefined();
+  });
+
+  test('handles untrusted immersive mode messages when trusted events are not required', () => {
+    onWebViewMessage({
+      isTrusted: false,
+      data: {
+        type: 'devvit-message',
+        data: {
+          id: '',
+          immersiveModeEvent: { immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE },
+        },
+      },
+    } as MessageEvent<WebViewMessageEvent_MessageData>);
+
+    expect(globalThis.devvit?.webViewMode).toBe(WebViewImmersiveMode.IMMERSIVE_MODE);
   });
 });

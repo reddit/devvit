@@ -1,6 +1,7 @@
 import type { WebViewMessageEvent_MessageData } from '@devvit/protos/json/devvit/ui/events/v1alpha/web_view.js';
 
 import { updateMode } from './devvit-global.js';
+import { requireTrustedEvents } from './experiments.js';
 
 /** @internal */
 export function initWebViewMode(): void {
@@ -9,6 +10,7 @@ export function initWebViewMode(): void {
 
 /** @internal */
 export function onWebViewMessage(ev: MessageEvent<WebViewMessageEvent_MessageData>): void {
+  if (requireTrustedEvents() && !ev.isTrusted) return;
   if (ev.data?.type !== 'devvit-message') return;
   if (!ev.data?.data?.immersiveModeEvent) return;
   updateMode(ev.data.data.immersiveModeEvent.immersiveMode);

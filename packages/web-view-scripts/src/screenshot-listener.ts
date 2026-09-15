@@ -7,6 +7,8 @@ import {
   screenshotScriptFileName,
 } from '@devvit/shared-types/web-view-scripts-constants.js';
 
+import { requireTrustedEvents } from './experiments.js';
+
 const fallbackScriptUrl = new URL(screenshotScriptFileName, devvitScriptUrl).toString();
 
 export function getScreenshotModuleUrl(scriptSrc: string | undefined): string {
@@ -24,10 +26,13 @@ export function getScreenshotModuleUrl(scriptSrc: string | undefined): string {
   return fallbackScriptUrl;
 }
 
-async function onMessage(
+/** @internal */
+export async function onMessage(
   event: MessageEvent<WebViewMessageEvent_MessageData>,
   scriptSrc: string | undefined
 ): Promise<void> {
+  if (requireTrustedEvents() && !event.isTrusted) return;
+
   const envelope = event.data;
   if (envelope?.type !== 'devvit-message' || envelope.data == null) return;
   const payload = envelope.data;

@@ -7,6 +7,8 @@ import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { emitTelemetryClickEffect } from '@devvit/shared-types/client/telemetry.js';
 import { onFCP, onTTFB } from 'web-vitals';
 
+import { requireTrustedEvents } from './experiments.js';
+
 /**
  * `initTelemetry()` is added to all Devvit apps which use web views.
  *
@@ -20,7 +22,9 @@ export function initTelemetry(): void {
 }
 
 function initLoadedEvent(): void {
-  addEventListener('load', () => {
+  addEventListener('load', (ev) => {
+    if (requireTrustedEvents() && !ev.isTrusted) return;
+
     const timeStart = performance.timeOrigin;
     const duration = performance.now();
     const timeEnd = performance.timeOrigin + duration;
@@ -44,8 +48,9 @@ function initLoadedEvent(): void {
 function initClickEvent(): void {
   document.addEventListener(
     'click',
-    (event) => {
-      emitTelemetryClickEffect(event);
+    (ev) => {
+      if (requireTrustedEvents() && !ev.isTrusted) return;
+      emitTelemetryClickEffect(ev);
     },
     { capture: true, passive: true }
   );
@@ -179,7 +184,9 @@ function initPerformanceMonitoring(): void {
   });
 
   if (document.readyState === 'loading') {
-    globalThis.addEventListener('DOMContentLoaded', () => {
+    globalThis.addEventListener('DOMContentLoaded', (ev) => {
+      if (requireTrustedEvents() && !ev.isTrusted) return;
+
       const tti = measureTti();
       if (tti) telemetryMetrics.push(tti);
     });
@@ -189,7 +196,9 @@ function initPerformanceMonitoring(): void {
   }
 
   // Emit metrics after page is fully loaded
-  globalThis.addEventListener('load', () => {
+  globalThis.addEventListener('load', (ev) => {
+    if (requireTrustedEvents() && !ev.isTrusted) return;
+
     const renderDuration = takeRenderDuration();
     if (renderDuration) telemetryMetrics.push(renderDuration);
     telemetryMetrics.push(buildTimeOriginMetric('web_view_load', performance.now()));

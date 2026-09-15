@@ -34,6 +34,7 @@ type MetricsMessage = { telemetry?: { metrics?: { metrics?: TelemetryMetricForTe
 const addEventListenerMock: EventListenerMock = vi.fn();
 const docAddEventListenerMock: EventListenerMock = vi.fn();
 const postMessageMock: EventListenerMock = vi.fn();
+const trustedEvent: MessageEvent = { isTrusted: true } as MessageEvent;
 let reportFcp: ((metric: FCPMetric) => void) | undefined;
 let reportTtfb: ((metric: TTFBMetric) => void) | undefined;
 
@@ -77,7 +78,7 @@ const expectNoMetric = (spanName: string): void => {
 const triggerWindowEvent = (type: string): void => {
   addEventListenerMock.mock.calls
     .filter(([eventType]) => eventType === type)
-    .forEach(([, handler]) => handler?.({}));
+    .forEach(([, handler]) => handler?.(trustedEvent));
 };
 
 const expectMetricSpanNames = (metrics: TelemetryMetricForTest[], spanNames: string[]): void => {
@@ -88,7 +89,7 @@ const createMockDevvit = (): DevvitGlobal => ({
   context: {} as DevvitGlobal['context'],
   dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
   entrypoints: {},
-  experiments: {},
+  experiments: { devvit_require_trusted_events: 'enabled' },
   share: undefined,
   adPayload: undefined,
   appPermissionState: undefined,
@@ -99,6 +100,7 @@ const createMockDevvit = (): DevvitGlobal => ({
 });
 
 beforeEach(() => {
+  globalThis.devvit = createMockDevvit();
   webVitalsMocks.onFCP.mockImplementation((callback) => {
     reportFcp = callback;
   });
@@ -120,6 +122,7 @@ afterEach(async () => {
   await new Promise((resolve) => setTimeout(resolve));
   reportFcp = undefined;
   reportTtfb = undefined;
+  delete (globalThis as { devvit?: DevvitGlobal }).devvit;
   delete (globalThis as { document?: {} }).document;
   delete (globalThis as { parent?: {} }).parent;
   delete (globalThis as { addEventListener?: {} }).addEventListener;
@@ -237,13 +240,27 @@ describe('telemetry', () => {
       expect(postMessageMock).toHaveBeenCalledWith(...clickPostMessageWithDefinition('strict'));
     });
 
-    it('does not add the strict flag if event is not trusted (emited programmatically)', () => {
+    it('ignores untrusted clicks', () => {
+      globalThis.devvit.experiments = { devvit_require_trusted_events: 'enabled' };
       const onClick = getGlobalClickListener();
       const button = renderDom('<button>I am just a button</button>');
 
       onClick(constructClickEvent({ target: button, isTrusted: false }));
-      expect(postMessageMock).toHaveBeenCalledWith(...clickPostMessageWithDefinition('default'));
+      expect(postMessageMock).not.toHaveBeenCalled();
     });
+
+    it.each([undefined, 'control_1'])(
+      'sends untrusted clicks when the experiment variant is %s',
+      (variant) => {
+        globalThis.devvit.experiments =
+          variant == null ? {} : { devvit_require_trusted_events: variant };
+        const onClick = getGlobalClickListener();
+        const button = renderDom('<button>I am just a button</button>');
+
+        onClick(constructClickEvent({ target: button, isTrusted: false }));
+        expect(postMessageMock).toHaveBeenCalledWith(...clickPostMessageWithDefinition('default'));
+      }
+    );
   });
 
   describe('elemTrackId', () => {
@@ -390,6 +407,18 @@ it('sends load telemetry on window load', async () => {
   );
 });
 
+it('ignores untrusted window load events', () => {
+  globalThis.devvit.experiments = { devvit_require_trusted_events: 'enabled' };
+  initTelemetry();
+
+  const loadHandlers = addEventListenerMock.mock.calls
+    .filter((call) => call[0] === 'load')
+    .map((call) => call[1]);
+  loadHandlers.forEach((handler) => handler?.({ isTrusted: false }));
+
+  expect(postMessageMock).not.toHaveBeenCalled();
+});
+
 describe('performance monitoring', () => {
   const defaultNavigationTiming: Partial<PerformanceNavigationTiming> = {
     requestStart: 100,
@@ -412,7 +441,7 @@ describe('performance monitoring', () => {
     ({ name: 'first-contentful-paint', startTime }) as PerformancePaintTiming;
 
   const completeDocument = (): void => {
-    (globalThis.document as unknown as { readyState: string }).readyState = 'complete';
+    (globalThis.document as { readyState?: string }).readyState = 'complete';
   };
 
   beforeEach(() => {
@@ -428,6 +457,27 @@ describe('performance monitoring', () => {
       type === 'navigation' && navigationTiming ? [navigationTiming] : []
     );
     initTelemetry();
+  });
+
+  it('only measures TTI for trusted DOMContentLoaded events', () => {
+    globalThis.devvit.experiments = { devvit_require_trusted_events: 'enabled' };
+    (globalThis.document as { readyState: string }).readyState = 'loading';
+    addEventListenerMock.mockClear();
+    initTelemetry();
+
+    const onDOMContentLoaded = addEventListenerMock.mock.calls.find(
+      (call) => call[0] === 'DOMContentLoaded'
+    )?.[1];
+    expect(onDOMContentLoaded).toBeDefined();
+
+    const getEntriesByTypeMock = vi.mocked(performance.getEntriesByType);
+    getEntriesByTypeMock.mockClear();
+
+    onDOMContentLoaded?.({ isTrusted: false });
+    expect(getEntriesByTypeMock).not.toHaveBeenCalled();
+
+    onDOMContentLoaded?.(trustedEvent);
+    expect(getEntriesByTypeMock).toHaveBeenCalledWith('navigation');
   });
 
   it('captures the TTFB reported by web-vitals', () => {
