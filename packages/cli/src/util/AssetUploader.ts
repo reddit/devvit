@@ -39,6 +39,7 @@ import { dirExists } from './files.js';
 import { retryAsync } from './retryAsync.js';
 
 const DEFAULT_PARALLEL_UPLOADS = 7;
+const MAX_PARALLEL_ASSET_READS = 16;
 
 let PARALLEL_UPLOADS = parseInt(process.env['DEVVIT_PARALLEL_UPLOADS'] || '0');
 if (isNaN(PARALLEL_UPLOADS) || PARALLEL_UPLOADS < 1) {
@@ -608,8 +609,9 @@ export async function queryAssets(
   const assets = (await tinyglob(assetsGlob, { filesOnly: true, absolute: true })).filter(
     (asset) => allowedExtensions.length === 0 || allowedExtensions.includes(path.extname(asset))
   );
-  return await Promise.all(
-    assets.map(async (asset) => {
+  return await mapAsyncWithMaxConcurrency(
+    assets,
+    async (asset) => {
       const filename = path.relative(dir, asset).replaceAll(path.sep, '/');
       let file = await fsp.readFile(asset);
 
@@ -630,7 +632,8 @@ export async function queryAssets(
         isWebviewAsset: assetKind === 'Client',
         contents,
       };
-    })
+    },
+    MAX_PARALLEL_ASSET_READS
   );
 }
 
