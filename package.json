@@ -23,7 +23,6 @@
     "clobber": "npx --yes turbo run clobber --output-logs=new-only && rm -rf node_modules",
     "docs:build": "yarn workspace devvit-docs docs:build",
     "docs:gen-devvit-docs": "yarn workspace devvit-docs gen:devvit-docs",
-    "docs:gen-next": "./packages/repo-tools/bin/gen-next-docs.mts",
     "docs:gen-private-docs": "yarn workspace devvit-docs gen:private-docs",
     "docs:gen-telemetry-toc": "./scripts/gen-telemetry-toc.mts",
     "docs:start": "yarn workspace devvit-docs docs:start",
