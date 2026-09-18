@@ -9,6 +9,26 @@ import {
 import { JSDOM } from 'jsdom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+const appClient = vi.hoisted(() => ({
+  CheckIfMediaExists: vi.fn(),
+  UploadNewMedia: vi.fn(),
+}));
+
+vi.mock('./clientGenerators.js', () => ({
+  createAppClient: () => appClient,
+}));
+
+vi.mock('@oclif/core', () => ({
+  ux: {
+    action: {
+      start: vi.fn(),
+      stop: vi.fn(),
+    },
+    error: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+
 import { AssetUploader, queryAssets, transformHTML } from './AssetUploader.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
 
@@ -163,6 +183,66 @@ describe('assertAssetCanBeAnIcon', () => {
       expect(cmd.warn.mock.calls).toMatchSnapshot(`${fileName}-warn`);
     });
   }
+});
+
+describe('syncAssets()', () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'devvit-assets-test-'));
+    fs.writeFileSync(path.join(tmpDir, 'header-logo.svg'), '<svg></svg>');
+    fs.writeFileSync(path.join(tmpDir, 'footer-logo.svg'), '<svg></svg>');
+
+    appClient.CheckIfMediaExists.mockImplementation(
+      async ({ signatures }: { signatures: { filePath: string }[] }) => ({
+        statuses: signatures.map((signature, index) => ({
+          ...signature,
+          isNew: true,
+          uploadUrl: `https://uploads.example.com/assets/${index}?signature=test`,
+          uploadHeaders: {},
+        })),
+      })
+    );
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+      })
+    );
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+    vi.clearAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('maps duplicate WebView asset paths to the same uploaded URL', async () => {
+    const cmd = {
+      project: {
+        root: tmpDir,
+        mediaDir: undefined,
+        clientDir: '.',
+        appConfig: undefined,
+      },
+      error: vi.fn((message: string) => {
+        throw new Error(message);
+      }),
+      log: vi.fn(),
+      warn: vi.fn(),
+    };
+    const assetUploader = new AssetUploader(cmd as unknown as DevvitCommand, 'some-slug', {
+      verbose: false,
+    });
+
+    const result = await assetUploader.syncAssets();
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(result.webViewAssetMap).toEqual({
+      'footer-logo.svg': 'https://uploads.example.com/assets/0',
+      'header-logo.svg': 'https://uploads.example.com/assets/0',
+    });
+  });
 });
 
 describe('queryAssets()', () => {
