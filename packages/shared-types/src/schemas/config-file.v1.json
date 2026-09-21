@@ -34,6 +34,16 @@
         "styles": {
           "description": "[experimental] Presentation styles for this entrypoint.",
           "$ref": "#/$defs/EntrypointStyles"
+        },
+        "semanticTypes": {
+          "type": "array",
+          "description": "Semantic purposes of this entrypoint: game_play for gameplay and creation for post creation. Each semantic type may appear at most once across all post entrypoints in the app.",
+          "items": {
+            "type": "string",
+            "enum": ["game_play", "creation"]
+          },
+          "uniqueItems": true,
+          "examples": [["game_play"], ["game_play", "creation"]]
         }
       }
     },

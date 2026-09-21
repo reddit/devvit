@@ -75,7 +75,10 @@ export type AppPostEntrypointConfig = {
   height: AppPostHeightConfig;
   inline?: boolean;
   styles?: AppPostEntrypointStylesConfig;
+  semanticTypes?: AppEntrypointSemanticType[];
 };
+/** Semantic purposes assigned to entrypoints, each used at most once per app. */
+export type AppEntrypointSemanticType = 'game_play' | 'creation';
 export type AppPostHeightConfig = 'short' | 'regular' | 'tall';
 export type AppPostEntrypointStyleHeightConfig = AppPostHeightConfig | number;
 export type AppPostEntrypointStylesConfig = {
@@ -306,6 +309,7 @@ export type AppPostEntrypointConfigJson = {
   height?: AppPostHeightConfig;
   inline?: boolean;
   styles?: AppPostEntrypointStylesConfig;
+  semanticTypes?: AppEntrypointSemanticType[];
 };
 export type AppSchedulerConfigJson = {
   tasks: { [name: string]: AppSchedulerTaskConfig | string };
@@ -576,6 +580,9 @@ function AppPostConfig(post: Readonly<AppPostConfigJson>): AppPostConfig {
       ...(post.entrypoints?.default.styles != null
         ? { styles: post.entrypoints.default.styles }
         : {}),
+      ...(post.entrypoints?.default.semanticTypes != null
+        ? { semanticTypes: post.entrypoints.default.semanticTypes }
+        : {}),
     },
   };
 
@@ -587,6 +594,7 @@ function AppPostConfig(post: Readonly<AppPostConfigJson>): AppPostConfig {
         height: pt.height ?? defaultHeight,
         inline: true,
         ...(pt.styles != null ? { styles: pt.styles } : {}),
+        ...(pt.semanticTypes != null ? { semanticTypes: pt.semanticTypes } : {}),
       };
   }
   return { dir, entrypoints };
@@ -703,6 +711,20 @@ function AppTriggersConfig(
 /** @internal */
 export function validate(config: Readonly<AppConfig>): void {
   const errs = [];
+
+  const semanticEntrypoints = new Map<AppEntrypointSemanticType, string>();
+  for (const [name, entrypoint] of Object.entries(config.post?.entrypoints ?? {})) {
+    for (const semanticType of entrypoint.semanticTypes ?? []) {
+      const previousName = semanticEntrypoints.get(semanticType);
+      if (previousName != null) {
+        errs.push(
+          `Semantic type "${semanticType}" is assigned to both post.entrypoints.${previousName} and post.entrypoints.${name}; each semantic type may appear at most once per app`
+        );
+      } else {
+        semanticEntrypoints.set(semanticType, name);
+      }
+    }
+  }
 
   if (config.menu?.items?.length && !config.permissions.redis)
     errs.push('`config.menu.items` requires `config.permissions.redis` to be enabled');

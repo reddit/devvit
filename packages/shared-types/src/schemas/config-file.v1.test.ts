@@ -3,6 +3,7 @@ import { describe, test } from 'vitest';
 
 import {
   type AppConfigJson,
+  type AppEntrypointSemanticType,
   type AppPostEntrypointConfigJson,
   parseAppConfig,
   parseAppConfigJson,
@@ -330,6 +331,121 @@ describe('parseAppConfigJSON()', () => {
     expect(config.post?.entrypoints.game.styles).toStrictEqual(gameStyles);
     expect(config.json.post?.entrypoints?.default.styles).toStrictEqual(defaultStyles);
     expect(config.json.post?.entrypoints?.game.styles).toStrictEqual(gameStyles);
+  });
+  describe('post entrypoint semantic types', () => {
+    test.each([
+      { defaultTypes: ['game_play'], gameTypes: undefined },
+      { defaultTypes: ['creation'], gameTypes: undefined },
+      { defaultTypes: undefined, gameTypes: ['game_play'] },
+      { defaultTypes: undefined, gameTypes: ['creation'] },
+      { defaultTypes: ['game_play', 'creation'], gameTypes: undefined },
+      { defaultTypes: undefined, gameTypes: ['game_play', 'creation'] },
+      { defaultTypes: ['game_play'], gameTypes: ['creation'] },
+      { defaultTypes: ['creation'], gameTypes: ['game_play'] },
+      { defaultTypes: [], gameTypes: [] },
+      { defaultTypes: undefined, gameTypes: undefined },
+    ] satisfies {
+      defaultTypes: AppEntrypointSemanticType[] | undefined;
+      gameTypes: AppEntrypointSemanticType[] | undefined;
+    }[])('preserves default=$defaultTypes and game=$gameTypes', ({ defaultTypes, gameTypes }) => {
+      const json = {
+        name: 'abc',
+        post: {
+          entrypoints: {
+            default: {
+              entry: 'index.html',
+              ...(defaultTypes != null ? { semanticTypes: defaultTypes } : {}),
+            },
+            game: {
+              entry: 'game.html',
+              ...(gameTypes != null ? { semanticTypes: gameTypes } : {}),
+            },
+          },
+        },
+      } satisfies AppConfigJson;
+      const original = structuredClone(json);
+      const config = parseAppConfig(JSON.stringify(json), false);
+      const serialized = JSON.parse(JSON.stringify(config));
+
+      expect(json).toStrictEqual(original);
+      expect(config.json).toStrictEqual(original);
+      expect(serialized.json).toStrictEqual(original);
+      for (const [name, semanticTypes] of [
+        ['default', defaultTypes],
+        ['game', gameTypes],
+      ] as const) {
+        expect(config.post?.entrypoints[name].semanticTypes).toStrictEqual(semanticTypes);
+        expect(serialized.post.entrypoints[name].semanticTypes).toStrictEqual(semanticTypes);
+        if (semanticTypes == null) {
+          expect(config.post?.entrypoints[name]).not.toHaveProperty('semanticTypes');
+          expect(serialized.post.entrypoints[name]).not.toHaveProperty('semanticTypes');
+        }
+      }
+    });
+
+    test.each(['game_play', 'creation'] satisfies AppEntrypointSemanticType[])(
+      'rejects duplicate %s assignments',
+      (semanticType) => {
+        for (const names of [
+          ['default', 'game'],
+          ['game', 'creator'],
+        ]) {
+          const entrypoints: NonNullable<AppConfigJson['post']>['entrypoints'] = {
+            default: { entry: 'index.html' },
+          };
+          for (const name of names) {
+            entrypoints[name] = { entry: `${name}.html`, semanticTypes: [semanticType] };
+          }
+          expect(() => parseAppConfigJson({ name: 'abc', post: { entrypoints } }, false)).toThrow(
+            `Semantic type "${semanticType}" is assigned to both post.entrypoints.${names[0]} and post.entrypoints.${names[1]}; each semantic type may appear at most once per app`
+          );
+        }
+      }
+    );
+
+    test.each([
+      { value: ['game_play', 'game_play'], error: 'contains duplicate item' },
+      { value: ['creation', 'creation'], error: 'contains duplicate item' },
+      { value: ['default'], error: 'is not one of enum values' },
+      { value: ['unknown'], error: 'is not one of enum values' },
+      { value: ['GAME_PLAY'], error: 'is not one of enum values' },
+      { value: ['CREATION'], error: 'is not one of enum values' },
+      { value: [1], error: 'is not of a type(s) string' },
+      { value: [null], error: 'is not of a type(s) string' },
+      { value: 'game_play', error: 'is not of a type(s) array' },
+      { value: null, error: 'is not of a type(s) array' },
+      { value: {}, error: 'is not of a type(s) array' },
+    ])('rejects invalid semanticTypes=$value', ({ value, error }) => {
+      for (const name of ['default', 'game']) {
+        expect(() =>
+          parseAppConfigJson(
+            {
+              name: 'abc',
+              post: {
+                entrypoints: {
+                  default: { entry: 'index.html' },
+                  [name]: { entry: 'index.html', semanticTypes: value },
+                },
+              },
+            },
+            false
+          )
+        ).toThrow(error);
+      }
+    });
+
+    test('does not infer semantic types for the implicit default entrypoint', () => {
+      // An empty post config creates a default entrypoint without assigning semantic types.
+      // Explicitly assigning semantic types to the default entrypoint is allowed.
+      const config = parseAppConfigJson({ name: 'abc', post: {} }, false);
+      expect(config.post?.entrypoints.default).not.toHaveProperty('semanticTypes');
+      expect(config.json).toStrictEqual({ name: 'abc', post: {} });
+    });
+
+    test('accepts configs without posts', () => {
+      const config = parseAppConfigJson({ name: 'abc', server: {} }, false);
+      expect(config).not.toHaveProperty('post');
+    });
   });
   test.each([
     { property: 'backgroundColor', value: '11223344', expectedError: 'does not match pattern' },
