@@ -1,6 +1,12 @@
 import { Severity } from '@devvit/protos/json/devvit/plugin/logger/logger.js';
+import { ScheduledActionManager } from '@devvit/protos/json/devvit/plugin/scheduler/scheduler.js';
 // eslint-disable-next-line no-restricted-imports
 import { type Logger, LoggerDefinition } from '@devvit/protos/types/devvit/plugin/logger/logger.js';
+// eslint-disable-next-line no-restricted-imports
+import {
+  type Scheduler,
+  SchedulerDefinition,
+} from '@devvit/protos/types/devvit/plugin/scheduler/scheduler.js';
 // eslint-disable-next-line no-restricted-imports
 import {
   Devvit,
@@ -263,13 +269,22 @@ function configureScheduler(schedulerConfig: Readonly<AppSchedulerConfig>): void
     Devvit.addTrigger({
       events: ['AppInstall', 'AppUpgrade'],
       onEvent: async () => {
-        // Get all jobs
-        const existingJobs = await scheduler.listJobs();
+        // Get all jobs that are managed by DEVVIT_JSON, as well as legacy actions without a specified manager
+        const existingJobs = await scheduler.listJobs([
+          ScheduledActionManager.DEVVIT_JSON,
+          ScheduledActionManager.MANAGER_UNSPECIFIED,
+        ]);
         // Filter down to just cron jobs
         const jobsToCancel = existingJobs.filter((job) => {
           // Only cancel cron jobs
           return 'cron' in job;
         });
+        // If there are no jobs to schedule and no jobs scheduled, return early
+        if (jobsToCancel.length === 0 && Object.keys(cronTasks).length === 0) {
+          return;
+        }
+        // Get the raw scheduler plugin because we need to schedule apps with a manager other than USER
+        const schedulerPlugin = getDevvitConfig().use<Scheduler>(SchedulerDefinition);
 
         // Cancel everything we need to
         await Promise.all(jobsToCancel.map((job) => scheduler.cancelJob(job.id)));
@@ -279,11 +294,17 @@ function configureScheduler(schedulerConfig: Readonly<AppSchedulerConfig>): void
             const logger = getDevvitConfig().use<Logger>(LoggerDefinition);
 
             try {
-              await scheduler.runJob({
-                name: name,
-                cron: task.cron!,
-                ...(task.data ? { data: task.data } : {}),
-              });
+              await schedulerPlugin.Schedule(
+                {
+                  action: {
+                    type: name,
+                    ...(task.data ? { data: task.data } : {}),
+                  },
+                  cron: task.cron!,
+                  manager: ScheduledActionManager.DEVVIT_JSON,
+                },
+                context.metadata
+              );
             } catch (error) {
               await logger.Log(
                 {
