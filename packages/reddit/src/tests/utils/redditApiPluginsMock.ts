@@ -27,7 +27,6 @@ export const redditApiPlugins = {
     EditUserText: vi.fn(),
     FollowPost: vi.fn(),
     AddPostToHighlights: vi.fn(),
-    GetIsPostHighlighted: vi.fn(),
     Hide: vi.fn(),
     Info: vi.fn(),
     Lock: vi.fn(),

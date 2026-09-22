@@ -6,8 +6,6 @@ import type {
   CommentRequest,
   EditCustomPostRequest,
   FollowPostRequest,
-  GetIsPostHighlightedRequest,
-  GetIsPostHighlightedResponse,
   InfoRequest,
   JsonWrappedComment,
   MoreChildrenRequest,
@@ -314,16 +312,6 @@ export class LinksAndCommentsPluginMock implements LinksAndComments {
   async FollowPost(_request: FollowPostRequest, _metadata?: Metadata): Promise<Empty> {
     throw new Error(
       `Reddit API method LinksAndComments.FollowPost is not implemented in the test harness.\n` +
-        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
-    );
-  }
-
-  async GetIsPostHighlighted(
-    _request: GetIsPostHighlightedRequest,
-    _metadata?: Metadata
-  ): Promise<GetIsPostHighlightedResponse> {
-    throw new Error(
-      `Reddit API method LinksAndComments.GetIsPostHighlighted is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }
