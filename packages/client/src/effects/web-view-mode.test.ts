@@ -152,22 +152,19 @@ describe('requestExpandedMode()', () => {
   });
 
   it.each<{
-    clientName: 'IOS' | 'ANDROID';
-    build: number;
+    variant: string | undefined;
     allowed: boolean;
   }>([
-    { clientName: 'IOS', build: 999998, allowed: false },
-    { clientName: 'IOS', build: 999999, allowed: true },
-    { clientName: 'IOS', build: 1000000, allowed: true },
-    { clientName: 'ANDROID', build: 1000000, allowed: false },
+    { variant: 'enabled', allowed: true },
+    { variant: undefined, allowed: false },
+    { variant: 'control', allowed: false },
   ])(
-    'handles already expanded mode on $clientName build $build (allowed: $allowed)',
-    ({ clientName, build, allowed }) => {
+    'handles already expanded mode with variant $variant (allowed: $allowed)',
+    ({ variant, allowed }) => {
       globalThis.devvit.webViewMode = WebViewImmersiveMode.IMMERSIVE_MODE;
-      globalThis.devvit.context.client = {
-        name: clientName,
-        version: { yyyy: 2026, release: 1, attempt: 0, number: build },
-      };
+      if (variant !== undefined) {
+        globalThis.devvit.experiments.devvit_games_tab_direct_to_play = variant;
+      }
 
       if (allowed) {
         expect(() => requestExpandedMode(trustedEvent, 'default')).not.toThrow();
@@ -183,6 +180,7 @@ describe('requestExpandedMode()', () => {
         expect(() => requestExpandedMode(trustedEvent, 'default')).toThrow(
           'web view is already expanded'
         );
+        expect(emitTelemetryClickEffect).not.toHaveBeenCalled();
         expect(emitEffect).not.toHaveBeenCalled();
       }
     }

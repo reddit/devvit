@@ -41,7 +41,7 @@ export function getWebViewMode(): WebViewMode {
  *              names are the `devvit.json` `post.entrypoints` keys. Passing the
  *              same entrypoint as currently loaded may cause a reload.
  * @returns A promise that resolves request has been received.
- * @throws When already expanded, except on iOS beta builds.
+ * @throws When already expanded, unless the direct-to-play experiment is enabled.
  *
  * @experimental
  * @example
@@ -52,10 +52,10 @@ export function getWebViewMode(): WebViewMode {
  * ```
  */
 export function requestExpandedMode(event: MouseEvent, entry: string): void {
-  const client = devvit.context.client;
+  const experiments = devvit.experiments;
   if (
     devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE &&
-    !(client?.name === 'IOS' && client.version.number >= 999999)
+    experiments.devvit_games_tab_direct_to_play !== 'enabled'
   )
     throw Error('web view is already expanded');
   // Count a click in case web view is destroyed when entry changes.
