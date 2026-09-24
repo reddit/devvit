@@ -420,7 +420,7 @@ describe('initContext()', () => {
         postId: 't3_123',
         userId: 't2_123',
       },
-      shareParam: { path: '', params: {}, hash: '', userData: 'shareData' },
+      shareParam: { path: '', params: {}, hash: '', userData: 'shareData', chromeless: false },
       webbitToken: noWebbitToken,
     };
 
