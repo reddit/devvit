@@ -5,8 +5,11 @@ import '@devvit/shared-types/shared/devvit-worker-global.js';
 import type { IncomingMessage, Server, ServerOptions, ServerResponse } from 'node:http';
 import { createServer as nodeCreateServer } from 'node:http';
 
-import { getMetadata, runWithContext } from './context.js';
+import { userProgressStateHeader } from '@devvit/shared-types/user-progress.js';
+
+import { getMetadata, runWithContext, setContextCache } from './context.js';
 import { Context } from './server-context.js';
+import { createUserProgressNotifier } from './user-progress.js';
 
 /**
  * Creates a new Devvit server. This implements the same API as Node.js's `createServer` function,
@@ -51,6 +54,7 @@ function _createServer<
   const server = nodeCreateServer(options, async (req, res) => {
     const context = Context(req.headers);
     return runWithContext(context, async () => {
+      setContextCache(userProgressStateHeader, createUserProgressNotifier(res));
       return requestListener?.(req, res);
     });
   });

@@ -1,3 +1,4 @@
+import { initUserProgress } from './effects/user-progress.js';
 import { initWebViewMode } from './effects/web-view-mode.js';
 
 export * from './clientContext.js';
@@ -15,3 +16,4 @@ export type { Context } from '@devvit/shared-types/client/client-context.js';
 export * from '@devvit/shared-types/PostData.js';
 
 initWebViewMode();
+initUserProgress();
