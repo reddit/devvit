@@ -1,3 +1,4 @@
+import { HighlightedPostLabel } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import type { QueryResponse } from '@devvit/protos/json/devvit/plugin/redditapi/graphql/graphql_msg.js';
 import { RenderStyle } from '@devvit/protos/json/reddit/devvit/post/v1/post.js';
 import { context } from '@devvit/server';
@@ -172,6 +173,41 @@ describe('Post API', () => {
   });
   afterEach(() => {
     delete (globalThis as { devvit?: DevvitWorkerGlobal }).devvit;
+  });
+
+  test('community highlight methods', async () => {
+    const post = new Post({ ...defaultPostData });
+    const getHighlights = redditApiPlugins.Subreddits.GetHighlightedPosts;
+    const addHighlight = redditApiPlugins.LinksAndComments.AddPostToHighlights;
+    const removeHighlight = redditApiPlugins.LinksAndComments.RemovePostFromHighlights;
+    const highlightUntil = new Date('2026-09-10T12:34:56.789Z');
+
+    getHighlights.mockResolvedValueOnce({
+      highlightedPosts: [{ postId: post.id }],
+    });
+    addHighlight.mockResolvedValueOnce({});
+    removeHighlight.mockResolvedValueOnce({});
+
+    await runWithTestContext(async () => {
+      await expect(post.isHighlighted()).resolves.toBe(true);
+      expect(getHighlights).toHaveBeenCalledWith({ subredditId: 't5_abcdef' }, context.metadata);
+
+      await post.highlight({
+        highlightUntil,
+        highlightLabelType: 'ANNOUNCEMENT',
+      });
+      expect(addHighlight).toHaveBeenCalledWith(
+        {
+          postId: 't3_qwerty',
+          expiresAt: Math.floor(highlightUntil.getTime() / 1000),
+          label: HighlightedPostLabel.ANNOUNCEMENT,
+        },
+        context.metadata
+      );
+
+      await post.unhighlight();
+      expect(removeHighlight).toHaveBeenCalledWith({ postId: 't3_qwerty' }, context.metadata);
+    });
   });
 
   describe('RedditClient', () => {

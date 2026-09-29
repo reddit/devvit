@@ -1,3 +1,4 @@
+import { HighlightedPostLabel } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import type { SubredditAboutResponse_AboutData } from '@devvit/protos/json/devvit/plugin/redditapi/subreddits/subreddits_msg.js';
 // eslint-disable-next-line no-restricted-imports
 import type { Listing } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
@@ -104,6 +105,46 @@ describe('Subreddit API', () => {
       ],
     },
   };
+
+  test('community highlight methods', async () => {
+    const subreddit = createTestSub({ id: 'abc123' });
+    const getHighlights = redditApiPlugins.Subreddits.GetHighlightedPosts;
+    const reorderHighlights = redditApiPlugins.Subreddits.ReorderHighlightedPosts;
+    const expiresAt = 1_788_956_096;
+
+    getHighlights.mockResolvedValueOnce({
+      highlightedPosts: [
+        {
+          postId: 't3_first',
+          expiresAt,
+          label: HighlightedPostLabel.EVENT,
+        },
+        { postId: 't3_second' },
+      ],
+    });
+    reorderHighlights.mockResolvedValueOnce({});
+
+    await runWithTestContext(async () => {
+      await expect(subreddit.getHighlightedPosts()).resolves.toEqual([
+        {
+          postId: 't3_first',
+          highlightedUntil: new Date(expiresAt * 1000),
+          highlightLabel: 'EVENT',
+        },
+        { postId: 't3_second' },
+      ]);
+      expect(getHighlights).toHaveBeenCalledWith({ subredditId: 't5_abc123' }, context.metadata);
+
+      await subreddit.reorderHighlightedPosts(['t3_second', 't3_first']);
+      expect(reorderHighlights).toHaveBeenCalledWith(
+        {
+          subredditId: 't5_abc123',
+          postIdsHighlightOrder: ['t3_second', 't3_first'],
+        },
+        context.metadata
+      );
+    });
+  });
 
   describe('RedditClient:Subreddit', () => {
     test('getCommentsAndPostsByUser()', async () => {

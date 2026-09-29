@@ -11,7 +11,7 @@ import type { Listing as ProtoListing } from '@devvit/protos/types/devvit/plugin
 import { context } from '@devvit/server';
 import { assertNonNull } from '@devvit/shared-types/NonNull.js';
 import type { Prettify } from '@devvit/shared-types/Prettify.js';
-import { T5 } from '@devvit/shared-types/tid.js';
+import { T3, T5 } from '@devvit/shared-types/tid.js';
 
 import { GraphQL } from '../graphql/GraphQL.js';
 import { makeGettersEnumerable } from '../helpers/makeGettersEnumerable.js';
@@ -33,11 +33,12 @@ import { getModerationLog } from './ModAction.js';
 import type {
   CrosspostOptions,
   GetPostsOptionsWithTimeframe,
+  HighlightedPostInfo,
   SearchPostsOptions,
   SubmitCustomPostOptions,
   SubmitPostOptions,
 } from './Post.js';
-import { Post } from './Post.js';
+import { highlightLabelTypeFromProto, Post } from './Post.js';
 import type { CreateRuleOptions } from './Rule.js';
 import { Rule } from './Rule.js';
 import type {
@@ -1216,6 +1217,33 @@ export class Subreddit {
     });
   }
 
+  /**
+   * Returns this subreddit's community highlights in display order.
+   *
+   * @example
+   * ```ts
+   * const highlightedPosts = await subreddit.getHighlightedPosts();
+   * ```
+   */
+  async getHighlightedPosts(): Promise<HighlightedPostInfo[]> {
+    return Subreddit.getHighlightedPosts(this.#id);
+  }
+
+  /**
+   * Reorders this subreddit's community highlights.
+   *
+   * @param postIds - Highlighted post IDs in their new display order.
+   *
+   * @example
+   * ```ts
+   * const highlights = await subreddit.getHighlightedPosts();
+   * await subreddit.reorderHighlightedPosts(highlights.map(({ postId }) => postId).reverse());
+   * ```
+   */
+  async reorderHighlightedPosts(postIds: readonly T3[]): Promise<void> {
+    await Subreddit.reorderHighlightedPosts(this.#id, postIds);
+  }
+
   /** @internal */
   static aboutLocation(
     options: AboutSubredditHelperOptions<AboutSubredditTypes>
@@ -1353,6 +1381,30 @@ export class Subreddit {
         message: data.message,
       };
     });
+  }
+
+  /** @internal */
+  static async getHighlightedPosts(subredditId: T5): Promise<HighlightedPostInfo[]> {
+    const client = getRedditApiPlugins().Subreddits;
+    const response = await client.GetHighlightedPosts({ subredditId }, this.#metadata);
+
+    return response.highlightedPosts.map((post) => {
+      const highlightLabel = highlightLabelTypeFromProto(post.label);
+      return {
+        postId: T3(post.postId),
+        ...(post.expiresAt == null ? {} : { highlightedUntil: new Date(post.expiresAt * 1000) }),
+        ...(highlightLabel == null ? {} : { highlightLabel }),
+      };
+    });
+  }
+
+  /** @internal */
+  static async reorderHighlightedPosts(subredditId: T5, postIds: readonly T3[]): Promise<void> {
+    const client = getRedditApiPlugins().Subreddits;
+    await client.ReorderHighlightedPosts(
+      { subredditId, postIdsHighlightOrder: [...postIds] },
+      this.#metadata
+    );
   }
 
   /** @internal */

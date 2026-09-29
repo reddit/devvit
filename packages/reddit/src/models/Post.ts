@@ -1,4 +1,7 @@
-import { GalleryMediaStatus as GalleryMediaStatusProto } from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
+import {
+  GalleryMediaStatus as GalleryMediaStatusProto,
+  HighlightedPostLabel as HighlightedPostLabelProto,
+} from '@devvit/protos/json/devvit/plugin/redditapi/common/common_msg.js';
 import { type CustomPostStylesInput } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import { type DevvitPostData } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { Scope } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
@@ -46,6 +49,50 @@ export type ModeratorReport = {
   /** Username of the author without the u/ prefix, e.g. 'spez' */
   author: string;
 };
+
+/** Label displayed alongside a post in a subreddit's community highlights. */
+export type HighlightLabelType = 'ANNOUNCEMENT' | 'EVENT' | 'MEGATHREAD' | 'SHOW_POST_FLAIR';
+
+/** Options for highlighting a post. */
+export type HighlightPostOptions = {
+  /** When the highlight expires. If omitted, it remains until explicitly removed. */
+  highlightUntil?: Date;
+  /** Label displayed alongside the highlighted post. */
+  highlightLabelType?: HighlightLabelType;
+};
+
+/** Information about a post in a subreddit's community highlights. */
+export type HighlightedPostInfo = {
+  /** Post thing ID. */
+  postId: T3;
+  /** When the highlight expires. Undefined means it does not expire automatically. */
+  highlightedUntil?: Date;
+  /** Label displayed alongside the highlighted post. */
+  highlightLabel?: HighlightLabelType;
+};
+
+/** @internal */
+export function highlightLabelTypeToProto(label: HighlightLabelType): HighlightedPostLabelProto {
+  return HighlightedPostLabelProto[label];
+}
+
+/** @internal */
+export function highlightLabelTypeFromProto(
+  label: HighlightedPostLabelProto | undefined
+): HighlightLabelType | undefined {
+  switch (label) {
+    case HighlightedPostLabelProto.ANNOUNCEMENT:
+      return 'ANNOUNCEMENT';
+    case HighlightedPostLabelProto.EVENT:
+      return 'EVENT';
+    case HighlightedPostLabelProto.MEGATHREAD:
+      return 'MEGATHREAD';
+    case HighlightedPostLabelProto.SHOW_POST_FLAIR:
+      return 'SHOW_POST_FLAIR';
+    default:
+      return undefined;
+  }
+}
 
 /**
  * Crowd Control threshold for comments on a post. Determines which comments
@@ -1294,6 +1341,48 @@ export class Post {
     await Post.unsticky(this.id);
   }
 
+  /**
+   * Returns whether this post is in its subreddit's community highlights.
+   *
+   * @example
+   * ```ts
+   * const post = await reddit.getPostById('t3_123');
+   * const isHighlighted = await post.isHighlighted();
+   * ```
+   */
+  async isHighlighted(): Promise<boolean> {
+    return Post.isHighlighted(this.id, this.#subredditId);
+  }
+
+  /**
+   * Adds this post to its subreddit's community highlights, or updates its
+   * highlight settings if it is already highlighted.
+   *
+   * Note: a subreddit can have up to six highlights at a time. Highlighting a seventh post
+   * will remove the last post in Subreddit.getHighlightedPosts() from the highlights.
+   *
+   * @param options - Optional expiration and label settings.
+   *
+   * @example
+   * ```ts
+   * await post.highlight({
+   *   highlightUntil: new Date('2030-01-01T00:00:00Z'),
+   *   highlightLabelType: 'ANNOUNCEMENT',
+   * });
+   * ```
+   */
+  async highlight(options?: Readonly<HighlightPostOptions>): Promise<void> {
+    await Post.highlight(this.id, options);
+  }
+
+  /**
+   * Removes this post from its subreddit's community highlights. If this post is
+   * not highlighted, this is a no-op.
+   */
+  async unhighlight(): Promise<void> {
+    await Post.unhighlight(this.id);
+  }
+
   /** Distinguishes the post as a moderator and updates this instance. */
   async distinguish(): Promise<void> {
     const { distinguishedBy } = await Post.distinguish(this.id, false);
@@ -1880,6 +1969,38 @@ export class Post {
       },
       context.metadata
     );
+  }
+
+  /** @internal */
+  static async isHighlighted(id: T3, subredditId: T5): Promise<boolean> {
+    const client = getRedditApiPlugins().Subreddits;
+    const response = await client.GetHighlightedPosts({ subredditId }, context.metadata);
+    return response.highlightedPosts.some((post) => post.postId === id);
+  }
+
+  /** @internal */
+  static async highlight(id: T3, options?: Readonly<HighlightPostOptions>): Promise<void> {
+    const client = getRedditApiPlugins().LinksAndComments;
+    await client.AddPostToHighlights(
+      {
+        postId: id,
+        expiresAt:
+          options?.highlightUntil == null
+            ? undefined
+            : Math.floor(options.highlightUntil.getTime() / 1000),
+        label:
+          options?.highlightLabelType == null
+            ? undefined
+            : highlightLabelTypeToProto(options.highlightLabelType),
+      },
+      context.metadata
+    );
+  }
+
+  /** @internal */
+  static async unhighlight(id: T3): Promise<void> {
+    const client = getRedditApiPlugins().LinksAndComments;
+    await client.RemovePostFromHighlights({ postId: id }, context.metadata);
   }
 
   /** @internal */
