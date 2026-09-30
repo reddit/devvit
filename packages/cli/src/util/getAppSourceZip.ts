@@ -4,28 +4,45 @@ import path from 'node:path';
 import ignore from 'ignore';
 import JSZip from 'jszip';
 
-import { DevvitCommand } from './commands/DevvitCommand.js';
+import type { DevvitCommand } from './commands/DevvitCommand.js';
 
 const ALWAYS_IGNORED_PATHS = Object.freeze(['node_modules', '.env', '.git']);
 
 export async function getAppSourceZip(cmd: DevvitCommand): Promise<ArrayBuffer> {
   const zip = new JSZip();
 
-  const ignoredPaths = await getIgnoredPaths(cmd, cmd.project.root);
-  await addDirectoryToZip(cmd.project.root, zip, ignoredPaths);
-
-  for (const additionalRoot of cmd.project.appConfig?.additionalSourceRoots ?? []) {
-    const ignoredPaths = await getIgnoredPaths(cmd, additionalRoot);
-    const additionalRootZip = zip.folder(additionalRoot);
-    if (!additionalRootZip) {
-      cmd.error(`Could not create zip folder for additional root ${additionalRoot}`);
+  const projectRoot = await fsp.realpath(cmd.project.root);
+  const sourceRoots = [projectRoot];
+  for (const root of cmd.project.appConfig?.additionalSourceRoots ?? []) {
+    if (path.isAbsolute(root)) {
+      cmd.error(`Additional source root must be relative: ${root}`);
     }
+    const sourceRoot = await fsp.realpath(path.resolve(projectRoot, root));
+    if (path.dirname(sourceRoot) === sourceRoot) {
+      cmd.error(`Additional source root must not resolve to a filesystem root: ${root}`);
+    }
+    sourceRoots.push(sourceRoot);
+  }
 
-    await addDirectoryToZip(
-      path.join(cmd.project.root, additionalRoot),
-      additionalRootZip,
-      ignoredPaths
-    );
+  let archiveRoot = projectRoot;
+  // Preserve relative imports without allowing parent traversal in ZIP entry names.
+  for (const sourceRoot of sourceRoots) {
+    let relativeRoot = path.relative(archiveRoot, sourceRoot);
+    while (relativeRoot.split(path.sep)[0] === '..' || path.isAbsolute(relativeRoot)) {
+      const parent = path.dirname(archiveRoot);
+      if (parent === archiveRoot) {
+        cmd.error('Source roots must share a filesystem root');
+      }
+      archiveRoot = parent;
+      relativeRoot = path.relative(archiveRoot, sourceRoot);
+    }
+  }
+
+  for (const sourceRoot of sourceRoots) {
+    const ignoredPaths = await getIgnoredPaths(cmd, sourceRoot);
+    const archivePath = path.relative(archiveRoot, sourceRoot).split(path.sep).join('/');
+    const sourceZip = archivePath ? zip.folder(archivePath)! : zip;
+    await addDirectoryToZip(sourceRoot, sourceZip, ignoredPaths);
   }
 
   return await zip.generateAsync({ type: 'arraybuffer' });
