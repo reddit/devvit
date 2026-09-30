@@ -27,7 +27,7 @@ export class ProjectTemplateResolver {
 
   async #fetchOptions(): Promise<ProjectTemplateInfo[]> {
     const response = await fetch(DEVVIT_PORTAL_URL + '/templates.json', {
-      headers: getHeaders(),
+      headers: getHeaders('ProjectTemplateResolver'),
     });
     if (!response.ok) {
       throw new Error(`Failed to fetch templates: ${response.statusText}`);

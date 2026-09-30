@@ -31,7 +31,7 @@ export async function gqlQuery<T, V extends JsonObject>(
     'content-type': 'application/json',
   };
 
-  const traceparent = generateTraceParent();
+  const traceparent = generateTraceParent(`GraphQL:${config.name}`);
   if (traceparent) {
     headers.traceparent = traceparent;
   }

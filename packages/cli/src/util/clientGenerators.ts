@@ -91,7 +91,7 @@ export function createAppClient(): AppClient {
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${APP_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('App'),
         isTokenOptional: true, // Some app info endpoints are public
       })
     )
@@ -104,7 +104,7 @@ export function createAppVersionClient(): AppVersionClient {
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${APP_VERSION_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('AppVersion'),
         isTokenOptional: true, // Some app version info endpoints are public
       })
     )
@@ -117,7 +117,7 @@ export function createAppSettingsClient(): DevPortalAppSettingsClient {
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${APP_SETTINGS_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('DevPortalAppSettings'),
       })
     )
   );
@@ -129,7 +129,7 @@ export function createInstallationsClient(): InstallationsClient {
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${INSTALLATIONS_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('Installations'),
       })
     )
   );
@@ -141,14 +141,14 @@ export function createFeedbackClient(): FeedbackClient {
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${FEEDBACK_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('Feedback'),
       })
     )
   );
 }
 
 export function createRemoteLoggerClient(): RemoteLogConsumer {
-  const headers = getHeaders();
+  const headers = getHeaders('RemoteLogConsumer');
   // Uncomment the below line to route all RemoteLog requests to gateway-execute in snoodev
   // headers.set('devvit-gateway-v2', 'true');
   return new RemoteLogConsumerClientImpl(
@@ -166,7 +166,7 @@ export function createWaitlistClient(): WaitlistClient {
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${WAITLIST_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('Waitlist'),
       })
     )
   );
@@ -177,7 +177,7 @@ export function createDeveloperAccountClient(): DeveloperAccountClient {
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${DEVELOPER_ACCOUNT_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('DeveloperAccount'),
       })
     )
   );
@@ -190,7 +190,7 @@ export function createEventsClient(): EventsClient {
         baseUrl: `${DEVVIT_PORTAL_API}/${EVENTS_PATH}`,
         getToken: getAccessToken,
         isTokenOptional: true,
-        headers: getHeaders(),
+        headers: getHeaders('Events'),
       })
     )
   );
@@ -202,7 +202,7 @@ export function createAppPublishRequestClient(): DevPortalAppPublishRequestClien
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${PUBLISH_REQUEST_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('DevPortalAppPublishRequest'),
       })
     )
   );
@@ -214,13 +214,13 @@ export function createDeveloperSettingsClient(): DevPortalDeveloperSettingsClien
       NodeFetchRPC({
         baseUrl: `${DEVVIT_PORTAL_API}/${DEVELOPER_SETTINGS_PATH}`,
         getToken: getAccessToken,
-        headers: getHeaders(),
+        headers: getHeaders('DevPortalDeveloperSettings'),
       })
     )
   );
 }
 
-export function getHeaders(): Headers {
+export function getHeaders(clientName: string): Headers {
   const headers = new Headers();
   headers.set(...HEADER_USER_AGENT());
   headers.set(...HEADER_DEVVIT_CLI());
@@ -230,7 +230,7 @@ export function getHeaders(): Headers {
     headers.set(...HEADER_DEVVIT_CANARY(process.env.DEVVIT_CANARY));
   }
 
-  const traceparent = generateTraceParent();
+  const traceparent = generateTraceParent(clientName);
   if (traceparent) {
     headers.set('traceparent', traceparent);
   }

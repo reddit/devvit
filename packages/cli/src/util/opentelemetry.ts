@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 
-export function generateTraceParent(): string | undefined {
+export function generateTraceParent(clientName: string): string | undefined {
   if (!process.env.DEVVIT_FORCE_TRACE) {
     return undefined;
   }
@@ -10,7 +10,7 @@ export function generateTraceParent(): string | undefined {
   const flags = '01'; // sampled
   const version = '00';
 
-  console.log(`Trace ID: ${traceId}`);
+  console.error(`Trace ID [${clientName}]: ${traceId}`);
 
   return `${version}-${traceId}-${spanId}-${flags}`;
 }
