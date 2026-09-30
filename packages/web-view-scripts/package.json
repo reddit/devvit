@@ -57,7 +57,7 @@
   },
   "filesize": {
     "dist/scripts/devvit.v1.min.js": {
-      "gzip": "5 kb",
+      "gzip": "6 kb",
       "none": "14 kb"
     },
     "dist/scripts/screenshot.v1.min.js": {

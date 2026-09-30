@@ -6,7 +6,7 @@ import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
 import type { FCPMetric, TTFBMetric } from 'web-vitals';
 
-import { initTelemetry } from './telemetry.js';
+import { initTelemetry, roundProps } from './telemetry.js';
 
 const webVitalsMocks = vi.hoisted(() => ({
   onFCP: vi.fn(),
@@ -66,7 +66,11 @@ const getFirstMetricsPayload = (): TelemetryMetricForTest[] => {
 const getAllMetrics = (): TelemetryMetricForTest[] => getMetricsPayloads().flat();
 
 const expectMetric = (spanName: string, timeStart: number, timeEnd: number): void => {
-  expect(getAllMetrics()).toContainEqual({ spanName, timeStart, timeEnd });
+  expect(getAllMetrics()).toContainEqual({
+    spanName,
+    timeStart: Math.round(timeStart),
+    timeEnd: Math.round(timeEnd),
+  });
 };
 
 const expectNoMetric = (spanName: string): void => {
@@ -97,6 +101,28 @@ const createMockDevvit = (): DevvitGlobal => ({
   webViewMode: undefined,
   startTime: 1717171717171,
   refreshToken: undefined,
+});
+
+describe('roundProps', () => {
+  it('rounds WebViewTelemetryMetric[] correctly', () => {
+    expect(
+      roundProps([
+        { spanName: 'abc', timeStart: 10.2, timeEnd: 20.8 },
+        { spanName: 'def', timeStart: 30.5, timeEnd: 42.5 },
+      ])
+    ).toEqual([
+      { spanName: 'abc', timeStart: 10, timeEnd: 21 },
+      { spanName: 'def', timeStart: 31, timeEnd: 43 },
+    ]);
+  });
+  it('round WebViewTelemetryLoadedEffect correctly', () => {
+    expect(roundProps({ event: 'abc', duration: 10.6, timeStart: 10.2, timeEnd: 20.8 })).toEqual({
+      event: 'abc',
+      duration: 11,
+      timeStart: 10,
+      timeEnd: 21,
+    });
+  });
 });
 
 beforeEach(() => {
@@ -519,6 +545,27 @@ describe('performance monitoring', () => {
       'web_view_render_duration',
       'web_view_load',
     ]);
+  });
+
+  it('rounds emitted metric timestamps without changing the metrics array', () => {
+    setNavigationTiming({ responseStart: 200.4, domInteractive: 300.6, loadEventEnd: 400.6 });
+    vi.spyOn(performance, 'now').mockReturnValue(400.6);
+
+    triggerFcp(createPaintEntry(300.6));
+    triggerWindowEvent('load');
+
+    expectMetric(
+      'web_view_first_contentful_paint',
+      performance.timeOrigin,
+      performance.timeOrigin + 301
+    );
+    expectMetric(
+      'web_view_render_duration',
+      performance.timeOrigin + 200.4,
+      performance.timeOrigin + 400.6
+    );
+    expectMetric('web_view_load', performance.timeOrigin, performance.timeOrigin + 401);
+    expect(Array.isArray(getFirstMetricsPayload())).toBe(true);
   });
 
   it('captures initialization, DOM interactive, and load milestones', () => {

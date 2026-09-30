@@ -28,12 +28,12 @@ function initLoadedEvent(): void {
     const timeStart = performance.timeOrigin;
     const duration = performance.now();
     const timeEnd = performance.timeOrigin + duration;
-    const loaded: WebViewTelemetryLoadedEffect = {
+    const loaded: WebViewTelemetryLoadedEffect = roundProps({
       event: 'web-view-loaded',
       timeStart,
       timeEnd,
       duration,
-    };
+    });
 
     void emitEffect({
       type: EffectType.EFFECT_TELEMETRY,
@@ -71,7 +71,7 @@ function buildTimeOriginMetric(spanName: string, offset: number): WebViewTelemet
 function emitMetrics(metrics: WebViewTelemetryMetric[]): void {
   emitEffect({
     type: EffectType.EFFECT_TELEMETRY,
-    telemetry: { metrics: { metrics } },
+    telemetry: { metrics: { metrics: roundProps(metrics) } },
   });
 }
 
@@ -218,4 +218,32 @@ function initPerformanceMonitoring(): void {
       });
     }
   });
+}
+
+// Recursively round every number in an event
+export function roundProps(props: WebViewTelemetryLoadedEffect): WebViewTelemetryLoadedEffect;
+export function roundProps(props: WebViewTelemetryMetric[]): WebViewTelemetryMetric[];
+export function roundProps(
+  props: WebViewTelemetryLoadedEffect | WebViewTelemetryMetric[]
+): WebViewTelemetryLoadedEffect | WebViewTelemetryMetric[] {
+  if (!props) {
+    return props;
+  }
+
+  if (Array.isArray(props)) {
+    return props.map(
+      (value): WebViewTelemetryMetric => ({
+        ...value,
+        timeStart: Math.round(value.timeStart),
+        timeEnd: Math.round(value.timeEnd),
+      })
+    );
+  }
+
+  return {
+    event: props.event,
+    duration: Math.round(props.duration),
+    timeStart: Math.round(props.timeStart),
+    timeEnd: Math.round(props.timeEnd),
+  } satisfies WebViewTelemetryLoadedEffect;
 }
