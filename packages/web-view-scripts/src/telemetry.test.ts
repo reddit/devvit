@@ -557,14 +557,14 @@ describe('performance monitoring', () => {
     expectMetric(
       'web_view_first_contentful_paint',
       performance.timeOrigin,
-      performance.timeOrigin + 301
+      performance.timeOrigin + 300.6
     );
     expectMetric(
       'web_view_render_duration',
       performance.timeOrigin + 200.4,
       performance.timeOrigin + 400.6
     );
-    expectMetric('web_view_load', performance.timeOrigin, performance.timeOrigin + 401);
+    expectMetric('web_view_load', performance.timeOrigin, performance.timeOrigin + 400.6);
     expect(Array.isArray(getFirstMetricsPayload())).toBe(true);
   });
 
