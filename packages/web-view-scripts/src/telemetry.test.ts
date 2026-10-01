@@ -554,6 +554,8 @@ describe('performance monitoring', () => {
     triggerFcp(createPaintEntry(300.6));
     triggerWindowEvent('load');
 
+    // Pass the unrounded times: expectMetric rounds them the same way telemetry does. Rounding the offset alone
+    // (e.g. timeOrigin + 301) disagrees whenever performance.timeOrigin's fraction is in [0.5, 0.9).
     expectMetric(
       'web_view_first_contentful_paint',
       performance.timeOrigin,
