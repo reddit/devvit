@@ -815,7 +815,7 @@
           "description": "Default subreddit name without r/ prefix to use for development. Can be overridden by the `DEVVIT_SUBREDDIT` environment variable.",
           "minLength": 3,
           "maxLength": 21,
-          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_]*$"
         }
       }
     },
