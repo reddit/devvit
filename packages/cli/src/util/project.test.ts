@@ -30,6 +30,8 @@ const noPermissions: AppPermissionConfig = {
   reddit: { enable: false, scope: 'user', asUser: [] },
   settings: false,
   triggers: false,
+  hideUserFromContext: false,
+  canBypassLinkInterstitial: false,
 };
 
 describe('Project', () => {

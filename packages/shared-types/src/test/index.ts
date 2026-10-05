@@ -30,7 +30,9 @@ export const getDefaultAppConfig = (): AppConfig => {
     name: 'test-app',
     permissions: {
       blob: true,
+      canBypassLinkInterstitial: false,
       chromeless: false,
+      hideUserFromContext: false,
       externalEndpoints: true,
       http: { enable: true, domains: [] },
       journeys: true,

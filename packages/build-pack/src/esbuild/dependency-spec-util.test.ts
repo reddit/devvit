@@ -19,6 +19,8 @@ const allPermissions: Readonly<AppPermissionConfig> = {
   reddit: { enable: true, scope: 'user', asUser: [RunAsScope.SUBMIT_POST] },
   settings: true,
   triggers: true,
+  hideUserFromContext: true,
+  canBypassLinkInterstitial: true,
 };
 const noPermissions: Readonly<AppPermissionConfig> = {
   externalEndpoints: false,
@@ -34,6 +36,8 @@ const noPermissions: Readonly<AppPermissionConfig> = {
   reddit: { enable: false, scope: 'user', asUser: [] },
   settings: false,
   triggers: false,
+  hideUserFromContext: false,
+  canBypassLinkInterstitial: false,
 };
 const asUserPermissions: Readonly<AppPermissionConfig> = {
   externalEndpoints: false,
@@ -49,6 +53,8 @@ const asUserPermissions: Readonly<AppPermissionConfig> = {
   reddit: { enable: true, scope: 'user', asUser: [RunAsScope.SUBMIT_POST] },
   settings: false,
   triggers: false,
+  hideUserFromContext: false,
+  canBypassLinkInterstitial: false,
 };
 const redditPermissionsWithoutAsUser: Readonly<AppPermissionConfig> = {
   externalEndpoints: false,
@@ -64,6 +70,8 @@ const redditPermissionsWithoutAsUser: Readonly<AppPermissionConfig> = {
   reddit: { enable: true, scope: 'user', asUser: [] },
   settings: false,
   triggers: false,
+  hideUserFromContext: false,
+  canBypassLinkInterstitial: false,
 };
 
 test('permissions', () =>

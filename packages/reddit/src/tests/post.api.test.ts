@@ -133,7 +133,9 @@ describe('Post API', () => {
       name: '',
       permissions: {
         blob: false,
+        canBypassLinkInterstitial: false,
         chromeless: false,
+        hideUserFromContext: false,
         externalEndpoints: false,
         http: {
           enable: false,

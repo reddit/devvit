@@ -532,6 +532,20 @@
               "default": false
             }
           ]
+        },
+        "canBypassLinkInterstitial": {
+          "type": ["boolean", "array"],
+          "description": "Enables bypassing the link interstitial for links that are outside Reddit. Either an array of domain names or `true` to bypass for all links. (An array of domains is strongly preferred, so moderators have a clear view of what you app might do.)",
+          "default": false,
+          "items": {
+            "type": "string",
+            "examples": ["example.com"]
+          }
+        },
+        "hideUserFromContext": {
+          "type": "boolean",
+          "description": "If set, hides the user from context, meaning all users appear the same as a logged out user. (While this defaults to false, if your app can set this to true, privacy-conscious moderators will appreciate it.)",
+          "default": false
         }
       }
     },

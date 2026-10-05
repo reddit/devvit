@@ -28,8 +28,10 @@ describe('parseAppConfig()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -66,8 +68,10 @@ describe('parseAppConfig()', () => {
         "name": "<% name %>",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -147,8 +151,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -211,8 +217,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -274,8 +282,10 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "canBypassLinkInterstitial": false,
             "chromeless": false,
             "externalEndpoints": false,
+            "hideUserFromContext": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -312,8 +322,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -499,8 +511,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -557,8 +571,10 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "canBypassLinkInterstitial": false,
             "chromeless": false,
             "externalEndpoints": false,
+            "hideUserFromContext": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -596,8 +612,10 @@ describe('parseAppConfigJSON()', () => {
           "name": "abc",
           "permissions": {
             "blob": false,
+            "canBypassLinkInterstitial": false,
             "chromeless": false,
             "externalEndpoints": false,
+            "hideUserFromContext": false,
             "http": {
               "domains": [],
               "enable": false,
@@ -636,8 +654,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -692,8 +712,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -746,8 +768,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -804,8 +828,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -859,8 +885,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -929,8 +957,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -993,8 +1023,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1042,8 +1074,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1091,8 +1125,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": true,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1142,8 +1178,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1195,13 +1233,122 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [
               "example.com",
             ],
             "enable": true,
+          },
+          "journeys": false,
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": false,
+            "scope": "user",
+          },
+          "redis": false,
+          "settings": false,
+          "triggers": false,
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+        },
+      }
+    `));
+  test('override permissions.canBypassLinkInterstitial and permissions.hideUserFromContext', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'name',
+          permissions: { canBypassLinkInterstitial: true, hideUserFromContext: true },
+          server: {},
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "json": {
+          "name": "name",
+          "permissions": {
+            "canBypassLinkInterstitial": true,
+            "hideUserFromContext": true,
+          },
+          "server": {},
+        },
+        "name": "name",
+        "permissions": {
+          "blob": false,
+          "canBypassLinkInterstitial": true,
+          "chromeless": false,
+          "externalEndpoints": false,
+          "hideUserFromContext": true,
+          "http": {
+            "domains": [],
+            "enable": false,
+          },
+          "journeys": false,
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": false,
+            "scope": "user",
+          },
+          "redis": false,
+          "settings": false,
+          "triggers": false,
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+        },
+      }
+    `));
+  test('override permissions.canBypassLinkInterstitial with an array', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          name: 'name',
+          permissions: { canBypassLinkInterstitial: ['example.com'] },
+          server: {},
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "json": {
+          "name": "name",
+          "permissions": {
+            "canBypassLinkInterstitial": [
+              "example.com",
+            ],
+          },
+          "server": {},
+        },
+        "name": "name",
+        "permissions": {
+          "blob": false,
+          "canBypassLinkInterstitial": [
+            "example.com",
+          ],
+          "chromeless": false,
+          "externalEndpoints": false,
+          "hideUserFromContext": false,
+          "http": {
+            "domains": [],
+            "enable": false,
           },
           "journeys": false,
           "media": false,
@@ -1245,8 +1392,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1307,8 +1456,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1529,8 +1680,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "test-app",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1835,8 +1988,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1926,8 +2081,10 @@ describe('parseAppConfigJSON()', () => {
         },
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -1998,8 +2155,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2084,8 +2243,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2164,8 +2325,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2236,8 +2399,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2290,8 +2455,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2344,8 +2511,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2395,8 +2564,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2455,8 +2626,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": true,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2524,8 +2697,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "abc",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": true,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2867,8 +3042,10 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -2943,8 +3120,10 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,
@@ -3018,8 +3197,10 @@ describe('validate()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
+          "canBypassLinkInterstitial": false,
           "chromeless": false,
           "externalEndpoints": false,
+          "hideUserFromContext": false,
           "http": {
             "domains": [],
             "enable": false,

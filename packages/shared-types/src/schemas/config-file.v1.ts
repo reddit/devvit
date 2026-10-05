@@ -52,8 +52,10 @@ export type AppBlocksConfig = { entry: string };
 /** Describes plugin usage. */
 export type AppPermissionConfig = {
   blob: boolean;
+  canBypassLinkInterstitial: boolean | string[];
   chromeless: boolean;
   externalEndpoints: boolean;
+  hideUserFromContext: boolean;
   http: { enable: boolean; domains: string[] };
   journeys: boolean;
   media: boolean;
@@ -288,7 +290,9 @@ export type AppPaymentsConfigJson = {
 } & ({ products: Product[] } | { productsFile: string });
 export type AppPermissionConfigJson = {
   blob?: boolean;
+  canBypassLinkInterstitial?: boolean | string[];
   chromeless?: boolean;
+  hideUserFromContext?: boolean;
   http?: { enable?: boolean; domains?: string[] };
   journeys?: boolean;
   media?: boolean;
@@ -526,8 +530,14 @@ function AppPermissionConfig(
         schema.properties.permissions.properties.http.properties.domains.default,
     },
     blob: permissions?.blob ?? schema.properties.permissions.properties.blob.default,
+    canBypassLinkInterstitial:
+      permissions?.canBypassLinkInterstitial ??
+      schema.properties.permissions.properties.canBypassLinkInterstitial.default,
     chromeless:
       permissions?.chromeless ?? schema.properties.permissions.properties.chromeless.default,
+    hideUserFromContext:
+      permissions?.hideUserFromContext ??
+      schema.properties.permissions.properties.hideUserFromContext.default,
     externalEndpoints: !!partial.server?.externalEndpoints,
     journeys: permissions?.journeys ?? schema.properties.permissions.properties.journeys.default,
     media: permissions?.media ?? schema.properties.permissions.properties.media.default,
