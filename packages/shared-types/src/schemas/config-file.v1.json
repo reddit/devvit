@@ -419,6 +419,10 @@
       "maxLength": 20,
       "pattern": "^[a-z][a-z0-9-]*$"
     },
+    "ad": {
+      "const": true,
+      "description": "If set, the app declares itself to be an advertisement app. This carries some permission restrictions, but must be set to allow an app to be rendered as an advertisement."
+    },
     "media": {
       "type": "object",
       "description": "Static asset config. All assets are available to the app client and server via the asset plugin. No overlap with the media plugin or permission.",

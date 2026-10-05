@@ -56,7 +56,7 @@ describe('parseAppConfig()', () => {
       }
     `));
 
-  test('unitialized ok', () =>
+  test('uninitialized ok', () =>
     expect(parseAppConfig('{ "name": "<% name %>", "server": {} }', true)).toMatchInlineSnapshot(`
       {
         "json": {
@@ -140,6 +140,70 @@ describe('parseAppConfigJSON()', () => {
       {
         "json": {
           "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+          "name": "name",
+          "post": {},
+          "server": {},
+        },
+        "name": "name",
+        "permissions": {
+          "blob": false,
+          "chromeless": false,
+          "externalEndpoints": false,
+          "http": {
+            "domains": [],
+            "enable": false,
+          },
+          "journeys": false,
+          "media": false,
+          "menu": false,
+          "payments": false,
+          "realtime": false,
+          "reddit": {
+            "asUser": [],
+            "enable": true,
+            "scope": "user",
+          },
+          "redis": true,
+          "settings": false,
+          "triggers": false,
+        },
+        "post": {
+          "dir": "public",
+          "entrypoints": {
+            "default": {
+              "entry": "index.html",
+              "height": "tall",
+              "inline": true,
+              "name": "default",
+            },
+          },
+        },
+        "schema": "v1",
+        "server": {
+          "dir": "dist/server",
+          "entry": "index.js",
+        },
+      }
+    `));
+
+  test('ad: true', () =>
+    expect(
+      parseAppConfigJson(
+        {
+          $schema: 'https://developers.reddit.com/schema/config-file.v1.json',
+          name: 'name',
+          ad: true,
+          server: {},
+          post: {},
+        } satisfies AppConfigJson,
+        false
+      )
+    ).toMatchInlineSnapshot(`
+      {
+        "ad": true,
+        "json": {
+          "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+          "ad": true,
           "name": "name",
           "post": {},
           "server": {},

@@ -23,6 +23,7 @@ import { validateProductsJSON } from './productsSchemaJSONValidator.js';
 export type AppConfig = {
   schema: 'v1';
   name: string;
+  ad?: true;
   media?: { dir: string };
   permissions: AppPermissionConfig;
   post?: AppPostConfig;
@@ -235,6 +236,7 @@ export type AppBlocksConfigJson = {
 export type AppConfigJson = {
   $schema?: string;
   name: string;
+  ad?: true;
   media?: { dir?: string };
   permissions?: AppPermissionConfigJson;
   post?: AppPostConfigJson;
@@ -414,6 +416,7 @@ function AppConfig(json: Readonly<AppConfigJson>): AppConfig {
     json,
   };
 
+  if (json.ad) partial.ad = true;
   if (json.media)
     partial.media = {
       dir: json.media.dir ?? schema.properties.media.properties.dir.default,
