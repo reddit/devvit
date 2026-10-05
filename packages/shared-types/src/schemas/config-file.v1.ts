@@ -513,9 +513,11 @@ function AppSchedulerConfig(scheduler: Readonly<AppSchedulerConfigJson>): AppSch
 }
 
 function AppPermissionConfig(
-  permissions: Readonly<AppPermissionConfigJson> | undefined,
+  rawPermissions: Readonly<AppPermissionConfigJson> | undefined,
   partial: Readonly<Omit<AppConfig, 'permissions'>>
 ): AppPermissionConfig {
+  const permissions = partial.ad ? forceAdPermissions(rawPermissions) : rawPermissions;
+
   const redditPermissions =
     typeof permissions?.reddit === 'boolean' ? { enable: permissions.reddit } : permissions?.reddit;
   return {
@@ -798,4 +800,28 @@ function externalEndpointsScopeFromJSON(
     case 'global':
       return ExternalEndpointsScope.SCOPE_GLOBAL;
   }
+}
+
+function forceAdPermissions(
+  permissions: Readonly<AppPermissionConfigJson> | undefined
+): AppPermissionConfigJson {
+  const retval = { ...permissions };
+
+  if (
+    permissions?.canBypassLinkInterstitial !== undefined &&
+    permissions?.canBypassLinkInterstitial !== true
+  ) {
+    throw new Error(
+      'Ad apps must have canBypassLinkInterstitial set to true; please update your devvit.json'
+    );
+  }
+  if (permissions?.hideUserFromContext !== undefined && permissions?.hideUserFromContext !== true) {
+    throw new Error(
+      'Ad apps must have hideUserFromContext set to true; please update your devvit.json'
+    );
+  }
+
+  retval.canBypassLinkInterstitial = true;
+  retval.hideUserFromContext = true;
+  return retval;
 }

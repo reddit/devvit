@@ -217,10 +217,10 @@ describe('parseAppConfigJSON()', () => {
         "name": "name",
         "permissions": {
           "blob": false,
-          "canBypassLinkInterstitial": false,
+          "canBypassLinkInterstitial": true,
           "chromeless": false,
           "externalEndpoints": false,
-          "hideUserFromContext": false,
+          "hideUserFromContext": true,
           "http": {
             "domains": [],
             "enable": false,
