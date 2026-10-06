@@ -72,7 +72,7 @@
     "dompurify": "^3.4.11",
     "http-cache-semantics": "^4.3.0",
     "nan": "2.20.0",
-    "protobufjs": "7.6.3",
+    "protobufjs": "7.6.5",
     "recursive-readdir/minimatch": "3.1.4",
     "serve-handler/minimatch": "3.1.4",
     "strip-ansi@3.0.1/ansi-regex": "3.0.1",
