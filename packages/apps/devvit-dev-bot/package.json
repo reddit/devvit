@@ -16,7 +16,6 @@
     "type-check": "tsc --build"
   },
   "dependencies": {
-    "@devvit/public-api": "0.14.7",
     "@devvit/web": "0.14.7",
     "@types/express-serve-static-core": "5.1.0",
     "devvit": "0.14.8-dev",
