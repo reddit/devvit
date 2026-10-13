@@ -46,10 +46,6 @@ export abstract class DevvitCommand extends Command {
     this.#project = project;
   }
 
-  isRunningInAppDirectory(): boolean {
-    return this.#project !== undefined;
-  }
-
   protected override async init(mode?: BuildMode | 'None'): Promise<void> {
     await super.init();
 

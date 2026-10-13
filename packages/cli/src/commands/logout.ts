@@ -17,7 +17,7 @@ export default class Logout extends DevvitCommand {
       return;
     }
 
-    await getOAuthSvc().Logout({});
+    await getOAuthSvc().Logout();
     this.log('Successfully logged out');
   }
 }

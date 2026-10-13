@@ -5,7 +5,6 @@ import { apiPathPrefix } from '@devvit/shared-types/constants.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import {
   type AppConfig,
-  type AppPermissionConfig,
   type AppPostConfig,
   type AppServerConfig,
   parseAppConfig,
@@ -124,10 +123,6 @@ export class Project {
     this.#config.name = name.toLowerCase();
     this.#config.json.name = this.#config.name;
     writeConfig(this.root, this.filename, this.#config);
-  }
-
-  get permissions(): Readonly<AppPermissionConfig> {
-    return this.#config.permissions;
   }
 
   get post(): Readonly<AppPostConfig | undefined> {

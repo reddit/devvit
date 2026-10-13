@@ -1,12 +1,9 @@
 import crypto from 'node:crypto';
 import querystring from 'node:querystring';
 
-import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import inquirer from 'inquirer';
 import open from 'open';
-import type { Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs';
 
 import { readLine } from '../../util/input-util.js';
 import type { R2OAuthConfig } from '../http/oauth.js';
@@ -31,10 +28,6 @@ export class NodeFSAuthenticationPlugin {
 
   readonly authTokenStore: AuthTokenStore;
 
-  autoRefreshTokenTimeout: ReturnType<typeof setTimeout> | undefined;
-
-  #authTokenStoreUpdatesSubscription: Subscription | undefined;
-
   constructor(cfg: NodeFSAuthenticationPluginConfig) {
     this.#authCfg = cfg.auth;
     this.authTokenStore = new AuthTokenStore(cfg.dotDevvitDir);
@@ -46,17 +39,6 @@ export class NodeFSAuthenticationPlugin {
 
   get #authenticationUrl(): string {
     return `${this.#authCfg.apiV1Url}/authorize`;
-  }
-
-  /** Remember to call .dispose() if you subscribed to auth changes through
-   * NotifyAuthenticationUpdates to clear the timeouts!
-   */
-  async dispose(): Promise<void> {
-    await this.authTokenStore.dispose();
-    this.#authTokenStoreUpdatesSubscription?.unsubscribe();
-    if (this.autoRefreshTokenTimeout != null) {
-      clearTimeout(this.autoRefreshTokenTimeout);
-    }
   }
 
   async refreshStoredToken(refreshToken: string, copyPaste: boolean): Promise<TokenInfo> {
@@ -88,34 +70,12 @@ export class NodeFSAuthenticationPlugin {
     }
   }
 
-  /**
-   * @description this implementation pushed updates in 2 cases:
-   * 1. When this.#authTokenStore file watcher notifies that changes have been
-   *    made to the auth store. (e.g. devvit login in a different session)
-   * 2. Before the current auth token is about to expire, the auth store will be
-   *    requested to refresh.
-   */
-  NotifyAuthenticationUpdates(_request: Empty): Observable<TokenInfo | undefined> {
-    // subscribe to token changes on FS and set up auto refresh token
-    if (!this.#authTokenStoreUpdatesSubscription) {
-      this.#authTokenStoreUpdatesSubscription = this.authTokenStore.updates.subscribe(
-        this.#resetAutoRefreshTokenTimeout.bind(this)
-      );
-    }
-
-    return this.authTokenStore.updates.pipe(
-      map((v) => (v.token.hasScopes(this.#authCfg.scopes) ? v : undefined))
-    );
-  }
-
-  async Logout(_request: Empty): Promise<Empty> {
+  async Logout(): Promise<void> {
     const tokenInfo = await this.authTokenStore.readFSToken();
     if (tokenInfo) {
       await this.#revokeToken(tokenInfo.token);
     }
     await this.authTokenStore.clearToken();
-
-    return {};
   }
 
   async loginViaCopyPaste(): Promise<StoredToken> {
@@ -145,29 +105,6 @@ export class NodeFSAuthenticationPlugin {
     const token = await this.fetchAccessToken(code, true);
     await this.authTokenStore.writeFSToken(token);
     return token;
-  }
-
-  #resetAutoRefreshTokenTimeout(curStoredToken: TokenInfo): void {
-    if (this.autoRefreshTokenTimeout != null) {
-      clearTimeout(this.autoRefreshTokenTimeout);
-    }
-
-    // refresh 10 minutes before actual expiry
-    const refreshIn = curStoredToken.token.expiresAt.getTime() - Date.now() - 10 * 60 * 1000;
-    if (refreshIn <= 0) {
-      // to-do: why isn't this awaited?
-      this.Authenticate()
-        .then()
-        .catch((err) => console.error(StringUtil.caughtToString(err)));
-      return;
-    }
-
-    this.autoRefreshTokenTimeout = setTimeout(() => {
-      // to-do: why isn't this awaited?
-      this.refreshStoredToken(curStoredToken.token.refreshToken, !!curStoredToken.copyPaste)
-        .then()
-        .catch(() => {});
-    }, refreshIn);
   }
 
   async #revokeToken(token: StoredToken, copyPaste?: boolean): Promise<void> {

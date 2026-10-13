@@ -77,7 +77,6 @@ describe('Project', () => {
     };
     const project = new Project('root', 'devvit.json', config, undefined);
     expect(project.appConfig).toBe(config);
-    expect(project.permissions).toBe(noPermissions);
     expect(project.clientDir).toBeUndefined();
     expect(project.mediaDir).toBeUndefined();
     config.post = {
