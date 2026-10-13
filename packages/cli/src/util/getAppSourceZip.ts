@@ -13,7 +13,7 @@ export async function getAppSourceZip(cmd: DevvitCommand): Promise<ArrayBuffer> 
 
   const projectRoot = await fsp.realpath(cmd.project.root);
   const sourceRoots = [projectRoot];
-  for (const root of cmd.project.appConfig?.additionalSourceRoots ?? []) {
+  for (const root of cmd.project.appConfig.additionalSourceRoots ?? []) {
     if (path.isAbsolute(root)) {
       cmd.error(`Additional source root must be relative: ${root}`);
     }
@@ -64,7 +64,7 @@ async function getIgnoredPaths(cmd: DevvitCommand, gitignoreDir: string): Promis
   }
 
   // Ignore any additional paths specified in app config
-  if (cmd.project.appConfig?.sourceIgnores) {
+  if (cmd.project.appConfig.sourceIgnores) {
     ignoreInstance.add(cmd.project.appConfig.sourceIgnores);
   }
 

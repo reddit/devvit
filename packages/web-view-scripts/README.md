@@ -3,7 +3,10 @@
 Intended for use exclusively in web view apps for code that is shipped on CDN or planned to be shipped on CDN. The mechanism works by injecting a script tag into any HTML files at web view asset upload time:
 
 ```html
-<script src="https://webview.devvit.net/scripts/devvit.v1.min.js?clientVersion=1.2.3"></script>
+<script
+  src="https://webview.devvit.net/scripts/devvit.v1.min.js"
+  data-client-version="1.2.3"
+></script>
 ```
 
 This code is not bundled with an app. It's always downloaded.

@@ -3,11 +3,13 @@ import path from 'node:path';
 import { TargetRuntime } from '@devvit/protos/json/devvit/runtime/bundle.js';
 // eslint-disable-next-line no-restricted-imports
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+import { parseAppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import type { BuildResult, OutputFile, PluginBuild } from 'esbuild';
 import type { Observable } from 'rxjs';
 import { vi } from 'vitest';
 
 import {
+  type ActorCompileParams,
   type CompileParams,
   type CompileResponse,
   ESBuildPack,
@@ -47,6 +49,7 @@ async function onEnd(arg: Partial<BuildResult>): Promise<void> {
 }
 
 const namespace = { hostname: 'local' };
+const watcherConfig = parseAppConfig('{"name":"watch-test","blocks":{"entry":"main.ts"}}', false);
 
 const TEST_TIMEOUT = 50_000; // tsc is slow
 
@@ -73,7 +76,7 @@ describe('Watcher', () => {
 
       const badActorPath = path.join(__dirname, '../test-actors/multi-file-hello-world-class');
 
-      const watcher = new Watcher(undefined, namespace, badActorPath, {
+      const watcher = new Watcher(watcherConfig, namespace, badActorPath, {
         name: badActorPath.split(path.sep).at(-1)!,
         owner: 'snoo',
         version: '0.0.0',
@@ -260,8 +263,8 @@ describe('ES Build Pack', () => {
     it(
       'correctly returns CompileResponse',
       async () => {
-        const req: CompileParams = {
-          config: undefined,
+        const req: ActorCompileParams = {
+          entry: 'main.ts',
           root: 'filename', // doesn't exist.
           info: {
             name: 'main',
@@ -272,8 +275,11 @@ describe('ES Build Pack', () => {
         };
         const rsp = await esBuildPack.compile(req);
 
-        processCompileResultForSnapshot(rsp);
-        expect(rsp).toMatchSnapshot();
+        expect(rsp).toStrictEqual({
+          bundles: [],
+          errors: [{ text: `[esbuild] Could not resolve "${path.resolve(req.root, req.entry)}"` }],
+          warnings: [],
+        });
       },
       TEST_TIMEOUT
     );
@@ -289,8 +295,8 @@ describe('ES Build Pack', () => {
       ['ECMAScript module (subclass)', 'es-module-class'],
     ].entries()) {
       test(`Case ${index}: "${name}"`, async () => {
-        const req: CompileParams = {
-          config: undefined,
+        const req: ActorCompileParams = {
+          entry: 'main.ts',
           root: dir == null ? dir : path.resolve(__dirname, '..', 'test-actors', dir),
           info: {
             name: dir,
@@ -314,7 +320,7 @@ describe('ES Build Pack', () => {
         vi.mock('esbuild', () => esbuild); // Hoisted.
 
         observable = esBuildPack.watch({
-          config: undefined,
+          config: watcherConfig,
           root: 'filename',
           info: {
             name: 'main',
@@ -330,6 +336,20 @@ describe('ES Build Pack', () => {
           warnings: [],
         });
       }, TEST_TIMEOUT * 5);
+
+      it(
+        'reuses a watcher for the same project',
+        async () => {
+          const reused = esBuildPack.watch({
+            config: watcherConfig,
+            root: path.resolve('filename'),
+            info: { name: 'main', owner: 'snoo', version: '0.0.0' },
+            minify: 'None',
+          });
+          expect(reused).toBe(observable);
+        },
+        TEST_TIMEOUT
+      );
 
       it(
         'will emit updates when module files are modified',

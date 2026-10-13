@@ -12,7 +12,6 @@ import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_c
 import type { ClientFactory } from '@devvit/shared-types/ConfigImpl.js';
 import { ConfigImpl as Config } from '@devvit/shared-types/ConfigImpl.js';
 import type { Namespace } from '@devvit/shared-types/Namespace.js';
-import { NonNull } from '@devvit/shared-types/NonNull.js';
 import type { AppConfig, AppServerConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { BuildContext, Plugin, PluginBuild } from 'esbuild';
@@ -22,7 +21,7 @@ import { of } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import type { ProjectRootDir } from '../lib/BuildPack.js';
-import { getClassicModuleEntrypoint, getModuleEntrypoint } from '../lib/BuildPack.js';
+import { getModuleEntrypoint } from '../lib/BuildPack.js';
 import { newBuildInfoDependencies } from './BuildInfoUtil.js';
 import type { ConcreteActorType } from './BundleModule.js';
 import { dangerouslyGetBundleActor } from './BundleModule.js';
@@ -30,11 +29,20 @@ import { createDependencySpec } from './dependency-spec-util.js';
 import { templatize } from './templatizer/templatizer.js';
 import { prefixBuildResultLogs } from './utils.js';
 
+/** Parameters for compiling an app described by devvit.json. */
 export type CompileParams = {
-  config: AppConfig | undefined;
+  config: Readonly<AppConfig>;
+  entry?: never;
   minify: 'None' | 'All';
   info: ActorSpec;
   root: ProjectRootDir;
+};
+
+/** Explicit source entry for internal examples. Eg, `bundleApps.ts`. */
+export type ActorCompileParams = Omit<CompileParams, 'config' | 'entry'> & {
+  config?: never;
+  /** Source filename relative to root, or an absolute path. */
+  entry: string;
 };
 
 export type CompileResponse = {
@@ -77,7 +85,7 @@ type BuildTarget = {
 };
 
 export class Watcher {
-  readonly #config: Readonly<AppConfig> | undefined;
+  readonly #config: Readonly<AppConfig>;
   readonly #root: ProjectRootDir;
   /**
    * the actual emitter of updates
@@ -100,7 +108,7 @@ export class Watcher {
   readonly #ready: Promise<void>;
 
   constructor(
-    config: Readonly<AppConfig> | undefined,
+    config: Readonly<AppConfig>,
     namespace: Readonly<Namespace>,
     root: ProjectRootDir,
     actorSpec: ActorSpec
@@ -171,12 +179,9 @@ export class Watcher {
 
   #makeEntry(): string {
     // The watched file doesn't change but its dependencies do.
-    const entry = getModuleEntrypoint(this.#config, this.#root);
-
-    if (this.#config) {
-      const template = templatize(this.#root, this.#config.blocks?.entry);
-      fs.writeFileSync(entry, template);
-    }
+    const entry = getModuleEntrypoint();
+    const template = templatize(this.#root, this.#config.blocks?.entry);
+    fs.writeFileSync(entry, template);
     return entry;
   }
 
@@ -257,8 +262,9 @@ export class ESBuildPack {
     this.#namespace = namespace;
   }
 
-  async compile({ config, minify, info, root }: CompileParams): Promise<CompileResponse> {
-    const entry = getModuleEntrypoint(config, root);
+  async compile(params: CompileParams | ActorCompileParams): Promise<CompileResponse> {
+    const { config, minify, info, root } = params;
+    const entry = config ? getModuleEntrypoint() : path.resolve(root, params.entry);
 
     if (config) {
       const template = templatize(root, config.blocks?.entry);
@@ -320,20 +326,18 @@ export class ESBuildPack {
   }
 
   watch({ config, root, info }: CompileParams): Observable<CompileResponse> {
-    // Use a stable entrypoint, not a template.
-    const blocksEntry = config?.blocks?.entry ?? getClassicModuleEntrypoint(root);
-    if (!this.#bundleWatchers.has(blocksEntry)) {
-      let watcher;
+    const projectRoot = path.resolve(root);
+    let watcher = this.#bundleWatchers.get(projectRoot);
+    if (!watcher) {
       try {
         watcher = new Watcher(config, this.#namespace, root, info);
       } catch (err) {
         return of(unknownToErrorCompileResponse('Compilation', err));
       }
-      this.#bundleWatchers.set(root, watcher);
-      return watcher.getObservable();
+      this.#bundleWatchers.set(projectRoot, watcher);
     }
 
-    return NonNull(this.#bundleWatchers.get(blocksEntry)).getObservable();
+    return watcher.getObservable();
   }
 }
 
@@ -506,7 +510,6 @@ function isEsbuildResult(err: unknown): err is esbuild.BuildResult {
   return err instanceof Object && 'errors' in err && 'warnings' in err;
 }
 
-/** Call with defined config for v1 behavior. */
 function esbuildConfig(config: Readonly<AppConfig> | undefined): esbuild.BuildOptions {
   return {
     // When Blocks migration is used, the Devvit singleton used in the template

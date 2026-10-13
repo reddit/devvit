@@ -33,7 +33,7 @@ export type JSONProduct = Omit<Product, 'metadata'> & Partial<Pick<Product, 'met
  * @throws if products.json is malformed
  */
 export async function readProducts(project: Project): Promise<JSONProduct[] | undefined> {
-  const configProducts = project.appConfig?.payments?.products;
+  const configProducts = project.appConfig.payments?.products;
   if (configProducts && configProducts.length > 0) {
     return configProducts;
   }

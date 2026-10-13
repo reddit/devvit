@@ -17,7 +17,7 @@ import type { Client } from '@devvit/shared-types/shared/client.js';
 import { T2, T3, T5 } from '@devvit/shared-types/tid.js';
 import { type WebbitToken } from '@devvit/shared-types/webbit.js';
 
-import { queryClientVersion } from './client.js';
+import { queryClientVersion, type ScriptDocument } from './client.js';
 import { decodeToken, requestTokenRefresh } from './token.js';
 
 declare global {
@@ -30,7 +30,7 @@ declare global {
 
 /** @internal */
 export const initDevvitGlobal = (
-  document: { readonly currentScript: { readonly src: string } | SVGScriptElement | null },
+  document: ScriptDocument,
   location: { readonly hash: string },
   window: { readonly name: string }
 ): void => {

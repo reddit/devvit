@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
-  clientVersionQueryParam,
+  clientVersionDataAttribute,
   devvitScriptUrl,
 } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { JSDOM } from 'jsdom';
@@ -64,6 +64,13 @@ describe('HTML Transformation', () => {
       expect(document.querySelector('h1')?.textContent).toBe('Hello');
     });
 
+    it.each([undefined, ''])('omits missing client version %s', (version) => {
+      const { document } = new JSDOM(transformHTML('<html><head></head></html>', version)).window;
+      const script = selectScript(document);
+      expect(script).not.toBeNull();
+      expect(script?.hasAttribute(clientVersionDataAttribute)).toBe(false);
+    });
+
     it('should handle malformed HTML gracefully', () => {
       const input = `
         <html>
@@ -80,9 +87,7 @@ describe('HTML Transformation', () => {
       const document = dom.window.document;
 
       // Verify script tag exists
-      const script = document.querySelector(
-        `script[src="${devvitScriptUrl}?${clientVersionQueryParam}=1.2.3"]`
-      );
+      const script = document.querySelector(`script[src="${devvitScriptUrl}"]`);
       assertScriptExpectations(script);
     });
 
@@ -95,9 +100,7 @@ describe('HTML Transformation', () => {
       const document = dom.window.document;
 
       // Verify script tag exists
-      const script = document.querySelector(
-        `script[src="${devvitScriptUrl}?${clientVersionQueryParam}=1.2.3"]`
-      );
+      const script = document.querySelector(`script[src="${devvitScriptUrl}"]`);
       assertScriptExpectations(script);
     });
 
@@ -200,7 +203,7 @@ describe('queryAssets()', () => {
     // Verify that the HTML was transformed.
     const transformedContent = new TextDecoder('utf-8').decode(assets[0].contents);
     expect(transformedContent).toContain(
-      `<script src="${devvitScriptUrl}?${clientVersionQueryParam}=1.2.3"></script>`
+      `<script src="${devvitScriptUrl}" ${clientVersionDataAttribute}="1.2.3"></script>`
     );
     expect(transformedContent).toContain('<title>Test Page</title>');
     expect(transformedContent).toContain('<h1>Hello World</h1>');
@@ -223,11 +226,10 @@ describe('queryAssets()', () => {
 });
 
 function selectScript(document: Document): Element | null {
-  return document.querySelector(
-    `head script[src="${devvitScriptUrl}?${clientVersionQueryParam}=1.2.3"]`
-  );
+  return document.querySelector(`head script[src="${devvitScriptUrl}"]`);
 }
 
 function assertScriptExpectations(script: Element | null) {
   expect(script).not.toBeNull();
+  expect(script?.getAttribute(clientVersionDataAttribute)).toBe('1.2.3');
 }

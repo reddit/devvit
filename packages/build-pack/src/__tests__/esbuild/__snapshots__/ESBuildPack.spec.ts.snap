@@ -236,18 +236,6 @@ exports[`ES Build Pack > Bundle > Case 7: "ECMAScript module (subclass)" 1`] = `
 }
 `;
 
-exports[`ES Build Pack > Bundle > correctly returns CompileResponse 1`] = `
-{
-  "bundles": [],
-  "errors": [
-    {
-      "text": "[esbuild] Could not resolve "filename/main.ts"",
-    },
-  ],
-  "warnings": [],
-}
-`;
-
 exports[`ES Build Pack > v1 > blocks 1`] = `
 {
   "bundles": [

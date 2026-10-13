@@ -1,5 +1,5 @@
 import { ESBuildPack } from '@devvit/build-pack/esbuild/ESBuildPack.js';
-import { formatLogs, type ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
+import { formatLogs } from '@devvit/build-pack/lib/BuildPack.js';
 import type { ActorSpec } from '@devvit/protos/json/devvit/runtime/bundle.js';
 // eslint-disable-next-line no-restricted-imports
 import { type Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
@@ -50,17 +50,13 @@ export class Bundler {
     await this.#buildPack.dispose();
   }
 
-  watch(
-    project: Readonly<Project> | undefined,
-    root: ProjectRootDir,
-    actorSpec: ActorSpec
-  ): Observable<BundlerResult> {
+  watch(project: Readonly<Project>, actorSpec: ActorSpec): Observable<BundlerResult> {
     return this.#buildPack
       .watch({
-        config: project?.appConfig,
+        config: project.appConfig,
         info: actorSpec,
         minify: 'None',
-        root,
+        root: project.root,
       })
       .pipe(
         map((rsp) => {

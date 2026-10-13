@@ -22,7 +22,7 @@ import {
 } from '@devvit/shared-types/constants.js';
 import { mapAsyncWithMaxConcurrency } from '@devvit/shared-types/mapAsyncWithMaxConcurrency.js';
 import {
-  clientVersionQueryParam,
+  clientVersionDataAttribute,
   devvitScriptUrl,
 } from '@devvit/shared-types/web-view-scripts-constants.js';
 import { ux } from '@oclif/core';
@@ -35,7 +35,7 @@ import { default as tinyglob } from 'tiny-glob';
 
 import { createAppClient } from './clientGenerators.js';
 import type { DevvitCommand } from './commands/DevvitCommand.js';
-import { dirExists } from './files.js';
+import { isDir } from './file-util.js';
 import { retryAsync } from './retryAsync.js';
 
 const DEFAULT_PARALLEL_UPLOADS = 7;
@@ -111,11 +111,11 @@ export class AssetUploader {
         : ([] as MediaSignatureWithContents[]),
     ]);
 
-    const iconAssetPath = this.#cmd.project.appConfig?.marketingAssets?.icon;
+    const iconAssetPath = this.#cmd.project.appConfig.marketingAssets?.icon;
     let iconAssetDetails: MediaSignatureWithContents | undefined;
     if (iconAssetPath) {
       const iconAssetFullPath = path.join(this.#cmd.project.root, iconAssetPath);
-      if (await dirExists(iconAssetFullPath)) {
+      if (await isDir(iconAssetFullPath)) {
         this.#cmd.error(`Icon asset path ${iconAssetPath} is a directory, not a file.`);
       }
       if (!(await fsp.stat(iconAssetFullPath)).isFile()) {
@@ -595,7 +595,7 @@ export async function queryAssets(
   clientVersionNum: string | undefined,
   skipWebViewScriptInjection: boolean
 ): Promise<MediaSignatureWithContents[]> {
-  if (!(await dirExists(dir))) {
+  if (!(await isDir(dir))) {
     // Return early if there isn't an assets directory
     return [];
   }
@@ -658,18 +658,11 @@ export function transformHTML(str: string, clientVersionNum: string | undefined)
     return str;
   }
 
-  const clientVersionQueryArg = clientVersionNum
-    ? `${clientVersionQueryParam}=${clientVersionNum}`
-    : '';
-  const scriptTag = `<script src="${devvitScriptUrl}?${clientVersionQueryArg}"></script>`;
+  const script = document.createElement('script');
+  script.src = devvitScriptUrl;
+  if (clientVersionNum) script.setAttribute(clientVersionDataAttribute, clientVersionNum);
 
-  // if no head tag, create one after the html tag
-  const headTag = document.querySelector('head');
-  if (headTag == null) {
-    htmlTag.insertAdjacentHTML('afterbegin', `<head>${scriptTag}</head>`); // eslint-disable-line no-unsanitized/method
-  } else {
-    headTag.insertAdjacentHTML('afterbegin', scriptTag); // eslint-disable-line no-unsanitized/method
-  }
+  document.head.prepend(script);
 
   return document.documentElement.outerHTML;
 }
