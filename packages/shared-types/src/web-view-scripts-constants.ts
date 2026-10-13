@@ -20,3 +20,9 @@ export const screenshotScriptFileName: string = 'screenshot.v1.min.js';
 
 /** CDN URL for the WebView bootstrap script. */
 export const devvitScriptUrl: string = `https://webview.devvit.net/scripts/${devvitScriptFileName}`;
+
+/** Constructs a Reddit URL from a post ID. */
+export const redditUrlFromPostId = (postId: string): string => {
+  const postWithoutPrefix = postId.replace('t3_', '');
+  return `https://reddit.com/r/_/comments/${postWithoutPrefix}`;
+};

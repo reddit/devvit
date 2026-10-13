@@ -95,6 +95,20 @@ describe('requestExpandedMode()', () => {
     } satisfies Effect);
   });
 
+  it('should include the title in the expanded mode effect', () => {
+    const title = 'Play the game';
+    requestExpandedMode(trustedEvent, 'default', { title });
+
+    expect(emitEffect).toHaveBeenCalledWith({
+      immersiveMode: {
+        entryUrl: 'https://corridor-game-csipc4-0-0-9-webview.devvit.net/index.html',
+        immersiveMode: WebViewImmersiveMode.IMMERSIVE_MODE,
+        title,
+      },
+      type: EffectType.EFFECT_WEB_VIEW,
+    } satisfies Effect);
+  });
+
   it('should emit a message for expanded mode nondefault entry', () => {
     requestExpandedMode(trustedEvent, 'splash');
 
