@@ -18,7 +18,7 @@
   "dependencies": {
     "@devvit/web": "0.14.8",
     "@types/express-serve-static-core": "5.1.0",
-    "devvit": "0.14.9-dev",
+    "devvit": "0.15.0-dev",
     "express": "5.1.0"
   },
   "devDependencies": {
