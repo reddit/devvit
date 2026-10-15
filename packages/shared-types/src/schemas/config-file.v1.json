@@ -561,7 +561,7 @@
         },
         "entrypoints": {
           "type": "object",
-          "description": "Map of named entrypoints for post rendering. The key is the entry name, the value is the configuration. The reserved keys _gameplay and _creation identify gameplay and post creation entrypoints for use-case requests.",
+          "description": "Map of named entrypoints for post rendering. The key is the entry name, the value is the configuration. The reserved keys _gameplay, _creation, and _direct_launch identify gameplay, post creation, and direct launch entrypoints for use-case requests.",
           "required": ["default"],
           "additionalProperties": false,
           "properties": {
@@ -571,7 +571,7 @@
             }
           },
           "patternProperties": {
-            "^(_gameplay|_creation|[a-zA-Z0-9-][a-zA-Z0-9_-]*)$": {
+            "^(_gameplay|_creation|_direct_launch|[a-zA-Z0-9-][a-zA-Z0-9_-]*)$": {
               "$ref": "#/$defs/Entrypoint",
               "required": ["entry"]
             }
