@@ -44,7 +44,6 @@ export function getWebViewMode(): WebViewMode {
  *              same entrypoint as currently loaded may cause a reload.
  * @param options Optional settings for the expanded web view. Set `title`
  * @returns A promise that resolves request has been received.
- * @throws When already expanded, unless the direct-to-play experiment is enabled.
  *
  * @experimental
  * @example
@@ -59,12 +58,6 @@ export function requestExpandedMode(
   entry: string,
   options?: WebViewOptions
 ): void {
-  const experiments = devvit.experiments;
-  if (
-    devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE &&
-    experiments.devvit_games_tab_direct_to_play !== 'enabled'
-  )
-    throw Error('web view is already expanded');
   // Count a click in case web view is destroyed when entry changes.
   emitTelemetryClickEffect(event);
   emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry, options?.title);
