@@ -1248,9 +1248,10 @@ export class Post {
   }
 
   /**
-   * Filters a post. When a post is filtered, it is added to the ModQueue for review, and in addition:
-   * - if @param options.keep is `false`, the post stops being in displayed the subreddit
-   * - if @param options.keep is `true`, the post is still displayed in the subreddit
+   * Filters a post. When a post is filtered, it is added to the ModQueue for
+   * review. By default, filtered posts are hidden while in the queue. Set
+   * `keep` to `true` to keep the post visible. Set `reason` to show moderators
+   * a reason; when `keep` is `true`, the reason is also shown on the post.
    *
    * @experimental
    */

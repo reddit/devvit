@@ -518,9 +518,10 @@ export class Comment {
   }
 
   /**
-   * Filters the comment. When a comment is filtered, it is added to the ModQueue for review, and in addition:
-   * - if @param options.keep is `false`, the comment stops being in displayed the subreddit
-   * - if @param options.keep is `true`, the comment is still displayed in the subreddit
+   * Filters the comment. When a comment is filtered, it is added to the ModQueue for review. By
+   * default, filtered comments are hidden while in the queue. Set `keep` to `true` to keep the
+   * comment visible. Set `reason` to show moderators a reason; when `keep` is `true`, the reason
+   * is also shown on the comment.
    *
    * @experimental
    */
