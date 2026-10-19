@@ -61,7 +61,7 @@
     "execa": "9.6.1",
     "file-type": "21.3.2",
     "ignore": "7.0.5",
-    "image-size": "2.0.2",
+    "image-size": "2.0.4",
     "inquirer": "9.1.4",
     "isomorphic-git": "1.33.1",
     "jsdom": "24.1.0",
