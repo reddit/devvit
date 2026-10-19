@@ -9,41 +9,30 @@ import {
 } from '@devvit/protos/json/devvit/runtime/bundle.js';
 // eslint-disable-next-line no-restricted-imports
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
-import type { ClientFactory } from '@devvit/shared-types/ConfigImpl.js';
-import { ConfigImpl as Config } from '@devvit/shared-types/ConfigImpl.js';
 import type { Namespace } from '@devvit/shared-types/Namespace.js';
 import type { AppConfig, AppServerConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import { StringUtil } from '@devvit/shared-types/StringUtil.js';
 import type { BuildContext, Plugin, PluginBuild } from 'esbuild';
 import esbuild, { type BuildResult } from 'esbuild';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { of } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
 import type { ProjectRootDir } from '../lib/BuildPack.js';
 import { getModuleEntrypoint } from '../lib/BuildPack.js';
 import { newBuildInfoDependencies } from './BuildInfoUtil.js';
-import type { ConcreteActorType } from './BundleModule.js';
-import { dangerouslyGetBundleActor } from './BundleModule.js';
 import { createDependencySpec } from './dependency-spec-util.js';
 import { templatize } from './templatizer/templatizer.js';
-import { prefixBuildResultLogs } from './utils.js';
 
-/** Parameters for compiling an app described by devvit.json. */
+/** Compiles an app config or an explicit actor entry with supplied dependencies. */
 export type CompileParams = {
-  config: Readonly<AppConfig>;
-  entry?: never;
   minify: 'None' | 'All';
   info: ActorSpec;
   root: ProjectRootDir;
-};
-
-/** Explicit source entry for internal examples. Eg, `bundleApps.ts`. */
-export type ActorCompileParams = Omit<CompileParams, 'config' | 'entry'> & {
-  config?: never;
-  /** Source filename relative to root, or an absolute path. */
-  entry: string;
-};
+} & (
+  | { config: Readonly<AppConfig>; entry?: never; dependencies?: never }
+  /** Internal actors only. */
+  | { entry: string; dependencies: Readonly<DependencySpec>; config?: never }
+);
 
 export type CompileResponse = {
   bundles: Bundle[];
@@ -71,40 +60,16 @@ const SERVER_ENTRY_INITIAL_DELAY_MS = 100;
 const SERVER_ENTRY_MAX_DELAY_MS = 2_000;
 const SERVER_ENTRY_WARN_THRESHOLD_MS = 5_000;
 
-const FAKE_FACTORY: ClientFactory = {
-  // TODO: remove use of any below
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Build(): any {},
-};
-
-const BUILD_TARGETS = [TargetRuntime.UNIVERSAL];
-
-type BuildTarget = {
-  ctx: BuildContext;
-  result?: BuildResult | undefined;
-};
-
 export class Watcher {
   readonly #config: Readonly<AppConfig>;
   readonly #root: ProjectRootDir;
-  /**
-   * the actual emitter of updates
-   */
-  readonly #observable: BehaviorSubject<CompileResponse>;
-
-  /**
-   * subscribers to this.observable will continue subscribing until this notifier emits a values
-   */
-  readonly #disposedNotifier: Subject<void> = new Subject();
-
-  /**
-   * will be asynchronously set as buildResult.stop after calling esbuild.build
-   */
-  #disposeWatcher?: () => Promise<void>;
+  readonly #observable = new BehaviorSubject<CompileResponse>({
+    bundles: [],
+    errors: [],
+    warnings: [],
+  });
+  #context?: BuildContext;
   readonly #namespace: Readonly<Namespace>;
-
-  readonly #buildTargets: Map<TargetRuntime, BuildTarget> = new Map();
-
   readonly #ready: Promise<void>;
 
   constructor(
@@ -116,22 +81,6 @@ export class Watcher {
     this.#config = config;
     this.#namespace = namespace;
     this.#root = root;
-    //  observers of this will be subscribed until this.disposedNotifier emits a value
-    const sourceObservable = new Observable<CompileResponse>().pipe(
-      takeUntil(this.#disposedNotifier)
-    );
-
-    // our observable is a BehaviorSubject used to multicast the source observer
-    this.#observable = new BehaviorSubject<CompileResponse>({
-      bundles: [],
-      errors: [],
-      warnings: [],
-    });
-
-    // multi-casts (shares) here
-    sourceObservable.subscribe(this.#observable);
-
-    // #init handles errors.
     this.#ready = this.#init(actorSpec);
   }
 
@@ -140,41 +89,21 @@ export class Watcher {
   }
 
   async dispose(): Promise<void> {
-    await this.#disposeWatcher?.();
-
-    // cancels all subscriptions after emitting value due to "takeUntil"
-    this.#disposedNotifier.next();
-    // clean up self
-    this.#disposedNotifier.complete();
+    await this.#context?.dispose();
+    this.#observable.complete();
   }
 
   async #init(actorSpec: ActorSpec): Promise<void> {
     const entry = this.#makeEntry();
-    // Building for Universal target. May include Server in the future.
-    for (const target of BUILD_TARGETS) {
-      this.#buildTargets.set(target, {
-        ctx: await this.#makeEsbuildContext(actorSpec, target, entry),
-      });
-    }
-
-    this.#disposeWatcher = async () => {
-      for (const [_, target] of this.#buildTargets) {
-        await target.ctx.dispose();
-      }
-    };
+    this.#context = await this.#makeEsbuildContext(actorSpec, entry);
 
     if (this.#observable.isStopped) {
-      // Disposed while await-ing and prior to setting disposeWatcher.
-      await this.#disposeWatcher();
+      // Disposal can happen while esbuild is creating the context.
+      await this.#context.dispose();
       return;
     }
 
-    const watchers = [];
-    for (const [_, target] of this.#buildTargets) {
-      watchers.push(target.ctx.watch());
-    }
-
-    await Promise.all(watchers);
+    await this.#context.watch();
   }
 
   #makeEntry(): string {
@@ -185,12 +114,8 @@ export class Watcher {
     return entry;
   }
 
-  async #makeEsbuildContext(
-    actorSpec: ActorSpec,
-    targetRuntime: TargetRuntime,
-    entry: string
-  ): Promise<BuildContext> {
-    const cfg = esbuildConfig(this.#config);
+  async #makeEsbuildContext(actorSpec: ActorSpec, entry: string): Promise<BuildContext> {
+    const cfg = appEsbuildConfig(this.#config, this.#root);
     return await esbuild.context({
       ...cfg,
       entryPoints: [entry],
@@ -200,10 +125,10 @@ export class Watcher {
       // esbuild now supports hooks through the onEnd callback in the build API.
       plugins: [
         {
-          name: 'optionally-type-check-and-publish-compile-result-on-build-end',
+          name: 'publish-compile-result',
           setup: (build: PluginBuild) => {
             build.onEnd(async (result) => {
-              await this.#onBuildEnd(actorSpec, result, targetRuntime);
+              await this.#onBuildEnd(actorSpec, result);
             });
           },
         },
@@ -216,35 +141,14 @@ export class Watcher {
   /**
    * @description The callback function for esbuild's onEnd hook. This is called after esbuild has finished building.
    */
-  async #onBuildEnd(
-    actorSpec: ActorSpec,
-    esbuildResult: BuildResult,
-    targetRuntime: TargetRuntime
-  ): Promise<void> {
+  async #onBuildEnd(actorSpec: ActorSpec, esbuildResult: BuildResult): Promise<void> {
     await this.#ready;
 
-    this.#buildTargets.get(targetRuntime)!.result = esbuildResult;
-
-    const results: Map<TargetRuntime, BuildResult> = new Map();
-
-    // bail early if any builds are incomplete
-    for (const [targetRuntime, target] of this.#buildTargets) {
-      if (!target.result) return;
-      results.set(targetRuntime, target.result);
-    }
-
     const esbuildCompileRes = await newCompileResponse(
-      this.#config,
+      { config: this.#config, info: actorSpec, root: this.#root, minify: 'None' },
       this.#namespace,
-      actorSpec,
-      results,
-      this.#root
+      esbuildResult
     );
-
-    // clear saved values so we don't double-fire the next time we get results
-    for (const [_, target] of this.#buildTargets) {
-      target.result = undefined;
-    }
 
     this.#observable.next(esbuildCompileRes);
   }
@@ -262,8 +166,8 @@ export class ESBuildPack {
     this.#namespace = namespace;
   }
 
-  async compile(params: CompileParams | ActorCompileParams): Promise<CompileResponse> {
-    const { config, minify, info, root } = params;
+  async compile(params: Readonly<CompileParams>): Promise<CompileResponse> {
+    const { config, minify, root } = params;
     const entry = config ? getModuleEntrypoint() : path.resolve(root, params.entry);
 
     if (config) {
@@ -275,42 +179,26 @@ export class ESBuildPack {
       }
     }
 
-    const buildResults: Map<TargetRuntime, BuildResult> = new Map();
-
-    for (const targetRuntime of BUILD_TARGETS) {
-      const cfg = esbuildConfig(config);
-      try {
-        const buildResult = await esbuild.build({
-          ...cfg,
-          entryPoints: [entry],
-          sourcemap: 'external',
-          plugins: [excludeNodeModulesFromSourceMapsPlugin(), ...(cfg.plugins || [])],
-          sourcesContent: false,
-          minify: minify === 'All',
-          outfile: 'main.js',
-          treeShaking: true,
-        });
-        buildResults.set(targetRuntime, buildResult);
-      } catch (err) {
-        return isEsbuildResult(err)
-          ? await newCompileResponse(
-              config,
-              this.#namespace,
-              info,
-              new Map([[targetRuntime, err]]),
-              root
-            )
-          : unknownToErrorCompileResponse('Compilation', err);
-      }
+    const cfg = config ? appEsbuildConfig(config, root) : esbuildConfig();
+    let buildResult;
+    try {
+      buildResult = await esbuild.build({
+        ...cfg,
+        entryPoints: [entry],
+        sourcemap: 'external',
+        plugins: [excludeNodeModulesFromSourceMapsPlugin(), ...(cfg.plugins || [])],
+        sourcesContent: false,
+        minify: minify === 'All',
+        outfile: 'main.js',
+        treeShaking: true,
+      });
+    } catch (err) {
+      return isEsbuildResult(err)
+        ? await newCompileResponse(params, this.#namespace, err)
+        : unknownToErrorCompileResponse('Compilation', err);
     }
 
-    const esbuildCompileResult = await newCompileResponse(
-      config,
-      this.#namespace,
-      info,
-      buildResults,
-      root
-    );
+    const esbuildCompileResult = await newCompileResponse(params, this.#namespace, buildResult);
 
     if (esbuildCompileResult.bundles.length === 0) {
       throw new Error(esbuildCompileResult.errors?.[0]?.text ?? 'Missing bundle');
@@ -325,7 +213,11 @@ export class ESBuildPack {
     );
   }
 
-  watch({ config, root, info }: CompileParams): Observable<CompileResponse> {
+  watch({
+    config,
+    root,
+    info,
+  }: CompileParams & { config: Readonly<AppConfig> }): Observable<CompileResponse> {
     const projectRoot = path.resolve(root);
     let watcher = this.#bundleWatchers.get(projectRoot);
     if (!watcher) {
@@ -378,53 +270,41 @@ async function waitForServerEntry(
 }
 
 async function newCompileResponse(
-  config: Readonly<AppConfig> | undefined,
+  params: CompileParams,
   namespace: Readonly<Namespace>,
-  actorSpec: ActorSpec,
-  buildResults: Map<TargetRuntime, BuildResult>,
-  root: ProjectRootDir
+  buildResult: BuildResult
 ): Promise<CompileResponse> {
-  const errors: CompileLog[] = [];
-  const warnings: CompileLog[] = [];
-  const bundles: Bundle[] = [];
+  const { info, root } = params;
+  const server = params.config?.server;
+  const errors = buildResult.errors.map(esbuildMessageToBuildLog);
+  const warnings = buildResult.warnings.map(esbuildMessageToBuildLog);
 
-  for (const [targetRuntime, buildResult] of buildResults) {
-    if (!buildResult) continue;
-
-    prefixBuildResultLogs(buildResult, 'esbuild');
-
-    errors.push(...buildResult.errors.map(esbuildMessageToBuildLog));
-    warnings.push(...buildResult.warnings.map(esbuildMessageToBuildLog));
-
-    let code: string = '';
-    let sourceMap: string = '';
-    for (const outputFile of buildResult.outputFiles || []) {
-      if (outputFile.path?.endsWith('.js')) {
-        if (code) {
-          throw new Error('There should only be one bundle after build');
-        }
-        code = outputFile.text;
-      } else if (outputFile.path?.endsWith('.js.map')) {
-        sourceMap = outputFile.text;
-      } else {
-        throw new Error('Unexpected output file: ' + outputFile.path);
-      }
+  let code = '';
+  let sourceMap = '';
+  for (const outputFile of buildResult.outputFiles || []) {
+    if (outputFile.path?.endsWith('.js')) {
+      if (code) throw new Error('There should only be one bundle after build');
+      code = outputFile.text;
+    } else if (outputFile.path?.endsWith('.js.map')) {
+      sourceMap = outputFile.text;
+    } else {
+      throw new Error('Unexpected output file: ' + outputFile.path);
     }
+  }
 
-    if (!code) {
-      const errors = buildResult.errors.map(esbuildMessageToBuildLog);
-      const warnings = buildResult.warnings.map(esbuildMessageToBuildLog);
-      return { bundles: [], errors, warnings };
-    }
+  if (!code) return { bundles: [], errors, warnings };
 
-    let dependencies;
-    try {
-      dependencies = await getDependencySpec(actorSpec, code, config, namespace);
-    } catch (err) {
-      return unknownToErrorCompileResponse('Evaluation', err);
-    }
+  let dependencies;
+  try {
+    dependencies = params.config
+      ? createDependencySpec(info, params.config, namespace)
+      : structuredClone(params.dependencies);
+  } catch (err) {
+    return unknownToErrorCompileResponse('Configuration', err);
+  }
 
-    bundles.push({
+  const bundles: Bundle[] = [
+    {
       assetIds: {},
       code,
       sourceMap,
@@ -432,56 +312,36 @@ async function newCompileResponse(
       buildInfo: {
         created: new Date(),
         dependencies: newBuildInfoDependencies(root),
-        targetRuntime,
+        targetRuntime: TargetRuntime.UNIVERSAL,
       },
       webviewAssetIds: {},
-    });
-  }
+    },
+  ];
 
-  const serverEntry = config?.server
-    ? path.join(config.server.dir, config.server.entry)
-    : undefined;
+  const serverEntry = server ? path.join(server.dir, server.entry) : undefined;
 
-  if (!(await waitForServerEntry(root, config?.server))) {
+  if (!(await waitForServerEntry(root, server))) {
     return unknownToErrorCompileResponse(
-      'Evaluation',
-      `Cannot read \`config.server.entry\` file (${serverEntry}). Make sure the \`server.entry\` value in devvit.json is correct and that your project is built.`
+      'Configuration',
+      `Cannot read \`config.server.entry\` file (${serverEntry}). Make sure the \`server.entry\` value is correct and that your project is built.`
     );
   }
 
   try {
-    updateBundleServer(bundles, root, config?.server);
+    updateBundleServer(bundles, root, server);
   } catch {
     return unknownToErrorCompileResponse(
-      'Evaluation',
-      `Cannot read \`config.server.entry\` file (${serverEntry}). Make sure the \`server.entry\` value in devvit.json is correct and that your project is built.`
+      'Configuration',
+      `Cannot read \`config.server.entry\` file (${serverEntry}). Make sure the \`server.entry\` value is correct and that your project is built.`
     );
   }
 
   return { bundles, errors, warnings };
 }
 
-async function dangerouslyMakeDependencySpec(
-  namespace: Readonly<Namespace>,
-  actorSpec: ActorSpec,
-  ActorClass: ConcreteActorType
-): Promise<DependencySpec> {
-  const config = new Config(FAKE_FACTORY, actorSpec, {}, {});
-  new ActorClass(config);
-  const spec = config.export(namespace);
-  for (const provide of spec.provides) {
-    for (const method of provide.definition?.methods ?? []) {
-      if (!(method.name in ActorClass.prototype)) {
-        throw new Error(`App class ${ActorClass.name} does not implement ${method.fullName}`);
-      }
-    }
-  }
-  return spec;
-}
-
 /** Stringifies val as a BuildLog error in a CompileResponse. */
 function unknownToErrorCompileResponse(
-  phase: 'Compilation' | 'Evaluation',
+  phase: 'Compilation' | 'Configuration',
   val: unknown
 ): CompileResponse {
   return {
@@ -493,7 +353,7 @@ function unknownToErrorCompileResponse(
 
 function esbuildMessageToBuildLog(msg: Readonly<esbuild.Message>): CompileLog {
   return {
-    text: msg.text,
+    text: `[esbuild] ${msg.text}`,
     ...(msg.location != null && {
       detail: {
         column: msg.location.column,
@@ -510,21 +370,31 @@ function isEsbuildResult(err: unknown): err is esbuild.BuildResult {
   return err instanceof Object && 'errors' in err && 'warnings' in err;
 }
 
-function esbuildConfig(config: Readonly<AppConfig> | undefined): esbuild.BuildOptions {
+/** Config for `devvit.json`. */
+function appEsbuildConfig(config: Readonly<AppConfig>, root: ProjectRootDir): esbuild.BuildOptions {
   return {
+    ...esbuildConfig(),
+    absWorkingDir: path.resolve(root),
     // When Blocks migration is used, the Devvit singleton used in the template
     // must be the same instance as that used elsewhere. Aliases are resolved
-    // from the current working directory, not the compiled file's directory, so
+    // from the app's working directory, not the compiled file's directory, so
     // this effectively maps the template's @devvit/public-api to the app's
     // version. The same could be done for @devvit/server but apps don't
     // necessarily have a copy.
-    alias: config?.blocks ? { '@devvit/public-api': '@devvit/public-api' } : {},
-    // Recursively inline any imported dependencies.
-    bundle: true,
+    alias: config.blocks ? { '@devvit/public-api': '@devvit/public-api' } : {},
     // Tightly coupled to blocks.template.ts.
     define: {
-      'globalThis.__devvit__': config ? JSON.stringify({ config }, undefined, 2) : 'undefined',
+      'globalThis.__devvit__': JSON.stringify({ config }, undefined, 2),
     },
+  };
+}
+
+/** Config for `devvit.json` or internal example actors. */
+function esbuildConfig(): esbuild.BuildOptions {
+  return {
+    // Recursively inline any imported dependencies.
+    bundle: true,
+    define: { 'globalThis.__devvit__': 'undefined' },
     external: [
       'node:*',
       // All .js files from https://github.com/nodejs/node/tree/b2405e9/lib that
@@ -578,7 +448,7 @@ function esbuildConfig(config: Readonly<AppConfig> | undefined): esbuild.BuildOp
       'zlib',
     ],
     // Both format and target are intended to align to
-    // @devvit/runtimes/package.json's build scripts for bootstrap compatibility.
+    // @devvit/boot's build scripts for bootstrap compatibility.
     format: 'cjs',
     // Use our own built-in `Blocks.createElement` for JSX calls instead
     // of defaulting to `React.createElement`.
@@ -599,7 +469,6 @@ function esbuildConfig(config: Readonly<AppConfig> | undefined): esbuild.BuildOp
 
 /**
  * Plugin for excluding code from inclusion in the source map by filename. This helps keep bundle size manageable.
- * @arg {RegExp} config.filter - A filter for what paths to exclude, if they match.
  */
 function excludeNodeModulesFromSourceMapsPlugin(): Plugin {
   return {
@@ -620,17 +489,6 @@ function excludeNodeModulesFromSourceMapsPlugin(): Plugin {
       });
     },
   };
-}
-
-async function getDependencySpec(
-  actorSpec: Readonly<ActorSpec>,
-  code: string,
-  config: Readonly<AppConfig> | undefined,
-  namespace: Readonly<Namespace>
-): Promise<DependencySpec> {
-  if (config) return createDependencySpec(actorSpec, config, namespace);
-  const ActorClass = await dangerouslyGetBundleActor(code);
-  return await dangerouslyMakeDependencySpec(namespace, actorSpec, ActorClass);
 }
 
 /** Throws when unable to read config.server.entry. */

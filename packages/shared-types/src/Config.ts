@@ -5,12 +5,8 @@ import type { AssetMap } from './Assets.js';
 import type { Namespace } from './Namespace.js';
 
 /**
- * Bundle configuration for code about to be built (eg, dependencies). All
- * Bundle config state that impacts building should be recorded in the
- * implementation. See Actor subclass constructors.
- *
- * This type is = kind of like a builder pattern where export() is the build
- * method. Devvit almost implements this class.
+ * Runtime service registration and client resolution for an actor. Build
+ * dependencies come from devvit.json or are supplied by internal builders.
  */
 export type Config = {
   readonly assets: Readonly<AssetMap>;

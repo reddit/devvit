@@ -20,8 +20,7 @@ import { findUpDirContaining, isFile } from './file-util.js';
 import { type DevvitPackageConfig, readPackageJSON } from './package-managers/package-util.js';
 
 /**
- * Whether the user may be building code while evaluating the project config.
- * Used as a hueristic on when to print which errors.
+ * Controls validation of generated files and uninitialized app names.
  * - Dynamic: User is building code (playtest).
  * - Static: User is not building code.
  * - Uninitialized: The app isn't initialized yet. Allows for project name '<% name %>', which is overwritten during initialization.
@@ -202,8 +201,7 @@ export class Project {
 }
 
 /**
- * Searches for dir containing the config filename. If found, returns a cached
- * config.
+ * Searches upwards for the config filename and loads the project if found.
  *
  * @arg filename Optional config filename override (usually CLI flag).
  */

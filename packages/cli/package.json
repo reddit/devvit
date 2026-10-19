@@ -49,7 +49,6 @@
     "@improbable-eng/grpc-web": "0.15.0",
     "@improbable-eng/grpc-web-node-http-transport": "0.15.0",
     "@oclif/core": "2.9.4",
-    "@oclif/plugin-autocomplete": "2.3.3",
     "@oclif/plugin-help": "5.2.14",
     "@oclif/plugin-not-found": "2.3.34",
     "@oclif/plugin-warn-if-update-available": "2.0.45",
@@ -78,7 +77,6 @@
   },
   "devDependencies": {
     "@devvit/tsconfig": "0.14.8",
-    "@types/file-type": "10.9.1",
     "@types/inquirer": "9.0.3",
     "@types/jsdom": "21.1.7",
     "@types/mime-types": "3.0.1",

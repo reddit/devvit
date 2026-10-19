@@ -1,4 +1,7 @@
+import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { TargetRuntime } from '@devvit/protos/json/devvit/runtime/bundle.js';
 // eslint-disable-next-line no-restricted-imports
@@ -9,7 +12,6 @@ import type { Observable } from 'rxjs';
 import { vi } from 'vitest';
 
 import {
-  type ActorCompileParams,
   type CompileParams,
   type CompileResponse,
   ESBuildPack,
@@ -111,6 +113,40 @@ describe('Watcher', () => {
 
 describe('ES Build Pack', () => {
   describe('v1', () => {
+    test('resolves the Blocks SDK from the app root', async () => {
+      const root = await mkdtemp(path.join(tmpdir(), 'devvit-build-pack-'));
+      const sdk = path.join(root, 'node_modules', '@devvit', 'public-api');
+      await mkdir(sdk, { recursive: true });
+      await writeFile(
+        path.join(sdk, 'package.json'),
+        JSON.stringify({ name: '@devvit/public-api', version: '0.0.0', type: 'module' })
+      );
+      const publicApi = fileURLToPath(import.meta.resolve('@devvit/public-api'));
+      await symlink(path.join(path.dirname(publicApi), 'devvit'), path.join(sdk, 'devvit'), 'dir');
+      await writeFile(
+        path.join(sdk, 'index.js'),
+        `export * from ${JSON.stringify(publicApi)}; export const appSdk = 'app SDK';`
+      );
+      await writeFile(
+        path.join(root, 'main.ts'),
+        `import { Devvit, appSdk } from '@devvit/public-api';
+           console.log(appSdk);
+           export default Devvit;`
+      );
+
+      const rsp = await esBuildPack.compile({
+        config: parseAppConfig('{"name":"app-sdk","blocks":{"entry":"main.ts"}}', false),
+        root,
+        info: { name: 'main', owner: 'snoo', version: '0.0.0' },
+        minify: 'None',
+      });
+
+      expect(rsp.errors).toStrictEqual([]);
+      expect(rsp.bundles).toHaveLength(1);
+      expect(rsp.bundles[0].code).toContain('app SDK');
+      await rm(root, { recursive: true, force: true });
+    });
+
     test(
       'blocks',
       async () => {
@@ -263,14 +299,18 @@ describe('ES Build Pack', () => {
     it(
       'correctly returns CompileResponse',
       async () => {
-        const req: ActorCompileParams = {
+        const info = { name: 'main', owner: 'snoo', version: '0.0.0' };
+        const req: CompileParams = {
           entry: 'main.ts',
-          root: 'filename', // doesn't exist.
-          info: {
-            name: 'main',
-            owner: 'snoo',
-            version: '0.0.0',
+          dependencies: {
+            actor: info,
+            hostname: 'main.local',
+            provides: [],
+            uses: [],
+            permissions: [],
           },
+          root: 'filename', // doesn't exist.
+          info,
           minify: 'None',
         };
         const rsp = await esBuildPack.compile(req);
@@ -295,14 +335,18 @@ describe('ES Build Pack', () => {
       ['ECMAScript module (subclass)', 'es-module-class'],
     ].entries()) {
       test(`Case ${index}: "${name}"`, async () => {
-        const req: ActorCompileParams = {
+        const info = { name: dir, owner: 'snoo', version: '0.0.0' };
+        const req: CompileParams = {
           entry: 'main.ts',
-          root: dir == null ? dir : path.resolve(__dirname, '..', 'test-actors', dir),
-          info: {
-            name: dir,
-            owner: 'snoo',
-            version: '0.0.0',
+          dependencies: {
+            actor: info,
+            hostname: `${dir}.local`,
+            provides: [],
+            uses: [],
+            permissions: [],
           },
+          root: dir == null ? dir : path.resolve(__dirname, '..', 'test-actors', dir),
+          info,
           minify: 'None',
         };
         const rsp = await esBuildPack.compile(req);

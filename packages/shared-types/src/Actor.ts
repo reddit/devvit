@@ -1,31 +1,22 @@
 /**
- * All Bundle programs are Actor subclasses. Actor instances are expected to
- * populate the passed in Config which is used by the builder to compile and
- * link the programs. Bundle programs are expected to export their subclass
- * constructor, either their own Actor subclass or Devvit.
+ * Bundle programs export an Actor subclass or the Devvit singleton. Actor
+ * instances receive a runtime Config to register services and resolve clients.
+ * Builders use devvit.json or supplied dependency metadata and do not
+ * instantiate actors.
  *
  * Devvit is an Actor subclass singleton with a non-class-based API.
  *
  * `instanceof` and `isPrototypeOf()` tests fail because Devvit and Actor
  * are multiply defined.
  *
- * Developers will, for now, implement this class and
- * utilize the the `cfg.use/provide` api for both:
- *
- * 1. specifying their `DependencySpec` (proto: devvit/runtime/bundle)
- *      Build packs will, for now, create an instance of the Actor and use the
- *      result of `config.export` for linking
- *
- * 2. When running within the overall system, `Bootstrap` actor will
- *      inject a config that is used to setup links within the runtime.
+ * The Bootstrap actor injects the Config used to set up runtime links.
  */
 
 import type { Config } from './Config.js';
 
 /**
- * Subclasses are expected to call config.init(), provides(), and uses(). It
- * is erroneous to not override the constructor. Override, invoke
- * `super(config)`, and call the Config APIs.
+ * Base class for actors initialized with a runtime Config. Subclasses can
+ * register services with config.provides() and resolve clients with config.use().
  */
 export abstract class Actor {
   constructor(

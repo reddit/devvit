@@ -40,9 +40,6 @@ export class AuthTokenStore {
       }
 
       rawToken = await readFile(this.#tokenLocation, { encoding: 'utf8' });
-      if (rawToken == null) {
-        return undefined;
-      }
     }
 
     try {
