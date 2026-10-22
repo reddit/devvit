@@ -451,7 +451,6 @@ export default class Publish extends DevvitCommand {
         value: VersionVisibility.UNLISTED,
       },
       validInstallTypes: [InstallationType.SUBREDDIT],
-      pool: -1, // Don't change the pool
     };
 
     ux.action.start(`Publishing version "${devvitVersion.toString()}" to Reddit`);
