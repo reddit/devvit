@@ -3,6 +3,7 @@ import type { T3 } from '@devvit/shared';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { maxShareParamUserDataChars } from '@devvit/shared-types/client/share.js';
 import { ICON_FILE_PATH } from '@devvit/shared-types/constants.js';
+import { redditUrlFromPostId } from '@devvit/shared-types/web-view-scripts-constants.js';
 
 export type ShareSheetOpts = {
   /** Data to share. Must be 1024 characters or less. */
@@ -33,8 +34,7 @@ export async function showShareSheet(opts: Readonly<ShareSheetOpts>): Promise<vo
 
   // Create the share URL using the post from the props, or the current post if not provided.
   const postId = opts.post ?? devvit.context.postId;
-  const postWithoutPrefix = postId.replace('t3_', '');
-  const url = `https://reddit.com/r/_/comments/${postWithoutPrefix}`;
+  const url = redditUrlFromPostId(postId);
 
   emitEffect({
     type: EffectType.EFFECT_WEB_VIEW,

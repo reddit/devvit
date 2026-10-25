@@ -20,6 +20,16 @@ export async function isFile(path: string): Promise<boolean> {
   }
 }
 
+/** Returns true if a directory exists at path. Never throws. */
+export async function isDir(path: string): Promise<boolean> {
+  try {
+    const stat = await fs.stat(path);
+    return stat.isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 async function _findUpDirContaining(
   root: string,
   dir: string,

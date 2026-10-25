@@ -1,8 +1,12 @@
+import { mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { TargetRuntime } from '@devvit/protos/json/devvit/runtime/bundle.js';
 // eslint-disable-next-line no-restricted-imports
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
+import { parseAppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import type { BuildResult, OutputFile, PluginBuild } from 'esbuild';
 import type { Observable } from 'rxjs';
 import { vi } from 'vitest';
@@ -47,6 +51,7 @@ async function onEnd(arg: Partial<BuildResult>): Promise<void> {
 }
 
 const namespace = { hostname: 'local' };
+const watcherConfig = parseAppConfig('{"name":"watch-test","blocks":{"entry":"main.ts"}}', false);
 
 const TEST_TIMEOUT = 50_000; // tsc is slow
 
@@ -73,7 +78,7 @@ describe('Watcher', () => {
 
       const badActorPath = path.join(__dirname, '../test-actors/multi-file-hello-world-class');
 
-      const watcher = new Watcher(undefined, namespace, badActorPath, {
+      const watcher = new Watcher(watcherConfig, namespace, badActorPath, {
         name: badActorPath.split(path.sep).at(-1)!,
         owner: 'snoo',
         version: '0.0.0',
@@ -108,6 +113,40 @@ describe('Watcher', () => {
 
 describe('ES Build Pack', () => {
   describe('v1', () => {
+    test('resolves the Blocks SDK from the app root', async () => {
+      const root = await mkdtemp(path.join(tmpdir(), 'devvit-build-pack-'));
+      const sdk = path.join(root, 'node_modules', '@devvit', 'public-api');
+      await mkdir(sdk, { recursive: true });
+      await writeFile(
+        path.join(sdk, 'package.json'),
+        JSON.stringify({ name: '@devvit/public-api', version: '0.0.0', type: 'module' })
+      );
+      const publicApi = fileURLToPath(import.meta.resolve('@devvit/public-api'));
+      await symlink(path.join(path.dirname(publicApi), 'devvit'), path.join(sdk, 'devvit'), 'dir');
+      await writeFile(
+        path.join(sdk, 'index.js'),
+        `export * from ${JSON.stringify(publicApi)}; export const appSdk = 'app SDK';`
+      );
+      await writeFile(
+        path.join(root, 'main.ts'),
+        `import { Devvit, appSdk } from '@devvit/public-api';
+           console.log(appSdk);
+           export default Devvit;`
+      );
+
+      const rsp = await esBuildPack.compile({
+        config: parseAppConfig('{"name":"app-sdk","blocks":{"entry":"main.ts"}}', false),
+        root,
+        info: { name: 'main', owner: 'snoo', version: '0.0.0' },
+        minify: 'None',
+      });
+
+      expect(rsp.errors).toStrictEqual([]);
+      expect(rsp.bundles).toHaveLength(1);
+      expect(rsp.bundles[0].code).toContain('app SDK');
+      await rm(root, { recursive: true, force: true });
+    });
+
     test(
       'blocks',
       async () => {
@@ -260,20 +299,27 @@ describe('ES Build Pack', () => {
     it(
       'correctly returns CompileResponse',
       async () => {
+        const info = { name: 'main', owner: 'snoo', version: '0.0.0' };
         const req: CompileParams = {
-          config: undefined,
-          root: 'filename', // doesn't exist.
-          info: {
-            name: 'main',
-            owner: 'snoo',
-            version: '0.0.0',
+          entry: 'main.ts',
+          dependencies: {
+            actor: info,
+            hostname: 'main.local',
+            provides: [],
+            uses: [],
+            permissions: [],
           },
+          root: 'filename', // doesn't exist.
+          info,
           minify: 'None',
         };
         const rsp = await esBuildPack.compile(req);
 
-        processCompileResultForSnapshot(rsp);
-        expect(rsp).toMatchSnapshot();
+        expect(rsp).toStrictEqual({
+          bundles: [],
+          errors: [{ text: `[esbuild] Could not resolve "${path.resolve(req.root, req.entry)}"` }],
+          warnings: [],
+        });
       },
       TEST_TIMEOUT
     );
@@ -289,14 +335,18 @@ describe('ES Build Pack', () => {
       ['ECMAScript module (subclass)', 'es-module-class'],
     ].entries()) {
       test(`Case ${index}: "${name}"`, async () => {
+        const info = { name: dir, owner: 'snoo', version: '0.0.0' };
         const req: CompileParams = {
-          config: undefined,
-          root: dir == null ? dir : path.resolve(__dirname, '..', 'test-actors', dir),
-          info: {
-            name: dir,
-            owner: 'snoo',
-            version: '0.0.0',
+          entry: 'main.ts',
+          dependencies: {
+            actor: info,
+            hostname: `${dir}.local`,
+            provides: [],
+            uses: [],
+            permissions: [],
           },
+          root: dir == null ? dir : path.resolve(__dirname, '..', 'test-actors', dir),
+          info,
           minify: 'None',
         };
         const rsp = await esBuildPack.compile(req);
@@ -314,7 +364,7 @@ describe('ES Build Pack', () => {
         vi.mock('esbuild', () => esbuild); // Hoisted.
 
         observable = esBuildPack.watch({
-          config: undefined,
+          config: watcherConfig,
           root: 'filename',
           info: {
             name: 'main',
@@ -330,6 +380,20 @@ describe('ES Build Pack', () => {
           warnings: [],
         });
       }, TEST_TIMEOUT * 5);
+
+      it(
+        'reuses a watcher for the same project',
+        async () => {
+          const reused = esBuildPack.watch({
+            config: watcherConfig,
+            root: path.resolve('filename'),
+            info: { name: 'main', owner: 'snoo', version: '0.0.0' },
+            minify: 'None',
+          });
+          expect(reused).toBe(observable);
+        },
+        TEST_TIMEOUT
+      );
 
       it(
         'will emit updates when module files are modified',

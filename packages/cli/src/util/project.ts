@@ -1,20 +1,10 @@
-/**
- * `ClassicAppConfig` is the old config being phased out for "Webbit".
- * "v1" / `AppConfig` is the new config backed by config-file.v1.json.
- * `DevvitConfig` is either of these.
- *
- * to-do: delete this comment when ClassicAppConfig is deleted.
- */
-
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 import type { ProjectRootDir } from '@devvit/build-pack/lib/BuildPack.js';
 import { apiPathPrefix } from '@devvit/shared-types/constants.js';
-import type { JsonValue } from '@devvit/shared-types/json.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import {
   type AppConfig,
-  type AppPermissionConfig,
   type AppPostConfig,
   type AppServerConfig,
   parseAppConfig,
@@ -27,27 +17,16 @@ import {
   DEVVIT_SUBREDDIT,
 } from '../constants/Environment.js';
 import { findUpDirContaining, isFile } from './file-util.js';
-import { dumpJsonToYaml, readYamlToJson } from './files.js';
 import { type DevvitPackageConfig, readPackageJSON } from './package-managers/package-util.js';
 
 /**
- * Whether the user may be building code while evaluating the project config.
- * Used as a hueristic on when to print which errors.
+ * Controls validation of generated files and uninitialized app names.
  * - Dynamic: User is building code (playtest).
  * - Static: User is not building code.
  * - Uninitialized: The app isn't initialized yet. Allows for project name '<% name %>', which is overwritten during initialization.
  */
 export type BuildMode = 'Dynamic' | 'Static' | 'Uninitialized';
 
-/** @deprecated Use AppConfig. */
-export type ClassicAppConfig = {
-  /** Lowercase app name and Community app slug. */
-  name: string;
-};
-export type DevvitConfig = ClassicAppConfig | AppConfig;
-
-/** Basename of default classic config. */
-export const devvitClassicConfigFilename: string = 'devvit.yaml';
 /** Basename of default schema v1 config. */
 export const devvitV1ConfigFilename: string = 'devvit.json';
 
@@ -65,20 +44,18 @@ export class Project {
     } catch {
       // Failure is fine, it just means we don't have a config file (yet)
     }
-    if (isAppConfig(config)) {
-      const missingFiles = validateConfig(config, existsSync, mode);
+    const missingFiles = validateConfig(config, existsSync, mode);
+    if (missingFiles.length) {
       // check if package.json has a build command
-      if (missingFiles.length) {
-        const containsBuildScript = Object.keys(packageJSON?.scripts ?? {}).some((script) =>
-          script.includes('build')
-        );
-        let error = "Your devvit.json references files that don't exist: ";
-        error += missingFiles.join(', ');
-        if (containsBuildScript) {
-          error += `. You may need to run your build script to fix this.`;
-        }
-        throw Error(error);
+      const containsBuildScript = Object.keys(packageJSON?.scripts ?? {}).some((script) =>
+        script.includes('build')
+      );
+      let error = "Your devvit.json references files that don't exist: ";
+      error += missingFiles.join(', ');
+      if (containsBuildScript) {
+        error += `. You may need to run your build script to fix this.`;
       }
+      throw Error(error);
     }
     return new Project(root, filename, config, packageJSON?.devvit);
   }
@@ -90,14 +67,14 @@ export class Project {
   readonly app: { defaultPlaytestSubredditId?: string | undefined } = {};
   readonly root: ProjectRootDir;
   readonly filename: string;
-  readonly #config: DevvitConfig;
+  readonly #config: AppConfig;
   /** @deprecated Use the config-file.v1.json schema instead. */
   readonly #packageConfig: Readonly<DevvitPackageConfig> | undefined;
 
   constructor(
     root: ProjectRootDir,
     filename: string,
-    config: DevvitConfig,
+    config: AppConfig,
     packageConfig: Readonly<DevvitPackageConfig> | undefined
   ) {
     this.root = root;
@@ -106,18 +83,18 @@ export class Project {
     this.#packageConfig = packageConfig;
   }
 
-  get appConfig(): Readonly<AppConfig> | undefined {
-    return isAppConfig(this.#config) ? this.#config : undefined;
+  get appConfig(): Readonly<AppConfig> {
+    return this.#config;
   }
 
-  // to-do: just return post once classic is removed.
+  // to-do: just expose `post`.
   get clientDir(): string | undefined {
-    return isAppConfig(this.#config) ? this.#config.post?.dir : 'webroot';
+    return this.#config.post?.dir;
   }
 
-  // to-do: just return media once classic is removed.
+  // to-do: just expose `media`.
   get mediaDir(): string | undefined {
-    return isAppConfig(this.#config) ? this.#config.media?.dir : 'assets';
+    return this.#config.media?.dir;
   }
 
   get name(): string {
@@ -143,20 +120,16 @@ export class Project {
     }
 
     this.#config.name = name.toLowerCase();
-    if (isAppConfig(this.#config)) this.#config.json.name = this.#config.name;
+    this.#config.json.name = this.#config.name;
     writeConfig(this.root, this.filename, this.#config);
   }
 
-  get permissions(): Readonly<AppPermissionConfig> | undefined {
-    return isAppConfig(this.#config) ? this.#config.permissions : undefined;
-  }
-
   get post(): Readonly<AppPostConfig | undefined> {
-    return isAppConfig(this.#config) ? this.#config.post : undefined;
+    return this.#config.post;
   }
 
   get server(): Readonly<AppServerConfig | undefined> {
-    return isAppConfig(this.#config) ? this.#config.server : undefined;
+    return this.#config.server;
   }
 
   // to-do: move into devvit.json.
@@ -177,7 +150,7 @@ export class Project {
     if (trimmedFlag) {
       return trimmedFlag;
     }
-    if (isAppConfig(this.#config) && this.#config.dev?.subreddit) {
+    if (this.#config.dev?.subreddit) {
       return this.#config.dev.subreddit;
     }
     return this.app.defaultPlaytestSubredditId;
@@ -200,8 +173,6 @@ export class Project {
       return;
     }
 
-    if (!isAppConfig(this.#config)) return;
-
     this.#config.dev ??= {};
     this.#config.dev.subreddit = subreddit;
 
@@ -212,7 +183,6 @@ export class Project {
 
   setProducts(products: Product[]) {
     if (
-      !isAppConfig(this.#config) ||
       !this.#config.payments ||
       !this.#config.json.payments ||
       !('products' in this.#config.json.payments)
@@ -231,8 +201,7 @@ export class Project {
 }
 
 /**
- * Searches for dir containing the config filename. If found, returns a cached
- * config.
+ * Searches upwards for the config filename and loads the project if found.
  *
  * @arg filename Optional config filename override (usually CLI flag).
  */
@@ -240,51 +209,30 @@ export async function newProject(
   filename: string | undefined,
   mode: BuildMode
 ): Promise<Project | undefined> {
-  filename ||= (await findUpDirContaining(devvitV1ConfigFilename))
-    ? devvitV1ConfigFilename
-    : devvitClassicConfigFilename;
+  filename ||= devvitV1ConfigFilename;
 
   const root = await findUpDirContaining(filename);
   if (root) return await Project.new(root, filename, mode);
-}
-
-/** @internal */
-export function isAppConfig(config: Readonly<DevvitConfig>): config is AppConfig {
-  return 'schema' in config && !!config.schema;
-}
-
-/** @internal */
-export function parseClassicConfig(json: JsonValue): DevvitConfig {
-  if (json == null || typeof json !== 'object' || Array.isArray(json))
-    throw Error(`${devvitClassicConfigFilename} must be an object \`{"name": "foo", ...}\`.`);
-
-  if (typeof json.name !== 'string')
-    throw Error(`${devvitClassicConfigFilename} must have \`name\` property.`);
-
-  // Include original data in case it's a superset.
-  return { ...json, name: json.name.toLowerCase() };
 }
 
 async function readConfig(
   root: string,
   filename: string,
   allowUninitializedConfig: boolean
-): Promise<DevvitConfig> {
+): Promise<AppConfig> {
   const configFilename = path.join(root, filename);
+  if (!configFilename.endsWith('.json'))
+    throw new Error('Project config must be a JSON file with a .json extension.');
   if (!(await isFile(configFilename))) throw new Error(`${configFilename} does not exist`);
 
-  if (configFilename.endsWith('.json')) {
-    let str;
-    try {
-      str = readFileSync(configFilename, 'utf8');
-    } catch (err) {
-      throw Error(`cannot read config ${configFilename}`, { cause: err });
-    }
-
-    return parseAppConfig(str, allowUninitializedConfig);
+  let str;
+  try {
+    str = readFileSync(configFilename, 'utf8');
+  } catch (err) {
+    throw Error(`cannot read config ${configFilename}`, { cause: err });
   }
 
-  return parseClassicConfig(await readYamlToJson(configFilename));
+  return parseAppConfig(str, allowUninitializedConfig);
 }
 
 /** @internal; */
@@ -325,15 +273,8 @@ export function validateConfig(
   return missingFiles;
 }
 
-function writeConfig(
-  projectPath: string,
-  configFile: string,
-  config: Readonly<DevvitConfig>
-): void {
-  writeFileSync(
-    path.join(projectPath, configFile),
-    isAppConfig(config) ? JSON.stringify(config.json, undefined, 2) : dumpJsonToYaml(config)
-  );
+function writeConfig(projectPath: string, configFile: string, config: Readonly<AppConfig>): void {
+  writeFileSync(path.join(projectPath, configFile), JSON.stringify(config.json, undefined, 2));
 }
 
 function updateEnvFileIfSettingExists(
@@ -388,8 +329,5 @@ export function doEnvFileReplacement(
 }
 
 export function isRunningInAppDirectory(): boolean {
-  return (
-    existsSync(path.join(process.cwd(), devvitClassicConfigFilename)) ||
-    existsSync(path.join(process.cwd(), devvitV1ConfigFilename))
-  );
+  return existsSync(path.join(process.cwd(), devvitV1ConfigFilename));
 }

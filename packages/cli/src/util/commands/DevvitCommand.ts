@@ -8,13 +8,7 @@ import type { StoredToken } from '../../lib/auth/StoredToken.js';
 import { getAccessToken } from '../auth.js';
 import { createDeveloperAccountClient } from '../clientGenerators.js';
 import { DEVVIT_PORTAL_URL } from '../config.js';
-import {
-  type BuildMode,
-  devvitClassicConfigFilename,
-  devvitV1ConfigFilename,
-  newProject,
-  type Project,
-} from '../project.js';
+import { type BuildMode, devvitV1ConfigFilename, newProject, type Project } from '../project.js';
 import {
   fetchUserDisplayName,
   fetchUserInfo,
@@ -32,7 +26,7 @@ export const toLowerCaseArgParser = async (input: string): Promise<string> => in
 
 export abstract class DevvitCommand extends Command {
   static override baseFlags = {
-    config: Flags.string({ description: 'path to devvit config file' }),
+    config: Flags.string({ description: 'path to Devvit JSON config file' }),
   } as const;
 
   protected readonly developerAccountClient = createDeveloperAccountClient();
@@ -40,7 +34,7 @@ export abstract class DevvitCommand extends Command {
 
   /** Project configuration. */
   get project(): Project {
-    if (!this.#project) this.error(`No project ${devvitClassicConfigFilename} config file found.`);
+    if (!this.#project) this.error(`No project ${devvitV1ConfigFilename} config file found.`);
     return this.#project;
   }
 
@@ -50,10 +44,6 @@ export abstract class DevvitCommand extends Command {
    */
   set project(project: Project) {
     this.#project = project;
-  }
-
-  isRunningInAppDirectory(): boolean {
-    return this.#project !== undefined;
   }
 
   protected override async init(mode?: BuildMode | 'None'): Promise<void> {
@@ -79,11 +69,7 @@ export abstract class DevvitCommand extends Command {
     if (mode !== 'None') {
       this.#project = await newProject(flags.config, mode ?? 'Static');
       if (flags.config && !this.#project) this.error(`Project config "${flags.config}" not found.`);
-      if (
-        flags.config &&
-        flags.config !== devvitClassicConfigFilename &&
-        flags.config !== devvitV1ConfigFilename
-      ) {
+      if (flags.config && flags.config !== devvitV1ConfigFilename) {
         this.log(`Using custom config file: ${flags.config}`);
       }
     }

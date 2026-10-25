@@ -5,7 +5,7 @@ import type {
 } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/telemetry.js';
 import { emitEffect } from '@devvit/shared-types/client/emit-effect.js';
 import { emitTelemetryClickEffect } from '@devvit/shared-types/client/telemetry.js';
-import { onFCP, onTTFB } from 'web-vitals';
+import { onFCP, onLCP, onTTFB } from 'web-vitals';
 
 import { requireTrustedEvents } from './experiments.js';
 
@@ -169,6 +169,19 @@ function initPerformanceMonitoring(): void {
       telemetryMetrics.push(fcp);
       if (renderDuration) telemetryMetrics.push(renderDuration);
     }
+  });
+
+  onLCP((metric) => {
+    const largestContentfulPaintEntry = metric.entries[metric.entries.length - 1];
+    if (!largestContentfulPaintEntry) return;
+
+    // LCP is finalized on interaction or when hidden, potentially after the load batch.
+    emitMetrics([
+      buildTimeOriginMetric(
+        'web_view_largest_contentful_paint',
+        largestContentfulPaintEntry.startTime
+      ),
+    ]);
   });
 
   onTTFB((metric) => {

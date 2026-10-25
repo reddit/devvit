@@ -10,8 +10,6 @@ import { MY_PORTAL_ENABLED } from '../config.js';
 const IDENTITY_QUERY_HASH = '1936294e5fc812fe34e30c5527b69400a8c44becf417c0c44acffebd3f1632d6';
 const GET_SUBREDDIT_INFO_BY_NAME_QUERY_HASH =
   'f1d2d2ac1ef6e39f9c4a103960d5b07d83665073a376c7852655fae2f1ad5159';
-const GET_REDDITOR_INFO_BY_NAME_QUERY_HASH =
-  '19b0be6bef17faf58939802d3858fec2622ba5ec28d6b8a2982998749ceca30b';
 const GET_SUBREDDIT_INFO_BY_ID_QUERY_HASH =
   '109b67500ceb4e883d6a0e15e1699948e957bf85dc630651f1e10463b6ed5db6';
 
@@ -114,17 +112,4 @@ export async function fetchSubredditSubscriberCount(
     }
     return subredditInfo.data.subredditInfoByName.subscribersCount;
   }
-}
-
-export async function getUserId(username: string, token: StoredToken): Promise<string> {
-  // Hack: GQL is failing below on snoodev.
-  if (MY_PORTAL_ENABLED) return '';
-
-  const identity = await gqlQuery<{ redditorInfoByName: { id: string } }, { name: string }>({
-    accessToken: token.accessToken,
-    hash: GET_REDDITOR_INFO_BY_NAME_QUERY_HASH,
-    name: 'GetRedditorInfoByName',
-    variables: { name: username },
-  });
-  return identity.data.redditorInfoByName.id;
 }

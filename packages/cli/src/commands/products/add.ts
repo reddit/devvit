@@ -225,7 +225,7 @@ export default class AddProduct extends DevvitCommand {
       products: [],
     };
 
-    if (this.project.appConfig?.payments) {
+    if (this.project.appConfig.payments) {
       this.log('Using products from app config payments section.');
       productsJSON.products = this.project.appConfig.payments.products;
       return productsJSON;
@@ -247,7 +247,7 @@ export default class AddProduct extends DevvitCommand {
   }
 
   async #writeProductsConfig(productsJSON: ProductsJSON): Promise<void> {
-    if (!this.project.appConfig?.payments) {
+    if (!this.project.appConfig.payments) {
       // Old products.json
       this.log('Writing to products.json file.');
       await writeFile(this.productsFilePath, JSON.stringify(productsJSON, null, 2), 'utf-8');

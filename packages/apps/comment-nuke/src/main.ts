@@ -1,10 +1,10 @@
+// eslint-disable-next-line no-restricted-imports -- Classic Blocks app.
 import { Devvit, type FormField } from '@devvit/public-api';
 
 import { handleNuke, handleNukePost } from './nuke.js';
 
 Devvit.configure({
   redditAPI: true,
-  modLog: true,
 });
 
 const nukeFields: FormField[] = [

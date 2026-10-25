@@ -407,7 +407,51 @@ describe('parseAppConfigJSON()', () => {
     expect(config.json.post?.entrypoints?.default.styles).toStrictEqual(defaultStyles);
     expect(config.json.post?.entrypoints?.game.styles).toStrictEqual(gameStyles);
   });
-  test.each(['_gameplay', '_creation'])(
+  test.each([
+    'default',
+    '_gameplay',
+    '_creation',
+    '_direct_launch',
+    'gameplay',
+    'game_play',
+    '1game',
+    '-game',
+  ])('accepts post entrypoint name %s', (name) => {
+    const config = parseAppConfigJson(
+      {
+        name: 'abc',
+        post: {
+          entrypoints: {
+            default: { entry: 'index.html' },
+            [name]: { entry: 'entry.html' },
+          },
+        },
+      } satisfies AppConfigJson,
+      false
+    );
+
+    expect(config.post?.entrypoints[name]).toMatchObject({ name, entry: 'entry.html' });
+  });
+  test.each(['_', '_custom', '__gameplay', '_gameplay_extra', '_creation-extra', '_Gameplay'])(
+    'rejects reserved post entrypoint name %s',
+    (name) => {
+      expect(() =>
+        parseAppConfigJson(
+          {
+            name: 'abc',
+            post: {
+              entrypoints: {
+                default: { entry: 'index.html' },
+                [name]: { entry: 'entry.html' },
+              },
+            },
+          } satisfies AppConfigJson,
+          false
+        )
+      ).toThrow(`post.entrypoints is not allowed to have the additional property "${name}"`);
+    }
+  );
+  test.each(['_gameplay', '_creation', '_direct_launch'])(
     'preserves reserved entrypoint %s through upload serialization',
     (name) => {
       const json = {

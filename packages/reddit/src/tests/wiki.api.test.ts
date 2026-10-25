@@ -57,7 +57,7 @@ describe('Wiki API', () => {
     vi.clearAllMocks();
   });
 
-  test('supports the V2 getWikiPage options overload', async () => {
+  test('supports getWikiPage options for V1 and V2', async () => {
     const isVersionEnabled = redditApiPlugins.Wiki.IsWikiVersionEnabledInSubreddit;
     const getWikiPage = redditApiPlugins.Wiki.GetWikiPage;
     isVersionEnabled.mockResolvedValue({ enabled: true });
@@ -72,7 +72,7 @@ describe('Wiki API', () => {
         revisionId,
         wikiVersion: 'v2',
       });
-      const v1Page = await reddit.getWikiPage('test_subreddit', 'index', revisionId);
+      const v1Page = await reddit.getWikiPage('test_subreddit', 'index', { revisionId });
 
       expect(isVersionEnabled).toHaveBeenCalledWith(
         {

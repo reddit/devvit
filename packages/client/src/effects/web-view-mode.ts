@@ -6,6 +6,8 @@ import { emitTelemetryClickEffect } from '@devvit/shared-types/client/telemetry.
 import { apiPathPrefix } from '@devvit/shared-types/constants.js';
 import { tokenParam } from '@devvit/shared-types/webbit.js';
 
+import type { WebViewOptions } from './web-view-options.js';
+
 /**
  * The presentation mode of the web view.
  * 'inline' The web view is displayed inline within a feed or post detail page
@@ -40,8 +42,8 @@ export function getWebViewMode(): WebViewMode {
  * @param entry The destination URI name. Eg, `'splash'` or `'default'`. Entry
  *              names are the `devvit.json` `post.entrypoints` keys. Passing the
  *              same entrypoint as currently loaded may cause a reload.
+ * @param options Optional settings for the expanded web view. Set `title`
  * @returns A promise that resolves request has been received.
- * @throws When already expanded, unless the direct-to-play experiment is enabled.
  *
  * @experimental
  * @example
@@ -51,16 +53,14 @@ export function getWebViewMode(): WebViewMode {
  * });
  * ```
  */
-export function requestExpandedMode(event: MouseEvent, entry: string): void {
-  const experiments = devvit.experiments;
-  if (
-    devvit.webViewMode === WebViewImmersiveMode.IMMERSIVE_MODE &&
-    experiments.devvit_games_tab_direct_to_play !== 'enabled'
-  )
-    throw Error('web view is already expanded');
+export function requestExpandedMode(
+  event: MouseEvent,
+  entry: string,
+  options?: WebViewOptions
+): void {
   // Count a click in case web view is destroyed when entry changes.
   emitTelemetryClickEffect(event);
-  emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry);
+  emitModeEffect(WebViewImmersiveMode.IMMERSIVE_MODE, event, entry, options?.title);
 }
 
 /**
@@ -113,7 +113,12 @@ export function removeWebViewModeListener(callback: WebViewModeListener): void {
   modeListeners.delete(callback);
 }
 
-function emitModeEffect(mode: WebViewImmersiveMode, event: Event, entry: string | undefined): void {
+function emitModeEffect(
+  mode: WebViewImmersiveMode,
+  event: Event,
+  entry: string | undefined,
+  title: string | undefined = undefined
+): void {
   if (!event.isTrusted || event.type !== 'click') {
     console.error('Expanded mode effect ignored due to untrusted event');
     throw new Error('Untrusted event');
@@ -133,7 +138,7 @@ function emitModeEffect(mode: WebViewImmersiveMode, event: Event, entry: string 
 
   emitEffect({
     type: EffectType.EFFECT_WEB_VIEW,
-    immersiveMode: { entryUrl, immersiveMode: mode },
+    immersiveMode: { entryUrl, immersiveMode: mode, title },
   });
 }
 

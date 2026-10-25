@@ -70,7 +70,6 @@ import type {
   UpdateWikiPageOptions,
   Vault,
   WikiPageRevision,
-  WikiPageRevisionId,
   WikiPageSettings,
   WikiVersionOptions,
 } from './models/index.js';
@@ -1341,9 +1340,10 @@ export class RedditClient {
   }
 
   /**
-   * Filters a post or comment. When a post or comment is filtered, it is added to the ModQueue for review, and in addition:
-   * - if @param options.keep is `false`, the post/comment stops being in displayed the subreddit
-   * - if @param options.keep is `true`, the post/comment is still displayed in the subreddit
+   * Filters a post or comment. When a post or comment is filtered, it is added to the ModQueue for
+   * review. By default, filtered content is hidden while in the queue. Set `keep` to `true` to keep
+   * the content visible. Set `reason` to show moderators a reason; when `keep` is `true`, the
+   * reason is also shown on the content.
    *
    * @param id - The id of the post (t3_) or comment (t1_) to filter.
    * @param options - The options for this filter action.
@@ -1571,21 +1571,6 @@ export class RedditClient {
   }
 
   /**
-   * Get a specific revision of a wiki page from a subreddit.
-   *
-   * @param subredditName - The name of the subreddit to get the wiki page from.
-   * @param page - The name of the wiki page to get.
-   * @param revisionId - The revision ID of the wiki page version to get. Leaving it empty returns the latest version.
-   * @returns The requested WikiPage object.
-   * @deprecated Pass a {@link GetWikiPageOptions} object as the third argument instead.
-   */
-  getWikiPage(
-    subredditName: string,
-    page: string,
-    revisionId: WikiPageRevisionId | undefined
-  ): Promise<WikiPage>;
-
-  /**
    * Get a wiki page from a subreddit.
    *
    * @param subredditName - The name of the subreddit to get the wiki page from.
@@ -1595,20 +1580,11 @@ export class RedditClient {
    * @param options.wikiVersion - Which wiki version to target. Defaults to `'v1'`.
    * @returns The requested WikiPage object.
    */
-  getWikiPage(
-    subredditName: string,
-    page: string,
-    options?: GetWikiPageOptions | undefined
-  ): Promise<WikiPage>;
   async getWikiPage(
     subredditName: string,
     page: string,
-    revisionIdOrOptions?: WikiPageRevisionId | GetWikiPageOptions | undefined
+    options?: GetWikiPageOptions | undefined
   ): Promise<WikiPage> {
-    const options =
-      typeof revisionIdOrOptions === 'string'
-        ? { revisionId: revisionIdOrOptions }
-        : revisionIdOrOptions;
     return WikiPage.getPage(subredditName, page, options);
   }
 

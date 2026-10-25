@@ -6,9 +6,10 @@ import { PaymentProcessorDefinition } from '@devvit/protos/types/devvit/actor/pa
 import { Bundle } from '@devvit/protos/types/devvit/plugin/buildpack/buildpack_common.js';
 import type { Product } from '@devvit/shared-types/payments/Product.js';
 import { AccountingType } from '@devvit/shared-types/payments/Product.js';
+import { parseAppConfig } from '@devvit/shared-types/schemas/config-file.v1.js';
 import path from 'path';
 
-import type { Project } from '../project.js';
+import { Project } from '../project.js';
 import {
   getPaymentsConfig,
   makePaymentsConfig,
@@ -57,16 +58,22 @@ const MOCK_BUNDLE: Bundle = {
 
 describe('Read product.json', () => {
   const PROJECT_ROOT = '/path/to/project';
+  const project = new Project(
+    PROJECT_ROOT,
+    'devvit.json',
+    parseAppConfig('{"name":"test-app","server":{}}', false),
+    undefined
+  );
   it('does not return any products if the files does not exist', async () => {
     vi.mocked(access).mockRejectedValueOnce(new Error('not found'));
-    const products = await readProducts({ root: PROJECT_ROOT } as Project);
+    const products = await readProducts(project);
     expect(products).toBeUndefined();
   });
 
   it('throws an error if products.json is not formatted properly', async () => {
     const products = [{ ...MOCK_PRODUCTS_JSON.products[0], price: 'not a number' }];
     vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify(products));
-    await expect(() => readProducts({ root: PROJECT_ROOT } as Project)).rejects.toThrowError(
+    await expect(() => readProducts(project)).rejects.toThrowError(
       'products.json validation error'
     );
   });

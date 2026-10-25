@@ -7,7 +7,6 @@ import type {
   DevPortalAppSettingsClient,
   DevPortalDeveloperSettingsClient,
   EventsClient,
-  FeedbackClient,
   InstallationsClient,
 } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
 // eslint-disable-next-line no-restricted-imports
@@ -19,13 +18,8 @@ import {
   DevPortalAppSettingsClientJSON,
   DevPortalDeveloperSettingsClientJSON,
   EventsClientJSON,
-  FeedbackClientJSON,
   InstallationsClientJSON,
 } from '@devvit/protos/types/devvit/dev_portal/dev_portal.twirp-client.js';
-// eslint-disable-next-line no-restricted-imports
-import type { WaitlistClient } from '@devvit/protos/types/devvit/dev_portal/waitlist/waitlist.twirp-client.js';
-// eslint-disable-next-line no-restricted-imports
-import { WaitlistClientJSON } from '@devvit/protos/types/devvit/dev_portal/waitlist/waitlist.twirp-client.js';
 // eslint-disable-next-line no-restricted-imports
 import {
   type RemoteLogConsumer,
@@ -77,8 +71,6 @@ const TWIRP_CODES_TO_NOT_RETRY = [
 const APP_PATH = 'app';
 const APP_VERSION_PATH = 'appVersion';
 const INSTALLATIONS_PATH = 'installations';
-const FEEDBACK_PATH = 'feedback';
-const WAITLIST_PATH = 'waitlist';
 const APP_SETTINGS_PATH = 'app-settings';
 const EVENTS_PATH = 'events';
 const PUBLISH_REQUEST_PATH = 'app-publish-request';
@@ -135,18 +127,6 @@ export function createInstallationsClient(): InstallationsClient {
   );
 }
 
-export function createFeedbackClient(): FeedbackClient {
-  return wrapWithRetry(
-    new FeedbackClientJSON(
-      NodeFetchRPC({
-        baseUrl: `${DEVVIT_PORTAL_API}/${FEEDBACK_PATH}`,
-        getToken: getAccessToken,
-        headers: getHeaders('Feedback'),
-      })
-    )
-  );
-}
-
 export function createRemoteLoggerClient(): RemoteLogConsumer {
   const headers = getHeaders('RemoteLogConsumer');
   // Uncomment the below line to route all RemoteLog requests to gateway-execute in snoodev
@@ -160,17 +140,6 @@ export function createRemoteLoggerClient(): RemoteLogConsumer {
   );
 }
 
-export function createWaitlistClient(): WaitlistClient {
-  return wrapWithRetry(
-    new WaitlistClientJSON(
-      NodeFetchRPC({
-        baseUrl: `${DEVVIT_PORTAL_API}/${WAITLIST_PATH}`,
-        getToken: getAccessToken,
-        headers: getHeaders('Waitlist'),
-      })
-    )
-  );
-}
 export function createDeveloperAccountClient(): DeveloperAccountClient {
   return wrapWithRetry(
     new DeveloperAccountClientJSON(

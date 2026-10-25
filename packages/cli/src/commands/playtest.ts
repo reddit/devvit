@@ -55,7 +55,7 @@ import { warnIfOutdatedNodeVersion } from '../util/common-actions/warnIfOutdated
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { killProcessTree, killProcessTreeSync } from '../util/kill-process-tree.js';
 import { isWebContainer } from '../util/platform-util.js';
-import { devvitClassicConfigFilename, devvitV1ConfigFilename } from '../util/project.js';
+import { devvitV1ConfigFilename } from '../util/project.js';
 import { logInBox } from '../util/ui.js';
 import Logs from './logs.js';
 
@@ -157,7 +157,7 @@ export default class Playtest extends DevvitCommand {
   #configReloadCount: number = 0;
 
   async #startDevScript(): Promise<void> {
-    const devCommand = this.project.appConfig?.scripts?.dev;
+    const devCommand = this.project.appConfig.scripts?.dev;
     if (!devCommand) return;
 
     if (this.#flags?.verbose) {
@@ -244,7 +244,7 @@ export default class Playtest extends DevvitCommand {
    * hang playtest indefinitely.
    */
   async #waitForFirstBuild(): Promise<void> {
-    if (!this.project.appConfig?.scripts?.dev) return;
+    if (!this.project.appConfig.scripts?.dev) return;
 
     const watchPaths = this.#devScriptOutputDirs();
     if (watchPaths.length === 0) return;
@@ -452,7 +452,7 @@ export default class Playtest extends DevvitCommand {
     }
     const shouldWriteToConfig = !this.#subreddit;
 
-    const hasDevScript = !!this.project.appConfig?.scripts?.dev;
+    const hasDevScript = !!this.project.appConfig.scripts?.dev;
     let latestVersion: AppVersionInfo | undefined =
       this.#appInfo.versions.length > 0 ? this.#appInfo.versions[0] : undefined;
     // Tracks whether `latestVersion` was just built from the developer's
@@ -586,7 +586,7 @@ export default class Playtest extends DevvitCommand {
    */
   #startWatchingSrc(username: string): void {
     if (!this.#bundler) throw Error('no bundler');
-    const watchSrc = this.#bundler.watch(this.project, this.project.root, {
+    const watchSrc = this.#bundler.watch(this.project, {
       name: ACTOR_SRC_PRIMARY_NAME,
       owner: username,
       // Version is always incorrect since it changes on each upload and the
@@ -613,7 +613,7 @@ export default class Playtest extends DevvitCommand {
     if (this.project.server)
       // Watch the server directory to allow the watched file to be renamed or deleted.
       assetPaths.push(path.join(this.project.root, this.project.server.dir, '..'));
-    if (this.project.appConfig?.marketingAssets?.icon) {
+    if (this.project.appConfig.marketingAssets?.icon) {
       assetPaths.push(path.join(this.project.root, this.project.appConfig.marketingAssets.icon));
     }
     this.#watchAssets = chokidar.watch(assetPaths, { ignoreInitial: true });
@@ -630,7 +630,7 @@ export default class Playtest extends DevvitCommand {
       ? [path.dirname(path.resolve(this.project.root, this.project.filename))]
       : [path.resolve(this.project.root)];
 
-    if (this.project.appConfig?.payments?.productsFile) {
+    if (this.project.appConfig.payments?.productsFile) {
       // Also watch the products file if one is configured
       files.push(path.resolve(this.project.root, this.project.appConfig.payments.productsFile));
     }
@@ -656,11 +656,9 @@ export default class Playtest extends DevvitCommand {
     const isFlaggedConfigFile =
       this.#flags?.config &&
       path.resolve(this.project.root, this.#flags.config as string) === resolvedFile;
-    const isDefaultConfigFile =
-      !this.#flags?.config &&
-      (baseFile === devvitV1ConfigFilename || baseFile === devvitClassicConfigFilename);
+    const isDefaultConfigFile = !this.#flags?.config && baseFile === devvitV1ConfigFilename;
     const isProductsFile =
-      this.project.appConfig?.payments?.productsFile &&
+      this.project.appConfig.payments?.productsFile &&
       resolvedFile ===
         path.resolve(this.project.root, this.project.appConfig.payments.productsFile);
 

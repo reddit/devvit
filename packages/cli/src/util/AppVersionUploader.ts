@@ -82,12 +82,7 @@ Please refer to https://developers.reddit.com/docs/capabilities/payments for mor
       })
     );
 
-    // Send the devvit.json file with the creation request, if it exists.
-    const appConfig = this.#cmd.project.appConfig;
-    let devvitJson: string | undefined;
-    if (appConfig) {
-      devvitJson = JSON.stringify(appConfig);
-    }
+    const devvitJson = JSON.stringify(this.#cmd.project.appConfig);
 
     const shouldShowUploadAction = this.#verbose;
     if (shouldShowUploadAction) {

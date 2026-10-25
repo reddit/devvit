@@ -4,17 +4,19 @@ import { webViewInternalMessageType } from '@devvit/shared-types/client/emit-eff
 import type { WebbitToken } from '@devvit/shared-types/webbit.js';
 import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
-import type { FCPMetric, TTFBMetric } from 'web-vitals';
+import type { FCPMetric, LCPMetric, TTFBMetric } from 'web-vitals';
 
 import { initTelemetry, roundProps } from './telemetry.js';
 
 const webVitalsMocks = vi.hoisted(() => ({
   onFCP: vi.fn(),
+  onLCP: vi.fn(),
   onTTFB: vi.fn(),
 }));
 
 vi.mock('web-vitals', () => webVitalsMocks);
 vi.mock('web-vitals/onFCP.js', () => ({ onFCP: webVitalsMocks.onFCP }));
+vi.mock('web-vitals/onLCP.js', () => ({ onLCP: webVitalsMocks.onLCP }));
 vi.mock('web-vitals/onTTFB.js', () => ({ onTTFB: webVitalsMocks.onTTFB }));
 
 type EventListenerMock = Mock<
@@ -36,6 +38,7 @@ const docAddEventListenerMock: EventListenerMock = vi.fn();
 const postMessageMock: EventListenerMock = vi.fn();
 const trustedEvent: MessageEvent = { isTrusted: true } as MessageEvent;
 let reportFcp: ((metric: FCPMetric) => void) | undefined;
+let reportLcp: ((metric: LCPMetric) => void) | undefined;
 let reportTtfb: ((metric: TTFBMetric) => void) | undefined;
 
 const triggerFcp = (
@@ -43,6 +46,13 @@ const triggerFcp = (
   value: number = entry?.startTime ?? 0
 ): void => {
   reportFcp?.({ value, entries: entry ? [entry] : [] } as FCPMetric);
+};
+
+const triggerLcp = (
+  entry?: LCPMetric['entries'][number],
+  value: number = entry?.startTime ?? 0
+): void => {
+  reportLcp?.({ value, entries: entry ? [entry] : [] } as LCPMetric);
 };
 
 const triggerTtfb = (
@@ -130,6 +140,9 @@ beforeEach(() => {
   webVitalsMocks.onFCP.mockImplementation((callback) => {
     reportFcp = callback;
   });
+  webVitalsMocks.onLCP.mockImplementation((callback) => {
+    reportLcp = callback;
+  });
   webVitalsMocks.onTTFB.mockImplementation((callback) => {
     reportTtfb = callback;
   });
@@ -148,6 +161,7 @@ afterEach(async () => {
   await new Promise((resolve) => setTimeout(resolve));
   reportFcp = undefined;
   reportTtfb = undefined;
+  reportLcp = undefined;
   delete (globalThis as { devvit?: DevvitGlobal }).devvit;
   delete (globalThis as { document?: {} }).document;
   delete (globalThis as { parent?: {} }).parent;
@@ -547,6 +561,31 @@ describe('performance monitoring', () => {
     ]);
   });
 
+  it.each(['before', 'after'])('emits LCP independently %s load', (timing) => {
+    if (timing === 'after') {
+      triggerWindowEvent('load');
+      completeDocument();
+    }
+    postMessageMock.mockClear();
+
+    triggerLcp({ startTime: 600.6 } as LCPMetric['entries'][number], 550);
+
+    expect(getMetricsPayloads()).toEqual([
+      [
+        {
+          spanName: 'web_view_largest_contentful_paint',
+          timeStart: Math.round(performance.timeOrigin),
+          timeEnd: Math.round(performance.timeOrigin + 600.6),
+        },
+      ],
+    ]);
+    if (timing === 'before') triggerWindowEvent('load');
+    expect(
+      getAllMetrics().filter((metric) => metric.spanName === 'web_view_largest_contentful_paint')
+    ).toHaveLength(1);
+    expectNoMetric('web_view_render_duration');
+  });
+
   it('rounds emitted metric timestamps without changing the metrics array', () => {
     setNavigationTiming({ responseStart: 200.4, domInteractive: 300.6, loadEventEnd: 400.6 });
     vi.spyOn(performance, 'now').mockReturnValue(400.6);
@@ -739,6 +778,11 @@ describe('performance monitoring', () => {
       name: 'FCP',
       spanName: 'web_view_first_contentful_paint',
       report: () => triggerFcp(undefined, 300),
+    },
+    {
+      name: 'LCP',
+      spanName: 'web_view_largest_contentful_paint',
+      report: () => triggerLcp(undefined, 600),
     },
     {
       name: 'TTFB',

@@ -278,7 +278,7 @@ export default class Upload extends DevvitCommand {
   }
 
   async #runBuildScriptIfConfigured(streamOutput: boolean): Promise<void> {
-    const buildCommand = this.project.appConfig?.scripts?.build;
+    const buildCommand = this.project.appConfig.scripts?.build;
     if (!buildCommand) return;
 
     const truncatedCommand =
