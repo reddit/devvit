@@ -341,6 +341,7 @@ export function devvit(opts: DevvitPluginOptions = {}): Plugin {
             build: {
               ...baseBuildOptions,
               ssr: serverEntry,
+              // TODO: Bump to node24.22.1 in the next breaking release
               target: 'node22',
               outDir: serverOutDir,
               minify: true,

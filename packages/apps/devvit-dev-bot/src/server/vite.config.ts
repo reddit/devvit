@@ -9,7 +9,7 @@ export default defineConfig({
     emptyOutDir: false,
     ssr: 'index.ts',
     outDir: '../../dist/server',
-    target: 'node22',
+    target: 'node24.22.1',
     sourcemap: true,
     commonjsOptions: {
       ignoreDynamicRequires: true,
