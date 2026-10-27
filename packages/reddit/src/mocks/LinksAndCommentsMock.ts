@@ -20,7 +20,6 @@ import type {
   SetSubredditStickyRequest,
   SetSuggestedSortRequest,
   SubmitRequest,
-  VoteRequest,
 } from '@devvit/protos/json/devvit/plugin/redditapi/linksandcomments/linksandcomments_msg.js';
 import type {
   GetCustomPostStylesRequest,
@@ -560,13 +559,6 @@ export class LinksAndCommentsPluginMock implements LinksAndComments {
   ): Promise<RemovePostFromHighlightsResponse> {
     throw new Error(
       `Reddit API method LinksAndComments.RemovePostFromHighlights is not implemented in the test harness.\n` +
-        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
-    );
-  }
-
-  async Vote(_request: VoteRequest, _metadata?: Metadata): Promise<Empty> {
-    throw new Error(
-      `Reddit API method LinksAndComments.Vote is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }

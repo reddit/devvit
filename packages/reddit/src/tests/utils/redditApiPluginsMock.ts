@@ -50,7 +50,6 @@ export const redditApiPlugins = {
     UnmarkNSFW: vi.fn(),
     Unsave: vi.fn(),
     Unspoiler: vi.fn(),
-    Vote: vi.fn(),
     SetCustomPostStyles: vi.fn(),
     GetCustomPostStyles: vi.fn(),
     GetUserPollOption: vi.fn(),
