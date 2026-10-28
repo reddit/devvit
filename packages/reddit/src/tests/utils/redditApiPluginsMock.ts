@@ -176,7 +176,6 @@ export const redditApiPlugins = {
     SetPermissions: vi.fn(),
     Unfriend: vi.fn(),
     UserDataByAccountIds: vi.fn(),
-    UsernameAvailable: vi.fn(),
     UnfriendUser: vi.fn(),
     GetFriendInformation: vi.fn(),
     UpdateFriendRelationship: vi.fn(),

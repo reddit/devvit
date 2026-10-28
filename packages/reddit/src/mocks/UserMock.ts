@@ -16,13 +16,11 @@ import type {
   UserDataByAccountIdsRequest,
   UserDataByAccountIdsResponse,
   UserDataByAccountIdsResponse_UserAccountData,
-  UsernameAvailableRequest,
   UserTrophiesResponse,
   UserWhereRequest,
 } from '@devvit/protos/json/devvit/plugin/redditapi/users/users_msg.js';
 import type { User } from '@devvit/protos/json/devvit/reddit/user.js';
 import type { Empty } from '@devvit/protos/json/google/protobuf/empty.js';
-import type { BoolValue } from '@devvit/protos/json/google/protobuf/wrappers.js';
 import type { Metadata } from '@devvit/protos/lib/Types.js';
 // eslint-disable-next-line no-restricted-imports
 import type { Listing } from '@devvit/protos/types/devvit/plugin/redditapi/common/common_msg.js';
@@ -170,16 +168,6 @@ export class UserPluginMock implements Users {
   async UserWhere(_request: UserWhereRequest, _metadata?: Metadata): Promise<Listing> {
     throw new Error(
       `Reddit API method Users.UserWhere is not implemented in the test harness.\n` +
-        `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
-    );
-  }
-
-  async UsernameAvailable(
-    _request: UsernameAvailableRequest,
-    _metadata?: Metadata
-  ): Promise<BoolValue> {
-    throw new Error(
-      `Reddit API method Users.UsernameAvailable is not implemented in the test harness.\n` +
         `For more information, visit https://developers.reddit.com/docs/guides/tools/devvit_test`
     );
   }
