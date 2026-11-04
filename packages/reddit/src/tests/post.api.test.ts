@@ -472,6 +472,28 @@ describe('Post API', () => {
         title: 'My First Post',
       };
 
+      test.each([true, false, undefined])('forwards spoiler=%s', async (spoiler) => {
+        const mockedPost = new Post({ ...defaultPostData });
+        const spyPlugin = redditApiPlugins.LinksAndComments.SubmitCustomPost;
+        spyPlugin.mockResolvedValueOnce({
+          json: { data: { id: 'post' }, errors: [] },
+        });
+        vi.spyOn(Post, 'getById').mockResolvedValueOnce(mockedPost);
+
+        await runWithTestContext(async () => {
+          await reddit.submitCustomPost({
+            title: mockedPost.title,
+            subredditName: mockedPost.subredditName,
+            ...(spoiler === undefined ? {} : { spoiler }),
+          });
+
+          expect(spyPlugin).toHaveBeenCalledWith(
+            expect.objectContaining({ spoiler }),
+            context.metadata
+          );
+        });
+      });
+
       test('submitCustomPost(): can set runAs: USER when userActions enabled', async () => {
         const mockedPost = new Post({ ...defaultPostData });
 
