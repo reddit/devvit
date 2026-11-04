@@ -107,7 +107,7 @@
     "eslint-plugin-simple-import-sort": "12.1.1",
     "eslint-plugin-sonarjs": "4.2.2",
     "globals": "15.2.0",
-    "lerna": "8.1.7",
+    "lerna": "10.1.1",
     "lint-staged": "13.0.3",
     "lockfile-lint": "4.10.1",
     "prettier": "3.3.3",
