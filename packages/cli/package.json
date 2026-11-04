@@ -86,7 +86,7 @@
     "concurrently": "7.5.0",
     "eslint": "9.11.1",
     "oclif": "3.17.2",
-    "typescript": "5.8.3",
+    "typescript": "6.0.3",
     "vitest": "4.1.0"
   },
   "engines": {

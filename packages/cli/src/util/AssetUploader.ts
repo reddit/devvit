@@ -464,7 +464,7 @@ export class AssetUploader {
         try {
           const resp = await fetch(newAsset.uploadUrl, {
             method: 'PUT',
-            body: newAsset.contents,
+            body: new Uint8Array(newAsset.contents),
             headers: newAsset.uploadHeaders,
           });
           if (!resp.ok) {
@@ -611,7 +611,7 @@ export async function queryAssets(
   return await Promise.all(
     assets.map(async (asset) => {
       const filename = path.relative(dir, asset).replaceAll(path.sep, '/');
-      let file = await fsp.readFile(asset);
+      let file: Buffer = await fsp.readFile(asset);
 
       // If the webview assets is an HTML file, inject the Devvit analytics
       // script.

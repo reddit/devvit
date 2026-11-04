@@ -84,7 +84,7 @@
     "form-data@^4": "4.0.6"
   },
   "dependencies": {
-    "typescript": "5.8.3"
+    "typescript": "6.0.3"
   },
   "devDependencies": {
     "@benasher44/eslint-plugin-implicit-dependencies": "1.1.3",
