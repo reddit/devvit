@@ -1,4 +1,7 @@
-import { NutritionCategory } from '@devvit/protos/json/devvit/dev_portal/nutrition/nutrition.js';
+import {
+  type MultipleNutritionCategories,
+  NutritionCategory,
+} from '@devvit/protos/json/devvit/dev_portal/nutrition/nutrition.js';
 // eslint-disable-next-line no-restricted-imports
 import {
   OnAppInstallDefinition,
@@ -96,17 +99,38 @@ type AppCapabilitiesActor = Readonly<{
 }>;
 
 /**
+ * This mirrors the AppPermissions table in the ecosystem DB. The permissions an app version has is
+ * relevant to its nutrition information, such as if/what domains it can skip navigateTo interstitials
+ * for, or if logged-in user info is visible to the app.
+ */
+export type AppPermissions =
+  | {
+      canBypassLinkInterstitial: boolean | string[];
+      hideUserFromContext: boolean;
+    }
+  | undefined;
+
+/**
+ * This is a partial mirror of the AppVersion table - specifically, what values we need to be able to
+ * determine what nutrition information we need to display for a given AppVersion.
+ */
+export type AppVersion = {
+  actors: AppCapabilitiesActor[];
+  assets?: { webviewAsset: boolean }[];
+  appPermissions: AppPermissions;
+};
+
+/**
  * Finds all of the capabilities that an app has based on its version.
  */
-export function appCapabilitiesFromAppVersion(
-  version: Readonly<{ actors: AppCapabilitiesActor[]; assets?: { webviewAsset: boolean }[] }>
-): NutritionCategory[] {
+export function appCapabilitiesFromAppVersion(version: Readonly<AppVersion>): NutritionCategory[] {
   const hasWebView = version.assets?.some((asset) => asset.webviewAsset) ?? false;
   const capabilities = version.actors.flatMap((actor) =>
     appCapabilitiesFromActor({
       actorTypes: actor.types,
       actorPlugins: actor.plugins,
       hasWebView,
+      appPermissions: version.appPermissions,
     })
   );
   // Filter out dups.
@@ -119,16 +143,50 @@ export function appCapabilitiesFromActor({
   actorTypes,
   actorPlugins,
   hasWebView,
+  appPermissions,
 }: {
   actorTypes: Readonly<AppActorTypes>;
   actorPlugins: Readonly<AppActorPlugins>;
   hasWebView: boolean;
+  appPermissions: AppPermissions;
 }): NutritionCategory[] {
   const names = [
     ...actorTypes.map((provide) => provide.name),
     ...actorPlugins.map((use) => use.fullname),
   ];
-  return appCapabilitiesFromFullNames(names, hasWebView);
+
+  return [
+    ...appCapabilitiesFromFullNames(names, hasWebView),
+    ...appCapabilitiesFromPermissions(appPermissions),
+  ];
+}
+
+export function nutritionInformationFromActor(details: {
+  actorTypes: Readonly<AppActorTypes>;
+  actorPlugins: Readonly<AppActorPlugins>;
+  hasWebView: boolean;
+  appPermissions: AppPermissions;
+  allowedDomains: {
+    domain: string;
+  }[];
+}): MultipleNutritionCategories {
+  const categories = appCapabilitiesFromActor(details);
+
+  let navigateToAllowlist: string[] = [];
+  if (
+    details.appPermissions?.canBypassLinkInterstitial &&
+    Array.isArray(details.appPermissions.canBypassLinkInterstitial)
+  ) {
+    navigateToAllowlist = details.appPermissions.canBypassLinkInterstitial;
+  }
+
+  return {
+    categories,
+    allowedHttpDomains: categories.includes(NutritionCategory.HTTP)
+      ? details.allowedDomains.map((d) => d.domain)
+      : [],
+    navigateToAllowlist,
+  };
 }
 
 /**
@@ -163,6 +221,17 @@ export function appCapabilitiesFromBundle(bundle: Readonly<Bundle>): NutritionCa
   const hasWebview = Object.keys(bundle.webviewAssetIds).length > 0;
 
   return appCapabilitiesFromFullNames(names, hasWebview);
+}
+
+function appCapabilitiesFromPermissions(appPermissions: AppPermissions): NutritionCategory[] {
+  const categories: NutritionCategory[] = [];
+  if (appPermissions?.canBypassLinkInterstitial) {
+    categories.push(NutritionCategory.BYPASS_INTERSTITIAL);
+  }
+  if (appPermissions?.hideUserFromContext) {
+    categories.push(NutritionCategory.USER_HIDDEN_FROM_CONTEXT);
+  }
+  return categories;
 }
 
 function appCapabilitiesFromFullNames(

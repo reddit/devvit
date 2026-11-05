@@ -7,6 +7,7 @@ import { expect, test } from 'vitest';
 
 import {
   appCapabilitiesFromActor,
+  appCapabilitiesFromAppVersion,
   appCapabilitiesFromBundle,
   appCapabilitiesFromLinkedBundle,
 } from './AppCapabilities.js';
@@ -65,6 +66,7 @@ describe(appCapabilitiesFromActor.name, () => {
         actorPlugins: [],
         actorTypes: [],
         hasWebView: true,
+        appPermissions: undefined,
       })
     ).toStrictEqual([NutritionCategory.MODERATOR, NutritionCategory.WEBVIEW]);
   });
@@ -75,6 +77,7 @@ describe(appCapabilitiesFromActor.name, () => {
         actorPlugins: PLUGINS.map((fullname) => ({ fullname })),
         actorTypes: ACTORS.map((name) => ({ name })),
         hasWebView: false,
+        appPermissions: undefined,
       })
     ).toStrictEqual([
       NutritionCategory.UI,
@@ -97,8 +100,43 @@ describe(appCapabilitiesFromActor.name, () => {
         actorPlugins: [{ fullname: 'devvit.plugin.telemetry.TelemetryPlugin' }],
         actorTypes: [],
         hasWebView: false,
+        appPermissions: undefined,
       })
     ).toStrictEqual([NutritionCategory.JOURNEYS, NutritionCategory.MODERATOR]);
+  });
+
+  test('an actor with app permissions', () => {
+    expect(
+      appCapabilitiesFromActor({
+        actorPlugins: [],
+        actorTypes: [],
+        hasWebView: false,
+        appPermissions: { canBypassLinkInterstitial: true, hideUserFromContext: true },
+      })
+    ).toStrictEqual([
+      NutritionCategory.MODERATOR,
+      NutritionCategory.BYPASS_INTERSTITIAL,
+      NutritionCategory.USER_HIDDEN_FROM_CONTEXT,
+    ]);
+  });
+});
+
+describe(appCapabilitiesFromAppVersion.name, () => {
+  test('combines actor capabilities, webview assets, and permissions without duplicates', () => {
+    expect(
+      appCapabilitiesFromAppVersion({
+        actors: [
+          { types: [], plugins: [] },
+          { types: [], plugins: [] },
+        ],
+        assets: [{ webviewAsset: true }],
+        appPermissions: { canBypassLinkInterstitial: true, hideUserFromContext: false },
+      })
+    ).toStrictEqual([
+      NutritionCategory.MODERATOR,
+      NutritionCategory.WEBVIEW,
+      NutritionCategory.BYPASS_INTERSTITIAL,
+    ]);
   });
 });
 
