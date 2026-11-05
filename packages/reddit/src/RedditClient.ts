@@ -520,7 +520,7 @@ export class RedditClient {
    * ```
    */
   async getCurrentUsername(): Promise<string | undefined> {
-    return (await this.getCurrentUser())?.username;
+    return context.username;
   }
 
   /**

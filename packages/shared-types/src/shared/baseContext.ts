@@ -40,10 +40,8 @@ export type BaseContext = {
    * @experimental
    */
   snoovatar: string | undefined;
-  // to-do: Remove experimental once `RequestContext` is used on all clients.
   /**
    * The current user's handle if logged in.
-   * @experimental
    */
   username: string | undefined;
 };

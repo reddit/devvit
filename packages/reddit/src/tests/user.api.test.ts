@@ -1,4 +1,5 @@
 import { context } from '@devvit/server';
+import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test, vi } from 'vitest';
 
 import { MODERATOR_PERMISSIONS } from '../helpers/permissions.js';
@@ -77,13 +78,35 @@ describe('User API', () => {
         expect(user?.username).toStrictEqual(currentUsername);
         expect(user?.createdAt).toStrictEqual(createdAt);
         expect(user?.hasVerifiedEmail).toStrictEqual(true);
-
-        // Also check the username while we're here
-
-        const username = await redditAPI.getCurrentUsername();
-        expect(username).toStrictEqual(currentUsername);
       });
     });
+  });
+
+  describe('RedditClient:getCurrentUsername()', () => {
+    test.each([
+      {
+        name: 'logged-in user',
+        headers: { [Header.User]: 't2_1234', [Header.Username]: 'test_user' },
+        expected: 'test_user',
+      },
+      {
+        name: 'logged-out user',
+        headers: { [Header.User]: '' },
+        expected: undefined,
+      },
+    ])(
+      'returns the context username for a $name without fetching the user',
+      async ({ headers, expected }) => {
+        const getCurrentUser = vi.spyOn(redditAPI, 'getCurrentUser');
+
+        await runWithTestContext(async () => {
+          expect(await redditAPI.getCurrentUsername()).toBe(expected);
+          expect(getCurrentUser).not.toHaveBeenCalled();
+        }, headers);
+
+        getCurrentUser.mockRestore();
+      }
+    );
   });
 
   describe('RedditClient:getSnoovatarUrl()', () => {
