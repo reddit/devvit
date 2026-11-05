@@ -83,10 +83,11 @@
     "@types/mustache": "4.2.2",
     "@types/node": "24.13.3",
     "@types/semver": "7.5.8",
+    "@typescript/native": "npm:typescript@7.0.2",
     "concurrently": "7.5.0",
     "eslint": "9.11.1",
     "oclif": "3.17.2",
-    "typescript": "6.0.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.0"
   },
   "engines": {

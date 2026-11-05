@@ -46,10 +46,11 @@
     "@devvit/tsconfig": "0.15.2",
     "@types/jsdom": "21.1.7",
     "@types/node": "24.13.3",
+    "@typescript/native": "npm:typescript@7.0.2",
     "esbuild": "0.25.9",
     "eslint": "9.11.1",
     "jsdom": "24.1.0",
-    "typescript": "6.0.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.0"
   },
   "publishConfig": {

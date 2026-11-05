@@ -41,11 +41,12 @@
     "@types/node": "24.13.3",
     "@types/redis-mock": "0.17.1",
     "@types/uuid": "9.0.0",
+    "@typescript/native": "npm:typescript@7.0.2",
     "eslint": "9.11.1",
     "lit": "2.5.0",
     "redis": "4.6.6",
     "redis-mock": "0.56.3",
-    "typescript": "6.0.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.0"
   },
   "publishConfig": {
