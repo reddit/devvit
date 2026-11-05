@@ -366,7 +366,12 @@ describe('Subreddit API', () => {
       });
     });
 
-    test('getRules()', async () => {
+    test.each([
+      { description: undefined, descriptionHtml: undefined },
+      { description: '', descriptionHtml: '' },
+      { description: 'Be kind', descriptionHtml: undefined },
+      { description: undefined, descriptionHtml: '<p>Be kind</p>' },
+    ])('getRules() with optional descriptions: %j', async (optionalDescriptions) => {
       const subreddit = createTestSub({ name: 'askReddit' });
       const spyPlugin = redditApiPlugins.Subreddits.SubredditAboutRules;
       spyPlugin.mockImplementationOnce(async () => ({
@@ -380,6 +385,13 @@ describe('Subreddit API', () => {
             createdUtc: 1773419801,
             descriptionHtml: '<p>No spammy posts</p>',
           },
+          {
+            shortName: 'Be kind',
+            kind: 'all',
+            priority: 1,
+            createdUtc: 1773419801,
+            ...optionalDescriptions,
+          },
         ],
       }));
 
@@ -387,19 +399,28 @@ describe('Subreddit API', () => {
         const rules = await subreddit.getRules();
 
         expect(spyPlugin).toHaveBeenCalledWith({ subreddit: 'askReddit' }, context.metadata);
-        expect(rules).toHaveLength(1);
+        expect(rules).toHaveLength(2);
         expect(rules[0].shortName).toBe('No spam');
+        expect(rules[0].description).toBe('No spammy posts');
+        expect(rules[0].descriptionHtml).toBe('<p>No spammy posts</p>');
+        expect(rules[1].shortName).toBe('Be kind');
+        expect(rules[1].description).toBe(optionalDescriptions.description ?? '');
+        expect(rules[1].descriptionHtml).toBe(optionalDescriptions.descriptionHtml ?? '');
       });
     });
 
-    test('createRule()', async () => {
+    test.each([
+      { options: { description: 'No spammy posts' }, expectedDescription: 'No spammy posts' },
+      { options: { description: '' }, expectedDescription: '' },
+      { options: {}, expectedDescription: '' },
+    ])('createRule() with options $options', async ({ options, expectedDescription }) => {
       const subreddit = createTestSub({ name: 'askReddit' });
       const spyPlugin = redditApiPlugins.Subreddits.AddSubredditRule;
       spyPlugin.mockImplementationOnce(async () => ({}));
 
       await runWithTestContext(async () => {
         await subreddit.createRule({
-          description: 'No spammy posts',
+          ...options,
           kind: 'link',
           shortName: 'No spam',
         });
@@ -407,7 +428,7 @@ describe('Subreddit API', () => {
         expect(spyPlugin).toHaveBeenCalledWith(
           {
             r: 'askReddit',
-            description: 'No spammy posts',
+            description: expectedDescription,
             kind: 'link',
             shortName: 'No spam',
             violationReason: '',
