@@ -104,8 +104,9 @@ export function contextFromRequestContext(
   postData: Readonly<DevvitPostData> | undefined
 ): Context {
   if (!reqCtx.app) throw Error('no RequestContext.app');
-  if (!reqCtx.post) throw Error('no RequestContext.post');
-  if (!reqCtx.subreddit) throw Error('no RequestContext.subreddit');
+  if (!reqCtx.post && !reqCtx.installation?.id)
+    throw Error('no RequestContext.post or RequestContext.installation.id');
+  if (!reqCtx.subreddit && reqCtx.post) throw Error('no RequestContext.subreddit');
   return {
     appName: reqCtx.app.name,
     appSlug: reqCtx.app.slug,
@@ -114,12 +115,12 @@ export function contextFromRequestContext(
     commentId: undefined,
     loid:
       reqCtx.user?.devvitLoid ?? (reqCtx.user as { devvit_loid?: string } | undefined)?.devvit_loid,
-    postAuthorId: T2(reqCtx.post.author),
+    postAuthorId: reqCtx.post ? T2(reqCtx.post.author) : undefined,
     postData: postData?.developerData,
-    postId: T3(reqCtx.post.id),
+    postId: reqCtx.post ? T3(reqCtx.post.id) : undefined,
     snoovatar: reqCtx.user?.snoovatar,
-    subredditId: T5(reqCtx.subreddit.id),
-    subredditName: reqCtx.subreddit.name,
+    subredditId: reqCtx.subreddit ? T5(reqCtx.subreddit.id) : undefined,
+    subredditName: reqCtx.subreddit?.name,
     userId: reqCtx.user?.id ? T2(reqCtx.user.id) : undefined,
     username: reqCtx.user?.name,
   };
