@@ -12,7 +12,6 @@ import type { LinksAndCommentsMock } from './LinksAndCommentsMock.js';
 
 const methodMap: { readonly [method: string]: string } = {
   GetUserSocialLinks: 'User.getSocialLinks',
-  GetSnoovatarUrlByName: 'User.getSnoovatarUrl',
   GetVaultContactByAddress: 'getVaultByAddress',
   GetVaultContactByUserId: 'getVaultByUserId',
   CreateModmailConversation: 'ModMailService.create*Conversation',

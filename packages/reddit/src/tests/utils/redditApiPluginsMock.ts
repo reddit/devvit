@@ -183,6 +183,7 @@ export const redditApiPlugins = {
     UserAbout: vi.fn(),
     UserWhere: vi.fn(),
     GetUserKarmaForSubreddit: vi.fn(),
+    GetSnoovatarUrl: vi.fn(),
   },
   Widgets: {
     AddButtonWidget: vi.fn(),

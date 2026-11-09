@@ -476,6 +476,12 @@ export class User {
     return userFlairs.users[0] ? convertUserFlairProtoToAPI(userFlairs.users[0]) : undefined;
   }
 
+  /**
+   * Gets this user's public Snoovatar image URL.
+   *
+   * @returns The image URL, or `undefined` if this user has no Snoovatar image.
+   * @throws If the account is unavailable or the lookup fails.
+   */
   getSnoovatarUrl(): Promise<string | undefined> {
     return User.getSnoovatarUrl(this.username);
   }
@@ -689,13 +695,11 @@ export class User {
       }
     }
 
-    // If not, query the API for the snoovatar URL
-    const operationName = 'GetSnoovatarUrlByName';
-    const persistedQueryHash = 'c47fd42345af268616d2d8904b56856acdc05cf61d3650380f539ad7d596ac0c';
-    // Legacy GQL query. Do not copy this pattern.
-    // eslint-disable-next-line no-restricted-properties
-    const response = await GraphQL.query(operationName, persistedQueryHash, { username });
-    return response.data?.redditorInfoByName?.snoovatarIcon?.url;
+    const response = await getRedditApiPlugins().Users.GetSnoovatarUrl(
+      { username },
+      context.metadata
+    );
+    return response.url || undefined;
   }
 
   /** @internal */

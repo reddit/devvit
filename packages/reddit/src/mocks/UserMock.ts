@@ -5,6 +5,8 @@ import type {
   FriendRequest,
   GeneralFriendResponse,
   GenericUsersRequest,
+  GetSnoovatarUrlRequest,
+  GetSnoovatarUrlResponse,
   GetUserKarmaForSubredditRequest,
   GetUserKarmaForSubredditResponse,
   ReportUserRequest,
@@ -49,6 +51,17 @@ export class UserPluginMock implements Users {
       throw new Error('HTTP 404 Not Found');
     }
     return { data: user };
+  }
+
+  async GetSnoovatarUrl(
+    request: GetSnoovatarUrlRequest,
+    _metadata?: Metadata
+  ): Promise<GetSnoovatarUrlResponse> {
+    const user = this._store.users.get(request.username);
+    if (!user) {
+      throw new Error('HTTP 404 Not Found');
+    }
+    return { url: user.snoovatarImg ?? '' };
   }
 
   async UserDataByAccountIds(

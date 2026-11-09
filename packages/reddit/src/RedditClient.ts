@@ -571,7 +571,8 @@ export class RedditClient {
    * Get the snoovatar URL for a given username.
    *
    * @param username - The username of the snoovatar to retrieve
-   * @returns A Promise that resolves to a URL of the snoovatar image if it exists.
+   * @returns The image URL, or `undefined` if the user has no Snoovatar image.
+   * @throws If the account is unavailable or the lookup fails.
    */
   async getSnoovatarUrl(username: string): Promise<string | undefined> {
     return User.getSnoovatarUrl(username);
