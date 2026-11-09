@@ -123,6 +123,7 @@ export function contextFromRequestContext(
     subredditName: reqCtx.subreddit?.name,
     userId: reqCtx.user?.id ? T2(reqCtx.user.id) : undefined,
     username: reqCtx.user?.name,
+    clientData: postData?.clientData,
   };
 }
 

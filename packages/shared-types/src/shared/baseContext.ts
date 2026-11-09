@@ -1,3 +1,4 @@
+import type { JsonObject } from '../json.js';
 import type { PostData } from '../PostData.js';
 import type { T1, T2, T3, T5 } from '../tid.js';
 
@@ -44,4 +45,9 @@ export type BaseContext = {
    * The current user's handle if logged in.
    */
   username: string | undefined;
+
+  /**
+   * Returns a JSON representation of the client-injected data.
+   */
+  clientData?: JsonObject | undefined;
 };
