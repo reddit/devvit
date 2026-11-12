@@ -30,8 +30,8 @@
     "prepublishOnly": "publish-package-json",
     "test": "yarn test:unit && yarn test:types && yarn lint",
     "test:types": "tsc --noEmit",
-    "test:unit": "vitest run",
-    "test:unit-with-coverage": "vitest run --coverage"
+    "test:unit": "vitest run --passWithNoTests",
+    "test:unit-with-coverage": "vitest run --coverage --passWithNoTests"
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
