@@ -39,6 +39,10 @@ import { DevvitCommand } from '../util/commands/DevvitCommand.js';
 import { installOnSubreddit } from '../util/common-actions/installOnSubreddit.js';
 import { warnIfOutdatedNodeVersion } from '../util/common-actions/warnIfOutdatedNodeVersion.js';
 import { DEVVIT_PORTAL_URL } from '../util/config.js';
+import {
+  canWriteAppVersion,
+  getAppAuthorizationRole,
+} from '../util/authorization/appAuthorization.js';
 import { getAppBySlug } from '../util/getAppBySlug.js';
 import { sendEvent } from '../util/metrics.js';
 import {
@@ -50,7 +54,7 @@ import {
 } from './init.js';
 
 export default class Upload extends DevvitCommand {
-  static override description = `Upload the app to the App Directory. Uploaded apps are only visible to you (the app owner) and can only be installed to a small test subreddit with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} subscribers`;
+  static override description = `Upload the app to the App Directory. Uploaded apps are visible to the app owner and designated maintainers and can only be installed to a small test subreddit with less than ${MAX_ALLOWED_SUBSCRIBER_COUNT} subscribers`;
 
   static override flags = {
     bump: Flags.custom<VersionBumpType>({
@@ -126,7 +130,8 @@ export default class Upload extends DevvitCommand {
     const token = await getAccessTokenAndLoginIfNeeded(
       flags['copy-paste'] ? 'CopyPaste' : 'LocalSocket'
     );
-    const username = await this.getUserDisplayName(token);
+    const userInfo = await this.getUserInfo(token);
+    const username = userInfo.username;
 
     await this.checkDeveloperAccount();
 
@@ -144,14 +149,19 @@ export default class Upload extends DevvitCommand {
     let shouldCreateNewApp = false;
     let shouldCreatePlaytestSubreddit = !this.project.getSubreddit('Dev');
 
-    const isOwner = appInfo?.app?.owner?.displayName === username;
-    if (!isOwner) {
+    const appAuthorizationRole = getAppAuthorizationRole(appInfo, {
+      id: userInfo.id,
+      displayName: username,
+    });
+    if (!canWriteAppVersion(appAuthorizationRole)) {
       shouldCreateNewApp = true;
       // Unless...
       if (flags['employee-update'] || flags['just-do-it']) {
         const isEmployee = await isCurrentUserEmployee(token);
         if (!isEmployee) {
-          this.error(`You're not an employee, so you can't playtest someone else's app.`);
+          this.error(
+            `You're not an employee, so you can't upload a version of someone else's app.`
+          );
         }
         // Else, we're an employee, so we can update someone else's app
         this.warn(`Overriding ownership check because you're an employee and told me to!`);
