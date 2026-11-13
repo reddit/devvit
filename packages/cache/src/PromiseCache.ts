@@ -286,6 +286,7 @@ export class PromiseCache {
       errorTime: null,
       checkedAt: 0,
     };
+    entry.expires = expires;
     try {
       entry.value = await closure();
       entry.error = null;
