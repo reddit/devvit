@@ -32,7 +32,7 @@ declare global {
 export const initDevvitGlobal = (
   document: ScriptDocument,
   location: { readonly hash: string },
-  window: { readonly name: string }
+  window: { name: string }
 ): void => {
   const bridge = getBridgeContext(window.name, location.hash);
 
@@ -82,6 +82,17 @@ export const initDevvitGlobal = (
     startTime: bridge?.startTime ?? undefined,
     refreshToken: requestTokenRefresh,
   };
+
+  // Same-origin navigations retain window.name, but must not inherit the
+  // host's launch timestamp. Keep the remaining context for the next document.
+  if (window.name && bridge.startTime != null) {
+    const navigation = performance.getEntriesByType('navigation')[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    // A reload may be the first document to run this script after an update.
+    if (navigation?.type === 'reload') globalThis.devvit.startTime = undefined;
+    window.name = JSON.stringify({ ...bridge, startTime: undefined });
+  }
 };
 
 export function updateConsentStatus(consentStatus: ConsentStatus): void {
