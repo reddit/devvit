@@ -490,6 +490,37 @@ describe('cache works functionality', () => {
     });
   });
 
+  test('refreshing an expired entry extends its expiry', async () => {
+    const clock = new Clock();
+    const random = new FakeRandomizer();
+    const stats = { gets: 0 };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vals: Record<string, any> = {};
+    const cache = mockedCache(clock, random, stats, vals);
+    const key = 'test';
+    let n = 0;
+
+    const get = async (): Promise<number> =>
+      cache(
+        async () => {
+          return n++;
+        },
+        { ttl: 10, key }
+      );
+
+    await runWithTestContext(async () => {
+      expect(await get()).toBe(0);
+      clock.advance(15_000);
+      expect(await get()).toBe(1);
+      const entry: CacheEntry = JSON.parse(vals[_namespaced(key)][0]);
+      expect(entry.expires).toBe(clock.now().getTime() + 10_000);
+
+      // Still well within the new TTL, so the value should not be fetched again.
+      clock.advance(6_000);
+      expect(await get()).toBe(1);
+    });
+  });
+
   test('allows stale, only re-fetches after delay', async () => {
     const clock = new Clock();
     const random = new FakeRandomizer();
