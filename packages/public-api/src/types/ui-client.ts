@@ -24,6 +24,14 @@ export type UIClient = {
   showToast(text: string): void;
   showToast(toast: Toast): void;
   showToast(textOrToast: string | Toast): void;
+  /**
+   * Emits the unhydrated show web view intent for a Devvit Web
+   * `UiResponse.showWebView`. Don't call this directly; return `showWebView`
+   * from a menu or form endpoint instead.
+   *
+   * @internal
+   */
+  showWebViewInternal(entrypointName: string, presentation: 'fullscreen' | 'modal'): void;
   /** Navigate to a URL */
   navigateTo(url: string): void;
   navigateTo(subreddit: Pick<Subreddit, 'permalink' | 'url'>): void;

@@ -11,6 +11,7 @@ import {
 import {
   Devvit,
   type FormKey,
+  type InternalUIClient,
   type MenuItem,
   SettingScope,
   type SettingsFormField,
@@ -20,7 +21,13 @@ import {
 } from '@devvit/public-api';
 import { scheduler, type TaskRequest } from '@devvit/scheduler';
 import { context } from '@devvit/server';
-import type { SettingsValidationResponse, Toast, TriggerRequest, UiResponse } from '@devvit/shared';
+import type {
+  SettingsValidationResponse,
+  ShowWebView,
+  Toast,
+  TriggerRequest,
+  UiResponse,
+} from '@devvit/shared';
 import type { JsonObject, PartialJsonObject } from '@devvit/shared-types/json.js';
 import type {
   AppConfig,
@@ -112,6 +119,7 @@ export function assertUiResponse(
     navigateTo: undefined,
     showToast: undefined,
     showForm: undefined,
+    showWebView: undefined,
   };
   for (const k in rsp)
     if (!(k in keyset))
@@ -168,6 +176,43 @@ export function assertUiResponse(
   if (rsp.navigateTo && rsp.showForm) {
     throw new Error('navigateTo and showForm cannot be used together in UiResponse');
   }
+
+  if ('showWebView' in rsp) {
+    if (!isValidShowWebView(rsp.showWebView))
+      throw Error(
+        `${preamble} showWebView must be a non-empty entrypoint name or \`{"entrypointName"?: string, "presentation"?: "fullscreen" | "modal"}\`: ${abbreviate(JSON.stringify(rsp.showWebView))}`
+      );
+
+    // showWebView opens its own surface, so it can't be combined with other
+    // effects that take over the screen.
+    if (rsp.navigateTo || rsp.showForm) {
+      throw new Error(
+        'showWebView cannot be used together with navigateTo or showForm in UiResponse'
+      );
+    }
+  }
+}
+
+function isValidShowWebView(
+  showWebView: Readonly<PartialJsonObject>[string]
+): showWebView is string | ShowWebView {
+  if (typeof showWebView === 'string') return showWebView !== '';
+  if (showWebView == null || typeof showWebView !== 'object' || Array.isArray(showWebView)) {
+    return false;
+  }
+  if ('entrypointName' in showWebView) {
+    if (typeof showWebView.entrypointName !== 'string' || showWebView.entrypointName === '') {
+      return false;
+    }
+  }
+  if (
+    'presentation' in showWebView &&
+    showWebView.presentation !== 'fullscreen' &&
+    showWebView.presentation !== 'modal'
+  ) {
+    return false;
+  }
+  return Object.keys(showWebView).every((key) => ['entrypointName', 'presentation'].includes(key));
 }
 
 function isValidToastObject(showToast: Readonly<PartialJsonObject>): showToast is Toast {
@@ -222,8 +267,10 @@ function configureTriggers(triggers: Readonly<AppTriggersConfig>): void {
  * to user actions in cases where the Devvit app is not in the direct code path.
  *
  * If multiple effects are present in the UiResponse, they will all be applied.
+ *
+ * @internal
  */
-function handleUiResponse(ui: UIClient, uiResponse: UiResponse): void {
+export function handleUiResponse(ui: UIClient, uiResponse: UiResponse): void {
   if (uiResponse.showToast) {
     ui.showToast(uiResponse.showToast);
   }
@@ -237,6 +284,19 @@ function handleUiResponse(ui: UIClient, uiResponse: UiResponse): void {
       formKeyMap[uiResponse.showForm.name],
       uiResponse.showForm.data,
       uiResponse.showForm.form
+    );
+  }
+
+  if (uiResponse.showWebView) {
+    const webView =
+      typeof uiResponse.showWebView === 'string'
+        ? { entrypointName: uiResponse.showWebView }
+        : uiResponse.showWebView;
+    // `showWebViewInternal` is `@internal` and only exposed via the
+    // `InternalUIClient` augmentation in devvit.d.ts.
+    (ui as InternalUIClient).showWebViewInternal(
+      webView.entrypointName ?? 'default',
+      webView.presentation ?? 'modal'
     );
   }
 }

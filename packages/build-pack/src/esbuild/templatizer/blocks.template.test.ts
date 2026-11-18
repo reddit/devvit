@@ -1,11 +1,12 @@
 // eslint-disable-next-line no-restricted-imports
-import type { FormKey } from '@devvit/public-api';
-import type { JsonObject } from '@devvit/shared';
+import type { FormKey, InternalUIClient } from '@devvit/public-api';
+import type { JsonObject, UiResponse } from '@devvit/shared';
 
 import {
   assertSettingsValidationResponse,
   assertUiResponse,
   formKeyMap,
+  handleUiResponse,
 } from './blocks.template.js';
 
 const mockFormKeyMap: Record<string, FormKey> = { 'valid-form': 'some-form-key' as FormKey };
@@ -206,6 +207,64 @@ describe('assertUiResponse()', () => {
       },
       expectThrows: /showToast must be a string or `{"text": string}`/,
     },
+    {
+      name: 'valid showWebView as entrypoint name',
+      input: { showWebView: 'settings' },
+      expectThrows: false,
+    },
+    {
+      name: 'valid showWebView as empty object',
+      input: { showWebView: {} },
+      expectThrows: false,
+    },
+    {
+      name: 'valid showWebView with entrypointName and presentation',
+      input: { showWebView: { entrypointName: 'settings', presentation: 'fullscreen' } },
+      expectThrows: false,
+    },
+    {
+      name: 'valid showWebView with showToast',
+      input: { showToast: 'Opening', showWebView: 'settings' },
+      expectThrows: false,
+    },
+    {
+      name: 'invalid showWebView empty string',
+      input: { showWebView: '' },
+      expectThrows: /showWebView must be a non-empty entrypoint name/,
+    },
+    {
+      name: 'invalid showWebView type',
+      input: { showWebView: 123 },
+      expectThrows: /showWebView must be a non-empty entrypoint name/,
+    },
+    {
+      name: 'invalid showWebView empty entrypointName',
+      input: { showWebView: { entrypointName: '' } },
+      expectThrows: /showWebView must be a non-empty entrypoint name/,
+    },
+    {
+      name: 'invalid showWebView presentation',
+      input: { showWebView: { presentation: 'inline' } },
+      expectThrows: /showWebView must be a non-empty entrypoint name/,
+    },
+    {
+      name: 'invalid showWebView unknown key',
+      input: { showWebView: { entrypointName: 'settings', height: 320 } },
+      expectThrows: /showWebView must be a non-empty entrypoint name/,
+    },
+    {
+      name: 'invalid combination - showWebView with navigateTo',
+      input: { showWebView: 'settings', navigateTo: 'https://example.com' },
+      expectThrows: 'showWebView cannot be used together with navigateTo or showForm in UiResponse',
+    },
+    {
+      name: 'invalid combination - showWebView with showForm',
+      input: {
+        showWebView: 'settings',
+        showForm: { name: 'valid-form', form: { fields: [] } },
+      },
+      expectThrows: 'showWebView cannot be used together with navigateTo or showForm in UiResponse',
+    },
   ] as const;
 
   testCases.forEach(({ name, input, expectThrows }) => {
@@ -216,6 +275,28 @@ describe('assertUiResponse()', () => {
         expect(() => assertUiResponse('endpoint', input)).toThrow(expectThrows);
       }
     });
+  });
+});
+
+describe('handleUiResponse()', () => {
+  test.each<{
+    name: string;
+    showWebView: NonNullable<UiResponse['showWebView']>;
+    expected: unknown[];
+  }>([
+    { name: 'entrypoint name', showWebView: 'settings', expected: ['settings', 'modal'] },
+    { name: 'empty object defaults', showWebView: {}, expected: ['default', 'modal'] },
+    {
+      name: 'object with presentation',
+      showWebView: { entrypointName: 'leaderboard', presentation: 'fullscreen' },
+      expected: ['leaderboard', 'fullscreen'],
+    },
+  ])('showWebView $name', ({ showWebView, expected }) => {
+    const ui = { showWebViewInternal: vi.fn() } as unknown as InternalUIClient;
+
+    handleUiResponse(ui, { showWebView });
+
+    expect(ui.showWebViewInternal).toHaveBeenCalledExactlyOnceWith(...expected);
   });
 });
 

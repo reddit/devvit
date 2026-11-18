@@ -15,6 +15,27 @@ export type UiResponse<InitFormData extends JsonObject = JsonObject> = {
   showToast?: string | Toast;
   /** Display a form in the user's reddit client. */
   showForm?: ShowForm<InitFormData>;
+  /**
+   * Open a Devvit web view surface for a `post.entrypoints` key, without a
+   * backing post. Pass the entrypoint name, or a `ShowWebView` for more
+   * options. Cannot be combined with `navigateTo` or `showForm`, but may
+   * accompany `showToast`.
+   *
+   * @experimental
+   */
+  showWebView?: string | ShowWebView;
+};
+
+/**
+ * Options for opening a Devvit web view surface from a menu or form endpoint.
+ *
+ * @experimental
+ */
+export type ShowWebView = {
+  /** The devvit.json `post.entrypoints` key to open. Defaults to "default". */
+  entrypointName?: string;
+  /** How the web view is presented. Defaults to "modal". */
+  presentation?: 'fullscreen' | 'modal';
 };
 
 export type ShowForm<InitFormData extends JsonObject> = {
