@@ -76,6 +76,9 @@ export const initDevvitGlobal = (
     experiments: clientData?.featureConfig?.experiments ?? {},
     share: bridge?.shareParam ? { userData: bridge?.shareParam.userData } : undefined,
     adPayload: bridge?.adPayload,
+    analytics: bridge?.analytics
+      ? { clientNavigationEntrypoint: bridge.analytics.clientNavigationEntrypoint }
+      : undefined,
     appPermissionState,
     token: (bridge.signedRequestContext || bridge.webbitToken) as WebbitToken,
     webViewMode: bridge?.viewMode,

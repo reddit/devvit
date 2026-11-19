@@ -21,6 +21,7 @@ describe('fetch()', () => {
     token: 'authToken' as WebbitToken,
     webViewMode: undefined,
     startTime: undefined,
+    analytics: undefined,
     refreshToken: undefined,
   };
 

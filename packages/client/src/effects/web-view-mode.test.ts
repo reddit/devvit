@@ -43,6 +43,7 @@ const trustedEvent = { isTrusted: true, type: 'click' } as PointerEvent;
 
 beforeEach(() => {
   globalThis.devvit = {
+    analytics: undefined,
     appPermissionState: undefined,
     dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
     entrypoints: {

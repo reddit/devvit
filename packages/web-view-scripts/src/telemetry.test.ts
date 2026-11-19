@@ -115,6 +115,7 @@ const createMockDevvit = (): DevvitGlobal => ({
   token: '' as WebbitToken,
   webViewMode: undefined,
   startTime: 1717171717171,
+  analytics: undefined,
   refreshToken: undefined,
 });
 

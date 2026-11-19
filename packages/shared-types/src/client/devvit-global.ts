@@ -31,6 +31,8 @@ export type DevvitGlobal = {
   webViewMode: WebViewImmersiveMode | undefined;
   /** Earliest moment the app started loading in UTC milliseconds. */
   startTime: number | undefined;
+  /** Attribution from the hosting client, such as the discovery surface the user navigated from. */
+  analytics: { clientNavigationEntrypoint: string | undefined } | undefined;
   /**
    * Function to refresh the token.
    * INTERNAL: This is an internal, unsupported API and may change or be removed at any time.

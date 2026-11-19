@@ -16,6 +16,7 @@ export async function fetch(
   if (isSameSite(location, new URL(req.url))) {
     req.headers.set('Authorization', `Bearer ${devvit.token}`);
     setTimezone(req.headers);
+    setClientNavigationEntrypoint(devvit, req.headers);
   }
   // to-do: pass devvit-debug from BridgeContext.
   return await globalFetch(req);
@@ -44,4 +45,13 @@ function setTimezone(headers: Headers): void {
   } catch {
     // Intl may be unavailable or report an unsendable value.
   }
+}
+
+/**
+ * Sets the discovery-surface attribution label from BridgeContext so the server
+ * framework forwards it to plugins as a gRPC metadata header.
+ */
+function setClientNavigationEntrypoint(devvit: Readonly<DevvitGlobal>, headers: Headers): void {
+  const entrypoint = devvit.analytics?.clientNavigationEntrypoint;
+  if (entrypoint) headers.set(Header.ClientNavigationEntrypoint, entrypoint);
 }
