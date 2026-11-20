@@ -1,0 +1,14 @@
+// TypeScript config for test code.
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["DOM", "ES2023"],
+    "types": ["node"]
+  },
+  "include": ["../**/*.test.*", "../**/test/", "../**/test/**/*.json"],
+  "exclude": ["${configDir}/node_modules/", "${configDir}/dist/"],
+  "references": [
+    {"path": "../server/"},
+    {"path": "../shared/"}
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "devvit-review-bot",
+  "server": {},
+  "scripts": {
+    "dev": "npm run watch"
+  },
+  "permissions": {
+    "reddit": true
+  },
+  "scheduler": {
+    "tasks": {
+      "uninstall-cleanup": {
+        "endpoint": "/internal/on/cron/uninstall-cleanup",
+        "cron": "* * * * *"
+      }
+    }
+  },
+  "dev": {
+    "subreddit": "devvit_review_bo_dev3"
+  },
+  "settings": {
+    "subreddit": {
+      "max-age-ms": {
+        "type": "number",
+        "label": "Maximum age (milliseconds)",
+        "helpText": "Maximum post age and moderator tenure. Must be greater than zero. Posts by non-moderators are removed immediately.",
+        "defaultValue": 3600000
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "private": true,
+  "name": "devvit-review-bot",
+  "version": "0.0.0",
+  "description": "Removes posts older than one hour from the Devvit review subreddit.",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild --bundle --log-level=warning --sourcemap=linked --target=node24 --format=cjs --outfile=dist/server/index.js --platform=node src/server/index.ts",
+    "clean": "rm -rf dist/",
+    "format": "npm run lint -- --fix",
+    "lint": "redlint src",
+    "playtest": "devvit playtest",
+    "publish": "npm run clean && npm run build && devvit publish",
+    "test": "npm run test:types && npm run lint && npm run test:unit && npm run build",
+    "test:types": "tsc --build",
+    "test:unit": "node --test \"src/**/*.test.ts\"",
+    "watch": "npm run build -- --watch=forever"
+  },
+  "dependencies": {
+    "@devvit/web": "0.15.4"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "devvit": "0.15.5-dev",
+    "esbuild": "0.25.9",
+    "typescript": "npm:@typescript/typescript6@6.0.2"
+  },
+  "engines": {
+    "node": ">=24.22.1"
+  }
+}

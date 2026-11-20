@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "target": "ES2023",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedIndexedAccess": true,
+    "erasableSyntaxOnly": true,
+    "rootDir": ".",
+    "outDir": "./dist/web/",
+    "skipLibCheck": true,
+    "lib": ["ES2023", "ESNext.Disposable"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  // Exclude colocated tests and test utils.
+  "exclude": [
+    "${configDir}/node_modules/",
+    "${configDir}/dist/",
+    "${configDir}/**/*.test.*",
+    "${configDir}/**/test/"
+  ]
+}
