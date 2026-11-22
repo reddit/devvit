@@ -50,7 +50,6 @@ export const redditApiPlugins = {
     UnmarkNSFW: vi.fn(),
     Unsave: vi.fn(),
     Unspoiler: vi.fn(),
-    Vote: vi.fn(),
     SetCustomPostStyles: vi.fn(),
     GetCustomPostStyles: vi.fn(),
     GetUserPollOption: vi.fn(),
@@ -177,7 +176,6 @@ export const redditApiPlugins = {
     SetPermissions: vi.fn(),
     Unfriend: vi.fn(),
     UserDataByAccountIds: vi.fn(),
-    UsernameAvailable: vi.fn(),
     UnfriendUser: vi.fn(),
     GetFriendInformation: vi.fn(),
     UpdateFriendRelationship: vi.fn(),
@@ -185,6 +183,7 @@ export const redditApiPlugins = {
     UserAbout: vi.fn(),
     UserWhere: vi.fn(),
     GetUserKarmaForSubreddit: vi.fn(),
+    GetSnoovatarUrl: vi.fn(),
   },
   Widgets: {
     AddButtonWidget: vi.fn(),

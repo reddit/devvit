@@ -29,6 +29,7 @@ export const Header = Object.freeze({
   Version: 'devvit-version',
   Language: 'devvit-accept-language',
   Timezone: 'devvit-accept-timezone',
+  ClientNavigationEntrypoint: 'devvit-client-navigation-entrypoint',
   Traceparent: 'traceparent',
   Tracestate: 'tracestate',
 });

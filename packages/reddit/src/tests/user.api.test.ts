@@ -1,4 +1,5 @@
 import { context } from '@devvit/server';
+import { Header } from '@devvit/shared-types/Header.js';
 import { describe, expect, test, vi } from 'vitest';
 
 import { MODERATOR_PERMISSIONS } from '../helpers/permissions.js';
@@ -77,13 +78,35 @@ describe('User API', () => {
         expect(user?.username).toStrictEqual(currentUsername);
         expect(user?.createdAt).toStrictEqual(createdAt);
         expect(user?.hasVerifiedEmail).toStrictEqual(true);
-
-        // Also check the username while we're here
-
-        const username = await redditAPI.getCurrentUsername();
-        expect(username).toStrictEqual(currentUsername);
       });
     });
+  });
+
+  describe('RedditClient:getCurrentUsername()', () => {
+    test.each([
+      {
+        name: 'logged-in user',
+        headers: { [Header.User]: 't2_1234', [Header.Username]: 'test_user' },
+        expected: 'test_user',
+      },
+      {
+        name: 'logged-out user',
+        headers: { [Header.User]: '' },
+        expected: undefined,
+      },
+    ])(
+      'returns the context username for a $name without fetching the user',
+      async ({ headers, expected }) => {
+        const getCurrentUser = vi.spyOn(redditAPI, 'getCurrentUser');
+
+        await runWithTestContext(async () => {
+          expect(await redditAPI.getCurrentUsername()).toBe(expected);
+          expect(getCurrentUser).not.toHaveBeenCalled();
+        }, headers);
+
+        getCurrentUser.mockRestore();
+      }
+    );
   });
 
   describe('RedditClient:getSnoovatarUrl()', () => {
@@ -91,34 +114,14 @@ describe('User API', () => {
     const currentUserSnoovatarUrl = 'https://example.com/my-snoovatar.png';
 
     test('can get snoovatar of current user', async () => {
-      const mockGetSnoovatarUrlResponse = {
-        data: {
-          redditorInfoByName: {
-            snoovatarIcon: {
-              url: currentUserSnoovatarUrl,
-            },
-          },
-        },
-        errors: [],
-      };
-
-      const spyPlugin = redditApiPlugins.GraphQL.PersistedQuery;
-      spyPlugin.mockImplementationOnce(async () => mockGetSnoovatarUrlResponse);
+      const spyPlugin = redditApiPlugins.Users.GetSnoovatarUrl;
+      spyPlugin.mockResolvedValueOnce({ url: currentUserSnoovatarUrl });
 
       await runWithTestContext(async () => {
         const snoovatarUrl = await redditAPI.getSnoovatarUrl(currentUsername);
 
         expect(spyPlugin).toHaveBeenCalledOnce();
-        expect(spyPlugin).toHaveBeenCalledWith(
-          {
-            operationName: 'GetSnoovatarUrlByName',
-            id: 'c47fd42345af268616d2d8904b56856acdc05cf61d3650380f539ad7d596ac0c',
-            variables: {
-              username: currentUsername,
-            },
-          },
-          context.metadata
-        );
+        expect(spyPlugin).toHaveBeenCalledWith({ username: currentUsername }, context.metadata);
 
         expect(snoovatarUrl).toStrictEqual(currentUserSnoovatarUrl);
       });
@@ -128,37 +131,24 @@ describe('User API', () => {
       const otherUsername = 'other_user';
       const otherSnoovatarUrl = 'https://example.com/other-snoovatar.png';
 
-      // Setup mock to retrieve snoovatar URL
-      const mockGetSnoovatarUrlResponse = {
-        data: {
-          redditorInfoByName: {
-            snoovatarIcon: {
-              url: otherSnoovatarUrl,
-            },
-          },
-        },
-        errors: [],
-      };
-
-      const gqlSpy = redditApiPlugins.GraphQL.PersistedQuery;
-      gqlSpy.mockImplementationOnce(async () => mockGetSnoovatarUrlResponse);
+      const pluginSpy = redditApiPlugins.Users.GetSnoovatarUrl;
+      pluginSpy.mockResolvedValueOnce({ url: otherSnoovatarUrl });
 
       await runWithTestContext(async () => {
         const snoovatarUrl = await redditAPI.getSnoovatarUrl(otherUsername);
 
-        expect(gqlSpy).toHaveBeenCalledOnce();
-        expect(gqlSpy).toHaveBeenCalledWith(
-          {
-            id: 'c47fd42345af268616d2d8904b56856acdc05cf61d3650380f539ad7d596ac0c',
-            operationName: 'GetSnoovatarUrlByName',
-            variables: {
-              username: otherUsername,
-            },
-          },
-          context.metadata
-        );
+        expect(pluginSpy).toHaveBeenCalledOnce();
+        expect(pluginSpy).toHaveBeenCalledWith({ username: otherUsername }, context.metadata);
 
         expect(snoovatarUrl).toStrictEqual(otherSnoovatarUrl);
+      });
+    });
+
+    test('returns undefined when the user has no Snoovatar image', async () => {
+      redditApiPlugins.Users.GetSnoovatarUrl.mockResolvedValueOnce({ url: '' });
+
+      await runWithTestContext(async () => {
+        expect(await redditAPI.getSnoovatarUrl('no_snoovatar')).toBeUndefined();
       });
     });
   });

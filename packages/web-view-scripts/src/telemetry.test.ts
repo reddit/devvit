@@ -1,3 +1,7 @@
+import {
+  type BridgeContext,
+  Client,
+} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/context.js';
 import { WebViewInternalMessageScope } from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/post_message.js';
 import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
 import { webViewInternalMessageType } from '@devvit/shared-types/client/emit-effect.js';
@@ -6,6 +10,7 @@ import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, it, type Mock, vi } from 'vitest';
 import type { FCPMetric, LCPMetric, TTFBMetric } from 'web-vitals';
 
+import { initDevvitGlobal } from './devvit-global.js';
 import { initTelemetry, roundProps } from './telemetry.js';
 
 const webVitalsMocks = vi.hoisted(() => ({
@@ -110,6 +115,7 @@ const createMockDevvit = (): DevvitGlobal => ({
   token: '' as WebbitToken,
   webViewMode: undefined,
   startTime: 1717171717171,
+  analytics: undefined,
   refreshToken: undefined,
 });
 
@@ -627,6 +633,60 @@ describe('performance monitoring', () => {
       'web_view_load',
     ]);
   });
+
+  it.each([Client.SHREDDIT, Client.ANDROID, Client.IOS])(
+    'keeps browser metrics and loaded telemetry across a document reload without repeating initialization (client: %s)',
+    (client) => {
+      const bridge: BridgeContext = {
+        client,
+        devvitDebug: '',
+        startTime: performance.timeOrigin - 100,
+        webbitToken: '',
+        webViewContext: {
+          appName: 'test-app',
+          appVersion: '1.0.0',
+          postId: 't3_post',
+          subredditId: 't5_subreddit',
+          subredditName: 'test-subreddit',
+          userId: '',
+        },
+      };
+      const window = { name: JSON.stringify(bridge) };
+      vi.spyOn(performance, 'now').mockReturnValue(400);
+      const bootDocument = (): void => {
+        vi.clearAllMocks();
+        initDevvitGlobal({ currentScript: null }, { hash: '' }, window);
+        initTelemetry();
+        triggerTtfb(navigationTiming);
+        triggerFcp(createPaintEntry());
+        triggerLcp({ startTime: 350 } as LCPMetric['entries'][number]);
+        triggerWindowEvent('load');
+      };
+      bootDocument();
+      expectMetric('web_view_initialization', bridge.startTime!, performance.timeOrigin);
+      const browserMetrics = getAllMetrics().filter(
+        (metric) => metric.spanName !== 'web_view_initialization'
+      );
+
+      bootDocument();
+
+      expectNoMetric('web_view_initialization');
+      expect(getAllMetrics()).toStrictEqual(browserMetrics);
+      expect(postMessageMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          telemetry: expect.objectContaining({
+            loaded: {
+              event: 'web-view-loaded',
+              timeStart: Math.round(performance.timeOrigin),
+              timeEnd: Math.round(performance.timeOrigin + 400),
+              duration: 400,
+            },
+          }),
+        }),
+        '*'
+      );
+    }
+  );
 
   it('emits browser-timed metrics without a bridge start time', () => {
     vi.clearAllMocks();

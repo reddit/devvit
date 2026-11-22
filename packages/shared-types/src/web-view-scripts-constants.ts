@@ -18,6 +18,9 @@ export const devvitScriptFileName: string = 'devvit.v1.min.js';
 /** Screenshot capture WebView script file name. */
 export const screenshotScriptFileName: string = 'screenshot.v1.min.js';
 
+/** Unhandled error web view script file name. */
+export const errorsScriptFileName: string = 'errors.v1.min.js';
+
 /** CDN URL for the WebView bootstrap script. */
 export const devvitScriptUrl: string = `https://webview.devvit.net/scripts/${devvitScriptFileName}`;
 

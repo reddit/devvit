@@ -24,6 +24,9 @@ export async function showShareSheet(opts: Readonly<ShareSheetOpts>): Promise<vo
       `data must be <= ${maxShareParamUserDataChars} characters but was ${opts.data.length} characters`
     );
 
+  const postId = opts.post ?? devvit.context.postId;
+  if (!postId) throw Error('A post must be specified when sharing outside a post');
+
   const iconURL = `${new URL(ICON_FILE_PATH, location.origin)}`;
   let iconRsp;
   try {
@@ -32,8 +35,6 @@ export async function showShareSheet(opts: Readonly<ShareSheetOpts>): Promise<vo
     //
   }
 
-  // Create the share URL using the post from the props, or the current post if not provided.
-  const postId = opts.post ?? devvit.context.postId;
   const url = redditUrlFromPostId(postId);
 
   emitEffect({

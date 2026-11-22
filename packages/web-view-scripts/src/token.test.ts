@@ -85,6 +85,7 @@ describe('refreshToken()', () => {
       token: '' as WebbitToken,
       webViewMode: undefined,
       startTime: undefined,
+      analytics: undefined,
       refreshToken: undefined,
     };
   });

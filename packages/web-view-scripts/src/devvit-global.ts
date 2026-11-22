@@ -32,7 +32,7 @@ declare global {
 export const initDevvitGlobal = (
   document: ScriptDocument,
   location: { readonly hash: string },
-  window: { readonly name: string }
+  window: { name: string }
 ): void => {
   const bridge = getBridgeContext(window.name, location.hash);
 
@@ -76,12 +76,26 @@ export const initDevvitGlobal = (
     experiments: clientData?.featureConfig?.experiments ?? {},
     share: bridge?.shareParam ? { userData: bridge?.shareParam.userData } : undefined,
     adPayload: bridge?.adPayload,
+    analytics: bridge?.analytics
+      ? { clientNavigationEntrypoint: bridge.analytics.clientNavigationEntrypoint }
+      : undefined,
     appPermissionState,
     token: (bridge.signedRequestContext || bridge.webbitToken) as WebbitToken,
     webViewMode: bridge?.viewMode,
     startTime: bridge?.startTime ?? undefined,
     refreshToken: requestTokenRefresh,
   };
+
+  // Same-origin navigations retain window.name, but must not inherit the
+  // host's launch timestamp. Keep the remaining context for the next document.
+  if (window.name && bridge.startTime != null) {
+    const navigation = performance.getEntriesByType('navigation')[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    // A reload may be the first document to run this script after an update.
+    if (navigation?.type === 'reload') globalThis.devvit.startTime = undefined;
+    window.name = JSON.stringify({ ...bridge, startTime: undefined });
+  }
 };
 
 export function updateConsentStatus(consentStatus: ConsentStatus): void {
@@ -104,8 +118,9 @@ export function contextFromRequestContext(
   postData: Readonly<DevvitPostData> | undefined
 ): Context {
   if (!reqCtx.app) throw Error('no RequestContext.app');
-  if (!reqCtx.post) throw Error('no RequestContext.post');
-  if (!reqCtx.subreddit) throw Error('no RequestContext.subreddit');
+  if (!reqCtx.post && !reqCtx.installation?.id)
+    throw Error('no RequestContext.post or RequestContext.installation.id');
+  if (!reqCtx.subreddit && reqCtx.post) throw Error('no RequestContext.subreddit');
   return {
     appName: reqCtx.app.name,
     appSlug: reqCtx.app.slug,
@@ -114,14 +129,15 @@ export function contextFromRequestContext(
     commentId: undefined,
     loid:
       reqCtx.user?.devvitLoid ?? (reqCtx.user as { devvit_loid?: string } | undefined)?.devvit_loid,
-    postAuthorId: T2(reqCtx.post.author),
+    postAuthorId: reqCtx.post ? T2(reqCtx.post.author) : undefined,
     postData: postData?.developerData,
-    postId: T3(reqCtx.post.id),
+    postId: reqCtx.post ? T3(reqCtx.post.id) : undefined,
     snoovatar: reqCtx.user?.snoovatar,
-    subredditId: T5(reqCtx.subreddit.id),
-    subredditName: reqCtx.subreddit.name,
+    subredditId: reqCtx.subreddit ? T5(reqCtx.subreddit.id) : undefined,
+    subredditName: reqCtx.subreddit?.name,
     userId: reqCtx.user?.id ? T2(reqCtx.user.id) : undefined,
     username: reqCtx.user?.name,
+    clientData: postData?.clientData,
   };
 }
 

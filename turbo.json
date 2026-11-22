@@ -9,6 +9,11 @@
         "packages/protos/src/types/**"
       ]
     },
+    "@devvit/internal-examples#build": {
+      "dependsOn": ["^build"],
+      "env": ["INTERNAL_EXAMPLES_WEBBIT_PROJECTS"],
+      "outputs": ["dist/**"]
+    },
     "lint": {
       "outputs": []
     },

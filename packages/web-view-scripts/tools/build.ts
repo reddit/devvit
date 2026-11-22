@@ -42,7 +42,7 @@ const baseOpts: esbuild.BuildOptions = {
 
 const devvitOpts: esbuild.BuildOptions = {
   ...baseOpts,
-  external: ['./screenshot.v1.min.js'],
+  external: ['./screenshot.v1.min.js', './errors.v1.min.js'],
   entryPoints: ['src/devvit.v1.ts'],
   format: 'iife',
 };
@@ -53,14 +53,23 @@ const screenshotOpts: esbuild.BuildOptions = {
   format: 'esm',
 };
 
+const errorsOpts: esbuild.BuildOptions = {
+  ...baseOpts,
+  entryPoints: ['src/errors.v1.ts'],
+  format: 'esm',
+};
+
 if (watch) {
   const devvitCtx = await esbuild.context(devvitOpts);
   const screenshotCtx = await esbuild.context(screenshotOpts);
-  await Promise.all([devvitCtx.watch(), screenshotCtx.watch()]);
+  const errorsCtx = await esbuild.context(errorsOpts);
+  await Promise.all([devvitCtx.watch(), screenshotCtx.watch(), errorsCtx.watch()]);
   if (serve) await devvitCtx.serve({ port: 1234, servedir: '.' });
 } else {
   const devvitResult = await esbuild.build(devvitOpts);
   const screenshotResult = await esbuild.build(screenshotOpts);
+  const errorsResult = await esbuild.build(errorsOpts);
   fs.writeFileSync('dist/devvit.v1.meta.json', JSON.stringify(devvitResult.metafile));
   fs.writeFileSync('dist/screenshot.v1.meta.json', JSON.stringify(screenshotResult.metafile));
+  fs.writeFileSync('dist/errors.v1.meta.json', JSON.stringify(errorsResult.metafile));
 }

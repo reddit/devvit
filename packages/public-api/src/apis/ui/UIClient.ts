@@ -1,4 +1,8 @@
 import { type Effect, EffectType } from '@devvit/protos/json/devvit/ui/effects/v1alpha/effect.js';
+import {
+  type ShowWebViewEffect,
+  ShowWebViewEffect_Presentation,
+} from '@devvit/protos/json/devvit/ui/effects/web_view/v1alpha/show_web_view.js';
 import type { Form as FormProto } from '@devvit/protos/json/devvit/ui/form_builder/v1alpha/form.js';
 import {
   type Toast as ToastProto,
@@ -84,6 +88,27 @@ export class UIClient implements _UIClient {
       showToast: {
         toast,
       },
+    });
+  }
+
+  /**
+   * Emits the unhydrated show web view intent for a Devvit Web
+   * `UiResponse.showWebView`. Don't call this directly.
+   *
+   * @internal
+   */
+  showWebViewInternal(entrypointName: string, presentation: 'fullscreen' | 'modal'): void {
+    const showWebView: ShowWebViewEffect = {
+      intent: { entrypointName },
+      presentation:
+        presentation === 'fullscreen'
+          ? ShowWebViewEffect_Presentation.FULLSCREEN
+          : ShowWebViewEffect_Presentation.MODAL,
+    };
+
+    this.#effects.push({
+      type: EffectType.EFFECT_SHOW_WEB_VIEW,
+      showWebView,
     });
   }
 

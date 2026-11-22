@@ -794,7 +794,7 @@ export class RedisPluginMock implements RedisAPI {
     const key = this._makeKey(request.key, request.scope);
     const storedData = await this._store.conn.getBuffer(key);
     const expiresAt = storedData == null ? -2 : await this._store.conn.pexpiretime(key);
-    let data = storedData == null ? Buffer.alloc(0) : Buffer.from(storedData);
+    let data: Buffer = storedData == null ? Buffer.alloc(0) : Buffer.from(storedData);
     let overflowBehavior = BitfieldOverflowBehavior.BITFIELD_OVERFLOW_BEHAVIOR_WRAP;
     const results: (number | null)[] = [];
     let changed = false;

@@ -220,4 +220,7 @@ const nutritionCategoryToString: Readonly<Record<NutritionCategory, string>> = {
   [NutritionCategory.WEBVIEW]: 'Embed webapps to display rich content.',
   [NutritionCategory.CUSTOM_POST]: 'Can create a custom post.',
   [NutritionCategory.USER_ACTIONS]: 'Can invoke Reddit APIs on behalf of the user.',
+  [NutritionCategory.BYPASS_INTERSTITIAL]:
+    'Can navigate the user to external URLs without prompting.',
+  [NutritionCategory.USER_HIDDEN_FROM_CONTEXT]: '*Cannot* see the identity of the user.',
 };

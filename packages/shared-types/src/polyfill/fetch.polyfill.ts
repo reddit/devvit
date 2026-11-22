@@ -64,10 +64,10 @@ globalThis.fetch = async function fetch(
     },
   });
 
-  let body: Uint8Array | undefined = pluginResponse.body;
-  if (pluginResponse.status === 204 || pluginResponse.status === 304) {
-    body = undefined;
-  }
+  const body =
+    pluginResponse.status === 204 || pluginResponse.status === 304
+      ? undefined
+      : new Uint8Array(pluginResponse.body);
 
   const rsp = new Response(body, {
     headers: pluginResponse.headers,

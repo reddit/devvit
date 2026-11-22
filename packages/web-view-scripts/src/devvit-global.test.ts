@@ -13,7 +13,7 @@ import {
 } from '@devvit/protos/json/reddit/devvit/app_permission/v1/app_permission.js';
 import type { DevvitGlobal } from '@devvit/shared-types/client/devvit-global.js';
 import { noWebbitToken } from '@devvit/shared-types/webbit.js';
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import {
   contextFromRequestContext,
@@ -71,6 +71,87 @@ describe('getBridgeContext()', () => {
 });
 
 describe('contextFromRequestContext()', () => {
+  afterEach(() => {
+    delete (globalThis as { devvit?: DevvitGlobal }).devvit;
+  });
+
+  const surfaceContext: RequestContext = {
+    installation: { id: 'de771700-7d2f-4d54-8c8b-1f38b0d3c603' },
+    app: { id: 'app123', name: 'test-app', slug: 'test-app', version: '1.0.0', status: 1 },
+    source: RequestSource.USER_WEBBIT,
+  };
+
+  test('supports installation surfaces without post or subreddit context', () => {
+    expect(contextFromRequestContext(surfaceContext, undefined, undefined)).toEqual({
+      appName: 'test-app',
+      appSlug: 'test-app',
+      appVersion: '1.0.0',
+      client: undefined,
+      commentId: undefined,
+      loid: undefined,
+      postAuthorId: undefined,
+      postData: undefined,
+      postId: undefined,
+      snoovatar: undefined,
+      subredditId: undefined,
+      subredditName: undefined,
+      userId: undefined,
+      username: undefined,
+    });
+  });
+
+  test('preserves subreddit context when provided for a surface', () => {
+    const context = contextFromRequestContext(
+      {
+        ...surfaceContext,
+        subreddit: { id: 't5_123', name: 'testSubreddit' },
+      },
+      undefined,
+      undefined
+    );
+    expect(context.subredditId).toBe('t5_123');
+    expect(context.subredditName).toBe('testSubreddit');
+  });
+
+  test.each([
+    {
+      context: { ...surfaceContext, installation: undefined },
+      error: 'no RequestContext.post or RequestContext.installation.id',
+    },
+    {
+      context: { ...surfaceContext, installation: { id: '' } },
+      error: 'no RequestContext.post or RequestContext.installation.id',
+    },
+    { context: { ...surfaceContext, app: undefined }, error: 'no RequestContext.app' },
+    {
+      context: { ...surfaceContext, post: { id: 't3_post', author: 't2_author' } },
+      error: 'no RequestContext.subreddit',
+    },
+  ])('rejects incomplete surface context: $error', ({ context, error }) => {
+    expect(() => contextFromRequestContext(context, undefined, undefined)).toThrow(error);
+  });
+
+  test('bootstraps an installation surface from its signed context', () => {
+    const payload = btoa(JSON.stringify({ devvit: surfaceContext }));
+    const token = `header.${payload}.signature`;
+    const bridge: BridgeContext = {
+      client: Client.SHREDDIT,
+      devvitDebug: '',
+      signedRequestContext: token,
+      webbitToken: '',
+      webViewClientData: {
+        appConfig: { entrypoints: { default: 'https://app.example.com/index.html' } },
+      },
+    };
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, { name: JSON.stringify(bridge) });
+    expect(devvit.context.postId).toBeUndefined();
+    expect(devvit.context.appSlug).toBe('test-app');
+    expect(devvit.context.subredditId).toBeUndefined();
+    expect(devvit.context.subredditName).toBeUndefined();
+    expect(devvit.token).toBe(token);
+    expect(devvit.entrypoints).toEqual(bridge.webViewClientData?.appConfig.entrypoints);
+  });
+
   test('creates context from request context', () => {
     const reqCtx: RequestContext = {
       app: {
@@ -102,6 +183,7 @@ describe('contextFromRequestContext()', () => {
         "appSlug": "test-app-123",
         "appVersion": "1.0.0",
         "client": undefined,
+        "clientData": undefined,
         "commentId": undefined,
         "loid": "NAntSOVzPGlf5ge0Z0UbDAz-5-r22CdusQb4f9Rfaws",
         "postAuthorId": "t2_400",
@@ -355,6 +437,7 @@ describe('initContext()', () => {
         "appSlug": "test-app-slug",
         "appVersion": "1.2.3",
         "client": undefined,
+        "clientData": undefined,
         "commentId": undefined,
         "loid": "loid-from-jwt-snake",
         "postAuthorId": "t2_400",
@@ -394,6 +477,7 @@ describe('initContext()', () => {
         "appSlug": "fromJwt",
         "appVersion": "2.0.0",
         "client": undefined,
+        "clientData": undefined,
         "commentId": undefined,
         "loid": undefined,
         "postAuthorId": "t2_400",
@@ -753,5 +837,157 @@ describe('updateConsentStatus()', () => {
     (globalThis as { devvit: DevvitGlobal }).devvit.appPermissionState = undefined;
     updateConsentStatus(ConsentStatus.REVOKED);
     expect(globalThis.devvit.appPermissionState).toBeUndefined();
+  });
+});
+
+describe('launch timestamp', () => {
+  const clients = [
+    Client.SHREDDIT,
+    Client.ANDROID,
+    Client.IOS,
+    Client.CLIENT_UNSPECIFIED,
+    undefined,
+    99,
+  ];
+  const makeBridge = (): BridgeContext & { futureField: { enabled: boolean } } => ({
+    client: Client.SHREDDIT,
+    devvitDebug: 'debug-data',
+    startTime: 1000,
+    signedRequestContext: `header.${btoa(
+      JSON.stringify({
+        devvit: {
+          app: { id: 'app-id', name: 'test-app', slug: 'test-app', version: '1.0.0' },
+          installation: { id: 'installation-id' },
+        },
+      })
+    )}.signature`,
+    webbitToken: noWebbitToken,
+    postData: { developerData: { score: 42 } },
+    shareParam: { userData: 'shared-data', path: '', params: {}, hash: '' },
+    webViewClientData: {
+      appConfig: { entrypoints: { default: 'https://app.example/index.html' } },
+      featureConfig: { experiments: { example: 'enabled' } },
+    },
+    appPermissionState: {
+      consentStatus: ConsentStatus.GRANTED,
+      grantedScopes: [],
+      requestedScopes: [],
+    },
+    viewMode: WebViewImmersiveMode.INLINE_MODE,
+    futureField: { enabled: true },
+  });
+
+  afterEach(() => {
+    delete (globalThis as { devvit?: DevvitGlobal }).devvit;
+  });
+
+  test.each(clients)(
+    'consumes the launch timestamp once and preserves other fields (client: %s)',
+    (client) => {
+      vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
+        { type: 'navigate' } as PerformanceNavigationTiming,
+      ]);
+      const bridge = { ...makeBridge(), client };
+      const window = { name: JSON.stringify(bridge) };
+      const { startTime, ...persistedContext } = getBridgeContext(window.name, '');
+
+      initDevvitGlobal({ currentScript: null }, { hash: '' }, window);
+
+      expect(devvit.startTime).toBe(startTime);
+      expect(devvit.token).toBe(bridge.signedRequestContext);
+      expect(getBridgeContext(window.name, '')).toStrictEqual(persistedContext);
+
+      initDevvitGlobal({ currentScript: null }, { hash: '' }, window);
+
+      expect(devvit.startTime).toBeUndefined();
+      expect(getBridgeContext(window.name, '')).toStrictEqual(persistedContext);
+    }
+  );
+
+  test('preserves the first launch time when navigation timing is unavailable', () => {
+    vi.spyOn(performance, 'getEntriesByType').mockReturnValue([]);
+    const window = { name: JSON.stringify(makeBridge()) };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, window);
+
+    expect(devvit.startTime).toBe(1000);
+    expect(getBridgeContext(window.name, '').startTime).toBeUndefined();
+  });
+
+  test.each(clients)(
+    'does not reuse launch time on the first patched reload of an older document (client: %s)',
+    (client) => {
+      vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
+        { type: 'reload' } as PerformanceNavigationTiming,
+      ]);
+      const window = { name: JSON.stringify({ ...makeBridge(), client }) };
+
+      initDevvitGlobal({ currentScript: null }, { hash: '' }, window);
+
+      expect(devvit.startTime).toBeUndefined();
+      expect(devvit.context.appSlug).toBe('test-app');
+      expect(getBridgeContext(window.name, '').startTime).toBeUndefined();
+    }
+  );
+
+  test('does not reuse launch time across repeated document bootstraps', () => {
+    const window = { name: JSON.stringify(makeBridge()) };
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, window);
+    const { startTime, ...initialGlobal } = devvit;
+    expect(startTime).toBe(1000);
+
+    for (let document = 0; document < 2; document++) {
+      initDevvitGlobal({ currentScript: null }, { hash: '' }, window);
+
+      expect(devvit).toStrictEqual({ ...initialGlobal, startTime: undefined });
+    }
+  });
+
+  test('accepts a fresh launch timestamp supplied for a new iframe', () => {
+    const firstWindow = { name: JSON.stringify(makeBridge()) };
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, firstWindow);
+    const nextWindow = { name: JSON.stringify({ ...makeBridge(), startTime: 2000 }) };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, nextWindow);
+
+    expect(devvit.startTime).toBe(2000);
+    expect(getBridgeContext(nextWindow.name, '').startTime).toBeUndefined();
+  });
+
+  test('leaves hash context transport unchanged', () => {
+    vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
+      { type: 'reload' } as PerformanceNavigationTiming,
+    ]);
+    const location = { hash: `#${encodeURIComponent(JSON.stringify(makeBridge()))}` };
+    const originalHash = location.hash;
+    const window = { name: '' };
+
+    initDevvitGlobal({ currentScript: null }, location, window);
+    initDevvitGlobal({ currentScript: null }, location, window);
+
+    expect(window.name).toBe('');
+    expect(location.hash).toBe(originalHash);
+    expect(devvit.startTime).toBe(1000);
+  });
+
+  test('does not rewrite a context without a launch timestamp', () => {
+    const name = JSON.stringify({ ...makeBridge(), startTime: undefined }, null, 2);
+    const window = { name };
+
+    initDevvitGlobal({ currentScript: null }, { hash: '' }, window);
+
+    expect(window.name).toBe(name);
+    expect(devvit.startTime).toBeUndefined();
+  });
+
+  test('preserves launch time when context initialization fails', () => {
+    const name = JSON.stringify({ ...makeBridge(), signedRequestContext: 'invalid' });
+    const window = { name };
+
+    expect(() => initDevvitGlobal({ currentScript: null }, { hash: '' }, window)).toThrow(
+      'token decode failure'
+    );
+
+    expect(window.name).toBe(name);
   });
 });

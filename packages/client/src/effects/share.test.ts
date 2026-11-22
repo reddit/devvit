@@ -88,4 +88,19 @@ describe('showShareSheet', () => {
       },
     });
   });
+
+  it('requires an explicit post when sharing from an installation surface', async () => {
+    globalThis.devvit = { ...mockDevvit, context: { ...mockDevvit.context, postId: undefined } };
+    await expect(showShareSheet({})).rejects.toThrow(
+      'A post must be specified when sharing outside a post'
+    );
+    expect(emitEffect).not.toHaveBeenCalled();
+
+    await showShareSheet({ post: 't3_shared' });
+    expect(emitEffect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        share: expect.objectContaining({ url: 'https://reddit.com/r/_/comments/shared' }),
+      })
+    );
+  });
 });

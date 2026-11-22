@@ -228,12 +228,12 @@ function overwriteDependencies(
   );
 
   for (const [depName, version] of dependenciesWeManage) {
-    const newSemVer = getTargetSemVer(devvitVersion, depName);
+    const { targetSemVer, targetDepString } = getTargetSemVer(devvitVersion, depName);
 
-    if (isDevvitDependency(depName) || forceUpdate || needsSync(version, newSemVer)) {
+    if (isDevvitDependency(depName) || forceUpdate || needsSync(version, targetSemVer)) {
       // If this is an @devvit dependency, or we're forcing an update, or the version needs to be
       // updated, update the version.
-      dependencies![depName] = newSemVer.version;
+      dependencies![depName] = targetDepString;
     }
   }
 }
@@ -269,9 +269,9 @@ function makeDepsSubtree(
   for (const [dep, v] of Object.entries(dependencies)) {
     if (isDependencyManagedByDevvit(dep)) {
       // For most dependencies, we want to target the version of devvit that the CLI is using
-      const targetSemVer = getTargetSemVer(devvitVersion, dep);
+      const { targetSemVer, targetDepString } = getTargetSemVer(devvitVersion, dep);
 
-      if (v === targetSemVer.version) {
+      if (v === targetDepString) {
         continue;
       }
 
@@ -280,10 +280,10 @@ function makeDepsSubtree(
 
         if (!vAsSemver) {
           // version was a range that's not parsable
-          tree.insert(`${dep} (${chalk.gray(v)}) -> (${chalk.green(targetSemVer)})`);
+          tree.insert(`${dep} (${chalk.gray(v)}) -> (${chalk.green(targetDepString)})`);
         } else {
           const warnColor = semver.gt(vAsSemver, targetSemVer) ? chalk.red : chalk.yellow;
-          tree.insert(`${dep} (${warnColor(vAsSemver)}) -> (${chalk.green(targetSemVer)})`);
+          tree.insert(`${dep} (${warnColor(vAsSemver)}) -> (${chalk.green(targetDepString)})`);
         }
       }
     }
@@ -291,16 +291,32 @@ function makeDepsSubtree(
   return tree;
 }
 
-function getTargetSemVer(devvitVersion: SemVer, dep: string): SemVer {
+function getTargetSemVer(
+  devvitVersion: SemVer,
+  dep: string
+): {
+  /** The SemVer for the dependency that we're targeting */
+  targetSemVer: SemVer;
+  /** The string to set the dependency to in package.json; this _may_ be an "npm:..." string */
+  targetDepString: string;
+} {
   // For `@devvit` dependencies, we want to target the version of devvit that the CLI is using
   if (isDevvitDependency(dep)) {
-    return devvitVersion;
+    return { targetSemVer: devvitVersion, targetDepString: devvitVersion.version };
   }
 
   // But this is a managed dependency that isn't a devvit one - target the version that the CLI is using
-  const parsedSemVer = semver.parse(
-    cliPackageJSON.dependencies[dep] ?? cliPackageJSON.devDependencies[dep]
-  );
+  const unparsedSemVer = cliPackageJSON.dependencies[dep] ?? cliPackageJSON.devDependencies[dep];
+  let parsedSemVer = semver.parse(unparsedSemVer);
+  if (!parsedSemVer) {
+    // This might be an `npm:` URL; if so, take whatever's after the `@`
+    const parsedNpmUrl = unparsedSemVer.match(/npm:(.*)@(.*)/);
+    if (parsedNpmUrl) {
+      parsedSemVer = semver.parse(parsedNpmUrl[2])!;
+    }
+  }
+
+  // If there still isn't a parsed semver, throw an error
   if (!parsedSemVer) {
     throw new Error(
       "Couldn't find the CLI's dependency for " +
@@ -308,5 +324,6 @@ function getTargetSemVer(devvitVersion: SemVer, dep: string): SemVer {
         " in `@devvit/cli`'s package.json - this should never happen, tell a Reddit dev!"
     );
   }
-  return parsedSemVer;
+
+  return { targetSemVer: parsedSemVer, targetDepString: unparsedSemVer };
 }

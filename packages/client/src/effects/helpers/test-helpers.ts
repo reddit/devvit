@@ -6,6 +6,7 @@ import { noWebbitToken } from '@devvit/shared-types/webbit.js';
 // Devvit mocks
 
 export const mockDevvit: Readonly<DevvitGlobal> = {
+  analytics: undefined,
   appPermissionState: undefined,
   dependencies: { client: undefined, webViewScripts: { hash: 'abc', version: '1.2.3' } },
   entrypoints: {},

@@ -1,6 +1,6 @@
 {
   "name": "create-devvit",
-  "version": "0.15.0",
+  "version": "0.15.4",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -26,17 +26,18 @@
     "prepublishOnly": "publish-package-json",
     "test": "yarn test:unit && yarn test:types && yarn lint",
     "test:types": "tsc --noEmit",
-    "test:unit": "vitest run",
-    "test:unit-with-coverage": "vitest run --coverage"
+    "test:unit": "vitest run --passWithNoTests",
+    "test:unit-with-coverage": "vitest run --coverage --passWithNoTests"
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/cli": "0.15.0"
+    "@devvit/cli": "0.15.4"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.15.0",
+    "@devvit/tsconfig": "0.15.4",
+    "@typescript/native": "npm:typescript@7.0.2",
     "eslint": "9.11.1",
-    "typescript": "5.8.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.0"
   },
   "source": "./src/index.ts"

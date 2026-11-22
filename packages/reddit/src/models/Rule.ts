@@ -18,9 +18,14 @@ function isKind(value: string | undefined): value is 'all' | 'link' | 'comment' 
 /**
  * Options for creating a new subreddit rule.
  */
-export type CreateRuleOptions = Omit<AddSubredditRuleRequest, 'r' | 'kind' | 'violationReason'> & {
+export type CreateRuleOptions = Omit<
+  AddSubredditRuleRequest,
+  'r' | 'kind' | 'violationReason' | 'description'
+> & {
   kind: 'all' | 'link' | 'comment';
   violationReason?: string;
+  /** The description of the rule. Defaults to an empty string. */
+  description?: string;
 };
 
 /**
@@ -37,27 +42,25 @@ export class Rule {
   #violationReason: string;
   #priority: number;
   #createdUtc: number;
-  #descriptionHtml: string | undefined;
+  #descriptionHtml: string;
   #subredditName: string;
 
   constructor(ruleData: SubredditRuleProto, subredditName: string) {
     makeGettersEnumerable(this);
 
     const shortName = ruleData.shortName;
-    const description = ruleData.description;
+    const description = ruleData.description ?? '';
     const priority = ruleData.priority;
     const createdUtc = ruleData.createdUtc;
-    const descriptionHtml = ruleData.descriptionHtml;
+    const descriptionHtml = ruleData.descriptionHtml ?? '';
 
     if (!isKind(ruleData.kind)) {
       throw new Error(`Invalid kind: ${ruleData.kind}`);
     }
 
     assertNonNull(shortName, 'Subreddit rule is missing shortName');
-    assertNonNull(description, 'Subreddit rule is missing description');
     assertNonNull(priority, 'Subreddit rule is missing priority');
     assertNonNull(createdUtc, 'Subreddit rule is missing createdUtc');
-    assertNonNull(descriptionHtml, 'Subreddit rule is missing descriptionHtml');
 
     this.#shortName = shortName;
     this.#description = description;
@@ -78,6 +81,7 @@ export class Rule {
 
   /**
    * The full description of the rule. This appears on your subreddit's sidebar.
+   * Defaults to an empty string when no description is provided.
    */
   get description(): string {
     return this.#description;
@@ -111,7 +115,10 @@ export class Rule {
     return this.#createdUtc;
   }
 
-  get descriptionHtml(): string | undefined {
+  /**
+   * The HTML description of the rule, or an empty string when none is provided.
+   */
+  get descriptionHtml(): string {
     return this.#descriptionHtml;
   }
 
@@ -194,16 +201,13 @@ export class Rule {
     if (options.shortName === '') {
       throw new Error('Short name cannot be empty');
     }
-    if (options.description === '') {
-      throw new Error('Description cannot be empty');
-    }
 
     const client = getRedditApiPlugins().Subreddits;
 
     await client.AddSubredditRule(
       {
         r: subredditName,
-        description: options.description,
+        description: options.description ?? '',
         kind: options.kind,
         shortName: options.shortName,
         violationReason: options.violationReason ?? '',

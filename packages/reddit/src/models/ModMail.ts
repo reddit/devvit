@@ -1073,9 +1073,12 @@ export class ModMailService {
   }
 
   /**
-   * Returns recent posts, comments and modmail conversations for a given user.
+   * Returns account and moderation information for the user participant of a modmail
+   * conversation, including their recent posts, comments, and modmail conversations
+   * in the same subreddit.
    *
-   * @param conversationId Id of a modmail conversation
+   * @param conversationId ID of a modmail conversation with a user participant.
+   * @throws If the conversation does not have a user participant.
    *
    * @example
    * ```ts

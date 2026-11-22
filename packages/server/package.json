@@ -1,6 +1,6 @@
 {
   "name": "@devvit/server",
-  "version": "0.15.0",
+  "version": "0.15.4",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -30,15 +30,16 @@
     "test:unit-with-coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@devvit/protos": "0.15.0",
-    "@devvit/shared": "0.15.0",
-    "@devvit/shared-types": "0.15.0"
+    "@devvit/protos": "0.15.4",
+    "@devvit/shared": "0.15.4",
+    "@devvit/shared-types": "0.15.4"
   },
   "devDependencies": {
-    "@devvit/tsconfig": "0.15.0",
+    "@devvit/tsconfig": "0.15.4",
     "@types/node": "24.13.3",
+    "@typescript/native": "npm:typescript@7.0.2",
     "eslint": "9.11.1",
-    "typescript": "5.8.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.0"
   },
   "publishConfig": {
