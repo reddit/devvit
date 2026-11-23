@@ -37,6 +37,7 @@
     "@devvit/protos": "0.15.4",
     "@devvit/shared": "0.15.4",
     "@devvit/shared-types": "0.15.4",
+    "@sentry/browser": "11.11.0",
     "html-to-image": "1.11.13",
     "jwt-decode": "4.0.0",
     "web-vitals": "4.2.4"
@@ -66,8 +67,8 @@
       "none": "13 kb"
     },
     "dist/scripts/errors.v1.min.js": {
-      "gzip": "1 kb",
-      "none": "1 kb"
+      "gzip": "22 kb",
+      "none": "60 kb"
     }
   },
   "source": "./src/index.ts"
