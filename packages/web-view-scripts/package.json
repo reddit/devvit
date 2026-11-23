@@ -1,6 +1,6 @@
 {
   "name": "@devvit/web-view-scripts",
-  "version": "0.15.4",
+  "version": "0.15.6",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
@@ -34,9 +34,9 @@
   },
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@devvit/protos": "0.15.4",
-    "@devvit/shared": "0.15.4",
-    "@devvit/shared-types": "0.15.4",
+    "@devvit/protos": "0.15.6",
+    "@devvit/shared": "0.15.6",
+    "@devvit/shared-types": "0.15.6",
     "@sentry/browser": "11.11.0",
     "html-to-image": "1.11.13",
     "jwt-decode": "4.0.0",
@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@ampproject/filesize": "4.3.0",
-    "@devvit/tsconfig": "0.15.4",
+    "@devvit/tsconfig": "0.15.6",
     "@types/jsdom": "21.1.7",
     "@types/node": "24.13.3",
     "@typescript/native": "npm:typescript@7.0.2",

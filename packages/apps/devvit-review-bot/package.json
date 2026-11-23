@@ -18,12 +18,12 @@
     "watch": "npm run build -- --watch=forever"
   },
   "dependencies": {
-    "@devvit/web": "0.15.4"
+    "@devvit/web": "0.15.6"
   },
   "devDependencies": {
     "@types/node": "24.13.3",
     "@typescript/native": "npm:typescript@7.0.2",
-    "devvit": "0.15.5-dev",
+    "devvit": "0.15.7-dev",
     "esbuild": "0.25.9",
     "typescript": "npm:@typescript/typescript6@6.0.2"
   },
