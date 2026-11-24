@@ -20,12 +20,19 @@
     "subreddit": "devvit_review_bo_dev3"
   },
   "settings": {
+    "global": {
+      "mod-allowlist": {
+        "type": "string",
+        "label": "Protected moderators",
+        "helpText": "Comma-separated list (CSV) of usernames that the bot will not unmod."
+      }
+    },
     "subreddit": {
       "max-age-ms": {
         "type": "number",
         "label": "Maximum age (milliseconds)",
         "helpText": "Maximum post age and moderator tenure. Must be greater than zero. Posts by non-moderators are removed immediately.",
-        "defaultValue": 3600000
+        "defaultValue": 1800000
       }
     }
   }

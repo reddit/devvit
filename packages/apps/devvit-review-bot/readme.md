@@ -6,8 +6,12 @@ than the configured maximum age. It also unmods accounts whose moderator tenure
 exceeds that age, except for protected accounts.
 
 Set `max-age-ms` in the app's subreddit settings to change the maximum age in
-milliseconds (default: `3600000`, one hour). The value must be greater than zero.
+milliseconds (default: `1800000`, 30 minutes). The value must be greater than zero.
 Posts by non-moderators are always removed immediately.
+
+Run `devvit settings set mod-allowlist` to configure a comma-separated list
+of moderator usernames that should never be unmodded. This setting applies to
+all installations of the app.
 
 ## Commands
 

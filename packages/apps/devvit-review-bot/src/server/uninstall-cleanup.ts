@@ -5,32 +5,32 @@ import type { OnCronUninstallCleanupRsp } from '../shared/api.ts';
 const RUN_BUDGET_MS: number = 20_000;
 const PAGE_SIZE: number = 100;
 
-// We can't unmod mods that came before but no sense polluting the logs trying.
-const EXCLUDED_ACCOUNTS = new Set([
-  'devvit-dev-bot',
-  'devvit-review-bot',
-  'devvit-reviewer',
-  'stephenoid',
-  'snoosnek',
-  'slowcooked99',
-]);
-
 /** Removes orphaned posts, old posts, and old moderator relationships. */
 export async function onCronUninstallCleanup(): Promise<TaskResponse & OnCronUninstallCleanupRsp> {
   const now = Date.now();
   const deadline = now + RUN_BUDGET_MS;
-  const maxAgeMs = (await settings.get<number>('max-age-ms')) ?? 60 * 60 * 1000;
+  const maxAgeMs = (await settings.get<number>('max-age-ms')) ?? 30 * 60 * 1000;
   if (!Number.isFinite(maxAgeMs) || maxAgeMs <= 0) {
     throw new Error('max-age-ms must be a positive finite number');
   }
+  const allowedMods = new Set(
+    ((await settings.get<string>('mod-allowlist')) ?? '')
+      .split(',')
+      .map((username) => username.trim().toLowerCase())
+      .filter(Boolean)
+  );
   const cutoff = now - maxAgeMs;
-  await cleanupMods(cutoff, deadline);
+  await cleanupMods(cutoff, deadline, allowedMods);
   await cleanupPosts(cutoff, deadline);
   return {};
 }
 
 /** Unmods eligible accounts added before the cutoff. */
-async function cleanupMods(cutoff: number, deadline: number): Promise<void> {
+async function cleanupMods(
+  cutoff: number,
+  deadline: number,
+  allowedMods: Set<string>
+): Promise<void> {
   const subredditName = ctx.subredditName;
   const appSlug = ctx.appSlug.toLowerCase();
   const mods = await reddit.getModerators({ subredditName }).all();
@@ -38,7 +38,7 @@ async function cleanupMods(cutoff: number, deadline: number): Promise<void> {
   for (const mod of mods) {
     if (Date.now() >= deadline) return;
     const username = mod.username.toLowerCase();
-    if (EXCLUDED_ACCOUNTS.has(username) || username === appSlug) continue;
+    if (allowedMods.has(username) || username === appSlug) continue;
     if (!(mod.date.getTime() < cutoff)) continue;
     try {
       await reddit.removeModerator(mod.username, subredditName);

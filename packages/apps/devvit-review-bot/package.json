@@ -2,7 +2,7 @@
   "private": true,
   "name": "devvit-review-bot",
   "version": "0.0.0",
-  "description": "Removes posts older than one hour from the Devvit review subreddit.",
+  "description": "Removes posts older than 30 minutes from the Devvit review subreddit.",
   "license": "BSD-3-Clause",
   "type": "module",
   "scripts": {

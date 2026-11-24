@@ -14,17 +14,17 @@ import {
 
 import { onCronUninstallCleanup } from './uninstall-cleanup.ts';
 
-const HOUR_MS = 60 * 60 * 1000;
+const HALF_HOUR_MS = 30 * 60 * 1000;
 
 type ReviewPost = Pick<Post, 'id' | 'authorName' | 'createdAt' | 'removed' | 'remove'>;
 type ReviewModerator = Pick<SubredditModeratorUser, 'username' | 'date' | 'createdAt'>;
 
-test('removes moderator posts only after one hour', async (t) => {
+test('removes moderator posts only after 30 minutes', async (t) => {
   const fix = fixture(t);
   fix.addModerator({ username: 'devvit-reviewer' });
   const old = fix.addPost();
-  fix.addPost({ createdAt: new Date(fix.now - HOUR_MS) });
-  fix.addPost({ createdAt: new Date(fix.now - HOUR_MS + 1) });
+  fix.addPost({ createdAt: new Date(fix.now - HALF_HOUR_MS) });
+  fix.addPost({ createdAt: new Date(fix.now - HALF_HOUR_MS + 1) });
   await fix.run();
   assert.deepEqual(fix.removed, [old.id]);
 });
@@ -38,22 +38,26 @@ test('removes recent non-moderator posts and preserves current moderators regard
   assert.deepEqual(fix.removed, [orphan.id]);
 });
 
-test('uses moderator tenure rather than account age for the one-hour cutoff', async (t) => {
+test('uses moderator tenure rather than account age for the 30-minute cutoff', async (t) => {
   const fix = fixture(t);
   const old = fix.addModerator();
-  fix.addModerator({ date: new Date(fix.now - HOUR_MS) });
-  fix.addModerator({ date: new Date(fix.now - HOUR_MS + 1) });
+  fix.addModerator({ date: new Date(fix.now - HALF_HOUR_MS) });
+  fix.addModerator({ date: new Date(fix.now - HALF_HOUR_MS + 1) });
   await fix.run();
   assert.deepEqual(fix.unmodded, [old.username]);
 });
 
 test('uses the configured maximum age for posts and moderators while removing orphaned posts immediately', async (t) => {
   const fix = fixture(t);
-  t.mock.method(settings, 'get', async () => 2 * HOUR_MS);
+  t.mock.method(settings, 'get', async (name: string) => {
+    if (name === 'max-age-ms') return 2 * HALF_HOUR_MS;
+    assert.equal(name, 'mod-allowlist');
+    return 'devvit-reviewer';
+  });
   fix.addModerator({ username: 'devvit-reviewer' });
-  const oldMod = fix.addModerator({ date: new Date(fix.now - 2 * HOUR_MS - 1) });
+  const oldMod = fix.addModerator({ date: new Date(fix.now - 2 * HALF_HOUR_MS - 1) });
   fix.addModerator();
-  const oldPost = fix.addPost({ createdAt: new Date(fix.now - 2 * HOUR_MS - 1) });
+  const oldPost = fix.addPost({ createdAt: new Date(fix.now - 2 * HALF_HOUR_MS - 1) });
   fix.addPost();
   const orphan = fix.addPost({ authorName: 'uninstalled-app', createdAt: new Date(fix.now) });
   await fix.run();
@@ -140,7 +144,7 @@ test('uses a fixed age cutoff for each run', async (t) => {
   const fix = fixture(t);
   fix.addModerator({ username: 'devvit-reviewer' });
   const first = fix.addPost();
-  fix.addPost({ createdAt: new Date(fix.now - HOUR_MS + 1000) });
+  fix.addPost({ createdAt: new Date(fix.now - HALF_HOUR_MS + 1000) });
   const remove = first.remove;
   t.mock.method(first, 'remove', async (isSpam?: boolean) => {
     await remove(isSpam);
@@ -164,23 +168,47 @@ test('unmods old moderators and logs each removal even when there are no posts',
   ]);
 });
 
-test('preserves all excluded moderators and itself regardless of case', async (t) => {
-  const fix = fixture(t);
-  fix.ctx.appSlug = 'another-app';
-  for (const username of [
-    'DEVVIT-DEV-BOT',
-    'Devvit-Reviewer',
-    'Stephenoid',
-    'SnooSnek',
-    'SlowCooked99',
-    'DEVVIT-REVIEW-BOT',
-    'ANOTHER-APP',
+test('preserves configured moderators and itself regardless of case', async (t) => {
+  for (const { name, allowlist, allowed, removed } of [
+    {
+      name: 'existing moderators',
+      allowlist:
+        'devvit-dev-bot, devvit-review-bot, devvit-reviewer, stephenoid, snoosnek, slowcooked99, RedditParadox',
+      allowed: [
+        'DEVVIT-DEV-BOT',
+        'Devvit-Reviewer',
+        'Stephenoid',
+        'SnooSnek',
+        'SlowCooked99',
+        'REDDITPARADOX',
+        'DEVVIT-REVIEW-BOT',
+      ],
+      removed: [],
+    },
+    {
+      name: 'custom moderators with whitespace and empty entries',
+      allowlist: ' , NEW-MOD,\tAnother-Mod ,new-mod, ',
+      allowed: ['new-mod', 'ANOTHER-MOD'],
+      removed: ['Stephenoid'],
+    },
+    { name: 'empty allowlist', allowlist: '', allowed: [], removed: ['Stephenoid'] },
   ]) {
-    fix.addModerator({ username });
+    await t.test(name, async (t) => {
+      const fix = fixture(t);
+      t.mock.method(settings, 'get', async (name: string) => {
+        if (name === 'max-age-ms') return undefined;
+        assert.equal(name, 'mod-allowlist');
+        return allowlist;
+      });
+      fix.ctx.appSlug = 'another-app';
+      for (const username of [...allowed, ...removed, 'ANOTHER-APP']) {
+        fix.addModerator({ username });
+      }
+      const eligible = fix.addModerator();
+      await fix.run();
+      assert.deepEqual(fix.unmodded, [...removed, eligible.username]);
+    });
   }
-  const eligible = fix.addModerator();
-  await fix.run();
-  assert.deepEqual(fix.unmodded, [eligible.username]);
 });
 
 test('preserves a moderator with an invalid relationship date', async (t) => {
@@ -238,15 +266,16 @@ function fixture(t: TestContext) {
   const failures = new Set<string>();
   const errors: unknown[] = [];
   const logs: string[] = [];
-  let clock = 2 * HOUR_MS;
+  let clock = 2 * HALF_HOUR_MS;
   const ctx = Context({
     'devvit-app': 'devvit-review-bot',
     'devvit-subreddit': 't5_test',
     'devvit-subreddit-name': 'devvit_review',
   });
   t.mock.method(settings, 'get', async (name: string) => {
-    assert.equal(name, 'max-age-ms');
-    return undefined;
+    if (name === 'max-age-ms') return undefined;
+    assert.equal(name, 'mod-allowlist');
+    return 'devvit-dev-bot, devvit-review-bot, devvit-reviewer, stephenoid, snoosnek, slowcooked99, RedditParadox';
   });
   t.mock.method(Date, 'now', () => clock);
   t.mock.method(console, 'error', (...args: unknown[]) => errors.push(args));
@@ -278,7 +307,7 @@ function fixture(t: TestContext) {
   const addModerator = (overrides: Partial<ReviewModerator> = {}): ReviewModerator => {
     const mod: ReviewModerator = {
       username: `review-app-${moderators.length}`,
-      date: new Date(clock - HOUR_MS - 1),
+      date: new Date(clock - HALF_HOUR_MS - 1),
       createdAt: new Date(0),
       ...overrides,
     };
@@ -291,7 +320,7 @@ function fixture(t: TestContext) {
     const post: ReviewPost = {
       id: `t3_${posts.length}`,
       authorName: 'devvit-reviewer',
-      createdAt: new Date(clock - HOUR_MS - 1),
+      createdAt: new Date(clock - HALF_HOUR_MS - 1),
       get removed() {
         return isRemoved;
       },

@@ -13,7 +13,7 @@ const sentryKey = 'ff215671c03739e27b47341a0502c369'; // Public client key for d
 const errorTrackingHost = 'error-tracking.reddit.com';
 const envelopeUrl = `https://${errorTrackingHost}/devvit/api/devvit-app/envelope/?sentry_key=${sentryKey}&sentry_version=7`;
 const maxErrorMessageLength = 1_000;
-const sampleRate = 10_000;
+const sampleRate = 1_000;
 
 const client = new BrowserClient({
   // The SDK requires a numeric project ID. The transport uses the actual project slug.

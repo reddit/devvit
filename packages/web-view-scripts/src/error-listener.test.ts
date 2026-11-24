@@ -153,9 +153,9 @@ it('honors Sentry event processors that filter reports before beforeSend', async
 
 it.each([
   { random: 0, sampled: true },
-  { random: 0.00009999, sampled: true },
-  { random: 0.0001, sampled: true },
-  { random: 0.00010001, sampled: false },
+  { random: 0.00099999, sampled: true },
+  { random: 0.001, sampled: true },
+  { random: 0.00100001, sampled: false },
   { random: 0.1, sampled: false },
   { random: 0.99, sampled: false },
 ])(
