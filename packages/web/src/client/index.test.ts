@@ -1,3 +1,5 @@
+import * as idk from "./index";
+
 test('index', () => {
-  expect(true).toBe(true);
+  expect(idk).toBeDefined();
 });
